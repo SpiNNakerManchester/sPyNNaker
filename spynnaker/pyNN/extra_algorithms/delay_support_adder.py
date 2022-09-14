@@ -25,7 +25,6 @@ from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, DelayedApplicationEdge,
     DelayAfferentApplicationEdge)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spynnaker.pyNN.utilities import constants
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -37,7 +36,7 @@ def delay_support_adder():
     """
     adder = _DelaySupportAdder()
     # pylint: disable=protected-access
-    adder._run()
+    return adder._run()
 
 
 class _DelaySupportAdder(object):
@@ -50,12 +49,14 @@ class _DelaySupportAdder(object):
     __slots__ = [
         "_app_to_delay_map",
         "_delay_post_edge_map",
-        "_new_edges"]
+        "_new_edges",
+        "_new_vertices"]
 
     def __init__(self):
         self._app_to_delay_map = dict()
         self._delay_post_edge_map = dict()
         self._new_edges = list()
+        self._new_vertices = list()
 
     def _run(self):
         """ adds the delay extensions to the app graph, now that all the\
@@ -95,16 +96,7 @@ class _DelaySupportAdder(object):
                         # dest vertex
                         self._create_post_delay_edge(
                             delay_app_vertex, app_edge)
-        # avoids mutating the list of outgoing partitions. add them afterwards
-        self._add_new_app_edges()
-
-    def _add_new_app_edges(self):
-        """ adds new edges to the app graph. avoids mutating the arrays being\
-            iterated over previously.
-        :rtype: None
-        """
-        for edge in self._new_edges:
-            SpynnakerDataView.add_edge(edge, constants.SPIKE_PARTITION_ID)
+        return self._new_vertices, self._new_edges
 
     def _create_post_delay_edge(self, delay_app_vertex, app_edge):
         """ creates the edge between delay extension and post vertex. stores\
@@ -157,7 +149,7 @@ class _DelaySupportAdder(object):
 
             # set trackers
             delay_app_vertex.splitter = SplitterDelayVertexSlice()
-            SpynnakerDataView.add_vertex(delay_app_vertex)
+            self._new_vertices.append(delay_app_vertex)
             self._app_to_delay_map[app_outgoing_edge_partition] = (
                 delay_app_vertex)
 

@@ -31,8 +31,7 @@ from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractCanReset,
-    AbstractRewritesDataSpecification)
+    AbstractCanReset, AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
 from spinn_front_end_common.utilities.constants import (
@@ -99,7 +98,7 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable, AbstractNeuronRecordable,
         AbstractEventRecordable,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, AbstractAcceptsIncomingSynapses,
+        AbstractAcceptsIncomingSynapses,
         AbstractCanReset, SupportsStructure):
     """ Underlying vertex model for Neural Populations.\
         Not actually abstract.
@@ -107,8 +106,6 @@ class AbstractPopulationVertex(
 
     __slots__ = [
         "__all_single_syn_sz",
-        "__change_requires_mapping",
-        "__change_requires_data_generation",
         "__incoming_spike_buffer_size",
         "__n_atoms",
         "__n_profile_samples",
@@ -240,8 +237,6 @@ class AbstractPopulationVertex(
             {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE})
 
         # bool for if state has changed.
-        self.__change_requires_mapping = True
-        self.__change_requires_data_generation = False
         self.__has_run = False
 
         # Current sources for this vertex
@@ -342,7 +337,7 @@ class AbstractPopulationVertex(
             The new projection to add
         """
         # Reset the ring buffer shifts as a projection has been added
-        self.__change_requires_mapping = True
+        SpynnakerDataView.set_requires_mapping()
         self.__max_row_info.clear()
         # pylint: disable=protected-access
         pre_vertex = projection._projection_edge.pre_vertex
@@ -481,21 +476,6 @@ class AbstractPopulationVertex(
         """
         self.__has_run = True
 
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
-    def requires_mapping(self):
-        return self.__change_requires_mapping
-
-    @property
-    @overrides(AbstractChangableAfterRun.requires_data_generation)
-    def requires_data_generation(self):
-        return self.__change_requires_data_generation
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
-    def mark_no_changes(self):
-        self.__change_requires_mapping = False
-        self.__change_requires_data_generation = False
-
     def get_neuron_params_position(self, n_atoms):
         """ Get the position of the neuron parameters themselves within the
             neuron parameters region
@@ -619,7 +599,8 @@ class AbstractPopulationVertex(
                 variable, new_state, sampling_interval, indexes)
         else:
             self.__raise_var_not_supported(variable)
-        self.__change_requires_mapping = not self.is_recording(variable)
+        if self.is_recording(variable):
+            SpynnakerDataView.set_requires_mapping()
 
     def get_data(self, variable):
         # pylint: disable=too-many-arguments
@@ -904,7 +885,7 @@ class AbstractPopulationVertex(
 
         # If synapses change during the run,
         if self.__synapse_dynamics.changes_during_run:
-            self.__change_requires_data_generation = True
+            SpynnakerDataView.set_requires_data_generation()
             for vertex in self.machine_vertices:
                 if isinstance(vertex, AbstractRewritesDataSpecification):
                     vertex.set_reload_required(True)
