@@ -75,7 +75,7 @@ class StepCurrentSource(AbstractCurrentSource):
                     # Check length: if longer, need to remap
                     if (len(self.__amplitudes) < len(value)):
                         if self.population is not None:
-                            self.population.requires_mapping = True
+                            SpynnakerDataView.set_requires_mapping()
 
                     self.__amplitudes = value
                 self.__parameters[key] = value

@@ -57,7 +57,6 @@ class Projection(object):
     # pylint: disable=redefined-builtin
     __slots__ = [
         "__projection_edge",
-        "__requires_mapping",
         "__synapse_information",
         "__virtual_connection_list",
         "__label"]
@@ -85,7 +84,6 @@ class Projection(object):
                 "cells.".format(__version__))
 
         self.__projection_edge = None
-        self.__requires_mapping = True
         self.__label = label
 
         pre_is_view = self.__check_population(
@@ -389,19 +387,6 @@ class Projection(object):
         return "projection {}".format(self.__label)
 
     # -----------------------------------------------------------------
-
-    @property
-    def requires_mapping(self):
-        """ Whether this projection requires mapping.
-
-        :rtype: bool
-        """
-        return self.__requires_mapping
-
-    def mark_no_changes(self):
-        """ Mark this projection as not having changes to be mapped.
-        """
-        self.__requires_mapping = False
 
     @property
     def _synapse_information(self):
