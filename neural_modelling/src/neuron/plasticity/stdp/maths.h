@@ -59,7 +59,7 @@ static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     int16_lut *sdram_lut = (int16_lut *) *address;
     uint32_t size = sizeof(int16_lut) + (sdram_lut->size * sizeof(int16_t));
     int16_lut *lut = spin1_malloc(size);
-    log_info("lut size %d sdram_lut size %d", size, sdram_lut->size);
+    log_debug("lut size %d sdram_lut size %d", size, sdram_lut->size);
     if (lut == NULL) {
         log_error("Not enough space to allocate LUT.  Try reducing the timestep,"
             " the number of neurons per core, or the tau value; size = %u", size);

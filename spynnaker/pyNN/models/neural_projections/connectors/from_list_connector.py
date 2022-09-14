@@ -20,6 +20,9 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
@@ -27,7 +30,7 @@ _TARGET = 1
 _FIRST_PARAM = 2
 
 
-class FromListConnector(AbstractConnector):
+class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     """ Make connections according to a list.
     """
     __slots__ = [
@@ -262,7 +265,7 @@ class FromListConnector(AbstractConnector):
         else:
             return numpy.var(numpy.abs(self.__weights))
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
@@ -431,17 +434,22 @@ class FromListConnector(AbstractConnector):
         """
         return self.__extra_parameter_names
 
-    @overrides(AbstractConnector.could_connect)
-    def could_connect(
-            self, synapse_info, src_machine_vertex, dest_machine_vertex):
-        pre_slices = \
-            src_machine_vertex.app_vertex.splitter.get_out_going_slices()
-        post_slices = \
-            dest_machine_vertex.app_vertex.splitter.get_in_coming_slices()
+    @overrides(AbstractConnector.get_connected_vertices)
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        pre_slices = source_vertex.splitter.get_out_going_slices()
+        post_slices = target_vertex.splitter.get_in_coming_slices()
         self._split_connections(pre_slices, post_slices)
-        pre_hi = src_machine_vertex.vertex_slice.hi_atom
-        post_hi = dest_machine_vertex.vertex_slice.hi_atom
-        return (pre_hi, post_hi) in self.__split_conn_list
+
+        pre_vertices = source_vertex.splitter.get_out_going_vertices(
+            SPIKE_PARTITION_ID)
+        return [
+            (m_vert, [s_vert for s_vert in pre_vertices
+                      if (s_vert.vertex_slice.hi_atom,
+                          m_vert.vertex_slice.hi_atom) in
+                      self.__split_conn_list])
+            for m_vert in target_vertex.splitter.get_in_coming_vertices(
+                SPIKE_PARTITION_ID)
+        ]
 
     def _apply_parameters_to_synapse_type(self, synapse_type):
         """

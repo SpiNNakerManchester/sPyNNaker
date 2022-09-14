@@ -43,8 +43,9 @@ class IFCondExpCerebellum(AbstractPyNNNeuronModelStandard):
         input_type = InputTypeConductance(e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(v_thresh)
 
-        super(IFCondExpCerebellum, self).set_model_max_atoms_per_core(
-            n_atoms=MAX_ATOMS_PER_CORE)
+        super(IFCondExpCerebellum,
+              self).set_model_max_atoms_per_dimension_per_core(
+                  n_atoms=MAX_ATOMS_PER_CORE)
 
         super(IFCondExpCerebellum, self).__init__(
             model_name="IF_cond_exp_cerebellum",

@@ -26,6 +26,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neuron.builds import IFCurrExpBase
 from spynnaker.pyNN.models.projection import Projection
 from spynnaker.pyNN.models.populations.population import Population
+import pyNN.spiNNaker as sim
 
 
 class TestSimulatorData(unittest.TestCase):
@@ -190,3 +191,7 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(4, SpynnakerDataView.get_segment_counter())
         writer.shut_down()
         self.assertEqual(4, SpynnakerDataView.get_segment_counter())
+
+    def test_sim_name(self):
+        self.assertEqual(SpynnakerDataView.get_sim_name(), sim.name())
+        self.assertIn("sPyNNaker", SpynnakerDataView.get_sim_name())

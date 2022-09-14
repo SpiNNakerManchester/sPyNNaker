@@ -32,12 +32,11 @@ from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
 from pyNN.space import distance as _pynn_distance
 
-from spinn_utilities.exceptions import (
-    SimulatorNotSetupException, SimulatorShutdownException)
+from spinn_utilities.exceptions import SimulatorNotSetupException
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.helpful_functions import is_singleton
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException)
-from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
@@ -50,7 +49,8 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     FixedNumberPreConnector, FixedProbabilityConnector,
     FromFileConnector, FromListConnector, IndexBasedProbabilityConnector,
     KernelConnector, MultapseConnector as FixedTotalNumberConnector,
-    OneToOneConnector, SmallWorldConnector)
+    OneToOneConnector, SmallWorldConnector, ConvolutionConnector,
+    PoolDenseConnector)
 # synapse structures
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic as StaticSynapse)
@@ -77,6 +77,11 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .elimination import (
         RandomByWeightElimination)
+
+# local-only synapses
+from spynnaker.pyNN.models.neuron.local_only import (
+    LocalOnlyConvolution as Convolution,
+    LocalOnlyPoolDense as PoolDense)
 
 # neuron stuff
 # noinspection PyUnresolvedReferences
@@ -143,7 +148,9 @@ __all__ = [
     'FixedNumberPreConnector', 'FixedProbabilityConnector',
     'FromFileConnector', 'FromListConnector', 'IndexBasedProbabilityConnector',
     'FixedTotalNumberConnector', 'KernelConnector', 'OneToOneConnector',
-    'SmallWorldConnector',
+    'SmallWorldConnector', 'ConvolutionConnector', 'PoolDenseConnector',
+    # Local-only
+    'Convolution', 'PoolDense',
     # synapse structures
     'StaticSynapse',
     # plastic stuff
@@ -174,6 +181,8 @@ __all__ = [
 
 # Dynamically-extracted operations from PyNN
 __pynn = {}
+# Cache of the simulator created by setup
+__simulator = None
 
 
 class RandomDistribution(_PynnRandomDistribution):
@@ -312,6 +321,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :raises ConfigurationException: if both ``n_chips_required`` and
         ``n_boards_required`` are used.
     """
+    global __simulator
     # Check for "auto" values
     if timestep == "auto":
         timestep = SPYNNAKER_AUTO_TIMESTEP
@@ -331,16 +341,17 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
                        "simulator to be stopped and cleared.")
         # if already exists, kill and rebuild
         try:
-            globals_variables.get_simulator().clear()
+            __simulator.clear()
         except Exception:  # pylint: disable=broad-except
             logger.exception("Error forcing previous simulation to clear")
 
     # create the main object for all stuff related software
-    SpiNNaker(
+    __simulator = SpiNNaker(
         time_scale_factor=time_scale_factor, timestep=timestep,
         min_delay=min_delay,
         n_chips_required=n_chips_required,
         n_boards_required=n_boards_required)
+    external_devices._set_simulator(__simulator)
 
     # warn about kwargs arguments
     if extra_params:
@@ -348,7 +359,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
                        "command which we do not consider", extra_params)
 
     # get overloaded functions from PyNN in relation of our simulator object
-    _create_overloaded_functions(globals_variables.get_simulator())
+    _create_overloaded_functions(__simulator)
     SpynnakerDataView.add_database_socket_addresses(database_socket_addresses)
     return rank()
 
@@ -358,7 +369,7 @@ def name():
 
     :rtype: str
     """
-    return globals_variables.get_last_simulator().name
+    return SpynnakerDataView.get_sim_name()
 
 
 def Projection(
@@ -424,20 +435,20 @@ def end(_=True):
     :param _: was named compatible_output, which we don't care about,
         so is a non-existent parameter
     """
-    try:
-        simulator = globals_variables.get_simulator()
-    except SimulatorShutdownException:
+    if SpynnakerDataView.is_shutdown():
         logger.warning("Second call to end ignored")
         return
+    try:
+        SpynnakerDataView.check_valid_simulator()
     except SimulatorNotSetupException:
         logger.exception("Calling end before setup makes no sense ignoring!")
         return
     for (population, variables, filename) in \
-            simulator.write_on_end:
+            __simulator.write_on_end:
         io = get_io(filename)
         population.write_data(io, variables)
-    simulator.write_on_end = []
-    simulator.stop()
+    __simulator.write_on_end = []
+    __simulator.stop()
 
 
 def record_v(source, filename):
@@ -488,18 +499,37 @@ def list_standard_models():
 
 
 def set_number_of_neurons_per_core(neuron_type, max_permitted):
-    """ Sets a ceiling on the number of neurons of a given type that can be\
+    """ Sets a ceiling on the number of neurons of a given model that can be\
         placed on a single core.
+        This can be overridden by the individual Population.
+        The new value can be None, meaning that the maximum is the same as
+        the number of atoms, an int, meaning all Populations of this model
+        must have one dimension, or a tuple of n integers, meaning all
+        Populations of this model must have n dimensions.
+        If not all Populations of this model have the same number of
+        dimensions, it is recommended to set this to None here and then
+        set the maximum on each Population.
 
     :param type(AbstractPopulationVertex) neuron_type: neuron type
     :param int max_permitted: the number to set to
     """
     if isinstance(neuron_type, str):
-        msg = "set_number_of_neurons_per_core call now expects " \
-              "neuron_type as a class instead of as a str"
-        raise ConfigurationException(msg)
-    SpynnakerDataView.add_number_of_neurons_per_core(
-        neuron_type, max_permitted)
+        raise ConfigurationException(
+            "set_number_of_neurons_per_core call now expects "
+            "neuron_type as a class instead of as a str")
+    max_neurons = max_permitted
+    if is_singleton(max_permitted):
+        max_neurons = (max_permitted, )
+    for m in max_neurons:
+        # Make sure an integer value is passed in here and warn if different
+        m_int = int(m)
+        if (m_int - m) != 0:
+            logger.warning(
+                f"The number of neurons per core requested {m} is not an "
+                f"integer; the value has been set to {m_int}")
+
+    SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
+        neuron_type, max_neurons)
 
 
 # These methods will defer to PyNN methods if a simulator exists

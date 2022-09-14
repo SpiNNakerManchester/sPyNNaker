@@ -27,7 +27,8 @@ from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio import EIEIOType
 from spynnaker.pyNN.external_devices_models import (
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
-    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl)
+    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl,
+    SPIFRetinaDevice, ICUBRetinaDevice)
 from spynnaker.pyNN.connections import (
     SpynnakerLiveSpikesConnection, SpynnakerPoissonControlConnection)
 from spynnaker.pyNN.external_devices_models.push_bot.control import (
@@ -62,7 +63,8 @@ __all__ = [
     # General Devices
     "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
     "MunichRetinaDevice", "MunichMotorDevice", "ArbitraryFPGADevice",
-    "PushBotRetinaViewer", "ExternalDeviceLifControl",
+    "PushBotRetinaViewer", "ExternalDeviceLifControl", "SPIFRetinaDevice",
+    "ICUBRetinaDevice",
 
     # PushBot Parameters
     "MunichIoSpiNNakerLinkProtocol",

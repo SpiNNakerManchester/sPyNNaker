@@ -26,13 +26,13 @@ from spinn_utilities.socket_address import SocketAddress
 from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.utility_objs import (
     LivePacketGatherParameters)
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
-    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl)
+    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl,
+    SPIFRetinaDevice, ICUBRetinaDevice)
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
     EthernetCommandConnection, EthernetControlConnection,
@@ -76,7 +76,8 @@ __all__ = [
     # General Devices
     "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
     "MunichRetinaDevice", "MunichMotorDevice", "ArbitraryFPGADevice",
-    "PushBotRetinaViewer", "ExternalDeviceLifControl",
+    "PushBotRetinaViewer", "ExternalDeviceLifControl", "SPIFRetinaDevice",
+    "ICUBRetinaDevice",
 
     # PushBot Parameters
     "MunichIoSpiNNakerLinkProtocol",
@@ -105,6 +106,8 @@ __all__ = [
     "run_forever",
     "add_poisson_live_rate_control"
 ]
+# Cache of the simulator provided by pyNN/__init__py
+__simulator = None
 
 
 def run_forever(sync_time=0):
@@ -115,7 +118,8 @@ def run_forever(sync_time=0):
         continue the simulation
     :return: when the application has started running on the SpiNNaker platform
     """
-    get_simulator().run(None, sync_time)
+    SpynnakerDataView.check_user_can_act()
+    __simulator.run(None, sync_time)
 
 
 def run_sync(run_time, sync_time):
@@ -125,20 +129,23 @@ def run_sync(run_time, sync_time):
     :param float run_time: The time in milliseconds to run the simulation for
     :param float sync_time: The time in milliseconds to pause before allowing
     """
-    get_simulator().run(run_time, sync_time)
+    SpynnakerDataView.check_user_can_act()
+    __simulator.run(run_time, sync_time)
 
 
 def continue_simulation():
     """ Continue a synchronised simulation
     """
-    get_simulator().continue_simulation()
+    SpynnakerDataView.check_valid_simulator()
+    __simulator.continue_simulation()
 
 
 def request_stop():
     """ Request a stop in the simulation without a complete stop.  Will stop\
         after the next auto-pause-and-resume cycle
     """
-    get_simulator().stop_run()
+    SpynnakerDataView.check_valid_simulator()
+    __simulator.stop_run()
 
 
 def register_database_notification_request(hostname, notify_port, ack_port):
@@ -302,3 +309,15 @@ def SpikeInjector(
             database_notify_host, database_notify_port_num,
             database_ack_port_num)
     return ExternalDeviceSpikeInjector()
+
+
+def _set_simulator(simulator):
+    """
+    Should only be called by pyNN/__init__py setup method.
+
+    Any other uses is not supported.
+
+    :param spynnaker.pyNN.spinnaker.SpiNNaker simulator:
+    """
+    global __simulator
+    __simulator = simulator
