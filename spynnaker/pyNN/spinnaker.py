@@ -54,6 +54,7 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_partitioner, spynnaker_splitter_selector)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.utility_calls import (
     moved_in_v7_warning)
 
@@ -480,7 +481,12 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             return
         with FecTimer(MAPPING, "DelaySupportAdder"):
             if name == "DelaySupportAdder":
-                delay_support_adder()
+                d_vertices, d_edges = delay_support_adder()
+                for vertex in d_vertices:
+                    self._data_writer.add_vertex(vertex)
+                for edge in d_edges:
+                    self._data_writer.add_edge(
+                        edge, constants.SPIKE_PARTITION_ID)
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")
