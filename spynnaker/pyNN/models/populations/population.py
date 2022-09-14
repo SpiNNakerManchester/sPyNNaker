@@ -25,7 +25,6 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     InvalidParameterType, SpynnakerException)
@@ -61,8 +60,6 @@ class Population(PopulationBase):
         "_all_ids",
         "_annotations",
         "_celltype",
-        "__change_requires_mapping",
-        "__delay_vertex",
         "__first_id",
         "__has_read_neuron_parameters_this_run",
         "__last_id",
@@ -71,7 +68,6 @@ class Population(PopulationBase):
         "_size",
         "__structure",
         "__vertex",
-        "__vertex_changeable_after_run",
         "__vertex_contains_units",
         "__vertex_population_initializable",
         "__vertex_population_settable"]
@@ -104,8 +100,6 @@ class Population(PopulationBase):
             model, size, label, additional_parameters)
         self._recorder = Recorder(population=self, vertex=self.__vertex)
 
-        self.__delay_vertex = None
-
         # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
         # generation of positions is deferred until needed.
@@ -124,7 +118,6 @@ class Population(PopulationBase):
         self._annotations = dict()
 
         # parameter
-        self.__change_requires_mapping = True
         self.__has_read_neuron_parameters_this_run = False
 
         # things for pynn demands
@@ -586,7 +579,7 @@ class Population(PopulationBase):
         self._positions = positions
 
         # state that something has changed in the population,
-        self.__change_requires_mapping = True
+        SpynnakerDataView.set_requires_mapping()
 
     @property
     def all_cells(self):
@@ -637,22 +630,7 @@ class Population(PopulationBase):
         """
         return self.__vertex
 
-    @property
-    def requires_mapping(self):
-        """ Whether this population requires mapping.
-
-        :rtype: bool
-        """
-        return self.__change_requires_mapping
-
-    @requires_mapping.setter
-    def requires_mapping(self, new_value):
-        self.__change_requires_mapping = new_value
-
-    def mark_no_changes(self):
-        """ Mark this population as not having changes to be mapped.
-        """
-        self.__change_requires_mapping = False
+    def _reset_has_read_neuron_parameters_this_run(self):
         self.__has_read_neuron_parameters_this_run = False
 
     @property
@@ -792,9 +770,6 @@ class Population(PopulationBase):
                 "Population does not support the initialisation of {}".format(
                     variable))
         if SpynnakerDataView.is_ran_last():
-            if not self.__vertex_changeable_after_run:
-                raise Exception(
-                    "Population does not support changes after run")
             self._read_parameters_before_set()
         self.__vertex.initialize(variable, value, selector)
 
@@ -808,7 +783,7 @@ class Population(PopulationBase):
         self.__vertex.inject(current_source, [n for n in range(self._size)])
         current_source.set_population(self)
         # Must remap if called between runs (with reset)
-        self.__change_requires_mapping = True
+        SpynnakerDataView.set_requires_mapping()
 
     def __len__(self):
         """ Get the total number of cells in the population.
@@ -849,10 +824,6 @@ class Population(PopulationBase):
                 parameter))
 
         SpynnakerDataView.check_user_can_act()
-        if (SpynnakerDataView.is_ran_ever()
-                and not self.__vertex_changeable_after_run):
-            raise Exception(
-                "Run has been called but vertex is not changable.")
 
         if isinstance(parameter, str):
             if value is None:
@@ -992,7 +963,7 @@ class Population(PopulationBase):
                 f"as the current limit for the model is {cap}")
         self.__vertex.set_max_atoms_per_dimension_per_core(max_atoms_per_core)
         # state that something has changed in the population
-        self.__change_requires_mapping = True
+        SpynnakerDataView.set_requires_mapping()
 
     @property
     def size(self):
@@ -1001,18 +972,6 @@ class Population(PopulationBase):
         :rtype: int
         """
         return self.__vertex.n_atoms
-
-    @property
-    def _internal_delay_vertex(self):
-        """
-        :rtype: DelayExtensionVertex
-        """
-        return self.__delay_vertex
-
-    @_internal_delay_vertex.setter
-    def _internal_delay_vertex(self, delay_vertex):
-        self.__delay_vertex = delay_vertex
-        self.__change_requires_mapping = True
 
     def _get_variable_unit(self, parameter_name):
         """ Helper method for getting units from a parameter used by the vertex
@@ -1108,8 +1067,6 @@ class Population(PopulationBase):
             isinstance(self.__vertex, AbstractPopulationSettable)
         self.__vertex_population_initializable = \
             isinstance(self.__vertex, AbstractPopulationInitializable)
-        self.__vertex_changeable_after_run = \
-            isinstance(self.__vertex, AbstractChangableAfterRun)
         self.__vertex_contains_units = \
             isinstance(self.__vertex, AbstractContainsUnits)
 

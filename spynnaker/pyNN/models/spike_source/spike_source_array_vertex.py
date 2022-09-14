@@ -19,7 +19,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangedListOfList
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
@@ -48,8 +47,7 @@ def _send_buffer_times(spike_times, time_step):
 
 class SpikeSourceArrayVertex(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractChangableAfterRun,
-        SupportsStructure):
+        SimplePopulationSettable, SupportsStructure):
     """ Model for play back of spikes
     """
 
@@ -76,11 +74,6 @@ class SpikeSourceArrayVertex(
         # handle recording
         self.__spike_recorder = EIEIOSpikeRecorder()
 
-        # used for reset and rerun
-        self.__requires_mapping = True
-
-        self.__structure = None
-
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure):
         self.__structure = structure
@@ -91,15 +84,6 @@ class SpikeSourceArrayVertex(
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.n_atoms)
         return super(ReverseIpTagMultiCastSource, self).atoms_shape
-
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
-    def requires_mapping(self):
-        return self.__requires_mapping
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
-    def mark_no_changes(self):
-        self.__requires_mapping = False
 
     @property
     def spike_times(self):
@@ -175,7 +159,8 @@ class SpikeSourceArrayVertex(
             logger.warning("Indexes currently not supported for "
                            "SpikeSourceArray so being ignored")
         self.enable_recording(new_state)
-        self.__requires_mapping = not self.__spike_recorder.record
+        if self.__spike_recorder.record:
+            SpynnakerDataView.set_requires_mapping()
         self.__spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)

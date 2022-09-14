@@ -16,6 +16,8 @@
 # Alternative implementation for
 # https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/common/populations.py
 
+from spynnaker.pyNN.data import SpynnakerDataView
+
 
 class IDMixin(object):
     """
@@ -166,7 +168,7 @@ class IDMixin(object):
         # pylint: disable=protected-access
         self.__population._vertex.inject(current_source, [self.__id])
         current_source.set_population(self.__population)
-        self.__population.requires_mapping = True
+        SpynnakerDataView.set_requires_mapping()
 
     def get_initial_value(self, variable):
         """ Get the initial value of a state variable of the cell.
