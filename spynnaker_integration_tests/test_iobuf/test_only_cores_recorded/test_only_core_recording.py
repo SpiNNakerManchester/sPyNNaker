@@ -36,7 +36,7 @@ class TestOnlyCoresRecording(BaseTestCase):
 
         # Make sure there is stuff at the cores specified in the cfg file
         input1.add_placement_constraint(0, 0, 4)
-        input2.add_placement_constrain(0, 0, 3)
+        input2.add_placement_constraint(0, 0, 3)
         # While there must be a chip 0,0  chip 1,1 could be missing
         if machine.is_chip_at(1, 1):
             input3.add_placement_constraint(1, 1, 5)
