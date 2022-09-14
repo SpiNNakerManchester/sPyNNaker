@@ -972,7 +972,7 @@ class Population(PopulationBase):
         :raises SimulatorNotSetupException: If called before sim.setup
         :raises SimulatorShutdownException: If called after sim.end
         """
-        self.set_fixed_location(ChipAndCore(x, y, p))
+        self.__vertex.set_fixed_location(x, y, p)
 
     # NON-PYNN API CALL
     def set_max_atoms_per_core(self, max_atoms_per_core):
