@@ -15,7 +15,6 @@
 
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
-from pacman.model.graphs.common import ChipAndCore
 from spynnaker.pyNN.data import SpynnakerDataView
 
 
@@ -36,13 +35,13 @@ class TestOnlyCoresRecording(BaseTestCase):
             1, sim.SpikeSourceArray(spike_times=[0]), label="input4")
 
         # Make sure there is stuff at the cores specified in the cfg file
-        input1.set_fixed_location(ChipAndCore(0, 0, 4))
-        input2.set_fixed_location(ChipAndCore(0, 0, 3))
+        input1.add_placement_constraint(0, 0, 4)
+        input2.add_placement_constrain(0, 0, 3)
         # While there must be a chip 0,0  chip 1,1 could be missing
         if machine.is_chip_at(1, 1):
-            input3.set_fixed_location(ChipAndCore(1, 1, 5))
+            input3.add_placement_constraint(1, 1, 5)
         # Make sure there is stuff at a core not specified in the cfg file
-        input4.set_fixed_location(ChipAndCore(0, 0, 10))
+        input4.add_placement_constraint(0, 0, 10)
 
         sim.run(500)
 

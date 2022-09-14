@@ -962,21 +962,6 @@ class Population(PopulationBase):
         return self.__structure
 
     # NON-PYNN API CALL
-    def set_fixed_location(self, fixed_location):
-        """ Apply a fixed_location to a population that restricts the
-            processor onto which its atoms will be placed.
-
-        :param ~pacman.model.graph.common.ChipAndCore fixed_location:
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
-        """
-        SpynnakerDataView.check_user_can_act()
-        self.__vertex.fixed_location = fixed_location
-        # state that something has changed in the population,
-        self.__change_requires_mapping = True
-
-    # NON-PYNN API CALL
     def add_placement_constraint(self, x, y, p=None):
         """ Add a placement constraint
 
