@@ -31,7 +31,7 @@ class MachineTest(BaseTestCase):
             ResetStatus.SETUP,
             SpynnakerDataView._UtilsDataView__data._reset_status, "setup")
         self.assertTrue(
-            SpynnakerDataView.get_vertices_or_edges_added(), "setup")
+            SpynnakerDataView.get_requires_mapping())
 
         sim.run(1)
         # HACK to avoid detecting user accessed machine
@@ -56,7 +56,7 @@ class MachineTest(BaseTestCase):
         machine = SpynnakerDataView._MachineDataView__data._machine
         self.assertEqual(id(machine), id(machine1), "reset 1")
         self.assertFalse(
-            SpynnakerDataView.get_vertices_or_edges_added(), "reset 1")
+            SpynnakerDataView.get_requires_mapping(), "reset 1")
 
         sim.run(3)
         self.assertFalse(
@@ -75,8 +75,8 @@ class MachineTest(BaseTestCase):
             SpynnakerDataView._UtilsDataView__data._reset_status)
         self.assertFalse(
             SpynnakerDataView._MachineDataView__data._user_accessed_machine)
-        self.assertFalse(
-            SpynnakerDataView.get_vertices_or_edges_added(), "reset 2")
+        self.assertTrue(
+            SpynnakerDataView.get_requires_mapping(), "reset 2")
         # HACK to avoid detecting user accessed machine
         self.assertIsNone(SpynnakerDataView._MachineDataView__data._machine)
 
@@ -98,7 +98,7 @@ class MachineTest(BaseTestCase):
         # HACK to avoid detecting user accessed machine
         machine = SpynnakerDataView._MachineDataView__data._machine
         self.assertFalse(
-            SpynnakerDataView.get_vertices_or_edges_added(), "reset 3")
+            SpynnakerDataView.get_requires_mapping(), "reset 3")
 
         self.assertEqual(id(machine), id(machine2), "reset 3")
         sim.run(5)
@@ -122,11 +122,11 @@ class MachineTest(BaseTestCase):
         self.assertFalse(
             SpynnakerDataView._MachineDataView__data._user_accessed_machine)
         self.assertTrue(
-            SpynnakerDataView.get_vertices_or_edges_added(), "reset 4")
+            SpynnakerDataView.get_requires_mapping(), "reset 4")
 
         sim.run(6)
         self.assertFalse(
-            SpynnakerDataView.get_vertices_or_edges_added(), "run 6")
+            SpynnakerDataView.get_requires_mapping(), "run 6")
         machine3 = SpynnakerDataView._MachineDataView__data._machine
         self.assertNotEqual(id(machine3), id(machine2), "run 6")
 
@@ -141,7 +141,7 @@ class MachineTest(BaseTestCase):
             SpynnakerDataView._MachineDataView__data._user_accessed_machine,
             "reset 5")
         self.assertFalse(
-            SpynnakerDataView.get_vertices_or_edges_added(), "reset 5")
+            SpynnakerDataView.get_requires_mapping(), "reset 5")
 
         sim.run(7)
         # HACK to avoid detecting user accessed machine
@@ -160,7 +160,7 @@ class MachineTest(BaseTestCase):
         machine = SpynnakerDataView._MachineDataView__data._machine
         self.assertEqual(id(machine), id(machine3), "reset 6")
         self.assertFalse(
-            SpynnakerDataView.get_vertices_or_edges_added(), "reset 6")
+            SpynnakerDataView.get_requires_mapping(), "reset 6")
 
         # This should create a new machine
         machine = sim.get_machine()

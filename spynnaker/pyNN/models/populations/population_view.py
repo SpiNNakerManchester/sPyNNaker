@@ -21,6 +21,7 @@ from pyNN import descriptions
 from pyNN.random import NumpyRNG
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ranged.abstract_sized import AbstractSized
+from spynnaker.pyNN.data import SpynnakerDataView
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 
@@ -217,7 +218,7 @@ class PopulationView(PopulationBase):
         """
         self._vertex.inject(current_source, self.__indexes)
         current_source.set_population(self.__population)
-        self.__population.requires_mapping = True
+        SpynnakerDataView.set_requires_mapping()
 
     def describe(self, template='populationview_default.txt',
                  engine='default'):

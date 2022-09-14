@@ -24,7 +24,7 @@ from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.resources import ConstantSDRAM
 from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractRewritesDataSpecification)
+    AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
 from spinn_front_end_common.interface.buffer_management import (
@@ -65,13 +65,11 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class SpikeSourcePoissonVertex(
         TDMAAwareApplicationVertex, AbstractSpikeRecordable,
-        AbstractChangableAfterRun, SimplePopulationSettable,
-        LegacyPartitionerAPI, SupportsStructure):
+        SimplePopulationSettable, LegacyPartitionerAPI, SupportsStructure):
     """ A Poisson Spike source object
     """
 
     __slots__ = [
-        "__change_requires_mapping",
         "__duration",
         "__model",
         "__model_name",
@@ -126,9 +124,6 @@ class SpikeSourcePoissonVertex(
         self.__seed = seed
         self.__kiss_seed = dict()
         self.__n_subvertices = 0
-
-        # check for changes parameters
-        self.__change_requires_mapping = True
 
         self.__spike_recorder = MultiSpikeRecorder()
 
@@ -322,7 +317,7 @@ class SpikeSourcePoissonVertex(
             logger.info('Increasing spike rate while recording requires a '
                         '"reset unless additional_parameters "max_rate" is '
                         'set')
-            self.__change_requires_mapping = True
+            SpynnakerDataView.set_requires_mapping()
             self.__max_rate = new_max
 
     @property
@@ -397,15 +392,6 @@ class SpikeSourcePoissonVertex(
     @property
     def rate_change(self):
         return self.__rate_change
-
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
-    def requires_mapping(self):
-        return self.__change_requires_mapping
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
-    def mark_no_changes(self):
-        self.__change_requires_mapping = False
 
     @overrides(SimplePopulationSettable.set_value)
     def set_value(self, key, value):
@@ -508,7 +494,7 @@ class SpikeSourcePoissonVertex(
             logger.warning("indexes not supported for "
                            "SpikeSourcePoisson so being ignored")
         if new_state and not self.__spike_recorder.record:
-            self.__change_requires_mapping = True
+            SpynnakerDataView.set_requires_mapping()
         self.__spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
