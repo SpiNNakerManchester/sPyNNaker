@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2020 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,18 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pyNN.spiNNaker as sim
+"""
+Synfirechain-like example
+"""
 from spinnaker_testbase import BaseTestCase
+from spynnaker_integration_tests.scripts.synfire_runner import SynfireRunner
+
+n_neurons = 200  # number of neurons in each population
+runtime = 6000
+delay = 100
+synfire_run = SynfireRunner()
 
 
-class TestFailedState(BaseTestCase):
+class TestLongDelay(BaseTestCase):
+    """
+    tests the run is split buy auto pause resume
+    """
 
-    # NO unittest_setup() as sim.setup is called
+    def test_run(self):
+        synfire_run.do_run(n_neurons, delay=delay, run_times=[runtime])
+        spikes = synfire_run.get_output_pop_spikes_numpy()
 
-    def test_double_end(self):
-        sim.setup(1.0)
-        sim.end()
-        sim.end()
+        self.assertEqual(59, len(spikes))
 
-    def test_only_end(self):
-        sim.end()
+    def more_runs(self):
+        self.runsafe(self.more_runs)
