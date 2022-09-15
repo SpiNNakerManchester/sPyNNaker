@@ -55,6 +55,7 @@ from spynnaker.pyNN.extra_algorithms import delay_support_adder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.config_setup import unittest_setup
+from spynnaker.pyNN.utilities import constants
 import pyNN.spiNNaker as p
 
 
@@ -116,7 +117,12 @@ def test_write_data_spec():
 
     writer.start_run()
     writer.set_plan_n_timesteps(100)
-    delay_support_adder()
+    d_vertices, d_edges = delay_support_adder()
+    for vertex in d_vertices:
+        writer.add_vertex(vertex)
+    for edge in d_edges:
+        writer.add_edge(
+            edge, constants.SPIKE_PARTITION_ID)
     spynnaker_splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
     writer.set_routing_infos(allocator.__call__([], flexible=False))
@@ -447,7 +453,12 @@ def test_pop_based_master_pop_table_standard(
 
     writer.start_run()
     writer.set_plan_n_timesteps(100)
-    delay_support_adder()
+    d_vertices, d_edges = delay_support_adder()
+    for vertex in d_vertices:
+        writer.add_vertex(vertex)
+    for edge in d_edges:
+        writer.add_edge(
+            edge, constants.SPIKE_PARTITION_ID)
     spynnaker_splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
     writer.set_routing_infos(allocator.__call__([], flexible=False))
