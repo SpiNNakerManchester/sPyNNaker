@@ -17,6 +17,7 @@ import logging
 import math
 import numpy
 import scipy.stats
+from pyNN.space import Grid2D, Grid3D
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary, RangedList
@@ -35,6 +36,7 @@ from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes, get_expander_rates_bytes)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.abstract_models import (
     PopulationApplicationVertex, ParameterHolder, RecordingType)
 
@@ -58,7 +60,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class SpikeSourcePoissonVertex(
         PopulationApplicationVertex, AbstractChangableAfterRun,
-        LegacyPartitionerAPI):
+        LegacyPartitionerAPI, SupportsStructure):
     """ A Poisson Spike source object
     """
 
@@ -80,6 +82,7 @@ class SpikeSourcePoissonVertex(
         "__is_variable_rate",
         "__outgoing_projections",
         "__incoming_control_edge",
+        "__structure",
         "__allowed_parameters"]
 
     SPIKE_RECORDING_REGION_ID = 0
@@ -245,12 +248,18 @@ class SpikeSourcePoissonVertex(
         self.__outgoing_projections = list()
         self.__incoming_control_edge = None
 
+        self.__structure = None
+
         if self.__is_variable_rate:
             self.__allowed_parameters = {"rates", "durations", "starts"}
         else:
             self.__allowed_parameters = {"rate", "duration", "start"}
 
         self.__last_rate_read_time = None
+
+    @overrides(SupportsStructure.set_structure)
+    def set_structure(self, structure):
+        self.__structure = structure
 
     def add_outgoing_projection(self, projection):
         """ Add an outgoing projection from this vertex
@@ -464,6 +473,9 @@ class SpikeSourcePoissonVertex(
 
     @overrides(LegacyPartitionerAPI.get_sdram_used_by_atoms)
     def get_sdram_used_by_atoms(self, vertex_slice):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        """
         poisson_params_sz = get_rates_bytes(
             vertex_slice.n_atoms, vertex_slice.n_atoms * self.__max_n_rates)
         poisson_expander_sz = get_expander_rates_bytes(
@@ -484,6 +496,13 @@ class SpikeSourcePoissonVertex(
     @property
     def n_atoms(self):
         return self.__n_atoms
+
+    @property
+    @overrides(PopulationApplicationVertex.atoms_shape)
+    def atoms_shape(self):
+        if isinstance(self.__structure, (Grid2D, Grid3D)):
+            return self.__structure.calculate_size(self.__n_atoms)
+        return super(SpikeSourcePoissonVertex, self).atoms_shape
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(

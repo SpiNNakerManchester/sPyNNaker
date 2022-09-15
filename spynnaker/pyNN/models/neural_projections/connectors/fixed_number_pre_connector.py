@@ -21,9 +21,12 @@ from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 
-class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
+class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
+                              AbstractGenerateConnectorOnHost):
     """ Connects a fixed number of pre-synaptic neurons selected at random,\
         to all post-synaptic neurons.
     """
@@ -201,7 +204,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
            synapse_info.weights, self.__n_pre * synapse_info.n_post_neurons,
            synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments

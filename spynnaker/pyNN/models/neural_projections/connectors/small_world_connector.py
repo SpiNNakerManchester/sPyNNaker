@@ -16,9 +16,11 @@ import math
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 
-class SmallWorldConnector(AbstractConnector):
+class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     """ A connector that uses connection statistics based on the Small World\
         network connectivity model.
 
@@ -155,7 +157,7 @@ class SmallWorldConnector(AbstractConnector):
         return self._get_weight_maximum(
             synapse_info.weights, self.__n_connections, synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments

@@ -20,11 +20,11 @@
 #include "plasticity/synapse_dynamics.h"
 #include <common/send_mc.h>
 
-//! Key from neruon.c
-extern uint32_t key;
-
 //! Whether to use key from neuron.c
 extern bool use_key;
+
+//! Keys for each neuron
+extern uint32_t *neuron_keys;
 
 //! Earliest time from neuron.c
 extern uint32_t earliest_send_time;
@@ -42,7 +42,7 @@ static inline void send_spike(UNUSED uint32_t timer_count, uint32_t time,
     synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
     if (use_key) {
-        send_spike_mc(key | neuron_index);
+        send_spike_mc(neuron_keys[neuron_index]);
 
         // Keep track of provenance data
         uint32_t clocks = tc[T1_COUNT];

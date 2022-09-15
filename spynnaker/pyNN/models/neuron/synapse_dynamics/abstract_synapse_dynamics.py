@@ -13,10 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
-import numpy
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 
 
 class AbstractSynapseDynamics(object, metaclass=AbstractBase):
@@ -24,10 +23,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     """
 
     __slots__ = ()
-
-    #: Type model of the basic configuration data of a connector
-    NUMPY_CONNECTORS_DTYPE = [("source", "uint32"), ("target", "uint32"),
-                              ("weight", "float64"), ("delay", "float64")]
 
     @abstractmethod
     def merge(self, synapse_dynamics):
@@ -39,65 +34,10 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def is_same_as(self, synapse_dynamics):
-        """ Determines if this synapse dynamics is the same as another
-
-        :param AbstractSynapseDynamics synapse_dynamics:
-        :rtype: bool
-        """
-
-    @abstractmethod
-    def are_weights_signed(self):
-        """ Determines if the weights are signed values
-
-        :rtype: bool
-        """
-
-    @abstractmethod
     def get_vertex_executable_suffix(self):
         """ Get the executable suffix for a vertex for this dynamics
 
         :rtype: str
-        """
-
-    @abstractmethod
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
-        """ Get the SDRAM usage of the synapse dynamics parameters in bytes
-
-        :param int n_neurons:
-        :param int n_synapse_types:
-        :rtype: int
-        """
-
-    @abstractmethod
-    def write_parameters(self, spec, region, global_weight_scale,
-                         synapse_weight_scales):
-        """ Write the synapse parameters to the spec
-
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The specification to write to
-        :param int region: region ID to write to
-        :param float global_weight_scale: The weight scale applied globally
-        :param list(float) synapse_weight_scales:
-            The total weight scale applied to each synapse including the global
-            weight scale
-        """
-
-    @abstractmethod
-    def get_parameter_names(self):
-        """ Get the parameter names available from the synapse \
-            dynamics components
-
-        :rtype: iterable(str)
-        """
-
-    @abstractmethod
-    def get_max_synapses(self, n_words):
-        """ Get the maximum number of synapses that can be held in the given\
-            number of words
-
-        :param int n_words: The number of words the synapses must fit in
-        :rtype: int
         """
 
     @abstractproperty
@@ -120,11 +60,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     @abstractmethod
     def set_delay(self, delay):
         """ Set the delay
-        """
-
-    @abstractproperty
-    def pad_to_length(self):
-        """ The amount each row should pad to, or None if not specified
         """
 
     @abstractproperty
@@ -202,47 +137,16 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_weight_variance(weights, synapse_info)
 
-    def convert_per_connection_data_to_rows(
-            self, connection_row_indices, n_rows, data, max_n_synapses):
-        """ Converts per-connection data generated from connections into\
-            row-based data to be returned from get_synaptic_data
+    def get_provenance_data(self, pre_population_label, post_population_label):
+        """ Get the provenance data from this synapse dynamics object
 
-        :param ~numpy.ndarray connection_row_indices:
-            The index of the row that each item should go into
-        :param int n_rows:
-            The number of rows
-        :param ~numpy.ndarray data:
-            The non-row-based data
-        :param int max_n_synapses:
-            The maximum number of synapses to generate in each row
-        :rtype: list(~numpy.ndarray)
+        :param str pre_population_label:
+        :param str post_population_label:
+        :rtype:
+            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
-        return [
-            data[connection_row_indices == i][:max_n_synapses].reshape(-1)
-            for i in range(n_rows)]
-
-    def get_n_items(self, rows, item_size):
-        """ Get the number of items in each row as 4-byte values, given the\
-            item size
-
-        :param ~numpy.ndarray rows:
-        :param int item_size:
-        :rtype: ~numpy.ndarray
-        """
-        return numpy.array([
-            int(math.ceil(float(row.size) / float(item_size)))
-            for row in rows], dtype="uint32").reshape((-1, 1))
-
-    def get_words(self, rows):
-        """ Convert the row data to words
-
-        :param ~numpy.ndarray rows:
-        :rtype: ~numpy.ndarray
-        """
-        words = [numpy.pad(
-            row, (0, (4 - (row.size % 4)) & 0x3), mode="constant",
-            constant_values=0).view("uint32") for row in rows]
-        return words
+        # pylint: disable=unused-argument
+        return []
 
     def get_synapse_id_by_target(self, target):
         """ Get the index of the synapse type based on the name, or None
@@ -253,3 +157,26 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         # pylint: disable=unused-argument
         return None
+
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        """ Get the machine vertices that are connected to each other with
+            this connector
+
+        :param SynapseInformation s_info:
+            The synapse information of the connection
+        :param ApplicationVertex source_vertex: The source of the spikes
+        :param ApplicationVertex target_vertex: The target of the spikes
+        :return: A list of tuples of (target machine vertex, source
+        :rtype: list(tuple(MachineVertex, list(AbstractVertex)))
+        """
+        # By default, just ask the connector
+        return s_info.connector.get_connected_vertices(
+            s_info, source_vertex, target_vertex)
+
+    @property
+    def absolute_max_atoms_per_core(self):
+        """ The absolute maximum number of atoms per core supported by this
+            synapse dynamics object
+        """
+        # By default, we can only support the maximum row length per core
+        return POP_TABLE_MAX_ROW_LENGTH

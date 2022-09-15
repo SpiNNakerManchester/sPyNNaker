@@ -145,8 +145,10 @@ def test_connector_split():
 
 class MockSplitter(object):
 
-    def __init__(self, slices):
+    def __init__(self, slices, app_vertex):
         self.slices = slices
+        self.m_vertices = [MockMachineVertex(vertex_slice, app_vertex)
+                           for vertex_slice in slices]
 
     def get_out_going_slices(self):
         return self.slices
@@ -154,36 +156,48 @@ class MockSplitter(object):
     def get_in_coming_slices(self):
         return self.slices
 
+    def get_in_coming_vertices(self, partition_id):
+        return self.m_vertices
+
+    def get_out_going_vertices(self, partition_id):
+        return self.m_vertices
+
 
 class MockAppVertex(object):
 
     def __init__(self, slices):
-        self.splitter = MockSplitter(slices)
+        self.splitter = MockSplitter(slices, self)
 
 
 class MockMachineVertex(object):
 
-    def __init__(self, slice, slices):
-        self.vertex_slice = slice
-        self.app_vertex = MockAppVertex(slices)
+    def __init__(self, vertex_slice, app_vertex):
+        self.vertex_slice = vertex_slice
+        self.app_vertex = app_vertex
 
 
-def test_could_connect():
+def test_get_connected():
     unittest_setup()
     pairs = numpy.array([[0, 0], [1, 2], [2, 0], [3, 3], [2, 6], [1, 8],
                          [4, 1], [5, 0], [6, 2], [4, 8]])
     connector = FromListConnector(pairs)
+    pre_slices = [Slice(0, 3), Slice(4, 6), Slice(7, 9)]
     post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
-    for post_slice in post_slices:
-        post_vertex = MockMachineVertex(post_slice, post_slices)
-        count = __get_n_connections(pairs, post_slice)
-        if count:
-            assert connector.could_connect(None, None, post_vertex)
-        else:
-            assert not connector.could_connect(None, None, post_vertex)
+    pre_vertex = MockAppVertex(pre_slices)
+    post_vertex = MockAppVertex(post_slices)
+    connected = connector.get_connected_vertices(None, pre_vertex, post_vertex)
+
+    for post_vertex, pre_vertices in connected:
+        post_slice = post_vertex.vertex_slice
+        for pre_vertex in pre_vertices:
+            pre_slice = pre_vertex.vertex_slice
+            count = __get_n_connections(pairs, pre_slice, post_slice)
+            assert count > 0
 
 
-def __get_n_connections(pairs, post_slice):
-    conns = pairs[(pairs[:, 1] >= post_slice.lo_atom) &
-                  (pairs[:, 1] <= post_slice.hi_atom)]
+def __get_n_connections(pairs, pre_slice, post_slice):
+    conns = pairs[(pairs[:, 0] >= pre_slice.lo_atom) &
+                  (pairs[:, 0] <= pre_slice.hi_atom)]
+    conns = conns[(conns[:, 1] >= post_slice.lo_atom) &
+                  (conns[:, 1] <= post_slice.hi_atom)]
     return len(conns)

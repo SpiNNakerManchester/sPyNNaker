@@ -414,8 +414,6 @@ def test_set_synapse_dynamics():
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
         (range(10), [4, 5, 6, 7], 1000, 100, 20),
-        # Should work but number of neurons don't work out
-        (range(5), [], 10000, 2048, None),
         # Should work but number of cores doesn't work out
         (range(2000), [], 10000, 5, None),
         # Should work but number of neurons with delays don't work out
@@ -445,7 +443,7 @@ def test_pop_based_master_pop_table_standard(
         100, p.IF_curr_exp(), label="Post",
         additional_parameters={
             "splitter": SplitterAbstractPopulationVertexFixed()})
-    p.IF_curr_exp.set_model_max_atoms_per_core(neurons_per_core)
+    p.IF_curr_exp.set_model_max_atoms_per_dimension_per_core(neurons_per_core)
     pre_pop = p.Population(
         n_pre_neurons, p.IF_curr_exp(), label="Pre",
         additional_parameters={

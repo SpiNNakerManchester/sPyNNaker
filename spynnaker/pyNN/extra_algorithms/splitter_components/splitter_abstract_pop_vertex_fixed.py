@@ -13,14 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import MultiRegionSDRAM
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.utilities.algorithm_utilities\
-    .partition_algorithm_utilities import get_remaining_constraints
+    .partition_algorithm_utilities import get_multidimensional_slices
 from spynnaker.pyNN.models.neuron import (
-    AbstractPopulationVertex, PopulationMachineVertex)
+    AbstractPopulationVertex, PopulationMachineVertex,
+    PopulationMachineLocalOnlyCombinedVertex, LocalOnlyProvenance)
 from spynnaker.pyNN.models.neuron.population_machine_vertex import (
     NeuronProvenance, SynapseProvenance, MainProvenance,
     SpikeProcessingProvenance)
@@ -31,7 +33,9 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
-from pacman.model.graphs.common.slice import Slice
+from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
+from collections import defaultdict
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 
@@ -78,14 +82,12 @@ class SplitterAbstractPopulationVertexFixed(
         max_atoms_per_core = min(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
 
-        projections = app_vertex.incoming_projections
-        constraints = get_remaining_constraints(app_vertex)
-        ring_buffer_shifts = app_vertex.get_ring_buffer_shifts(projections)
+        ring_buffer_shifts = app_vertex.get_ring_buffer_shifts()
         weight_scales = app_vertex.get_weight_scales(ring_buffer_shifts)
         all_syn_block_sz = app_vertex.get_synapses_size(
-            max_atoms_per_core, projections)
+            max_atoms_per_core)
         structural_sz = app_vertex.get_structural_dynamics_size(
-            max_atoms_per_core, projections)
+            max_atoms_per_core)
         sdram = self.get_sdram_used_by_atoms(
             max_atoms_per_core, all_syn_block_sz, structural_sz)
         synapse_regions = PopulationMachineVertex.SYNAPSE_REGIONS
@@ -101,9 +103,9 @@ class SplitterAbstractPopulationVertexFixed(
             chip_counter.add_core(sdram)
             label = f"Slice {vertex_slice} of {app_vertex.label}"
             machine_vertex = self.create_machine_vertex(
-                vertex_slice, sdram, label, constraints, structural_sz,
-                ring_buffer_shifts, weight_scales, index, max_atoms_per_core,
-                synaptic_matrices, neuron_data)
+                vertex_slice, sdram, label, app_vertex.constraints,
+                structural_sz, ring_buffer_shifts, weight_scales,
+                index, max_atoms_per_core, synaptic_matrices, neuron_data)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
@@ -124,6 +126,28 @@ class SplitterAbstractPopulationVertexFixed(
     def get_in_coming_vertices(self, partition_id):
         return list(self._governed_app_vertex.machine_vertices)
 
+    @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
+    def get_source_specific_in_coming_vertices(
+            self, source_vertex, partition_id):
+
+        # Determine the real pre-vertex
+        pre_vertex = source_vertex
+        if isinstance(source_vertex, DelayExtensionVertex):
+            pre_vertex = source_vertex.source_vertex
+
+        # Use the real pre-vertex to get the projections
+        targets = defaultdict(OrderedSet)
+        for proj in self.governed_app_vertex.get_incoming_projections_from(
+                pre_vertex):
+            # pylint: disable=protected-access
+            s_info = proj._synapse_information
+            # Use the original source vertex to get the connected vertices,
+            # as the real source machine vertices must make it in to this array
+            for (tgt, srcs) in s_info.synapse_dynamics.get_connected_vertices(
+                    s_info, source_vertex, self.governed_app_vertex):
+                targets[tgt].update(srcs)
+        return [(m_vertex, tgts) for m_vertex, tgts in targets.items()]
+
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
         return self._governed_app_vertex.machine_vertices
@@ -132,6 +156,14 @@ class SplitterAbstractPopulationVertexFixed(
             self, vertex_slice, sdram, label, remaining_constraints,
             structural_sz, ring_buffer_shifts, weight_scales, index,
             max_atoms_per_core, synaptic_matrices, neuron_data):
+
+        # If using local-only create a local-only vertex
+        s_dynamics = self._governed_app_vertex.synapse_dynamics
+        if isinstance(s_dynamics, AbstractLocalOnly):
+            return PopulationMachineLocalOnlyCombinedVertex(
+                sdram, label, remaining_constraints,
+                self._governed_app_vertex, vertex_slice, index,
+                ring_buffer_shifts, weight_scales)
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
@@ -180,22 +212,49 @@ class SplitterAbstractPopulationVertexFixed(
         :param int n_atoms: The number of atoms to account for
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
+        s_dynamics = self._governed_app_vertex.synapse_dynamics
         n_record = (
             len(self._governed_app_vertex.neuron_recordables) +
             len(self._governed_app_vertex.synapse_recordables))
 
         n_provenance = NeuronProvenance.N_ITEMS + MainProvenance.N_ITEMS
-        n_provenance += (
-            SynapseProvenance.N_ITEMS + SpikeProcessingProvenance.N_ITEMS)
+        if isinstance(s_dynamics, AbstractLocalOnly):
+            n_provenance += LocalOnlyProvenance.N_ITEMS
+        else:
+            n_provenance += (
+                SynapseProvenance.N_ITEMS + SpikeProcessingProvenance.N_ITEMS)
 
         sdram = MultiRegionSDRAM()
-        sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
-            n_record, n_provenance,
-            PopulationMachineVertex.COMMON_REGIONS))
-        sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
-            n_atoms, PopulationMachineVertex.NEURON_REGIONS))
-        sdram.merge(self.__get_synapse_constant_sdram(
-            n_atoms, all_syn_block_sz, structural_sz))
+        if isinstance(s_dynamics, AbstractLocalOnly):
+            sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
+                n_record, n_provenance,
+                PopulationMachineLocalOnlyCombinedVertex.COMMON_REGIONS))
+            sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
+                n_atoms,
+                PopulationMachineLocalOnlyCombinedVertex.NEURON_REGIONS))
+            sdram.merge(self.__get_local_only_constant_sdram(n_atoms))
+        else:
+            sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
+                n_record, n_provenance,
+                PopulationMachineVertex.COMMON_REGIONS))
+            sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
+                n_atoms, PopulationMachineVertex.NEURON_REGIONS))
+            sdram.merge(self.__get_synapse_constant_sdram(
+                n_atoms, all_syn_block_sz, structural_sz))
+        return sdram
+
+    def __get_local_only_constant_sdram(self, n_atoms):
+        app_vertex = self._governed_app_vertex
+        s_dynamics = app_vertex.synapse_dynamics
+        sdram = MultiRegionSDRAM()
+        sdram.add_cost(
+            PopulationMachineLocalOnlyCombinedVertex.REGIONS.LOCAL_ONLY.value,
+            PopulationMachineLocalOnlyCombinedVertex.LOCAL_ONLY_SIZE)
+        sdram.add_cost(
+            (PopulationMachineLocalOnlyCombinedVertex.
+             REGIONS.LOCAL_ONLY_PARAMS.value),
+            s_dynamics.get_parameters_usage_in_bytes(
+                n_atoms, app_vertex.incoming_projections))
         return sdram
 
     def __get_synapse_constant_sdram(
@@ -208,7 +267,6 @@ class SplitterAbstractPopulationVertexFixed(
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         app_vertex = self._governed_app_vertex
-        projections = self._governed_app_vertex.incoming_projections
         regions = PopulationMachineVertex.SYNAPSE_REGIONS
         sdram = MultiRegionSDRAM()
         sdram.add_cost(regions.synapse_params,
@@ -220,11 +278,12 @@ class SplitterAbstractPopulationVertexFixed(
         sdram.add_cost(
             regions.pop_table,
             MasterPopTableAsBinarySearch.get_master_population_table_size(
-                projections))
+                app_vertex.incoming_projections))
         sdram.add_cost(regions.connection_builder,
-                       app_vertex.get_synapse_expander_size(projections))
+                       app_vertex.get_synapse_expander_size())
         sdram.add_cost(regions.bitfield_filter,
-                       get_sdram_for_bit_field_region(projections))
+                       get_sdram_for_bit_field_region(
+                           app_vertex.incoming_projections))
         return sdram
 
     @overrides(AbstractSplitterCommon.reset_called)
@@ -237,10 +296,7 @@ class SplitterAbstractPopulationVertexFixed(
         """
         if self.__slices is not None:
             return
-        n_atoms = self._governed_app_vertex.n_atoms
-        per_core = self._governed_app_vertex.get_max_atoms_per_core()
-        self.__slices = [Slice(i, min(i + per_core - 1, n_atoms - 1))
-                         for i in range(0, n_atoms, per_core)]
+        self.__slices = get_multidimensional_slices(self._governed_app_vertex)
 
     @property
     def n_synapse_vertices(self):

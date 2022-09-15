@@ -313,7 +313,7 @@ class SynapticMatrixApp(object):
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
         :return: A list of arrays of connections, each with dtype
-            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
         synapses_address = locate_memory_region_for_placement(
@@ -340,7 +340,7 @@ class SynapticMatrixApp(object):
         :param int synapses_address:
             The base address of the synaptic matrix region
         :return: A list of arrays of connections, each with dtype
-            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
         connections = list()

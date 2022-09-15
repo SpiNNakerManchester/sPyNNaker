@@ -19,9 +19,12 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 
-class AllToAllConnector(AbstractGenerateConnectorOnMachine):
+class AllToAllConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractGenerateConnectorOnHost):
     """ Connects all cells in the presynaptic population to all cells in \
         the postsynaptic population.
     """
@@ -90,7 +93,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         return self._get_weight_maximum(
             synapse_info.weights, n_conns, synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
@@ -110,7 +113,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             block["target"] += post_vertex_slice.lo_atom
         else:
             block["source"] = numpy.repeat(numpy.arange(
-                0, synapse_info.n_pre_neurons), synapse_info.n_pre_neurons)
+                0, synapse_info.n_pre_neurons), post_vertex_slice.n_atoms)
             block["target"] = numpy.tile(numpy.arange(
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
                 synapse_info.n_pre_neurons)

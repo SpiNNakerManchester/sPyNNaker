@@ -24,11 +24,14 @@ from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 N_GEN_PARAMS = 6
 
 
-class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
+class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
+                                AbstractGenerateConnectorOnHost):
     """ For each pair of pre-post cells, the connection probability is \
         constant.
     """
@@ -125,7 +128,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         return self._get_weight_maximum(
             synapse_info.weights, n_connections, synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments

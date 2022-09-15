@@ -172,7 +172,8 @@ class NeuronData(object):
             if self.__neuron_recording_data is not None:
                 rec_data = self.__neuron_recording_data
             else:
-                rec_data = neuron_recorder.get_generator_data(vertex_slice)
+                rec_data = neuron_recorder.get_generator_data(
+                    vertex_slice, self.__app_vertex.atoms_shape)
             n_words = len(data) + len(header) + len(rec_data)
             spec.reserve_memory_region(
                 region=self.__neuron_regions.neuron_builder,
@@ -188,7 +189,7 @@ class NeuronData(object):
             spec.write_array(neuron_data)
             neuron_recorder.write_neuron_recording_region(
                 spec, self.__neuron_regions.neuron_recording,
-                vertex_slice)
+                vertex_slice, self.__app_vertex.atoms_shape)
         spec.reserve_memory_region(
             region=self.__neuron_regions.initial_values,
             size=self.__app_vertex.get_sdram_usage_for_neuron_params(
@@ -209,7 +210,7 @@ class NeuronData(object):
         if struct.repeat_type == StructRepeat.GLOBAL:
             return struct.get_data(values)
         return struct.get_data(
-            values, vertex_slice.lo_atom, vertex_slice.n_atoms)
+            values, vertex_slice, self.__app_vertex.atoms_shape)
 
     def __get_neuron_builder_data(self, vertex_slice):
         structs = self.__app_vertex.neuron_impl.structs
@@ -225,7 +226,7 @@ class NeuronData(object):
         if struct.repeat_type == StructRepeat.GLOBAL:
             return struct.get_generator_data(values)
         return struct.get_generator_data(
-            values, vertex_slice.lo_atom, vertex_slice.n_atoms)
+            values, vertex_slice, self.__app_vertex.atoms_shape)
 
     def __get_neuron_builder_header(self, vertex_slice, n_structs):
         return numpy.array([

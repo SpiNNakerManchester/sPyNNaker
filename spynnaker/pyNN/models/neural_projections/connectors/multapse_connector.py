@@ -22,9 +22,12 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 
-class MultapseConnector(AbstractGenerateConnectorOnMachine):
+class MultapseConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractGenerateConnectorOnHost):
     """ Create a multapse connector. The size of the source and destination\
         populations are obtained when the projection is connected. The number\
         of synapses is specified. when instantiated, the required number of\
@@ -184,7 +187,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         return self._get_weight_maximum(
             synapse_info.weights, self.__num_synapses, synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments

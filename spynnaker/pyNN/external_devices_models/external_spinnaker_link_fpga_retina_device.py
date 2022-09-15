@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
@@ -90,8 +88,8 @@ class ExternalFPGARetinaDevice(
         fixed_n_neurons = self.get_n_neurons(mode, polarity)
         super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
-            label=label, max_atoms_per_core=fixed_n_neurons,
-            board_address=board_address)
+            label=label, board_address=board_address, incoming=True,
+            outgoing=True)
 
         self.__fixed_key = (retina_key & 0xFFFF) << 16
         self.__fixed_mask = 0xFFFF8000
@@ -100,8 +98,9 @@ class ExternalFPGARetinaDevice(
 
         self.__fixed_mask = self._get_mask(mode)
 
-        self.add_constraint(FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)]))
+    @overrides(PopulationSpiNNakerLinkVertex.get_fixed_key_and_mask)
+    def get_fixed_key_and_mask(self, partition_id):
+        return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 
     def _get_mask(self, mode):
         if mode == ExternalFPGARetinaDevice.MODE_128:

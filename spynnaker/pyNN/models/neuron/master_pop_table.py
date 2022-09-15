@@ -329,13 +329,12 @@ class MasterPopTableAsBinarySearch(object):
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int
         """
-        # There will be an address list entry for each incoming projection
-        n_entries = len(incoming_projections)
-
         # Count the pre-machine-vertices
+        n_entries = 0
         n_vertices = 0
         seen_edges = set()
         for proj in incoming_projections:
+            n_entries += 1
             # pylint: disable=protected-access
             in_edge = proj._projection_edge
 

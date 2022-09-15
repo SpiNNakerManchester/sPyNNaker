@@ -17,12 +17,16 @@ from collections import namedtuple
 
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
+
+from pacman.utilities.utility_calls import get_field_based_keys
+
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
+from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 
@@ -183,7 +187,8 @@ class PopulationMachineNeurons(
             n_atoms))
 
         # Reserve and switch to the memory region
-        params_size = self._app_vertex.get_sdram_usage_for_core_neuron_params()
+        params_size = self._app_vertex.get_sdram_usage_for_core_neuron_params(
+            n_atoms)
         spec.reserve_memory_region(
             region=self._neuron_regions.core_params, size=params_size,
             label='Neuron Core Params')
@@ -193,10 +198,17 @@ class PopulationMachineNeurons(
         # isn't to be used
         if self._key is None:
             spec.write_value(data=0)
-            spec.write_value(data=0)
+            keys = [0] * n_atoms
         else:
             spec.write_value(data=1)
-            spec.write_value(data=self._key)
+            # Quick and dirty way to avoid using field based keys in cases
+            # which use grids but not local-only neuron models
+            if isinstance(self._app_vertex.synapse_dynamics,
+                          AbstractLocalOnly):
+                keys = get_field_based_keys(self._key, self._vertex_slice)
+            else:
+                # keys are consecutive from the base value
+                keys = [self._key + nn for nn in range(n_atoms)]
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
@@ -208,6 +220,9 @@ class PopulationMachineNeurons(
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         spec.write_value(n_synapse_types)
         spec.write_array(ring_buffer_shifts)
+
+        # Write the keys
+        spec.write_array(keys)
 
     def _write_current_source_parameters(self, spec):
         # pylint: disable=too-many-arguments

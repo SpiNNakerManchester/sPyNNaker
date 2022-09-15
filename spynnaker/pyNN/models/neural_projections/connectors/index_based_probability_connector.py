@@ -23,6 +23,8 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 # support for arbitrary expression for the indices
 _index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
@@ -31,7 +33,8 @@ _index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
                                tan, tanh, maximum, minimum, e=e, pi=pi)
 
 
-class IndexBasedProbabilityConnector(AbstractConnector):
+class IndexBasedProbabilityConnector(AbstractConnector,
+                                     AbstractGenerateConnectorOnHost):
     """ Make connections using a probability distribution which varies\
         dependent upon the indices of the pre- and post-populations.
     """
@@ -143,7 +146,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         return self._get_weight_maximum(
             synapse_info.weights, n_connections, synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # setup probs here
