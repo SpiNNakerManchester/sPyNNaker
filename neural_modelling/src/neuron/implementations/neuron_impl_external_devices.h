@@ -113,11 +113,6 @@ static synapse_param_t *neuron_synapse_shaping_params;
 //! The number of steps to run per timestep
 static uint n_steps_per_timestep;
 
-//#ifndef SOMETIMES_UNUSED
-//#define SOMETIMES_UNUSED __attribute__((unused))
-//#endif // !SOMETIMES_UNUSED
-
-
 // Typesafe magic reinterpret cast
 static inline uint _int_bits(int value) {
     typedef union _int_bits_union {
