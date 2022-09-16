@@ -158,8 +158,6 @@ static inline current_state_t *_alloc_state(void) {
 
 bool synaptogenesis_dynamics_initialise(
         address_t sdram_sp_address, uint32_t *recording_regions_used) {
-    log_debug("SR init.");
-
     uint8_t *data = sp_structs_read_in_common(
             sdram_sp_address, &rewiring_data, &pre_info, &post_to_pre_table);
 
@@ -335,7 +333,6 @@ static inline bool row_restructure(
         uint32_t no_elems = synapse_dynamics_n_connections_in_row(
                 synapse_row_fixed_region(row));
         if (no_elems >= rewiring_data.s_max) {
-            log_debug("row is full");
             return false;
         } else {
             if (current_state->with_replacement) {

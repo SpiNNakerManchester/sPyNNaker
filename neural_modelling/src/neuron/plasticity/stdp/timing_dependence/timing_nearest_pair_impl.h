@@ -134,10 +134,8 @@ static inline update_state_t timing_apply_post_spike(
         int32_t decayed_r1 = maths_lut_exponential_decay(
             time_since_last_pre, tau_plus_lookup);
 
-        log_debug("\t\t\ttime_since_last_pret=%u, decayed_r1=%d\n",
+        log_debug("\t\t\ttime_since_last_pre=%u, decayed_r1=%d\n",
                 time_since_last_pre, decayed_r1);
-        log_debug("\t\t\ttime_since_last_post=%u, decayed_r1=%d\n",
-                time_since_last_post, decayed_r1);
 
         if (time_since_last_post < time_since_last_pre) {
             log_debug("\t\t\tSetting trace to zero as not first pre-post pairing");
