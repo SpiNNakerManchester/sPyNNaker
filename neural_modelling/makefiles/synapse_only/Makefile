@@ -23,11 +23,14 @@ MODELS = synapses\
          synapses_stdp_mad_vogels_2011_additive\
          synapses_structural_random_distance_weight\
          synapses_structural_last_neuron_distance_weight\
-         synapses_stdp_mad_pair_additive_structural_random_distance_weight\
-         synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight\
-         synapses_stdp_izhikevich_neuromodulation_pair_additive\
-         synapses_stdp_izhikevich_neuromodulation_pair_additive_structural_random_distance_weight\
-         synapses_stdp_izhikevich_neuromodulation_pair_additive_structural_last_neuron_distance_weight
+         synapses_stdp_izhikevich_neuromodulation_pair_additive
+         
+ifneq ($(SPYNNAKER_DEBUG), DEBUG)
+    MODELS += synapses_stdp_mad_pair_additive_structural_random_distance_weight\
+              synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight\
+              synapses_stdp_izhikevich_neuromodulation_pair_additive_structural_random_distance_weight\
+              synapses_stdp_izhikevich_neuromodulation_pair_additive_structural_last_neuron_distance_weight
+endif
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done

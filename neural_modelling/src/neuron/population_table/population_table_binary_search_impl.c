@@ -412,7 +412,6 @@ static inline bool population_table_position_in_the_master_pop_array(
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words) {
-    log_debug("Population_table_initialise: starting");
     pop_table_config_t *config = (pop_table_config_t *) table_address;
 
     master_population_table_length = config->table_length;
@@ -485,7 +484,6 @@ bool population_table_get_first_address(
                 spike, spike);
         return false;
     }
-    log_debug("position = %d", position);
 
     master_population_table_entry entry = master_population_table[position];
 
@@ -509,10 +507,8 @@ bool population_table_get_first_address(
 
     // check we have a entry in the bit field for this (possible not to due to
     // DTCM limitations or router table compression). If not, go to DMA check.
-    log_debug("Checking bit field");
     if (connectivity_bit_field != NULL &&
             connectivity_bit_field[position] != NULL) {
-        log_debug("Can be checked, bitfield is allocated");
         // check that the bit flagged for this neuron id does hit a
         // neuron here. If not return false and avoid the DMA check.
         if (!bit_field_test(

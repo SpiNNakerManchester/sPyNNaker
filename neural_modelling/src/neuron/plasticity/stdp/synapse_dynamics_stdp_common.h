@@ -138,52 +138,6 @@ static inline bool synapse_dynamics_stdp_init(
     return true;
 }
 
-//---------------------------------------
-// Synaptic row plastic-region implementation
-//---------------------------------------
-void synapse_dynamics_print_plastic_synapses(
-        synapse_row_plastic_data_t *plastic_region_data,
-        synapse_row_fixed_part_t *fixed_region,
-        accum *min_weights) {
-    __use(plastic_region_data);
-    __use(fixed_region);
-    __use(min_weights);
-
-#if LOG_LEVEL >= LOG_DEBUG
-    // Extract separate arrays of weights (from plastic region),
-    // Control words (from fixed region) and number of plastic synapses
-    const plastic_synapse_t *plastic_words = plastic_region_data->synapses;
-    const control_t *control_words = synapse_row_plastic_controls(fixed_region);
-    size_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
-
-    log_debug("Plastic region %u synapses\n", plastic_synapse);
-
-    // Loop through plastic synapses
-    for (uint32_t i = 0; i < plastic_synapse; i++) {
-        // Get next control word (auto incrementing control word)
-        uint32_t control_word = *control_words++;
-        uint32_t synapse_type = synapse_row_sparse_type(
-                control_word, synapse_index_bits, synapse_type_mask);
-
-        // Get weight
-        update_state_t update_state = synapse_structure_get_update_state(
-                *plastic_words++, synapse_type);
-        final_state_t final_state = synapse_structure_get_final_state(
-                update_state);
-        weight_t weight = synapse_structure_get_final_weight(final_state);
-
-        log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);
-        synapses_print_weight(
-                weight, min_weights[synapse_type]);
-        log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
-                synapse_row_sparse_delay(control_word, synapse_type_index_bits, synapse_delay_mask),
-                synapse_types_get_type_char(synapse_type),
-                synapse_row_sparse_index(control_word, synapse_index_mask),
-                synapse_delay_mask, synapse_type_index_bits);
-    }
-#endif // LOG_LEVEL >= LOG_DEBUG
-}
-
 input_t synapse_dynamics_get_intrinsic_bias(
         UNUSED uint32_t time, UNUSED index_t neuron_index) {
     return ZERO;

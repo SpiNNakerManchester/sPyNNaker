@@ -45,7 +45,6 @@ address_t weight_initialise(
         address_t address, uint32_t n_synapse_types, REAL *min_weights) {
     log_debug("weight_initialise: starting");
     log_debug("\tSTDP multiplicative weight dependence");
-
     // Copy plasticity region data from address
     // **NOTE** this seems somewhat safer than relying on sizeof
     plasticity_weight_region_data_t *dtcm_copy = plasticity_weight_region_data =
@@ -75,8 +74,6 @@ address_t weight_initialise(
                 s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,
                 dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus, min_weight[s]);
     }
-
-    log_debug("weight_initialise: completed successfully");
 
     // Return end address of region
     return (address_t) config;
