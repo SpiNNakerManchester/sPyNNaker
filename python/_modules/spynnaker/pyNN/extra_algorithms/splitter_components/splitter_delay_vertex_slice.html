@@ -81,8 +81,6 @@
 
     <span class="n">_EXPANDER_BASE_PARAMS_SIZE</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
-    <span class="n">SPLITTER_NAME</span> <span class="o">=</span> <span class="s2">&quot;SplitterDelayVertexSlice&quot;</span>
-
     <span class="n">INVALID_POP_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;The vertex </span><span class="si">{}</span><span class="s2"> cannot be supported by the &quot;</span>
         <span class="s2">&quot;SplitterDelayVertexSlice as&quot;</span>
@@ -102,7 +100,7 @@
         <span class="sd">&quot;&quot;&quot; splitter for delay extensions</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SPLITTER_NAME</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_machine_vertex_by_slice</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SplitterDelayVertexSlice.get_out_going_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_out_going_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">)</span>

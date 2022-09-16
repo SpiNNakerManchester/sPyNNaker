@@ -107,9 +107,6 @@
         <span class="s2">&quot;__vertices&quot;</span>
     <span class="p">]</span>
 
-    <span class="sd">&quot;&quot;&quot; The name of the splitter &quot;&quot;&quot;</span>
-    <span class="n">SPLITTER_NAME</span> <span class="o">=</span> <span class="s2">&quot;SplitterAbstractPopulationVertexFixed&quot;</span>
-
     <span class="sd">&quot;&quot;&quot; The message to use when the Population is invalid &quot;&quot;&quot;</span>
     <span class="n">INVALID_POP_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;The vertex </span><span class="si">{}</span><span class="s2"> cannot be supported by the &quot;</span>
@@ -119,7 +116,7 @@
         <span class="s2">&quot;your vertex and try again.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SPLITTER_NAME</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>

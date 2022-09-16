@@ -152,8 +152,6 @@
         <span class="s2">&quot;__neuromodulators&quot;</span>
         <span class="p">]</span>
 
-    <span class="n">SPLITTER_NAME</span> <span class="o">=</span> <span class="s2">&quot;SplitterAbstractPopulationVertexNeuronsSynapses&quot;</span>
-
     <span class="n">INVALID_POP_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;The vertex </span><span class="si">{}</span><span class="s2"> cannot be supported by the &quot;</span>
         <span class="s2">&quot;SplitterAbstractPopVertexNeuronsSynapses as&quot;</span>
@@ -180,8 +178,7 @@
 <span class="sd">            whether delay extensions should be needed.</span>
 <span class="sd">        :type allow_delay_extension: bool or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SplitterAbstractPopulationVertexNeuronsSynapses</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">SPLITTER_NAME</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SplitterAbstractPopulationVertexNeuronsSynapses</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">AbstractSpynnakerSplitterDelay</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_vertices</span> <span class="o">=</span> <span class="n">n_synapse_vertices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="n">max_delay</span>
