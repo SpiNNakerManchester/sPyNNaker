@@ -248,10 +248,8 @@ static inline uint8_t *sp_structs_read_in_common(
     uint8_t *data = (uint8_t *) sdram_sp_address;
     spin1_memcpy(rewiring_data, data, sizeof(rewiring_data_t));
     data += sizeof(rewiring_data_t);
-    log_debug("Topographic Map Impl, s_max=%u", rewiring_data->s_max);
 
     pre_info->no_pre_pops = rewiring_data->no_pre_pops;
-    log_debug(" no pre pops = %d", pre_info->no_pre_pops);
     pre_info->prepop_info = spin1_malloc(
             rewiring_data->no_pre_pops * sizeof(pre_info_t *));
     if (pre_info->prepop_info == NULL) {

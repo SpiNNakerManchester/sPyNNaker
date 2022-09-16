@@ -46,8 +46,6 @@ typedef struct {
 // Functions
 //---------------------------------------
 address_t timing_initialise(address_t address) {
-    log_debug("timing_initialise: starting");
-    log_debug("\tRecurrent pre-calculated stochastic STDP rule");
     pre_stochastic_config_t *config = (pre_stochastic_config_t *) address;
 
     // Copy plasticity region data from address
@@ -66,8 +64,6 @@ address_t timing_initialise(address_t address) {
             sizeof(config->pre_exp_dist_lookup));
     spin1_memcpy(post_exp_dist_lookup, config->post_exp_dist_lookup,
             sizeof(config->post_exp_dist_lookup));
-
-    log_debug("timing_initialise: completed successfully");
 
     return config->following_data;
 }
