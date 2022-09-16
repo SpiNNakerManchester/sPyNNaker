@@ -89,7 +89,7 @@ bool neuron_resume(void) { // EXPORTED
     // (re)load the current source parameters
     current_source_load_parameters(current_source_address);
 
-    log_debug("Resume: neuron_load_neuron_parameters starting");
+//    log_debug("Resume: neuron_load_neuron_parameters starting");
     return neuron_load_neuron_parameters();
 }
 

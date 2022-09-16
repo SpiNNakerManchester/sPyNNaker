@@ -320,15 +320,15 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
          log_debug("Master pop key: 0x%08x, mask: 0x%08x",
                  master_population_table[mp_i].key, master_population_table[mp_i].mask);
 
-#ifdef LOG_DEBUG
-         // Sanity checking code; not needed in normal operation, and costs ITCM
-         // With both things being in key order, this should never happen...
-         if (bf_i < n_filters &&
-                 filters[bf_i].key < master_population_table[mp_i].key) {
-             log_error("Skipping bitfield %d for key 0x%08x", bf_i, filters[bf_i].key);
-             rt_error(RTE_SWERR);
-         }
-#endif
+//#ifdef LOG_DEBUG
+//         // Sanity checking code; not needed in normal operation, and costs ITCM
+//         // With both things being in key order, this should never happen...
+//         if (bf_i < n_filters &&
+//                 filters[bf_i].key < master_population_table[mp_i].key) {
+//             log_error("Skipping bitfield %d for key 0x%08x", bf_i, filters[bf_i].key);
+//             rt_error(RTE_SWERR);
+//         }
+//#endif
 
          // While there is a match, keep track of the start and end; note this
          // may recheck the first entry, but there might not be a first entry if
@@ -336,7 +336,7 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
          uint32_t start = bf_i;
          uint32_t n_words_total = 0;
          uint32_t useful = 0;
-         log_debug("Starting with bit field %d with key 0x%08x", bf_i, filters[bf_i].key);
+//         log_debug("Starting with bit field %d with key 0x%08x", bf_i, filters[bf_i].key);
          while (bf_i < n_filters && matches(mp_i, filters[bf_i].key)) {
              log_debug("Using bit field %d with key 0x%08x, merged %d, redundant %d",
                      bf_i, filters[bf_i].key, filters[bf_i].merged, filters[bf_i].all_ones);
@@ -487,12 +487,12 @@ bool population_table_get_first_address(
 
     master_population_table_entry entry = master_population_table[position];
 
-    #if LOG_LEVEL >= LOG_DEBUG
-    if (entry.count == 0) {
-        log_debug("Spike %u (= %x): Population found in master population"
-                "table but count is 0", spike, spike);
-    }
-    #endif
+//    #if LOG_LEVEL >= LOG_DEBUG
+//    if (entry.count == 0) {
+//        log_debug("Spike %u (= %x): Population found in master population"
+//                "table but count is 0", spike, spike);
+//    }
+//    #endif
 
     last_spike = spike;
     next_item = entry.start;
@@ -513,12 +513,12 @@ bool population_table_get_first_address(
         // neuron here. If not return false and avoid the DMA check.
         if (!bit_field_test(
                 connectivity_bit_field[position], last_neuron_id)) {
-            log_debug("Tested and was not set");
+//            log_debug("Tested and was not set");
             bit_field_filtered_packets += 1;
             items_to_go = 0;
             return false;
         }
-        log_debug("Was set, carrying on");
+//        log_debug("Was set, carrying on");
     } else {
         log_debug("Bit field was not set up. "
                 "either its due to a lack of DTCM, or because the "

@@ -336,7 +336,7 @@ static inline void start_dma_loop(void) {
     	    		max_flushed_spikes = spikes_remaining;
     	    	}
 
-    	    	log_debug("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
+//    	    	log_debug("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
     	    }
     }
 #endif

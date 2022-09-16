@@ -52,13 +52,12 @@ extern uint32_t synapse_delay_mask;
 //! Count of the number of times the synapses have saturated their weights.
 extern uint32_t synapses_saturation_count;
 
-
 //! \brief Print the weight of a synapse
 //! \param[in] weight: the weight to print in synapse-row form
 //! \param[in] left_shift: the shift to use when decoding
 static inline void synapses_print_weight(
         weight_t weight, uint32_t left_shift) {
-    if (weight != 0) {
+	if (weight != 0) {
         io_printf(IO_BUF, "%12.6k",
                 synapse_row_convert_weight_to_input(weight, left_shift));
     } else {

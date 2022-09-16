@@ -54,8 +54,8 @@ bool direct_synapses_initialise(
             log_error("Not enough memory to allocate direct matrix");
             return false;
         }
-        log_debug("Copying %u bytes of direct synapses to 0x%08x",
-                direct_matrix_size, dtcm_copy);
+//        log_debug("Copying %u bytes of direct synapses to 0x%08x",
+//                direct_matrix_size, dtcm_copy);
         spin1_memcpy(dtcm_copy, direct_matrix->data, direct_matrix_size);
         *direct_synapses_address = dtcm_copy;
     }

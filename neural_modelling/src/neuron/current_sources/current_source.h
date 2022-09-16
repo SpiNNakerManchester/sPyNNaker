@@ -92,8 +92,8 @@ static bool current_source_initialise(address_t cs_address, uint32_t n_neurons) 
         n_step_sources = (uint32_t) cs_address[next++];
         n_noisy_sources = (uint32_t) cs_address[next++];
 
-        log_debug("Check numbers of sources: AC %u DC %u STEP %u NOISY %u",
-                n_dc_sources, n_ac_sources, n_step_sources, n_noisy_sources);
+//        log_debug("Check numbers of sources: AC %u DC %u STEP %u NOISY %u",
+//                n_dc_sources, n_ac_sources, n_step_sources, n_noisy_sources);
 
 		// Now initialise separate sources
 #ifdef _CURRENT_SOURCE_DC_H_
