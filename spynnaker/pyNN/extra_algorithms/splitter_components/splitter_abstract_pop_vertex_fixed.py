@@ -67,9 +67,6 @@ class SplitterAbstractPopulationVertexFixed(
         "__vertices"
     ]
 
-    """ The name of the splitter """
-    SPLITTER_NAME = "SplitterAbstractPopulationVertexFixed"
-
     """ The message to use when the Population is invalid """
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
@@ -79,7 +76,7 @@ class SplitterAbstractPopulationVertexFixed(
         "your vertex and try again.")
 
     def __init__(self):
-        super().__init__(self.SPLITTER_NAME)
+        super().__init__()
         self.__ring_buffer_shifts = None
         self.__weight_scales = None
         self.__all_syn_block_sz = dict()
