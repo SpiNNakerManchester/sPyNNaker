@@ -96,6 +96,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
 <tr class="memdesc:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse dynamics.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">More...</a><br /></td></tr>
 <tr class="separator:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0dc7f1b3f6348db279fbad8c8040b1c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ac0dc7f1b3f6348db279fbad8c8040b1c">synapse_dynamics_print_plastic_synapses</a> (<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_data, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memdesc:ac0dc7f1b3f6348db279fbad8c8040b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the synapse dynamics.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#ac0dc7f1b3f6348db279fbad8c8040b1c">More...</a><br /></td></tr>
+<tr class="separator:ac0dc7f1b3f6348db279fbad8c8040b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abade6b73a469c1ff0e54366f065343e5"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#abade6b73a469c1ff0e54366f065343e5">sparse_axonal_delay</a> (uint32_t x)</td></tr>
 <tr class="memdesc:abade6b73a469c1ff0e54366f065343e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the axonal delay.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#abade6b73a469c1ff0e54366f065343e5">More...</a><br /></td></tr>
 <tr class="separator:abade6b73a469c1ff0e54366f065343e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -306,6 +309,52 @@ The per-synapse information. </td></tr>
 
 </div>
 </div>
+<a id="ac0dc7f1b3f6348db279fbad8c8040b1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0dc7f1b3f6348db279fbad8c8040b1c">&#9670;&nbsp;</a></span>synapse_dynamics_print_plastic_synapses()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void synapse_dynamics_print_plastic_synapses </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *&#160;</td>
+          <td class="paramname"><em>plastic_region_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *&#160;</td>
+          <td class="paramname"><em>fixed_region</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>ring_buffer_to_input_buffer_left_shifts</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Print the synapse dynamics. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">plastic_region_data</td><td>Where the plastic data is </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed_region</td><td>Where the fixed data is </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ring_buffer_to_input_buffer_left_shifts</td><td>How to interpret the values from the ring buffers </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00124">124</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
+
+</div>
+</div>
 <a id="abade6b73a469c1ff0e54366f065343e5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abade6b73a469c1ff0e54366f065343e5">&#9670;&nbsp;</a></span>sparse_axonal_delay()</h2>
 
@@ -339,7 +388,7 @@ The per-synapse information. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the axonal delay </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00125">125</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00170">170</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
 
 </div>
 </div>
@@ -378,7 +427,7 @@ The per-synapse information. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00136">136</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00181">181</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
 
 </div>
 </div>
@@ -439,7 +488,7 @@ The per-synapse information. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the processing was successful or not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00177">177</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00222">222</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
 
 </div>
 </div>
@@ -507,7 +556,7 @@ The per-synapse information. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>was the search successful? </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00214">214</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00259">259</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
 
 </div>
 </div>
@@ -547,7 +596,7 @@ The per-synapse information. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>was the removal successful? </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00245">245</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00290">290</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
 
 </div>
 </div>
@@ -608,14 +657,14 @@ The per-synapse information. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>was the addition successful? </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00266">266</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00311">311</a> of file <a class="el" href="synapse__dynamics__stdp__mad__impl_8c_source.html">synapse_dynamics_stdp_mad_impl.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 14 2022 13:20:21 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Sep 16 2022 06:59:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

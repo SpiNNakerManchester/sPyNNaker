@@ -2633,25 +2633,25 @@
       <anchor>af2c8c3ce110bf3e9b4d0dc27f22b4860</anchor>
       <arglist>(address_t address, uint32_t next, uint32_t n_neurons)</arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
+    <member kind="function" static="yes">
+      <type>static void</type>
       <name>neuron_impl_print_inputs</name>
       <anchorfile>neuron__impl_8h.html</anchorfile>
-      <anchor>aa1d6d1186174dd22b3d152b919a4ca0f</anchor>
+      <anchor>acd93dc53f9853bbfdc0f8f410c475431</anchor>
       <arglist>(uint32_t n_neurons)</arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
+    <member kind="function" static="yes">
+      <type>static void</type>
       <name>neuron_impl_print_synapse_parameters</name>
       <anchorfile>neuron__impl_8h.html</anchorfile>
-      <anchor>a29ad1f4cd958c5acde321fe2f2d41abe</anchor>
+      <anchor>a1095c8e988d10fd07d007592b99f8594</anchor>
       <arglist>(uint32_t n_neurons)</arglist>
     </member>
-    <member kind="function">
-      <type>const char *</type>
+    <member kind="function" static="yes">
+      <type>static const char *</type>
       <name>neuron_impl_get_synapse_type_char</name>
       <anchorfile>neuron__impl_8h.html</anchorfile>
-      <anchor>ab28525e166d16dfb00284093d84c6661</anchor>
+      <anchor>a674c6afffa4715a3f55fd5cae2dc9863</anchor>
       <arglist>(uint32_t synapse_type)</arglist>
     </member>
   </compound>
@@ -4393,13 +4393,6 @@
     <class kind="struct">stdp_params</class>
     <class kind="struct">fixed_stdp_synapse</class>
     <member kind="function">
-      <type>void</type>
-      <name>synapse_dynamics_print_plastic_synapses</name>
-      <anchorfile>synapse__dynamics__stdp__common_8h.html</anchorfile>
-      <anchor>ac0dc7f1b3f6348db279fbad8c8040b1c</anchor>
-      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, uint32_t *ring_buffer_to_input_buffer_left_shifts)</arglist>
-    </member>
-    <member kind="function">
       <type>uint32_t</type>
       <name>synapse_dynamics_get_plastic_pre_synaptic_events</name>
       <anchorfile>synapse__dynamics__stdp__common_8h.html</anchorfile>
@@ -4485,6 +4478,13 @@
       <anchor>a4a1c98d660ba6a17d4678ae9ef2a5526</anchor>
       <arglist>(address_t address, uint32_t n_neurons, uint32_t n_synapse_types, uint32_t *ring_buffer_to_input_buffer_left_shifts)</arglist>
     </member>
+    <member kind="function">
+      <type>void</type>
+      <name>synapse_dynamics_print_plastic_synapses</name>
+      <anchorfile>synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html</anchorfile>
+      <anchor>ac0dc7f1b3f6348db279fbad8c8040b1c</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, uint32_t *ring_buffer_to_input_buffer_left_shifts)</arglist>
+    </member>
     <member kind="function" static="yes">
       <type>static index_t</type>
       <name>sparse_axonal_delay</name>
@@ -4548,6 +4548,13 @@
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
       <anchor>a4a1c98d660ba6a17d4678ae9ef2a5526</anchor>
       <arglist>(address_t address, uint32_t n_neurons, uint32_t n_synapse_types, uint32_t *ring_buffer_to_input_buffer_left_shifts)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>synapse_dynamics_print_plastic_synapses</name>
+      <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
+      <anchor>ac0dc7f1b3f6348db279fbad8c8040b1c</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, uint32_t *ring_buffer_to_input_buffer_left_shifts)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static index_t</type>
@@ -8419,13 +8426,6 @@
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>aa1af43227da048950da85c91ca255075</anchor>
       <arglist>(synapse_row_fixed_part_t *fixed_region, uint32_t time)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>print_synapse_parameters</name>
-      <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>a74c97ada7fedd1b5e90ed09797072c29</anchor>
-      <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>

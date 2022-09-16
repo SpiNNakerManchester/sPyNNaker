@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['floor_5fto_5f2_5023',['FLOOR_TO_2',['../neuron__recording_8c.html#a403b173ad583ec922758a7edc380fa3c',1,'neuron_recording.c']]],
-  ['fract_5fconst_5024',['FRACT_CONST',['../maths-util_8h.html#ade056d60ae7bac69fab1196cc114cfb3',1,'maths-util.h']]]
+  ['floor_5fto_5f2_5021',['FLOOR_TO_2',['../neuron__recording_8c.html#a403b173ad583ec922758a7edc380fa3c',1,'neuron_recording.c']]],
+  ['fract_5fconst_5022',['FRACT_CONST',['../maths-util_8h.html#ade056d60ae7bac69fab1196cc114cfb3',1,'maths-util.h']]]
 ];

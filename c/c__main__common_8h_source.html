@@ -165,12 +165,11 @@ $(function() {
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="comment">// Finalise any recordings that are in progress</span></div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="c__main_8c.html#a9a97f21dc7fccaac8071bcd29894bccb">recording_flags</a> &gt; 0) {</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;updating recording regions&quot;</span>);</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/recording_8h.html#a61f4d74e9f18ff231c0b3926cb144b3b">recording_finalise</a>();</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    }</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8h.html#a0b7e4fa366688c5ad4e3a0861023b015">profiler_finalise</a>();</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;}</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/recording_8h.html#a61f4d74e9f18ff231c0b3926cb144b3b">recording_finalise</a>();</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8h.html#a0b7e4fa366688c5ad4e3a0861023b015">profiler_finalise</a>();</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;}</div>
 <div class="ttc" id="abit__field__sorter__and__searcher_8c_html_a7fcef664d5dc54944296abea6f026276"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/bit__field__sorter__and__searcher_8c.html#a7fcef664d5dc54944296abea6f026276">priorities</a></div><div class="ttdeci">priorities</div></div>
 <div class="ttc" id="ac__main_8c_html_a9a97f21dc7fccaac8071bcd29894bccb"><div class="ttname"><a href="c__main_8c.html#a9a97f21dc7fccaac8071bcd29894bccb">recording_flags</a></div><div class="ttdeci">static uint32_t recording_flags</div><div class="ttdoc">The recording flags indicating if anything is recording.</div><div class="ttdef"><b>Definition:</b> <a href="c__main_8c_source.html#l00106">c_main.c:106</a></div></div>
 <div class="ttc" id="adata__specification_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification.h</a></div></div>
@@ -178,7 +177,6 @@ $(function() {
 <div class="ttc" id="adata__specification_8h_html_a77cda8f0103039e98d16777000de889a"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#a77cda8f0103039e98d16777000de889a">data_specification_get_data_address</a></div><div class="ttdeci">data_specification_metadata_t * data_specification_get_data_address(void)</div></div>
 <div class="ttc" id="adata__specification_8h_html_acfeb7a17f6fd55f4fde96be91a8a4b0a"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#acfeb7a17f6fd55f4fde96be91a8a4b0a">data_specification_read_header</a></div><div class="ttdeci">bool data_specification_read_header(data_specification_metadata_t *ds_regions)</div></div>
 <div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
-<div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
 <div class="ttc" id="adelay__extension_8c_html_a2178bb4764f423b1534a9631b0cc6e5e"><div class="ttname"><a href="delay__extension_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">simulation_ticks</a></div><div class="ttdeci">static uint32_t simulation_ticks</div><div class="ttdoc">Simulation speed.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00103">delay_extension.c:103</a></div></div>
 <div class="ttc" id="adelay__extension_8c_html_a9ee6c18f2c55e2b60ea4194d4722f735"><div class="ttname"><a href="delay__extension_8c.html#a9ee6c18f2c55e2b60ea4194d4722f735">infinite_run</a></div><div class="ttdeci">static uint32_t infinite_run</div><div class="ttdoc">True if we're running forever.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00105">delay_extension.c:105</a></div></div>
 <div class="ttc" id="adelay__extension_8c_html_ac0c27301e134af3ce80814a553601074"><div class="ttname"><a href="delay__extension_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a></div><div class="ttdeci">static uint32_t timer_period</div><div class="ttdoc">Used for configuring the timer hardware.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00154">delay_extension.c:154</a></div></div>
@@ -206,7 +204,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 14 2022 13:20:20 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Sep 16 2022 06:59:48 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
