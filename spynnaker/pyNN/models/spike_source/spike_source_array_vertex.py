@@ -32,6 +32,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 # Cutoff to warn too many spikes sent at one time
 TOO_MANY_SPIKES = 100
 
+
 def _as_numpy_ticks(times, time_step):
     return numpy.ceil(
         numpy.floor(numpy.array(times) * 1000.0) / time_step).astype("int64")

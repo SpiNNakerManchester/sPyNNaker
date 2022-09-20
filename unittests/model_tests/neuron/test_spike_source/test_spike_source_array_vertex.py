@@ -45,12 +45,6 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             label="test", max_atoms_per_core=None, model=None, splitter=None)
         v.spike_times = [2, 12, 32]
 
-    def test_singleton_list(self):
-        v = SpikeSourceArrayVertex(
-            n_neurons=5, spike_times=[1, 11, 22], constraints=None,
-            label="test", max_atoms_per_core=None, model=None, splitter=None)
-        v.spike_times = [2, 12, 32]
-
     def test_double_list(self):
         SpikeSourceArrayVertex(
             n_neurons=3, spike_times=[[1], [11], [22]], constraints=None,
@@ -66,17 +60,17 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
         spike_list3.extend([21, 23, 45])
         spike_list = [spike_list1, spike_list2, spike_list3]
         with LogCapture() as lc:
-             SpikeSourceArrayVertex(
+            SpikeSourceArrayVertex(
                 n_neurons=3, spike_times=spike_list, constraints=None,
                 label="test", max_atoms_per_core=None, model=None,
                 splitter=None)
-             found = False
-             for record in lc.records:
+            found = False
+            for record in lc.records:
                 if "too many spikes" in record.msg.fmt:
                     self.assertIn("110", record.msg.fmt)
                     self.assertIn("15", record.msg.fmt)
                     found = True
-             self.assertTrue(found)
+            self.assertTrue(found)
 
     def test_shared_list_big(self):
         with LogCapture() as lc:
