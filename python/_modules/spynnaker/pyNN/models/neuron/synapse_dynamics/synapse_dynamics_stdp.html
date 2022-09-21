@@ -141,7 +141,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight</span> <span class="o">=</span> <span class="n">weight</span>
         <span class="k">if</span> <span class="n">delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">delay</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_min_delay</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__delay</span> <span class="o">=</span> <span class="n">delay</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_round_delay</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__backprop_delay</span> <span class="o">=</span> <span class="n">backprop_delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -611,10 +611,6 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay</span>
-
-<div class="viewcode-block" id="SynapseDynamicsSTDP.set_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.set_delay">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">set_delay</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__delay</span> <span class="o">=</span> <span class="n">delay</span></div>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">pad_to_length</span><span class="p">)</span>

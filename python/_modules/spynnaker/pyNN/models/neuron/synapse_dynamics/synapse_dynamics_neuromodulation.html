@@ -287,12 +287,6 @@
         <span class="c1"># Delay is always 1!</span>
         <span class="k">return</span> <span class="mi">1</span>
 
-<div class="viewcode-block" id="SynapseDynamicsNeuromodulation.set_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.set_delay">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">set_delay</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">delay</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;Neuromodulation delay must be 0&quot;</span><span class="p">)</span></div>
-
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">pad_to_length</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">pad_to_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

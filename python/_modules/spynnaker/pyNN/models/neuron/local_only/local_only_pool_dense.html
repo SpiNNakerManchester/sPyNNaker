@@ -177,11 +177,6 @@
     <span class="k">def</span> <span class="nf">delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span>
 
-<div class="viewcode-block" id="LocalOnlyPoolDense.set_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.local_only.html#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.set_delay">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractLocalOnly</span><span class="o">.</span><span class="n">set_delay</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
-        <span class="c1"># We don&#39;t need no stinking delay</span>
-        <span class="k">pass</span></div>
-
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractLocalOnly</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

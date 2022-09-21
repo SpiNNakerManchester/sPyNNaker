@@ -59,7 +59,6 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">pyNN</span> <span class="kn">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">pynn_common</span>
-<span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">pyNN.recording.files</span> <span class="kn">import</span> <span class="n">StandardTextFile</span>
 <span class="kn">from</span> <span class="nn">pyNN.space</span> <span class="kn">import</span> <span class="n">Space</span> <span class="k">as</span> <span class="n">PyNNSpace</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
@@ -178,16 +177,6 @@
         <span class="c1"># if any) and add them to the synapse dynamics object</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">FromListConnector</span><span class="p">):</span>
             <span class="n">connector</span><span class="o">.</span><span class="n">_apply_parameters_to_synapse_type</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">)</span>
-
-        <span class="c1"># round the delays to multiples of full timesteps</span>
-        <span class="c1"># (otherwise SDRAM estimation calculations can go wrong)</span>
-        <span class="k">if</span> <span class="p">((</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">))</span>
-                <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">,</span> <span class="nb">str</span><span class="p">))):</span>
-            <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">set_delay</span><span class="p">(</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
-                    <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span> <span class="o">*</span>
-                    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_ms</span><span class="p">())</span> <span class="o">*</span>
-                <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">())</span>
 
         <span class="c1"># set the plasticity dynamics for the post pop (allows plastic stuff</span>
         <span class="c1">#  when needed)</span>
