@@ -137,11 +137,6 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def delay(self):
         return SpynnakerDataView.get_simulation_time_step_ms()
 
-    @overrides(AbstractLocalOnly.set_delay)
-    def set_delay(self, delay):
-        # We don't need no stinking delay
-        pass
-
     @property
     @overrides(AbstractLocalOnly.weight)
     def weight(self):
