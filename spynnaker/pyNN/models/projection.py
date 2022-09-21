@@ -58,7 +58,6 @@ class Projection(object):
     # pylint: disable=redefined-builtin
     __slots__ = [
         "__projection_edge",
-        "__requires_mapping",
         "__synapse_information",
         "__virtual_connection_list",
         "__label"]
@@ -86,7 +85,6 @@ class Projection(object):
                 "cells.".format(__version__))
 
         self.__projection_edge = None
-        self.__requires_mapping = True
         self.__label = label
 
         pre_is_view = self.__check_population(
@@ -139,7 +137,7 @@ class Projection(object):
         # as a from-list connector can have plastic parameters, grab those (
         # if any) and add them to the synapse dynamics object
         if isinstance(connector, FromListConnector):
-            connector._apply_parameters_to_synapse_type(synaptic_type)
+            connector._apply_parameters_to_synapse_type(synapse_dynamics)
 
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
@@ -182,6 +180,10 @@ class Projection(object):
                 label=label)
             SpynnakerDataView.add_edge(
                 self.__projection_edge, SPIKE_PARTITION_ID)
+
+        # Ensure the connector is happy
+        connector.validate_connection(
+            self.__projection_edge, self.__synapse_information)
 
         # add projection to the SpiNNaker control system
         SpynnakerDataView.add_projection(self)
@@ -396,19 +398,6 @@ class Projection(object):
         return "projection {}".format(self.__label)
 
     # -----------------------------------------------------------------
-
-    @property
-    def requires_mapping(self):
-        """ Whether this projection requires mapping.
-
-        :rtype: bool
-        """
-        return self.__requires_mapping
-
-    def mark_no_changes(self):
-        """ Mark this projection as not having changes to be mapped.
-        """
-        self.__requires_mapping = False
 
     @property
     def _synapse_information(self):

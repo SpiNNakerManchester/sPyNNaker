@@ -17,6 +17,11 @@ import logging
 import math
 import numpy
 from scipy import special  # @UnresolvedImport
+import operator
+from functools import reduce
+from collections import defaultdict
+
+from pyNN.space import Grid2D, Grid3D
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
@@ -26,8 +31,7 @@ from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractCanReset,
-    AbstractRewritesDataSpecification)
+    AbstractCanReset, AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
 from spinn_front_end_common.utilities.constants import (
@@ -47,14 +51,18 @@ from spynnaker.pyNN.models.common import (
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractContainsUnits, AbstractMaxSpikes,
-    HasSynapses)
-from spynnaker.pyNN.exceptions import InvalidParameterType
+    HasSynapses, SupportsStructure)
+from spynnaker.pyNN.exceptions import InvalidParameterType, SpynnakerException
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
-from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
+from spynnaker.pyNN.utilities.constants import (
+    POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
+    AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural,
+    AbstractSupportsSignedWeights)
+from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
@@ -77,21 +85,27 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
 
 
+def _prod(iterable):
+    """ Finds the product of the iterable
+
+    :param iterable iterable: Things to multiply together
+    """
+    return reduce(operator.mul, iterable, 1)
+
+
 class AbstractPopulationVertex(
         TDMAAwareApplicationVertex, AbstractContainsUnits,
         AbstractSpikeRecordable, AbstractNeuronRecordable,
         AbstractEventRecordable,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, AbstractAcceptsIncomingSynapses,
-        AbstractCanReset):
+        AbstractAcceptsIncomingSynapses,
+        AbstractCanReset, SupportsStructure):
     """ Underlying vertex model for Neural Populations.\
         Not actually abstract.
     """
 
     __slots__ = [
         "__all_single_syn_sz",
-        "__change_requires_mapping",
-        "__change_requires_data_generation",
         "__incoming_spike_buffer_size",
         "__n_atoms",
         "__n_profile_samples",
@@ -113,7 +127,8 @@ class AbstractPopulationVertex(
         "__max_row_info",
         "__self_projection",
         "__current_sources",
-        "__current_source_id_list"]
+        "__current_source_id_list",
+        "__structure"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -131,8 +146,8 @@ class AbstractPopulationVertex(
     _SYNAPSE_BASE_N_CPU_CYCLES = 10
 
     # 5 elements before the start of global parameters
-    # 1. has key, 2. key, 3. n atoms, 4. n_atoms_peak 5. n_synapse_types
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
+    # 1. has key, 2. n atoms, 3. n_atoms_peak 4. n_synapse_types
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 4 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
@@ -222,8 +237,6 @@ class AbstractPopulationVertex(
             {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE})
 
         # bool for if state has changed.
-        self.__change_requires_mapping = True
-        self.__change_requires_data_generation = False
         self.__has_run = False
 
         # Current sources for this vertex
@@ -235,13 +248,66 @@ class AbstractPopulationVertex(
             "Reports", "n_profile_samples")
 
         # Set up for incoming
-        self.__incoming_projections = list()
+        self.__incoming_projections = defaultdict(list)
         self.__max_row_info = dict()
         self.__self_projection = None
 
-        # Prepare for dealing with STDP - there can only be one (non-static)
-        # synapse dynamics per vertex at present
-        self.__synapse_dynamics = None
+        # Keep track of the synapse dynamics for the vertex overall
+        self.__synapse_dynamics = SynapseDynamicsStatic()
+
+        self.__structure = None
+
+    @overrides(TDMAAwareApplicationVertex.get_max_atoms_per_core)
+    def get_max_atoms_per_core(self):
+        max_atoms = super().get_max_atoms_per_core()
+
+        # Dynamically adjust depending on the needs of the synapse dynamics
+        return min(
+            max_atoms, self.__synapse_dynamics.absolute_max_atoms_per_core)
+
+    @overrides(TDMAAwareApplicationVertex.get_max_atoms_per_dimension_per_core)
+    def get_max_atoms_per_dimension_per_core(self):
+        max_atoms = self.get_max_atoms_per_core()
+
+        # If single dimensional, we can use the max atoms calculation
+        if len(self.atoms_shape) == 1:
+            return (max_atoms, )
+
+        # If not, the user has to be more specific if the total number of
+        # atoms is not small enough to fit on one core
+        max_per_dim = super().get_max_atoms_per_dimension_per_core()
+
+        total_max_atoms = numpy.prod(max_per_dim)
+        if self.n_atoms < total_max_atoms:
+            total_max_atoms = self.n_atoms
+        if total_max_atoms > max_atoms:
+            raise SpynnakerException(
+                "When using a multidimensional Population, a maximum number of"
+                " neurons per core for each dimension must be provided such"
+                " that the total number of neurons per core is less than or"
+                f" equal to {max_atoms}")
+        if len(max_per_dim) != len(self.atoms_shape):
+            raise SpynnakerException(
+                "When using a multidimensional Population, a maximum number of"
+                " neurons per core must be provided for each dimension (in"
+                " this case, please set a max neurons per core with"
+                f" {len(self.atoms_shape)} dimensions)")
+        return max_per_dim
+
+    @overrides(TDMAAwareApplicationVertex.set_max_atoms_per_dimension_per_core)
+    def set_max_atoms_per_dimension_per_core(self, new_value):
+        max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
+        if numpy.prod(new_value) > max_atoms:
+            raise SpynnakerException(
+                "In the current configuration, the maximum number of"
+                " neurons for each dimension must be such that the total"
+                " number of neurons per core is less than or equal to"
+                f" {max_atoms}")
+        super().set_max_atoms_per_dimension_per_core(new_value)
+
+    @overrides(SupportsStructure.set_structure)
+    def set_structure(self, structure):
+        self.__structure = structure
 
     @property
     def synapse_dynamics(self):
@@ -261,11 +327,8 @@ class AbstractPopulationVertex(
         :param AbstractSynapseDynamics synapse_dynamics:
             The synapse dynamics to set
         """
-        if self.__synapse_dynamics is None:
-            self.__synapse_dynamics = synapse_dynamics
-        else:
-            self.__synapse_dynamics = self.__synapse_dynamics.merge(
-                synapse_dynamics)
+        self.__synapse_dynamics = self.__synapse_dynamics.merge(
+            synapse_dynamics)
 
     def add_incoming_projection(self, projection):
         """ Add a projection incoming to this vertex
@@ -274,11 +337,12 @@ class AbstractPopulationVertex(
             The new projection to add
         """
         # Reset the ring buffer shifts as a projection has been added
-        self.__change_requires_mapping = True
+        SpynnakerDataView.set_requires_mapping()
         self.__max_row_info.clear()
-        self.__incoming_projections.append(projection)
         # pylint: disable=protected-access
-        if projection._projection_edge.pre_vertex == self:
+        pre_vertex = projection._projection_edge.pre_vertex
+        self.__incoming_projections[pre_vertex].append(projection)
+        if pre_vertex == self:
             self.__self_projection = projection
 
     @property
@@ -293,6 +357,13 @@ class AbstractPopulationVertex(
     @overrides(TDMAAwareApplicationVertex.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
+
+    @property
+    @overrides(TDMAAwareApplicationVertex.atoms_shape)
+    def atoms_shape(self):
+        if isinstance(self.__structure, (Grid2D, Grid3D)):
+            return self.__structure.calculate_size(self.__n_atoms)
+        return super(AbstractPopulationVertex, self).atoms_shape
 
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):
@@ -313,6 +384,15 @@ class AbstractPopulationVertex(
         :rtype: int
         """
         return self.__all_single_syn_sz
+
+    @property
+    def direct_matrix_size(self):
+        """ The size of the direct matrix region in bytes
+
+        :rtype: int
+        """
+        # An additional word is used for the size of the region
+        return self.__all_single_syn_sz + BYTES_PER_WORD
 
     @property
     def incoming_spike_buffer_size(self):
@@ -395,20 +475,23 @@ class AbstractPopulationVertex(
         """
         self.__has_run = True
 
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
-    def requires_mapping(self):
-        return self.__change_requires_mapping
+    def get_neuron_params_position(self, n_atoms):
+        """ Get the position of the neuron parameters themselves within the
+            neuron parameters region
 
-    @property
-    @overrides(AbstractChangableAfterRun.requires_data_generation)
-    def requires_data_generation(self):
-        return self.__change_requires_data_generation
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
-    def mark_no_changes(self):
-        self.__change_requires_mapping = False
-        self.__change_requires_data_generation = False
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms.
+        :rtype: int
+        """
+        return (
+            # Parameters global for the neurons
+            self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            # The ring buffer shifts
+            (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
+            # TDMA parameters
+            self.tdma_sdram_size_in_bytes +
+            # The keys per neuron
+            n_atoms * BYTES_PER_WORD)
 
     def get_sdram_usage_for_neuron_params(self, n_atoms):
         """ Calculate the SDRAM usage for just the neuron parameters region.
@@ -418,9 +501,7 @@ class AbstractPopulationVertex(
         :return: The SDRAM required for the neuron region
         """
         return (
-            self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
-            self.tdma_sdram_size_in_bytes +
+            self.get_neuron_params_position(n_atoms) +
             self.__neuron_impl.get_sdram_usage_in_bytes(n_atoms))
 
     def get_sdram_usage_for_current_source_params(self, n_atoms):
@@ -517,7 +598,8 @@ class AbstractPopulationVertex(
                 variable, new_state, sampling_interval, indexes)
         else:
             self.__raise_var_not_supported(variable)
-        self.__change_requires_mapping = not self.is_recording(variable)
+        if self.is_recording(variable):
+            SpynnakerDataView.set_requires_mapping()
 
     def get_data(self, variable):
         # pylint: disable=too-many-arguments
@@ -801,9 +883,8 @@ class AbstractPopulationVertex(
                 vertex.set_reload_required(True)
 
         # If synapses change during the run,
-        if (self.__synapse_dynamics is not None and
-                self.__synapse_dynamics.changes_during_run):
-            self.__change_requires_data_generation = True
+        if self.__synapse_dynamics.changes_during_run:
+            SpynnakerDataView.set_requires_data_generation()
             for vertex in self.machine_vertices:
                 if isinstance(vertex, AbstractRewritesDataSpecification):
                     vertex.set_reload_required(True)
@@ -880,7 +961,7 @@ class AbstractPopulationVertex(
         return ((average_spikes_per_timestep * weight_mean) +
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
-    def get_ring_buffer_shifts(self, incoming_projections):
+    def get_ring_buffer_shifts(self):
         """ Get the shift of the ring buffers for transfer of values into the
             input buffers for this model.
 
@@ -888,112 +969,33 @@ class AbstractPopulationVertex(
             The projections to consider in the calculations
         :rtype: list(int)
         """
-        weight_scale = self.__neuron_impl.get_global_weight_scale()
-        weight_scale_squared = weight_scale * weight_scale
-        # This only gets ring buffer shifts for neuron synapses
-        n_synapse_types = self.__neuron_impl.get_n_synapse_types()
-        running_totals = [RunningStats() for _ in range(n_synapse_types)]
-        delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
-        total_weights = numpy.zeros(n_synapse_types)
-        biggest_weight = numpy.zeros(n_synapse_types)
-        weights_signed = False
-        rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
-        min_max_weight = numpy.ones(n_synapse_types) * 2 ** 32
+        stats = _Stats(self.__neuron_impl, self.__spikes_per_second,
+                       self.__ring_buffer_sigma)
 
-        for proj in incoming_projections:
+        for proj in self.incoming_projections:
             # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             # Skip if this is a synapse dynamics synapse type
             if synapse_info.synapse_type_from_dynamics:
                 continue
-            synapse_type = synapse_info.synapse_type
-            synapse_dynamics = synapse_info.synapse_dynamics
-            connector = synapse_info.connector
+            stats.add_projection(proj)
 
-            weight_mean = (
-                synapse_dynamics.get_weight_mean(
-                    connector, synapse_info) * weight_scale)
-            n_connections = \
-                connector.get_n_connections_to_post_vertex_maximum(
-                    synapse_info)
-            weight_variance = synapse_dynamics.get_weight_variance(
-                connector, synapse_info.weights,
-                synapse_info) * weight_scale_squared
-            running_totals[synapse_type].add_items(
-                weight_mean, weight_variance, n_connections)
-
-            delay_variance = synapse_dynamics.get_delay_variance(
-                connector, synapse_info.delays, synapse_info)
-            delay_running_totals[synapse_type].add_items(
-                0.0, delay_variance, n_connections)
-
-            weight_max = (synapse_dynamics.get_weight_maximum(
-                connector, synapse_info) * weight_scale)
-            min_max_weight[synapse_type] = \
-                min(min_max_weight[synapse_type], weight_max)
-            biggest_weight[synapse_type] = max(
-                biggest_weight[synapse_type], weight_max)
-
-            spikes_per_tick = max(
-                1.0, self.__spikes_per_second / steps_per_second)
-            spikes_per_second = self.__spikes_per_second
-            # pylint: disable=protected-access
-            pre_vertex = proj._projection_edge.pre_vertex
-            if isinstance(pre_vertex, AbstractMaxSpikes):
-                rate = pre_vertex.max_spikes_per_second()
-                if rate != 0:
-                    spikes_per_second = rate
-                spikes_per_tick = pre_vertex.max_spikes_per_ts()
-            rate_stats[synapse_type].add_items(
-                spikes_per_second, 0, n_connections)
-            total_weights[synapse_type] += spikes_per_tick * (
-                weight_max * n_connections)
-
-            if synapse_dynamics.are_weights_signed():
-                weights_signed = True
-
+        n_synapse_types = self.__neuron_impl.get_n_synapse_types()
         max_weights = numpy.zeros(n_synapse_types)
         for synapse_type in range(n_synapse_types):
-            if delay_running_totals[synapse_type].variance == 0.0:
-                max_weights[synapse_type] = max(total_weights[synapse_type],
-                                                biggest_weight[synapse_type])
-            else:
-                stats = running_totals[synapse_type]
-                rates = rate_stats[synapse_type]
-                max_weights[synapse_type] = min(
-                    self._ring_buffer_expected_upper_bound(
-                        stats.mean, stats.standard_deviation, rates.mean,
-                        stats.n_items, self.__ring_buffer_sigma),
-                    total_weights[synapse_type])
-                max_weights[synapse_type] = max(
-                    max_weights[synapse_type], biggest_weight[synapse_type])
-            # This is to deal with very small weights that are floored to 0
-            if min_max_weight[synapse_type] != 0:
-                mmw = 2**math.floor(math.log(min_max_weight[synapse_type], 2))
-            else:
-                # if it is zero then can't take logs...
-                small = 1.0 / 65536.0
-                mmw = 2**math.floor(math.log(small, 2))
-            max_weights[synapse_type] = min(mmw * 2 ** 15,
-                                            max_weights[synapse_type])
+            max_weights[synapse_type] = stats.get_max_weight(synapse_type)
 
         # Convert these to powers; we could use int.bit_length() for this if
         # they were integers, but they aren't...
         max_weight_powers = (
-            0 if w <= 1 else int(math.ceil(max(0, math.log(w, 2))))
+            0 if w <= 1 else int(math.ceil(max(0, math.log2(w))))
             for w in max_weights)
 
         # If 2^max_weight_power equals the max weight, we have to add another
         # power, as range is 0 - (just under 2^max_weight_power)!
         max_weight_powers = (
-            w + 1 if (2 ** w) < a else w
+            w + 1 if (2 ** w) <= a else w
             for w, a in zip(max_weight_powers, max_weights))
-
-        # If we have synapse dynamics that uses signed weights,
-        # Add another bit of shift to prevent overflows
-        if weights_signed:
-            max_weight_powers = (m + 1 for m in max_weight_powers)
 
         return list(max_weight_powers)
 
@@ -1026,7 +1028,7 @@ class AbstractPopulationVertex(
             self, app_edge, synapse_info):
         # Start with something in the list so that concatenate works
         connections = [numpy.zeros(
-                0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
+                0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
         progress = ProgressBar(
             len(self.machine_vertices),
             "Getting synaptic data between {} and {}".format(
@@ -1056,13 +1058,15 @@ class AbstractPopulationVertex(
             The slice of the vertex to get the usage of
         :rtype: int
         """
-        if self.__synapse_dynamics is None:
-            return 0
+
+        if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
+            return self.__synapse_dynamics.get_parameters_usage_in_bytes(
+                self.incoming_projections)
 
         return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
             n_atoms, self.__neuron_impl.get_n_synapse_types())
 
-    def get_structural_dynamics_size(self, n_atoms, incoming_projections):
+    def get_structural_dynamics_size(self, n_atoms):
         """ Get the size of the structural dynamics region
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1070,8 +1074,6 @@ class AbstractPopulationVertex(
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
             The projections to consider in the calculations
         """
-        if self.__synapse_dynamics is None:
-            return 0
 
         if not isinstance(
                 self.__synapse_dynamics, AbstractSynapseDynamicsStructural):
@@ -1079,9 +1081,9 @@ class AbstractPopulationVertex(
 
         return self.__synapse_dynamics\
             .get_structural_parameters_sdram_usage_in_bytes(
-                incoming_projections, n_atoms)
+                self.incoming_projections, n_atoms)
 
-    def get_synapses_size(self, n_post_atoms, incoming_projections):
+    def get_synapses_size(self, n_post_atoms):
         """ Get the maximum SDRAM usage for the synapses on a vertex slice
 
         :param int n_post_atoms: The number of atoms projected to
@@ -1089,7 +1091,7 @@ class AbstractPopulationVertex(
             The projections to consider in the calculations
         """
         addr = 2 * BYTES_PER_WORD
-        for proj in incoming_projections:
+        for proj in self.incoming_projections:
             addr = self.__add_matrix_size(addr, proj, n_post_atoms)
         return addr
 
@@ -1110,7 +1112,8 @@ class AbstractPopulationVertex(
             synapse_info, n_post_atoms, app_edge)
 
         vertex = app_edge.pre_vertex
-        n_sub_atoms = int(min(vertex.get_max_atoms_per_core(), vertex.n_atoms))
+        max_atoms = vertex.get_max_atoms_per_core()
+        n_sub_atoms = int(min(max_atoms, vertex.n_atoms))
         n_sub_edges = int(math.ceil(vertex.n_atoms / n_sub_atoms))
 
         if max_row_info.undelayed_max_n_synapses > 0:
@@ -1143,15 +1146,13 @@ class AbstractPopulationVertex(
         self.__max_row_info[key] = max_row_info
         return max_row_info
 
-    def get_synapse_expander_size(self, incoming_projections):
+    def get_synapse_expander_size(self):
         """ Get the size of the synapse expander region in bytes
 
-        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
-            The projections to consider in the calculations
         :rtype: int
         """
         size = 0
-        for proj in incoming_projections:
+        for proj in self.incoming_projections:
             # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             app_edge = proj._projection_edge
@@ -1200,8 +1201,6 @@ class AbstractPopulationVertex(
 
         :rtype: str
         """
-        if self.__synapse_dynamics is None:
-            return ""
         return self.__synapse_dynamics.get_vertex_executable_suffix()
 
     @property
@@ -1320,6 +1319,149 @@ class AbstractPopulationVertex(
     def incoming_projections(self):
         """ The projections that target this population vertex
 
-        :rtype: list(~spynnaker.pyNN.models.projection.Projection)
+        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)
         """
-        return self.__incoming_projections
+        for proj_list in self.__incoming_projections.values():
+            for proj in proj_list:
+                yield proj
+
+    def get_incoming_projections_from(self, source_vertex):
+        """ Get the projections that target this population vertex from
+            the given source
+        """
+        return self.__incoming_projections[source_vertex]
+
+
+class _Stats(object):
+    """ Object to keep hold of and process statistics for ring buffer scaling
+    """
+    __slots__ = [
+        "w_scale",
+        "w_scale_sq",
+        "n_synapse_types",
+        "running_totals",
+        "delay_running_totals",
+        "total_weights",
+        "biggest_weight",
+        "rate_stats",
+        "steps_per_second",
+        "min_max_weight",
+        "default_spikes_per_second",
+        "ring_buffer_sigma"
+    ]
+
+    def __init__(
+            self, neuron_impl, default_spikes_per_second, ring_buffer_sigma):
+        self.w_scale = neuron_impl.get_global_weight_scale()
+        self.w_scale_sq = self.w_scale ** 2
+        n_synapse_types = neuron_impl.get_n_synapse_types()
+
+        self.running_totals = [
+            RunningStats() for _ in range(n_synapse_types)]
+        self.delay_running_totals = [
+            RunningStats() for _ in range(n_synapse_types)]
+        self.total_weights = numpy.zeros(n_synapse_types)
+        self.biggest_weight = numpy.zeros(n_synapse_types)
+        self.rate_stats = [RunningStats() for _ in range(n_synapse_types)]
+
+        self.steps_per_second = (
+            SpynnakerDataView.get_simulation_time_step_per_s())
+        self.min_max_weight = numpy.ones(n_synapse_types) * 2 ** 32
+        self.default_spikes_per_second = default_spikes_per_second
+        self.ring_buffer_sigma = ring_buffer_sigma
+
+    def add_projection(self, proj):
+        # pylint: disable=protected-access
+        s_dynamics = proj._synapse_information.synapse_dynamics
+        if isinstance(s_dynamics, AbstractSupportsSignedWeights):
+            self.__add_signed_projection(proj)
+        else:
+            self.__add_unsigned_projection(proj)
+
+    def __add_signed_projection(self, proj):
+        # pylint: disable=protected-access
+        s_info = proj._synapse_information
+        connector = s_info.connector
+        s_dynamics = s_info.synapse_dynamics
+
+        n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
+        d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
+
+        s_type_pos = s_dynamics.get_positive_synapse_index(proj)
+        w_mean_pos = s_dynamics.get_mean_positive_weight(proj)
+        w_var_pos = s_dynamics.get_variance_positive_weight(proj)
+        w_max_pos = s_dynamics.get_maximum_positive_weight(proj)
+        self.__add_details(
+            proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos, d_var)
+
+        s_type_neg = s_dynamics.get_negative_synapse_index(proj)
+        w_mean_neg = -s_dynamics.get_mean_negative_weight(proj)
+        w_var_neg = -s_dynamics.get_variance_negative_weight(proj)
+        w_max_neg = -s_dynamics.get_minimum_negative_weight(proj)
+        self.__add_details(
+            proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
+
+    def __add_unsigned_projection(self, proj):
+        # pylint: disable=protected-access
+        s_info = proj._synapse_information
+        s_type = s_info.synapse_type
+        s_dynamics = s_info.synapse_dynamics
+        connector = s_info.connector
+
+        n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
+        w_mean = s_dynamics.get_weight_mean(connector, s_info)
+        w_var = s_dynamics.get_weight_variance(
+            connector, s_info.weights, s_info)
+        w_max = s_dynamics.get_weight_maximum(connector, s_info)
+        d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
+        self.__add_details(proj, s_type, n_conns, w_mean, w_var, w_max, d_var)
+
+    def __add_details(
+            self, proj, s_type, n_conns, w_mean, w_var, w_max, d_var):
+        self.running_totals[s_type].add_items(
+            w_mean * self.w_scale, w_var * self.w_scale_sq, n_conns)
+        self.min_max_weight[s_type] = min(self.min_max_weight[s_type], w_max)
+        self.biggest_weight[s_type] = max(
+            self.biggest_weight[s_type], w_max * self.w_scale)
+        self.delay_running_totals[s_type].add_items(0.0, d_var, n_conns)
+
+        spikes_per_tick, spikes_per_second = self.__pre_spike_stats(proj)
+        self.rate_stats[s_type].add_items(spikes_per_second, 0, n_conns)
+        self.total_weights[s_type] += spikes_per_tick * (w_max * n_conns)
+
+    def __pre_spike_stats(self, proj):
+        spikes_per_tick = max(
+            1.0, self.default_spikes_per_second / self.steps_per_second)
+        spikes_per_second = self.default_spikes_per_second
+        # pylint: disable=protected-access
+        pre_vertex = proj._projection_edge.pre_vertex
+        if isinstance(pre_vertex, AbstractMaxSpikes):
+            rate = pre_vertex.max_spikes_per_second()
+            if rate != 0:
+                spikes_per_second = rate
+            spikes_per_tick = pre_vertex.max_spikes_per_ts()
+        return spikes_per_tick, spikes_per_second
+
+    def get_max_weight(self, s_type):
+        if self.delay_running_totals[s_type].variance == 0.0:
+            w_max = max(self.total_weights[s_type],
+                        self.biggest_weight[s_type])
+        else:
+            stats = self.running_totals[s_type]
+            rates = self.rate_stats[s_type]
+            # pylint: disable=protected-access
+            w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
+                stats.mean, stats.standard_deviation, rates.mean,
+                stats.n_items, self.ring_buffer_sigma)
+            w_max = min(w_max, self.total_weights[s_type])
+            w_max = max(w_max, self.biggest_weight[s_type])
+
+        # This is to deal with very small weights that are floored to zero
+        if self.min_max_weight[s_type] != 0:
+            mmw = 2**math.floor(math.log(self.min_max_weight[s_type], 2))
+        else:                # if it is zero then can't take logs...
+            small = 1.0 / 65536.0
+            mmw = 2**math.floor(math.log(small, 2))
+        w_max = min(mmw * 2 ** 15, w_max)
+
+        return w_max

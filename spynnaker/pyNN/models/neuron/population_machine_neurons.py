@@ -17,15 +17,18 @@ from collections import namedtuple
 
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
+
+from pacman.utilities.utility_calls import get_field_based_keys
+
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
+from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 
@@ -193,10 +196,17 @@ class PopulationMachineNeurons(
         # isn't to be used
         if self._key is None:
             spec.write_value(data=0)
-            spec.write_value(data=0)
+            keys = [0] * n_atoms
         else:
             spec.write_value(data=1)
-            spec.write_value(data=self._key)
+            # Quick and dirty way to avoid using field based keys in cases
+            # which use grids but not local-only neuron models
+            if isinstance(self._app_vertex.synapse_dynamics,
+                          AbstractLocalOnly):
+                keys = get_field_based_keys(self._key, self._vertex_slice)
+            else:
+                # keys are consecutive from the base value
+                keys = [self._key + nn for nn in range(n_atoms)]
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
@@ -213,10 +223,13 @@ class PopulationMachineNeurons(
         spec.write_value(n_synapse_types)
         spec.write_array(ring_buffer_shifts)
 
+        # Write the keys
+        spec.write_array(keys)
+
         # Write the neuron parameters
         neuron_data = self._app_vertex.neuron_impl.get_data(
             self._app_vertex.parameters, self._app_vertex.state_variables,
-            self._vertex_slice)
+            self._vertex_slice, self._app_vertex.atoms_shape)
         spec.write_array(neuron_data)
 
     def _write_current_source_parameters(self, spec):
@@ -337,11 +350,8 @@ class PopulationMachineNeurons(
 
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
-        neurons_pre_size = (
-            self._app_vertex.tdma_sdram_size_in_bytes +
-            self._app_vertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            (self._app_vertex.neuron_impl.get_n_synapse_types() *
-             BYTES_PER_WORD))
+        neurons_pre_size = self._app_vertex.get_neuron_params_position(
+            self._vertex_slice.n_atoms)
         neuron_parameters_sdram_address = (
             neuron_region_sdram_address + neurons_pre_size)
 

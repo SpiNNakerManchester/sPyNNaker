@@ -16,15 +16,9 @@ import math
 
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
-from pacman.model.constraints.partitioner_constraints import (
-    AbstractPartitionerConstraint)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.resources import ConstantSDRAM
-from pacman.utilities import utility_calls
-from pacman.utilities.algorithm_utilities.\
-    partition_algorithm_utilities import (
-        get_remaining_constraints)
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
 from spinn_utilities.overrides import overrides
@@ -47,8 +41,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
 
     _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
-    SPLITTER_NAME = "SplitterDelayVertexSlice"
-
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
         "SplitterDelayVertexSlice as"
@@ -68,7 +60,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         """ splitter for delay extensions
 
         """
-        super().__init__(self.SPLITTER_NAME)
+        super().__init__()
         self._machine_vertex_by_slice = dict()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
@@ -92,12 +84,12 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         # pylint: disable=arguments-differ
         source_app_vertex = self._governed_app_vertex.source_vertex
         slices = source_app_vertex.splitter.get_out_going_slices()
-        constraints = get_remaining_constraints(self._governed_app_vertex)
 
         # create vertices correctly
         for vertex_slice in slices:
             vertex = self.create_machine_vertex(
-                source_app_vertex, vertex_slice, constraints)
+                source_app_vertex, vertex_slice,
+                self._governed_app_vertex.constraints)
             self._governed_app_vertex.remember_machine_vertex(vertex)
             chip_counter.add_core(vertex.sdram_required)
 
@@ -200,13 +192,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
                     synapse_info.delays),
                 connector.gen_connector_params_size_in_bytes))
         return 0
-
-    @overrides(AbstractSplitterCommon.check_supported_constraints)
-    def check_supported_constraints(self):
-        utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[],
-            abstract_constraint_type=AbstractPartitionerConstraint)
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):

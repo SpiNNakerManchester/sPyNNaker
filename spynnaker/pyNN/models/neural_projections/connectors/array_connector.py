@@ -16,14 +16,16 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 
-class ArrayConnector(AbstractConnector):
+class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     """ Make connections using an array of integers based on the IDs\
         of the neurons in the pre- and post-populations.
     """
 
-    __slots = [
+    __slots__ = [
         "__array", "__array_dims", "__n_total_connections"]
 
     def __init__(self, array, safe=True, callback=None, verbose=False):
@@ -112,7 +114,7 @@ class ArrayConnector(AbstractConnector):
         return self._get_weight_maximum(
             synapse_info.weights, self.__n_total_connections, synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
