@@ -247,12 +247,6 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         # Delay is always 1!
         return 1
 
-    @overrides(AbstractPlasticSynapseDynamics.set_delay)
-    def set_delay(self, delay):
-        if delay != 1:
-            raise SynapticConfigurationException(
-                "Neuromodulation delay must be 0")
-
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self):
