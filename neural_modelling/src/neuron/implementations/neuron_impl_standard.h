@@ -177,9 +177,6 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \param[in] n_neurons: number of neurons
 static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons) {
-    log_debug("reading parameters, next is %u, n_neurons is %u ",
-            next, n_neurons);
-
     // Read the number of steps per timestep
     n_steps_per_timestep = address[next++];
     if (n_steps_per_timestep > 1) {
