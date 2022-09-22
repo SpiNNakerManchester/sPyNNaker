@@ -411,8 +411,6 @@ def test_set_synapse_dynamics():
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
         (range(10), [4, 5, 6, 7], 1000, 100, True, 100),
-        # Should work but number of neurons don't work out
-        (range(5), [], 10000, 2048, False, None),
         # Should work but number of cores doesn't work out
         (range(2000), [], 10000, 5, False, None),
         # Should work but number of neurons with delays don't work out
