@@ -54,7 +54,7 @@ class SynapseDynamicsStatic(
         self.__weight = weight
         if delay is None:
             delay = SpynnakerDataView.get_min_delay()
-        self.__delay = delay
+        self.__delay = self._round_delay(delay)
         self.__pad_to_length = pad_to_length
 
     @overrides(AbstractStaticSynapseDynamics.merge)
@@ -218,10 +218,6 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.delay)
     def delay(self):
         return self.__delay
-
-    @overrides(AbstractStaticSynapseDynamics.set_delay)
-    def set_delay(self, delay):
-        self.__delay = delay
 
     @property
     @overrides(AbstractStaticSynapseDynamics.pad_to_length)
