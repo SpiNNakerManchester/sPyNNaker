@@ -101,7 +101,7 @@ class SynapseDynamicsSTDP(
         self.__weight = weight
         if delay is None:
             delay = SpynnakerDataView.get_min_delay()
-        self.__delay = delay
+        self.__delay = self._round_delay(delay)
         self.__backprop_delay = backprop_delay
         self.__neuromodulation = None
 
@@ -571,10 +571,6 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.delay)
     def delay(self):
         return self.__delay
-
-    @overrides(AbstractPlasticSynapseDynamics.set_delay)
-    def set_delay(self, delay):
-        self.__delay = delay
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)

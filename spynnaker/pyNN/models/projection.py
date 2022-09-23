@@ -19,7 +19,6 @@ import numpy
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from pyNN import common as pynn_common
-from pyNN.random import RandomDistribution
 from pyNN.recording.files import StandardTextFile
 from pyNN.space import Space as PyNNSpace
 from spinn_utilities.logger_utils import warn_once
@@ -138,16 +137,6 @@ class Projection(object):
         # if any) and add them to the synapse dynamics object
         if isinstance(connector, FromListConnector):
             connector._apply_parameters_to_synapse_type(synapse_dynamics)
-
-        # round the delays to multiples of full timesteps
-        # (otherwise SDRAM estimation calculations can go wrong)
-        if ((not isinstance(synapse_dynamics.delay, RandomDistribution))
-                and (not isinstance(synapse_dynamics.delay, str))):
-            synapse_dynamics.set_delay(
-                numpy.rint(
-                    numpy.array(synapse_dynamics.delay) *
-                    SpynnakerDataView.get_simulation_time_step_per_ms()) *
-                SpynnakerDataView.get_simulation_time_step_ms())
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
