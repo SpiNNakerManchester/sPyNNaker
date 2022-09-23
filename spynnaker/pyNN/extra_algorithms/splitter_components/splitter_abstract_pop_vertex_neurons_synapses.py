@@ -220,8 +220,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         else:
             print("=" * 80)
             print("Computing RB left shifts for", app_vertex.label)
-            rb_shifts = app_vertex.get_ring_buffer_shifts(
-                app_vertex.incoming_projections)
+            rb_shifts = app_vertex.get_ring_buffer_shifts()
             print("RB left shifts for {:20}".format(app_vertex.label),
                   "=", rb_shifts)
 
