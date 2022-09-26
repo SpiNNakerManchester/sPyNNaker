@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -630,7 +631,39 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.builds package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.builds">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.builds">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation"><code class="docutils literal notranslate"><span class="pre">EIFConductanceAlphaPopulation</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_initial_values"><code class="docutils literal notranslate"><span class="pre">EIFConductanceAlphaPopulation.default_initial_values</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.EIFConductanceAlphaPopulation.default_parameters"><code class="docutils literal notranslate"><span class="pre">EIFConductanceAlphaPopulation.default_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp"><code class="docutils literal notranslate"><span class="pre">HHCondExp</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp.default_initial_values"><code class="docutils literal notranslate"><span class="pre">HHCondExp.default_initial_values</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.HHCondExp.default_parameters"><code class="docutils literal notranslate"><span class="pre">HHCondExp.default_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha"><code class="docutils literal notranslate"><span class="pre">IFCondAlpha</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_initial_values"><code class="docutils literal notranslate"><span class="pre">IFCondAlpha.default_initial_values</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCondAlpha.default_parameters"><code class="docutils literal notranslate"><span class="pre">IFCondAlpha.default_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCondExpBase"><code class="docutils literal notranslate"><span class="pre">IFCondExpBase</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCondExpStoc"><code class="docutils literal notranslate"><span class="pre">IFCondExpStoc</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCurrAlpha"><code class="docutils literal notranslate"><span class="pre">IFCurrAlpha</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCurrDelta"><code class="docutils literal notranslate"><span class="pre">IFCurrDelta</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCurrDualExpBase"><code class="docutils literal notranslate"><span class="pre">IFCurrDualExpBase</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpBase"><code class="docutils literal notranslate"><span class="pre">IFCurrExpBase</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpCa2Adaptive"><code class="docutils literal notranslate"><span class="pre">IFCurrExpCa2Adaptive</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFCurrExpSEMDBase"><code class="docutils literal notranslate"><span class="pre">IFCurrExpSEMDBase</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation"><code class="docutils literal notranslate"><span class="pre">IFFacetsConductancePopulation</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_initial_values"><code class="docutils literal notranslate"><span class="pre">IFFacetsConductancePopulation.default_initial_values</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IFFacetsConductancePopulation.default_parameters"><code class="docutils literal notranslate"><span class="pre">IFFacetsConductancePopulation.default_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IzkCondExpBase"><code class="docutils literal notranslate"><span class="pre">IzkCondExpBase</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.builds.IzkCurrExpBase"><code class="docutils literal notranslate"><span class="pre">IzkCurrExpBase</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -693,7 +726,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

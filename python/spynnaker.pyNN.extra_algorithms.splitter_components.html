@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.extra_models package" href="spynnaker.pyNN.extra_models.html" />
@@ -918,7 +919,83 @@ machine vertices on the same chip.</p>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.extra_algorithms.splitter_components package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.splitter_components">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.splitter_components">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay"><code class="docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.MAX_SUPPORTED_DELAY_TICS"><code class="docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay.MAX_SUPPORTED_DELAY_TICS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex"><code class="docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.max_support_delay"><code class="docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay.max_support_delay()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput"><code class="docutils literal notranslate"><span class="pre">AbstractSupportsOneToOneSDRAMInput</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.INVALID_POP_ERROR_MESSAGE"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.INVALID_POP_ERROR_MESSAGE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.create_machine_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.create_machine_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_in_coming_slices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.get_in_coming_slices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_in_coming_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.get_in_coming_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_out_going_slices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.get_out_going_slices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_out_going_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.get_out_going_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_source_specific_in_coming_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.get_source_specific_in_coming_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.machine_vertices_for_recording"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.machine_vertices_for_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.reset_called"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.reset_called()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.set_governed_app_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.set_governed_app_vertex()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.INVALID_POP_ERROR_MESSAGE"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.INVALID_POP_ERROR_MESSAGE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.accepts_edges_from_delay_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.accepts_edges_from_delay_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.create_machine_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.create_machine_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_in_coming_slices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_in_coming_slices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_in_coming_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_in_coming_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_internal_multicast_partitions"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_internal_multicast_partitions()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_internal_sdram_partitions"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_internal_sdram_partitions()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_slices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_slices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_same_chip_groups"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_same_chip_groups()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_source_specific_in_coming_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_source_specific_in_coming_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.machine_vertices_for_recording"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.machine_vertices_for_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.n_synapse_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.n_synapse_vertices</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.reset_called"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.reset_called()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.set_governed_app_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.set_governed_app_vertex()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.DELAY_RECORDING_ERROR"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.DELAY_RECORDING_ERROR</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.INVALID_POP_ERROR_MESSAGE"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.INVALID_POP_ERROR_MESSAGE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.NEED_EXACT_ERROR_MESSAGE"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.NEED_EXACT_ERROR_MESSAGE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.create_machine_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.create_machine_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_in_coming_slices"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.get_in_coming_slices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_in_coming_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.get_in_coming_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_machine_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.get_machine_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_out_going_slices"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.get_out_going_slices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_out_going_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.get_out_going_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_sdram_used_by_atoms"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.get_sdram_used_by_atoms()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_source_specific_in_coming_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.get_source_specific_in_coming_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.machine_vertices_for_recording"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.machine_vertices_for_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.reset_called"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.reset_called()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.set_governed_app_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterDelayVertexSlice.set_governed_app_vertex()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate"><code class="docutils literal notranslate"><span class="pre">SplitterPoissonDelegate</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.INVALID_POP_ERROR_MESSAGE"><code class="docutils literal notranslate"><span class="pre">SplitterPoissonDelegate.INVALID_POP_ERROR_MESSAGE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.create_machine_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterPoissonDelegate.create_machine_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_in_coming_slices"><code class="docutils literal notranslate"><span class="pre">SplitterPoissonDelegate.get_in_coming_slices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_out_going_slices"><code class="docutils literal notranslate"><span class="pre">SplitterPoissonDelegate.get_out_going_slices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_out_going_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterPoissonDelegate.get_out_going_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_same_chip_groups"><code class="docutils literal notranslate"><span class="pre">SplitterPoissonDelegate.get_same_chip_groups()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.send_over_sdram"><code class="docutils literal notranslate"><span class="pre">SplitterPoissonDelegate.send_over_sdram</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.set_governed_app_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterPoissonDelegate.set_governed_app_vertex()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterFixedLegacy"><code class="docutils literal notranslate"><span class="pre">SpynnakerSplitterFixedLegacy</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner"><code class="docutils literal notranslate"><span class="pre">spynnaker_splitter_partitioner()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector"><code class="docutils literal notranslate"><span class="pre">spynnaker_splitter_selector()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -980,7 +1057,7 @@ machine vertices on the same chip.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

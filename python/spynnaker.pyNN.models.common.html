@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.current_sources package" href="spynnaker.pyNN.models.current_sources.html" />
@@ -921,8 +922,90 @@ ordered by time, one element per event</p>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.common package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.recording_utils">spynnaker.pyNN.models.common.recording_utils module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.recording_utils">spynnaker.pyNN.models.common.recording_utils module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.recording_utils.make_missing_string"><code class="docutils literal notranslate"><span class="pre">make_missing_string()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractEventRecordable"><code class="docutils literal notranslate"><span class="pre">AbstractEventRecordable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractEventRecordable.clear_event_recording"><code class="docutils literal notranslate"><span class="pre">AbstractEventRecordable.clear_event_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractEventRecordable.get_events"><code class="docutils literal notranslate"><span class="pre">AbstractEventRecordable.get_events()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractEventRecordable.get_events_sampling_interval"><code class="docutils literal notranslate"><span class="pre">AbstractEventRecordable.get_events_sampling_interval()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractEventRecordable.is_recording_events"><code class="docutils literal notranslate"><span class="pre">AbstractEventRecordable.is_recording_events()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractEventRecordable.set_recording_events"><code class="docutils literal notranslate"><span class="pre">AbstractEventRecordable.set_recording_events()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronRecordable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.clear_recording"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronRecordable.clear_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_data"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronRecordable.get_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_neuron_sampling_interval"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronRecordable.get_neuron_sampling_interval()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_recordable_variables"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronRecordable.get_recordable_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.is_recording"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronRecordable.is_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.set_recording"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronRecordable.set_recording()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable"><code class="docutils literal notranslate"><span class="pre">AbstractSpikeRecordable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable.clear_spike_recording"><code class="docutils literal notranslate"><span class="pre">AbstractSpikeRecordable.clear_spike_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable.get_spikes"><code class="docutils literal notranslate"><span class="pre">AbstractSpikeRecordable.get_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable.get_spikes_sampling_interval"><code class="docutils literal notranslate"><span class="pre">AbstractSpikeRecordable.get_spikes_sampling_interval()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable.is_recording_spikes"><code class="docutils literal notranslate"><span class="pre">AbstractSpikeRecordable.is_recording_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable.set_recording_spikes"><code class="docutils literal notranslate"><span class="pre">AbstractSpikeRecordable.set_recording_spikes()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder"><code class="docutils literal notranslate"><span class="pre">EIEIOSpikeRecorder</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_spikes"><code class="docutils literal notranslate"><span class="pre">EIEIOSpikeRecorder.get_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.record"><code class="docutils literal notranslate"><span class="pre">EIEIOSpikeRecorder.record</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.set_recording"><code class="docutils literal notranslate"><span class="pre">EIEIOSpikeRecorder.set_recording()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder"><code class="docutils literal notranslate"><span class="pre">MultiSpikeRecorder</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">MultiSpikeRecorder.get_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_spikes"><code class="docutils literal notranslate"><span class="pre">MultiSpikeRecorder.get_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder.record"><code class="docutils literal notranslate"><span class="pre">MultiSpikeRecorder.record</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.MAX_REWIRES"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.MAX_REWIRES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.PACKETS"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.PACKETS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.PACKETS_TYPE"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.PACKETS_TYPE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.REWIRING"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.REWIRING</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.REWIRING_N_WORDS"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.REWIRING_N_WORDS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.REWIRING_TYPE"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.REWIRING_TYPE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.SPIKES"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.SPIKES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.add_region_offset"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.add_region_offset()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.check_indexes"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.check_indexes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_buffered_sdram()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram_per_record"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_buffered_sdram_per_record()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram_per_timestep"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_buffered_sdram_per_timestep()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_event_recordable_variables"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_event_recordable_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_events"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_events()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_matrix_data"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_matrix_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_max_buffered_sdram_per_record"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_max_buffered_sdram_per_record()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_max_variable_sdram_usage"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_max_variable_sdram_usage()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_metadata_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_metadata_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_neuron_sampling_interval"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_neuron_sampling_interval()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_recordable_variables"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_recordable_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_region_sizes"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_region_sizes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_sampling_overflow_sdram"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_sampling_overflow_sdram()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_spikes"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_variable_sdram_usage"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.get_variable_sdram_usage()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.is_recordable"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.is_recordable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.is_recording"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.is_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.recorded_ids_by_slice"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.recorded_ids_by_slice()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.recorded_region_ids"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.recorded_region_ids</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.recording_variables"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.recording_variables</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.set_max_rewires_per_ts"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.set_max_rewires_per_ts()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.set_recording"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.set_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.NeuronRecorder.write_neuron_recording_region"><code class="docutils literal notranslate"><span class="pre">NeuronRecorder.write_neuron_recording_region()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.SimplePopulationSettable"><code class="docutils literal notranslate"><span class="pre">SimplePopulationSettable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.SimplePopulationSettable.get_value"><code class="docutils literal notranslate"><span class="pre">SimplePopulationSettable.get_value()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.SimplePopulationSettable.set_value"><code class="docutils literal notranslate"><span class="pre">SimplePopulationSettable.set_value()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -984,7 +1067,7 @@ ordered by time, one element per event</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -583,7 +584,60 @@ weight scale</p></li>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus"><code class="docutils literal notranslate"><span class="pre">AbstractHasAPlusAMinus</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.A_minus"><code class="docutils literal notranslate"><span class="pre">AbstractHasAPlusAMinus.A_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.A_plus"><code class="docutils literal notranslate"><span class="pre">AbstractHasAPlusAMinus.A_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.set_a_plus_a_minus"><code class="docutils literal notranslate"><span class="pre">AbstractHasAPlusAMinus.set_a_plus_a_minus()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><code class="docutils literal notranslate"><span class="pre">AbstractWeightDependence</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">AbstractWeightDependence.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractWeightDependence.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.is_same_as"><code class="docutils literal notranslate"><span class="pre">AbstractWeightDependence.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">AbstractWeightDependence.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.weight_maximum"><code class="docutils literal notranslate"><span class="pre">AbstractWeightDependence.weight_maximum</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.write_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractWeightDependence.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditive</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditive.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditive.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.is_same_as"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditive.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditive.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.w_max"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditive.w_max</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.w_min"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditive.w_min</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.weight_maximum"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditive.weight_maximum</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.write_parameters"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditive.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.A3_minus"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.A3_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.A3_plus"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.A3_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.default_parameters"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.default_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.is_same_as"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.w_max"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.w_max</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.w_min"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.w_min</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.weight_maximum"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.weight_maximum</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.write_parameters"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative"><code class="docutils literal notranslate"><span class="pre">WeightDependenceMultiplicative</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">WeightDependenceMultiplicative.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">WeightDependenceMultiplicative.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.is_same_as"><code class="docutils literal notranslate"><span class="pre">WeightDependenceMultiplicative.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">WeightDependenceMultiplicative.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.w_max"><code class="docutils literal notranslate"><span class="pre">WeightDependenceMultiplicative.w_max</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.w_min"><code class="docutils literal notranslate"><span class="pre">WeightDependenceMultiplicative.w_min</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.weight_maximum"><code class="docutils literal notranslate"><span class="pre">WeightDependenceMultiplicative.weight_maximum</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.write_parameters"><code class="docutils literal notranslate"><span class="pre">WeightDependenceMultiplicative.write_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -648,7 +702,7 @@ weight scale</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

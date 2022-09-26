@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.utility_models.spike_injector package" href="spynnaker.pyNN.models.utility_models.spike_injector.html" />
@@ -588,7 +589,78 @@ The maximum number of delay stages required by any connection            out of 
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.utility_models.delays package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.utility_models.delays">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.utility_models.delays">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayBlock"><code class="docutils literal notranslate"><span class="pre">DelayBlock</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayBlock.add_delay"><code class="docutils literal notranslate"><span class="pre">DelayBlock.add_delay()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayBlock.delay_block"><code class="docutils literal notranslate"><span class="pre">DelayBlock.delay_block</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.BACKGROUND_MAX_QUEUED_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.BACKGROUND_MAX_QUEUED_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.BACKGROUND_OVERLOADS_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.BACKGROUND_OVERLOADS_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.COUNT_SATURATION_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.COUNT_SATURATION_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.DELAYED_FOR_TRAFFIC_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.DELAYED_FOR_TRAFFIC_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.MAX_BACKGROUND_QUEUED"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.MAX_BACKGROUND_QUEUED</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_BACKGROUND_OVERLOADS"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_BACKGROUND_OVERLOADS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_BUFFER_OVERFLOWS"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_BUFFER_OVERFLOWS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_DELAYS"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_DELAYS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_LATE_SPIKES"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_LATE_SPIKES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_ADDED"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_ADDED</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_DROPPED_DUE_TO_INVALID_KEY"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_LOST_DUE_TO_COUNT_SATURATION"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_LOST_DUE_TO_COUNT_SATURATION</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_PROCESSED"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_PROCESSED</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_RECEIVED"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_RECEIVED</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_SENT"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_SENT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_WITH_INVALID_NEURON_IDS"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_WITH_INVALID_NEURON_IDS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INPUT_BUFFER_LOST_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.INPUT_BUFFER_LOST_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INVALID_KEY_COUNT_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.INVALID_KEY_COUNT_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INVALID_NEURON_ID_COUNT_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.INVALID_NEURON_ID_COUNT_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.MISMATCH_ADDED_FROM_PROCESSED_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.MISMATCH_ADDED_FROM_PROCESSED_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_LATE_SPIKES_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.N_LATE_SPIKES_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_PACKETS_PROCESSED_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.N_PACKETS_PROCESSED_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_PACKETS_RECEIVED_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.N_PACKETS_RECEIVED_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_PACKETS_SENT_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.N_PACKETS_SENT_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.gen_on_machine"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.gen_on_machine()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.generate_data_specification"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.generate_data_specification()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_binary_file_name"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.get_binary_file_name()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_binary_start_type"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.get_binary_start_type()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_n_keys_for_partition"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.get_n_keys_for_partition()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.parse_extra_provenance_items"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.parse_extra_provenance_items()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.sdram_required"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.sdram_required</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.write_delay_parameters"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.write_delay_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.MAX_DTCM_AVAILABLE"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.MAX_DTCM_AVAILABLE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.MAX_SLOTS"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.MAX_SLOTS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.SAFETY_FACTOR"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.SAFETY_FACTOR</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_delays"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.add_delays()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_generator_data"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.add_generator_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_outgoing_edge"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.add_outgoing_edge()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_blocks_for"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.delay_blocks_for()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_generator_data"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.delay_generator_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_params_size"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.delay_params_size()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_per_stage"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.delay_per_stage</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.drop_late_spikes"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.drop_late_spikes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.gen_on_machine"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.gen_on_machine()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_max_delay_ticks_supported"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.get_max_delay_ticks_supported()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_n_cores"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.get_n_cores()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.n_atoms"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.n_atoms</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.n_delay_stages"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.n_delay_stages</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.outgoing_edges"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.outgoing_edges</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.partition"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.partition</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.set_new_n_delay_stages_and_delay_per_stage"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.set_new_n_delay_stages_and_delay_per_stage()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.source_vertex"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.source_vertex</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -651,7 +723,7 @@ The maximum number of delay stages required by any connection            out of 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

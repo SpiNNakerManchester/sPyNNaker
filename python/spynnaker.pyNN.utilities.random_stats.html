@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.utilities.ranged package" href="spynnaker.pyNN.utilities.ranged.html" />
@@ -654,7 +655,129 @@
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.utilities.random_stats package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.cdf"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.mean"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.std"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.var"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.cdf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.ppf()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.std()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.var()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -716,7 +839,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

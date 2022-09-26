@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation package" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.html" />
@@ -190,7 +191,23 @@ or has not changed (and also used on static weight connections)</p></li>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination"><code class="docutils literal notranslate"><span class="pre">AbstractElimination</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">AbstractElimination.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractElimination.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">AbstractElimination.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.write_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractElimination.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination"><code class="docutils literal notranslate"><span class="pre">RandomByWeightElimination</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">RandomByWeightElimination.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">RandomByWeightElimination.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">RandomByWeightElimination.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.write_parameters"><code class="docutils literal notranslate"><span class="pre">RandomByWeightElimination.write_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -255,7 +272,7 @@ or has not changed (and also used on static weight connections)</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

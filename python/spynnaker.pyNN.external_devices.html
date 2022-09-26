@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.external_devices_models package" href="spynnaker.pyNN.external_devices_models.html" />
@@ -49,8 +50,8 @@
             
   <section id="spynnaker-pynn-external-devices-package">
 <h1>spynnaker.pyNN.external_devices package<a class="headerlink" href="#spynnaker-pynn-external-devices-package" title="Permalink to this heading">¶</a></h1>
-<section id="module-spynnaker.pyNN.external_devices">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices" title="Permalink to this heading">¶</a></h2>
+<section id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <p>This contains functions and classes for handling external devices such as the
 PushBot (<a class="reference external" href="http://spinnakermanchester.github.io/docs/push_bot/">http://spinnakermanchester.github.io/docs/push_bot/</a>).</p>
 <div class="admonition note">
@@ -59,7 +60,7 @@ PushBot (<a class="reference external" href="http://spinnakermanchester.github.i
 SpiNNaker system to run in real-time mode, which usually reduces numerical
 accuracy to gain performance.</p>
 </div>
-<dl class="py class">
+<span class="target" id="module-spynnaker.pyNN.external_devices"></span><dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ArbitraryFPGADevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">ArbitraryFPGADevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chip_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ArbitraryFPGADevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationFPGAVertex</span></code></p>
@@ -2369,7 +2370,307 @@ continue the simulation</p>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.external_devices package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices">Module contents</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ArbitraryFPGADevice"><code class="docutils literal notranslate"><span class="pre">ArbitraryFPGADevice</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.EIEIOType"><code class="docutils literal notranslate"><span class="pre">EIEIOType</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.EIEIOType.KEY_16_BIT"><code class="docutils literal notranslate"><span class="pre">EIEIOType.KEY_16_BIT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.EIEIOType.KEY_32_BIT"><code class="docutils literal notranslate"><span class="pre">EIEIOType.KEY_32_BIT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.EIEIOType.KEY_PAYLOAD_16_BIT"><code class="docutils literal notranslate"><span class="pre">EIEIOType.KEY_PAYLOAD_16_BIT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.EIEIOType.KEY_PAYLOAD_32_BIT"><code class="docutils literal notranslate"><span class="pre">EIEIOType.KEY_PAYLOAD_32_BIT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.EIEIOType.key_bytes"><code class="docutils literal notranslate"><span class="pre">EIEIOType.key_bytes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.EIEIOType.max_value"><code class="docutils literal notranslate"><span class="pre">EIEIOType.max_value</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.EIEIOType.payload_bytes"><code class="docutils literal notranslate"><span class="pre">EIEIOType.payload_bytes</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalCochleaDevice"><code class="docutils literal notranslate"><span class="pre">ExternalCochleaDevice</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalDeviceLifControl"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalDeviceLifControl.create_vertex"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControl.create_vertex()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.DOWN_POLARITY"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.DOWN_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.MERGED_POLARITY"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.MERGED_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.MODE_128"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.MODE_128</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.MODE_16"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.MODE_16</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.MODE_32"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.MODE_32</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.MODE_64"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.MODE_64</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.UP_POLARITY"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.UP_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.get_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.get_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.get_n_neurons"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.get_n_neurons()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ICUBRetinaDevice"><code class="docutils literal notranslate"><span class="pre">ICUBRetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ICUBRetinaDevice.get_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">ICUBRetinaDevice.get_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ICUBRetinaDevice.get_incoming_slice"><code class="docutils literal notranslate"><span class="pre">ICUBRetinaDevice.get_incoming_slice()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ICUBRetinaDevice.get_machine_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">ICUBRetinaDevice.get_machine_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.ICUBRetinaDevice.get_shape_key_fields"><code class="docutils literal notranslate"><span class="pre">ICUBRetinaDevice.get_shape_key_fields()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.add_payload_logic_to_current_output_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.bias_values"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.bias_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.bias_values_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.bias_values_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.configure_master_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.configure_master_key()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.configure_master_key_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.configure_master_key_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.disable_retina"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.disable_retina()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.disable_retina_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.disable_retina_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.enable_disable_motor_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.enable_disable_motor_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_leak_to_0_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor0_raw_output_permanent_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_leak_to_0_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor1_raw_output_permanent_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor_disable"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor_disable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor_enable"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor_enable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor_total_period"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor_total_period()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.generic_motor_total_period_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.generic_motor_total_period_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.instance_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.instance_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.master_slave_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.master_slave_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_active"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_active()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_not_started"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.master_slave_set_master_clock_not_started()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.master_slave_set_slave"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.master_slave_set_slave()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.master_slave_use_internal_counter"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.master_slave_use_internal_counter()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.mode"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.mode</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.poll_individual_sensor_continuously_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.poll_sensors_once"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.poll_sensors_once()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.poll_sensors_once_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.poll_sensors_once_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.protocol_instance"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.protocol_instance</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_laser_set_frequency_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_led_back_active_time_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_led_front_active_time_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_led_set_frequency_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_led_total_period_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_leaking_towards_zero_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_leaking_towards_zero_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_active_time_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_speaker_config_total_period_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_melody_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.push_bot_speaker_set_tone_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_0_ratio_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_channel_1_ratio_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_a_duration_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_0_ratio_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_channel_1_ratio_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_b_duration_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_0_ratio_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_channel_1_ratio_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.pwm_pin_output_timer_c_duration_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.query_state_of_io_lines_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.remove_payload_logic_to_current_output_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.reset_retina"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.reset_retina()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.reset_retina_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.reset_retina_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.sensor_transmission_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.sensor_transmission_key()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.sent_mode_command"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.sent_mode_command()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_mode"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.set_mode()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_mode_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.set_mode_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_retina_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.set_retina_key()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_retina_key_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.set_retina_key_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_retina_transmission"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.set_retina_transmission()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_retina_transmission_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.set_retina_transmission_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting_key"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.turn_off_sensor_reporting_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.uart_id"><code class="docutils literal notranslate"><span class="pre">MunichIoSpiNNakerLinkProtocol.uart_id</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichMotorDevice"><code class="docutils literal notranslate"><span class="pre">MunichMotorDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichMotorDevice.default_initial_values"><code class="docutils literal notranslate"><span class="pre">MunichMotorDevice.default_initial_values</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichMotorDevice.default_parameters"><code class="docutils literal notranslate"><span class="pre">MunichMotorDevice.default_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichMotorDevice.dependent_vertices"><code class="docutils literal notranslate"><span class="pre">MunichMotorDevice.dependent_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichMotorDevice.edge_partition_identifiers_for_dependent_vertex"><code class="docutils literal notranslate"><span class="pre">MunichMotorDevice.edge_partition_identifiers_for_dependent_vertex()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.DOWN_POLARITY"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.DOWN_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.LEFT_RETINA"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.LEFT_RETINA</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.MERGED_POLARITY"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.MERGED_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.RIGHT_RETINA"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.RIGHT_RETINA</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.UP_POLARITY"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.UP_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.default_parameters"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.default_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.get_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.get_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice.set_command_protocol"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice.set_command_protocol()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice.set_command_protocol"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice.set_command_protocol()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice.set_command_protocol"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice.set_command_protocol()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_database_connection"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice.get_database_connection()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_injector_label"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice.get_injector_label()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_injector_parameters"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice.get_injector_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_n_neurons"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice.get_n_neurons()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_translator"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice.get_translator()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice.set_command_protocol"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice.set_command_protocol()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLED"><code class="docutils literal notranslate"><span class="pre">PushBotLED</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLED.LED_BACK_ACTIVE_TIME"><code class="docutils literal notranslate"><span class="pre">PushBotLED.LED_BACK_ACTIVE_TIME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLED.LED_FREQUENCY"><code class="docutils literal notranslate"><span class="pre">PushBotLED.LED_FREQUENCY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLED.LED_FRONT_ACTIVE_TIME"><code class="docutils literal notranslate"><span class="pre">PushBotLED.LED_FRONT_ACTIVE_TIME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLED.LED_TOTAL_PERIOD"><code class="docutils literal notranslate"><span class="pre">PushBotLED.LED_TOTAL_PERIOD</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLaser"><code class="docutils literal notranslate"><span class="pre">PushBotLaser</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLaser.LASER_ACTIVE_TIME"><code class="docutils literal notranslate"><span class="pre">PushBotLaser.LASER_ACTIVE_TIME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLaser.LASER_FREQUENCY"><code class="docutils literal notranslate"><span class="pre">PushBotLaser.LASER_FREQUENCY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLaser.LASER_TOTAL_PERIOD"><code class="docutils literal notranslate"><span class="pre">PushBotLaser.LASER_TOTAL_PERIOD</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLifEthernet"><code class="docutils literal notranslate"><span class="pre">PushBotLifEthernet</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotLifSpinnakerLink"><code class="docutils literal notranslate"><span class="pre">PushBotLifSpinnakerLink</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotMotor"><code class="docutils literal notranslate"><span class="pre">PushBotMotor</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotMotor.MOTOR_0_LEAKY"><code class="docutils literal notranslate"><span class="pre">PushBotMotor.MOTOR_0_LEAKY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotMotor.MOTOR_0_PERMANENT"><code class="docutils literal notranslate"><span class="pre">PushBotMotor.MOTOR_0_PERMANENT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotMotor.MOTOR_1_LEAKY"><code class="docutils literal notranslate"><span class="pre">PushBotMotor.MOTOR_1_LEAKY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotMotor.MOTOR_1_PERMANENT"><code class="docutils literal notranslate"><span class="pre">PushBotMotor.MOTOR_1_PERMANENT</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotRetinaResolution"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaResolution</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotRetinaResolution.DOWNSAMPLE_16_X_16"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaResolution.DOWNSAMPLE_16_X_16</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotRetinaResolution.DOWNSAMPLE_32_X_32"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaResolution.DOWNSAMPLE_32_X_32</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotRetinaResolution.DOWNSAMPLE_64_X_64"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaResolution.DOWNSAMPLE_64_X_64</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotRetinaResolution.NATIVE_128_X_128"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaResolution.NATIVE_128_X_128</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotRetinaViewer"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotRetinaViewer.local_host"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.local_host</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotRetinaViewer.local_port"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.local_port</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotRetinaViewer.run"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpeaker"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpeaker.SPEAKER_ACTIVE_TIME"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker.SPEAKER_ACTIVE_TIME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpeaker.SPEAKER_MELODY"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker.SPEAKER_MELODY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpeaker.SPEAKER_TONE"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker.SPEAKER_TONE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpeaker.SPEAKER_TOTAL_PERIOD"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker.SPEAKER_TOTAL_PERIOD</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkLEDDevice"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkLEDDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkLEDDevice.default_parameters"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkLEDDevice.default_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkLaserDevice"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkLaserDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkLaserDevice.default_parameters"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkLaserDevice.default_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkMotorDevice"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkMotorDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkMotorDevice.default_parameters"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkMotorDevice.default_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkRetinaDevice"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkRetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkRetinaDevice.default_parameters"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkRetinaDevice.default_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkRetinaDevice.new_key_command_payload"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkRetinaDevice.new_key_command_payload()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkRetinaDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkRetinaDevice.start_resume_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkSpeakerDevice"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkSpeakerDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkSpeakerDevice.default_parameters"><code class="docutils literal notranslate"><span class="pre">PushBotSpiNNakerLinkSpeakerDevice.default_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice.X_MASK"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.X_MASK</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice.X_PER_ROW"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.X_PER_ROW</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice.Y_MASK"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.Y_MASK</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice.get_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice.get_incoming_slice_for_link"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_incoming_slice_for_link()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice.get_machine_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_machine_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice.get_shape_key_fields"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_shape_key_fields()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SPIFRetinaDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpikeInjector"><code class="docutils literal notranslate"><span class="pre">SpikeInjector()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerLiveSpikesConnection"><code class="docutils literal notranslate"><span class="pre">SpynnakerLiveSpikesConnection</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerLiveSpikesConnection.send_spike"><code class="docutils literal notranslate"><span class="pre">SpynnakerLiveSpikesConnection.send_spike()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerLiveSpikesConnection.send_spikes"><code class="docutils literal notranslate"><span class="pre">SpynnakerLiveSpikesConnection.send_spikes()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection"><code class="docutils literal notranslate"><span class="pre">SpynnakerPoissonControlConnection</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_init_callback"><code class="docutils literal notranslate"><span class="pre">SpynnakerPoissonControlConnection.add_init_callback()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_pause_stop_callback"><code class="docutils literal notranslate"><span class="pre">SpynnakerPoissonControlConnection.add_pause_stop_callback()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_poisson_label"><code class="docutils literal notranslate"><span class="pre">SpynnakerPoissonControlConnection.add_poisson_label()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_receive_callback"><code class="docutils literal notranslate"><span class="pre">SpynnakerPoissonControlConnection.add_receive_callback()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_start_callback"><code class="docutils literal notranslate"><span class="pre">SpynnakerPoissonControlConnection.add_start_callback()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_start_resume_callback"><code class="docutils literal notranslate"><span class="pre">SpynnakerPoissonControlConnection.add_start_resume_callback()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.set_rate"><code class="docutils literal notranslate"><span class="pre">SpynnakerPoissonControlConnection.set_rate()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.set_rates"><code class="docutils literal notranslate"><span class="pre">SpynnakerPoissonControlConnection.set_rates()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.activate_live_output_for"><code class="docutils literal notranslate"><span class="pre">activate_live_output_for()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.activate_live_output_to"><code class="docutils literal notranslate"><span class="pre">activate_live_output_to()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.add_poisson_live_rate_control"><code class="docutils literal notranslate"><span class="pre">add_poisson_live_rate_control()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.register_database_notification_request"><code class="docutils literal notranslate"><span class="pre">register_database_notification_request()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices.run_forever"><code class="docutils literal notranslate"><span class="pre">run_forever()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2430,7 +2731,7 @@ continue the simulation</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.synapse_dynamics package" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html" />
@@ -227,7 +228,30 @@
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.AbstractPartnerSelection"><code class="docutils literal notranslate"><span class="pre">AbstractPartnerSelection</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.AbstractPartnerSelection.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">AbstractPartnerSelection.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.AbstractPartnerSelection.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractPartnerSelection.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.AbstractPartnerSelection.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">AbstractPartnerSelection.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.AbstractPartnerSelection.write_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractPartnerSelection.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.LastNeuronSelection"><code class="docutils literal notranslate"><span class="pre">LastNeuronSelection</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.LastNeuronSelection.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">LastNeuronSelection.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.LastNeuronSelection.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">LastNeuronSelection.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.LastNeuronSelection.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">LastNeuronSelection.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.LastNeuronSelection.write_parameters"><code class="docutils literal notranslate"><span class="pre">LastNeuronSelection.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.RandomSelection"><code class="docutils literal notranslate"><span class="pre">RandomSelection</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.RandomSelection.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">RandomSelection.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.RandomSelection.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">RandomSelection.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.RandomSelection.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">RandomSelection.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.RandomSelection.write_parameters"><code class="docutils literal notranslate"><span class="pre">RandomSelection.write_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -292,7 +316,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link package" href="spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link.html" />
@@ -233,7 +234,49 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.external_devices_models.push_bot.parameters package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.parameters">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.parameters">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED"><code class="docutils literal notranslate"><span class="pre">PushBotLED</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED.LED_BACK_ACTIVE_TIME"><code class="docutils literal notranslate"><span class="pre">PushBotLED.LED_BACK_ACTIVE_TIME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED.LED_FREQUENCY"><code class="docutils literal notranslate"><span class="pre">PushBotLED.LED_FREQUENCY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED.LED_FRONT_ACTIVE_TIME"><code class="docutils literal notranslate"><span class="pre">PushBotLED.LED_FRONT_ACTIVE_TIME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED.LED_TOTAL_PERIOD"><code class="docutils literal notranslate"><span class="pre">PushBotLED.LED_TOTAL_PERIOD</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser"><code class="docutils literal notranslate"><span class="pre">PushBotLaser</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser.LASER_ACTIVE_TIME"><code class="docutils literal notranslate"><span class="pre">PushBotLaser.LASER_ACTIVE_TIME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser.LASER_FREQUENCY"><code class="docutils literal notranslate"><span class="pre">PushBotLaser.LASER_FREQUENCY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser.LASER_TOTAL_PERIOD"><code class="docutils literal notranslate"><span class="pre">PushBotLaser.LASER_TOTAL_PERIOD</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor"><code class="docutils literal notranslate"><span class="pre">PushBotMotor</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor.MOTOR_0_LEAKY"><code class="docutils literal notranslate"><span class="pre">PushBotMotor.MOTOR_0_LEAKY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor.MOTOR_0_PERMANENT"><code class="docutils literal notranslate"><span class="pre">PushBotMotor.MOTOR_0_PERMANENT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor.MOTOR_1_LEAKY"><code class="docutils literal notranslate"><span class="pre">PushBotMotor.MOTOR_1_LEAKY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor.MOTOR_1_PERMANENT"><code class="docutils literal notranslate"><span class="pre">PushBotMotor.MOTOR_1_PERMANENT</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaResolution</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution.DOWNSAMPLE_16_X_16"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaResolution.DOWNSAMPLE_16_X_16</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution.DOWNSAMPLE_32_X_32"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaResolution.DOWNSAMPLE_32_X_32</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution.DOWNSAMPLE_64_X_64"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaResolution.DOWNSAMPLE_64_X_64</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution.NATIVE_128_X_128"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaResolution.NATIVE_128_X_128</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.local_host"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.local_host</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.local_port"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.local_port</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.run"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker.SPEAKER_ACTIVE_TIME"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker.SPEAKER_ACTIVE_TIME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker.SPEAKER_MELODY"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker.SPEAKER_MELODY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker.SPEAKER_TONE"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker.SPEAKER_TONE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker.SPEAKER_TOTAL_PERIOD"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker.SPEAKER_TOTAL_PERIOD</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -296,7 +339,7 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

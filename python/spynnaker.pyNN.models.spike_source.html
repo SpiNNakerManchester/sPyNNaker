@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.utility_models package" href="spynnaker.pyNN.models.utility_models.html" />
@@ -1105,9 +1106,129 @@ If None the assumption is all neurons are recording</p></li>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.spike_source package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_array_vertex">spynnaker.pyNN.models.spike_source.spike_source_array_vertex module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex">spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex">spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.get_rates_bytes"><code class="docutils literal notranslate"><span class="pre">get_rates_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.get_sdram_edge_params_bytes"><code class="docutils literal notranslate"><span class="pre">get_sdram_edge_params_bytes()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex">spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArray"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArray</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArray.create_vertex"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArray.create_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArray.default_population_parameters"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArray.default_population_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.atoms_shape"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.atoms_shape</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.clear_spike_recording"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.clear_spike_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.describe"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.describe()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.get_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes_sampling_interval"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.get_spikes_sampling_interval()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.is_recording_spikes"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.is_recording_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.set_recording_spikes"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.set_recording_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.set_structure"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.set_structure()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.set_value_by_selector"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.set_value_by_selector()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.spike_times"><code class="docutils literal notranslate"><span class="pre">SpikeSourceArrayVertex.spike_times</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceFromFile"><code class="docutils literal notranslate"><span class="pre">SpikeSourceFromFile</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourceFromFile.spike_times"><code class="docutils literal notranslate"><span class="pre">SpikeSourceFromFile.spike_times</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoisson"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoisson</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoisson.absolute_max_atoms_per_core"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoisson.absolute_max_atoms_per_core</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoisson.create_vertex"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoisson.create_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoisson.default_population_parameters"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoisson.default_population_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.TDMA_MISSED_SLOTS"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.TDMA_MISSED_SLOTS</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.FAST_RATE_PER_TICK_CUTOFF"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.FAST_RATE_PER_TICK_CUTOFF</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.PARAMS_BASE_WORDS"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.PARAMS_BASE_WORDS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.SDRAM_EDGE_PARAMS"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.SDRAM_EDGE_PARAMS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.TDMA_REGION"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.TDMA_REGION</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.PROFILE_TAG_LABELS"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.PROFILE_TAG_LABELS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.SEED_OFFSET_BYTES"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.SEED_OFFSET_BYTES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.SEED_SIZE_BYTES"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.SEED_SIZE_BYTES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.SLOW_RATE_PER_TICK_CUTOFF"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.SLOW_RATE_PER_TICK_CUTOFF</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.generate_data_specification"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.generate_data_specification()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.get_binary_file_name"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.get_binary_file_name()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.get_binary_start_type"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.get_binary_start_type()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.get_profile_data"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.get_profile_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.get_recorded_region_ids"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.get_recorded_region_ids()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.get_recording_region_base_address"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.get_recording_region_base_address()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.max_spikes_per_second"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.max_spikes_per_second()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.max_spikes_per_ts"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.max_spikes_per_ts()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.parse_extra_provenance_items"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.parse_extra_provenance_items()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.poisson_param_region_address"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.poisson_param_region_address()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.poisson_rate_region_address"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.poisson_rate_region_address()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.read_parameters_from_machine"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.read_parameters_from_machine()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.regenerate_data_specification"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.regenerate_data_specification()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.reload_required"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.reload_required()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.reserve_memory_regions"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.reserve_memory_regions()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.sdram_required"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.sdram_required</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.sdram_requirement"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.sdram_requirement()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.set_reload_required"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.set_reload_required()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.set_sdram_partition"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonMachineVertex.set_sdram_partition()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVariable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable.absolute_max_atoms_per_core"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVariable.absolute_max_atoms_per_core</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable.create_vertex"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVariable.create_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable.default_population_parameters"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVariable.default_population_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.add_outgoing_projection"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.add_outgoing_projection()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.atoms_shape"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.atoms_shape</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.clear_spike_recording"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.clear_spike_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.create_machine_vertex"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.create_machine_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.describe"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.describe()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.duration"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.duration</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.durations"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.durations</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_n_cores"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.get_n_cores()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recording_sdram_usage"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.get_recording_sdram_usage()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_sdram_used_by_atoms"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.get_sdram_used_by_atoms()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_spikes"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.get_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_spikes_sampling_interval"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.get_spikes_sampling_interval()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.incoming_control_edge"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.incoming_control_edge</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.is_recording_spikes"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.is_recording_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.kiss_seed"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.kiss_seed()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.max_rate"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.max_rate</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.max_spikes_per_ts"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.max_spikes_per_ts()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.n_atoms"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.n_atoms</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.n_profile_samples"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.n_profile_samples</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.outgoing_projections"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.outgoing_projections</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.rate"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.rate</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.rate_change"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.rate_change</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.rates"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.rates</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.seed"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.seed</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_live_poisson_control_edge"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.set_live_poisson_control_edge()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_recording_spikes"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.set_recording_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_structure"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.set_structure()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_value"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.set_value()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.start"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.start</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.starts"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.starts</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.time_to_spike"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.time_to_spike</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.update_kiss_seed"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVertex.update_kiss_seed()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1169,7 +1290,7 @@ If None the assumption is all neurons are recording</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

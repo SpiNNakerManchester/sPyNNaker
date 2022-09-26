@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.input_types package" href="spynnaker.pyNN.models.neuron.input_types.html" />
@@ -719,7 +720,66 @@ they appear</p>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.implementations package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.implementations">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.implementations">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.add_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.add_state_variables"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.binary_name"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.binary_name</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_data"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_global_weight_scale()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_n_synapse_types"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_n_synapse_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_data_types"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_recordable_data_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_units"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_recordable_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_variable_index"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_recordable_variable_index()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_recordable_variables"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_recordable_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_synapse_targets"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_synapse_targets()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_units"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.is_conductance_based"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.is_conductance_based</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.is_recordable"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.is_recordable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.model_name"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.model_name</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.read_data"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronImpl.read_data()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_state_variables"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_data"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent.get_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent.get_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_units"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_values"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.has_variable"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.read_data"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent.read_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.struct"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent.struct</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.update_values"><code class="docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent.update_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.add_parameters"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.add_state_variables"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.binary_name"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.binary_name</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_data"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_global_weight_scale()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_n_synapse_types"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_n_synapse_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_data_types"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_recordable_data_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_units"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_recordable_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_variable_index"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_recordable_variable_index()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_variables"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_recordable_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_synapse_targets"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_synapse_targets()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_units"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.is_conductance_based"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.is_conductance_based</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.is_recordable"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.is_recordable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.model_name"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.model_name</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.n_steps_per_timestep"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.n_steps_per_timestep</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.read_data"><code class="docutils literal notranslate"><span class="pre">NeuronImplStandard.read_data()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.RangedDictVertexSlice"><code class="docutils literal notranslate"><span class="pre">RangedDictVertexSlice</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -782,7 +842,7 @@ they appear</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

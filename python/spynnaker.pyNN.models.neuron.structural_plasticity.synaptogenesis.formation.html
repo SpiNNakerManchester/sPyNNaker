@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection package" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.html" />
@@ -225,7 +226,25 @@
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation"><code class="docutils literal notranslate"><span class="pre">AbstractFormation</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">AbstractFormation.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractFormation.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">AbstractFormation.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.AbstractFormation.write_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractFormation.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.DistanceDependentFormation"><code class="docutils literal notranslate"><span class="pre">DistanceDependentFormation</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.DistanceDependentFormation.distance"><code class="docutils literal notranslate"><span class="pre">DistanceDependentFormation.distance()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.DistanceDependentFormation.generate_distance_probability_array"><code class="docutils literal notranslate"><span class="pre">DistanceDependentFormation.generate_distance_probability_array()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.DistanceDependentFormation.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">DistanceDependentFormation.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.DistanceDependentFormation.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">DistanceDependentFormation.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.DistanceDependentFormation.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">DistanceDependentFormation.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.DistanceDependentFormation.write_parameters"><code class="docutils literal notranslate"><span class="pre">DistanceDependentFormation.write_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -290,7 +309,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

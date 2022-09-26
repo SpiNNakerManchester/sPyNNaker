@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -308,7 +309,32 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.threshold_types package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.threshold_types">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.threshold_types">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><code class="docutils literal notranslate"><span class="pre">AbstractThresholdType</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMaassStochastic</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.add_parameters"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMaassStochastic.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.add_state_variables"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMaassStochastic.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.du_th"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMaassStochastic.du_th</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.get_units"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMaassStochastic.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.get_values"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMaassStochastic.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.has_variable"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMaassStochastic.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.tau_th"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMaassStochastic.tau_th</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.update_values"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMaassStochastic.update_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.v_thresh"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMaassStochastic.v_thresh</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeStatic</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.add_parameters"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeStatic.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.add_state_variables"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeStatic.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.get_units"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeStatic.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.get_values"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeStatic.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.has_variable"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeStatic.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.update_values"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeStatic.update_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.v_thresh"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeStatic.v_thresh</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -371,7 +397,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

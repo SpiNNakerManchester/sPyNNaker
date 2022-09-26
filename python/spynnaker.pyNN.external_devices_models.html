@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.external_devices_models.push_bot package" href="spynnaker.pyNN.external_devices_models.push_bot.html" />
@@ -73,7 +74,23 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#module-spynnaker.pyNN.external_devices_models.push_bot">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#module-spynnaker.pyNN.external_devices_models.push_bot">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice"><code class="docutils literal notranslate"><span class="pre">AbstractPushBotOutputDevice</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.max_value"><code class="docutils literal notranslate"><span class="pre">AbstractPushBotOutputDevice.max_value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.min_value"><code class="docutils literal notranslate"><span class="pre">AbstractPushBotOutputDevice.min_value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.protocol_property"><code class="docutils literal notranslate"><span class="pre">AbstractPushBotOutputDevice.protocol_property</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.send_type"><code class="docutils literal notranslate"><span class="pre">AbstractPushBotOutputDevice.send_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.time_between_send"><code class="docutils literal notranslate"><span class="pre">AbstractPushBotOutputDevice.time_between_send</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotRetinaDevice"><code class="docutils literal notranslate"><span class="pre">AbstractPushBotRetinaDevice</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotRetinaDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">AbstractPushBotRetinaDevice.pause_stop_commands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotRetinaDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">AbstractPushBotRetinaDevice.start_resume_commands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotRetinaDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">AbstractPushBotRetinaDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1146,7 +1163,120 @@ in the order of the fields</p>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.external_devices_models package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetController"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetController</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetController.get_external_devices"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetController.get_external_devices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetController.get_message_translator"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetController.get_message_translator()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetController.get_outgoing_partition_ids"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetController.get_outgoing_partition_ids()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetSensor"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetSensor</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetSensor.get_database_connection"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetSensor.get_database_connection()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetSensor.get_injector_label"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetSensor.get_injector_label()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetSensor.get_injector_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetSensor.get_injector_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetSensor.get_n_neurons"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetSensor.get_n_neurons()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetSensor.get_translator"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetSensor.get_translator()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetTranslator</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator.translate_control_packet"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetTranslator.translate_control_packet()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_key"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_max_value"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_max_value</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_min_value"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_min_value</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_partition_id"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_partition_id</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_scaling_factor"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_scaling_factor</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_send_type"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_send_type</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_timesteps_between_sending"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_timesteps_between_sending</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_uses_payload"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_uses_payload</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ArbitraryFPGADevice"><code class="docutils literal notranslate"><span class="pre">ArbitraryFPGADevice</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalCochleaDevice"><code class="docutils literal notranslate"><span class="pre">ExternalCochleaDevice</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl.create_vertex"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControl.create_vertex()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.DOWN_POLARITY"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.DOWN_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.MERGED_POLARITY"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.MERGED_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.MODE_128"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.MODE_128</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.MODE_16"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.MODE_16</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.MODE_32"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.MODE_32</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.MODE_64"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.MODE_64</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.UP_POLARITY"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.UP_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.get_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_n_neurons"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.get_n_neurons()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">ExternalFPGARetinaDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ICUBRetinaDevice"><code class="docutils literal notranslate"><span class="pre">ICUBRetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ICUBRetinaDevice.get_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">ICUBRetinaDevice.get_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ICUBRetinaDevice.get_incoming_slice"><code class="docutils literal notranslate"><span class="pre">ICUBRetinaDevice.get_incoming_slice()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ICUBRetinaDevice.get_machine_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">ICUBRetinaDevice.get_machine_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ICUBRetinaDevice.get_shape_key_fields"><code class="docutils literal notranslate"><span class="pre">ICUBRetinaDevice.get_shape_key_fields()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice"><code class="docutils literal notranslate"><span class="pre">MachineMunichMotorDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.INPUT_BUFFER_FULL_NAME"><code class="docutils literal notranslate"><span class="pre">MachineMunichMotorDevice.INPUT_BUFFER_FULL_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.MOTOR_PARTITION_ID"><code class="docutils literal notranslate"><span class="pre">MachineMunichMotorDevice.MOTOR_PARTITION_ID</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.generate_data_specification"><code class="docutils literal notranslate"><span class="pre">MachineMunichMotorDevice.generate_data_specification()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_binary_file_name"><code class="docutils literal notranslate"><span class="pre">MachineMunichMotorDevice.get_binary_file_name()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_binary_start_type"><code class="docutils literal notranslate"><span class="pre">MachineMunichMotorDevice.get_binary_start_type()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_n_keys_for_partition"><code class="docutils literal notranslate"><span class="pre">MachineMunichMotorDevice.get_n_keys_for_partition()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.parse_extra_provenance_items"><code class="docutils literal notranslate"><span class="pre">MachineMunichMotorDevice.parse_extra_provenance_items()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.reserve_memory_regions"><code class="docutils literal notranslate"><span class="pre">MachineMunichMotorDevice.reserve_memory_regions()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.sdram_required"><code class="docutils literal notranslate"><span class="pre">MachineMunichMotorDevice.sdram_required</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice"><code class="docutils literal notranslate"><span class="pre">MunichMotorDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.default_initial_values"><code class="docutils literal notranslate"><span class="pre">MunichMotorDevice.default_initial_values</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.default_parameters"><code class="docutils literal notranslate"><span class="pre">MunichMotorDevice.default_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.dependent_vertices"><code class="docutils literal notranslate"><span class="pre">MunichMotorDevice.dependent_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice.edge_partition_identifiers_for_dependent_vertex"><code class="docutils literal notranslate"><span class="pre">MunichMotorDevice.edge_partition_identifiers_for_dependent_vertex()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.DOWN_POLARITY"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.DOWN_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.LEFT_RETINA"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.LEFT_RETINA</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.MERGED_POLARITY"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.MERGED_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.RIGHT_RETINA"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.RIGHT_RETINA</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.UP_POLARITY"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.UP_POLARITY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.default_parameters"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.default_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.get_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.get_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.X_MASK"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.X_MASK</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.X_PER_ROW"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.X_PER_ROW</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.Y_MASK"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.Y_MASK</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_incoming_slice_for_link"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_incoming_slice_for_link()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_machine_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_machine_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_shape_key_fields"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_shape_key_fields()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.add_parameters"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.add_state_variables"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_units"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_values"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.has_variable"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.update_values"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.update_values()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1207,7 +1337,7 @@ in the order of the fields</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

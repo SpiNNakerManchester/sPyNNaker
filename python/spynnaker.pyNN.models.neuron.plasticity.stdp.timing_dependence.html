@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -980,7 +981,98 @@ weight scale</p></li>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence"><code class="docutils literal notranslate"><span class="pre">AbstractTimingDependence</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">AbstractTimingDependence.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractTimingDependence.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence.is_same_as"><code class="docutils literal notranslate"><span class="pre">AbstractTimingDependence.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence.n_weight_terms"><code class="docutils literal notranslate"><span class="pre">AbstractTimingDependence.n_weight_terms</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence.pre_trace_n_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractTimingDependence.pre_trace_n_bytes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence.synaptic_structure"><code class="docutils literal notranslate"><span class="pre">AbstractTimingDependence.synaptic_structure</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">AbstractTimingDependence.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence.write_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractTimingDependence.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.A_minus"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.A_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.A_plus"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.A_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.is_same_as"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.n_weight_terms"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.n_weight_terms</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.pre_trace_n_bytes"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.pre_trace_n_bytes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.synaptic_structure"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.synaptic_structure</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.tau_minus"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.tau_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.tau_plus"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.tau_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.tau_x"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.tau_x</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.tau_y"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.tau_y</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.write_parameters"><code class="docutils literal notranslate"><span class="pre">TimingDependencePfisterSpikeTriplet.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.A_minus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.A_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.A_plus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.A_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.default_parameters"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.default_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.is_same_as"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.n_weight_terms"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.n_weight_terms</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.pre_trace_n_bytes"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.pre_trace_n_bytes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.synaptic_structure"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.synaptic_structure</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.write_parameters"><code class="docutils literal notranslate"><span class="pre">TimingDependenceRecurrent.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.A_minus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.A_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.A_plus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.A_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.default_parameters"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.default_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.is_same_as"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.n_weight_terms"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.n_weight_terms</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.pre_trace_n_bytes"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.pre_trace_n_bytes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.synaptic_structure"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.synaptic_structure</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.tau_minus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.tau_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.tau_plus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.tau_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikeNearestPair.write_parameters"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikeNearestPair.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.A_minus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.A_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.A_plus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.A_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.is_same_as"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.n_weight_terms"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.n_weight_terms</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.pre_trace_n_bytes"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.pre_trace_n_bytes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.synaptic_structure"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.synaptic_structure</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.tau_minus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.tau_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.tau_plus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.tau_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceSpikePair.write_parameters"><code class="docutils literal notranslate"><span class="pre">TimingDependenceSpikePair.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.A_minus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.A_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.A_plus"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.A_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.alpha"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.alpha</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.default_parameters"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.default_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.is_same_as"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.n_weight_terms"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.n_weight_terms</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.pre_trace_n_bytes"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.pre_trace_n_bytes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.synaptic_structure"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.synaptic_structure</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.tau"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.tau</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.write_parameters"><code class="docutils literal notranslate"><span class="pre">TimingDependenceVogels2011.write_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1045,7 +1137,7 @@ weight scale</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

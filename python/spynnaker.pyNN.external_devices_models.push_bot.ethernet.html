@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.external_devices_models.push_bot.parameters package" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html" />
@@ -712,7 +713,77 @@ or None to use the default</p></li>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.external_devices_models.push_bot.ethernet package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.ethernet">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.ethernet">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_key"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_key</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_max_value"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_max_value</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_min_value"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_min_value</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_partition_id"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_partition_id</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_send_type"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_send_type</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_timesteps_between_sending"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_timesteps_between_sending</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_uses_payload"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_uses_payload</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.protocol"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.protocol</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.set_command_protocol"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.set_command_protocol()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.set_command_protocol"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice.set_command_protocol()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.set_command_protocol"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice.set_command_protocol()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.set_command_protocol"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice.set_command_protocol()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_database_connection"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice.get_database_connection()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_injector_label"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice.get_injector_label()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_injector_parameters"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice.get_injector_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_n_neurons"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice.get_n_neurons()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_translator"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetRetinaDevice.get_translator()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.set_command_protocol"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice.set_command_protocol()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotRetinaConnection"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaConnection</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotTranslator"><code class="docutils literal notranslate"><span class="pre">PushBotTranslator</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotTranslator.translate_control_packet"><code class="docutils literal notranslate"><span class="pre">PushBotTranslator.translate_control_packet()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.RECV_SIZE"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.RECV_SIZE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.close"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.close()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.get_receive_method"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.get_receive_method()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.is_connected"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.is_connected()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.is_ready_to_receive"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.is_ready_to_receive()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.local_ip_address"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.local_ip_address</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.local_port"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.local_port</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.receive"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.receive()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.remote_ip_address"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.remote_ip_address</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.remote_port"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.remote_port</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.send"><code class="docutils literal notranslate"><span class="pre">PushBotWIFIConnection.send()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.get_pushbot_wifi_connection"><code class="docutils literal notranslate"><span class="pre">get_pushbot_wifi_connection()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -775,7 +846,7 @@ or None to use the default</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

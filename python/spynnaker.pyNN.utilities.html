@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.utilities.random_stats package" href="spynnaker.pyNN.utilities.random_stats.html" />
@@ -54,11 +55,144 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html">spynnaker.pyNN.utilities.random_stats package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.cdf"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.mean"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.std"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.var"><code class="docutils literal notranslate"><span class="pre">AbstractRandomStats.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsBinomialImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsExponentialImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsGammaImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsLogNormalImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalClippedImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsNormalImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsPoissonImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsRandIntImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsScipyImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsUniformImpl.var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.cdf"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.cdf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.high"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.low"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.mean"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.ppf"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.ppf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.std"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.var"><code class="docutils literal notranslate"><span class="pre">RandomStatsVonmisesImpl.var()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html">spynnaker.pyNN.utilities.ranged package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#module-spynnaker.pyNN.utilities.ranged">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#module-spynnaker.pyNN.utilities.ranged">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangeDictionary</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary.list_factory"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangeDictionary.list_factory()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangedList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.as_list"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangedList.as_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.is_list"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangedList.is_list()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -933,10 +1067,10 @@ returned by field_types</p></li>
 </dd></dl>
 
 </section>
-<section id="module-spynnaker.pyNN.utilities.utility_calls">
-<span id="spynnaker-pynn-utilities-utility-calls-module"></span><h2>spynnaker.pyNN.utilities.utility_calls module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.utility_calls" title="Permalink to this heading">¶</a></h2>
+<section id="spynnaker-pynn-utilities-utility-calls-module">
+<h2>spynnaker.pyNN.utilities.utility_calls module<a class="headerlink" href="#spynnaker-pynn-utilities-utility-calls-module" title="Permalink to this heading">¶</a></h2>
 <p>utility class containing simple helper methods</p>
-<dl class="py function">
+<span class="target" id="module-spynnaker.pyNN.utilities.utility_calls"></span><dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">check_directory_exists_and_create_if_not</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#check_directory_exists_and_create_if_not"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a parent directory for a file if it doesn’t exist</p>
@@ -1293,17 +1427,144 @@ regardless of whether they were recording or not.</p></li>
 <li><a class="reference internal" href="#">spynnaker.pyNN.utilities package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.bit_field_utilities">spynnaker.pyNN.utilities.bit_field_utilities module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.constants">spynnaker.pyNN.utilities.constants module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.data_cache">spynnaker.pyNN.utilities.data_cache module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.extracted_data">spynnaker.pyNN.utilities.extracted_data module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider">spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.neo_compare">spynnaker.pyNN.utilities.neo_compare module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.neo_convertor">spynnaker.pyNN.utilities.neo_convertor module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.running_stats">spynnaker.pyNN.utilities.running_stats module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.struct">spynnaker.pyNN.utilities.struct module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.utility_calls">spynnaker.pyNN.utilities.utility_calls module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.variable_cache">spynnaker.pyNN.utilities.variable_cache module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.bit_field_utilities">spynnaker.pyNN.utilities.bit_field_utilities module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.ELEMENTS_USED_IN_BIT_FIELD_HEADER"><code class="docutils literal notranslate"><span class="pre">ELEMENTS_USED_IN_BIT_FIELD_HEADER</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.N_KEYS_DATA_SET_IN_WORDS"><code class="docutils literal notranslate"><span class="pre">N_KEYS_DATA_SET_IN_WORDS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.N_REGIONS_ADDRESSES"><code class="docutils literal notranslate"><span class="pre">N_REGIONS_ADDRESSES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region"><code class="docutils literal notranslate"><span class="pre">exact_sdram_for_bit_field_builder_region()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region"><code class="docutils literal notranslate"><span class="pre">get_estimated_sdram_for_bit_field_region()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region"><code class="docutils literal notranslate"><span class="pre">get_estimated_sdram_for_key_region()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions"><code class="docutils literal notranslate"><span class="pre">reserve_bit_field_regions()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data"><code class="docutils literal notranslate"><span class="pre">write_bitfield_init_data()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.constants">spynnaker.pyNN.utilities.constants module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.constants.LIVE_POISSON_CONTROL_PARTITION_ID"><code class="docutils literal notranslate"><span class="pre">LIVE_POISSON_CONTROL_PARTITION_ID</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.constants.MIN_SUPPORTED_DELAY"><code class="docutils literal notranslate"><span class="pre">MIN_SUPPORTED_DELAY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.constants.OUT_SPIKE_BYTES"><code class="docutils literal notranslate"><span class="pre">OUT_SPIKE_BYTES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.constants.OUT_SPIKE_SIZE"><code class="docutils literal notranslate"><span class="pre">OUT_SPIKE_SIZE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.constants.POP_TABLE_MAX_ROW_LENGTH"><code class="docutils literal notranslate"><span class="pre">POP_TABLE_MAX_ROW_LENGTH</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.constants.SPIKE_PARTITION_ID"><code class="docutils literal notranslate"><span class="pre">SPIKE_PARTITION_ID</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.constants.SYNAPSE_SDRAM_PARTITION_ID"><code class="docutils literal notranslate"><span class="pre">SYNAPSE_SDRAM_PARTITION_ID</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.constants.SYNAPTIC_ROW_HEADER_WORDS"><code class="docutils literal notranslate"><span class="pre">SYNAPTIC_ROW_HEADER_WORDS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.constants.WRITE_BANDWIDTH_BYTES_PER_SECOND"><code class="docutils literal notranslate"><span class="pre">WRITE_BANDWIDTH_BYTES_PER_SECOND</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.data_cache">spynnaker.pyNN.utilities.data_cache module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache"><code class="docutils literal notranslate"><span class="pre">DataCache</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache.description"><code class="docutils literal notranslate"><span class="pre">DataCache.description</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache.get_data"><code class="docutils literal notranslate"><span class="pre">DataCache.get_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache.has_data"><code class="docutils literal notranslate"><span class="pre">DataCache.has_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache.label"><code class="docutils literal notranslate"><span class="pre">DataCache.label</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache.rec_datetime"><code class="docutils literal notranslate"><span class="pre">DataCache.rec_datetime</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache.recording_start_time"><code class="docutils literal notranslate"><span class="pre">DataCache.recording_start_time</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache.save_data"><code class="docutils literal notranslate"><span class="pre">DataCache.save_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache.segment_number"><code class="docutils literal notranslate"><span class="pre">DataCache.segment_number</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache.t"><code class="docutils literal notranslate"><span class="pre">DataCache.t</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.data_cache.DataCache.variables"><code class="docutils literal notranslate"><span class="pre">DataCache.variables</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.extracted_data">spynnaker.pyNN.utilities.extracted_data module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.extracted_data.ExtractedData"><code class="docutils literal notranslate"><span class="pre">ExtractedData</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.extracted_data.ExtractedData.get"><code class="docutils literal notranslate"><span class="pre">ExtractedData.get()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.extracted_data.ExtractedData.set"><code class="docutils literal notranslate"><span class="pre">ExtractedData.set()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider">spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider"><code class="docutils literal notranslate"><span class="pre">FakeHBPPortalMachineProvider</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.create"><code class="docutils literal notranslate"><span class="pre">FakeHBPPortalMachineProvider.create()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.destroy"><code class="docutils literal notranslate"><span class="pre">FakeHBPPortalMachineProvider.destroy()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.get_machine_info"><code class="docutils literal notranslate"><span class="pre">FakeHBPPortalMachineProvider.get_machine_info()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.wait_till_not_ready"><code class="docutils literal notranslate"><span class="pre">FakeHBPPortalMachineProvider.wait_till_not_ready()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.wait_until_ready"><code class="docutils literal notranslate"><span class="pre">FakeHBPPortalMachineProvider.wait_until_ready()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.neo_compare">spynnaker.pyNN.utilities.neo_compare module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_compare.compare_analogsignal"><code class="docutils literal notranslate"><span class="pre">compare_analogsignal()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_compare.compare_blocks"><code class="docutils literal notranslate"><span class="pre">compare_blocks()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_compare.compare_segments"><code class="docutils literal notranslate"><span class="pre">compare_segments()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_compare.compare_spiketrain"><code class="docutils literal notranslate"><span class="pre">compare_spiketrain()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_compare.compare_spiketrains"><code class="docutils literal notranslate"><span class="pre">compare_spiketrains()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.neo_convertor">spynnaker.pyNN.utilities.neo_convertor module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.convert_analog_signal"><code class="docutils literal notranslate"><span class="pre">convert_analog_signal()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.convert_data"><code class="docutils literal notranslate"><span class="pre">convert_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.convert_data_list"><code class="docutils literal notranslate"><span class="pre">convert_data_list()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.convert_gsyn"><code class="docutils literal notranslate"><span class="pre">convert_gsyn()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.convert_gsyn_exc_list"><code class="docutils literal notranslate"><span class="pre">convert_gsyn_exc_list()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.convert_gsyn_inh_list"><code class="docutils literal notranslate"><span class="pre">convert_gsyn_inh_list()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.convert_spikes"><code class="docutils literal notranslate"><span class="pre">convert_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.convert_spiketrains"><code class="docutils literal notranslate"><span class="pre">convert_spiketrains()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.convert_v_list"><code class="docutils literal notranslate"><span class="pre">convert_v_list()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.count_spikes"><code class="docutils literal notranslate"><span class="pre">count_spikes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.neo_convertor.count_spiketrains"><code class="docutils literal notranslate"><span class="pre">count_spiketrains()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.running_stats">spynnaker.pyNN.utilities.running_stats module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.running_stats.RunningStats"><code class="docutils literal notranslate"><span class="pre">RunningStats</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.add_item"><code class="docutils literal notranslate"><span class="pre">RunningStats.add_item()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.add_items"><code class="docutils literal notranslate"><span class="pre">RunningStats.add_items()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.mean"><code class="docutils literal notranslate"><span class="pre">RunningStats.mean</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.n_items"><code class="docutils literal notranslate"><span class="pre">RunningStats.n_items</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.standard_deviation"><code class="docutils literal notranslate"><span class="pre">RunningStats.standard_deviation</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.variance"><code class="docutils literal notranslate"><span class="pre">RunningStats.variance</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.struct">spynnaker.pyNN.utilities.struct module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct"><code class="docutils literal notranslate"><span class="pre">Struct</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.field_types"><code class="docutils literal notranslate"><span class="pre">Struct.field_types</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.get_data"><code class="docutils literal notranslate"><span class="pre">Struct.get_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.get_size_in_whole_words"><code class="docutils literal notranslate"><span class="pre">Struct.get_size_in_whole_words()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.numpy_dtype"><code class="docutils literal notranslate"><span class="pre">Struct.numpy_dtype</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.read_data"><code class="docutils literal notranslate"><span class="pre">Struct.read_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker-pynn-utilities-utility-calls-module">spynnaker.pyNN.utilities.utility_calls module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not"><code class="docutils literal notranslate"><span class="pre">check_directory_exists_and_create_if_not()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.convert_param_to_numpy"><code class="docutils literal notranslate"><span class="pre">convert_param_to_numpy()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.convert_to"><code class="docutils literal notranslate"><span class="pre">convert_to()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.create_mars_kiss_seeds"><code class="docutils literal notranslate"><span class="pre">create_mars_kiss_seeds()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.get_maximum_probable_value"><code class="docutils literal notranslate"><span class="pre">get_maximum_probable_value()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.get_mean"><code class="docutils literal notranslate"><span class="pre">get_mean()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.get_minimum_probable_value"><code class="docutils literal notranslate"><span class="pre">get_minimum_probable_value()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.get_n_bits"><code class="docutils literal notranslate"><span class="pre">get_n_bits()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.get_probability_within_range"><code class="docutils literal notranslate"><span class="pre">get_probability_within_range()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.get_probable_maximum_selected"><code class="docutils literal notranslate"><span class="pre">get_probable_maximum_selected()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.get_probable_minimum_selected"><code class="docutils literal notranslate"><span class="pre">get_probable_minimum_selected()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.get_standard_deviation"><code class="docutils literal notranslate"><span class="pre">get_standard_deviation()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.get_time_to_write_us"><code class="docutils literal notranslate"><span class="pre">get_time_to_write_us()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.get_variance"><code class="docutils literal notranslate"><span class="pre">get_variance()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.high"><code class="docutils literal notranslate"><span class="pre">high()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.low"><code class="docutils literal notranslate"><span class="pre">low()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.moved_in_v6"><code class="docutils literal notranslate"><span class="pre">moved_in_v6()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.moved_in_v7"><code class="docutils literal notranslate"><span class="pre">moved_in_v7()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.moved_in_v7_warning"><code class="docutils literal notranslate"><span class="pre">moved_in_v7_warning()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.read_in_data_from_file"><code class="docutils literal notranslate"><span class="pre">read_in_data_from_file()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.utility_calls.read_spikes_from_file"><code class="docutils literal notranslate"><span class="pre">read_spikes_from_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.variable_cache">spynnaker.pyNN.utilities.variable_cache module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache"><code class="docutils literal notranslate"><span class="pre">VariableCache</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.data"><code class="docutils literal notranslate"><span class="pre">VariableCache.data</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.indexes"><code class="docutils literal notranslate"><span class="pre">VariableCache.indexes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.n_neurons"><code class="docutils literal notranslate"><span class="pre">VariableCache.n_neurons</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.sampling_interval"><code class="docutils literal notranslate"><span class="pre">VariableCache.sampling_interval</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.units"><code class="docutils literal notranslate"><span class="pre">VariableCache.units</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities">Module contents</a></li>
 </ul>
 </li>
@@ -1365,7 +1626,7 @@ regardless of whether they were recording or not.</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

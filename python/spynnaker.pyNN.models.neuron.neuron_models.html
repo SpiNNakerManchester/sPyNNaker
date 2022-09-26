@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -566,7 +567,50 @@ that they appear</p></li>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.neuron_models package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.neuron_models">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.neuron_models">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronModel</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronModel.get_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_global_values"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronModel.get_global_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronModel.get_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.global_struct"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronModel.global_struct</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.read_data"><code class="docutils literal notranslate"><span class="pre">AbstractNeuronModel.read_data()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.a"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.a</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.add_parameters"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.add_state_variables"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.b"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.b</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.c"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.c</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.d"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.d</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_global_values"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.get_global_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_units"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_values"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.has_variable"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.i_offset"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.i_offset</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.u_init"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.u_init</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.update_values"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.update_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.v_init"><code class="docutils literal notranslate"><span class="pre">NeuronModelIzh.v_init</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.add_parameters"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.add_state_variables"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.cm"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.cm</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_units"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.get_values"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.has_variable"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.i_offset"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.i_offset</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.tau_m"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.tau_m</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.tau_refrac"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.tau_refrac</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.update_values"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.update_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_init"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.v_init</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_reset"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.v_reset</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelLeakyIntegrateAndFire.v_rest"><code class="docutils literal notranslate"><span class="pre">NeuronModelLeakyIntegrateAndFire.v_rest</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -629,7 +673,7 @@ that they appear</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

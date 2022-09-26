@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -1166,7 +1167,116 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.synapse_types package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.synapse_types">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.synapse_types">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseType</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_n_synapse_types"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseType.get_n_synapse_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseType.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_synapse_targets"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseType.get_synapse_targets()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.add_parameters"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.add_state_variables"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.exc_response"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.exc_response</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.get_n_synapse_types"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.get_n_synapse_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.get_synapse_targets"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.get_synapse_targets()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.get_units"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.get_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.has_variable"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.inh_response"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.inh_response</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.tau_syn_E"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.tau_syn_E</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.tau_syn_I"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.tau_syn_I</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.update_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeAlpha.update_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.add_parameters"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.add_state_variables"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.get_n_synapse_types"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.get_n_synapse_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.get_synapse_targets"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.get_synapse_targets()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.get_units"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.get_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.has_variable"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.isyn_exc"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.isyn_exc</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.isyn_inh"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.isyn_inh</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.update_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDelta.update_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.add_parameters"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.add_state_variables"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.get_n_synapse_types"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.get_n_synapse_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.get_synapse_targets"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.get_synapse_targets()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.get_units"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.get_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.has_variable"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_exc"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.isyn_exc</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_exc2"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.isyn_exc2</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_inh"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.isyn_inh</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_E"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.tau_syn_E</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_E2"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.tau_syn_E2</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_I"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.tau_syn_I</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.update_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeDualExponential.update_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.add_parameters"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.add_state_variables"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_n_synapse_types"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.get_n_synapse_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_synapse_targets"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.get_synapse_targets()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_units"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.has_variable"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.isyn_exc"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.isyn_exc</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.isyn_inh"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.isyn_inh</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.tau_syn_E"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.tau_syn_E</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.tau_syn_I"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.tau_syn_I</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.update_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated.update_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.add_parameters"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.add_state_variables"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_n_synapse_types"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.get_n_synapse_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_synapse_targets"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.get_synapse_targets()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_units"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.get_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.has_variable"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.isyn_exc"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.isyn_exc</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.isyn_inh"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.isyn_inh</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.tau_syn_E"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.tau_syn_E</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.tau_syn_I"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.tau_syn_I</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.update_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeExponential.update_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.add_parameters"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.add_state_variables"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.exc2_old"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.exc2_old</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.get_n_synapse_types"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.get_n_synapse_types()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.get_synapse_targets"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.get_synapse_targets()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.get_units"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.get_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.has_variable"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_exc"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.isyn_exc</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_exc2"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.isyn_exc2</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_inh"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.isyn_inh</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.multiplicator"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.multiplicator</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.scaling_factor"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.scaling_factor</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_E"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.tau_syn_E</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_E2"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.tau_syn_E2</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_I"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.tau_syn_I</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.update_values"><code class="docutils literal notranslate"><span class="pre">SynapseTypeSEMD.update_values()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1229,7 +1339,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

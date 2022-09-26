@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.neuron_models package" href="spynnaker.pyNN.models.neuron.neuron_models.html" />
@@ -550,7 +551,51 @@ synapse dynamics object</p>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.local_only package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.local_only">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.local_only">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.AbstractLocalOnly"><code class="docutils literal notranslate"><span class="pre">AbstractLocalOnly</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.AbstractLocalOnly.absolute_max_atoms_per_core"><code class="docutils literal notranslate"><span class="pre">AbstractLocalOnly.absolute_max_atoms_per_core</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.AbstractLocalOnly.get_parameters_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractLocalOnly.get_parameters_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.AbstractLocalOnly.write_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractLocalOnly.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.changes_during_run"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.changes_during_run</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.delay"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.delay</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.get_maximum_positive_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.get_maximum_positive_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.get_mean_negative_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.get_mean_negative_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.get_mean_positive_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.get_mean_positive_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.get_minimum_negative_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.get_minimum_negative_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.get_negative_synapse_index"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.get_negative_synapse_index()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.get_parameters_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.get_parameters_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.get_positive_synapse_index"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.get_positive_synapse_index()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.get_variance_negative_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.get_variance_negative_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.get_variance_positive_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.get_variance_positive_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.get_vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.get_vertex_executable_suffix()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.merge"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.merge()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.weight</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.write_parameters"><code class="docutils literal notranslate"><span class="pre">LocalOnlyConvolution.write_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.changes_during_run"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.changes_during_run</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.delay"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.delay</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.get_maximum_positive_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.get_maximum_positive_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.get_mean_negative_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.get_mean_negative_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.get_mean_positive_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.get_mean_positive_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.get_minimum_negative_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.get_minimum_negative_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.get_negative_synapse_index"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.get_negative_synapse_index()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.get_parameters_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.get_parameters_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.get_positive_synapse_index"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.get_positive_synapse_index()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.get_variance_negative_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.get_variance_negative_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.get_variance_positive_weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.get_variance_positive_weight()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.get_vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.get_vertex_executable_suffix()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.merge"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.merge()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.weight"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.weight</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.local_only.LocalOnlyPoolDense.write_parameters"><code class="docutils literal notranslate"><span class="pre">LocalOnlyPoolDense.write_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -613,7 +658,7 @@ synapse dynamics object</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

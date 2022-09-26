@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.common package" href="spynnaker.pyNN.models.common.html" />
@@ -642,7 +643,86 @@ of words, and with the number of neurons rounded up to a power of 2</p>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.abstract_models package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.abstract_models">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.abstract_models">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses"><code class="docutils literal notranslate"><span class="pre">AbstractAcceptsIncomingSynapses</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache"><code class="docutils literal notranslate"><span class="pre">AbstractAcceptsIncomingSynapses.clear_connection_cache()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine"><code class="docutils literal notranslate"><span class="pre">AbstractAcceptsIncomingSynapses.get_connections_from_machine()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">AbstractAcceptsIncomingSynapses.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.set_synapse_dynamics"><code class="docutils literal notranslate"><span class="pre">AbstractAcceptsIncomingSynapses.set_synapse_dynamics()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.verify_splitter"><code class="docutils literal notranslate"><span class="pre">AbstractAcceptsIncomingSynapses.verify_splitter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits"><code class="docutils literal notranslate"><span class="pre">AbstractContainsUnits</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits.get_units"><code class="docutils literal notranslate"><span class="pre">AbstractContainsUnits.get_units()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages"><code class="docutils literal notranslate"><span class="pre">AbstractHasDelayStages</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages.n_delay_stages"><code class="docutils literal notranslate"><span class="pre">AbstractHasDelayStages.n_delay_stages</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes"><code class="docutils literal notranslate"><span class="pre">AbstractMaxSpikes</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second"><code class="docutils literal notranslate"><span class="pre">AbstractMaxSpikes.max_spikes_per_second()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts"><code class="docutils literal notranslate"><span class="pre">AbstractMaxSpikes.max_spikes_per_ts()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationInitializable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_value"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationInitializable.get_initial_value()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_values"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationInitializable.get_initial_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initial_values"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationInitializable.initial_values</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationInitializable.initialize()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationInitializable.initialize_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationSettable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.get_value_by_selector"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationSettable.get_value_by_selector()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.n_atoms"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationSettable.n_atoms</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.set_value_by_selector"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationSettable.set_value_by_selector()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet"><code class="docutils literal notranslate"><span class="pre">AbstractReadParametersBeforeSet</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet.read_parameters_from_machine"><code class="docutils literal notranslate"><span class="pre">AbstractReadParametersBeforeSet.read_parameters_from_machine()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable"><code class="docutils literal notranslate"><span class="pre">AbstractSettable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable.get_value"><code class="docutils literal notranslate"><span class="pre">AbstractSettable.get_value()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable.set_value"><code class="docutils literal notranslate"><span class="pre">AbstractSettable.set_value()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseExpandable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.connection_generator_region"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseExpandable.connection_generator_region</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseExpandable.gen_on_machine()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.max_gen_data"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseExpandable.max_gen_data</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseExpandable.read_generated_connection_holders()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable"><code class="docutils literal notranslate"><span class="pre">AbstractWeightUpdatable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable.update_weight"><code class="docutils literal notranslate"><span class="pre">AbstractWeightUpdatable.update_weight()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.HasShapeKeyFields"><code class="docutils literal notranslate"><span class="pre">HasShapeKeyFields</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.HasShapeKeyFields.get_shape_key_fields"><code class="docutils literal notranslate"><span class="pre">HasShapeKeyFields.get_shape_key_fields()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.HasSynapses"><code class="docutils literal notranslate"><span class="pre">HasSynapses</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.HasSynapses.clear_connection_cache"><code class="docutils literal notranslate"><span class="pre">HasSynapses.clear_connection_cache()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.HasSynapses.get_connections_from_machine"><code class="docutils literal notranslate"><span class="pre">HasSynapses.get_connections_from_machine()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM"><code class="docutils literal notranslate"><span class="pre">ReceivesSynapticInputsOverSDRAM</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.N_BYTES_PER_INPUT"><code class="docutils literal notranslate"><span class="pre">ReceivesSynapticInputsOverSDRAM.N_BYTES_PER_INPUT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer"><code class="docutils literal notranslate"><span class="pre">ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_target_neurons"><code class="docutils literal notranslate"><span class="pre">ReceivesSynapticInputsOverSDRAM.n_target_neurons</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_target_synapse_types"><code class="docutils literal notranslate"><span class="pre">ReceivesSynapticInputsOverSDRAM.n_target_synapse_types</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.weight_scales"><code class="docutils literal notranslate"><span class="pre">ReceivesSynapticInputsOverSDRAM.weight_scales</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.SendsSynapticInputsOverSDRAM"><code class="docutils literal notranslate"><span class="pre">SendsSynapticInputsOverSDRAM</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.SupportsStructure"><code class="docutils literal notranslate"><span class="pre">SupportsStructure</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.SupportsStructure.set_structure"><code class="docutils literal notranslate"><span class="pre">SupportsStructure.set_structure()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -704,7 +784,7 @@ of words, and with the number of neurons rounded up to a power of 2</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

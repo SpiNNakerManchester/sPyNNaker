@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -563,7 +564,57 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.input_types package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.input_types">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.input_types">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><code class="docutils literal notranslate"><span class="pre">AbstractInputType</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.AbstractInputType.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">AbstractInputType.get_global_weight_scale()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.add_parameters"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.add_state_variables"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.e_rev_E"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.e_rev_E</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.e_rev_I"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.e_rev_I</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.get_global_weight_scale()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_units"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_values"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.has_variable"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.update_values"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.update_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.add_parameters"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.add_state_variables"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.get_global_weight_scale()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_units"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_values"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.has_variable"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.update_values"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.update_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.add_parameters"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.add_state_variables"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.get_global_weight_scale()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_units"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_values"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.has_variable"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.inh_input_previous"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.inh_input_previous</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.multiplicator"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.multiplicator</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.update_values"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.update_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.add_parameters"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.add_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.add_state_variables"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.add_state_variables()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.get_global_weight_scale()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_units"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.get_units()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_values"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.get_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.has_variable"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.has_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.update_values"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.update_values()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -626,7 +677,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

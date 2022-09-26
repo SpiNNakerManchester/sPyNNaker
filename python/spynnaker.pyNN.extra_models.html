@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -409,7 +410,40 @@ weight scale</p></li>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.extra_models package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_models">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.extra_models">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.IFCondExpStoc"><code class="docutils literal notranslate"><span class="pre">IFCondExpStoc</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.IFCurDelta"><code class="docutils literal notranslate"><span class="pre">IFCurDelta</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.IFCurrExpCa2Adaptive"><code class="docutils literal notranslate"><span class="pre">IFCurrExpCa2Adaptive</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.IF_curr_dual_exp"><code class="docutils literal notranslate"><span class="pre">IF_curr_dual_exp</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.IF_curr_exp_sEMD"><code class="docutils literal notranslate"><span class="pre">IF_curr_exp_sEMD</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.Izhikevich_cond"><code class="docutils literal notranslate"><span class="pre">Izhikevich_cond</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.Neuromodulation"><code class="docutils literal notranslate"><span class="pre">Neuromodulation</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.PfisterSpikeTriplet"><code class="docutils literal notranslate"><span class="pre">PfisterSpikeTriplet</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.RecurrentRule"><code class="docutils literal notranslate"><span class="pre">RecurrentRule</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.SpikeNearestPairRule"><code class="docutils literal notranslate"><span class="pre">SpikeNearestPairRule</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVariable</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.absolute_max_atoms_per_core"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVariable.absolute_max_atoms_per_core</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.create_vertex"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVariable.create_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.default_population_parameters"><code class="docutils literal notranslate"><span class="pre">SpikeSourcePoissonVariable.default_population_parameters</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.Vogels2011Rule"><code class="docutils literal notranslate"><span class="pre">Vogels2011Rule</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.A3_minus"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.A3_minus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.A3_plus"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.A3_plus</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.default_parameters"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.default_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.get_parameter_names()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.is_same_as"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.is_same_as()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.vertex_executable_suffix</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.w_max"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.w_max</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.w_min"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.w_min</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.weight_maximum"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.weight_maximum</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.write_parameters"><code class="docutils literal notranslate"><span class="pre">WeightDependenceAdditiveTriplet.write_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -470,7 +504,7 @@ weight scale</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

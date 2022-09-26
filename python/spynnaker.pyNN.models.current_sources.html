@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neural_projections package" href="spynnaker.pyNN.models.neural_projections.html" />
@@ -489,7 +490,63 @@ The sdram usage of the current source.</p>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.current_sources package</a><ul>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.current_sources">Module contents</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.current_sources">Module contents</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.ACSource"><code class="docutils literal notranslate"><span class="pre">ACSource</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.ACSource.current_source_id"><code class="docutils literal notranslate"><span class="pre">ACSource.current_source_id</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.ACSource.get_parameter_types"><code class="docutils literal notranslate"><span class="pre">ACSource.get_parameter_types</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.ACSource.get_parameters"><code class="docutils literal notranslate"><span class="pre">ACSource.get_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.ACSource.get_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">ACSource.get_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.ACSource.set_parameters"><code class="docutils literal notranslate"><span class="pre">ACSource.set_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.app_vertex"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource.app_vertex</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.current_source_id"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource.current_source_id</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.get_parameter_types"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource.get_parameter_types</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.get_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource.get_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.get_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource.get_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.inject_into"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource.inject_into()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.population"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource.population</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.set_app_vertex"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource.set_app_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.set_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource.set_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.set_population"><code class="docutils literal notranslate"><span class="pre">AbstractCurrentSource.set_population()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.CurrentSourceIDs"><code class="docutils literal notranslate"><span class="pre">CurrentSourceIDs</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.AC_SOURCE"><code class="docutils literal notranslate"><span class="pre">CurrentSourceIDs.AC_SOURCE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.DC_SOURCE"><code class="docutils literal notranslate"><span class="pre">CurrentSourceIDs.DC_SOURCE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.NOISY_CURRENT_SOURCE"><code class="docutils literal notranslate"><span class="pre">CurrentSourceIDs.NOISY_CURRENT_SOURCE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.NO_SOURCE"><code class="docutils literal notranslate"><span class="pre">CurrentSourceIDs.NO_SOURCE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.N_SOURCES"><code class="docutils literal notranslate"><span class="pre">CurrentSourceIDs.N_SOURCES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.STEP_CURRENT_SOURCE"><code class="docutils literal notranslate"><span class="pre">CurrentSourceIDs.STEP_CURRENT_SOURCE</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.DCSource"><code class="docutils literal notranslate"><span class="pre">DCSource</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.DCSource.current_source_id"><code class="docutils literal notranslate"><span class="pre">DCSource.current_source_id</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.DCSource.get_parameter_types"><code class="docutils literal notranslate"><span class="pre">DCSource.get_parameter_types</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.DCSource.get_parameters"><code class="docutils literal notranslate"><span class="pre">DCSource.get_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.DCSource.get_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">DCSource.get_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.DCSource.set_parameters"><code class="docutils literal notranslate"><span class="pre">DCSource.set_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.NoisyCurrentSource"><code class="docutils literal notranslate"><span class="pre">NoisyCurrentSource</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.NoisyCurrentSource.current_source_id"><code class="docutils literal notranslate"><span class="pre">NoisyCurrentSource.current_source_id</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.NoisyCurrentSource.get_parameter_types"><code class="docutils literal notranslate"><span class="pre">NoisyCurrentSource.get_parameter_types</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.NoisyCurrentSource.get_parameters"><code class="docutils literal notranslate"><span class="pre">NoisyCurrentSource.get_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.NoisyCurrentSource.get_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">NoisyCurrentSource.get_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.NoisyCurrentSource.set_parameters"><code class="docutils literal notranslate"><span class="pre">NoisyCurrentSource.set_parameters()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.StepCurrentSource"><code class="docutils literal notranslate"><span class="pre">StepCurrentSource</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.StepCurrentSource.current_source_id"><code class="docutils literal notranslate"><span class="pre">StepCurrentSource.current_source_id</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.StepCurrentSource.get_parameter_types"><code class="docutils literal notranslate"><span class="pre">StepCurrentSource.get_parameter_types</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.StepCurrentSource.get_parameters"><code class="docutils literal notranslate"><span class="pre">StepCurrentSource.get_parameters</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.StepCurrentSource.get_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">StepCurrentSource.get_sdram_usage_in_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.current_sources.StepCurrentSource.set_parameters"><code class="docutils literal notranslate"><span class="pre">StepCurrentSource.set_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -551,7 +608,7 @@ The sdram usage of the current source.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>
