@@ -190,7 +190,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
         proc_offset = NeuronProvenance.N_ITEMS
         end_proc_offset = proc_offset + LocalOnlyProvenance.N_ITEMS
         self._parse_neuron_provenance(
-            label, x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
+            x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
         self._parse_local_only_provenance(
             label, x, y, p, provenance_data[proc_offset:end_proc_offset])
 
@@ -265,8 +265,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
     def regenerate_data_specification(self, spec, placement):
         # pylint: disable=too-many-arguments, arguments-differ
 
-        # write the neuron params into the new DSG region
-        self._write_neuron_parameters(spec, self.__ring_buffer_shifts)
+        self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
 
         # close spec
         spec.end_specification()
