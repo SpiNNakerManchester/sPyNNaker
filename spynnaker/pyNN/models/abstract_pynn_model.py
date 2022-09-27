@@ -137,15 +137,11 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def create_vertex(self, n_neurons, label, constraints):
+    def create_vertex(self, n_neurons, label):
         """ Create a vertex for a population of the model
 
         :param int n_neurons: The number of neurons in the population
         :param str label: The label to give to the vertex
-        :param constraints:
-            A list of constraints to give to the vertex, or None
-        :type constraints:
-            list(~pacman.model.constraints.AbstractConstraint) or None
         :return: An application vertex for the population
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """

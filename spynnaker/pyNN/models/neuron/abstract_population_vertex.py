@@ -162,16 +162,13 @@ class AbstractPopulationVertex(
     BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 4 * BYTES_PER_WORD
 
     def __init__(
-            self, n_neurons, label, constraints, max_atoms_per_core,
-            spikes_per_second, ring_buffer_sigma,
-            incoming_spike_buffer_size, neuron_impl, pynn_model,
-            drop_late_spikes, splitter, min_weights, weight_random_sigma,
-            max_stdp_spike_delta):
+            self, n_neurons, label, max_atoms_per_core,
+            spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
+            neuron_impl, pynn_model, drop_late_spikes, splitter, min_weights,
+            weight_random_sigma, max_stdp_spike_delta):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints on where a population's vertices may be placed.
         :param int max_atoms_per_core:
             The maximum number of atoms (neurons) per SpiNNaker core.
         :param spikes_per_second: Expected spike rate
@@ -200,7 +197,7 @@ class AbstractPopulationVertex(
         """
 
         # pylint: disable=too-many-arguments
-        super().__init__(label, constraints, max_atoms_per_core, splitter)
+        super().__init__(label, max_atoms_per_core, splitter)
 
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
 

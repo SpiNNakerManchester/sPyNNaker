@@ -67,7 +67,7 @@ class MunichMotorDevice(
             speed, sample_time, update_time, delay_time, delta_threshold,
             continue_if_not_different, label, app_vertex=self)
         super().__init__(
-            m_vertex, label, None, MachineMunichMotorDevice._N_ATOMS)
+            m_vertex, label, MachineMunichMotorDevice._N_ATOMS)
         self.__dependent_vertices = [
             _MunichMotorDevice(spinnaker_link_id, board_address)]
 

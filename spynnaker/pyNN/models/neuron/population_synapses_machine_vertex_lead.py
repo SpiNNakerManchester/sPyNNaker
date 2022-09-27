@@ -38,15 +38,13 @@ class PopulationSynapsesMachineVertexLead(
         "__synapse_references"]
 
     def __init__(
-            self, sdram, label, constraints, app_vertex,
+            self, sdram, label, app_vertex,
             vertex_slice, min_weights, weight_scales, all_syn_block_sz,
             structural_sz, synapse_references):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The sdram used by the vertex
         :param str label: The label of the vertex
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints for the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -55,7 +53,7 @@ class PopulationSynapsesMachineVertexLead(
             The computed minimum weights to be used in the simulation
         """
         super(PopulationSynapsesMachineVertexLead, self).__init__(
-            sdram, label, constraints, app_vertex, vertex_slice)
+            sdram, label, app_vertex, vertex_slice)
         self.__min_weights = min_weights
         self.__weight_scales = weight_scales
         self.__all_syn_block_sz = all_syn_block_sz

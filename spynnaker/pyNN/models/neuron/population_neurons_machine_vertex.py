@@ -93,14 +93,12 @@ class PopulationNeuronsMachineVertex(
         0: "TIMER_NEURONS"}
 
     def __init__(
-            self, sdram, label, constraints, app_vertex,
-            vertex_slice, slice_index, min_weights, weight_scales):
+            self, sdram, label, app_vertex, vertex_slice, slice_index,
+            min_weights, weight_scales):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The sdram used by the vertex
         :param str label: The label of the vertex
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints for the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -113,8 +111,7 @@ class PopulationNeuronsMachineVertex(
             The scaling to apply to weights to store them in the synapses
         """
         super(PopulationNeuronsMachineVertex, self).__init__(
-            label, constraints, app_vertex, vertex_slice, sdram,
-            self.COMMON_REGIONS,
+            label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + NeuronMainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None

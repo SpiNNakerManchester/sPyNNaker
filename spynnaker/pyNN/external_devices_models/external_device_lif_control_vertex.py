@@ -44,7 +44,7 @@ class ExternalDeviceLifControlVertex(
             self, devices, create_edges, max_atoms_per_core, neuron_impl,
             pynn_model, translator=None, spikes_per_second=None, label=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-            drop_late_spikes=None, constraints=None, splitter=None,
+            drop_late_spikes=None, splitter=None,
             min_weights=None, weight_random_sigma=None,
             max_stdp_spike_delta=None):
         """
@@ -68,14 +68,13 @@ class ExternalDeviceLifControlVertex(
         :param splitter: splitter from app to machine
         :type splitter: None or
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         :param list min_weights:
         :param float weight_random_sigma:
         :param float max_stdp_spike_delta:
         """
         # pylint: disable=too-many-arguments
         super().__init__(
-            len(devices), label, constraints, max_atoms_per_core,
+            len(devices), label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter, min_weights,
             weight_random_sigma, max_stdp_spike_delta)
