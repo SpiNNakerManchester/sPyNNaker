@@ -179,21 +179,18 @@
         <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;PROCESS_PLASTIC_SYNAPSES&quot;</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span>  <span class="n">vertex_slice</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span>  <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.resources.AbstractSDRAM sdram:</span>
 <span class="sd">            The sdram used by the vertex</span>
 <span class="sd">        :param str label: The label of the vertex</span>
-<span class="sd">        :param list(~pacman.model.constraints.AbstractConstraint) constraints:</span>
-<span class="sd">            Constraints for the vertex</span>
 <span class="sd">        :param AbstractPopulationVertex app_vertex:</span>
 <span class="sd">            The associated application vertex</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of the population that this implements</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PopulationSynapsesMachineVertexCommon</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">COMMON_REGIONS</span><span class="p">,</span>
+            <span class="n">label</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMMON_REGIONS</span><span class="p">,</span>
             <span class="n">SynapseProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span> <span class="o">+</span> <span class="n">SpikeProcessingFastProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_PROFILE_TAG_LABELS</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_binary_file_name</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span> <span class="o">=</span> <span class="kc">None</span>

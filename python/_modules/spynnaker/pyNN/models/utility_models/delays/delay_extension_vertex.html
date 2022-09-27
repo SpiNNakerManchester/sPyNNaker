@@ -98,21 +98,18 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span>
-            <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;DelayExtension&quot;</span><span class="p">):</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;DelayExtension&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param partition: The parition this Delay is supporting</span>
 <span class="sd">        :type partition:</span>
 <span class="sd">            ~pacman.mode.graph.application.ApplicationEdgePartition</span>
 <span class="sd">        :param int delay_per_stage: the delay per stage</span>
 <span class="sd">        :param int n_delay_stages: the (initial) number of delay stages needed</span>
-<span class="sd">        :param iterable(~pacman.model.constraints.AbstractConstraint) \</span>
-<span class="sd">                constraints:</span>
-<span class="sd">            the vertex constraints</span>
 <span class="sd">        :param str label: the vertex label</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">label</span><span class="p">,</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__partition</span> <span class="o">=</span> <span class="n">partition</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span> <span class="o">=</span> <span class="n">n_delay_stages</span>

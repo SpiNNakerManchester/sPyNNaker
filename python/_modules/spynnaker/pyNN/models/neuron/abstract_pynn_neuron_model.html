@@ -88,15 +88,14 @@
 <div class="viewcode-block" id="AbstractPyNNNeuronModel.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.create_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">,</span>
                <span class="n">additional_arguments</span><span class="o">=</span><span class="n">_population_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
-            <span class="n">ring_buffer_sigma</span><span class="p">,</span> <span class="n">incoming_spike_buffer_size</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span>
-            <span class="n">splitter</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">ring_buffer_sigma</span><span class="p">,</span>
+            <span class="n">incoming_spike_buffer_size</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_max_atoms_per_dimension_per_core</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">AbstractPopulationVertex</span><span class="p">(</span>
-            <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
-            <span class="n">ring_buffer_sigma</span><span class="p">,</span> <span class="n">incoming_spike_buffer_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model</span><span class="p">,</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span></div>
+            <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">ring_buffer_sigma</span><span class="p">,</span>
+            <span class="n">incoming_spike_buffer_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span>
+            <span class="n">splitter</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

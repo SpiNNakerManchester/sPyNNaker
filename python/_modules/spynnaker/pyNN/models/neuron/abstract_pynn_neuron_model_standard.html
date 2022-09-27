@@ -95,13 +95,13 @@
 <div class="viewcode-block" id="AbstractPyNNNeuronModelStandard.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.create_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPyNNNeuronModel</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">,</span>
                <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;n_steps_per_timestep&quot;</span><span class="p">})</span>
     <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
             <span class="n">ring_buffer_sigma</span><span class="p">,</span> <span class="n">incoming_spike_buffer_size</span><span class="p">,</span>
             <span class="n">n_steps_per_timestep</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">n_steps_per_timestep</span> <span class="o">=</span> <span class="n">n_steps_per_timestep</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">(</span>
-            <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
+            <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
             <span class="n">ring_buffer_sigma</span><span class="p">,</span> <span class="n">incoming_spike_buffer_size</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span>
             <span class="n">splitter</span><span class="p">)</span></div>
 </pre></div>

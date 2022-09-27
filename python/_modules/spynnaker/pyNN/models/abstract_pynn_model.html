@@ -178,15 +178,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractPyNNModel.create_vertex"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create a vertex for a population of the model</span>
 
 <span class="sd">        :param int n_neurons: The number of neurons in the population</span>
 <span class="sd">        :param str label: The label to give to the vertex</span>
-<span class="sd">        :param constraints:</span>
-<span class="sd">            A list of constraints to give to the vertex, or None</span>
-<span class="sd">        :type constraints:</span>
-<span class="sd">            list(~pacman.model.constraints.AbstractConstraint) or None</span>
 <span class="sd">        :return: An application vertex for the population</span>
 <span class="sd">        :rtype: ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        &quot;&quot;&quot;</span></div></div>

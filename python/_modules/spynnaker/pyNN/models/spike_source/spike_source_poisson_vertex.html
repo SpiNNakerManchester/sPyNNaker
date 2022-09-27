@@ -135,15 +135,11 @@
     <span class="n">SPIKE_RECORDING_REGION_ID</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span>
-            <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rates</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">starts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">durations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">max_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
+            <span class="n">rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rates</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">starts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">durations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_neurons:</span>
-<span class="sd">        :param constraints:</span>
-<span class="sd">        :type constraints:</span>
-<span class="sd">            iterable(~pacman.model.constraints.AbstractConstraint)</span>
 <span class="sd">        :param str label:</span>
 <span class="sd">        :param float seed:</span>
 <span class="sd">        :param int max_atoms_per_core:</span>
@@ -156,7 +152,7 @@
 <span class="sd">            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span>
 
         <span class="c1"># atoms params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_n_atoms</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="s2">&quot;n_neurons&quot;</span><span class="p">)</span>
@@ -499,13 +495,13 @@
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.create_machine_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.create_machine_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LegacyPartitionerAPI</span><span class="o">.</span><span class="n">create_machine_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_machine_vertex</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_subvertices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_subvertices</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">SpikeSourcePoissonMachineVertex</span><span class="p">(</span>
             <span class="n">sdram</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span><span class="p">,</span>
-            <span class="n">constraints</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span></div>
+            <span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

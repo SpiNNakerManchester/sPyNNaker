@@ -174,21 +174,20 @@ accuracy to gain performance.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ExternalDeviceLifControl.create_vertex">
-<span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes_per_second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_buffer_sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_spike_buffer_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps_per_timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_late_spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control.html#ExternalDeviceLifControl.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalDeviceLifControl.create_vertex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes_per_second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_buffer_sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_spike_buffer_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps_per_timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_late_spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control.html#ExternalDeviceLifControl.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalDeviceLifControl.create_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vertex for a population of the model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label to give to the vertex</p></li>
-<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) – A list of constraints to give to the vertex, or None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a></p>
+<dd class="field-odd"><p><em>ApplicationVertex</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -997,7 +996,7 @@ in the order of the fields</p>
 <dd><p>Return the vertices which this vertex depends upon</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>)</p>
+<dd class="field-odd"><p>iterable(<em>ApplicationVertex</em>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1008,7 +1007,7 @@ in the order of the fields</p>
 <dd><p>Return the dependent edge identifiers for a particular dependent            vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – </p>
+<dd class="field-odd"><p><strong>vertex</strong> (<em>ApplicationVertex</em>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -2292,7 +2291,7 @@ to global keys rather than core-based keys</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – The pyNN population object from which spikes will be sent.</p></li>
 <li><p><strong>device</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a><em> or
-</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – The pyNN population or external device to which the spikes will be
+</em><em>ApplicationVertex</em>) – The pyNN population or external device to which the spikes will be
 sent.</p></li>
 <li><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The partition ID to activate live output to.</p></li>
 </ul>

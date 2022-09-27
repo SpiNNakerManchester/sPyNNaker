@@ -123,7 +123,7 @@ slices</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex">
-<span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sdram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remaining_constraints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sdram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -246,7 +246,7 @@ machine or application vertices that should hit the target)</p>
 <dd class="field-even"><p>list of machine vertices</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>)</p>
+<dd class="field-odd"><p>iterable(<em>MachineVertex</em>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -466,7 +466,7 @@ machine or application vertices that should hit the target)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pre_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – The vertex sending into the Projection</p></li>
+<li><p><strong>pre_vertex</strong> (<em>ApplicationVertex</em>) – The vertex sending into the Projection</p></li>
 <li><p><strong>.AbstractConnector</strong> (<em>connectors</em>) – The connector in use in the Projection</p></li>
 <li><p><strong>.AbstractSynapseDynamics</strong> (<em>synapse_dynamics</em>) – The synapse dynamics in use in the Projection</p></li>
 </ul>
@@ -489,7 +489,7 @@ machine or application vertices that should hit the target)</p>
 <dd class="field-even"><p>list of machine vertices</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>)</p>
+<dd class="field-odd"><p>iterable(<em>MachineVertex</em>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -564,14 +564,11 @@ machine or application vertices that should hit the target)</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertex">
-<span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_app_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remaining_constraints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_delay_vertex_slice.html#SplitterDelayVertexSlice.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_app_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_delay_vertex_slice.html#SplitterDelayVertexSlice.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates a delay extension machine vertex and adds to the tracker.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>source_vertex</strong> (<em>MachineVertex</em>) – The source of the delay</p></li>
-<li><p><strong>remaining_constraints</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>)</em>) – none partitioner constraints.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>source_vertex</strong> (<em>MachineVertex</em>) – The source of the delay</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>machine vertex</p>
@@ -725,7 +722,7 @@ machine or application vertices that should hit the target)</p>
 <dd class="field-even"><p>list of machine vertices</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>)</p>
+<dd class="field-odd"><p>iterable(<em>MachineVertex</em>)</p>
 </dd>
 </dl>
 </dd></dl>

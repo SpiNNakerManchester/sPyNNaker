@@ -1246,7 +1246,7 @@ to global keys rather than core-based keys</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – The pyNN population object from which spikes will be sent.</p></li>
 <li><p><strong>device</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a><em> or
-</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – The pyNN population or external device to which the spikes will be
+</em><em>ApplicationVertex</em>) – The pyNN population or external device to which the spikes will be
 sent.</p></li>
 <li><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The partition ID to activate live output to.</p></li>
 </ul>
@@ -1281,8 +1281,8 @@ simulation should start.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – the pre-vertex to connect the edge from</p></li>
-<li><p><strong>device_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – the post vertex to connect the edge to</p></li>
+<li><p><strong>vertex</strong> (<em>ApplicationVertex</em>) – the pre-vertex to connect the edge from</p></li>
+<li><p><strong>device_vertex</strong> (<em>ApplicationVertex</em>) – the post vertex to connect the edge to</p></li>
 <li><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the partition identifier for making nets</p></li>
 </ul>
 </dd>
@@ -1322,8 +1322,8 @@ used, False if SDP is to be used (default)</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex_to_record_from</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a><em> or
-</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
+<li><p><strong>vertex_to_record_from</strong> (<em>ApplicationVertex</em><em> or
+</em><em>MachineVertex</em>) – </p></li>
 <li><p><strong>lpg_label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
 <li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
@@ -4633,7 +4633,7 @@ is assumed that an Exception will be raised if anything is wrong.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.Population">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">Population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellclass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.Population" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">Population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellclass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.Population" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationBase</span></code></p>
 <p>PyNN 0.9 population object.</p>
 <dl class="field-list simple">
@@ -4647,7 +4647,6 @@ instantiated object.</p></li>
 <li><p><strong>structure</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.10)"><em>BaseStructure</em></a>) – </p></li>
 <li><p><strong>initial_values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – Initial values of state variables</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A label for the population</p></li>
-<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>)</em>) – Any constraints on how the population is deployed to SpiNNaker.</p></li>
 <li><p><strong>additional_parameters</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – Additional parameters to pass to the vertex creation function.</p></li>
 </ul>
 </dd>
@@ -5139,48 +5138,11 @@ pass through method</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.Population.set_constraint">
-<span class="sig-name descname"><span class="pre">set_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.Population.set_constraint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply a constraint to a population that restricts the processor            onto which its atoms will be placed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>constraint</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>) – </p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
-<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
-<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.Population.set_initial_value">
 <span class="sig-name descname"><span class="pre">set_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.Population.set_initial_value" title="Permalink to this definition">¶</a></dt>
 <dd><div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 6.0: </span>Use <a class="reference internal" href="#spynnaker.pyNN.initialize" title="spynnaker.pyNN.initialize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">initialize()</span></code></a> instead.</p>
 </div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.Population.set_mapping_constraint">
-<span class="sig-name descname"><span class="pre">set_mapping_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraint_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_mapping_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.Population.set_mapping_constraint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a placement constraint - for backwards compatibility</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>constraint_dict</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – A dictionary containing “x”, “y” and optionally “p” as keys, and
-ints as values</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
-<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
-<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -6247,21 +6209,20 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 <dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPyNNModel</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.SpikeSourceArray.create_vertex">
-<span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array.html#SpikeSourceArray.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.SpikeSourceArray.create_vertex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array.html#SpikeSourceArray.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.SpikeSourceArray.create_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vertex for a population of the model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label to give to the vertex</p></li>
-<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) – A list of constraints to give to the vertex, or None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a></p>
+<dd class="field-odd"><p><em>ApplicationVertex</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -6284,21 +6245,20 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.SpikeSourcePoisson.create_vertex">
-<span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.SpikeSourcePoisson.create_vertex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.SpikeSourcePoisson.create_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vertex for a population of the model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label to give to the vertex</p></li>
-<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) – A list of constraints to give to the vertex, or None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a></p>
+<dd class="field-odd"><p><em>ApplicationVertex</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -7154,9 +7114,7 @@ big enough for your needs.</p></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.Population.sample"><code class="docutils literal notranslate"><span class="pre">Population.sample()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.Population.set"><code class="docutils literal notranslate"><span class="pre">Population.set()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.Population.set_by_selector"><code class="docutils literal notranslate"><span class="pre">Population.set_by_selector()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.Population.set_constraint"><code class="docutils literal notranslate"><span class="pre">Population.set_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.Population.set_initial_value"><code class="docutils literal notranslate"><span class="pre">Population.set_initial_value()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.Population.set_mapping_constraint"><code class="docutils literal notranslate"><span class="pre">Population.set_mapping_constraint()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.Population.set_max_atoms_per_core"><code class="docutils literal notranslate"><span class="pre">Population.set_max_atoms_per_core()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.Population.size"><code class="docutils literal notranslate"><span class="pre">Population.size</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.Population.spinnaker_get_data"><code class="docutils literal notranslate"><span class="pre">Population.spinnaker_get_data()</span></code></a></li>

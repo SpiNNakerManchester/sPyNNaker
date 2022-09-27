@@ -787,9 +787,7 @@
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.sample"><code class="docutils literal notranslate"><span class="pre">Population.sample()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.set"><code class="docutils literal notranslate"><span class="pre">Population.set()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.set_by_selector"><code class="docutils literal notranslate"><span class="pre">Population.set_by_selector()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.set_constraint"><code class="docutils literal notranslate"><span class="pre">Population.set_constraint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.set_initial_value"><code class="docutils literal notranslate"><span class="pre">Population.set_initial_value()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.set_mapping_constraint"><code class="docutils literal notranslate"><span class="pre">Population.set_mapping_constraint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.set_max_atoms_per_core"><code class="docutils literal notranslate"><span class="pre">Population.set_max_atoms_per_core()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.size"><code class="docutils literal notranslate"><span class="pre">Population.size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.spinnaker_get_data"><code class="docutils literal notranslate"><span class="pre">Population.spinnaker_get_data()</span></code></a></li>
@@ -1010,21 +1008,20 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vertex for a population of the model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label to give to the vertex</p></li>
-<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) – A list of constraints to give to the vertex, or None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a></p>
+<dd class="field-odd"><p><em>ApplicationVertex</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1367,7 +1364,7 @@ are calculated automatically.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – the population to record for</p></li>
-<li><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – the SpiNNaker graph vertex used by the population</p></li>
+<li><p><strong>vertex</strong> (<em>ApplicationVertex</em>) – the SpiNNaker graph vertex used by the population</p></li>
 </ul>
 </dd>
 </dl>

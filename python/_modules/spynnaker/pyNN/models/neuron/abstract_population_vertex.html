@@ -190,14 +190,12 @@
     <span class="n">BYTES_TILL_START_OF_GLOBAL_PARAMETERS</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span>
             <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">ring_buffer_sigma</span><span class="p">,</span> <span class="n">incoming_spike_buffer_size</span><span class="p">,</span>
             <span class="n">neuron_impl</span><span class="p">,</span> <span class="n">pynn_model</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_neurons: The number of neurons in the population</span>
 <span class="sd">        :param str label: The label on the population</span>
-<span class="sd">        :param list(~pacman.model.constraints.AbstractConstraint) constraints:</span>
-<span class="sd">            Constraints on where a population&#39;s vertices may be placed.</span>
 <span class="sd">        :param int max_atoms_per_core:</span>
 <span class="sd">            The maximum number of atoms (neurons) per SpiNNaker core.</span>
 <span class="sd">        :param spikes_per_second: Expected spike rate</span>
@@ -220,7 +218,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_n_atoms</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="s2">&quot;n_neurons&quot;</span><span class="p">)</span>
 

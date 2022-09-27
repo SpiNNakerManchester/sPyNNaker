@@ -64,8 +64,6 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">pacman.model.constraints</span> <span class="kn">import</span> <span class="n">AbstractConstraint</span>
-<span class="kn">from</span> <span class="nn">pacman.model.constraints.placer_constraints</span> <span class="kn">import</span> <span class="n">ChipAndCoreConstraint</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
@@ -117,8 +115,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">cellclass</span><span class="p">,</span> <span class="n">cellparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">initial_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">additional_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">initial_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">additional_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int size: The number of neurons in the population</span>
 <span class="sd">        :param cellclass: The implementation of the individual neurons.</span>
@@ -131,8 +128,6 @@
 <span class="sd">        :param dict(str,float) initial_values:</span>
 <span class="sd">            Initial values of state variables</span>
 <span class="sd">        :param str label: A label for the population</span>
-<span class="sd">        :param list(~pacman.model.constraints.AbstractConstraint) constraints:</span>
-<span class="sd">            Any constraints on how the population is deployed to SpiNNaker.</span>
 <span class="sd">        :param additional_parameters:</span>
 <span class="sd">            Additional parameters to pass to the vertex creation function.</span>
 <span class="sd">        :type additional_parameters: dict(str, ...)</span>
@@ -143,7 +138,7 @@
         <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__create_model</span><span class="p">(</span><span class="n">cellclass</span><span class="p">,</span> <span class="n">cellparams</span><span class="p">)</span>
         <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__roundsize</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__create_vertex</span><span class="p">(</span>
-            <span class="n">model</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">additional_parameters</span><span class="p">)</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">additional_parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span> <span class="o">=</span> <span class="n">Recorder</span><span class="p">(</span><span class="n">population</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">)</span>
 
         <span class="c1"># Internal structure now supported 23 November 2014 ADR</span>
@@ -978,25 +973,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span>
 
     <span class="c1"># NON-PYNN API CALL</span>
-<div class="viewcode-block" id="Population.set_constraint"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.set_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">set_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Apply a constraint to a population that restricts the processor\</span>
-<span class="sd">            onto which its atoms will be placed.</span>
-
-<span class="sd">        :param ~pacman.model.constraints.AbstractConstraint constraint:</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">constraint</span><span class="p">,</span> <span class="n">AbstractConstraint</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;the constraint entered is not a recognised constraint&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
-        <span class="c1"># state that something has changed in the population,</span>
-        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
-
-    <span class="c1"># NON-PYNN API CALL</span>
 <div class="viewcode-block" id="Population.add_placement_constraint"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.add_placement_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">add_placement_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add a placement constraint</span>
 
@@ -1007,28 +983,7 @@
 <span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
 <span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">ChipAndCoreConstraint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
-
-        <span class="c1"># state that something has changed in the population,</span>
-        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
-
-    <span class="c1"># NON-PYNN API CALL</span>
-<div class="viewcode-block" id="Population.set_mapping_constraint"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.set_mapping_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">set_mapping_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint_dict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a placement constraint - for backwards compatibility</span>
-
-<span class="sd">        :param dict(str,int) constraint_dict:</span>
-<span class="sd">            A dictionary containing &quot;x&quot;, &quot;y&quot; and optionally &quot;p&quot; as keys, and</span>
-<span class="sd">            ints as values</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_placement_constraint</span><span class="p">(</span><span class="o">**</span><span class="n">constraint_dict</span><span class="p">)</span>
-
-        <span class="c1"># state that something has changed in the population,</span>
-        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_fixed_location</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span></div>
 
     <span class="c1"># NON-PYNN API CALL</span>
 <div class="viewcode-block" id="Population.set_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.set_max_atoms_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">set_max_atoms_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
@@ -1100,15 +1055,13 @@
         <span class="k">return</span> <span class="n">model</span>
 
     <span class="k">def</span> <span class="nf">__create_vertex</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">additional_parameters</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">additional_parameters</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param model: The implementation of the individual neurons.</span>
 <span class="sd">        :type model: ApplicationVertex or AbstractPyNNModel</span>
 <span class="sd">        :param int size:</span>
 <span class="sd">        :param label:</span>
 <span class="sd">        :type label: str or None</span>
-<span class="sd">        :param list(~pacman.model.constraints.AbstractConstraint) constraints:</span>
-<span class="sd">            Any constraints on how the population is deployed to SpiNNaker.</span>
 <span class="sd">        :param additional_parameters:</span>
 <span class="sd">            Additional parameters to pass to the vertex creation function.</span>
 <span class="sd">        :type additional_parameters: dict(str, ...)</span>
@@ -1127,7 +1080,7 @@
                 <span class="n">population_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__process_additional_params</span><span class="p">(</span>
                     <span class="n">additional_parameters</span><span class="p">,</span> <span class="n">population_parameters</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">(</span>
-                <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="o">**</span><span class="n">population_parameters</span><span class="p">)</span>
+                <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">population_parameters</span><span class="p">)</span>
 
         <span class="c1"># Use a provided application vertex directly</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ApplicationVertex</span><span class="p">):</span>
@@ -1143,8 +1096,6 @@
                     <span class="s2">&quot;Vertex size does not match Population size&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">add_constraints</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span>
 
         <span class="c1"># Fail on anything else</span>
         <span class="k">else</span><span class="p">:</span>

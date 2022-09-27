@@ -129,8 +129,7 @@
         <span class="c1"># create vertices correctly</span>
         <span class="k">for</span> <span class="n">vertex_slice</span> <span class="ow">in</span> <span class="n">slices</span><span class="p">:</span>
             <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_machine_vertex</span><span class="p">(</span>
-                <span class="n">source_app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
+                <span class="n">source_app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">remember_machine_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
             <span class="n">chip_counter</span><span class="o">.</span><span class="n">add_core</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">sdram_required</span><span class="p">)</span></div>
 
@@ -152,13 +151,10 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POP_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="SplitterDelayVertexSlice.create_machine_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_machine_vertex</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">source_app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">remaining_constraints</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">source_app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; creates a delay extension machine vertex and adds to the tracker.</span>
 
 <span class="sd">        :param MachineVertex source_vertex: The source of the delay</span>
-<span class="sd">        :param remaining_constraints: none partitioner constraints.</span>
-<span class="sd">        :type remaining_constraints:</span>
-<span class="sd">            iterable(~pacman.model.constraints.AbstractConstraint)</span>
 <span class="sd">        :return: machine vertex</span>
 <span class="sd">        :rtype: DelayExtensionMachineVertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -166,8 +162,7 @@
         <span class="n">sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_used_by_atoms</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
 
         <span class="n">machine_vertex</span> <span class="o">=</span> <span class="n">DelayExtensionMachineVertex</span><span class="p">(</span>
-            <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">remaining_constraints</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">)</span>
+            <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_machine_vertex_by_slice</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">machine_vertex</span>
         <span class="k">return</span> <span class="n">machine_vertex</span></div>
