@@ -18,7 +18,6 @@ import numpy
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities import constants
@@ -49,18 +48,19 @@ def _send_buffer_times(spike_times, time_step):
 
 class SpikeSourceArrayVertex(
         ReverseIpTagMultiCastSource, PopulationApplicationVertex,
-        AbstractChangableAfterRun, SupportsStructure):
+        SupportsStructure):
     """ Model for play back of spikes
     """
 
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
-            self, n_neurons, spike_times, constraints, label,
+            self, n_neurons, spike_times, label,
             max_atoms_per_core, model, splitter):
         # pylint: disable=too-many-arguments
         self.__model_name = "SpikeSourceArray"
         self.__model = model
+        self.__structure = None
 
         if spike_times is None:
             spike_times = []
@@ -72,7 +72,7 @@ class SpikeSourceArrayVertex(
         time_step = SpynnakerDataView.get_simulation_time_step_us()
 
         super().__init__(
-            n_keys=n_neurons, label=label, constraints=constraints,
+            n_keys=n_neurons, label=label,
             max_atoms_per_core=max_atoms_per_core,
             send_buffer_times=_send_buffer_times(spike_times, time_step),
             send_buffer_partition_id=constants.SPIKE_PARTITION_ID,
@@ -80,11 +80,6 @@ class SpikeSourceArrayVertex(
 
         # handle recording
         self.__spike_recorder = EIEIOSpikeRecorder()
-
-        # used for reset and rerun
-        self.__requires_mapping = True
-
-        self.__structure = None
 
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure):
@@ -96,15 +91,6 @@ class SpikeSourceArrayVertex(
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.n_atoms)
         return super(ReverseIpTagMultiCastSource, self).atoms_shape
-
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
-    def requires_mapping(self):
-        return self.__requires_mapping
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
-    def mark_no_changes(self):
-        self.__requires_mapping = False
 
     def _to_early_spikes_single_list(self, spike_times):
         """
@@ -207,6 +193,7 @@ class SpikeSourceArrayVertex(
             logger.warning("Indices currently not supported for "
                            "SpikeSourceArray so being ignored")
         self.enable_recording(True)
+        SpynnakerDataView.set_requires_mapping()
 
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name, indices=None):

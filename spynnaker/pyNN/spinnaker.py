@@ -53,6 +53,7 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_partitioner, spynnaker_splitter_selector)
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.utility_calls import (
     moved_in_v7_warning)
 
@@ -137,11 +138,15 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         # pylint: disable=protected-access
 
-        # extra post run algorithms
+        # extra post prerun algorithms
         for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
+        if self._data_writer.is_ran_ever():
+            for population in self._data_writer.iterate_populations():
+                population._reset_has_read_neuron_parameters_this_run()
 
         super(SpiNNaker, self).run(run_time, sync_time)
+        # extra post run algorithms
         for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
 
@@ -277,27 +282,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             "We do not support externally altering the segment counter")
 
     @property
-    def running(self):
-        """ Whether the simulation is running or has run.
-
-        .. note::
-            Ties into our has_ran parameter for automatic pause and resume.
-
-        :return: the has_ran variable from the SpiNNaker main interface
-        :rtype: bool
-        """
-        return self._has_ran
-
-    @running.setter
-    def running(self, new_value):
-        """ Setter for the has_ran parameter, only used by the PyNN interface,\
-            supports tracking where it thinks its setting this parameter.
-
-        :param bool new_value: the new value for the simulation
-        """
-        self._has_ran = new_value
-
-    @property
     def name(self):
         """ The name of the simulator. Used to ensure PyNN recording neo\
             blocks are correctly labelled.
@@ -366,26 +350,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 "*** reliably supported by the SpiNNaker machine. ***")
             logger.warning(
                 "****************************************************")
-
-    def _detect_if_graph_has_changed(self):
-        """ Iterate though the graph and look for changes.
-
-        """
-        changed, data_changed = super()._detect_if_graph_has_changed()
-
-        # Additionally check populations for changes
-        for population in self._data_writer.iterate_populations():
-            if population.requires_mapping:
-                changed = True
-            population.mark_no_changes()
-
-        # Additionally check projections for changes
-        for projection in self._data_writer.iterate_projections():
-            if projection.requires_mapping:
-                changed = True
-            projection.mark_no_changes()
-
-        return changed, data_changed
 
     @staticmethod
     def _count_unique_keys(commands):
@@ -510,7 +474,12 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             return
         with FecTimer(MAPPING, "DelaySupportAdder"):
             if name == "DelaySupportAdder":
-                delay_support_adder()
+                d_vertices, d_edges = delay_support_adder()
+                for vertex in d_vertices:
+                    self._data_writer.add_vertex(vertex)
+                for edge in d_edges:
+                    self._data_writer.add_edge(
+                        edge, constants.SPIKE_PARTITION_ID)
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")

@@ -147,15 +147,13 @@ class PopulationMachineVertex(
         4: "PROCESS_PLASTIC_SYNAPSES"}
 
     def __init__(
-            self, sdram, label, constraints, app_vertex,
-            vertex_slice, slice_index, ring_buffer_shifts, weight_scales,
+            self, sdram, label, app_vertex, vertex_slice, slice_index,
+            ring_buffer_shifts, weight_scales,
             structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The sdram used by the vertex
         :param str label: The label of the vertex
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints for the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -172,7 +170,7 @@ class PopulationMachineVertex(
         :param NeuronData neuron_data: The handler of neuron data
         """
         super(PopulationMachineVertex, self).__init__(
-            label, constraints, app_vertex, vertex_slice, sdram,
+            label, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
             SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,

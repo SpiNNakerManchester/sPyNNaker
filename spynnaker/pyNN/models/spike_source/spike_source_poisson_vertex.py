@@ -24,7 +24,6 @@ from spinn_utilities.ranged import RangeDictionary, RangedList
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.resources import ConstantSDRAM
 from spinn_utilities.config_holder import get_config_int
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.utilities.constants import (
@@ -59,14 +58,12 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 
 class SpikeSourcePoissonVertex(
-        PopulationApplicationVertex, AbstractChangableAfterRun,
+        PopulationApplicationVertex,
         LegacyPartitionerAPI, SupportsStructure):
     """ A Poisson Spike source object
     """
 
     __slots__ = [
-        "__change_requires_mapping",
-        "__change_requires_data_generation",
         "__last_rate_read_time",
         "__model",
         "__model_name",
@@ -88,15 +85,11 @@ class SpikeSourcePoissonVertex(
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
-            self, n_neurons, constraints, label, seed,
-            max_atoms_per_core, model, rate=None, start=None,
-            duration=None, rates=None, starts=None, durations=None,
-            max_rate=None, splitter=None):
+            self, n_neurons, label, seed, max_atoms_per_core, model,
+            rate=None, start=None, duration=None, rates=None, starts=None,
+            durations=None, max_rate=None, splitter=None):
         """
         :param int n_neurons:
-        :param constraints:
-        :type constraints:
-            iterable(~pacman.model.constraints.AbstractConstraint)
         :param str label:
         :param float seed:
         :param int max_atoms_per_core:
@@ -109,7 +102,7 @@ class SpikeSourcePoissonVertex(
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         """
         # pylint: disable=too-many-arguments
-        super().__init__(label, constraints, max_atoms_per_core, splitter)
+        super().__init__(label, max_atoms_per_core, splitter)
 
         # atoms params
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
@@ -117,10 +110,6 @@ class SpikeSourcePoissonVertex(
         self.__model = model
         self.__seed = seed
         self.__kiss_seed = dict()
-
-        # check for changes parameters
-        self.__change_requires_mapping = True
-        self.__change_requires_data_generation = True
 
         self.__spike_recorder = MultiSpikeRecorder()
 
@@ -284,21 +273,6 @@ class SpikeSourcePoissonVertex(
     def time_to_spike(self):
         return self.__data["time_to_spike"]
 
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
-    def requires_mapping(self):
-        return self.__change_requires_mapping
-
-    @property
-    @overrides(AbstractChangableAfterRun.requires_data_generation)
-    def requires_data_generation(self):
-        return self.__change_requires_data_generation
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
-    def mark_no_changes(self):
-        self.__change_requires_mapping = False
-        self.__change_requires_data_generation = False
-
     def __read_parameters_now(self):
         # If we already read the parameters at this time, don't do it again
         current_time = SpynnakerDataView().get_current_run_time_ms()
@@ -336,7 +310,7 @@ class SpikeSourcePoissonVertex(
         # If we have just run, we need to read parameters to avoid overwrite
         if SpynnakerDataView().is_ran_last():
             self.__read_parameters_now()
-            self.__change_requires_data_generation = True
+            SpynnakerDataView.set_requires_data_generation()
             for m_vertex in self.machine_vertices:
                 m_vertex.set_rate_changed()
 
@@ -385,7 +359,7 @@ class SpikeSourcePoissonVertex(
             logger.warning("Indices currently not supported for "
                            "SpikeSourcePoisson so being ignored")
         if not self.__spike_recorder.record:
-            self.__change_requires_mapping = True
+            SpynnakerDataView.set_requires_mapping()
         self.__spike_recorder.record = True
 
     @overrides(PopulationApplicationVertex.get_recording_variables)
@@ -506,11 +480,11 @@ class SpikeSourcePoissonVertex(
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, sdram, label=None, constraints=None):
+            self, vertex_slice, sdram, label=None):
         # pylint: disable=arguments-differ
         return SpikeSourcePoissonMachineVertex(
             sdram, self.__spike_recorder.record,
-            constraints, label, self, vertex_slice)
+            label, self, vertex_slice)
 
     @property
     def max_rate(self):

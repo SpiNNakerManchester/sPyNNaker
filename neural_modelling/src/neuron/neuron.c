@@ -75,7 +75,6 @@ struct neuron_core_parameters {
 //! \param[in] time: the current time step
 //! \return true if the memory copies worked, false otherwise
 static bool neuron_load_neuron_parameters(uint32_t time) {
-    log_debug("loading parameters");
     address_t save_address = NULL;
     if (time == 0) {
     	save_address = saved_initial_values_address;
@@ -94,7 +93,7 @@ bool neuron_resume(uint32_t time) { // EXPORTED
     // (re)load the current source parameters
     current_source_load_parameters(current_source_address);
 
-    log_debug("neuron_reloading_neuron_parameters: starting");
+    log_debug("Resume: neuron_load_neuron_parameters starting");
     return neuron_load_neuron_parameters(time);
 }
 
@@ -102,8 +101,6 @@ bool neuron_initialise(
         void *core_params_address, void *neuron_params_address,
         void *current_sources_address, void *recording_address,
         void *initial_values_address, uint32_t *n_rec_regions_used) {
-    log_debug("neuron_initialise: starting");
-
     // Read the neuron parameters
     struct neuron_core_parameters *params = core_params_address;
 

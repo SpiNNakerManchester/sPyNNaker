@@ -51,9 +51,6 @@ class SplitterAbstractPopulationVertexFixed(
         "__slices"
     ]
 
-    """ The name of the splitter """
-    SPLITTER_NAME = "SplitterAbstractPopulationVertexFixed"
-
     """ The message to use when the Population is invalid """
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
@@ -63,7 +60,7 @@ class SplitterAbstractPopulationVertexFixed(
         "your vertex and try again.")
 
     def __init__(self):
-        super().__init__(self.SPLITTER_NAME)
+        super().__init__()
         self.__slices = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
@@ -103,7 +100,7 @@ class SplitterAbstractPopulationVertexFixed(
             chip_counter.add_core(sdram)
             label = f"Slice {vertex_slice} of {app_vertex.label}"
             machine_vertex = self.create_machine_vertex(
-                vertex_slice, sdram, label, app_vertex.constraints,
+                vertex_slice, sdram, label,
                 structural_sz, ring_buffer_shifts, weight_scales,
                 index, max_atoms_per_core, synaptic_matrices, neuron_data)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
@@ -153,7 +150,7 @@ class SplitterAbstractPopulationVertexFixed(
         return self._governed_app_vertex.machine_vertices
 
     def create_machine_vertex(
-            self, vertex_slice, sdram, label, remaining_constraints,
+            self, vertex_slice, sdram, label,
             structural_sz, ring_buffer_shifts, weight_scales, index,
             max_atoms_per_core, synaptic_matrices, neuron_data):
 
@@ -161,13 +158,13 @@ class SplitterAbstractPopulationVertexFixed(
         s_dynamics = self._governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractLocalOnly):
             return PopulationMachineLocalOnlyCombinedVertex(
-                sdram, label, remaining_constraints,
+                sdram, label,
                 self._governed_app_vertex, vertex_slice, index,
                 ring_buffer_shifts, weight_scales)
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
-            sdram, label, remaining_constraints, self._governed_app_vertex,
+            sdram, label, self._governed_app_vertex,
             vertex_slice, index, ring_buffer_shifts, weight_scales,
             structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data)
 

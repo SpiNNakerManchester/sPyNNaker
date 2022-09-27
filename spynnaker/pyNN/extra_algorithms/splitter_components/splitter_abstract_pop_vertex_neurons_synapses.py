@@ -112,8 +112,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__neuromodulators"
         ]
 
-    SPLITTER_NAME = "SplitterAbstractPopulationVertexNeuronsSynapses"
-
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
         "SplitterAbstractPopVertexNeuronsSynapses as"
@@ -140,8 +138,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             whether delay extensions should be needed.
         :type allow_delay_extension: bool or None
         """
-        super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__(
-            self.SPLITTER_NAME)
+        super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__()
         AbstractSpynnakerSplitterDelay.__init__(self)
         self.__n_synapse_vertices = n_synapse_vertices
         self.__max_delay = max_delay
@@ -253,7 +250,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
                 vertex_slice, total_sdram, label, index, rb_shifts,
-                weight_scales, app_vertex.constraints, neuron_data, atoms_per_core)
+                weight_scales, neuron_data, atoms_per_core)
             chip_counter.add_core(total_sdram)
 
             # Keep track of synapse vertices for each neuron vertex and
@@ -266,7 +263,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__add_lead_synapse_core(
                     vertex_slice, structural_sz, lead_synapse_core_sdram,
                     label, rb_shifts, weight_scales, synapse_vertices,
-                    neuron_vertex, app_vertex.constraints, atoms_per_core,
+                    neuron_vertex, atoms_per_core,
                     synaptic_matrices)
             chip_counter.add_core(lead_synapse_core_sdram)
 
@@ -275,7 +272,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__add_shared_synapse_core(
                     syn_label, i, vertex_slice, synapse_references,
                     shared_synapse_sdram, feedback_partition,
-                    synapse_vertices, neuron_vertex, app_vertex.constraints)
+                    synapse_vertices, neuron_vertex)
                 chip_counter.add_core(shared_synapse_sdram)
 
             # Add resources for Poisson vertices up to core limit
@@ -318,7 +315,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __add_neuron_core(
             self, vertex_slice, sdram, label, index, rb_shifts,
-            weight_scales, constraints, neuron_data, atoms_per_core):
+            weight_scales, neuron_data, atoms_per_core):
         """ Add a neuron core for for a slice of neurons
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -331,8 +328,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             back to S1615 values
         :param list(int) weight_scales:
             The scale to apply to weights to encode them in the 16-bit synapses
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints to add
         :return: The neuron vertex created and the resources used
         :rtype: PopulationNeuronsMachineVertex
         """
@@ -340,7 +335,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         neuron_label = "{}_Neurons:{}-{}".format(
             label, vertex_slice.lo_atom, vertex_slice.hi_atom)
         neuron_vertex = PopulationNeuronsMachineVertex(
-            sdram, neuron_label, constraints, app_vertex,
+            sdram, neuron_label, app_vertex,
             vertex_slice, index, rb_shifts, weight_scales, neuron_data,
             atoms_per_core)
         app_vertex.remember_machine_vertex(neuron_vertex)
@@ -351,7 +346,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def __add_lead_synapse_core(
             self, vertex_slice, structural_sz, lead_synapse_core_sdram, label,
             rb_shifts, weight_scales, synapse_vertices, neuron_vertex,
-            constraints, atoms_per_core, synaptic_matrices):
+            atoms_per_core, synaptic_matrices):
         """ Add the first synapse core for a neuron core.  This core will
             generate all the synaptic data required.
 
@@ -373,8 +368,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             A list to add the core to
         :param PopulationNeuronsMachineVertex neuron_vertex:
             The neuron vertex the synapses will feed into
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints to add
         :param int atoms_per_core: The maximum atoms per core
         :return: References to the synapse regions that can be used by a shared
             synapse core, and the basic label for the synapse cores
@@ -386,7 +379,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # Do the lead synapse core
         lead_synapse_vertex = PopulationSynapsesMachineVertexLead(
-            lead_synapse_core_sdram, "{}(0)".format(syn_label), constraints,
+            lead_synapse_core_sdram, "{}(0)".format(syn_label),
             self._governed_app_vertex, vertex_slice, rb_shifts, weight_scales,
             structural_sz, synapse_references, atoms_per_core,
             synaptic_matrices)
@@ -401,7 +394,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def __add_shared_synapse_core(
             self, syn_label, s_index, vertex_slice, synapse_references,
             shared_synapse_sdram, feedback_partition, synapse_vertices,
-            neuron_vertex, constraints):
+            neuron_vertex):
         """ Add a second or subsequent synapse core.  This will reference the
             synaptic data generated by the lead synapse core.
 
@@ -418,14 +411,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             A list to add the core to
         :param PopulationNeuronsMachineVertex neuron_vertex:
             The neuron vertex the synapses will feed into
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints to add
         """
         app_vertex = self._governed_app_vertex
         synapse_label = "{}({})".format(syn_label, s_index)
         synapse_vertex = PopulationSynapsesMachineVertexShared(
-            shared_synapse_sdram, synapse_label, constraints, app_vertex,
-            vertex_slice, synapse_references)
+            shared_synapse_sdram, synapse_label, app_vertex, vertex_slice,
+            synapse_references)
         app_vertex.remember_machine_vertex(synapse_vertex)
         self.__synapse_vertices.append(synapse_vertex)
         synapse_vertices.append(synapse_vertex)

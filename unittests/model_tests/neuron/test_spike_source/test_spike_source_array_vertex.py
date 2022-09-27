@@ -25,7 +25,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
 
     def test_no_spikes(self):
         v = SpikeSourceArrayVertex(
-            n_neurons=5, spike_times=[], constraints=None, label="test",
+            n_neurons=5, spike_times=[], label="test",
             max_atoms_per_core=None, model=None, splitter=None)
         v.set_parameter_values("spike_times", [])
         v.set_parameter_values("spike_times", [1, 2, 3], [1, 3])
@@ -35,11 +35,11 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
 
     def test_singleton_list(self):
         v = SpikeSourceArrayVertex(
-            n_neurons=5, spike_times=[1, 11, 22], constraints=None,
+            n_neurons=5, spike_times=[1, 11, 22],
             label="test", max_atoms_per_core=None, model=None, splitter=None)
         v.set_parameter_values("spike_times", [2, 12, 32])
 
     def test_double_list(self):
         SpikeSourceArrayVertex(
-            n_neurons=3, spike_times=[[1], [11], [22]], constraints=None,
+            n_neurons=3, spike_times=[[1], [11], [22]],
             label="test", max_atoms_per_core=None, model=None, splitter=None)

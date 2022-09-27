@@ -16,7 +16,6 @@
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
@@ -30,13 +29,11 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics,
-        AbstractChangableAfterRun, AbstractGenerateOnMachine):
+        AbstractGenerateOnMachine):
     """ The dynamics of a synapse that does not change over time.
     """
 
     __slots__ = [
-        # Indicates if a change that has been made requires mapping
-        "__change_requires_mapping",
         # padding to add to a synaptic row for synaptic rewiring
         "__pad_to_length",
         # weight of connections
@@ -52,11 +49,10 @@ class SynapseDynamicsStatic(
         :type delay: float or None
         :param int pad_to_length:
         """
-        self.__change_requires_mapping = True
         self.__weight = weight
         if delay is None:
             delay = SpynnakerDataView.get_min_delay()
-        self.__delay = delay
+        self.__delay = self._round_delay(delay)
         self.__pad_to_length = pad_to_length
 
     @overrides(AbstractStaticSynapseDynamics.merge)
@@ -194,23 +190,6 @@ class SynapseDynamicsStatic(
 
         return connections
 
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping, extend_doc=False)
-    def requires_mapping(self):
-        """ True if changes that have been made require that mapping be\
-            performed.  Note that this should return True the first time it\
-            is called, as the vertex must require mapping as it has been\
-            created!
-        """
-        return self.__change_requires_mapping
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes, extend_doc=False)
-    def mark_no_changes(self):
-        """ Marks the point after which changes are reported.  Immediately\
-            after calling this method, requires_mapping should return False.
-        """
-        self.__change_requires_mapping = False
-
     @overrides(AbstractStaticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):
         return ['weight', 'delay']
@@ -262,10 +241,6 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.delay)
     def delay(self):
         return self.__delay
-
-    @overrides(AbstractStaticSynapseDynamics.set_delay)
-    def set_delay(self, delay):
-        self.__delay = delay
 
     @property
     @overrides(AbstractStaticSynapseDynamics.pad_to_length)

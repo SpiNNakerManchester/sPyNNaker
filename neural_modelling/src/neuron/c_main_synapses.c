@@ -150,8 +150,6 @@ void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
 //!        recording data.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(void) {
-    log_debug("Initialise: started");
-
     data_specification_metadata_t *ds_regions;
     if (!initialise_common_regions(
             &timer_period, &simulation_ticks, &infinite_run, &time,
@@ -198,7 +196,6 @@ static bool initialise(void) {
 
     recording_reset();
 
-    log_debug("Initialise: finished");
     return true;
 }
 

@@ -124,7 +124,6 @@ static inline void common_pause(uint32_t recording_flags) {
 
     // Finalise any recordings that are in progress
     if (recording_flags > 0) {
-        log_debug("updating recording regions");
         recording_finalise();
     }
 

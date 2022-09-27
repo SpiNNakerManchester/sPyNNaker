@@ -132,12 +132,6 @@ static inline void synapse_types_shape_input(
 		synapse_types_t *parameters) {
     alpha_shaping(&parameters->exc);
     alpha_shaping(&parameters->inh);
-#if 0
-    log_debug("lin: %12.6k, exp: %12.6k, comb: %12.6k",
-            parameters->exc.lin_buff,
-            parameters->exc.exp_buff,
-            parameters->exc.lin_buff * parameters->exc.exp_buff);
-#endif
 }
 
 //! \brief helper function to add input for a given timer period to a given

@@ -24,7 +24,7 @@ def test_selector():
     sim.setup()
     model = IFCurrExpBase()
     pop_1 = Population(
-        size=5, label="Test", constraints=None, cellclass=model,
+        size=5, label="Test", cellclass=model,
         structure=None, initial_values={})
     pop_1.set(tau_m=2)
     values = pop_1.get("tau_m")
@@ -47,5 +47,5 @@ def test_round():
     model = IFCurrExpBase()
     pop_1 = Population(
         size=4.999999, label="Test", cellclass=model,
-        constraints=None, structure=None, initial_values={})
+        structure=None, initial_values={})
     assert pop_1.size == 5

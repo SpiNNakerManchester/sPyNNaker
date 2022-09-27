@@ -32,7 +32,7 @@ from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (
-    AbstractCanReset, AbstractChangableAfterRun)
+    AbstractCanReset)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.interface.profiling.profile_utils import (
@@ -100,14 +100,12 @@ def _prod(iterable):
 
 class AbstractPopulationVertex(
         PopulationApplicationVertex, AbstractAcceptsIncomingSynapses,
-        AbstractChangableAfterRun, AbstractCanReset, SupportsStructure):
+        AbstractCanReset, SupportsStructure):
     """ Underlying vertex model for Neural Populations.\
         Not actually abstract.
     """
 
     __slots__ = [
-        "__change_requires_mapping",
-        "__change_requires_data_generation",
         "__incoming_spike_buffer_size",
         "__n_atoms",
         "__n_profile_samples",
@@ -156,14 +154,12 @@ class AbstractPopulationVertex(
     CORE_PARAMS_BASE_SIZE = 5 * BYTES_PER_WORD
 
     def __init__(
-            self, n_neurons, label, constraints, max_atoms_per_core,
+            self, n_neurons, label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter, seed):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints on where a population's vertices may be placed.
         :param int max_atoms_per_core:
             The maximum number of atoms (neurons) per SpiNNaker core.
         :param spikes_per_second: Expected spike rate
@@ -186,7 +182,7 @@ class AbstractPopulationVertex(
         """
 
         # pylint: disable=too-many-arguments
-        super().__init__(label, constraints, max_atoms_per_core, splitter)
+        super().__init__(label, max_atoms_per_core, splitter)
 
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
 
@@ -235,10 +231,6 @@ class AbstractPopulationVertex(
             [NeuronRecorder.REWIRING],
             {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE})
 
-        # bool for if state has changed.
-        self.__change_requires_mapping = True
-        self.__change_requires_data_generation = False
-
         # Current sources for this vertex
         self.__current_sources = []
         self.__current_source_id_list = dict()
@@ -257,7 +249,7 @@ class AbstractPopulationVertex(
 
         self.__structure = None
 
-                # An RNG for use in synaptic generation
+        # An RNG for use in synaptic generation
         self.__rng = numpy.random.RandomState(seed)
         self.__pop_seed = create_mars_kiss_seeds(self.__rng)
 
@@ -276,7 +268,8 @@ class AbstractPopulationVertex(
         return min(
             max_atoms, self.__synapse_dynamics.absolute_max_atoms_per_core)
 
-    @overrides(PopulationApplicationVertex.get_max_atoms_per_dimension_per_core)
+    @overrides(
+        PopulationApplicationVertex.get_max_atoms_per_dimension_per_core)
     def get_max_atoms_per_dimension_per_core(self):
         max_atoms = self.get_max_atoms_per_core()
 
@@ -374,7 +367,7 @@ class AbstractPopulationVertex(
             The new projection to add
         """
         # Reset the ring buffer shifts as a projection has been added
-        self.__change_requires_mapping = True
+        SpynnakerDataView.set_requires_mapping()
         self.__max_row_info.clear()
         # pylint: disable=protected-access
         pre_vertex = projection._projection_edge.pre_vertex
@@ -481,21 +474,6 @@ class AbstractPopulationVertex(
         :rtype: bool
         """
         return self.__drop_late_spikes
-
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
-    def requires_mapping(self):
-        return self.__change_requires_mapping
-
-    @property
-    @overrides(AbstractChangableAfterRun.requires_data_generation)
-    def requires_data_generation(self):
-        return self.__change_requires_data_generation
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
-    def mark_no_changes(self):
-        self.__change_requires_mapping = False
-        self.__change_requires_data_generation = False
 
     def get_sdram_usage_for_core_neuron_params(self, n_atoms):
         return (
@@ -607,9 +585,9 @@ class AbstractPopulationVertex(
         # If we have run, and not reset, we need to read the values back
         # so that we don't overwrite the state.  Note that a reset will
         # then make this a waste, but we can't see the future...
-        if SpynnakerDataView().is_ran_last():
+        if SpynnakerDataView.is_ran_last():
             self.__read_parameters_now()
-            self.__change_requires_data_generation = True
+            SpynnakerDataView.set_requires_data_generation()
             self.__tell_neuron_vertices_to_regenerate()
         self.__parameters[name].set_value_by_selector(selector, value)
 
@@ -640,7 +618,7 @@ class AbstractPopulationVertex(
         # then make this a waste, but we can't see the future...
         if SpynnakerDataView.is_ran_last():
             self.__read_parameters_now()
-            self.__change_requires_data_generation = True
+            SpynnakerDataView.set_requires_data_generation()
             self.__tell_neuron_vertices_to_regenerate()
             self.__state_variables[name].set_value_by_selector(
                 selector, value)
@@ -690,7 +668,7 @@ class AbstractPopulationVertex(
                 name, True, sampling_interval, indices)
         else:
             raise KeyError(f"It is not possible to record {name}")
-        self.__change_requires_mapping = True
+        SpynnakerDataView.set_requires_mapping()
 
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name, indices=None):
@@ -866,13 +844,13 @@ class AbstractPopulationVertex(
     def reset_to_first_timestep(self):
         # Mark that reset has been done, and reload state variables
         self.__state_variables.copy_into(self.__initial_state_variables)
-        self.__change_requires_data_generation = True
+        SpynnakerDataView.set_requires_data_generation()
         self.__tell_neuron_vertices_to_regenerate()
 
         # If synapses change during the run also regenerate these to get
         # back to the initial state
         if self.__synapse_dynamics.changes_during_run:
-            self.__change_requires_data_generation = True
+            SpynnakerDataView.set_requires_data_generation()
             self.__tell_synapse_vertices_to_regenerate()
 
     @staticmethod

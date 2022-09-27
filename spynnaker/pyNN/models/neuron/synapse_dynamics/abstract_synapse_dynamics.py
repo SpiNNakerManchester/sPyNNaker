@@ -13,9 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+import logging
+import numpy
+from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.log import FormatAdapter
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AbstractSynapseDynamics(object, metaclass=AbstractBase):
@@ -52,14 +60,31 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """ The weight of connections
         """
 
+    def _round_delay(self, delay):
+        """
+        round the delays to multiples of full timesteps
+
+        (otherwise SDRAM estimation calculations can go wrong)
+
+        :param delay:
+        :return:
+        """
+        if isinstance(delay, RandomDistribution):
+            return delay
+        if isinstance(delay, str):
+            return delay
+        new_delay = (
+                numpy.rint(numpy.array(delay) *
+                           SpynnakerDataView.get_simulation_time_step_per_ms())
+                * SpynnakerDataView.get_simulation_time_step_ms())
+        if not numpy.allclose(delay, new_delay):
+            logger.warning(f"Rounding up delay in f{self} "
+                           f"from {delay} to {new_delay}")
+        return new_delay
+
     @abstractproperty
     def delay(self):
         """ The delay of connections
-        """
-
-    @abstractmethod
-    def set_delay(self, delay):
-        """ Set the delay
         """
 
     @abstractproperty

@@ -17,7 +17,6 @@ import math
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -43,15 +42,12 @@ NEUROMODULATION_TARGETS = {
 
 class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics,
-        AbstractChangableAfterRun, AbstractGenerateOnMachine):
+        AbstractGenerateOnMachine):
     """ The dynamics of a synapse that changes over time using a \
         Spike Timing Dependent Plasticity (STDP) rule.
     """
 
     __slots__ = [
-        # Flag: whether there is state in this class that is not reflected on
-        # the SpiNNaker system
-        "__change_requires_mapping",
         # Fraction of delay that is dendritic (instead of axonal or synaptic)
         "__dendritic_delay_fraction",
         # timing dependence to use for the STDP rule
@@ -100,12 +96,11 @@ class SynapseDynamicsSTDP(
         weight_dependence.set_a_plus_a_minus(
             timing_dependence.A_plus, timing_dependence.A_minus)
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
-        self.__change_requires_mapping = True
         self.__pad_to_length = pad_to_length
         self.__weight = weight
         if delay is None:
             delay = SpynnakerDataView.get_min_delay()
-        self.__delay = delay
+        self.__delay = self._round_delay(delay)
         self.__backprop_delay = backprop_delay
         self.__neuromodulation = None
 
@@ -163,23 +158,6 @@ class SynapseDynamicsSTDP(
         # Otherwise, it is static or neuromodulation, so return ourselves
         return self
 
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping, extend_doc=False)
-    def requires_mapping(self):
-        """ True if changes that have been made require that mapping be\
-            performed.  Note that this should return True the first time it\
-            is called, as the vertex must require mapping as it has been\
-            created!
-        """
-        return self.__change_requires_mapping
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes, extend_doc=False)
-    def mark_no_changes(self):
-        """ Marks the point after which changes are reported.  Immediately\
-            after calling this method, requires_mapping should return False.
-        """
-        self.__change_requires_mapping = False
-
     @overrides(AbstractPlasticSynapseDynamics.get_value)
     def get_value(self, key):
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
@@ -193,7 +171,7 @@ class SynapseDynamicsSTDP(
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
-                self.__change_requires_mapping = True
+                SpynnakerDataView.set_requires_mapping()
                 return
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
@@ -607,10 +585,6 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.delay)
     def delay(self):
         return self.__delay
-
-    @overrides(AbstractPlasticSynapseDynamics.set_delay)
-    def set_delay(self, delay):
-        self.__delay = delay
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.is_single_core_capable)

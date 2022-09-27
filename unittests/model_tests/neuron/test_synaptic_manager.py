@@ -56,6 +56,7 @@ from spynnaker.pyNN.extra_algorithms import delay_support_adder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.config_setup import unittest_setup
+from spynnaker.pyNN.utilities import constants
 import pyNN.spiNNaker as p
 
 
@@ -117,7 +118,12 @@ def test_write_data_spec():
 
     writer.start_run()
     writer.set_plan_n_timesteps(100)
-    delay_support_adder()
+    d_vertices, d_edges = delay_support_adder()
+    for vertex in d_vertices:
+        writer.add_vertex(vertex)
+    for edge in d_edges:
+        writer.add_edge(
+            edge, constants.SPIKE_PARTITION_ID)
     spynnaker_splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
     writer.set_routing_infos(allocator.__call__([], flexible=False))
@@ -215,7 +221,7 @@ def test_set_synapse_dynamics():
     p.setup(1.0)
     post_app_model = IFCurrExpBase()
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         seed=None)
@@ -326,7 +332,7 @@ def test_set_synapse_dynamics():
 
     # Try starting again to get a couple more combinations
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         seed=None)
@@ -349,7 +355,7 @@ def test_set_synapse_dynamics():
 
     # One more time!
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         seed=None)
@@ -387,7 +393,7 @@ def test_set_synapse_dynamics():
 
     # OK, just one more, honest
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         seed=None)
@@ -453,7 +459,12 @@ def test_pop_based_master_pop_table_standard(
 
     writer.start_run()
     writer.set_plan_n_timesteps(100)
-    delay_support_adder()
+    d_vertices, d_edges = delay_support_adder()
+    for vertex in d_vertices:
+        writer.add_vertex(vertex)
+    for edge in d_edges:
+        writer.add_edge(
+            edge, constants.SPIKE_PARTITION_ID)
     spynnaker_splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
     writer.set_routing_infos(allocator.__call__([], flexible=False))

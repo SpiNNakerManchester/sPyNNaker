@@ -22,8 +22,6 @@ from pyNN.random import NumpyRNG
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints import AbstractConstraint
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
@@ -56,7 +54,6 @@ class Population(PopulationBase):
     __slots__ = [
         "__annotations",
         "__celltype",
-        "__change_requires_mapping",
         "__first_id",
         "__last_id",
         "__positions",
@@ -67,8 +64,7 @@ class Population(PopulationBase):
 
     def __init__(
             self, size, cellclass, cellparams=None, structure=None,
-            initial_values=None, label=None, constraints=None,
-            additional_parameters=None):
+            initial_values=None, label=None, additional_parameters=None):
         """
         :param int size: The number of neurons in the population
         :param cellclass: The implementation of the individual neurons.
@@ -81,8 +77,6 @@ class Population(PopulationBase):
         :param dict(str,float) initial_values:
             Initial values of state variables
         :param str label: A label for the population
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Any constraints on how the population is deployed to SpiNNaker.
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
         :type additional_parameters: dict(str, ...)
@@ -93,7 +87,7 @@ class Population(PopulationBase):
         model = self.__create_model(cellclass, cellparams)
         size = self.__roundsize(size, label)
         self.__create_vertex(
-            model, size, label, constraints, additional_parameters)
+            model, size, label, additional_parameters)
         self.__recorder = Recorder(population=self, vertex=self.__vertex)
 
         # Internal structure now supported 23 November 2014 ADR
@@ -112,9 +106,6 @@ class Population(PopulationBase):
             size = self.__vertex.n_atoms
         self.__size = size
         self.__annotations = dict()
-
-        # parameter
-        self.__change_requires_mapping = True
 
         # things for pynn demands
         self.__first_id, self.__last_id = SpynnakerDataView.add_population(
@@ -530,23 +521,6 @@ class Population(PopulationBase):
         return self.__recorder
 
     @property
-    def requires_mapping(self):
-        """ Whether this population requires mapping.
-
-        :rtype: bool
-        """
-        return self.__change_requires_mapping
-
-    @requires_mapping.setter
-    def requires_mapping(self, new_value):
-        self.__change_requires_mapping = new_value
-
-    def mark_no_changes(self):
-        """ Mark this population as not having changes to be mapped.
-        """
-        self.__change_requires_mapping = False
-
-    @property
     def conductance_based(self):
         """ True if the population uses conductance inputs
 
@@ -676,25 +650,6 @@ class Population(PopulationBase):
         return self.__structure
 
     # NON-PYNN API CALL
-    def set_constraint(self, constraint):
-        """ Apply a constraint to a population that restricts the processor\
-            onto which its atoms will be placed.
-
-        :param ~pacman.model.constraints.AbstractConstraint constraint:
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
-        """
-        SpynnakerDataView.check_user_can_act()
-        if not isinstance(constraint, AbstractConstraint):
-            raise ConfigurationException(
-                "the constraint entered is not a recognised constraint")
-
-        self.__vertex.add_constraint(constraint)
-        # state that something has changed in the population,
-        self.__change_requires_mapping = True
-
-    # NON-PYNN API CALL
     def add_placement_constraint(self, x, y, p=None):
         """ Add a placement constraint
 
@@ -705,28 +660,7 @@ class Population(PopulationBase):
         :raises SimulatorNotSetupException: If called before sim.setup
         :raises SimulatorShutdownException: If called after sim.end
         """
-        SpynnakerDataView.check_user_can_act()
-        self.__vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
-
-        # state that something has changed in the population,
-        self.__change_requires_mapping = True
-
-    # NON-PYNN API CALL
-    def set_mapping_constraint(self, constraint_dict):
-        """ Add a placement constraint - for backwards compatibility
-
-        :param dict(str,int) constraint_dict:
-            A dictionary containing "x", "y" and optionally "p" as keys, and
-            ints as values
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
-        """
-        SpynnakerDataView.check_user_can_act()
-        self.add_placement_constraint(**constraint_dict)
-
-        # state that something has changed in the population,
-        self.__change_requires_mapping = True
+        self.__vertex.set_fixed_location(x, y, p)
 
     # NON-PYNN API CALL
     def set_max_atoms_per_core(self, max_atoms_per_core):
@@ -747,7 +681,7 @@ class Population(PopulationBase):
                 f"as the current limit for the model is {cap}")
         self.__vertex.set_max_atoms_per_dimension_per_core(max_atoms_per_core)
         # state that something has changed in the population
-        self.__change_requires_mapping = True
+        SpynnakerDataView.set_requires_mapping()
 
     @property
     def size(self):
@@ -786,15 +720,13 @@ class Population(PopulationBase):
         return model
 
     def __create_vertex(
-            self, model, size, label, constraints, additional_parameters):
+            self, model, size, label, additional_parameters):
         """
         :param model: The implementation of the individual neurons.
         :type model: ApplicationVertex or AbstractPyNNModel
         :param int size:
         :param label:
         :type label: str or None
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Any constraints on how the population is deployed to SpiNNaker.
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
         :type additional_parameters: dict(str, ...)
@@ -813,7 +745,7 @@ class Population(PopulationBase):
                 population_parameters = self.__process_additional_params(
                     additional_parameters, population_parameters)
             self.__vertex = model.create_vertex(
-                size, label, constraints, **population_parameters)
+                size, label, **population_parameters)
 
         # Use a provided application vertex directly
         elif isinstance(model, PopulationApplicationVertex):
@@ -829,8 +761,6 @@ class Population(PopulationBase):
                     "Vertex size does not match Population size")
             if label is not None:
                 self.__vertex.set_label(label)
-            if constraints is not None:
-                self.__vertex.add_constraints(constraints)
 
         # Fail on anything else
         else:
