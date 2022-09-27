@@ -61,7 +61,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
         spike_list = [spike_list1, spike_list2, spike_list3]
         with LogCapture() as lc:
             SpikeSourceArrayVertex(
-                n_neurons=3, spike_times=spike_list, constraints=None,
+                n_neurons=3, spike_times=spike_list,
                 label="test", max_atoms_per_core=None, model=None,
                 splitter=None)
             found = False
@@ -75,7 +75,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
     def test_shared_list_big(self):
         with LogCapture() as lc:
             v = SpikeSourceArrayVertex(
-                n_neurons=3, spike_times=None, constraints=None,
+                n_neurons=3, spike_times=None,
                 label="test", max_atoms_per_core=None, model=None,
                 splitter=None)
             v.spike_times = [34] * 35
@@ -89,7 +89,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
     def test_list_big(self):
         with LogCapture() as lc:
             SpikeSourceArrayVertex(
-                n_neurons=1, spike_times=[37] * 109, constraints=None,
+                n_neurons=1, spike_times=[37] * 109,
                 label="test", max_atoms_per_core=None, model=None,
                 splitter=None)
             found = False
