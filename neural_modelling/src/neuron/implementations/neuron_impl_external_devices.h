@@ -230,8 +230,6 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons,
 		address_t save_initial_state) {
-    log_debug("reading parameters, next is %u, n_neurons is %u ",
-            next, n_neurons);
 
     // Read the number of steps per timestep
     n_steps_per_timestep = address[next++];
@@ -410,11 +408,8 @@ static void neuron_impl_do_timestep_update(
                         the_packet_firing->type,
                         value_to_send * the_packet_firing->value_as_payload);
 
-                    log_debug("Sending key=0x%08x payload=0x%08x",
-                            the_packet_firing->key, payload);
                     send_spike_mc_payload(the_packet_firing->key, payload);
                 } else {
-                    log_debug("Sending key=0x%08x", the_packet_firing->key);
                     send_spike_mc(the_packet_firing->key);
                 }
             }

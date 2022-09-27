@@ -23,7 +23,7 @@ MODELS = IF_curr_exp \
 
 ifneq ($(SPYNNAKER_DEBUG), DEBUG)
     MODELS += external_device_lif_control \
-	          IF_curr_alpha \
+              IF_curr_alpha \
               IF_cond_exp_stoc \
               IF_curr_exp_sEMD \
               IF_curr_exp_stdp_mad_pair_additive \

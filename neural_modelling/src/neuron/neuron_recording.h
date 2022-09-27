@@ -474,8 +474,6 @@ bool neuron_recording_initialise(
     // Copy the number of regions used
     *n_rec_regions_used = header->n_recorded_vars + header->n_bitfield_vars;
     data_addr = &header[1];
-    log_debug("Recording %d variables and %d bitfield variables",
-            N_RECORDED_VARS, N_BITFIELD_VARS);
 
     if (!allocate_word_dtcm(n_neurons)) {
         log_error("failed to allocate DTCM for the neuron recording structs.");

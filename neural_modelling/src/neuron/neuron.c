@@ -93,7 +93,6 @@ bool neuron_resume(uint32_t time) { // EXPORTED
     // (re)load the current source parameters
     current_source_load_parameters(current_source_address);
 
-    log_debug("Resume: neuron_load_neuron_parameters starting");
     return neuron_load_neuron_parameters(time);
 }
 

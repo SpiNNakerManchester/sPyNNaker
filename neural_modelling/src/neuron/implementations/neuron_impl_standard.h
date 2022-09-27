@@ -165,14 +165,10 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons,
 		address_t save_initial_state) {
-	log_debug("reading parameters, next is %u, n_neurons is %u ",
-            next, n_neurons);
 
     // Read the number of steps per timestep
     n_steps_per_timestep = address[next++];
-    if (n_steps_per_timestep > 1) {
-    	log_debug("Looping over %u steps each timestep", n_steps_per_timestep);
-    } else if (n_steps_per_timestep == 0) {
+    if (n_steps_per_timestep == 0) {
         log_error("bad number of steps per timestep: 0");
         rt_error(RTE_SWERR);
     }

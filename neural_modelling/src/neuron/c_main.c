@@ -166,8 +166,6 @@ static inline void process_ring_buffers(void) {
 void background_callback(uint timer_count, uint local_time) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
-    log_debug("Timer tick %u \n", local_time);
-
     spike_processing_do_rewiring(synaptogenesis_n_updates());
 
     // Now do neuron time step update
@@ -278,7 +276,6 @@ static bool initialise(void) {
     }
 
     // Set timer tick (in microseconds)
-    log_debug("setting timer tick callback for %d microseconds", timer_period);
     spin1_set_timer_tick(timer_period);
 
     return true;
