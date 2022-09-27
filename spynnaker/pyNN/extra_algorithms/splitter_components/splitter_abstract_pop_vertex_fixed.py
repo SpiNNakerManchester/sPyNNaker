@@ -107,7 +107,7 @@ class SplitterAbstractPopulationVertexFixed(
 
             label = f"Slice {vertex_slice} of {app_vertex.label}"
             machine_vertex = self.create_machine_vertex(
-                vertex_slice, sdram, label, app_vertex.constraints)
+                vertex_slice, sdram, label)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
             self.__vertices.append(machine_vertex)
 
@@ -156,7 +156,7 @@ class SplitterAbstractPopulationVertexFixed(
         return self.__vertices
 
     def create_machine_vertex(
-            self, vertex_slice, sdram, label, remaining_constraints):
+            self, vertex_slice, sdram, label):
 
         if self.__ring_buffer_shifts is None:
             app_vertex = self._governed_app_vertex
@@ -171,14 +171,12 @@ class SplitterAbstractPopulationVertexFixed(
         s_dynamics = self._governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractLocalOnly):
             return PopulationMachineLocalOnlyCombinedVertex(
-                sdram, label, remaining_constraints,
-                self._governed_app_vertex, vertex_slice, index,
+                sdram, label, self._governed_app_vertex, vertex_slice, index,
                 self.__ring_buffer_shifts, self.__weight_scales)
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
-            sdram, label, remaining_constraints,
-            self._governed_app_vertex,
+            sdram, label, self._governed_app_vertex,
             vertex_slice, index, self.__ring_buffer_shifts,
             self.__weight_scales, self.__all_syn_block_size(vertex_slice),
             self.__structural_size(vertex_slice))
