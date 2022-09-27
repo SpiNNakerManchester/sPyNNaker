@@ -33,9 +33,9 @@ class SpikeInjector(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
     def create_vertex(
-            self, n_neurons, label, constraints, port, virtual_key,
+            self, n_neurons, label, port, virtual_key,
             reserve_reverse_ip_tag, splitter):
         # pylint: disable=arguments-differ
         return SpikeInjectorVertex(
-            n_neurons, label, constraints, port, virtual_key,
+            n_neurons, label, port, virtual_key,
             reserve_reverse_ip_tag, splitter)

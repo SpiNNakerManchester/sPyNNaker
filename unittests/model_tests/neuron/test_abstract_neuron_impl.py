@@ -37,7 +37,7 @@ class _MyPyNNModelImpl(AbstractPyNNModel):
     def absolute_max_atoms_per_core(cls):  # @NoSelf
         return 1000
 
-    def create_vertex(self, n_neurons, label, constraints):
+    def create_vertex(self, n_neurons, label):
         return None
 
 
