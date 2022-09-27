@@ -97,7 +97,7 @@ class SynapseDynamicsStatic(
     def set_value(self, key, value):
         if hasattr(self, key):
             setattr(self, key, value)
-            self.__change_requires_mapping = True
+            SpynnakerDataView.set_requires_mapping()
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
