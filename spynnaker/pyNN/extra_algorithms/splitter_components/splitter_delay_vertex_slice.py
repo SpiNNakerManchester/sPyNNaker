@@ -88,8 +88,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         # create vertices correctly
         for vertex_slice in slices:
             vertex = self.create_machine_vertex(
-                source_app_vertex, vertex_slice,
-                self._governed_app_vertex.constraints)
+                source_app_vertex, vertex_slice)
             self._governed_app_vertex.remember_machine_vertex(vertex)
             chip_counter.add_core(vertex.sdram_required)
 
@@ -111,13 +110,10 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     def create_machine_vertex(
-            self, source_app_vertex, vertex_slice, remaining_constraints):
+            self, source_app_vertex, vertex_slice):
         """ creates a delay extension machine vertex and adds to the tracker.
 
         :param MachineVertex source_vertex: The source of the delay
-        :param remaining_constraints: none partitioner constraints.
-        :type remaining_constraints:
-            iterable(~pacman.model.constraints.AbstractConstraint)
         :return: machine vertex
         :rtype: DelayExtensionMachineVertex
         """
@@ -125,8 +121,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         sdram = self.get_sdram_used_by_atoms(vertex_slice)
 
         machine_vertex = DelayExtensionMachineVertex(
-            sdram, label, vertex_slice, remaining_constraints,
-            self._governed_app_vertex)
+            sdram, label, vertex_slice, self._governed_app_vertex)
 
         self._machine_vertex_by_slice[vertex_slice] = machine_vertex
         return machine_vertex

@@ -58,7 +58,7 @@ class SpikeSourceArrayVertex(
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
-            self, n_neurons, spike_times, constraints, label,
+            self, n_neurons, spike_times, label,
             max_atoms_per_core, model, splitter):
         # pylint: disable=too-many-arguments
         self.__model_name = "SpikeSourceArray"
@@ -69,7 +69,7 @@ class SpikeSourceArrayVertex(
         time_step = self.get_spikes_sampling_interval()
 
         super().__init__(
-            n_keys=n_neurons, label=label, constraints=constraints,
+            n_keys=n_neurons, label=label,
             max_atoms_per_core=max_atoms_per_core,
             send_buffer_times=_send_buffer_times(spike_times, time_step),
             send_buffer_partition_id=constants.SPIKE_PARTITION_ID,

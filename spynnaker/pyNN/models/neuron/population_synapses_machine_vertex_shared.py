@@ -33,21 +33,18 @@ class PopulationSynapsesMachineVertexShared(
     ]
 
     def __init__(
-            self, sdram, label, constraints, app_vertex,
-            vertex_slice, synapse_references):
+            self, sdram, label, app_vertex, vertex_slice, synapse_references):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The sdram used by the vertex
         :param str label: The label of the vertex
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints for the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
         """
         super(PopulationSynapsesMachineVertexShared, self).__init__(
-            sdram, label, constraints, app_vertex, vertex_slice)
+            sdram, label, app_vertex, vertex_slice)
         self.__synapse_references = synapse_references
 
     @overrides(

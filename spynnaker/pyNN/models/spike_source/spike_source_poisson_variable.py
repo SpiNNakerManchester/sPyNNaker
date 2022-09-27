@@ -38,10 +38,9 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=default_population_parameters.keys())
     def create_vertex(
-            self, n_neurons, label, constraints, seed, splitter):
+            self, n_neurons, label, seed, splitter):
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return SpikeSourcePoissonVertex(
-            n_neurons, constraints, label, seed, max_atoms, self,
-            rates=self._rates, starts=self._starts, durations=self._durations,
-            splitter=splitter)
+            n_neurons, label, seed, max_atoms, self, rates=self._rates,
+            starts=self._starts, durations=self._durations, splitter=splitter)
