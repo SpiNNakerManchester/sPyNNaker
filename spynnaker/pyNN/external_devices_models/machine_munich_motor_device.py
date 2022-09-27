@@ -68,7 +68,7 @@ class MachineMunichMotorDevice(
     def __init__(
             self, speed, sample_time, update_time, delay_time,
             delta_threshold, continue_if_not_different,
-            label=None, constraints=None, app_vertex=None):
+            label=None, app_vertex=None):
         """
         :param int speed:
         :param int sample_time:
@@ -77,11 +77,10 @@ class MachineMunichMotorDevice(
         :param int delta_threshold:
         :param bool continue_if_not_different:
         :param str label:
-        :param constraints:
         :param app_vertex:
         """
         super().__init__(
-            label=label, constraints=constraints, app_vertex=app_vertex,
+            label=label, app_vertex=app_vertex,
             vertex_slice=Slice(0, self._N_ATOMS - 1))
         self.__speed = speed
         self.__sample_time = sample_time

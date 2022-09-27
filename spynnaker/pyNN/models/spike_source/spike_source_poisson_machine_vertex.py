@@ -171,12 +171,11 @@ class SpikeSourcePoissonMachineVertex(
     SEED_OFFSET_BYTES = (PARAMS_BASE_WORDS * 4) - SEED_SIZE_BYTES
 
     def __init__(
-            self, sdram, is_recording, constraints=None,
+            self, sdram, is_recording,
             label=None, app_vertex=None, vertex_slice=None, slice_index=None):
         # pylint: disable=too-many-arguments
         super().__init__(
-            label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=vertex_slice)
+            label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__is_recording = is_recording
         self.__sdram = sdram
         self.__change_requires_neuron_parameters_reload = False

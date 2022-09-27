@@ -81,23 +81,18 @@ class DelayExtensionMachineVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    def __init__(self, sdram, label, vertex_slice, constraints=None,
-                 app_vertex=None):
+    def __init__(self, sdram, label, vertex_slice, app_vertex=None):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The sdram required by the vertex
         :param str label: The name of the vertex
         :param Slice vertex_slice: The slice of the vertex
-        :param iterable(~pacman.model.constraints.AbstractConstraint) \
-                constraints:
-            The optional initial constraints of the vertex
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             The application vertex that caused this machine vertex to be
             created. If None, there is no such application vertex.
         """
         super().__init__(
-            label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=vertex_slice)
+            label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__sdram = sdram
 
     @property
