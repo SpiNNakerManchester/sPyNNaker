@@ -554,7 +554,7 @@ class SynapticMatrices(object):
             if rinfo is None:
                 return None
             # Mask is not the same as the last mask?  Doesn't work
-            if mask is not None and rinfo.first != mask:
+            if mask is not None and rinfo.mask != mask:
                 return None
             mask = rinfo.mask
             keys.append((rinfo.key, m_vertex.vertex_slice))
