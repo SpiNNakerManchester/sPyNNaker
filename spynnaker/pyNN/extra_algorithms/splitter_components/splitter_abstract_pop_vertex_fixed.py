@@ -91,8 +91,7 @@ class SplitterAbstractPopulationVertexFixed(
         synaptic_matrices = SynapticMatrices(
             app_vertex, synapse_regions, max_atoms_per_core, weight_scales,
             all_syn_block_sz)
-        neuron_regions = PopulationMachineVertex.NEURON_REGIONS
-        neuron_data = NeuronData(neuron_regions, app_vertex)
+        neuron_data = NeuronData(app_vertex)
 
         self.__create_slices()
 
@@ -160,7 +159,8 @@ class SplitterAbstractPopulationVertexFixed(
             return PopulationMachineLocalOnlyCombinedVertex(
                 sdram, label,
                 self._governed_app_vertex, vertex_slice, index,
-                ring_buffer_shifts, weight_scales)
+                ring_buffer_shifts, weight_scales, neuron_data,
+                max_atoms_per_core)
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(

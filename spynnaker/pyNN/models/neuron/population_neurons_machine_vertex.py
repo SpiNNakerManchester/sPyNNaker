@@ -244,10 +244,7 @@ class PopulationNeuronsMachineVertex(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
         # Write the other parameters
-        self._neuron_data.write_data(spec, self._vertex_slice)
-
-        # write the current source params into the new DSG region
-        self._write_current_source_parameters(spec)
+        self._rewrite_neuron_data_spec(spec)
 
         # close spec
         spec.end_specification()

@@ -68,8 +68,6 @@ class NeuronData(object):
     """
 
     __slots__ = [
-        # The neuron regions to be used
-        "__neuron_regions",
 
         # The application vertex
         "__app_vertex",
@@ -90,8 +88,7 @@ class NeuronData(object):
         "__gen_on_machine"
     ]
 
-    def __init__(self, neuron_regions, app_vertex):
-        self.__neuron_regions = neuron_regions
+    def __init__(self, app_vertex):
         self.__app_vertex = app_vertex
         self.__neuron_data = None
         self.__neuron_recording_data = None
@@ -101,6 +98,10 @@ class NeuronData(object):
 
     @property
     def gen_on_machine(self):
+        """ Whether the neuron data can be generated on the machine or not
+
+        :rtype: bool
+        """
         if self.__gen_on_machine is None:
             # First try to generate data.  This might have already been done.
             self.generate_data()
@@ -114,6 +115,8 @@ class NeuronData(object):
         return self.__gen_on_machine
 
     def generate_data(self):
+        """ Do the data generation internally
+        """
         if self.__generation_done:
             return
         self.__generation_done = True
@@ -149,16 +152,22 @@ class NeuronData(object):
         # If we get here, we know everything is generated on machine
         self.__gen_on_machine = True
 
-    def write_data(self, spec, vertex_slice):
+    def write_data(self, spec, vertex_slice, neuron_regions):
+        """ Write the generated data
+
+        :param DataSpecificationGenerator spec: The spec to write to
+        :param Slice vertex_slice: The vertex_slice to generate for
+        :param NeuronRegions neuron_regions: The regions to write to
+        """
         self.generate_data()
         spec.reserve_memory_region(
-            region=self.__neuron_regions.neuron_params,
+            region=neuron_regions.neuron_params,
             size=self.__app_vertex.get_sdram_usage_for_neuron_params(
                     vertex_slice.n_atoms),
             label="neuron_params")
         neuron_recorder = self.__app_vertex.neuron_recorder
         spec.reserve_memory_region(
-            region=self.__neuron_regions.neuron_recording,
+            region=neuron_regions.neuron_recording,
             size=neuron_recorder.get_metadata_sdram_usage_in_bytes(
                 vertex_slice.n_atoms),
             label="neuron recording")
@@ -168,7 +177,8 @@ class NeuronData(object):
                 n_structs = self.__neuron_data_n_structs
             else:
                 n_structs, data = self.__get_neuron_builder_data(vertex_slice)
-            header = self.__get_neuron_builder_header(vertex_slice, n_structs)
+            header = self.__get_neuron_builder_header(
+                vertex_slice, n_structs, neuron_regions)
             if self.__neuron_recording_data is not None:
                 rec_data = self.__neuron_recording_data
             else:
@@ -176,27 +186,32 @@ class NeuronData(object):
                     vertex_slice, self.__app_vertex.atoms_shape)
             n_words = len(data) + len(header) + len(rec_data)
             spec.reserve_memory_region(
-                region=self.__neuron_regions.neuron_builder,
+                region=neuron_regions.neuron_builder,
                 size=n_words * BYTES_PER_WORD,
                 label="neuron_builder")
-            spec.switch_write_focus(self.__neuron_regions.neuron_builder)
+            spec.switch_write_focus(neuron_regions.neuron_builder)
             spec.write_array(header)
             spec.write_array(data)
             spec.write_array(rec_data)
         else:
-            spec.switch_write_focus(self.__neuron_regions.neuron_params)
+            spec.switch_write_focus(neuron_regions.neuron_params)
             neuron_data = self.__get_neuron_param_data(vertex_slice)
             spec.write_array(neuron_data)
             neuron_recorder.write_neuron_recording_region(
-                spec, self.__neuron_regions.neuron_recording,
+                spec, neuron_regions.neuron_recording,
                 vertex_slice, self.__app_vertex.atoms_shape)
         spec.reserve_memory_region(
-            region=self.__neuron_regions.initial_values,
+            region=neuron_regions.initial_values,
             size=self.__app_vertex.get_sdram_usage_for_neuron_params(
                     vertex_slice.n_atoms),
             label="initial_values")
 
     def __get_neuron_param_data(self, vertex_slice):
+        """ Get neuron parameter data for a slice
+
+        :param Slice vertex_slice: The slice to get the data for
+        :rtype: numpy.ndarray
+        """
         structs = self.__app_vertex.neuron_impl.structs
         params = self.__app_vertex.parameters
         state_vars = self.__app_vertex.state_variables
@@ -207,12 +222,24 @@ class NeuronData(object):
         return numpy.concatenate(all_data)
 
     def __get_struct_data(self, struct, values, vertex_slice):
+        """ Get the data for a struct
+
+        :param Struct struct: The struct to get the data for
+        :param RangeDictionary values: The values to fill in the struct with
+        :param Slice vertex_slice: The slice to get the values for
+        """
         if struct.repeat_type == StructRepeat.GLOBAL:
             return struct.get_data(values)
         return struct.get_data(
             values, vertex_slice, self.__app_vertex.atoms_shape)
 
     def __get_neuron_builder_data(self, vertex_slice):
+        """ Get the data to build neuron parameters with
+
+        :param Slice vertex_slice: The slice to get the parameters for
+        :return: The number of structs and the data
+        :rtype: tuple(int, numpy.ndarray)
+        """
         structs = self.__app_vertex.neuron_impl.structs
         params = self.__app_vertex.parameters
         state_vars = self.__app_vertex.state_variables
@@ -223,42 +250,66 @@ class NeuronData(object):
         return len(structs), numpy.concatenate(all_data)
 
     def __get_builder_data(self, struct, values, vertex_slice):
+        """ Get the builder data for a struct
+
+        :param Struct struct: The struct to get the data for
+        :param RangeDictionary values: The values to fill in the struct with
+        :param Slice vertex_slice: The slice to get the values for
+        """
         if struct.repeat_type == StructRepeat.GLOBAL:
             return struct.get_generator_data(values)
         return struct.get_generator_data(
             values, vertex_slice, self.__app_vertex.atoms_shape)
 
-    def __get_neuron_builder_header(self, vertex_slice, n_structs):
+    def __get_neuron_builder_header(
+            self, vertex_slice, n_structs, neuron_regions):
+        """ Get the header of the neuron builder region
+
+        :param Slice vertex_slice: The slice to put in the header
+        :param int n_structs: The number of structs to generate
+        :param NeuronRegions neuron_regions: The regions to point to
+        :rtype: numpy.ndarray
+        """
         return numpy.array([
-            self.__neuron_regions.neuron_params,
-            self.__neuron_regions.neuron_recording,
+            neuron_regions.neuron_params,
+            neuron_regions.neuron_recording,
             *self.__app_vertex.pop_seed, *self.__app_vertex.core_seed,
             n_structs, vertex_slice.n_atoms
         ], dtype="uint32")
 
-    def read_data(self, placement):
-        """ Read the current state of the data from the machine
+    def read_data(self, placement, neuron_regions):
+        """ Read the current state of the data from the machine into the
+            application vertex
 
         :param Placement placement: The placement of the vertex to read
+        :param NeuronRegions neuron_regions: The regions to read from
         """
         params = self.__app_vertex.parameters
         state_vars = self.__app_vertex.state_variables
         merged_dict = _MergedDict(params, state_vars)
         self.__do_read_data(
-            placement, self.__neuron_regions.neuron_params, merged_dict)
+            placement, neuron_regions.neuron_params, merged_dict)
 
-    def read_initial_data(self, placement):
-        """ Read the initial state of the data from the machine
+    def read_initial_data(self, placement, neuron_regions):
+        """ Read the initial state of the data from the machine into the
+            application vertex
 
         :param Placement placement: The placement of the vertex to read
+        :param NeuronRegions neuron_regions: The regions to read from
         """
         params = self.__app_vertex.parameters
         state_vars = self.__app_vertex.initial_state_variables
         merged_dict = _MergedDict(params, state_vars)
         self.__do_read_data(
-            placement, self.__neuron_regions.initial_values, merged_dict)
+            placement, neuron_regions.initial_values, merged_dict)
 
     def __do_read_data(self, placement, region, results):
+        """ Perform the reading of data
+
+        :param Placement placement: Where the vertex is on the machine
+        :param int region: The region to read from
+        :param MergedDict results: Where to write the results to
+        """
         address = locate_memory_region_for_placement(placement, region)
         vertex_slice = placement.vertex.vertex_slice
         data_size = self.__app_vertex.get_sdram_usage_for_neuron_params(

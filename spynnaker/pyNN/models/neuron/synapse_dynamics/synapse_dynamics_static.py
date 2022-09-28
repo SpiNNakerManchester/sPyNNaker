@@ -86,21 +86,6 @@ class SynapseDynamicsStatic(
         # Nothing to do here
         pass
 
-    @overrides(AbstractStaticSynapseDynamics.get_value)
-    def get_value(self, key):
-        if hasattr(self, key):
-            return getattr(self, key)
-        raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
-
-    @overrides(AbstractStaticSynapseDynamics.set_value)
-    def set_value(self, key, value):
-        if hasattr(self, key):
-            setattr(self, key, value)
-            SpynnakerDataView.set_requires_mapping()
-        raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
-
     @overrides(
         AbstractStaticSynapseDynamics.get_n_words_for_static_connections)
     def get_n_words_for_static_connections(self, n_connections):

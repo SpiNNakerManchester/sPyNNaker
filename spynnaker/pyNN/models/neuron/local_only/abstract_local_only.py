@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
 
@@ -49,3 +50,8 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
         # A bit of an estimate for these local-only systems, which don't use
         # the master population table and so don't have the same limit
         return 2048
+
+    @property
+    @overrides(AbstractSynapseDynamics.is_single_core_capable)
+    def is_single_core_capable(self):
+        return True

@@ -158,24 +158,6 @@ class SynapseDynamicsSTDP(
         # Otherwise, it is static or neuromodulation, so return ourselves
         return self
 
-    @overrides(AbstractPlasticSynapseDynamics.get_value)
-    def get_value(self, key):
-        for obj in [self.__timing_dependence, self.__weight_dependence, self]:
-            if hasattr(obj, key):
-                return getattr(obj, key)
-        raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
-
-    @overrides(AbstractPlasticSynapseDynamics.set_value)
-    def set_value(self, key, value):
-        for obj in [self.__timing_dependence, self.__weight_dependence, self]:
-            if hasattr(obj, key):
-                setattr(obj, key, value)
-                SpynnakerDataView.set_requires_mapping()
-                return
-        raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
-
     @property
     def weight_dependence(self):
         """

@@ -237,8 +237,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         synaptic_matrices = SynapticMatrices(
             app_vertex, synapse_regions, atoms_per_core, weight_scales,
             all_syn_block_sz)
-        neuron_regions = PopulationNeuronsMachineVertex.NEURON_REGIONS
-        neuron_data = NeuronData(neuron_regions, app_vertex)
+        neuron_data = NeuronData(app_vertex)
 
         # Keep track of the SDRAM for each group of vertices
         total_sdram = neuron_sdram + lead_synapse_core_sdram

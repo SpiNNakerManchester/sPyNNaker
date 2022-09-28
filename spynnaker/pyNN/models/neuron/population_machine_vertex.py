@@ -307,7 +307,7 @@ class PopulationMachineVertex(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
         if self.__regenerate_neuron_data:
-            self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
+            self._rewrite_neuron_data_spec(spec)
             self.__regenerate_neuron_data = False
 
         if self.__regenerate_synapse_data:

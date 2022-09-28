@@ -170,7 +170,24 @@ class PopulationMachineNeurons(
         self._write_current_source_parameters(spec)
 
         # Write the other parameters
-        self._neuron_data.write_data(spec, self._vertex_slice)
+        self._neuron_data.write_data(
+            spec, self._vertex_slice, self._neuron_regions)
+
+    def _rewrite_neuron_data_spec(self, spec):
+        """ Re-Write the data specification of the neuron data
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        :param list(int) ring_buffer_shifts:
+            The shifts to apply to convert ring buffer values to S1615 values
+        """
+
+        # Write the current source parameters
+        self._write_current_source_parameters(spec)
+
+        # Write the other parameters
+        self._neuron_data.write_data(
+            spec, self._vertex_slice, self._neuron_regions)
 
     def _write_neuron_core_parameters(self, spec, ring_buffer_shifts):
         """ Write the neuron parameters region
@@ -212,6 +229,8 @@ class PopulationMachineNeurons(
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
+
+        # Write the maximum number of neurons based on the max atoms per core
         spec.write_value(data=2**get_n_bits(self._max_atoms_per_core))
 
         # Write the ring buffer data
@@ -338,7 +357,7 @@ class PopulationMachineNeurons(
 
         :param Placement placement: Where to read the data from
         """
-        self._neuron_data.read_data(placement)
+        self._neuron_data.read_data(placement, self._neuron_regions)
 
     def read_initial_parameters_from_machine(self, placement):
         """ Read the parameters and state of the neurons from the machine
@@ -346,7 +365,7 @@ class PopulationMachineNeurons(
 
         :param Placement placement: Where to read the data from
         """
-        self._neuron_data.read_initial_data(placement)
+        self._neuron_data.read_initial_data(placement, self._neuron_regions)
 
     @overrides(AbstractNeuronExpandable.gen_neurons_on_machine)
     def gen_neurons_on_machine(self):
@@ -364,5 +383,5 @@ class PopulationMachineNeurons(
         if self._app_vertex.read_initial_values:
 
             # If we do decide to read now, we can also copy the initial values
-            self._neuron_data.read_data(placement)
+            self._neuron_data.read_data(placement, self._neuron_regions)
             self._app_vertex.copy_initial_state_variables(self._vertex_slice)

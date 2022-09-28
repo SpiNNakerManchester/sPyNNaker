@@ -156,7 +156,9 @@ def get_max_row_info(
     max_delay_supported = get_maximum_delay_supported_in_ms(
         in_edge.post_vertex.splitter.max_support_delay())
     max_delay = max_delay_supported * (n_delay_stages + 1)
-    pad_to_length = synapse_info.synapse_dynamics.pad_to_length
+    pad_to_length = None
+    if isinstance(synapse_info.synapse_dynamics, AbstractSDRAMSynapseDynamics):
+        pad_to_length = synapse_info.synapse_dynamics.pad_to_length
 
     # delay point where delay extensions start
     min_delay_for_delay_extension = (

@@ -1060,6 +1060,8 @@ class AbstractPopulationVertex(
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
             The projections to consider in the calculations
         """
+        if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
+            return 0
         addr = 2 * BYTES_PER_WORD
         for proj in self.incoming_projections:
             addr = self.__add_matrix_size(addr, proj, n_post_atoms)
