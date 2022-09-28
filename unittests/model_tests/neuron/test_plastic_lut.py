@@ -19,6 +19,7 @@ from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     write_mfvn_lut, write_pfpc_lut)
 
+
 class TestPlasticLUT(unittest.TestCase):
 
     def setUp(self):
@@ -26,7 +27,8 @@ class TestPlasticLUT(unittest.TestCase):
 
     def test_plastic_mfvn_lut(self):
         t_mfvn, out_float_mfvn, _plot_times = write_mfvn_lut(
-            spec=None, sigma=200, beta=10, lut_size=256, shift=0, time_probe=22)
+            spec=None, sigma=200, beta=10, lut_size=256, shift=0,
+            time_probe=22)
 
         t_compare = [15, 20, 30, 35, 45, 47, 99, 115, 135, 140, 150]
         mfvn_float = [0.4697, 0.3642, 0.2181, 0.1685, 0.1002, 0.0902, 0.0055,
