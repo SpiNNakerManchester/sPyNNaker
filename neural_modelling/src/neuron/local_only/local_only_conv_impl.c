@@ -208,7 +208,7 @@ static inline void do_convolution_operation(
                     synapse_delay_mask);
                 weight = -weight;
             }
-            log_info("Updating ring_buffers[%u] for post neuron %u = %u, %u, with weight %u",
+            log_debug("Updating ring_buffers[%u] for post neuron %u = %u, %u, with weight %u",
                     rb_index, post_index, tmp_col, tmp_row, weight);
 
             // Add weight to current ring buffer value, avoiding saturation
