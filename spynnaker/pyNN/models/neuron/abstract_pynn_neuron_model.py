@@ -53,6 +53,6 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return AbstractPopulationVertex(
-            n_neurons, label, spikes_per_second, ring_buffer_sigma,
+            n_neurons, label, max_atoms, spikes_per_second, ring_buffer_sigma,
             incoming_spike_buffer_size, self.__model, self, drop_late_spikes,
             splitter, rb_left_shifts)
