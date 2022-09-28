@@ -184,6 +184,10 @@ static bool do_bitfield_generation(
         return false;
     }
 
+    if (master_pop_table_length == 0) {
+    	return true;
+    }
+
     uint32_t n_atom_bytes = master_pop_table_length * sizeof(uint32_t);
     uint32_t *n_atom_data = spin1_malloc(n_atom_bytes);
     if (n_atom_data == NULL) {
