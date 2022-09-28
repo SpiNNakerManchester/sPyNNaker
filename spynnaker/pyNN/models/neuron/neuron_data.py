@@ -272,8 +272,8 @@ class NeuronData(object):
                 offset += struct.get_size_in_whole_words() * BYTES_PER_WORD
             else:
                 struct.read_data(
-                    block, results, offset, vertex_slice.lo_atom,
-                    vertex_slice.n_atoms)
+                    block, results, offset, vertex_slice,
+                    self.__app_vertex.atoms_shape)
                 offset += (
                     struct.get_size_in_whole_words(vertex_slice.n_atoms) *
                     BYTES_PER_WORD)
