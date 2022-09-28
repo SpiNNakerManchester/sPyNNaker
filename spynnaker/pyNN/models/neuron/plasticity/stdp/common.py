@@ -15,7 +15,6 @@
 
 import math
 import numpy
-import matplotlib.pyplot as plt
 
 # Default value of fixed-point one for STDP
 STDP_FIXED_POINT_ONE = (1 << 11)
@@ -55,7 +54,8 @@ def get_exp_lut_array(time_step, time_constant, shift=0):
 
 
 def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
-                   fixed_point_one=STDP_FIXED_POINT_ONE, kernel_scaling=1.0):
+                   fixed_point_one=STDP_FIXED_POINT_ONE, kernel_scaling=1.0,
+                   plot=False):
     sin_pwr = 20
 
     # Calculate required time constant
@@ -75,7 +75,7 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
 
     final_exp_fix = []
 
-    for i in range(0, lut_size):  # note that i corresponds to 1 timestep!!!!!!
+    for i in range(0, lut_size):  # note that i corresponds to 1 timestep!
 
         # Multiply by inverse of time constant
         value = float(i) * inv_tau
@@ -108,18 +108,6 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
         out_fixed = numpy.array(out_fixed)
         out_float = numpy.array(out_float)
 
-        plt.plot(t, out_float, label='float')
-        # plt.plot(t,out_fixed, label='fixed')
-        plt.legend()
-        plt.title("pf-PC LUT")
-        plt.savefig("figures/write_pfpc_lut.png")
-
-        plt.plot(t, out_fixed, label='fixed int16')
-        plt.legend()
-        plt.title("pf-PC LUT")
-        plt.savefig("figures/write_pfpc_lut_final_exp_fix.png")
-        # plt.show()
-
         compare_t_values = numpy.array([15, 20, 30, 35, 45, 47,
                                         99, 115, 135, 140, 150])
         print("LUT VALUES TO COMPARE TO SPINNAKER:")
@@ -128,18 +116,15 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
                             out_float[compare_t_values]):
             print("{:8} | {:8} | {:8.4f}".format(x, y, z))
 
-        return t, out_float
+        return compare_t_values, out_float, out_fixed, t
     else:
         header = numpy.array([len(final_exp_fix), shift], dtype="uint16")
         array_to_write = numpy.concatenate((
             header,
             numpy.array(final_exp_fix).astype("uint16"))).view("uint32")
         #
-        # spec.write_array(array_to_write)
-        print("pfpc_lut: ", array_to_write)
-        print("header: ", header)
+        spec.write_array(array_to_write)
         return array_to_write
-        # spec.write_array(final_exp_fix, data_type=DataType.INT16)
 
 
 def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
@@ -161,7 +146,7 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
 
     final_exp_fix = []
 
-    for i in range(0, lut_size):  # note that i corresponds to 1 timestep!!!!!!
+    for i in range(0, lut_size):  # note that i corresponds to 1 timestep!
 
         # Multiply by inverse of time constant
         value = float(i) * inv_sigma
@@ -187,18 +172,11 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
 
         else:  # at runtime, so write to spec
             final_exp_fix.append(exp_fix)
-            # spec.write_value(data=exp_fix, data_type=DataType.INT16)
 
     if spec is None:
         print("peak: time {}, value {}".format(peak_time, kernel_peak_value))
         out_fixed = numpy.array(out_fixed)
         out_float = numpy.array(out_float)
-
-        plt.plot(plot_times, out_float, label='float')
-        # plt.plot(t,out_fixed, label='fixed')
-        plt.legend()
-        plt.title("mf-VN LUT")
-        plt.savefig("figures/write_mfvn_lut.png")
 
         compare_t_values = numpy.array([15, 20, 30, 35, 45, 47,
                                         99, 115, 135, 140, 150])
@@ -208,13 +186,11 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
                             out_float[compare_t_values]):
             print("{:8} | {:8} | {:8.4f}".format(x, y, z))
         # plt.show()
-        return plot_times, out_float
+        return compare_t_values, out_float, plot_times
     else:
         header = numpy.array([len(final_exp_fix), shift], dtype="uint16")
         array_to_write = numpy.concatenate((
             header,
             numpy.array(final_exp_fix).astype("uint16"))).view("uint32")
         spec.write_array(array_to_write)
-        print("mfvn_lut: ", array_to_write)
-        print("header: ", header)
-        # spec.write_array(final_exp_fix, data_type=DataType.INT16)
+        return array_to_write
