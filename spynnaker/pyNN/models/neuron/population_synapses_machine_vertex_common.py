@@ -234,9 +234,9 @@ class PopulationSynapsesMachineVertexCommon(
             routing_info = SpynnakerDataView.get_routing_infos()
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 self.__neuron_vertex, self.__partition_id)
-            spec.write_value(r_info.first_key)
-            spec.write_value(r_info.first_mask)
-            spec.write_value(~r_info.first_mask & 0xFFFFFFFF)
+            spec.write_value(r_info.key)
+            spec.write_value(r_info.mask)
+            spec.write_value(~r_info.mask & 0xFFFFFFFF)
             spec.write_value(int(self._app_vertex.self_projection is not None))
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)

@@ -263,8 +263,8 @@ class SynapseDynamicsStructuralCommon(
                 r_info = routing_info.get_routing_info_from_pre_vertex(
                     m_vertex, SPIKE_PARTITION_ID)
                 vertex_slice = m_vertex.vertex_slice
-                spec.write_value(r_info.first_key)
-                spec.write_value(r_info.first_mask)
+                spec.write_value(r_info.key)
+                spec.write_value(r_info.mask)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
