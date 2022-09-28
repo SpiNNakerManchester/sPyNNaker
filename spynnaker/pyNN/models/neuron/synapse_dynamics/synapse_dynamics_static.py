@@ -21,8 +21,7 @@ from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
-from spynnaker.pyNN.exceptions import InvalidParameterType,\
-    SynapticConfigurationException
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 

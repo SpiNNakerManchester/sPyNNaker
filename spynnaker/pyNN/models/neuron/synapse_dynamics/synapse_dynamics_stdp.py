@@ -20,8 +20,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import (
-    InvalidParameterType, SynapticConfigurationException)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
