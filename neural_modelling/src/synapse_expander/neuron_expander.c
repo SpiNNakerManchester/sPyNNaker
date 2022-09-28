@@ -37,11 +37,11 @@
 // Mask to work out MOD 4
 #define MOD_4 0x3
 
-//! When bitwise anded with a number will floor to the nearest multiple of 4
-#define FLOOR_TO_4 0xFFFFFFFC
+//! When bitwise anded with a number will floor to the nearest multiple of 2
+#define FLOOR_TO_2 0xFFFFFFFE
 
-//! Add to a number before applying floor to 4 to turn it into a ceil operation
-#define CEIL_TO_4 3
+//! Add to a number before applying floor to 2 to turn it into a ceil operation
+#define CEIL_TO_2 1
 
 // An array of how much to add to align data to 4-bytes
 // indexed by [current offset % 4][size to write % 4].
@@ -396,8 +396,8 @@ static bool run_neuron_expander(data_specification_metadata_t *ds_regions,
     address = &(recording_params[1]);
     void *sdram_address = &(sdram_recording_params[1]);
 
-    // Round up the number of neurons to the next multiple of 4
-    uint32_t n_neurons_max = (n_neurons + CEIL_TO_4) & FLOOR_TO_4;
+    // Round up the number of neurons to the next multiple of 2
+    uint32_t n_neurons_max = (n_neurons + CEIL_TO_2) & FLOOR_TO_2;
 
     // Do variables
     for (uint32_t i = 0; i < n_variables; i++) {
