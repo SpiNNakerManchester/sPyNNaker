@@ -102,13 +102,13 @@ typedef struct sdram_variable_recording_data {
     uint32_t rate;
     uint32_t n_recording;
     uint32_t element_size;
-    uint8_t indices[];
+    uint16_t indices[];
 } sdram_variable_recording_data_t;
 
 typedef struct sdram_bitfield_recording_data {
     uint32_t rate;
     uint32_t n_recording;
-    uint8_t indices[];
+    uint16_t indices[];
 } sdram_bitfield_recording_data_t;
 
 typedef struct recording_index {
@@ -249,11 +249,11 @@ static bool read_struct_builder_region(void **region,
 }
 
 static inline uint32_t read_index(uint32_t n_items, recording_index_t *items,
-        uint32_t n_neurons, uint32_t n_neurons_max, uint8_t *sdram_out) {
+        uint32_t n_neurons, uint32_t n_neurons_max, uint16_t *sdram_out) {
     // Go through the data
-    uint8_t indices[n_neurons_max];
+    uint16_t indices[n_neurons_max];
     uint32_t neuron_id = 0;
-    uint32_t next_index = 0;
+    uint16_t next_index = 0;
     uint32_t n_recording = 0;
     for (uint32_t i = 0; i < n_items; i++) {
         recording_index_t item = items[i];
@@ -268,7 +268,7 @@ static inline uint32_t read_index(uint32_t n_items, recording_index_t *items,
             n_recording += n_repeats;
         } else {
             for (uint32_t r = 0; r < n_repeats; r++) {
-                indices[neuron_id++] = n_neurons;
+                indices[neuron_id++] = (uint16_t) n_neurons;
             }
         }
     }
@@ -276,15 +276,15 @@ static inline uint32_t read_index(uint32_t n_items, recording_index_t *items,
     // Copy to SDRAM
     uint32_t *index_words = (uint32_t *) &(indices[0]);
     uint32_t *sdram_out_words = (uint32_t *) sdram_out;
-    for (uint32_t i = 0; i < (n_neurons_max >> 2); i++) {
+    for (uint32_t i = 0; i < (n_neurons_max >> 1); i++) {
         sdram_out_words[i] = index_words[i];
     }
     return n_recording;
 }
 
-static void write_zero_index(uint32_t n_neurons_max, uint8_t *sdram_out) {
+static void write_zero_index(uint32_t n_neurons_max, uint16_t *sdram_out) {
     uint32_t *sdram_out_words = (uint32_t *) sdram_out;
-    for (uint32_t i = 0; i < (n_neurons_max >> 2); i++) {
+    for (uint32_t i = 0; i < (n_neurons_max >> 1); i++) {
         sdram_out_words[i] = 0;
     }
 }
