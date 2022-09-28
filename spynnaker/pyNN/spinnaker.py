@@ -379,15 +379,13 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @overrides(AbstractSpinnakerBase._execute_graph_data_specification_writer)
     def _execute_graph_data_specification_writer(self):
-        with FecTimer(DATA_GENERATION, "Spynnaker data specification writer"):
+        with FecTimer("Spynnaker data specification writer", FecTimer.OTHER):
             self._data_writer.set_dsg_targets(
                 spynnaker_data_specification_writer())
 
     def _execute_spynnaker_ordered_covering_compressor(self):
-        with FecTimer(
-                LOADING,
-                "Spynnaker machine bitfield ordered covering compressor") \
-                as timer:
+        with FecTimer("Spynnaker machine bitfield ordered covering compressor",
+                      FecTimer.COMPRESSING) as timer:
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitfield_ordered_covering_compressor()
@@ -397,8 +395,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     def _execute_spynnaker_pair_compressor(self):
         with FecTimer(
-                LOADING, "Spynnaker machine bitfield pair router compressor") \
-                as timer:
+                "Spynnaker machine bitfield pair router compressor",
+                FecTimer.COMPRESSING) as timer:
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitField_pair_router_compressor()
@@ -418,19 +416,20 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             self, name, compressed)
 
     def _execute_synapse_expander(self):
-        with FecTimer(LOADING, "Synapse expander") as timer:
+        with FecTimer("Synapse expander", FecTimer.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
                 return
             synapse_expander()
 
     def _execute_on_chip_bit_field_generator(self):
-        with FecTimer(LOADING, "Execute on chip bitfield generator") as timer:
+        with FecTimer("Execute on chip bitfield generator",
+                      FecTimer.BITFIELD) as timer:
             if timer.skip_if_virtual_board():
                 return
             on_chip_bitfield_generator()
 
     def _execute_finish_connection_holders(self):
-        with FecTimer(LOADING, "Finish connection holders"):
+        with FecTimer("Finish connection holders", FecTimer.OTHER):
             finish_connection_holders()
 
     @overrides(AbstractSpinnakerBase._do_extra_load_algorithms)
@@ -439,10 +438,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         self._execute_on_chip_bit_field_generator()
         self._execute_finish_connection_holders()
 
-    def _execute_write_network_graph(self):
-        with FecTimer(
-                MAPPING,
-                "SpYNNakerNeuronGraphNetworkSpecificationReport") as timer:
+    def _report_write_network_graph(self):
+        with FecTimer("SpYNNakerNeuronGraphNetworkSpecificationReport",
+                      FecTimer.REPORT) as timer:
             if timer.skip_if_cfg_false("Reports", "write_network_graph"):
                 return
             spynnaker_neuron_graph_network_specification_report()
@@ -450,7 +448,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     @overrides(AbstractSpinnakerBase._do_extra_mapping_algorithms,
                extend_doc=False)
     def _do_extra_mapping_algorithms(self):
-        self._execute_write_network_graph()
+        self._report_write_network_graph()
 
     @overrides(AbstractSpinnakerBase._do_provenance_reports)
     def _do_provenance_reports(self):
@@ -458,7 +456,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         self._report_redundant_packet_count()
 
     def _report_redundant_packet_count(self):
-        with FecTimer(RUN_LOOP, "Redundant packet count report") as timer:
+        with FecTimer("Redundant packet count report",
+                      FecTimer.REPORT) as timer:
             if timer.skip_if_cfg_false(
                     "Reports", "write_redundant_packet_count_report"):
                 return
@@ -466,7 +465,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @overrides(AbstractSpinnakerBase._execute_splitter_selector)
     def _execute_splitter_selector(self):
-        with FecTimer(MAPPING, "Spynnaker splitter selector"):
+        with FecTimer("Spynnaker splitter selector", FecTimer.OTHER):
             spynnaker_splitter_selector()
 
     @overrides(AbstractSpinnakerBase._execute_delay_support_adder,
@@ -478,7 +477,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         name = get_config_str("Mapping", "delay_support_adder")
         if name is None:
             return
-        with FecTimer(MAPPING, "DelaySupportAdder"):
+        with FecTimer("DelaySupportAdder", FecTimer.OTHER):
             if name == "DelaySupportAdder":
                 d_vertices, d_edges = delay_support_adder()
                 for vertex in d_vertices:
@@ -494,6 +493,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def _execute_splitter_partitioner(self):
         if self._data_writer.get_n_vertices() == 0:
             return
-        with FecTimer(MAPPING, "SpynnakerSplitterPartitioner"):
+        with FecTimer("SpynnakerSplitterPartitioner", FecTimer.OTHER):
             n_chips_in_graph = spynnaker_splitter_partitioner()
             self._data_writer.set_n_chips_in_graph(n_chips_in_graph)
