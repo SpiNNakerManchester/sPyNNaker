@@ -212,7 +212,7 @@ def test_set_synapse_dynamics():
     p.setup(1.0)
     post_app_model = IFCurrExpBase()
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         rb_left_shifts=None)
@@ -323,7 +323,7 @@ def test_set_synapse_dynamics():
 
     # Try starting again to get a couple more combinations
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         rb_left_shifts=None)
@@ -346,7 +346,7 @@ def test_set_synapse_dynamics():
 
     # One more time!
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         rb_left_shifts=None)
@@ -384,7 +384,7 @@ def test_set_synapse_dynamics():
 
     # OK, just one more, honest
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
         rb_left_shifts=None)

@@ -28,8 +28,7 @@ class Population(_BaseClass):
 
     def __init__(
             self, size, cellclass, cellparams=None, structure=None,
-            initial_values=None, label=None, constraints=None,
-            additional_parameters=None):
+            initial_values=None, label=None, additional_parameters=None):
         """
         :param int size: The number of neurons in the population
         :param cellclass: The implementation of the individual neurons.
@@ -42,8 +41,6 @@ class Population(_BaseClass):
         :param dict(str,float) initial_values:
             Initial values of state variables
         :param str label: A label for the population
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Any constraints on how the population is deployed to SpiNNaker.
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
         :type additional_parameters: dict(str, ...)
@@ -53,4 +50,4 @@ class Population(_BaseClass):
                     "spynnaker.pyNN.models.populations.Population")
         super(Population, self).__init__(
             size, cellclass, cellparams, structure, initial_values, label,
-            constraints, additional_parameters)
+            additional_parameters)
