@@ -12,6 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import io
+import numpy
+import logging
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.config_holder import get_config_bool
 from spinn_machine.sdram import SDRAM
@@ -29,13 +32,12 @@ from spinn_front_end_common.utilities.utility_calls import (
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
+from spinn_front_end_common.utilities.helpful_functions import (
+    write_address_to_user1)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, AbstractNeuronExpandable, SYNAPSE_EXPANDER_APLX,
     NEURON_EXPANDER_APLX)
-import io
-import numpy
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +53,9 @@ def spynnaker_data_specification_reloader():
     progress = ProgressBar(
         SpynnakerDataView.get_n_placements(), "Reloading data")
 
-    expander_cores = ExecutableTargets()
+    synapse_expander_cores = ExecutableTargets()
     synapse_expandables = list()
+    neuron_expander_cores = ExecutableTargets()
     neuron_expandables = list()
     for pl in progress.over(SpynnakerDataView.iterate_placemements()):
         # Generate the data spec for the placement if needed
@@ -60,27 +63,42 @@ def spynnaker_data_specification_reloader():
             if isinstance(pl.vertex, AbstractSynapseExpandable):
                 if pl.vertex.gen_on_machine():
                     synapse_expandables.append(pl)
-                    expander_cores.add_processor(
+                    synapse_expander_cores.add_processor(
                         synapse_bin, pl.x, pl.y, pl.p, ExecutableType.SYSTEM)
             if isinstance(pl.vertex, AbstractNeuronExpandable):
                 if pl.vertex.gen_neurons_on_machine():
                     neuron_expandables.append(pl)
-                    expander_cores.add_procesor(
+                    neuron_expander_cores.add_processor(
                         neuron_bin, pl.x, pl.y, pl.p, ExecutableType.SYSTEM)
 
-    progress = ProgressBar(expander_cores.total_processors,
-                           "Re-expanding Synapse and Neuron Data")
     expander_app_id = SpynnakerDataView.get_new_id()
+    progress = ProgressBar(synapse_expander_cores.total_processors,
+                           "Re-expanding Synapse Data")
+    for pl in synapse_expandables:
+        write_address_to_user1(
+            pl.x, pl.y, pl.p, pl.vertex.connection_generator_region)
     run_system_application(
-        expander_cores, expander_app_id,
+        synapse_expander_cores, expander_app_id,
         get_config_bool("Reports", "write_expander_iobuf"),
         None, [CPUState.FINISHED], False,
-        "rerun_expander_on_{}_{}_{}.txt", progress_bar=progress,
+        "rerun_synapse_expander_on_{}_{}_{}.txt", progress_bar=progress,
         logger=logger)
     progress.end()
-
     for pl in synapse_expandables:
         pl.vertex.read_generated_connection_holders(pl)
+
+    progress = ProgressBar(neuron_expander_cores.total_processors,
+                           "Re-expanding Neuron Data")
+    for pl in neuron_expandables:
+        write_address_to_user1(
+            pl.x, pl.y, pl.p, pl.vertex.neuron_generator_region)
+    run_system_application(
+        neuron_expander_cores, expander_app_id,
+        get_config_bool("Reports", "write_expander_iobuf"),
+        None, [CPUState.FINISHED], False,
+        "rerun_neuron_expander_on_{}_{}_{}.txt", progress_bar=progress,
+        logger=logger)
+    progress.end()
     for pl in neuron_expandables:
         pl.vertex.read_generated_initial_values(pl)
 
