@@ -121,7 +121,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span> <span class="o">=</span> <span class="n">EIEIOSpikeRecorder</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_check_spike_density</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_check_density_double_list</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
