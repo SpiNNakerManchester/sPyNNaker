@@ -80,7 +80,7 @@ class SpikeSourceArrayVertex(
         self.__spike_recorder = EIEIOSpikeRecorder()
 
     def _check_spike_density(self):
-        if self._spike_times:
+        if len(self._spike_times):
             if hasattr(self._spike_times[0], '__iter__'):
                 self._check_density_double_list()
             else:
