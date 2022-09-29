@@ -683,8 +683,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             self, n_atoms, all_syn_block_sz, structural_sz):
         app_vertex = self._governed_app_vertex
         independent_synapse_sdram = self.__independent_synapse_sdram()
-        proj_dependent_sdram = self.__proj_dependent_synapse_sdram(
-            app_vertex.incoming_projections)
+        proj_dependent_sdram = self.__proj_dependent_synapse_sdram()
         dynamics_sz = self._governed_app_vertex.get_synapse_dynamics_size(
             n_atoms)
         dynamics_sz = max(dynamics_sz, BYTES_PER_WORD)
@@ -742,7 +741,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             max(exact_sdram_for_bit_field_builder_region(), BYTES_PER_WORD))
         return sdram
 
-    def __proj_dependent_synapse_sdram(self, incoming_projections):
+    def __proj_dependent_synapse_sdram(self):
         """ Get the SDRAM used by synapse cores dependent on the projections
 
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
@@ -754,7 +753,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS.pop_table,
             max(MasterPopTableAsBinarySearch.get_master_population_table_size(
-                    incoming_projections), BYTES_PER_WORD))
+                    app_vertex.incoming_projections), BYTES_PER_WORD))
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
             .connection_builder,
@@ -763,12 +762,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
             .bitfield_filter,
-            max(get_estimated_sdram_for_bit_field_region(incoming_projections),
+            max(get_estimated_sdram_for_bit_field_region(
+                app_vertex.incoming_projections),
                 BYTES_PER_WORD))
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
             .bitfield_key_map,
-            max(get_estimated_sdram_for_key_region(incoming_projections),
+            max(get_estimated_sdram_for_key_region(
+                app_vertex.incoming_projections),
                 BYTES_PER_WORD))
         return sdram
 
