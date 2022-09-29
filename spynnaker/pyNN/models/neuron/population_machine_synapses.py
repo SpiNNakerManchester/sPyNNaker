@@ -205,7 +205,7 @@ class PopulationMachineSynapses(
         # write up the bitfield builder data
         # reserve bit field region
         bit_field_utilities.reserve_bit_field_regions(
-            spec, self._app_vertex.incoming_projections,
+            spec, self._app_vertex,
             self._synapse_regions.bitfield_builder,
             self._synapse_regions.bitfield_filter,
             self._synapse_regions.bitfield_key_map,
