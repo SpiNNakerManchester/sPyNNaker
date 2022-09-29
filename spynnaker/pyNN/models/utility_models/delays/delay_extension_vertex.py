@@ -57,21 +57,18 @@ class DelayExtensionVertex(
 
     def __init__(
             self, partition, delay_per_stage, n_delay_stages,
-            constraints=None, label="DelayExtension"):
+            label="DelayExtension"):
         """
         :param partition: The parition this Delay is supporting
         :type partition:
             ~pacman.mode.graph.application.ApplicationEdgePartition
         :param int delay_per_stage: the delay per stage
         :param int n_delay_stages: the (initial) number of delay stages needed
-        :param iterable(~pacman.model.constraints.AbstractConstraint) \
-                constraints:
-            the vertex constraints
         :param str label: the vertex label
         """
         # pylint: disable=too-many-arguments
         super().__init__(
-            label, constraints, POP_TABLE_MAX_ROW_LENGTH, splitter=None)
+            label, POP_TABLE_MAX_ROW_LENGTH, splitter=None)
 
         self.__partition = partition
         self.__n_delay_stages = n_delay_stages

@@ -102,7 +102,7 @@ class MockNeuron(AbstractPopulationVertex):
     def __init__(self):
         foo_bar = FooBar()
         super().__init__(
-            n_neurons=5, label="Mock", constraints=None,
+            n_neurons=5, label="Mock",
             max_atoms_per_core=None, spikes_per_second=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
             neuron_impl=foo_bar.model, pynn_model=foo_bar,

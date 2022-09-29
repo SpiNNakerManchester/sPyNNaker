@@ -65,12 +65,10 @@ class PopulationMachineCommon(
     ]
 
     def __init__(
-            self, label, constraints, app_vertex, vertex_slice, sdram,
+            self, label, app_vertex, vertex_slice, sdram,
             regions, n_provenance_items, profile_tags, binary_file_name):
         """
         :param str label: The label of the vertex
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints for the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -85,7 +83,7 @@ class PopulationMachineCommon(
         :param str binary_file_name: The name of the binary file
         """
         super(PopulationMachineCommon, self).__init__(
-            label, constraints, app_vertex, vertex_slice)
+            label, app_vertex, vertex_slice)
         self.__sdram = sdram
         self.__regions = regions
         self.__n_provenance_items = n_provenance_items
