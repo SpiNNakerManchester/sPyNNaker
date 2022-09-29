@@ -681,7 +681,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __get_shared_synapse_sdram(
             self, n_atoms, all_syn_block_sz, structural_sz):
-        app_vertex = self._governed_app_vertex
         independent_synapse_sdram = self.__independent_synapse_sdram()
         proj_dependent_sdram = self.__proj_dependent_synapse_sdram()
         dynamics_sz = self._governed_app_vertex.get_synapse_dynamics_size(
