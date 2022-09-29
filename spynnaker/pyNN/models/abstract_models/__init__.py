@@ -29,6 +29,7 @@ from .population_application_vertex import (
     PopulationApplicationVertex, RecordingType)
 from .population_fpga_vertex import PopulationFPGAVertex
 from .population_spinnaker_link_vertex import PopulationSpiNNakerLinkVertex
+from .population_2d_fpga_vertex import Population2DFPGAVertex
 from .supports_structure import SupportsStructure
 from .has_shape_key_fields import HasShapeKeyFields
 
@@ -39,4 +40,4 @@ __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractHasDelayStages",
            "HasSynapses", "AbstractNeuronExpandable", "NEURON_EXPANDER_APLX",
            "ParameterHolder", "PopulationApplicationVertex", "RecordingType",
            "PopulationFPGAVertex", "PopulationSpiNNakerLinkVertex",
-           "SupportsStructure", "HasShapeKeyFields"]
+           "Population2DFPGAVertex", "SupportsStructure", "HasShapeKeyFields"]
