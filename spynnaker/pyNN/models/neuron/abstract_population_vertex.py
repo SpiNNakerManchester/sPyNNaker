@@ -620,13 +620,10 @@ class AbstractPopulationVertex(
             self.__read_parameters_now()
             SpynnakerDataView.set_requires_data_generation()
             self.__tell_neuron_vertices_to_regenerate()
-            self.__state_variables[name].set_value_by_selector(
-                selector, value)
-        else:
-            self.__state_variables[name].set_value_by_selector(
-                selector, value)
-            self.__initial_state_variables[name].set_value_by_selector(
-                selector, value)
+        self.__state_variables[name].set_value_by_selector(
+            selector, value)
+        self.__initial_state_variables[name].set_value_by_selector(
+            selector, value)
 
     @overrides(PopulationApplicationVertex.get_state_variables)
     def get_state_variables(self):
