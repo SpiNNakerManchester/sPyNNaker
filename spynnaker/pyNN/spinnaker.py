@@ -29,7 +29,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.interface.provenance import (
-    DATA_GENERATION, LOADING, MAPPING, ProvenanceWriter, RUN_LOOP, FecTimer)
+    FecTimer, ProvenanceWriter)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
