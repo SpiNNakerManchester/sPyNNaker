@@ -95,12 +95,11 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             # Merge edges with the same source
             for (_, vertex_slice), edge_list in edges_for_source.items():
-                group_key = edge_list[0][1].first_key
-                group_mask = edge_list[0][1].first_mask
+                group_key = edge_list[0][1].key
+                group_mask = edge_list[0][1].mask
                 for _, r_info in edge_list:
                     group_key, group_mask = self.__merge_key_and_mask(
-                        group_key, group_mask, r_info.first_key,
-                        r_info.first_mask)
+                        group_key, group_mask, r_info.key, r_info.mask)
                 incoming_info.append(
                     (incoming, vertex_slice, group_key, group_mask))
 
