@@ -70,11 +70,8 @@
 
 <span class="sd">        :param PartitionRoutingInfo r_info: The routing information to add</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">key_and_mask</span> <span class="ow">in</span> <span class="n">r_info</span><span class="o">.</span><span class="n">keys_and_masks</span><span class="p">:</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">mask</span>
-            <span class="n">n_keys</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_trailing_0s</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_elements</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">n_keys</span><span class="p">)</span></div>
+        <span class="n">n_keys</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_trailing_0s</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_elements</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">n_keys</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KeySpaceTracker.is_allocated"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.key_space_tracker.KeySpaceTracker.is_allocated">[docs]</a>    <span class="k">def</span> <span class="nf">is_allocated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">n_keys</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine if any of the keys in the mask are allocated</span>

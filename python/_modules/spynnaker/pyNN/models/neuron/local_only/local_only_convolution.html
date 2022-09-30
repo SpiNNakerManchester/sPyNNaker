@@ -217,14 +217,14 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
                     <span class="n">slice_sources</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-                <span class="n">group_key</span> <span class="o">=</span> <span class="n">r_info</span><span class="o">.</span><span class="n">first_key</span>
-                <span class="n">group_mask</span> <span class="o">=</span> <span class="n">r_info</span><span class="o">.</span><span class="n">first_mask</span>
+                <span class="n">group_key</span> <span class="o">=</span> <span class="n">r_info</span><span class="o">.</span><span class="n">key</span>
+                <span class="n">group_mask</span> <span class="o">=</span> <span class="n">r_info</span><span class="o">.</span><span class="n">mask</span>
                 <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">slice_sources</span><span class="p">:</span>
                     <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
                         <span class="n">source</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
                     <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__merge_key_and_mask</span><span class="p">(</span>
-                        <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span><span class="p">,</span> <span class="n">r_info</span><span class="o">.</span><span class="n">first_key</span><span class="p">,</span>
-                        <span class="n">r_info</span><span class="o">.</span><span class="n">first_mask</span><span class="p">)</span>
+                        <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span><span class="p">,</span> <span class="n">r_info</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                        <span class="n">r_info</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
                 <span class="n">key_source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span>
                     <span class="n">incoming</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span><span class="p">)</span>
                 <span class="n">key_cache</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">key_source</span>

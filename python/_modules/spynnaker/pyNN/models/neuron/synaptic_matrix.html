@@ -261,7 +261,7 @@
         <span class="c1"># If we have routing info but no synapses, write an invalid entry</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_n_synapses</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_invalid_machine_entry</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">first_key_and_mask</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">single_addr</span>
 
         <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">row_data</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
@@ -277,7 +277,7 @@
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">write_padding</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_machine_entry</span><span class="p">(</span>
             <span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">first_key_and_mask</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">row_data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span> <span class="o">=</span> <span class="n">block_addr</span>
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next_addr</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrix_size</span><span class="p">)</span>
@@ -301,7 +301,7 @@
         <span class="c1"># If we have routing info but no synapses, write an invalid entry</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_n_synapses</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__delay_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_invalid_machine_entry</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__delay_routing_info</span><span class="o">.</span><span class="n">first_key_and_mask</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__delay_routing_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">block_addr</span>
 
         <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">row_data</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
@@ -312,7 +312,7 @@
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">write_padding</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_machine_entry</span><span class="p">(</span>
             <span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delay_routing_info</span><span class="o">.</span><span class="n">first_key_and_mask</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__delay_routing_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">row_data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_syn_mat_offset</span> <span class="o">=</span> <span class="n">block_addr</span>
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next_addr</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_matrix_size</span><span class="p">)</span>
@@ -336,7 +336,7 @@
                 <span class="n">data_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__single_matrix_size</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_machine_entry</span><span class="p">(</span>
             <span class="n">single_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">first_key_and_mask</span><span class="p">,</span> <span class="n">is_single</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">,</span> <span class="n">is_single</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">single_synapses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">single_rows</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span> <span class="o">=</span> <span class="n">single_addr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__is_single</span> <span class="o">=</span> <span class="kc">True</span>
@@ -359,7 +359,7 @@
         <span class="c1"># If we have routing info but no synapses, add an invalid entry</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_n_synapses</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_invalid_machine_entry</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">first_key_and_mask</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">SYN_REGION_UNUSED</span>
 
         <span class="c1"># Otherwise add a master population table entry for the incoming</span>
@@ -367,7 +367,7 @@
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">get_next_allowed_address</span><span class="p">(</span><span class="n">block_addr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_machine_entry</span><span class="p">(</span>
             <span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">first_key_and_mask</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span> <span class="o">=</span> <span class="n">block_addr</span>
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next_addr</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrix_size</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span></div>
@@ -388,7 +388,7 @@
         <span class="c1"># If we have routing info but no synapses, add an invalid entry</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_n_synapses</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__delay_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_invalid_machine_entry</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__delay_routing_info</span><span class="o">.</span><span class="n">first_key_and_mask</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__delay_routing_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">SYN_REGION_UNUSED</span>
 
         <span class="c1"># Otherwise add a master population table entry for the incoming</span>
@@ -396,7 +396,7 @@
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">get_next_allowed_address</span><span class="p">(</span><span class="n">block_addr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">add_machine_entry</span><span class="p">(</span>
             <span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delay_routing_info</span><span class="o">.</span><span class="n">first_key_and_mask</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__delay_routing_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_syn_mat_offset</span> <span class="o">=</span> <span class="n">block_addr</span>
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next_addr</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_matrix_size</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_syn_mat_offset</span></div>

@@ -595,10 +595,10 @@
             <span class="k">if</span> <span class="n">rinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="c1"># Mask is not the same as the last mask?  Doesn&#39;t work</span>
-            <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">first_mask</span> <span class="o">!=</span> <span class="n">mask</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">mask</span> <span class="o">!=</span> <span class="n">mask</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">first_mask</span>
-            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">first_key</span><span class="p">,</span> <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">mask</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -645,10 +645,10 @@
             <span class="k">if</span> <span class="n">rinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="c1"># Mask is not the same as the last mask?  Doesn&#39;t work</span>
-            <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">first_mask</span> <span class="o">!=</span> <span class="n">mask</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">mask</span> <span class="o">!=</span> <span class="n">mask</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">first_mask</span>
-            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">first_key</span><span class="p">,</span> <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">mask</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_key_slices</span><span class="p">(</span>
                 <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span>

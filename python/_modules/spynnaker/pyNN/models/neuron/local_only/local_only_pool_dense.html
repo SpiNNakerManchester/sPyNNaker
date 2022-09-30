@@ -136,12 +136,11 @@
 
             <span class="c1"># Merge edges with the same source</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">),</span> <span class="n">edge_list</span> <span class="ow">in</span> <span class="n">edges_for_source</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">group_key</span> <span class="o">=</span> <span class="n">edge_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">first_key</span>
-                <span class="n">group_mask</span> <span class="o">=</span> <span class="n">edge_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">first_mask</span>
+                <span class="n">group_key</span> <span class="o">=</span> <span class="n">edge_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">key</span>
+                <span class="n">group_mask</span> <span class="o">=</span> <span class="n">edge_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mask</span>
                 <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">r_info</span> <span class="ow">in</span> <span class="n">edge_list</span><span class="p">:</span>
                     <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__merge_key_and_mask</span><span class="p">(</span>
-                        <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span><span class="p">,</span> <span class="n">r_info</span><span class="o">.</span><span class="n">first_key</span><span class="p">,</span>
-                        <span class="n">r_info</span><span class="o">.</span><span class="n">first_mask</span><span class="p">)</span>
+                        <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span><span class="p">,</span> <span class="n">r_info</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">r_info</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
                 <span class="n">incoming_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">(</span><span class="n">incoming</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span><span class="p">))</span>
 
