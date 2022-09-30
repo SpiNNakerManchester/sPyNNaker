@@ -385,13 +385,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_sz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sdram</span> <span class="o">=</span> <span class="n">MultiRegionSDRAM</span><span class="p">()</span>
-            <span class="n">projections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span>
             <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
                 <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">bitfield_filter</span><span class="p">,</span>
-                <span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span><span class="n">projections</span><span class="p">))</span>
+                <span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">))</span>
             <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
                 <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">bitfield_key_map</span><span class="p">,</span>
-                <span class="n">get_estimated_sdram_for_key_region</span><span class="p">(</span><span class="n">projections</span><span class="p">))</span>
+                <span class="n">get_estimated_sdram_for_key_region</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">))</span>
             <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
                 <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">bitfield_builder</span><span class="p">,</span>
                 <span class="n">exact_sdram_for_bit_field_builder_region</span><span class="p">())</span>

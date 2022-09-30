@@ -148,7 +148,7 @@
 
 
 <div class="viewcode-block" id="reserve_bit_field_regions"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions">[docs]</a><span class="k">def</span> <span class="nf">reserve_bit_field_regions</span><span class="p">(</span>
-        <span class="n">spec</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">bit_field_builder_region</span><span class="p">,</span>
+        <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">bit_field_builder_region</span><span class="p">,</span>
         <span class="n">bit_filter_region</span><span class="p">,</span> <span class="n">bit_field_key_region</span><span class="p">,</span>
         <span class="n">bit_field_builder_region_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bit_filter_region_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">bit_field_key_region_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -175,7 +175,8 @@
     <span class="c1"># reserve the final destination for the bitfields</span>
     <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
         <span class="n">region</span><span class="o">=</span><span class="n">bit_filter_region</span><span class="p">,</span>
-        <span class="n">size</span><span class="o">=</span><span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">),</span>
+        <span class="n">size</span><span class="o">=</span><span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span>
+            <span class="n">app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">),</span>
         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bit_field region&quot;</span><span class="p">,</span>
         <span class="n">reference</span><span class="o">=</span><span class="n">bit_filter_region_ref</span><span class="p">)</span>
 
@@ -189,7 +190,8 @@
     <span class="c1"># reserve memory region for the key region</span>
     <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
         <span class="n">region</span><span class="o">=</span><span class="n">bit_field_key_region</span><span class="p">,</span>
-        <span class="n">size</span><span class="o">=</span><span class="n">get_estimated_sdram_for_key_region</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">),</span>
+        <span class="n">size</span><span class="o">=</span><span class="n">get_estimated_sdram_for_key_region</span><span class="p">(</span>
+            <span class="n">app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">),</span>
         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bit field key data&quot;</span><span class="p">,</span>
         <span class="n">reference</span><span class="o">=</span><span class="n">bit_field_key_region_ref</span><span class="p">)</span></div>
 
