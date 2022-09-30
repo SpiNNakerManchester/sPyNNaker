@@ -229,7 +229,7 @@ def write_bitfield_init_data(
     for source_vertex, n_atoms, n_atoms_per_core in sources:
         r_info = routing_info.get_routing_info_from_pre_vertex(
             source_vertex, SPIKE_PARTITION_ID)
-        spec.write_value(r_info.first)
+        spec.write_value(r_info.key)
         spec.write_value(n_atoms)
         if len(source_vertex.machine_vertices) > 1:
             spec.write_value(r_info.n_bits_atoms | (n_atoms_per_core << 5))
