@@ -220,7 +220,7 @@ class SynapticMatrix(object):
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
             self.__index = self.__poptable.add_invalid_machine_entry(
-                self.__routing_info.first_key_and_mask)
+                self.__routing_info.key_and_mask)
             return block_addr, single_addr
 
         size = len(row_data) * BYTES_PER_WORD
@@ -236,7 +236,7 @@ class SynapticMatrix(object):
         block_addr = self.__poptable.write_padding(spec, block_addr)
         self.__index = self.__poptable.add_machine_entry(
             block_addr, self.__max_row_info.undelayed_max_words,
-            self.__routing_info.first_key_and_mask)
+            self.__routing_info.key_and_mask)
         spec.write_array(row_data)
         self.__syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
@@ -260,7 +260,7 @@ class SynapticMatrix(object):
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
             self.__delay_index = self.__poptable.add_invalid_machine_entry(
-                self.__delay_routing_info.first_key_and_mask)
+                self.__delay_routing_info.key_and_mask)
             return block_addr
 
         size = len(row_data) * BYTES_PER_WORD
@@ -271,7 +271,7 @@ class SynapticMatrix(object):
         block_addr = self.__poptable.write_padding(spec, block_addr)
         self.__delay_index = self.__poptable.add_machine_entry(
             block_addr, self.__max_row_info.delayed_max_words,
-            self.__delay_routing_info.first_key_and_mask)
+            self.__delay_routing_info.key_and_mask)
         spec.write_array(row_data)
         self.__delay_syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
@@ -295,7 +295,7 @@ class SynapticMatrix(object):
                 data_size, self.__single_matrix_size))
         self.__index = self.__poptable.add_machine_entry(
             single_addr, self.__max_row_info.undelayed_max_words,
-            self.__routing_info.first_key_and_mask, is_single=True)
+            self.__routing_info.key_and_mask, is_single=True)
         single_synapses.append(single_rows)
         self.__syn_mat_offset = single_addr
         self.__is_single = True
@@ -318,7 +318,7 @@ class SynapticMatrix(object):
         # If we have routing info but no synapses, add an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
             self.__index = self.__poptable.add_invalid_machine_entry(
-                self.__routing_info.first_key_and_mask)
+                self.__routing_info.key_and_mask)
             return block_addr, SYN_REGION_UNUSED
 
         # Otherwise add a master population table entry for the incoming
@@ -326,7 +326,7 @@ class SynapticMatrix(object):
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
         self.__index = self.__poptable.add_machine_entry(
             block_addr, self.__max_row_info.undelayed_max_words,
-            self.__routing_info.first_key_and_mask)
+            self.__routing_info.key_and_mask)
         self.__syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
         return block_addr, self.__syn_mat_offset
@@ -347,7 +347,7 @@ class SynapticMatrix(object):
         # If we have routing info but no synapses, add an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
             self.__delay_index = self.__poptable.add_invalid_machine_entry(
-                self.__delay_routing_info.first_key_and_mask)
+                self.__delay_routing_info.key_and_mask)
             return block_addr, SYN_REGION_UNUSED
 
         # Otherwise add a master population table entry for the incoming
@@ -355,7 +355,7 @@ class SynapticMatrix(object):
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
         self.__delay_index = self.__poptable.add_machine_entry(
             block_addr, self.__max_row_info.delayed_max_words,
-            self.__delay_routing_info.first_key_and_mask)
+            self.__delay_routing_info.key_and_mask)
         self.__delay_syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
         return block_addr, self.__delay_syn_mat_offset

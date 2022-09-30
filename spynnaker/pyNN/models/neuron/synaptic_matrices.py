@@ -554,10 +554,10 @@ class SynapticMatrices(object):
             if rinfo is None:
                 return None
             # Mask is not the same as the last mask?  Doesn't work
-            if mask is not None and rinfo.first_mask != mask:
+            if mask is not None and rinfo.mask != mask:
                 return None
-            mask = rinfo.first_mask
-            keys.append((rinfo.first_key, m_vertex.vertex_slice))
+            mask = rinfo.mask
+            keys.append((rinfo.key, m_vertex.vertex_slice))
 
         if mask is None:
             return None
@@ -604,10 +604,10 @@ class SynapticMatrices(object):
             if rinfo is None:
                 return None
             # Mask is not the same as the last mask?  Doesn't work
-            if mask is not None and rinfo.first_mask != mask:
+            if mask is not None and rinfo.mask != mask:
                 return None
-            mask = rinfo.first_mask
-            keys.append((rinfo.first_key, m_vertex.vertex_slice))
+            mask = rinfo.mask
+            keys.append((rinfo.key, m_vertex.vertex_slice))
 
         if not self.__check_key_slices(
                 app_edge.pre_vertex.n_atoms, pre_slices,
