@@ -107,7 +107,7 @@ def exact_sdram_for_bit_field_builder_region():
 
 
 def reserve_bit_field_regions(
-        spec, incoming_projections, bit_field_builder_region,
+        spec, app_vertex, bit_field_builder_region,
         bit_filter_region, bit_field_key_region,
         bit_field_builder_region_ref=None, bit_filter_region_ref=None,
         bit_field_key_region_ref=None):
@@ -134,7 +134,8 @@ def reserve_bit_field_regions(
     # reserve the final destination for the bitfields
     spec.reserve_memory_region(
         region=bit_filter_region,
-        size=get_estimated_sdram_for_bit_field_region(incoming_projections),
+        size=get_estimated_sdram_for_bit_field_region(
+            app_vertex.incoming_projections),
         label="bit_field region",
         reference=bit_filter_region_ref)
 
@@ -148,7 +149,8 @@ def reserve_bit_field_regions(
     # reserve memory region for the key region
     spec.reserve_memory_region(
         region=bit_field_key_region,
-        size=get_estimated_sdram_for_key_region(incoming_projections),
+        size=get_estimated_sdram_for_key_region(
+            app_vertex.incoming_projections),
         label="bit field key data",
         reference=bit_field_key_region_ref)
 

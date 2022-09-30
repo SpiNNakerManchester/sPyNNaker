@@ -159,15 +159,14 @@ class PopulationMachineSynapses(
         :param int all_syn_block_sz: The maximum size of the synapses in bytes
         :param int structural_sz: The size of the structural data
         """
-        # Get incoming projections
-        incoming = self._app_vertex.incoming_projections
 
         # Write the synapse parameters
         self._write_synapse_parameters(spec, ring_buffer_shifts)
 
         # Write the synaptic matrices
         self._synaptic_matrices.write_synaptic_data(
-            spec, incoming, all_syn_block_sz, weight_scales)
+            spec, self._app_vertex.incoming_projections, all_syn_block_sz,
+            weight_scales)
 
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics
@@ -206,14 +205,15 @@ class PopulationMachineSynapses(
         # write up the bitfield builder data
         # reserve bit field region
         bit_field_utilities.reserve_bit_field_regions(
-            spec, incoming, self._synapse_regions.bitfield_builder,
+            spec, self._app_vertex,
+            self._synapse_regions.bitfield_builder,
             self._synapse_regions.bitfield_filter,
             self._synapse_regions.bitfield_key_map,
             self._synapse_references.bitfield_builder,
             self._synapse_references.bitfield_filter,
             self._synapse_references.bitfield_key_map)
         bit_field_utilities.write_bitfield_init_data(
-            spec, incoming,
+            spec, self._app_vertex.incoming_projections,
             self._synapse_regions.bitfield_builder,
             self._synapse_regions.pop_table,
             self._synapse_regions.synaptic_matrix,

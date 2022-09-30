@@ -344,13 +344,14 @@ class SplitterAbstractPopulationVertexFixed(
         """
         if self.__bitfield_sz is None:
             sdram = MultiRegionSDRAM()
-            projections = self._governed_app_vertex.incoming_projections
             sdram.add_cost(
                 PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_filter,
-                get_estimated_sdram_for_bit_field_region(projections))
+                get_estimated_sdram_for_bit_field_region(
+                    self._governed_app_vertex.incoming_projections))
             sdram.add_cost(
                 PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_key_map,
-                get_estimated_sdram_for_key_region(projections))
+                get_estimated_sdram_for_key_region(
+                    self._governed_app_vertex.incoming_projections))
             sdram.add_cost(
                 PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_builder,
                 exact_sdram_for_bit_field_builder_region())
