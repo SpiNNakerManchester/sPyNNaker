@@ -355,7 +355,7 @@ static void neuron_impl_store_neuron_parameters(
 		for (uint32_t i = 0; i < n_neurons; i++) {
 			neuron_model_save_state(&neuron_array[i], &params[i]);
 		}
-        next += n_words_needed(n_neurons * sizeof(neuron_t));
+        next += n_words_needed(n_neurons * sizeof(neuron_params_t));
     }
 
     if (sizeof(input_type_t)) {
@@ -363,7 +363,7 @@ static void neuron_impl_store_neuron_parameters(
 		for (uint32_t i = 0; i < n_neurons; i++) {
 			input_type_save_state(&input_type_array[i], &params[i]);
 		}
-        next += n_words_needed(n_neurons * sizeof(input_type_t));
+        next += n_words_needed(n_neurons * sizeof(input_type_params_t));
     }
 
     if (sizeof(threshold_type_t)) {
@@ -371,7 +371,7 @@ static void neuron_impl_store_neuron_parameters(
         for (uint32_t i = 0; i < n_neurons; i++) {
         	threshold_type_save_state(&threshold_type_array[i], &params[i]);
         }
-        next += n_words_needed(n_neurons * sizeof(threshold_type_t));
+        next += n_words_needed(n_neurons * sizeof(threshold_type_params_t));
     }
 
     if (sizeof(synapse_types_t)) {
@@ -379,7 +379,7 @@ static void neuron_impl_store_neuron_parameters(
 		for (uint32_t i = 0; i < n_neurons; i++) {
 			synapse_types_save_state(&synapse_types_array[i], &params[i]);
 		}
-        next += n_words_needed(n_neurons * sizeof(synapse_types_t));
+        next += n_words_needed(n_neurons * sizeof(synapse_types_params_t));
     }
 
     if (sizeof(additional_input_t)) {
@@ -387,7 +387,7 @@ static void neuron_impl_store_neuron_parameters(
 		for (uint32_t i = 0; i < n_neurons; i++) {
 			additional_input_save_state(&additional_input_array[i], &params[i]);
 		}
-        next += n_words_needed(n_neurons * sizeof(additional_input_t));
+        next += n_words_needed(n_neurons * sizeof(additional_input_params_t));
     }
 }
 
