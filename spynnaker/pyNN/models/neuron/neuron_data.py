@@ -152,14 +152,17 @@ class NeuronData(object):
         # If we get here, we know everything is generated on machine
         self.__gen_on_machine = True
 
-    def write_data(self, spec, vertex_slice, neuron_regions):
+    def write_data(
+            self, spec, vertex_slice, neuron_regions, gen_on_machine=True):
         """ Write the generated data
 
         :param DataSpecificationGenerator spec: The spec to write to
         :param Slice vertex_slice: The vertex_slice to generate for
         :param NeuronRegions neuron_regions: The regions to write to
+        :param bool gen_on_machine: Whether to allow generation on machine
         """
-        self.generate_data()
+        if gen_on_machine:
+            self.generate_data()
         spec.reserve_memory_region(
             region=neuron_regions.neuron_params,
             size=self.__app_vertex.get_sdram_usage_for_neuron_params(
@@ -171,7 +174,7 @@ class NeuronData(object):
             size=neuron_recorder.get_metadata_sdram_usage_in_bytes(
                 vertex_slice.n_atoms),
             label="neuron recording")
-        if self.gen_on_machine:
+        if self.gen_on_machine and gen_on_machine:
             if self.__neuron_data is not None:
                 data = self.__neuron_data
                 n_structs = self.__neuron_data_n_structs

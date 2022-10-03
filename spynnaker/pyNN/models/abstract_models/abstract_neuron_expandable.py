@@ -56,3 +56,10 @@ class AbstractNeuronExpandable(object, metaclass=AbstractBase):
         :param ~pacman.model.placements.Placement placement:
             Where the data is on the machine
         """
+
+    @abstractmethod
+    def do_neuron_regeneration(self):
+        """ Determine whether neuron *regeneration* is required
+
+        :rtype: bool
+        """

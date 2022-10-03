@@ -432,7 +432,7 @@ bool spike_processing_initialise( // EXPORTED
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
         if (dma_buffers[i].row == NULL) {
-            log_error("Could not initialise DMA buffers");
+            log_error("Could not initialise DMA buffers with %u words", row_max_n_words);
             return false;
         }
     }

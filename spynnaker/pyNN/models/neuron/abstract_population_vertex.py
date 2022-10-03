@@ -1346,12 +1346,12 @@ class AbstractPopulationVertex(
     def __tell_neuron_vertices_to_regenerate(self):
         for vertex in self.machine_vertices:
             if isinstance(vertex, PopulationMachineNeurons):
-                vertex.do_neuron_regeneration()
+                vertex.set_do_neuron_regeneration()
 
     def __tell_synapse_vertices_to_regenerate(self):
         for vertex in self.machine_vertices:
             if isinstance(vertex, PopulationMachineSynapses):
-                vertex.do_synapse_regeneration()
+                vertex.set_do_synapse_regeneration()
 
 
 class _Stats(object):

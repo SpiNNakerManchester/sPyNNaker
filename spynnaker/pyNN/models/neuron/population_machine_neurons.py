@@ -126,7 +126,7 @@ class PopulationMachineNeurons(
         """
 
     @abstractmethod
-    def do_neuron_regeneration(self):
+    def set_do_neuron_regeneration(self):
         """ Indicate that data re-generation of neuron parameters is required
         """
 
@@ -185,9 +185,16 @@ class PopulationMachineNeurons(
         # Write the current source parameters
         self._write_current_source_parameters(spec)
 
-        # Write the other parameters
+        # If we haven't reset, we can't generate on the machine, as we can't
+        # run the neuron expander
+        gen_on_machine = False
+        if SpynnakerDataView.is_soft_reset():
+            gen_on_machine = True
+
+        # Write the other parameters after forcing a regeneration
+        self._neuron_data.reset_generation()
         self._neuron_data.write_data(
-            spec, self._vertex_slice, self._neuron_regions)
+            spec, self._vertex_slice, self._neuron_regions, gen_on_machine)
 
     def _write_neuron_core_parameters(self, spec, ring_buffer_shifts):
         """ Write the neuron parameters region

@@ -389,10 +389,18 @@ class PopulationMachineVertex(
                 x, y, p, self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME,
                 prov.max_size_input_buffer)
 
+    @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
+    def set_do_neuron_regeneration(self):
+        self.__regenerate_neuron_data = True
+
+    @overrides(PopulationMachineSynapses.set_do_synapse_regeneration)
+    def set_do_synapse_regeneration(self):
+        self.__regenerate_synapse_data = True
+
     @overrides(PopulationMachineNeurons.do_neuron_regeneration)
     def do_neuron_regeneration(self):
-        self.__regenerate_neuron_data = True
+        return self.__regenerate_neuron_data
 
     @overrides(PopulationMachineSynapses.do_synapse_regeneration)
     def do_synapse_regeneration(self):
-        self.__regenerate_synapse_data = True
+        return self.__regenerate_synapse_data

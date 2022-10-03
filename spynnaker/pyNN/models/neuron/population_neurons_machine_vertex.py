@@ -288,6 +288,10 @@ class PopulationNeuronsMachineVertex(
         raise SynapticConfigurationException(
             "Unknown pre vertex type in edge {}".format(sdram_machine_edge))
 
+    @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
+    def set_do_neuron_regeneration(self):
+        self.__regenerate_data = True
+
     @overrides(PopulationMachineNeurons.do_neuron_regeneration)
     def do_neuron_regeneration(self):
-        self.__regenerate_data = True
+        return self.__regenerate_data

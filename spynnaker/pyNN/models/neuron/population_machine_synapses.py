@@ -82,7 +82,7 @@ class PopulationMachineSynapses(
         """
 
     @abstractmethod
-    def do_synapse_regeneration(self):
+    def set_do_synapse_regeneration(self):
         """ Indicates that synaptic data regeneration is required
         """
 

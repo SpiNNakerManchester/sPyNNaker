@@ -45,28 +45,25 @@ class TestInitialize(BaseTestCase):
         self.assertEquals([-62, -62, -62], pop.initial_values["v"])
         id_mixin = pop[1]
         id_mixin.initialize(v=-60)
-        # v on not changed is now the current state not initial value
-        self.assertNotEqual(-60, pop.initial_values["v"][0])
-        self.assertNotEqual(-62, pop.initial_values["v"][0])
+        # v on not changed is still the initial value
+        self.assertEquals(-62, pop.initial_values["v"][0])
         self.assertEquals(-60, pop.initial_values["v"][1])
-        self.assertNotEqual(-60, pop.initial_values["v"][2])
-        self.assertNotEqual(-62, pop.initial_values["v"][2])
+        self.assertEquals(-62, pop.initial_values["v"][2])
         p.run(runtime3)
 
         p.reset()
-        self.assertEquals([-64, -64, -64], pop.initial_values["v"])
+        self.assertEquals([-62, -60, -62], pop.initial_values["v"])
         pop.initialize(isyn_exc=-0.1)
-        self.assertEquals([-64, -64, -64], pop.initial_values["v"])
+        self.assertEquals([-62, -60, -62], pop.initial_values["v"])
         p.run(runtime1)
-        self.assertEquals([-64, -64, -64], pop.initial_values["v"])
+        self.assertEquals([-62, -60, -62], pop.initial_values["v"])
         view = pop[0:2]
         view.initialize(v=-63)
         self.assertEquals(-63, pop.initial_values["v"][0])
         self.assertEquals(-63, pop.initial_values["v"][1])
 
-        # v on not changed is now the current state not initial value
-        self.assertNotEqual(-63, pop.initial_values["v"][2])
-        self.assertNotEqual(-64, pop.initial_values["v"][2])
+        # v for the unchanged item is unchanged
+        self.asserEqual(-62, pop.initial_values["v"][2])
         p.run(runtime2)
 
         neo = pop.get_data('v')
