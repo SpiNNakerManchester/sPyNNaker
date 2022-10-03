@@ -20,6 +20,7 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.utilities.algorithm_utilities\
     .partition_algorithm_utilities import get_multidimensional_slices
+from pacman.utilities.utility_calls import get_n_bits_for_fields
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex,
     PopulationMachineLocalOnlyCombinedVertex, LocalOnlyProvenance)
@@ -38,6 +39,12 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from collections import defaultdict
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
+
+# The maximum number of bits for the ring buffer index that are likely to
+# fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
+MAX_RING_BUFFER_BITS = 14
 
 
 class SplitterAbstractPopulationVertexFixed(
@@ -97,6 +104,23 @@ class SplitterAbstractPopulationVertexFixed(
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
         app_vertex = self._governed_app_vertex
+
+        # Do some checks to make sure everything is likely to fit
+        field_sizes = [
+            min(max_atoms, n) for max_atoms, n in zip(
+                app_vertex.get_max_atoms_per_dimension_per_core(),
+                app_vertex.atoms_shape)]
+        n_atom_bits = get_n_bits_for_fields(field_sizes)
+        n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
+        if (n_atom_bits + get_n_bits(n_synapse_types) +
+                get_n_bits(self.max_support_delay())) > MAX_RING_BUFFER_BITS:
+            raise SynapticConfigurationException(
+                "The combination of the number of neurons per core ({}), "
+                "the number of synapse types ({}), and the maximum delay per "
+                "core ({}) will require too much DTCM.  Please reduce one or "
+                "more of these values.".format(
+                    field_sizes, n_synapse_types, self.max_support_delay()))
+
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
 
