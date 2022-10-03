@@ -16,6 +16,12 @@
 # Alternative implementation for
 # https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/common/populations.py
 
+import logging
+from spinn_utilities.logger_utils import warn_once
+from spinn_utilities.log import FormatAdapter
+
+logger = FormatAdapter(logging.getLogger(__name__))
+
 
 class IDMixin(object):
     """
@@ -81,6 +87,14 @@ class IDMixin(object):
     @property
     def initial_values(self):
         return self.__vertex.get_initial_state_values(
+            self.__vertex.get_state_variables(), self.__id)
+
+    @property
+    def current_values(self):
+        warn_once(
+            logger, "current_values is non-standard PyNN and therefore "
+            "will not be portable to other simulators.")
+        return self.__vertex.get_current_state_values(
             self.__vertex.get_state_variables(), self.__id)
 
     def __getattr__(self, name):
@@ -179,6 +193,38 @@ class IDMixin(object):
         """
         for variable, value in initial_values.items():
             self.__vertex.set_initial_state_values(variable, value, self.__id)
+
+    def get_current_value(self, variable):
+        """ Get the current value of a state variable of the cell.
+
+        :param str variable: The name of the variable
+        :rtype: float
+        """
+        warn_once(
+            logger, "get_current_value is non-standard PyNN and therefore "
+            "will not be portable to other simulators.")
+        return self.__vertex.get_current_state_values(variable, self.__id)
+
+    def set_current_value(self, variable, value):
+        """ Set the current value of a state variable of the cell.
+
+        :param str variable: The name of the variable
+        :param float value: The value of the variable
+        """
+        warn_once(
+            logger, "set_current_value is non-standard PyNN and therefore "
+            "will not be portable to other simulators.")
+        self.__vertex.set_current_state_values(variable, value, self.__id)
+
+    def set_state(self, **initial_values):
+        """ Set the current value of a state variable of the cell.
+
+        """
+        warn_once(
+            logger, "set_state is non-standard PyNN and therefore "
+            "will not be portable to other simulators.")
+        for variable, value in initial_values.items():
+            self.__vertex.set_current_state_values(variable, value, self.__id)
 
     def as_view(self):
         """ Return a PopulationView containing just this cell.

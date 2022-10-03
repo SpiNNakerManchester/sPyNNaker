@@ -192,7 +192,6 @@ class PopulationMachineNeurons(
             gen_on_machine = True
 
         # Write the other parameters after forcing a regeneration
-        self._neuron_data.reset_generation()
         self._neuron_data.write_data(
             spec, self._vertex_slice, self._neuron_regions, gen_on_machine)
 

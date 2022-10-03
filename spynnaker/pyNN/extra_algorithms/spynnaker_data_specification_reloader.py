@@ -46,31 +46,47 @@ def spynnaker_data_specification_reloader():
     neuron_expander_cores = ExecutableTargets()
     neuron_expandables = list()
     normal_cores = ExecutableTargets()
+    placements_to_free = set()
     for pl in progress.over(SpynnakerDataView.iterate_placemements()):
         # Generate the data spec for the placement if needed
         if regenerate_data_spec(pl, data_dir):
-            if isinstance(pl.vertex, AbstractHasAssociatedBinary):
-                vertex_bin = SpynnakerDataView.get_executable_path(
-                    pl.vertex.get_binary_file_name())
-                normal_cores.add_processor(
-                    vertex_bin, pl.x, pl.y, pl.p,
-                    pl.vertex.get_binary_start_type())
+            is_expanded = False
             if isinstance(pl.vertex, AbstractSynapseExpandable):
                 if (pl.vertex.do_synapse_regeneration() and
                         pl.vertex.gen_on_machine()):
                     synapse_expandables.append(pl)
                     synapse_expander_cores.add_processor(
                         synapse_bin, pl.x, pl.y, pl.p, ExecutableType.SYSTEM)
+                    is_expanded = True
             if isinstance(pl.vertex, AbstractNeuronExpandable):
                 if (pl.vertex.do_neuron_regeneration() and
                         pl.vertex.gen_neurons_on_machine()):
                     neuron_expandables.append(pl)
                     neuron_expander_cores.add_processor(
                         neuron_bin, pl.x, pl.y, pl.p, ExecutableType.SYSTEM)
+                    is_expanded = True
+            if is_expanded:
+                if isinstance(pl.vertex, AbstractHasAssociatedBinary):
+                    vertex_bin = SpynnakerDataView.get_executable_path(
+                        pl.vertex.get_binary_file_name())
+                    normal_cores.add_processor(
+                        vertex_bin, pl.x, pl.y, pl.p,
+                        pl.vertex.get_binary_start_type())
+                    placements_to_free.add(pl)
 
     # If we didn't do a reset, we can't re-run the expander
     if not SpynnakerDataView.is_soft_reset():
         return
+
+    # Free recorded data on placements that will be restarted
+    buffer_manager = SpynnakerDataView.get_buffer_manager()
+    txrx = SpynnakerDataView.get_transceiver()
+    app_id = SpynnakerDataView.get_app_id()
+    for pl in placements_to_free:
+        for region in pl.get_recorded_region_ids():
+            addr = buffer_manager.get_recording_address(pl, region)
+            if addr is not None:
+                txrx.free_sdram(pl.x, pl.y, addr, app_id)
 
     expander_app_id = SpynnakerDataView.get_new_id()
     progress = ProgressBar(synapse_expander_cores.total_processors,

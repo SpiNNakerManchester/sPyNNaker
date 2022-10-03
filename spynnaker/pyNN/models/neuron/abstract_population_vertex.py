@@ -613,6 +613,30 @@ class AbstractPopulationVertex(
     @overrides(PopulationApplicationVertex.set_initial_state_values)
     def set_initial_state_values(self, name, value, selector=None):
         self._check_variables([name], set(self.__state_variables.keys()))
+        if not SpynnakerDataView.is_ran_last():
+            self.__state_variables[name].set_value_by_selector(
+                selector, value)
+        self.__initial_state_variables[name].set_value_by_selector(
+            selector, value)
+
+    def __read_current_state_variable(self, name, selector=None):
+        return self.__state_variables[name].get_values(selector)
+
+    @overrides(PopulationApplicationVertex.get_current_state_values)
+    def get_current_state_values(self, names, selector=None):
+        self._check_variables(names, set(self.__state_variables.keys()))
+        # If we haven't yet run, or have just reset, note to read the values
+        # when they are ready
+        if not SpynnakerDataView.is_ran_last():
+            self.__read_initial_values = True
+        else:
+            self.__read_parameters_now()
+        return ParameterHolder(
+            names, self.__read_current_state_variable, selector)
+
+    @overrides(PopulationApplicationVertex.set_current_state_values)
+    def set_current_state_values(self, name, value, selector=None):
+        self._check_variables([name], set(self.__state_variables.keys()))
         # If we have run, and not reset, we need to read the values back
         # so that we don't overwrite all the state.  Note that a reset will
         # then make this a waste, but we can't see the future...
@@ -621,8 +645,6 @@ class AbstractPopulationVertex(
             SpynnakerDataView.set_requires_data_generation()
             self.__tell_neuron_vertices_to_regenerate()
         self.__state_variables[name].set_value_by_selector(
-            selector, value)
-        self.__initial_state_variables[name].set_value_by_selector(
             selector, value)
 
     @overrides(PopulationApplicationVertex.get_state_variables)

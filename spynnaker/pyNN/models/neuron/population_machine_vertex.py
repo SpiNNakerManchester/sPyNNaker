@@ -392,6 +392,7 @@ class PopulationMachineVertex(
     @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
     def set_do_neuron_regeneration(self):
         self.__regenerate_neuron_data = True
+        self.__neuron_data.reset_generation()
 
     @overrides(PopulationMachineSynapses.set_do_synapse_regeneration)
     def set_do_synapse_regeneration(self):

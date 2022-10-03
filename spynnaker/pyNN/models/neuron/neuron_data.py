@@ -38,7 +38,7 @@ def _all_one_val_gen(rd):
             if not rd[key].range_based():
                 return False
             for i, (_start, _stop, val) in enumerate(rd[key].iter_ranges()):
-                if i > 1:
+                if i > 0:
                     return False
                 if not is_param_generatable(val):
                     return False
@@ -134,8 +134,9 @@ class NeuronData(object):
 
         # Check that all parameters and state variables have a single range
         if (not _all_one_val_gen(params) or not _all_one_val_gen(state_vars)):
-            # Note at this point, we might still be able to generate ranges
-            # on machine
+            # Note at this point, we can still generate ranges on machine,
+            # just that it has to be different per core
+            self.__gen_on_machine = None
             return
 
         # Go through all the structs and make all the data
@@ -335,8 +336,11 @@ class NeuronData(object):
     def reset_generation(self):
         """ Reset generation so it is done again
         """
-        self.__gen_on_machine = None
+        self.__neuron_data = None
+        self.__neuron_recording_data = None
         self.__generation_done = False
+        self.__gen_on_machine = None
+        self.__neuron_data_n_structs = 0
 
 
 class _MergedDict(object):

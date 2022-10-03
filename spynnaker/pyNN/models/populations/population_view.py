@@ -130,6 +130,18 @@ class PopulationView(PopulationBase):
             self.__vertex.get_state_variables(), self.__indexes)
 
     @property
+    def current_values(self):
+        """ A dict containing the initial values of the state variables.
+
+        :rtype: InitialValuesHolder
+        """
+        warn_once(
+            logger, "current_values is non-standard PyNN and therefore "
+            "will not be portable to other simulators.")
+        return self.__vertex.get_current_state_values(
+            self.__vertex.get_state_variables(), self.__indexes)
+
+    @property
     def parent(self):
         """ A reference to the parent Population (that this is a view of).
 
@@ -429,6 +441,33 @@ class PopulationView(PopulationBase):
 
         for variable, value in initial_values.items():
             self.__vertex.set_initial_state_values(
+                variable, value, self.__indexes)
+
+    def set_state(self, **initial_values):
+        """ Set current values of state variables, e.g. the membrane\
+            potential.  Values passed to ``initialize()`` may be:
+
+        * single numeric values (all neurons set to the same value), or
+        * :py:class:`~pyNN.random.RandomDistribution` objects, or
+        * lists / arrays of numbers of the same size as the population
+          mapping functions, where a mapping function accepts a single
+          argument (the cell index) and returns a single number.
+
+        Values should be expressed in the standard PyNN units (i.e.
+        millivolts, nanoamps, milliseconds, microsiemens, nanofarads,
+        events per second).
+
+        Examples::
+
+            p.set_state(v=-70.0)
+            p.set_state(v=rand_distr, gsyn_exc=0.0)
+            p.set_state(v=lambda i: -65 + i / 10.0)
+        """
+        warn_once(
+            logger, "set_state is non-standard PyNN and therefore "
+            "will not be portable to other simulators.")
+        for variable, value in initial_values.items():
+            self.__vertex.set_current_state_values(
                 variable, value, self.__indexes)
 
     def record(self, variables,  to_file=None, sampling_interval=None):

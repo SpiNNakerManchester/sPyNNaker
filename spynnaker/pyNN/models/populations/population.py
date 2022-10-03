@@ -438,16 +438,65 @@ class Population(PopulationBase):
             p.initialize(v=lambda i: -65 + i / 10.0)
         """
         SpynnakerDataView.check_user_can_act()
+        if SpynnakerDataView.is_ran_last():
+            warn_once(
+                logger, "Calling initialize without reset will have no effect."
+                " If you want to set the current value of a state variable"
+                " consider calling the non-PyNN function set_state instead.")
         for variable, value in kwargs.items():
             self.__vertex.set_initial_state_values(variable, value)
 
     @property
     def initial_values(self):
-        """
+        """ Get the initial values of the state variables.  Note that these
+            values will be the same as the values set with the last call to
+            initialize rather than the actual initial values if this call has
+            been made.
+
         :rtype: InitialValuesHolder
         """
         SpynnakerDataView.check_user_can_act()
         return self.__vertex.get_initial_state_values(
+            self.__vertex.get_state_variables())
+
+    def set_state(self, **kwargs):
+        """ Set current values of state variables, e.g. the membrane\
+            potential.  Values passed to ``set_state()`` may be:
+
+        * single numeric values (all neurons set to the same value), or
+        * :py:class:`~pyNN.random.RandomDistribution` objects, or
+        * lists / arrays of numbers of the same size as the population
+          mapping functions, where a mapping function accepts a single
+          argument (the cell index) and returns a single number.
+
+        Values should be expressed in the standard PyNN units (i.e.
+        millivolts, nanoamps, milliseconds, microsiemens, nanofarads,
+        event per second).
+
+        Examples::
+
+            p.set_state(v=-70.0)
+            p.set_state(v=rand_distr, gsyn_exc=0.0)
+            p.set_state(v=lambda i: -65 + i / 10.0)
+        """
+        SpynnakerDataView.check_user_can_act()
+        warn_once(
+            logger, "set_state is non-standard PyNN and therefore "
+            "will not be portable to other simulators.")
+        for variable, value in kwargs.items():
+            self.__vertex.set_current_state_values(variable, value)
+
+    @property
+    def current_values(self):
+        """ Get the current values of the state variables.
+
+        :rtype: InitialValuesHolder
+        """
+        SpynnakerDataView.check_user_can_act()
+        warn_once(
+            logger, "current_values is non-standard PyNN and therefore "
+            "will not be portable to other simulators.")
+        return self.__vertex.get_current_state_values(
             self.__vertex.get_state_variables())
 
     @property

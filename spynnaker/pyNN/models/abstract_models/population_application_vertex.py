@@ -151,6 +151,38 @@ class PopulationApplicationVertex(ApplicationVertex):
             "This Population does not support the initialization of state"
             " variables")
 
+    def get_current_state_values(self, names, selector=None):
+        """ Get the current values of a state variable for the whole Population
+            or a subset if the selector is used
+
+        :param names: The name or names of the variable to get
+        :type name: str or list
+        :param selector: a description of the subrange to accept, or ``None``
+            for all. See:
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: None or slice or int or list(bool) or list(int)
+        :rtype: ParameterHolder
+        :raise KeyError: if the variable is not something that can be read
+        """
+        raise KeyError(
+            "This Population does not support the reading of state"
+            " variables")
+
+    def set_current_state_values(self, name, value, selector=None):
+        """ Set the current values of a state variable for the whole Population
+            or a subset if the selector is used
+
+        :param str name: The name of the variable to set
+        :param selector: a description of the subrange to accept, or ``None``
+            for all. See:
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: None or slice or int or list(bool) or list(int)
+        :raise KeyError: if the variable is not something that can be changed
+        """
+        raise KeyError(
+            "This Population does not support the setting of state"
+            " variables")
+
     def get_state_variables(self):
         """ Get a list of supported state variables
 
