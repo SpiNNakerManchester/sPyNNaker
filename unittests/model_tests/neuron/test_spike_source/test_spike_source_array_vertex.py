@@ -79,7 +79,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
                 n_neurons=3, spike_times=None,
                 label="test", max_atoms_per_core=None, model=None,
                 splitter=None)
-            v.spike_times = [34] * 35
+            v.set_parameter_values("spike_times", [34] * 35)
             found = False
             for record in lc.records:
                 if "too many spikes" in record.msg.fmt:

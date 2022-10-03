@@ -56,6 +56,12 @@ class SpikeSourceArrayVertex(
     """ Model for play back of spikes
     """
 
+    __slots__ = ["__model_name",
+                 "__model",
+                 "__structure",
+                 "_spike_times",
+                 "__spike_recorder"]
+
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
@@ -82,21 +88,21 @@ class SpikeSourceArrayVertex(
             send_buffer_partition_id=constants.SPIKE_PARTITION_ID,
             splitter=splitter)
 
-        self._check_spike_density()
+        self._check_spike_density(spike_times)
         # handle recording
         self.__spike_recorder = EIEIOSpikeRecorder()
 
-    def _check_spike_density(self):
-        if len(self._spike_times):
-            if hasattr(self._spike_times[0], '__iter__'):
-                self._check_density_double_list()
+    def _check_spike_density(self, spike_times):
+        if len(spike_times):
+            if hasattr(spike_times[0], '__iter__'):
+                self._check_density_double_list(spike_times)
             else:
-                self._check_density_single_list()
+                self._check_density_single_list(spike_times)
         else:
             logger.warning("SpikeSourceArray has no spike times")
 
-    def _check_density_single_list(self):
-        counter = Counter(self._spike_times)
+    def _check_density_single_list(self, spike_times):
+        counter = Counter(spike_times)
         top = counter.most_common(1)
         val, count = top[0]
         if count * self.n_atoms > TOO_MANY_SPIKES:
@@ -113,10 +119,10 @@ class SpikeSourceArrayVertex(
                     f"For example at time {val} {count * self.n_atoms} "
                     f"spikes will be sent")
 
-    def _check_density_double_list(self):
+    def _check_density_double_list(self, spike_times):
         counter = Counter()
         for neuron_id in range(0, self.n_atoms):
-            counter.update(self._spike_times[neuron_id])
+            counter.update(spike_times[neuron_id])
         top = counter.most_common(1)
         val, count = top[0]
         if count > TOO_MANY_SPIKES:
@@ -186,7 +192,7 @@ class SpikeSourceArrayVertex(
             else:
                 self._to_early_spikes_single_list(spike_times)
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
-        self._check_spike_density()
+        self._check_spike_density(spike_times)
 
     def __read_parameter(self, name, selector):
         # pylint: disable=unused-argument
