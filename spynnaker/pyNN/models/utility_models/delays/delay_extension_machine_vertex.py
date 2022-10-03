@@ -265,8 +265,8 @@ class DelayExtensionMachineVertex(
             if source_vertex.vertex_slice == self.vertex_slice:
                 r_info = routing_infos.get_routing_info_from_pre_vertex(
                     source_vertex, SPIKE_PARTITION_ID)
-                incoming_key = r_info.first_key
-                incoming_mask = r_info.first_mask
+                incoming_key = r_info.key
+                incoming_mask = r_info.mask
                 break
 
         self.write_delay_parameters(

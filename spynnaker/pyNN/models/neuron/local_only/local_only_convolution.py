@@ -176,14 +176,14 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             else:
                 r_info = routing_info.get_routing_info_from_pre_vertex(
                     slice_sources[0], SPIKE_PARTITION_ID)
-                group_key = r_info.first_key
-                group_mask = r_info.first_mask
+                group_key = r_info.key
+                group_mask = r_info.mask
                 for source in slice_sources:
                     r_info = routing_info.get_routing_info_from_pre_vertex(
                         source, SPIKE_PARTITION_ID)
                     group_key, group_mask = self.__merge_key_and_mask(
-                        group_key, group_mask, r_info.first_key,
-                        r_info.first_mask)
+                        group_key, group_mask, r_info.key,
+                        r_info.mask)
                 key_source = Source(
                     incoming, vertex_slice, group_key, group_mask)
                 key_cache[vertex_slice] = key_source

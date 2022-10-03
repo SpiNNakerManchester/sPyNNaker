@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import Counter
 import logging
 import numpy
 from spinn_utilities.log import FormatAdapter
@@ -28,6 +29,9 @@ from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from pyNN.space import Grid2D, Grid3D
 
 logger = FormatAdapter(logging.getLogger(__name__))
+
+# Cutoff to warn too many spikes sent at one time
+TOO_MANY_SPIKES = 100
 
 
 def _as_numpy_ticks(times, time_step):
@@ -78,8 +82,48 @@ class SpikeSourceArrayVertex(
             send_buffer_partition_id=constants.SPIKE_PARTITION_ID,
             splitter=splitter)
 
+        self._check_spike_density()
         # handle recording
         self.__spike_recorder = EIEIOSpikeRecorder()
+
+    def _check_spike_density(self):
+        if len(self._spike_times):
+            if hasattr(self._spike_times[0], '__iter__'):
+                self._check_density_double_list()
+            else:
+                self._check_density_single_list()
+        else:
+            logger.warning("SpikeSourceArray has no spike times")
+
+    def _check_density_single_list(self):
+        counter = Counter(self._spike_times)
+        top = counter.most_common(1)
+        val, count = top[0]
+        if count * self.n_atoms > TOO_MANY_SPIKES:
+            if self.n_atoms > 1:
+                logger.warning(
+                    "Danger of SpikeSourceArray sending too many spikes "
+                    "at the same time. "
+                    f"This is because ({self.n_atoms}) neurons "
+                    f"share the same spike list")
+            else:
+                logger.warning(
+                    "Danger of SpikeSourceArray sending too many spikes "
+                    "at the same time. "
+                    f"For example at time {val} {count * self.n_atoms} "
+                    f"spikes will be sent")
+
+    def _check_density_double_list(self):
+        counter = Counter()
+        for neuron_id in range(0, self.n_atoms):
+            counter.update(self._spike_times[neuron_id])
+        top = counter.most_common(1)
+        val, count = top[0]
+        if count > TOO_MANY_SPIKES:
+            logger.warning(
+                "Danger of SpikeSourceArray sending too many spikes "
+                "at the same time. "
+                f"For example at time {val} {count} spikes will be sent")
 
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure):
@@ -142,6 +186,7 @@ class SpikeSourceArrayVertex(
             else:
                 self._to_early_spikes_single_list(spike_times)
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
+        self._check_spike_density()
 
     def __read_parameter(self, name, selector):
         # pylint: disable=unused-argument
