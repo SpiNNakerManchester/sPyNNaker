@@ -65,10 +65,20 @@ def get_n_rates(vertex_slice, rate_data):
         vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
 
 
+def get_params_bytes(n_atoms):
+    """ Gets the size of the Poisson parameters in bytes
+
+    :param int n_atoms: How many atoms to account for
+    :rtype: int
+    """
+    return (PARAMS_BASE_WORDS + n_atoms) * BYTES_PER_WORD
+
+
 def get_rates_bytes(n_atoms, n_rates):
     """ Gets the size of the Poisson rates in bytes
 
-    :param ~pacman.model.graphs.common.Slice vertex_slice:
+    :param int n_atoms: How many atoms to account for
+    :param int n_rates: How many rates to account for
     :rtype: int
     """
     return ((n_atoms * PARAMS_WORDS_PER_NEURON) +
@@ -78,7 +88,8 @@ def get_rates_bytes(n_atoms, n_rates):
 def get_expander_rates_bytes(n_atoms, n_rates):
     """ Gets the size of the Poisson rates in bytes
 
-    :param ~pacman.model.graphs.common.Slice vertex_slice:
+    :param int n_atoms: How many atoms to account for
+    :param int n_rates: How many rates to account for
     :rtype: int
     """
     return ((n_atoms * PARAMS_WORDS_PER_NEURON) +
@@ -100,6 +111,16 @@ def _u3232_to_uint64(array):
     return numpy.round(array * float(DataType.U3232.scale)).astype(
         DataType.U3232.numpy_typename)
 
+
+# 1. uint32_t has_key;
+# 2. uint32_t set_rate_neuron_id_mask;
+# 3. UFRACT seconds_per_tick; 4. REAL ticks_per_second;
+# 5. REAL slow_rate_per_tick_cutoff; 6. REAL fast_rate_per_tick_cutoff;
+# 7. unt32_t first_source_id; 8. uint32_t n_spike_sources;
+# 9. uint32_t max_spikes_per_timestep;
+# 10,11,12,13 mars_kiss64_seed_t (uint[4]) spike_source_seed;
+# 14. Rate changed flag
+PARAMS_BASE_WORDS = 14
 
 # uint32_t n_rates; uint32_t index
 PARAMS_WORDS_PER_NEURON = 2
@@ -170,16 +191,6 @@ class SpikeSourcePoissonMachineVertex(
 
     # between Knuth algorithm and Gaussian approx.
     FAST_RATE_PER_TICK_CUTOFF = 10
-
-    # 1. uint32_t has_key;
-    # 2. uint32_t set_rate_neuron_id_mask;
-    # 3. UFRACT seconds_per_tick; 4. REAL ticks_per_second;
-    # 5. REAL slow_rate_per_tick_cutoff; 6. REAL fast_rate_per_tick_cutoff;
-    # 7. unt32_t first_source_id; 8. uint32_t n_spike_sources;
-    # 9. uint32_t max_spikes_per_timestep;
-    # 10,11,12,13 mars_kiss64_seed_t (uint[4]) spike_source_seed;
-    # 14. Rate changed flag
-    PARAMS_BASE_WORDS = 14
 
     # Seed offset in parameters and size on bytes
     SEED_SIZE_BYTES = 4 * BYTES_PER_WORD
@@ -430,7 +441,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.reserve_memory_region(
             region=(
                 self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value),
-            size=self.PARAMS_BASE_WORDS * BYTES_PER_WORD,
+            size=get_params_bytes(self.vertex_slice.n_atoms),
             label="PoissonParams")
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value)
@@ -491,12 +502,7 @@ class SpikeSourcePoissonMachineVertex(
     def set_rate_changed(self):
         self.__rate_changed = True
 
-    def poisson_param_region_address(self, placement):
-        return helpful_functions.locate_memory_region_for_placement(
-            placement,
-            self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value)
-
-    def poisson_rate_region_address(self, placement):
+    def __poisson_rate_region_address(self, placement):
         return helpful_functions.locate_memory_region_for_placement(
             placement,
             self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value)
@@ -509,7 +515,7 @@ class SpikeSourcePoissonMachineVertex(
 
             # locate SDRAM address where the rates are stored
             poisson_rate_region_sdram_address = (
-                self.poisson_rate_region_address(placement))
+                self.__poisson_rate_region_address(placement))
 
             # get size of poisson params
             n_atoms = self._vertex_slice.n_atoms

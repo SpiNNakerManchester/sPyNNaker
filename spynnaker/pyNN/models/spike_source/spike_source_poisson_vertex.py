@@ -33,7 +33,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import MultiSpikeRecorder
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
-    get_sdram_edge_params_bytes, get_expander_rates_bytes)
+    get_sdram_edge_params_bytes, get_expander_rates_bytes, get_params_bytes)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.abstract_models import (
@@ -311,8 +311,8 @@ class SpikeSourcePoissonVertex(
         if SpynnakerDataView().is_ran_last():
             self.__read_parameters_now()
             SpynnakerDataView.set_requires_data_generation()
-            for m_vertex in self.machine_vertices:
-                m_vertex.set_rate_changed()
+        for m_vertex in self.machine_vertices:
+            m_vertex.set_rate_changed()
 
         # Must be parameter without the s
         fixed_name = f"{name}s"
@@ -450,7 +450,8 @@ class SpikeSourcePoissonVertex(
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
-        poisson_params_sz = get_rates_bytes(
+        poisson_params_sz = get_params_bytes(vertex_slice.n_atoms)
+        poisson_rates_sz = get_rates_bytes(
             vertex_slice.n_atoms, vertex_slice.n_atoms * self.__max_n_rates)
         poisson_expander_sz = get_expander_rates_bytes(
             vertex_slice.n_atoms, vertex_slice.n_atoms * self.__max_n_rates)
@@ -458,7 +459,7 @@ class SpikeSourcePoissonVertex(
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
-            poisson_params_sz + poisson_expander_sz +
+            poisson_params_sz + poisson_rates_sz + poisson_expander_sz +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
             profile_utils.get_profile_region_size(self.__n_profile_samples) +
