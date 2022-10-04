@@ -176,17 +176,3 @@ class AbstractGenerateConnectorOnMachine(
         :rtype: int
         """
         return 0
-
-    @staticmethod
-    def _get_view_lo_hi(view):
-        """ Get the range of neuron IDs covered by a view.
-
-        :param ~spynnaker.pyNN.models.populations.PopulationView view:
-        :rtype: tuple(int,int)
-        """
-        # Evil forward reference to subpackage implementation of type!
-        # pylint: disable=protected-access
-        indexes = view._indexes
-        view_lo = indexes[0]
-        view_hi = indexes[-1]
-        return view_lo, view_hi
