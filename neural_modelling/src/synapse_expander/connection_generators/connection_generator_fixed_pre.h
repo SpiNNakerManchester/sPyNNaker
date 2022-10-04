@@ -116,7 +116,7 @@ bool connection_generator_fixed_pre_generate(
 
     struct fixed_pre *obj = generator;
     // Get how many values can be sampled from
-    uint32_t n_values = pre_hi - pre_lo;
+    uint32_t n_values = pre_hi - pre_lo + 1;
     // Get the number of connections in each column
     uint32_t n_conns = obj->params.n_pre;
 
