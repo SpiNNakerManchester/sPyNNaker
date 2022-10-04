@@ -132,7 +132,7 @@ static bool connection_generator_fixed_post_generate(
 
     struct fixed_post *obj = generator;
     // Get how many values can be sampled from
-    uint32_t n_values = post_hi - post_lo;
+    uint32_t n_values = post_hi - post_lo + 1;
     // Get the number of connections on each row
     uint32_t n_conns = obj->params.n_post;
 

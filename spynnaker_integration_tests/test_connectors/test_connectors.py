@@ -301,10 +301,10 @@ class ConnectorsTest(BaseTestCase):
     def fixedpost_population_views(self):
         sim.setup(timestep=1.0)
         in_pop = sim.Population(4, sim.SpikeSourceArray([0]), label="in_pop")
-        pop = sim.Population(4, sim.IF_curr_exp(), label="pop")
-        rng = NumpyRNG(seed=1)
+        pop = sim.Population(4, sim.IF_curr_exp(), label="pop",
+                             additional_parameters={"seed": 1})
         conn = sim.Projection(in_pop[0:3], pop[1:4],
-                              sim.FixedNumberPostConnector(2, rng=rng),
+                              sim.FixedNumberPostConnector(2),
                               sim.StaticSynapse(weight=0.5, delay=2))
         sim.run(1)
         weights = conn.get(['weight', 'delay'], 'list')
