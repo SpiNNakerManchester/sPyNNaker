@@ -86,7 +86,7 @@ static bool connection_generator_one_to_one_generate(
 
 	// Work out the pre start and end to be generated
 	uint32_t pre_start = pre_lo + offset;
-	uint32_t pre_end = min(pre_lo + length, pre_hi);
+	uint32_t pre_end = min(pre_start + length, pre_hi);
 
     for (uint32_t pre = pre_start, post = post_start; pre <= pre_end; pre++, post++) {
         uint32_t local_post = post - post_slice_start;
