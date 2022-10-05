@@ -184,8 +184,8 @@ static bool connection_generator_fixed_total_generate(
         matrix_generator_t matrix_generator) {
     struct fixed_total *obj = generator;
 
-    uint32_t n_pre = pre_hi - pre_lo;
-    uint32_t n_post = post_hi - post_lo;
+    uint32_t n_pre = pre_hi - pre_lo + 1;
+    uint32_t n_post = post_hi - post_lo + 1;
     uint32_t post_slice_end = post_slice_start + post_slice_count;
     uint32_t n_conns = obj->params.n_synapses_total;
 

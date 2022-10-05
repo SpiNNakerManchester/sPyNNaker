@@ -70,14 +70,31 @@ static bool connection_generator_one_to_one_generate(
         param_generator_t weight_generator, param_generator_t delay_generator,
         matrix_generator_t matrix_generator) {
 
-    // Get the actual ranges to generate within
-    uint32_t post_start = max(post_slice_start, post_lo);
-    uint32_t post_end = min(post_slice_start + post_slice_count - 1, post_hi);
-    uint32_t pre_start = max(pre_lo, post_start);
-    uint32_t pre_end = min(pre_hi, post_end);
+	// First check if any of the range to generate is on this slice
+	uint32_t post_slice_end = post_slice_start + post_slice_count - 1;
+	if (post_lo > post_slice_end || post_hi < post_slice_start) {
+		return true;
+	}
 
-    for (uint32_t pre = pre_start; pre <= pre_end; pre++) {
-        uint32_t local_post = pre - post_slice_start;
+	// Find the start and end on the current slice
+	uint32_t post_start = max(post_slice_start, post_lo);
+	uint32_t post_end = min(post_slice_end, post_hi);
+
+	// Find the offset and length on the current slice
+	uint32_t offset = post_start - post_lo;
+	uint32_t length = post_end - post_start;
+
+	// Work out the pre start and end to be generated
+	uint32_t pre_start = pre_lo + offset;
+	uint32_t pre_end = min(pre_lo + length, pre_hi);
+
+    log_info("Post slice start %u, post_slice_count %u", post_slice_start, post_slice_count);
+    log_info("Post lo %u, post hi %u", post_lo, post_hi);
+    log_info("Pre lo %u, pre_hi %u", pre_lo, pre_hi);
+    log_info("Post start %u, post end %u, pre_start %u, pre_end %u", post_start, post_end, pre_start, pre_end);
+
+    for (uint32_t pre = pre_start, post = post_start; pre <= pre_end; pre++, post++) {
+        uint32_t local_post = post - post_slice_start;
         uint16_t weight = rescale_weight(
                 param_generator_generate(weight_generator), weight_scale);
         uint16_t delay = rescale_delay(

@@ -76,6 +76,21 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         self.__synapses_per_edge = None
         self._rng = rng
 
+    def set_projection_information(self, synapse_info):
+        super().set_projection_information(synapse_info)
+        n_pairs = synapse_info.n_post_neurons * synapse_info.n_pre_neurons
+        if not self.__with_replacement and self.__num_synapses > n_pairs:
+            raise SpynnakerException(
+                "FixedTotalNumberConnector will not work when "
+                "with_replacement=False and n > n_pre * n_post")
+        if (not self.__with_replacement and
+                not self.__allow_self_connections and
+                self.__num_synapses == n_pairs):
+            raise SpynnakerException(
+                "FixedNumberPostConnector will not work when "
+                "with_replacement=False, allow_self_connections=False "
+                "and n = n_pre * n_post")
+
     def get_rng_next(self, num_synapses, prob_connect):
         """ Get the required RNGs
 
