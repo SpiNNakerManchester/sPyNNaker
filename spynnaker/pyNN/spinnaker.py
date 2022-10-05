@@ -361,6 +361,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :rtype: None
         """
         # pylint: disable=protected-access
+        self._data_writer.stopping()
+        FecTimer.start_category(TimerCategory.SHUTTING_DOWN)
         for population in self._data_writer.iterate_populations():
             population._end()
 
