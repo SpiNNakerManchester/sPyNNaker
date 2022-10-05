@@ -88,11 +88,6 @@ static bool connection_generator_one_to_one_generate(
 	uint32_t pre_start = pre_lo + offset;
 	uint32_t pre_end = min(pre_lo + length, pre_hi);
 
-    log_info("Post slice start %u, post_slice_count %u", post_slice_start, post_slice_count);
-    log_info("Post lo %u, post hi %u", post_lo, post_hi);
-    log_info("Pre lo %u, pre_hi %u", pre_lo, pre_hi);
-    log_info("Post start %u, post end %u, pre_start %u, pre_end %u", post_start, post_end, pre_start, pre_end);
-
     for (uint32_t pre = pre_start, post = post_start; pre <= pre_end; pre++, post++) {
         uint32_t local_post = post - post_slice_start;
         uint16_t weight = rescale_weight(

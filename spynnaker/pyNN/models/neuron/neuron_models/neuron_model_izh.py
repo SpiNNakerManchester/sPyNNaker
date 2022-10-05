@@ -72,6 +72,7 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
                 (DataType.S1615, D),
                 (DataType.S1615, V),
                 (DataType.S1615, U),
+                (DataType.S1615, I_OFFSET),
                 (DataType.S1615, TIMESTEP),
                 (DataType.S1615, NEXT_H)])],
             {A: "ms", B: "ms", C: "mV", D: "mV/ms", V: "mV", U: "mV/ms",
