@@ -29,7 +29,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.interface.provenance import (
-    FecTimer, ProvenanceWriter, TimerWork)
+    FecTimer, ProvenanceWriter, TimerCategory, TimerWork)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -361,7 +361,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :rtype: None
         """
         # pylint: disable=protected-access
-        self._data_writer.stopping()
         FecTimer.start_category(TimerCategory.SHUTTING_DOWN)
         for population in self._data_writer.iterate_populations():
             population._end()
