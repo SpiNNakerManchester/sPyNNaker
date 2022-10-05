@@ -310,7 +310,6 @@ class SpikeSourcePoissonVertex(
         # If we have just run, we need to read parameters to avoid overwrite
         if SpynnakerDataView().is_ran_last():
             self.__read_parameters_now()
-            SpynnakerDataView.set_requires_data_generation()
         for m_vertex in self.machine_vertices:
             m_vertex.set_rate_changed()
 

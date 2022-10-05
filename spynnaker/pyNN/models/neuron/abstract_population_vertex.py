@@ -587,7 +587,6 @@ class AbstractPopulationVertex(
         # then make this a waste, but we can't see the future...
         if SpynnakerDataView.is_ran_last():
             self.__read_parameters_now()
-            SpynnakerDataView.set_requires_data_generation()
             self.__tell_neuron_vertices_to_regenerate()
         self.__parameters[name].set_value_by_selector(selector, value)
 
@@ -642,7 +641,6 @@ class AbstractPopulationVertex(
         # then make this a waste, but we can't see the future...
         if SpynnakerDataView.is_ran_last():
             self.__read_parameters_now()
-            SpynnakerDataView.set_requires_data_generation()
             self.__tell_neuron_vertices_to_regenerate()
         self.__state_variables[name].set_value_by_selector(
             selector, value)
@@ -863,7 +861,6 @@ class AbstractPopulationVertex(
     def reset_to_first_timestep(self):
         # Mark that reset has been done, and reload state variables
         self.__state_variables.copy_into(self.__initial_state_variables)
-        SpynnakerDataView.set_requires_data_generation()
         self.__tell_neuron_vertices_to_regenerate()
 
         # If synapses change during the run also regenerate these to get

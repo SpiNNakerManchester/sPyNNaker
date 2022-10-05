@@ -277,8 +277,7 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        # Handled by app vertex
-        pass
+        self.__rate_changed = new_value
 
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
