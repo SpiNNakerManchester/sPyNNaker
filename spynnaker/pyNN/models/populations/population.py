@@ -512,7 +512,7 @@ class Population(PopulationBase):
                                  "for an unstructured population")
             self.__positions = self.__structure.generate_positions(
                 self.__vertex.n_atoms)
-        return self.__positions
+        return self.__positions.T
 
     @positions.setter
     def positions(self, positions):
