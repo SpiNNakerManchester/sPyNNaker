@@ -83,14 +83,25 @@ struct kernel {
  * \return A data item to be passed in to other functions later on
  */
 static void *connection_generator_kernel_initialise(void **region) {
+    struct kernel *params_sdram = *region;
+
     // Allocate the data structure for parameters
-    struct kernel *obj = spin1_malloc(sizeof(struct kernel));
+    uint32_t kernelSize = params_sdram->kernelWidth * params_sdram->kernelHeight;
+    uint32_t size = sizeof(struct kernel);
+    uint32_t extra = 0;
+    if (params_sdram->weightsPresent) {
+    	size += kernelSize * sizeof(accum);
+    	extra += kernelSize;
+    }
+    if (params_sdram->delaysPresent) {
+    	size += kernelSize * sizeof(accum);
+    	extra += kernelSize;
+    }
+    struct kernel *obj = spin1_malloc(size);
 
     // Copy the parameters into the data structure
-    struct kernel *params_sdram = *region;
-    // Smaller than standard memcpy()
-    *obj = *params_sdram;
-    *region = &params_sdram[1];
+    spin1_memcpy(obj, params_sdram, size);
+    *region = &(params_sdram->kernelWeightsAndDelays[extra]);
 
     log_debug("Kernel connector, m_kernelWidth, m_kernelHeight = %u %u",
     		obj->kernelWidth, obj->kernelHeight);
@@ -144,10 +155,10 @@ static bool connection_generator_kernel_generate(
     uint32_t post_end = min(post_slice_start + post_slice_count - 1, post_hi);
 
     // Go through and find the coordinates needed
-    for (uint32_t pre = pre_lo; pre < pre_hi; pre++) {
+    for (uint32_t pre = pre_lo; pre <= pre_hi; pre++) {
         uint16_t pre_c = 0;
         uint16_t pre_r = uidiv(pre, obj->preWidth, &pre_c);
-        for (uint32_t post = post_start; post < post_end; post++) {
+        for (uint32_t post = post_start; post <= post_end; post++) {
             uint16_t post_r, post_c; //post raw
             uint16_t pac_r, pac_c; // post as common
             int16_t pap_r, pap_c; // post as pre

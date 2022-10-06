@@ -313,13 +313,13 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
+        # Use the kernel delays if user has supplied them
+        if self._krn_delays is not None:
+            return numpy.max(self._krn_delays)
+
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel delays if user has supplied them
-        if self._krn_delays is not None:
-            return self._get_delay_maximum(
-                self._krn_delays, n_conns, synapse_info)
 
         # if not then use the values that came in
         return self._get_delay_maximum(
@@ -327,17 +327,25 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
+        # Use the kernel delays if user has supplied them
+        if self._krn_delays is not None:
+            return numpy.min(self._krn_delays)
+
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel delays if user has supplied them
-        if self._krn_delays is not None:
-            return self._get_delay_minimum(
-                self._krn_delays, n_conns, synapse_info)
 
         # if not then use the values that came in
         return self._get_delay_minimum(
             synapse_info.delays, n_conns, synapse_info)
+
+    @overrides(AbstractConnector.get_delay_variance)
+    def get_delay_variance(self, delays, synapse_info):
+        if self._krn_delays is not None:
+            return numpy.var(self._krn_delays)
+
+        return super(KernelConnector, self).get_delay_variance(
+            delays, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -353,16 +361,35 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self._krn_weights is not None:
+            return numpy.max(self._krn_weights)
+
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel weights if user has supplied them
-        if self._krn_weights is not None:
-            return self._get_weight_maximum(
-                self._krn_weights, n_conns, synapse_info)
-
         return self._get_weight_maximum(
             synapse_info.weights, n_conns, synapse_info)
+
+    @overrides(AbstractConnector.get_weight_mean)
+    def get_weight_mean(self, weights, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self._krn_weights is not None:
+            return numpy.mean(self._krn_weights)
+
+        # I think this is overestimated, but not by much
+        return super(KernelConnector, self).get_weight_mean(
+            weights, synapse_info)
+
+    @overrides(AbstractConnector.get_weight_variance)
+    def get_weight_variance(self, weights, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self._krn_weights is not None:
+            return numpy.var(self._krn_weights)
+
+        # I think this is overestimated, but not by much
+        return super(KernelConnector, self).get_weight_variance(
+            weights, synapse_info)
 
     def __repr__(self):
         return "KernelConnector(shape_kernel[{},{}])".format(
@@ -412,10 +439,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         extra_data = []
         if self._krn_weights is not None:
             extra_data.append(DataType.S1615.encode_as_numpy_int_array(
-                self._krn_weights))
+                self._krn_weights.flatten()))
         if self._krn_delays is not None:
             extra_data.append(DataType.S1615.encode_as_numpy_int_array(
-                self._krn_delays))
+                self._krn_delays.flatten()))
 
         if extra_data:
             return numpy.concatenate((data, *extra_data))
