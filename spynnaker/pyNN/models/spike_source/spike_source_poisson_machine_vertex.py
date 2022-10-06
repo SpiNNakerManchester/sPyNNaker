@@ -406,12 +406,12 @@ class SpikeSourcePoissonMachineVertex(
         n_items = 0
         data = self._app_vertex.data
         ids = self.vertex_slice.get_raster_ids(self.app_vertex.atoms_shape)
-        for (start, stop, data) in data.iter_ranges_by_ids(ids):
+        for (start, stop, item) in data.iter_ranges_by_ids(ids):
             count = stop - start
             items = numpy.dstack(
-                (_u3232_to_uint64(data['rates']),
-                 _u3232_to_uint64(data['starts']),
-                 _u3232_to_uint64(data['durations']))
+                (_u3232_to_uint64(item['rates']),
+                 _u3232_to_uint64(item['starts']),
+                 _u3232_to_uint64(item['durations']))
                 )[0]
             data_items.extend([[count], [len(items)], [0],
                                numpy.ravel(items).view("uint32")])

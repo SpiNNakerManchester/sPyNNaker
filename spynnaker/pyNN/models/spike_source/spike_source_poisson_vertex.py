@@ -56,6 +56,9 @@ OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 # The microseconds per timestep will be divided by this to get the max offset
 _MAX_OFFSET_DENOMINATOR = 10
 
+# Indicates a duration that never ends
+DURATION_FOREVER = 0xFFFFFFFF
+
 
 class SpikeSourcePoissonVertex(
         PopulationApplicationVertex,
@@ -160,10 +163,10 @@ class SpikeSourcePoissonVertex(
             durations = numpy.array(durations)
         else:
             if hasattr(rates[0], "__len__"):
-                durations = [numpy.array([0 for r in _rate])
+                durations = [numpy.array([DURATION_FOREVER for r in _rate])
                              for _rate in rates]
             else:
-                durations = numpy.array([0 for _rate in rates])
+                durations = numpy.array([DURATION_FOREVER for _rate in rates])
 
         # Check that there is either one list for all neurons,
         # or one per neuron

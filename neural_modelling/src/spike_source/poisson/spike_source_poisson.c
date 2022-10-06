@@ -416,7 +416,7 @@ static inline void set_spike_source_details(uint32_t id, bool rate_changed) {
     spike_source_t *p = &(source[id]);
     p->start_ticks = ms_to_ticks(details.start);
     log_debug("Start of %u is %u", id, p->start_ticks);
-    if (details.duration == 0) {
+    if (details.duration == END_OF_TIME) {
         log_debug("Duration of %u is forever", id);
         p->end_ticks = END_OF_TIME;
     } else {
@@ -482,7 +482,7 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
     log_info("read global_parameters: starting");
     ssp_params = *sdram_globals;
     ts_per_second = ukbits(1000 * bitsuk(ssp_params.ticks_per_ms));
-    
+
     uint32_t keys_size = sizeof(uint32_t) * ssp_params.n_spike_sources;
     keys = spin1_malloc(keys_size);
     if (keys == NULL) {
