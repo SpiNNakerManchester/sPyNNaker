@@ -89,6 +89,10 @@ _NEURON_GENERATOR_PER_ITEM = (2 * BYTES_PER_WORD) + MAX_PARAMS_BYTES
 # 1 for incoming spike buffer size
 _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
 
+_EXTRA_RECORDABLE_UNITS = {NeuronRecorder.SPIKES: "",
+                           NeuronRecorder.PACKETS: "",
+                           NeuronRecorder.REWIRING: ""}
+
 
 def _prod(iterable):
     """ Finds the product of the iterable
@@ -651,6 +655,8 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.get_units)
     def get_units(self, name):
+        if name in _EXTRA_RECORDABLE_UNITS:
+            return _EXTRA_RECORDABLE_UNITS[name]
         if self.__neuron_impl.is_recordable(name):
             return self.__neuron_impl.get_recordable_units(name)
         if (name not in self.__parameters and

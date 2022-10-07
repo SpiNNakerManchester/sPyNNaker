@@ -243,17 +243,6 @@ class NeuronRecorder(object):
             i for i in vertex_slice.get_raster_ids(atoms_shape)
             if i in indexes]
 
-    def get_neuron_sampling_interval(self, variable):
-        """ Return the current sampling interval for this variable
-
-        :param str variable: PyNN name of the variable
-        :return: Sampling interval in microseconds
-        :rtype: float
-        """
-        if variable in self.__per_timestep_variables:
-            return get_sampling_interval(1)
-        return get_sampling_interval(self.__sampling_rates[variable])
-
     def _convert_placement_matrix_data(
             self, row_data, n_rows, data_row_length, n_neurons, data_type):
 
@@ -365,7 +354,8 @@ class NeuronRecorder(object):
         :param str variable: The variable to get the sampling interval of
         :rtype: float
         """
-        if variable in self.__per_timestep_variables:
+        if (variable in self.__per_timestep_variables or
+                variable in self.__events_per_core_variables):
             return get_sampling_interval(1)
 
         return get_sampling_interval(self.__sampling_rates[variable])
@@ -439,7 +429,8 @@ class NeuronRecorder(object):
             return self.get_spikes(label, application_vertex, variable)
         if variable in self.__events_per_core_variables:
             return self.get_events(label, application_vertex, variable)
-        if variable in self.__sampling_rates:
+        if (variable in self.__sampling_rates or
+                variable in self.__per_timestep_variables):
             return self.get_matrix_data(label, application_vertex, variable)
         raise KeyError(f"This vertex cannot record {variable}")
 
@@ -448,7 +439,8 @@ class NeuronRecorder(object):
             return RecordingType.BIT_FIELD
         if variable in self.__events_per_core_variables:
             return RecordingType.EVENT
-        if variable in self.__sampling_rates:
+        if (variable in self.__sampling_rates or
+                variable in self.__per_timestep_variables):
             return RecordingType.MATRIX
         raise KeyError(f"This vertex cannot record {variable}")
 

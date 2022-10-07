@@ -92,7 +92,7 @@ class TestSetRecord(BaseTestCase):
         ssp.record("spikes", sampling_interval=2)
         self.assertCountEqual(
             ["spikes"], if_curr._vertex.get_recording_variables())
-        assert recorder.get_neuron_sampling_interval("spikes") == 2
+        assert recorder.get_sampling_interval("spikes") == 2
 
     def test_set_spikes_interval2(self):
         sim.setup(timestep=0.5)
@@ -103,7 +103,7 @@ class TestSetRecord(BaseTestCase):
         if_curr.record("spikes", sampling_interval=2.5)
         self.assertCountEqual(
             ["spikes"], if_curr._vertex.get_recording_variables())
-        assert recorder.get_neuron_sampling_interval("spikes") == 2.5
+        assert recorder.get_sampling_interval("spikes") == 2.5
 
     def test_set_spikes_indexes(self):
         sim.setup(timestep=1)
