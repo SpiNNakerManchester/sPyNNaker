@@ -170,12 +170,12 @@ class SpikeInjectorVertex(
         will be returned.
         """
 
-        parameters = self.get_parameter_values(self.default_parameters)
-
         context = {
             "name": "SpikeInjector",
             "default_parameters": self.default_parameters,
             "default_initial_values": self.default_parameters,
-            "parameters": parameters,
+            "parameters": {
+                "port": self.__receive_port,
+                "virtual_key": self.__virtual_key},
         }
         return context
