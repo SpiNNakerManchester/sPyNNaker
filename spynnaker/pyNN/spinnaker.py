@@ -42,8 +42,7 @@ from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
     delay_support_adder, neuron_expander, synapse_expander,
     redundant_packet_count_report,
-    spynnaker_neuron_graph_network_specification_report,
-    spynnaker_data_specification_reloader)
+    spynnaker_neuron_graph_network_specification_report)
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_machine_bit_field_router_compressor import (
         spynnaker_machine_bitfield_ordered_covering_compressor,
@@ -487,22 +486,3 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         with FecTimer(MAPPING, "SpynnakerSplitterPartitioner"):
             n_chips_in_graph = spynnaker_splitter_partitioner()
             self._data_writer.set_n_chips_in_graph(n_chips_in_graph)
-
-    @overrides(AbstractSpinnakerBase._execute_dsg_region_reloader)
-    def _execute_dsg_region_reloader(self):
-        """
-            Runs, times and logs the DSGRegionReloader if required
-
-            Reload any parameters over the loaded data if we have already
-            run and not using a virtual board and the data hasn't already
-            been regenerated
-
-        """
-        if not self._data_writer.is_ran_ever():
-            return
-        if self._data_writer.is_hard_reset():
-            return
-        with FecTimer(RUN_LOOP, "SpyNNaker DSG region reloader") as timer:
-            if timer.skip_if_virtual_board():
-                return
-            spynnaker_data_specification_reloader()

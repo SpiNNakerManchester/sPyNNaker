@@ -79,10 +79,3 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
 
         :rtype: int
         """
-
-    @abstractmethod
-    def do_synapse_regeneration(self):
-        """ Determine if synapse *regeneration* is required
-
-        :rtype: bool
-        """

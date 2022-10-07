@@ -352,7 +352,3 @@ class PopulationMachineLocalOnlyCombinedVertex(
     @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
     def set_do_neuron_regeneration(self):
         self.__regenerate_data = True
-
-    @overrides(PopulationMachineNeurons.do_neuron_regeneration)
-    def do_neuron_regeneration(self):
-        return self.__regenerate_data
