@@ -35,10 +35,8 @@ enum send_type {
 // Includes for model parts used in this implementation
 
 #include <neuron/models/neuron_model_lif_impl.h>
-#include <neuron/additional_inputs/additional_input.h>
 #include <neuron/synapse_types/synapse_types_exponential_impl.h>
 #include <neuron/input_types/input_type_current.h>
-#include <neuron/additional_inputs/additional_input_none_impl.h>
 
 #include <neuron/current_sources/current_source_impl.h>
 #include <neuron/current_sources/current_source.h>
@@ -94,12 +92,6 @@ enum bitfield_recording_indices {
 //! Array of neuron states
 static neuron_t *neuron_array;
 
-//! Input states array
-static input_type_t *input_type_array;
-
-//! Additional input array
-static additional_input_t *additional_input_array;
-
 //! Threshold states array
 static packet_firing_data_t *packet_firing_array;
 
@@ -153,54 +145,29 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 static bool neuron_impl_initialise(uint32_t n_neurons) {
 
     // Allocate DTCM for neuron array
-    if (sizeof(neuron_t)) {
-        neuron_array = spin1_malloc(n_neurons * sizeof(neuron_t));
-        if (neuron_array == NULL) {
-            log_error("Unable to allocate neuron array - Out of DTCM");
-            return false;
-        }
-    }
-
-    // Allocate DTCM for input type array and copy block of data
-    if (sizeof(input_type_t)) {
-        input_type_array = spin1_malloc(n_neurons * sizeof(input_type_t));
-        if (input_type_array == NULL) {
-            log_error("Unable to allocate input type array - Out of DTCM");
-            return false;
-        }
-    }
-
-    // Allocate DTCM for additional input array and copy block of data
-    if (sizeof(additional_input_t)) {
-        additional_input_array =
-                spin1_malloc(n_neurons * sizeof(additional_input_t));
-        if (additional_input_array == NULL) {
-            log_error("Unable to allocate additional input array"
-                    " - Out of DTCM");
-            return false;
-        }
-    }
+	log_info("Initialising for %u neurons", n_neurons);
+	neuron_array = spin1_malloc(n_neurons * sizeof(neuron_t));
+	if (neuron_array == NULL) {
+		log_error("Unable to allocate neuron array - Out of DTCM");
+		return false;
+	}
 
     // Allocate DTCM for threshold type array and copy block of data
-    if (sizeof(packet_firing_data_t)) {
-        packet_firing_array =
-                spin1_malloc(n_neurons * sizeof(packet_firing_data_t));
-        if (packet_firing_array == NULL) {
-            log_error("Unable to allocate threshold type array - Out of DTCM");
-            return false;
-        }
-    }
+	packet_firing_array =
+			spin1_malloc(n_neurons * sizeof(packet_firing_data_t));
+	if (packet_firing_array == NULL) {
+		log_error("Unable to allocate threshold type array - Out of DTCM");
+		return false;
+	}
 
     // Allocate DTCM for synapse shaping parameters
-    if (sizeof(synapse_types_t)) {
-        synapse_types_array =
-                spin1_malloc(n_neurons * sizeof(synapse_types_t));
-        if (synapse_types_array == NULL) {
-            log_error("Unable to allocate synapse parameters array"
-                    " - Out of DTCM");
-            return false;
-        }
-    }
+	synapse_types_array =
+			spin1_malloc(n_neurons * sizeof(synapse_types_t));
+	if (synapse_types_array == NULL) {
+		log_error("Unable to allocate synapse parameters array"
+				" - Out of DTCM");
+		return false;
+	}
 
     return true;
 }
@@ -239,43 +206,21 @@ static void neuron_impl_load_neuron_parameters(
         log_error("bad number of steps per timestep: 0");
     }
 
-    if (sizeof(neuron_t)) {
-        neuron_params_t *params = (neuron_params_t *) &address[next];
-		for (uint32_t i = 0; i < n_neurons; i++) {
-			neuron_model_initialise(&neuron_array[i], &params[i]);
-		}
-        next += n_words_needed(n_neurons * sizeof(neuron_t));
-    }
+	neuron_params_t *neuron_params = (neuron_params_t *) &address[next];
+	for (uint32_t i = 0; i < n_neurons; i++) {
+		neuron_model_initialise(&neuron_array[i], &neuron_params[i]);
+	}
+	next += n_words_needed(n_neurons * sizeof(neuron_params_t));
 
-    if (sizeof(input_type_t)) {
-        input_type_params_t *params = (input_type_params_t *) &address[next];
-		for (uint32_t i = 0; i < n_neurons; i++) {
-			input_type_initialise(&input_type_array[i], &params[i]);
-		}
-        next += n_words_needed(n_neurons * sizeof(input_type_t));
-    }
+	spin1_memcpy(packet_firing_array, &address[next],
+			n_neurons * sizeof(packet_firing_data_t));
+	next += n_words_needed(n_neurons * sizeof(packet_firing_data_t));
 
-    if (sizeof(packet_firing_data_t)) {
-        spin1_memcpy(packet_firing_array, &address[next],
-                n_neurons * sizeof(packet_firing_data_t));
-        next += n_words_needed(n_neurons * sizeof(packet_firing_data_t));
-    }
-
-    if (sizeof(synapse_types_t)) {
-        synapse_types_params_t *params = (synapse_types_params_t *) &address[next];
-		for (uint32_t i = 0; i < n_neurons; i++) {
-			synapse_types_initialise(&synapse_types_array[i], &params[i]);
-		}
-        next += n_words_needed(n_neurons * sizeof(synapse_types_t));
-    }
-
-    if (sizeof(additional_input_t)) {
-        additional_input_params_t *params = (additional_input_params_t *) &address[next];
-		for (uint32_t i = 0; i < n_neurons; i++) {
-			additional_input_initialise(&additional_input_array[i], &params[i]);
-		}
-        next += n_words_needed(n_neurons * sizeof(additional_input_t));
-    }
+	synapse_types_params_t *synapse_params = (synapse_types_params_t *) &address[next];
+	for (uint32_t i = 0; i < n_neurons; i++) {
+		synapse_types_initialise(&synapse_types_array[i], &synapse_params[i]);
+	}
+	next += n_words_needed(n_neurons * sizeof(synapse_types_params_t));
 
     // If we are to save the initial state, copy the whole of the parameters
 	// to the initial state
@@ -317,14 +262,9 @@ static void neuron_impl_do_timestep_update(
         // Get the neuron itself
         neuron_t *this_neuron = &neuron_array[neuron_index];
 
-        // Get the input_type parameters and voltage for this neuron
-        input_type_t *input_types = &input_type_array[neuron_index];
-
         // Get threshold and additional input parameters for this neuron
         packet_firing_data_t *the_packet_firing =
             &packet_firing_array[neuron_index];
-        additional_input_t *additional_inputs =
-                &additional_input_array[neuron_index];
         synapse_types_t *the_synapse_type =
                 &synapse_types_array[neuron_index];
 
@@ -339,17 +279,11 @@ static void neuron_impl_do_timestep_update(
 
             // Get the exc and inh values from the synapses
             input_t exc_values[NUM_EXCITATORY_RECEPTORS];
-            input_t *exc_syn_values =
+            input_t *exc_input_values =
                     synapse_types_get_excitatory_input(exc_values, the_synapse_type);
             input_t inh_values[NUM_INHIBITORY_RECEPTORS];
-            input_t *inh_syn_values =
+            input_t *inh_input_values =
                     synapse_types_get_inhibitory_input(inh_values, the_synapse_type);
-
-            // Call functions to obtain exc_input and inh_input
-            input_t *exc_input_values = input_type_get_input_value(
-                    exc_syn_values, input_types, NUM_EXCITATORY_RECEPTORS);
-            input_t *inh_input_values = input_type_get_input_value(
-                    inh_syn_values, input_types, NUM_INHIBITORY_RECEPTORS);
 
             // Sum g_syn contributions from all receptors for recording
             REAL total_exc = 0;
@@ -372,23 +306,14 @@ static void neuron_impl_do_timestep_update(
                         GSYN_INH_RECORDING_INDEX, neuron_index, total_inh);
             }
 
-            // Call functions to convert exc_input and inh_input to current
-            input_type_convert_excitatory_input_to_current(
-                    exc_input_values, input_types, soma_voltage);
-            input_type_convert_inhibitory_input_to_current(
-                    inh_input_values, input_types, soma_voltage);
-
             // Get any input from an injected current source
             REAL current_offset = current_source_get_offset(time, neuron_index);
-
-            uint32_t external_bias = additional_input_get_input_value_as_current(
-                    additional_inputs, soma_voltage);
 
             // update neuron parameters
             state_t result = neuron_model_state_update(
                     NUM_EXCITATORY_RECEPTORS, exc_input_values,
                     NUM_INHIBITORY_RECEPTORS, inh_input_values,
-                    external_bias, current_offset, this_neuron);
+                    0, current_offset, this_neuron);
 
             // determine if a packet should fly
             will_fire = _test_will_fire(the_packet_firing);
@@ -439,43 +364,21 @@ static void neuron_impl_store_neuron_parameters(
     // Skip over the steps per timestep
     next += 1;
 
-    if (sizeof(neuron_t)) {
-		neuron_params_t *params = (neuron_params_t *) &address[next];
-		for (uint32_t i = 0; i < n_neurons; i++) {
-			neuron_model_save_state(&neuron_array[i], &params[i]);
-		}
-		next += n_words_needed(n_neurons * sizeof(neuron_t));
+	neuron_params_t *neuron_params = (neuron_params_t *) &address[next];
+	for (uint32_t i = 0; i < n_neurons; i++) {
+		neuron_model_save_state(&neuron_array[i], &neuron_params[i]);
 	}
+	next += n_words_needed(n_neurons * sizeof(neuron_params_t));
 
-	if (sizeof(input_type_t)) {
-		input_type_params_t *params = (input_type_params_t *) &address[next];
-		for (uint32_t i = 0; i < n_neurons; i++) {
-			input_type_save_state(&input_type_array[i], &params[i]);
-		}
-		next += n_words_needed(n_neurons * sizeof(input_type_t));
+	spin1_memcpy(&address[next], packet_firing_array,
+			n_neurons * sizeof(packet_firing_data_t));
+	next += n_words_needed(n_neurons * sizeof(packet_firing_data_t));
+
+	synapse_types_params_t *synapse_params = (synapse_types_params_t *) &address[next];
+	for (uint32_t i = 0; i < n_neurons; i++) {
+		synapse_types_save_state(&synapse_types_array[i], &synapse_params[i]);
 	}
-
-	if (sizeof(packet_firing_data_t)) {
-        spin1_memcpy(&address[next], packet_firing_array,
-                n_neurons * sizeof(packet_firing_data_t));
-        next += n_words_needed(n_neurons * sizeof(packet_firing_data_t));
-    }
-
-	if (sizeof(synapse_types_t)) {
-		synapse_types_params_t *params = (synapse_types_params_t *) &address[next];
-		for (uint32_t i = 0; i < n_neurons; i++) {
-			synapse_types_save_state(&synapse_types_array[i], &params[i]);
-		}
-		next += n_words_needed(n_neurons * sizeof(synapse_types_t));
-	}
-
-	if (sizeof(additional_input_t)) {
-		additional_input_params_t *params = (additional_input_params_t *) &address[next];
-		for (uint32_t i = 0; i < n_neurons; i++) {
-			additional_input_save_state(&additional_input_array[i], &params[i]);
-		}
-		next += n_words_needed(n_neurons * sizeof(additional_input_t));
-	}
+	next += n_words_needed(n_neurons * sizeof(synapse_types_params_t));
 }
 
 #if LOG_LEVEL >= LOG_DEBUG
