@@ -345,7 +345,7 @@ class SynapticMatrices(object):
         # Per-Population RNG
         spec.write_array(self.__app_vertex.pop_seed)
         # Per-Core RNG
-        spec.write_array(self.__app_vertex.core_seed)
+        spec.write_array(self.__app_vertex.core_seed(post_vertex_slice))
         for w in self.__weight_scales:
             # if the weights are high enough and the population size large
             # enough, then weight_scales < 1 will result in a zero scale

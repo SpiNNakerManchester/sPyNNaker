@@ -133,6 +133,7 @@ class AbstractPopulationVertex(
         "__structure",
         "__rng",
         "__pop_seed",
+        "__core_seeds",
         "__connection_cache",
         "__read_initial_values",
         "__have_read_initial_values",
@@ -256,6 +257,7 @@ class AbstractPopulationVertex(
         # An RNG for use in synaptic generation
         self.__rng = numpy.random.RandomState(seed)
         self.__pop_seed = create_mars_kiss_seeds(self.__rng)
+        self.__core_seeds = dict()
 
         # Store connections read from machine until asked to clear
         # Key is app_edge, synapse_info
@@ -865,15 +867,17 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
-        # Mark that reset has been done, and reload state variables
+        # Reset state variables
         self.__state_variables.copy_into(self.__initial_state_variables)
-        self.__tell_neuron_vertices_to_regenerate()
 
         # If synapses change during the run also regenerate these to get
         # back to the initial state
         if self.__synapse_dynamics.changes_during_run:
             SpynnakerDataView.set_requires_data_generation()
-            self.__tell_synapse_vertices_to_regenerate()
+        else:
+            # We only get neuron vertices to regenerate not redoing data
+            # generation
+            self.__tell_neuron_vertices_to_regenerate()
 
     @staticmethod
     def _ring_buffer_expected_upper_bound(
@@ -1337,14 +1341,18 @@ class AbstractPopulationVertex(
         """
         return self.__pop_seed
 
-    @property
-    def core_seed(self):
+    def core_seed(self, vertex_slice):
         """ The seed to use for a core
+
+        :param Slice vertex_slice: The machine vertex that the seed is for
 
         :return: A list of 4 integers
         :rtype: list(int)
         """
-        return create_mars_kiss_seeds(self.__rng)
+        if vertex_slice not in self.__core_seeds:
+            self.__core_seeds[vertex_slice] = create_mars_kiss_seeds(
+                self.__rng)
+        return self.__core_seeds[vertex_slice]
 
     def copy_initial_state_variables(self, vertex_slice):
         """ Copies the state variables into the initial state variables

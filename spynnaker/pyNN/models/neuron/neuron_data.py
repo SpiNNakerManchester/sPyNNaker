@@ -277,7 +277,8 @@ class NeuronData(object):
         return numpy.array([
             neuron_regions.neuron_params,
             neuron_regions.neuron_recording,
-            *self.__app_vertex.pop_seed, *self.__app_vertex.core_seed,
+            *self.__app_vertex.pop_seed,
+            *self.__app_vertex.core_seed(vertex_slice),
             n_structs, vertex_slice.n_atoms
         ], dtype="uint32")
 
