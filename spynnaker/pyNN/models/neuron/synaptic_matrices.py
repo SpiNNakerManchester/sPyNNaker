@@ -87,10 +87,10 @@ class SynapticMatrices(object):
         "__generated_data",
         # The size needed for generated data
         "__generated_data_size",
-        # The number of generated matrices
-        "__n_generated_matrices",
         # The matrices that need to be generated on host
         "__on_host_matrices",
+        # The matrices that have been generated on machine
+        "__on_machine_matrices",
         # The application vertex
         "__app_vertex",
         # The weight scales
@@ -132,9 +132,9 @@ class SynapticMatrices(object):
         self.__data_generated = False
         self.__max_gen_data = 0
         self.__on_host_matrices = None
+        self.__on_machine_matrices = None
         self.__generated_data = None
         self.__generated_data_size = 0
-        self.__n_generated_matrices = 0
         self.__master_pop_data = None
         self.__bit_field_size = 0
         self.__bit_field_key_map = None
@@ -196,10 +196,10 @@ class SynapticMatrices(object):
 
         # Set up other lists
         self.__on_host_matrices = list()
+        self.__on_machine_matrices = list()
         generated_data = list()
 
         # Keep on-machine generated blocks together at the end
-        generate_on_machine = list()
         self.__generated_data_size = (
             SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
             (self.__n_synapse_types * DataType.U3232.size))
@@ -222,7 +222,7 @@ class SynapticMatrices(object):
 
             # If we can generate on machine, store until end
             if synapse_info.may_generate_on_machine():
-                generate_on_machine.append(app_matrix)
+                self.__on_machine_matrices.append(app_matrix)
             else:
                 block_addr = app_matrix.reserve_matrices(block_addr, poptable)
                 self.__on_host_matrices.append(app_matrix)
@@ -231,7 +231,7 @@ class SynapticMatrices(object):
 
         # Now add the blocks on machine to keep these all together
         self.__max_gen_data = 0
-        for app_matrix in generate_on_machine:
+        for app_matrix in self.__on_machine_matrices:
             block_addr = app_matrix.reserve_matrices(block_addr, poptable)
             gen_data = app_matrix.get_generator_data()
             self.__generated_data_size += gen_data.size
@@ -239,11 +239,9 @@ class SynapticMatrices(object):
             self.__max_gen_data += app_matrix.gen_size
         if generated_data:
             self.__gen_on_machine = True
-            self.__n_generated_matrices = len(generate_on_machine)
             self.__generated_data = numpy.concatenate(generated_data)
         else:
             self.__gen_on_machine = True
-            self.__n_generated_matrices = 0
             self.__generated_data = numpy.zeros(0, dtype="uint32")
 
         self.__on_chip_generated_block_addr = block_addr
@@ -335,7 +333,7 @@ class SynapticMatrices(object):
             spec.write_value(self.__regions.structural_dynamics)
         else:
             spec.write_value(INVALID_REGION_ID)
-        spec.write_value(self.__n_generated_matrices)
+        spec.write_value(len(self.__on_machine_matrices))
         spec.write_value(post_vertex_slice.lo_atom)
         spec.write_value(post_vertex_slice.n_atoms)
         spec.write_value(0)  # TODO: The index if needed
@@ -436,7 +434,7 @@ class SynapticMatrices(object):
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
         """
-        for matrix in self.__matrices.values():
+        for matrix in self.__on_machine_matrices:
             matrix.read_generated_connection_holders(placement)
 
     @property
