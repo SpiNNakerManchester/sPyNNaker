@@ -97,7 +97,7 @@ def variable_rate_options():
 
     pops.append(
         p.Population(n_neurons, p.SpikeSourcePoisson(rate=[1, 10]),
-                     label="pop_j", additional_parameters={"seed": seed}))
+                     label="pop_j", additional_parameters={"seed": seed + 1}))
 
     pops.append(
         p.Population(
