@@ -63,8 +63,6 @@ class TestDebug(BaseTestCase):
             # ??? used by MachineExecuteDataSpecification but not called ???
             # write_network_specification_report
             network_specification_file_name,
-            # write_provenance_data
-            "provenance_data",
             # write_tag_allocation_reports
             reports_names._TAGS_FILENAME,
             # write_algorithm_timings
