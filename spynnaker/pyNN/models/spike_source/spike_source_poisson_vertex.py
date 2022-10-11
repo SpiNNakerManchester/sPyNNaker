@@ -291,18 +291,17 @@ class SpikeSourcePoissonVertex(
         if (SpynnakerDataView.is_ran_last() and
                 SpynnakerDataView.has_transceiver()):
             self.__read_parameters_now()
-        return self.__data[name].get_values(selector)
+        return self.__data[self.__full_name(name)].get_values(selector)
 
-    def __fix_names(self, names):
+    def __full_name(self, name):
         if self.__is_variable_rate:
-            return names
-        return [f"{name}s" for name in self._as_list(names)]
+            return name
+        return f"{name}s"
 
     @overrides(PopulationApplicationVertex.get_parameter_values)
     def get_parameter_values(self, names, selector=None):
         self._check_parameters(names, self.__allowed_parameters)
-        return ParameterHolder(
-            self.__fix_names(names), self.__read_parameter, selector)
+        return ParameterHolder(names, self.__read_parameter, selector)
 
     @overrides(PopulationApplicationVertex.set_parameter_values)
     def set_parameter_values(self, name, value, selector=None):

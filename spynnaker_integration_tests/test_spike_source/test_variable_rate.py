@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import pyNN.spiNNaker as p
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    DURATION_FOREVER)
 from spinnaker_testbase import BaseTestCase
 import scipy
 import numpy
@@ -158,9 +160,9 @@ def variable_rate_options():
                 array(values[0]), array(values[1]), array(values[2]))
             ends = list()
             for j, (start, duration) in enumerate(zip(starts, durations)):
-                if duration == 0 and (j + 1) >= len(starts):
+                if duration == DURATION_FOREVER and (j + 1) >= len(starts):
                     ends.append(run_time)
-                elif duration == 0:
+                elif duration == DURATION_FOREVER:
                     ends.append(starts[j + 1])
                 else:
                     ends.append(start + duration)

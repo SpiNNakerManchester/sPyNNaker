@@ -410,7 +410,7 @@ static inline void set_spike_source_details(uint32_t id, bool rate_changed) {
     log_debug("Source %u is at index %u", id, index);
     source_details details = source_data[id]->details[index];
     if (rate_changed) {
-        log_debug("Setting rate of %u to %k", id, (s1615) details.rate);
+        log_debug("Setting rate of %u to %k at %u", id, (s1615) details.rate, time);
         set_spike_source_rate(id, details.rate);
     }
     spike_source_t *p = &(source[id]);
@@ -528,8 +528,10 @@ static inline void read_next_rates(uint32_t id) {
 
 //! \brief Read the rates of the Poisson.
 //! \param[in] sdram_sources: the configuration in SDRAM
+//! \param[in] rate_changed: whether any rates have actually changed
+//! \param[in] next_time: the time which will be the next timestep to run
 //! \return Whether the rates were read successfully.
-static bool read_rates(source_info *sdram_sources, bool rate_changed) {
+static bool read_rates(source_info *sdram_sources, bool rate_changed, uint32_t next_time) {
     // Allocate DTCM for array of spike sources and copy block of data
     if (ssp_params.n_spike_sources > 0) {
         // the first time around, the array is set to NULL, afterwards,
@@ -565,11 +567,12 @@ static bool read_rates(source_info *sdram_sources, bool rate_changed) {
             uint32_t index = 0;
             uint32_t n_rates = source_data[i]->n_rates;
             while ((index + 1) < n_rates
-                    && time >= ms_to_ticks(source_data[i]->details[index + 1].start)) {
+                    && next_time >= ms_to_ticks(source_data[i]->details[index + 1].start)) {
                 index++;
             }
+            bool new_index = source_data[i]->index != index;
             source_data[i]->index = index;
-            set_spike_source_details(i, rate_changed);
+            set_spike_source_details(i, rate_changed || new_index);
         }
     }
     log_info("read_poisson_parameters: completed successfully");
@@ -577,6 +580,10 @@ static bool read_rates(source_info *sdram_sources, bool rate_changed) {
 }
 
 static bool expand_rates(source_expand_region *items, source_info *sdram_sources) {
+
+	if (!items->rate_changed) {
+		return false;
+	}
 
     // We need a pointer here as each item is dynamically sized.  This pointer
     // will be updated each time with the start of the next item to be read
@@ -614,7 +621,8 @@ static bool expand_rates(source_expand_region *items, source_info *sdram_sources
         item = (source_expand_details *) &(item->info.details[n_rates]);
     }
 
-    return items->rate_changed;
+    items->rate_changed = false;
+    return true;
 }
 
 //! \brief Initialise the recording parts of the model.
@@ -701,7 +709,7 @@ static bool initialize(void) {
     bool rates_changed = expand_rates(
             data_specification_get_region(EXPANDER_REGION, ds_regions),
             rates_region);
-    if (!read_rates(rates_region, rates_changed)) {
+    if (!read_rates(rates_region, rates_changed, 0)) {
         return false;
     }
 
@@ -769,12 +777,23 @@ static void resume_callback(void) {
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
 
+    // If we are resetting, re-read the seed
+    bool rates_changed = false;
+    if (time == UINT32_MAX) {
+    	if (!read_global_parameters(data_specification_get_region(
+    			POISSON_PARAMS, ds_regions))) {
+    		log_error("failed to reread the Poisson params");
+    		rt_error(RTE_SWERR);
+    	}
+    	rates_changed = true;
+    }
+
     void *rates_region = data_specification_get_region(RATES, ds_regions);
-    bool rates_changed = expand_rates(
+    rates_changed = rates_changed || expand_rates(
             data_specification_get_region(EXPANDER_REGION, ds_regions),
             rates_region);
 
-    if (!read_rates(rates_region, rates_changed)) {
+    if (!read_rates(rates_region, rates_changed, time + 1)) {
         log_error("failed to reread the Poisson rates from SDRAM");
         rt_error(RTE_SWERR);
     }
@@ -949,22 +968,31 @@ static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
         sark_word_set(input_this_timestep, 0, sdram_inputs->size_in_bytes);
     }
 
-    // Loop through spike sources
+    // Loop through spike sources and see if they need updating
+    // NOTE: This full loop needs to happen first with processing in a second
+    // separate loop.  This is to ensure that the random generator use matches
+    // between a single run and a split run (as slow sources can produce
+    // multiple spikes in a single time step).
     for (index_t s_id = 0; s_id < ssp_params.n_spike_sources; s_id++) {
-        // If this spike source is active this tick
+        spike_source_t *spike_source = &source[s_id];
+
+        // Move to the next tick now if needed
+        if (time >= spike_source->next_ticks) {
+            log_debug("Moving to next rate at time %d", time);
+            read_next_rates(s_id);
+#if LOG_LEVEL >= LOG_DEBUG
+            print_spike_source(s_id);
+#endif
+        }
+    }
+
+    // Loop through the sources and process them
+    for (index_t s_id = 0; s_id < ssp_params.n_spike_sources; s_id++) {
         spike_source_t *spike_source = &source[s_id];
         if (spike_source->is_fast_source) {
             process_fast_source(s_id, spike_source);
         } else {
             process_slow_source(s_id, spike_source);
-        }
-
-        if ((time + 1) >= spike_source->next_ticks) {
-            log_debug("Moving to next rate at time %d", time);
-            read_next_rates(s_id);
-#if LOG_LEVEL >= LOG_DEBUG
-            // print_spike_source(s_id);
-#endif
         }
     }
 
