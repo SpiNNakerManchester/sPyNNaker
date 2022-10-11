@@ -101,13 +101,15 @@ class SynapseDynamicsStructuralCommon(
             len(structural_projections))
 
         # Write the pre-population info
-        pop_index, subpop_index = self.__write_prepopulation_info(
-            spec, app_vertex, structural_projections,
-            weight_scales, synaptic_matrices)
+        pop_index, subpop_index, lo_atom_index = \
+            self.__write_prepopulation_info(
+                spec, app_vertex, structural_projections,
+                weight_scales, synaptic_matrices)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
-            spec, pop_index, subpop_index, app_vertex, vertex_slice)
+            spec, pop_index, subpop_index, lo_atom_index, app_vertex,
+            vertex_slice)
 
         # Write the component parameters
         # pylint: disable=no-member, protected-access
@@ -221,6 +223,7 @@ class SynapseDynamicsStructuralCommon(
         pop_index = dict()
         routing_info = SpynnakerDataView.get_routing_infos()
         subpop_index = dict()
+        lo_atom_index = dict()
         index = 0
         for proj in structural_projections:
             spec.comment("Writing pre-population info for {}".format(
@@ -270,12 +273,15 @@ class SynapseDynamicsStructuralCommon(
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
                     app_edge, synapse_info))
+                lo = m_vertex.vertex_slice.lo_atom
                 for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
                     subpop_index[app_edge.pre_vertex, synapse_info, i] = sub
-        return pop_index, subpop_index
+                    lo_atom_index[app_edge.pre_vertex, synapse_info, i] = lo
+        return pop_index, subpop_index, lo_atom_index
 
     def __write_post_to_pre_table(
-            self, spec, pop_index, subpop_index, app_vertex, vertex_slice):
+            self, spec, pop_index, subpop_index, lo_atom_index, app_vertex,
+            vertex_slice):
         """ Post to pre table is basically the transpose of the synaptic\
             matrix.
 
@@ -303,12 +309,12 @@ class SynapseDynamicsStructuralCommon(
              for (_, a_edge, s_info) in slice_conns], conn_lens)
         # Make a single large array of sub-population index
         subpop_indices = numpy.array([
-            subpop_index[a_edge, s_info, c["source"]]
+            subpop_index[a_edge.pre_vertex, s_info, c["source"]]
             for (conns, a_edge, s_info) in slice_conns for c in conns])
         # Get the low atom for each source and subtract
-        lo_atoms = numpy.repeat(
-            [pre_slice.lo_atom
-             for (_, _, _, pre_slice, _) in slice_conns], conn_lens)
+        lo_atoms = numpy.array([
+            lo_atom_index[a_edge.pre_vertex, s_info, c["source"]]
+            for (conns, a_edge, s_info) in slice_conns for c in conns])
         connections["source"] = connections["source"] - lo_atoms
         connections["target"] = connections["target"] - vertex_slice.lo_atom
 
