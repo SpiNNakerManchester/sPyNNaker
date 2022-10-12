@@ -179,15 +179,15 @@ static bool do_bitfield_generation(
         uint32_t *n_atom_data_sdram, void *master_pop,
         void *synaptic_matrix, void *bitfield_filters, void *structural_matrix) {
 
-    uint32_t row_max_n_words;
-    if (!population_table_setup(master_pop, &row_max_n_words, &master_pop_table_length,
-            &master_pop_table, &address_list)) {
-        return false;
-    }
+	pop_table_config_t *config = (pop_table_config_t *) master_pop;
+	master_pop_table_length = config->table_length;
 
     if (master_pop_table_length == 0) {
     	return true;
     }
+
+    master_pop_table = &config->data[0];
+    address_list = (address_list_entry *) &config->data[master_pop_table_length];
 
     uint32_t n_atom_bytes = master_pop_table_length * sizeof(uint32_t);
     uint32_t *n_atom_data = spin1_malloc(n_atom_bytes);
@@ -197,6 +197,8 @@ static bool do_bitfield_generation(
     }
     spin1_memcpy(n_atom_data, n_atom_data_sdram, n_atom_bytes);
 
+
+    uint32_t row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
     synaptic_row_t row_data = spin1_malloc(row_max_n_words * sizeof(uint32_t));
     if (row_data == NULL) {
         log_error("Could not allocate dtcm for the row data");
