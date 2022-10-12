@@ -350,10 +350,7 @@ class PopulationView(PopulationBase):
         :return: array of the data
         :rtype: ~numpy.ndarray
         """
-        warn_once(
-            logger, "spinnaker_get_data is non-standard PyNN and therefore "
-            "will not be portable to other simulators.")
-        return self.__recorder.get_recorded_pynn7(
+        return self.__population.spinnaker_get_data(
             variable, as_matrix, self.__indexes)
 
     def get_spike_counts(self, gather=True):
