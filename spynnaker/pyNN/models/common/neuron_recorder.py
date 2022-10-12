@@ -1447,13 +1447,15 @@ class NeuronRecorder(object):
                     next_id, i = next(id_iter, (None, i + 1))
 
                 # Add the count of things to be recorded
-                data.append((i - start_i + 1) | _RECORDED_FLAG)
+                data.append((i - start_i) | _RECORDED_FLAG)
                 last_recorded = i - 1
+                n_items += 1
 
         # If there are more items in the vertex slice, they must be
         # non-recorded items
         if next_id is not None:
             data.append((vertex_slice.n_atoms - i) | _NOT_RECORDED_FLAG)
+            n_items += 1
 
         data[0] = n_items
         return numpy.array(data, dtype="uint32")
