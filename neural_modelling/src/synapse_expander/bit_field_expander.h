@@ -102,13 +102,13 @@ static inline bool generate_bit_field(filter_region_t *bitfield_filters,
         }
         clear_bit_field(bit_field, n_words);
 
-        master_population_table_entry *mp_entry = &master_pop_table[i];
+        master_population_table_entry mp_entry = master_pop_table[i];
 
         if (structural_matrix != NULL) {
 
             // If this is a structural entry, set all the bits
             uint32_t dummy1 = 0, dummy2 = 0, dummy3 = 0, dummy4 = 0;
-            if (sp_structs_find_by_spike(pre_info, mp_entry->key,
+            if (sp_structs_find_by_spike(pre_info, mp_entry.key,
                     &dummy1, &dummy2, &dummy3, &dummy4)) {
             	for (uint32_t n = 0; n < n_neurons; n++) {
                     bit_field_set(bit_field, n);
@@ -117,19 +117,19 @@ static inline bool generate_bit_field(filter_region_t *bitfield_filters,
         } else {
 
 			// Go through the addresses of the master pop entry
-			uint32_t pos = mp_entry->start;
-			for (uint32_t j = mp_entry->count; j > 0; j--, pos++) {
+			uint32_t pos = mp_entry.start;
+			for (uint32_t j = mp_entry.count; j > 0; j--, pos++) {
 
 				// Find the base address and row length of the address entry
-				address_list_entry *entry = &address_list[pos];
+				address_list_entry entry = address_list[pos];
 
 				// Skip invalid addresses
-				if (entry->address == INVALID_ADDRESS) {
+				if (entry.address == INVALID_ADDRESS) {
 					continue;
 				}
-				uint32_t *address = (uint32_t *) get_address(*entry,
+				uint32_t *address = (uint32_t *) get_address(entry,
 						(uint32_t) synaptic_matrix);
-				uint32_t row_length = get_row_length(*entry) + N_SYNAPSE_ROW_HEADER_WORDS;
+				uint32_t row_length = get_row_length(entry) + N_SYNAPSE_ROW_HEADER_WORDS;
 				uint32_t row_length_bytes = row_length * sizeof(uint32_t);
 
 				// Go through each neuron and check the row
@@ -153,10 +153,10 @@ static inline bool generate_bit_field(filter_region_t *bitfield_filters,
         }
 
         // Copy details into SDRAM
-        bitfield_filters->filters[i].key = mp_entry->key;
+        bitfield_filters->filters[i].key = mp_entry.key;
         bitfield_filters->filters[i].n_atoms = n_neurons;
-        bitfield_filters->filters[i].n_atoms_per_core = mp_entry->n_neurons;
-        bitfield_filters->filters[i].core_shift = mp_entry->mask_shift;
+        bitfield_filters->filters[i].n_atoms_per_core = mp_entry.n_neurons;
+        bitfield_filters->filters[i].core_shift = mp_entry.mask_shift;
         spin1_memcpy(&bit_field_words_location[position], bit_field,
                 n_words * sizeof(uint32_t));
         bitfield_filters->filters[i].data = &bit_field_words_location[position];
