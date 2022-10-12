@@ -104,51 +104,52 @@ static inline bool generate_bit_field(filter_region_t *bitfield_filters,
 
         master_population_table_entry *mp_entry = &master_pop_table[i];
 
-        // If this is a structural entry, set the bits and continue
         if (structural_matrix != NULL) {
+
+            // If this is a structural entry, set all the bits
             uint32_t dummy1 = 0, dummy2 = 0, dummy3 = 0, dummy4 = 0;
             if (sp_structs_find_by_spike(pre_info, mp_entry->key,
                     &dummy1, &dummy2, &dummy3, &dummy4)) {
-                for (uint32_t n = 0; n < n_neurons; n++) {
+            	for (uint32_t n = 0; n < n_neurons; n++) {
                     bit_field_set(bit_field, n);
                 }
-                continue;
             }
-        }
+        } else {
 
-        // Go through the addresses of the master pop entry
-        uint32_t pos = mp_entry->start;
-        for (uint32_t j = mp_entry->count; j > 0; j--, pos++) {
+			// Go through the addresses of the master pop entry
+			uint32_t pos = mp_entry->start;
+			for (uint32_t j = mp_entry->count; j > 0; j--, pos++) {
 
-            // Find the base address and row length of the address entry
-            address_list_entry *entry = &address_list[pos];
+				// Find the base address and row length of the address entry
+				address_list_entry *entry = &address_list[pos];
 
-            // Skip invalid addresses
-            if (entry->address == INVALID_ADDRESS) {
-            	continue;
-            }
-            uint32_t *address = (uint32_t *) get_address(*entry,
-                    (uint32_t) synaptic_matrix);
-            uint32_t row_length = get_row_length(*entry) + N_SYNAPSE_ROW_HEADER_WORDS;
-            uint32_t row_length_bytes = row_length * sizeof(uint32_t);
+				// Skip invalid addresses
+				if (entry->address == INVALID_ADDRESS) {
+					continue;
+				}
+				uint32_t *address = (uint32_t *) get_address(*entry,
+						(uint32_t) synaptic_matrix);
+				uint32_t row_length = get_row_length(*entry) + N_SYNAPSE_ROW_HEADER_WORDS;
+				uint32_t row_length_bytes = row_length * sizeof(uint32_t);
 
-            // Go through each neuron and check the row
-            for (uint32_t n = 0; n < n_neurons; n++) {
+				// Go through each neuron and check the row
+				for (uint32_t n = 0; n < n_neurons; n++) {
 
-                // If this neuron is already set, skip it this round
-                if (bit_field_test(bit_field, n)) {
-                    continue;
-                }
+					// If this neuron is already set, skip it this round
+					if (bit_field_test(bit_field, n)) {
+						continue;
+					}
 
-                // Check if the row is non-empty and if so set a bit
-                synaptic_row_t row = (synaptic_row_t) address;
-                if (do_sdram_read_and_test(row_data, row, row_length_bytes)) {
-                    bit_field_set(bit_field, n);
-                }
+					// Check if the row is non-empty and if so set a bit
+					synaptic_row_t row = (synaptic_row_t) address;
+					if (do_sdram_read_and_test(row_data, row, row_length_bytes)) {
+						bit_field_set(bit_field, n);
+					}
 
-                // Move to the next row for the next neuron
-                address = &address[row_length];
-            }
+					// Move to the next row for the next neuron
+					address = &address[row_length];
+				}
+			}
         }
 
         // Copy details into SDRAM
@@ -206,11 +207,8 @@ static bool do_bitfield_generation(
     post_to_pre_entry *post_to_pre_table;
     pre_pop_info_table_t pre_info = {0, NULL};
     if (structural_matrix != NULL) {
-        if (!sp_structs_read_in_common(
-                structural_matrix, &rewiring_data, &pre_info, &post_to_pre_table)) {
-            log_error("Failed to init the synaptogenesis");
-            return false;
-        }
+        sp_structs_read_in_common(
+            structural_matrix, &rewiring_data, &pre_info, &post_to_pre_table);
     }
 
     if (!generate_bit_field(bitfield_filters, n_atom_data, synaptic_matrix,

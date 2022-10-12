@@ -282,3 +282,8 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         return [(m_vertex, [source_vertex])
                 for m_vertex in target_vertex.splitter.get_in_coming_vertices(
                     SPIKE_PARTITION_ID)]
+
+    @property
+    @overrides(SynapseDynamicsStatic.is_single_core_capable)
+    def is_single_core_capable(self):
+        return False
