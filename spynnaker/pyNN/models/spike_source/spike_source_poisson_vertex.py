@@ -253,6 +253,14 @@ class SpikeSourcePoissonVertex(
     def set_structure(self, structure):
         self.__structure = structure
 
+    @property
+    def rates(self):
+        """ Get the rates
+
+        :rtype: RangedList
+        """
+        return self.__data["rates"]
+
     def add_outgoing_projection(self, projection):
         """ Add an outgoing projection from this vertex
 

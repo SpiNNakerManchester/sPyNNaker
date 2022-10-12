@@ -535,7 +535,7 @@ class SpikeSourcePoissonMachineVertex(
                 offset += PARAMS_WORDS_PER_NEURON * BYTES_PER_WORD
                 rates = list()
                 for _ in range(n_rates):
-                    rate_int = _ONE_WORD.unpack_from(byte_array, offset)
+                    rate_int = _ONE_WORD.unpack_from(byte_array, offset)[0]
                     rates.append(rate_int / DataType.S1615.scale)
                     # Skip the start and duration as they can't change
                     offset += PARAMS_WORDS_PER_RATE * BYTES_PER_WORD
