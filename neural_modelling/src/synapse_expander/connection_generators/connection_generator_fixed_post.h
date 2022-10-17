@@ -92,12 +92,11 @@ static uint32_t post_random_in_range(rng_t *rng, uint32_t range) {
 static bool fixed_post_write(uint32_t pre, uint32_t post, accum weight_scale,
         accum timestep_per_delay, param_generator_t weight_generator,
         param_generator_t delay_generator, matrix_generator_t matrix_generator) {
-    uint16_t weight = rescale_weight(
-            param_generator_generate(weight_generator), weight_scale);
+    accum weight = param_generator_generate(weight_generator);
     uint16_t delay = rescale_delay(
             param_generator_generate(delay_generator), timestep_per_delay);
     return matrix_generator_write_synapse(
-            matrix_generator, pre, post, weight, delay);
+            matrix_generator, pre, post, weight, delay, weight_scale);
 }
 
 /**

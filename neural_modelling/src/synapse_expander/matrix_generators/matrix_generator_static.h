@@ -208,12 +208,14 @@ static void matrix_generator_static_free(void *generator) {
  * \param[in] pre_index: The index of the pre-neuron relative to the start of
  *                       the matrix
  * \param[in] post_index: The index of the post-neuron on this core
- * \param[in] weight: The weight of the synapse pre-encoded as a uint16_t
+ * \param[in] weight: The weight of the synapse in raw format
  * \param[in] delay: The delay of the synapse in time steps
+ * \param[in] weight_scale: The scale to apply to the weight if needed
  * \return whether the synapses was added or not
  */
 static bool matrix_generator_static_write_synapse(void *generator,
-        uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay) {
+        uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,
+		accum weight_scale) {
     matrix_genetator_static_data_t *data = generator;
     struct delay_value delay_and_stage = get_delay(delay, data->max_stage,
             data->max_delay_per_stage);
@@ -243,8 +245,10 @@ static bool matrix_generator_static_write_synapse(void *generator,
         }
     }
 
+    uint16_t scaled_weight = rescale_weight(weight, weight_scale);
+
     row->fixed_fixed_size = pos + 1;
-    row->fixed_fixed_data[pos] = build_static_word(weight, delay_and_stage.delay,
+    row->fixed_fixed_data[pos] = build_static_word(scaled_weight, delay_and_stage.delay,
             data->synapse_type, post_index, data->synapse_type_bits,
             data->synapse_index_bits, data->delay_bits);
     return true;

@@ -114,12 +114,11 @@ static bool connection_generator_fixed_prob_generate(
             // If less than our probability, generate a connection
             if (value <= obj->params.probability) {
                 uint32_t local_post = post - post_slice_start;
-                uint16_t weight = rescale_weight(
-                        param_generator_generate(weight_generator), weight_scale);
+                accum weight = param_generator_generate(weight_generator);
                 uint16_t delay = rescale_delay(
                         param_generator_generate(delay_generator), timestep_per_delay);
                 if (!matrix_generator_write_synapse(matrix_generator, pre, local_post,
-                        weight, delay)) {
+                        weight, delay, weight_scale)) {
                     // Retry not useful here
                     log_warning("Could not add to matrix!");
                 }

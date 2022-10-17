@@ -276,11 +276,13 @@ void matrix_generator_stdp_free(void *generator) {
  * \param[in] pre_index: The index of the pre-neuron relative to the start of
  *                       the matrix
  * \param[in] post_index: The index of the post-neuron on this core
- * \param[in] weight: The weight of the synapse pre-encoded as a uint16_t
+ * \param[in] weight: The weight of the synapse in raw form
  * \param[in] delay: The delay of the synapse in time steps
+ * \param[in] weight_scale: The scale to apply to the weight if needed
  */
 static bool matrix_generator_stdp_write_synapse(void *generator,
-        uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay) {
+        uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,
+		accum weight_scale) {
     matrix_generator_stdp_data_t *data = generator;
     struct delay_value delay_and_stage = get_delay(delay, data->max_stage,
             data->max_delay_per_stage);
@@ -315,12 +317,15 @@ static bool matrix_generator_stdp_write_synapse(void *generator,
             return false;
         }
     }
+
+    uint16_t scaled_weight = rescale_weight(weight, weight_scale);
+
     fixed_row->fixed_plastic_size = pos + 1;
     fixed_row->fixed_plastic_data[pos] = build_fixed_plastic_half_word(
             delay_and_stage.delay, data->synapse_type, post_index,
             data->synapse_type_bits, data->synapse_index_bits, data->delay_bits);
     uint32_t plastic_pos = data->n_half_words_per_pp_row_header
             + (data->n_half_words_per_pp_synapse * pos) + data->weight_half_word;
-    plastic_row->plastic_plastic_data[plastic_pos] = weight;
+    plastic_row->plastic_plastic_data[plastic_pos] = scaled_weight;
     return true;
 }

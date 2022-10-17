@@ -127,8 +127,7 @@ bool connection_generator_fixed_pre_generate(
         if (obj->params.with_replacement) {
             // If with replacement just repeated pick
             for (uint32_t j = 0; j < n_conns; j++) {
-                uint16_t weight = rescale_weight(
-                        param_generator_generate(weight_generator), weight_scale);
+                accum weight = param_generator_generate(weight_generator);
                 uint16_t delay = rescale_delay(
                         param_generator_generate(delay_generator), timestep_per_delay);
                 uint32_t pre;
@@ -138,7 +137,8 @@ bool connection_generator_fixed_pre_generate(
                     pre = pre_random_in_range(core_rng, n_values) + pre_lo;
                     if (obj->params.allow_self_connections || pre != post) {
                         written = matrix_generator_write_synapse(
-                                matrix_generator, pre, local_post, weight, delay);
+                                matrix_generator, pre, local_post, weight, delay,
+								weight_scale);
                         n_retries++;
                     }
                 } while (!written && n_retries < 10);
@@ -170,13 +170,12 @@ bool connection_generator_fixed_pre_generate(
                 }
             }
             for (uint32_t j = 0; j < n_conns; j++) {
-                uint16_t weight = rescale_weight(
-                        param_generator_generate(weight_generator), weight_scale);
+                accum weight = param_generator_generate(weight_generator);
                 uint16_t delay = rescale_delay(
                         param_generator_generate(delay_generator), timestep_per_delay);
                 // Not a lot we can do here!
                 if (!matrix_generator_write_synapse(matrix_generator, values[j],
-                        local_post, weight, delay)) {
+                        local_post, weight, delay, weight_scale)) {
                     log_warning("Could not write to matrix!");
                 }
             }

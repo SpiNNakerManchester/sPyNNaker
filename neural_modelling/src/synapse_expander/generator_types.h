@@ -83,12 +83,14 @@ typedef accum (generate_param_func)(void *generator);
  * \param[in] pre_index: The index of the pre-neuron relative to the start of
  *                       the matrix
  * \param[in] post_index: The index of the post-neuron on this core
- * \param[in] weight: The weight of the synapse pre-encoded as a uint16_t
+ * \param[in] weight: The weight of the synapse in raw numbers
  * \param[in] delay: The delay of the synapse in time steps
+ * \param[in] weight_scale: The scaling to apply to the weight if needed
  * \return: Whether the synapse was added or not
  */
 typedef bool (write_synapse_func)(void *generator,
-        uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay);
+        uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,
+		accum weight_scale);
 
 /**
  * \brief How to generate connections with a connection generator
@@ -139,11 +141,15 @@ static inline uint16_t rescale_delay(accum delay, accum timestep_per_delay) {
 //! \param[in] weight_scale: The weight scaling factor
 //! \return the rescaled weight
 static inline uint16_t rescale_weight(accum weight, unsigned long accum weight_scale) {
-    if (weight < 0) {
-        weight = -weight;
+    unsigned long accum uweight = 0;
+	if (weight < 0) {
+        uweight = -weight;
+    } else {
+    	uweight = weight;
     }
-    accum weight_scaled = weight * weight_scale;
-    uint16_t weight_int = (uint16_t) weight_scaled;
+    unsigned long accum weight_scaled = uweight * weight_scale;
+    unsigned long accum weight_rounded = roundulk(weight_scaled, 32);
+    uint16_t weight_int = (uint16_t) (bitsulk(weight_rounded) >> 32);
     if (weight_scaled != weight_int) {
         log_debug("Rounded weight %k to %u (scale is %k)",
                 weight_scaled, weight_int, weight_scale);

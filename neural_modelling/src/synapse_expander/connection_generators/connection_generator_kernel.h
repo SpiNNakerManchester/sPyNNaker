@@ -201,8 +201,8 @@ static bool connection_generator_kernel_generate(
                 }
                 if (!matrix_generator_write_synapse(
                         matrix_generator, pre, local_post,
-                        rescale_weight(weight, weight_scale),
-                        rescale_delay(delay, timestep_per_delay))) {
+                        weight, rescale_delay(delay, timestep_per_delay),
+						weight_scale)) {
                     log_error("Matrix size is wrong!");
                     return false;
                 }

@@ -38,7 +38,8 @@ LOOKUP_TAU_C_SHIFT = 4
 LOOKUP_TAU_D_SHIFT = 2
 
 
-class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
+class SynapseDynamicsNeuromodulation(
+        AbstractPlasticSynapseDynamics, AbstractGenerateOnMachine):
     """ Synapses that target a neuromodulation receptor
     """
 
@@ -235,7 +236,6 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     def gen_matrix_id(self):
         return MatrixGeneratorID.NEUROMODULATION_MATRIX.value
 
-    @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(
             self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
