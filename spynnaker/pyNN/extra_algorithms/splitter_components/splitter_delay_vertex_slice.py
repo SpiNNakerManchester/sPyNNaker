@@ -126,7 +126,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         return ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             self._governed_app_vertex.delay_params_size() +
-            self._governed_app_vertex.tdma_sdram_size_in_bytes +
             DelayExtensionMachineVertex.get_provenance_data_size(
                 DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES))
 

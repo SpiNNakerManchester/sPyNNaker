@@ -15,9 +15,8 @@
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_bool
+from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.abstract_models.impl import (
-    TDMAAwareApplicationVertex)
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from spynnaker.pyNN.utilities.constants import (
@@ -27,7 +26,7 @@ _DELAY_PARAM_HEADER_WORDS = 8
 
 
 class DelayExtensionVertex(
-        TDMAAwareApplicationVertex, AbstractHasDelayStages):
+        ApplicationVertex, AbstractHasDelayStages):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -119,10 +118,6 @@ class DelayExtensionVertex(
         """ The size of the delay parameters
         """
         return BYTES_PER_WORD * _DELAY_PARAM_HEADER_WORDS
-
-    @overrides(TDMAAwareApplicationVertex.get_n_cores)
-    def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices())
 
     @property
     def partition(self):

@@ -106,11 +106,9 @@ class DelayExtensionMachineVertex(
                parse_extra_provenance_items)
     def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
-         n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
+         _n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
          max_bg, n_bg_overloads) = provenance_data
 
-        self._app_vertex.get_tdma_provenance_item(
-            x, y, p, label, n_tdma_behind)
         with ProvenanceWriter() as db:
             db.insert_core(
                 x, y, p, self.COUNT_SATURATION_NAME, n_sat)
@@ -244,10 +242,6 @@ class DelayExtensionMachineVertex(
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
-        spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.TDMA_REGION.value,
-            size=self._app_vertex.tdma_sdram_size_in_bytes, label="tdma data")
-
         # reserve region for provenance
         self.reserve_provenance_data_region(spec)
 
@@ -271,13 +265,6 @@ class DelayExtensionMachineVertex(
 
         self.write_delay_parameters(
             spec, self._vertex_slice, key, incoming_key, incoming_mask)
-
-        # add tdma data
-        spec.switch_write_focus(
-            self._DELAY_EXTENSION_REGIONS.TDMA_REGION.value)
-        spec.write_array(
-            self._app_vertex.generate_tdma_data_specification_data(
-                self.index))
 
         # End-of-Spec:
         spec.end_specification()
