@@ -210,7 +210,8 @@ class DelayExtensionMachineVertex(
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id):
-        return self._vertex_slice.n_atoms * self.app_vertex.n_delay_stages
+        n_keys = super().get_n_keys_for_partition(partition_id)
+        return n_keys * self.app_vertex.n_delay_stages
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
