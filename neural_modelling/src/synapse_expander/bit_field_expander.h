@@ -127,10 +127,6 @@ static inline bool generate_bit_field(filter_region_t *bitfield_filters,
 				if (entry.address == INVALID_ADDRESS) {
 					continue;
 				}
-				uint32_t *address = (uint32_t *) get_address(entry,
-						(uint32_t) synaptic_matrix);
-				uint32_t row_length = get_row_length(entry) + N_SYNAPSE_ROW_HEADER_WORDS;
-				uint32_t row_length_bytes = row_length * sizeof(uint32_t);
 
 				// Go through each neuron and check the row
 				for (uint32_t n = 0; n < n_neurons; n++) {
@@ -140,14 +136,15 @@ static inline bool generate_bit_field(filter_region_t *bitfield_filters,
 						continue;
 					}
 
+					synaptic_row_t row;
+					uint32_t n_bytes_to_transfer;
+					get_row_addr_and_size(entry, (uint32_t) synaptic_matrix,
+					        n, &row, &n_bytes_to_transfer);
+
 					// Check if the row is non-empty and if so set a bit
-					synaptic_row_t row = (synaptic_row_t) address;
-					if (do_sdram_read_and_test(row_data, row, row_length_bytes)) {
+					if (do_sdram_read_and_test(row_data, row, n_bytes_to_transfer)) {
 						bit_field_set(bit_field, n);
 					}
-
-					// Move to the next row for the next neuron
-					address = &address[row_length];
 				}
 			}
         }

@@ -24,6 +24,8 @@
 
 #include <common/neuron-typedefs.h>
 #include <filter_info.h>
+#include <neuron/synapse_row.h>
+#include <debug.h>
 
 
 //! bits in a word
@@ -150,6 +152,29 @@ static inline uint32_t get_neuron_id(
 static inline uint32_t get_local_neuron_id(
         master_population_table_entry entry, spike_t spike) {
     return spike & ~(entry.mask | (entry.core_mask << entry.mask_shift));
+}
+
+//! \brief Get the row address and size for a given neuron
+//! \param[in] item The address list item
+//! \param[in] synaptic_rows_based_address The address of all synaptic rows
+//! \param[in] neuron_id The incoming neuron to get the address of
+//! \param[out] row_address Holder of the row address on return
+//! \param[out] n_bytes_to_transfer Holder of the bytes to transfer on return
+static inline void get_row_addr_and_size(address_list_entry item,
+		uint32_t synaptic_rows_base_address, uint32_t neuron_id,
+		synaptic_row_t *row_address, uint32_t *n_bytes_to_transfer) {
+	uint32_t row_length = get_row_length(item);
+	uint32_t block_address = get_address(item, synaptic_rows_base_address);
+	uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+	uint32_t neuron_offset = neuron_id * stride * sizeof(uint32_t);
+
+	*row_address = (synaptic_row_t) (block_address + neuron_offset);
+	*n_bytes_to_transfer = stride * sizeof(uint32_t);
+
+    log_debug("neuron_id = %u, block_address = 0x%.8x, "
+            "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
+            neuron_id, block_address, row_length, *row_address,
+            *n_bytes_to_transfer);
 }
 
 //! \brief the number of times a DMA resulted in 0 entries
