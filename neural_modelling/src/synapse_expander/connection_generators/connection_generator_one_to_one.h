@@ -90,8 +90,7 @@ static bool connection_generator_one_to_one_generate(
 
     for (uint32_t pre = pre_start, post = post_start; pre <= pre_end; pre++, post++) {
         uint32_t local_post = post - post_slice_start;
-        accum weight = rescale_weight(
-                param_generator_generate(weight_generator), weight_scale);
+        accum weight = param_generator_generate(weight_generator);
         uint16_t delay = rescale_delay(
                 param_generator_generate(delay_generator), timestep_per_delay);
         if (!matrix_generator_write_synapse(matrix_generator, pre, local_post,
