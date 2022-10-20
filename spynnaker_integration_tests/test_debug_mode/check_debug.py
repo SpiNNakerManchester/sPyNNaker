@@ -126,5 +126,3 @@ class CheckDebug(BaseTestCase):
             self.assertIn(report, found)
 
         sim.end()
-
-
