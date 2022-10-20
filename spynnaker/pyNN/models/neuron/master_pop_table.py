@@ -369,6 +369,7 @@ class MasterPopTableAsBinarySearch(object):
                     n_cores *= _DELAY_SCALE
 
                 n_vertices += n_cores
+                n_entries += n_vertices
 
         return (
             _BASE_SIZE_BYTES +
