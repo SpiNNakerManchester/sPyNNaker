@@ -337,9 +337,13 @@ def get_synapses(
         stages = numpy.floor((numpy.round(
             delayed_connections["delay"] - 1.0)) / max_delay).astype(
             "uint32")
-        delayed_row_indices = (
-                delayed_connections["source"] +
-                ((stages - 1) * app_edge.pre_vertex.n_atoms))
+        delayed_cores = delayed_connections["source"] // max_atoms_per_core
+        local_sources = delayed_connections["source"] - (
+            delayed_cores * max_atoms_per_core)
+        delay_atoms_per_core = max_atoms_per_core * n_delay_stages
+        delayed_pre_cores = delayed_cores * delay_atoms_per_core
+        local_index = ((stages - 1) * max_atoms_per_core) + local_sources
+        delayed_row_indices = delayed_pre_cores + local_index
         delayed_connections["delay"] -= max_delay * stages
 
         # Get the data

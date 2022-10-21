@@ -202,7 +202,8 @@ class SynapseDynamicsStatic(
             max_row_info.undelayed_max_words, max_row_info.delayed_max_words,
             synapse_info.synapse_type, n_synapse_type_bits,
             n_synapse_index_bits, app_edge.n_delay_stages + 1,
-            max_delay, max_delay_bits, app_edge.pre_vertex.n_atoms],
+            max_delay, max_delay_bits, app_edge.pre_vertex.n_atoms,
+            max_atoms_per_core],
             dtype=numpy.uint32)
 
     @property

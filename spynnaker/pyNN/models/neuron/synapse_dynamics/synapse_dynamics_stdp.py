@@ -543,7 +543,8 @@ class SynapseDynamicsSTDP(
             synapse_info.synapse_type, n_synapse_type_bits,
             n_synapse_index_bits, app_edge.n_delay_stages + 1,
             max_delay, max_delay_bits, app_edge.pre_vertex.n_atoms,
-            self._n_header_bytes // BYTES_PER_SHORT, n_half_words, half_word],
+            max_atoms_per_core, self._n_header_bytes // BYTES_PER_SHORT,
+            n_half_words, half_word],
             dtype=numpy.uint32)
 
     @property
