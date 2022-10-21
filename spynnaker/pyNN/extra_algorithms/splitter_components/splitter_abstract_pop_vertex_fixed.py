@@ -97,7 +97,7 @@ class SplitterAbstractPopulationVertexFixed(
 
         for index, vertex_slice in enumerate(self.__slices):
             chip_counter.add_core(sdram)
-            label = f"Slice {vertex_slice} of {app_vertex.label}"
+            label = f"{app_vertex.label}{vertex_slice}"
             machine_vertex = self.create_machine_vertex(
                 vertex_slice, sdram, label,
                 structural_sz, ring_buffer_shifts, weight_scales,
