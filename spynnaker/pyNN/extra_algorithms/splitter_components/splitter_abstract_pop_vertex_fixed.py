@@ -129,7 +129,7 @@ class SplitterAbstractPopulationVertexFixed(
             sdram = self.get_sdram_used_by_atoms(vertex_slice)
             chip_counter.add_core(sdram)
 
-            label = f"Slice {vertex_slice} of {app_vertex.label}"
+            label = f"{app_vertex.label}{vertex_slice}"
             machine_vertex = self.create_machine_vertex(
                 vertex_slice, sdram, label)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
