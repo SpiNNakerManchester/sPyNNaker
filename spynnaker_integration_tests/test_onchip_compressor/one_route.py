@@ -80,6 +80,7 @@ def do_one_run():
                     receptor_type="inhibitory")
 
     sim.run(1)
-    t = ProvenanceReader().get_timer_provenance("Routing table loader")
+    with ProvenanceReader() as db:
+        t = db.get_timer_provenance("Routing table loader")
     assert t == "", "Routing table loader should not have run"
     sim.end()

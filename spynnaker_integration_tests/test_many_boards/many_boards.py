@@ -87,7 +87,8 @@ class ManyBoards(BaseTestCase):
         for pop in self._pops:
             check_data(pop, self._expected_spikes, self.simtime)
         t_after_check = time.time()
-        results = ProvenanceReader().get_run_time_of_BufferExtractor()
+        with ProvenanceReader() as db:
+            results = db.get_run_time_of_BufferExtractor()
         self.report(results, report_file)
         self.report(
             "machine run time was: {} seconds\n".format(
