@@ -258,9 +258,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
-                vertex_slice, total_sdram, label, index, rb_shifts,
+                vertex_slice, neuron_sdram, label, index, rb_shifts,
                 weight_scales)
-            chip_counter.add_core(total_sdram)
+            chip_counter.add_core(neuron_sdram)
 
             # Keep track of synapse vertices for each neuron vertex and
             # resources used by each core (neuron core is added later)
