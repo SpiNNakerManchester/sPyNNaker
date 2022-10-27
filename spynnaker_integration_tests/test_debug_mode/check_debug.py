@@ -31,6 +31,8 @@ from spinn_front_end_common.utilities.report_functions.\
 #    import EnergyReport
 from spinn_front_end_common.utilities.report_functions.board_chip_report \
     import AREA_CODE_REPORT_NAME
+from spinn_front_end_common.utilities.report_functions.timer_report import (
+    TIMER_FILENAME)
 from spinn_front_end_common.utility_models import \
      DataSpeedUpPacketGatherMachineVertex
 from spinnaker_testbase import BaseTestCase
@@ -130,3 +132,5 @@ class CheckDebug(BaseTestCase):
         self.assertIn("data2.sqlite3", found)
 
         sim.end()
+        found = os.listdir(SpynnakerDataView.get_timestamp_dir_path())
+        self.assertIn(TIMER_FILENAME, found)

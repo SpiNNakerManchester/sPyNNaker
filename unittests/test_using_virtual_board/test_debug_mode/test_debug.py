@@ -19,6 +19,8 @@ import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
     import _FILENAME as network_specification_file_name
+from spinn_front_end_common.utilities.report_functions.timer_report import (
+    TIMER_FILENAME)
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.\
@@ -89,9 +91,10 @@ class TestDebug(BaseTestCase):
         sim.end()
 
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        print(found)
         for report in reports:
             self.assertIn(report, found)
+        found = os.listdir(SpynnakerDataView.get_timestamp_dir_path())
+        self.assertIn(TIMER_FILENAME, found)
 
     def test_debug(self):
         self.runsafe(self.debug)
