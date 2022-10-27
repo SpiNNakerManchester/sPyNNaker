@@ -284,9 +284,9 @@
 
             <span class="c1"># Create the neuron vertex for the slice</span>
             <span class="n">neuron_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_neuron_core</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">total_sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">rb_shifts</span><span class="p">,</span>
+                <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">neuron_sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">rb_shifts</span><span class="p">,</span>
                 <span class="n">weight_scales</span><span class="p">)</span>
-            <span class="n">chip_counter</span><span class="o">.</span><span class="n">add_core</span><span class="p">(</span><span class="n">total_sdram</span><span class="p">)</span>
+            <span class="n">chip_counter</span><span class="o">.</span><span class="n">add_core</span><span class="p">(</span><span class="n">neuron_sdram</span><span class="p">)</span>
 
             <span class="c1"># Keep track of synapse vertices for each neuron vertex and</span>
             <span class="c1"># resources used by each core (neuron core is added later)</span>
