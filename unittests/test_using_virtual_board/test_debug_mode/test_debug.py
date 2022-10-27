@@ -15,6 +15,7 @@
 
 import os
 import unittest
+from spinn_front_end_common.interface.ds import DsSqlliteDatabase
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
@@ -75,7 +76,7 @@ class TestDebug(BaseTestCase):
             # DataSpeedUpPacketGatherMachineVertex.REPORT_NAME
             _GRAPH_NAME,
             # TODO why svg when default is png
-            _GRAPH_NAME + ".svg",
+            _GRAPH_NAME + ".svg"
             ]
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
@@ -89,9 +90,9 @@ class TestDebug(BaseTestCase):
         sim.end()
 
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        print(found)
         for report in reports:
             self.assertIn(report, found)
+        self.assertIn("ds.sqlite3", found)
 
     def test_debug(self):
         self.runsafe(self.debug)
