@@ -15,7 +15,6 @@
 
 import os
 import unittest
-from spinn_front_end_common.interface.ds import DsSqlliteDatabase
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
