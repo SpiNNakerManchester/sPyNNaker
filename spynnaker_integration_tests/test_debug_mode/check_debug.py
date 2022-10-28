@@ -106,6 +106,7 @@ class CheckDebug(BaseTestCase):
         for report in reports:
             self.assertIn(report, found)
         self.assertIn("data.sqlite3", found)
+        self.assertIn("redundant_packet_count.rpt", found)
 
         sim.run(10)
         pop.get_data("v")
@@ -118,6 +119,7 @@ class CheckDebug(BaseTestCase):
         pop.get_data("v")
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
         self.assertIn("data1.sqlite3", found)
+        self.assertIn("redundant_packet_count1.rpt", found)
         # No point in checking files they are already there
 
         sim.reset()
@@ -128,5 +130,6 @@ class CheckDebug(BaseTestCase):
         for report in reports:
             self.assertIn(report, found)
         self.assertIn("data2.sqlite3", found)
+        self.assertIn("redundant_packet_count2.rpt", found)
 
         sim.end()
