@@ -25,6 +25,8 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
 
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
@@ -442,46 +444,16 @@ class NeuronRecorder(object):
 
             neurons = numpy.array(self._neurons_recording(
                 variable, vertex_slice, application_vertex.atoms_shape))
-            neurons_recording = len(neurons)
-            if neurons_recording == 0:
-                continue
 
-            # Read the spikes
-            n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
-            n_bytes = n_words * BYTES_PER_WORD
-            n_words_with_timestamp = n_words + 1
-
-            # for buffering output info is taken form the buffer manager
             region = self.__region_ids[variable]
-            buffer_manager = SpynnakerDataView.get_buffer_manager()
-            record_raw, data_missing = buffer_manager.get_data_by_placement(
-                    placement, region)
-            if data_missing:
-                missing_str += "({}, {}, {}); ".format(
-                    placement.x, placement.y, placement.p)
-            if len(record_raw) > 0:
-                raw_data = (
-                    numpy.asarray(record_raw, dtype="uint8").view(
-                        dtype="<i4")).reshape([-1, n_words_with_timestamp])
-            else:
-                raw_data = record_raw
-            if len(raw_data) > 0:
-                record_time = (raw_data[:, 0] *
-                               SpynnakerDataView.get_simulation_time_step_ms())
-                spikes = raw_data[:, 1:].byteswap().view("uint8")
-                bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
-                    (-1, 32))).reshape((-1, n_bytes * 8))
-                time_indices, local_indices = numpy.where(bits == 1)
-                if self.__indexes[variable] is None:
-                    indices = neurons[local_indices]
-                    times = record_time[time_indices].reshape((-1))
-                    spike_ids.extend(indices)
-                    spike_times.extend(times)
-                else:
-                    for time_indice, local in zip(time_indices, local_indices):
-                        if local < neurons_recording:
-                            spike_ids.append(neurons[local])
-                            spike_times.append(record_time[time_indice])
+
+            times, indices = NeoBufferDatabase().get_spikes(
+                placement.x, placement.y, placement.p, region, neurons,
+                SpynnakerDataView.get_simulation_time_step_ms(),
+                (self.__indexes[variable] is None))
+
+            spike_ids.extend(indices)
+            spike_times.extend(times)
 
         if len(missing_str) > 0:
             logger.warning(
