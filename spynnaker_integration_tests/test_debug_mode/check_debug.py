@@ -113,6 +113,8 @@ class CheckDebug(BaseTestCase):
         # No point in checking files they are already there
 
         sim.reset()
+        found = os.listdir(SpynnakerDataView.get_run_dir_path())
+        self.assertIn("chip_active_report.rpt", found)
         pop.get_data("v")
         SpynnakerDataView.set_requires_data_generation()
         sim.run(10)
@@ -122,7 +124,11 @@ class CheckDebug(BaseTestCase):
         self.assertIn("ds1.sqlite3", found)
         # No point in checking files they are already there
 
+        old_run = SpynnakerDataView.get_run_dir_path()
         sim.reset()
+        found = os.listdir(old_run)
+        self.assertIn("chip_active_report1.rpt", found)
+
         SpynnakerDataView.set_requires_mapping()
         sim.run(10)
         pop.get_data("v")
@@ -133,3 +139,5 @@ class CheckDebug(BaseTestCase):
         self.assertIn("ds2.sqlite3", found)
 
         sim.end()
+        found = os.listdir(SpynnakerDataView.get_run_dir_path())
+        self.assertIn("chip_active_report2.rpt", found)
