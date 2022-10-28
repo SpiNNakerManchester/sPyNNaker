@@ -66,7 +66,6 @@ REDUNDANCY_SUMMARY = (
     "FROM redundancy_by_core")
 
 
-_FILE_NAME = "redundant_packet_count.rpt"
 _N_PROV_ITEMS_NEEDED = 4
 _MAX = 100
 
@@ -76,7 +75,9 @@ def redundant_packet_count_report():
 
     :return:
     """
-    file_name = os.path.join(SpynnakerDataView.get_run_dir_path(), _FILE_NAME)
+    file_name = os.path.join(
+        SpynnakerDataView.get_run_dir_path(),
+        f"redundant_packet_count{SpynnakerDataView.get_reset_str()}.rpt")
 
     try:
         _create_views()
