@@ -95,7 +95,7 @@ class TestDebug(BaseTestCase):
         for report in reports:
             self.assertIn(report, found)
         self.assertIn("ds.sqlite3", found)
-        #check stuff outside of the run directory
+        # check stuff outside of the run directory
         found = os.listdir(SpynnakerDataView.get_timestamp_dir_path())
         self.assertIn(TIMER_FILENAME, found)
 
