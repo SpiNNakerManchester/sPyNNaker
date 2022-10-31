@@ -18,9 +18,6 @@ import struct
 import numpy
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
-from pacman.utilities.utility_calls import get_field_based_index
-from spinnman.messages.eieio.data_messages import EIEIODataHeader
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
