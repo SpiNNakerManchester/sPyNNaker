@@ -27,10 +27,11 @@ class NeoBufferDatabase(object):
         # storage area for received data from cores
         self._db = BufferDatabase()
 
-    def get_spikes(self, x, y, p, region, neurons, simulation_time_step_ms, no_indexes):
+    def get_spikes(self, x, y, p, region, neurons, simulation_time_step_ms,
+                   no_indexes):
         neurons_recording = len(neurons)
         if neurons_recording == 0:
-            return []
+            return [], []
         n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
         n_bytes = n_words * BYTES_PER_WORD
         n_words_with_timestamp = n_words + 1
@@ -39,7 +40,7 @@ class NeoBufferDatabase(object):
             x, y, p, region)
 
         if len(record_raw) == 0:
-            return []
+            return [], []
 
         spike_times = list()
         spike_ids = list()
