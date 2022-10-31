@@ -74,7 +74,6 @@ class EIEIOSpikeRecorder(object):
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
         # pylint: disable=too-many-arguments
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
         results = list()
         missing = []
         vertices = application_vertex.machine_vertices
