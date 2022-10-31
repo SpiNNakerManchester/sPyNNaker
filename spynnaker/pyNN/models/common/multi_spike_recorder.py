@@ -73,7 +73,6 @@ class MultiSpikeRecorder(object):
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
         # pylint: disable=too-many-arguments
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
         spike_times = list()
         spike_ids = list()
 
