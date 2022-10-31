@@ -124,3 +124,41 @@ class NeoBufferDatabase(object):
             neuron_ids = slice_ids[local_ids]
             offset += length + 2 * BYTES_PER_WORD
             results.append(numpy.dstack((neuron_ids, timestamps))[0])
+        return results
+
+    def get_multi_spikes(
+            self, x, y, p, region, simulation_time_step_ms, vertex_slice,
+            atoms_shape):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param tuple(int) atoms_shape:
+        """
+        raw_data, data_missing = self._db.get_region_data(
+            x, y, p, region)
+        spike_ids = []
+        spike_times = []
+
+        n_words = int(math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
+        n_bytes_per_block = n_words * BYTES_PER_WORD
+        offset = 0
+        neurons = vertex_slice.get_raster_ids(atoms_shape)
+        while offset < len(raw_data):
+            time, n_blocks = _TWO_WORDS.unpack_from(raw_data, offset)
+            offset += _TWO_WORDS.size
+            spike_data = numpy.frombuffer(
+                raw_data, dtype="uint8",
+                count=n_bytes_per_block * n_blocks, offset=offset)
+            offset += n_bytes_per_block * n_blocks
+
+            spikes = spike_data.view("<i4").byteswap().view("uint8")
+            bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
+                (-1, 32))).reshape((-1, n_bytes_per_block * 8))
+            local_indices = numpy.nonzero(bits)[1]
+            indices = neurons[local_indices]
+            times = numpy.repeat(
+                [time * simulation_time_step_ms],
+                len(indices))
+            spike_ids.append(indices)
+            spike_times.append(times)
+
+        return spike_times, spike_ids

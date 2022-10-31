@@ -25,6 +25,7 @@ from pacman.model.resources.variable_sdram import VariableSDRAM
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -84,15 +85,12 @@ class MultiSpikeRecorder(object):
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
-            # Read the spikes from the buffer manager
-            neuron_param_data, data_missing = \
-                buffer_manager.get_data_by_placement(placement, region)
-            if data_missing:
-                missing.append(placement)
-            self._process_spike_data(
-                vertex_slice, application_vertex.atoms_shape,
-                int(math.ceil(vertex_slice.n_atoms / BITS_PER_WORD)),
-                neuron_param_data, spike_ids, spike_times)
+            times, indices = NeoBufferDatabase().get_multi_spikes(
+                placement.x, placement.y, placement.p, region,
+                SpynnakerDataView.get_simulation_time_step_ms(), vertex_slice,
+                application_vertex.atoms_shape)
+            spike_ids.extend(indices)
+            spike_times.extend(times)
 
         if missing:
             logger.warning(
@@ -107,38 +105,3 @@ class MultiSpikeRecorder(object):
         spike_times = numpy.hstack(spike_times)
         result = numpy.dstack((spike_ids, spike_times))[0]
         return result[numpy.lexsort((spike_times, spike_ids))]
-
-    @staticmethod
-    def _process_spike_data(
-            vertex_slice, atoms_shape, n_words, raw_data, spike_ids,
-            spike_times):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param tuple(int) atoms_shape:
-        :param int n_words:
-        :param bytearray raw_data:
-        :param list(~numpy.ndarray) spike_ids:
-        :param list(~numpy.ndarray) spike_times:
-        """
-        # pylint: disable=too-many-arguments
-        n_bytes_per_block = n_words * BYTES_PER_WORD
-        offset = 0
-        neurons = vertex_slice.get_raster_ids(atoms_shape)
-        while offset < len(raw_data):
-            time, n_blocks = _TWO_WORDS.unpack_from(raw_data, offset)
-            offset += _TWO_WORDS.size
-            spike_data = numpy.frombuffer(
-                raw_data, dtype="uint8",
-                count=n_bytes_per_block * n_blocks, offset=offset)
-            offset += n_bytes_per_block * n_blocks
-
-            spikes = spike_data.view("<i4").byteswap().view("uint8")
-            bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
-                (-1, 32))).reshape((-1, n_bytes_per_block * 8))
-            local_indices = numpy.nonzero(bits)[1]
-            indices = neurons[local_indices]
-            times = numpy.repeat(
-                [time * SpynnakerDataView.get_simulation_time_step_ms()],
-                len(indices))
-            spike_ids.append(indices)
-            spike_times.append(times)
