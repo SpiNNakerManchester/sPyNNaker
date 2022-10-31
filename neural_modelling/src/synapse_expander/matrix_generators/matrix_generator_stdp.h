@@ -129,7 +129,7 @@ static row_plastic_t *get_stdp_delay_row(uint32_t *delayed_synaptic_matrix,
 	uint32_t delay_local_index = ((delay_stage - 1) * n_pre_neurons_per_core) + local_pre_index;
 	uint32_t pre_row = delay_core_index + delay_local_index;
 	uint32_t idx = pre_row * (max_delayed_row_n_words + N_HEADER_WORDS);
-	return (static_row_t *) &delayed_synaptic_matrix[idx];
+	return (row_plastic_t *) &delayed_synaptic_matrix[idx];
 }
 
 /**
