@@ -789,9 +789,10 @@ static void resume_callback(void) {
     }
 
     void *rates_region = data_specification_get_region(RATES, ds_regions);
-    rates_changed = rates_changed || expand_rates(
+    bool expand_rates_changed = expand_rates(
             data_specification_get_region(EXPANDER_REGION, ds_regions),
             rates_region);
+    rates_changed = rates_changed || expand_rates_changed;
 
     if (!read_rates(rates_region, rates_changed, time + 1)) {
         log_error("failed to reread the Poisson rates from SDRAM");
