@@ -15,10 +15,15 @@
 
 import math
 import numpy
+import struct
+from spinnman.messages.eieio.data_messages import EIEIODataHeader
+from pacman.utilities.utility_calls import get_field_based_index
 from spinn_front_end_common.interface.buffer_management.storage_objects \
     import BufferDatabase
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
+
+_TWO_WORDS = struct.Struct("<II")
 
 
 class NeoBufferDatabase(object):
@@ -29,6 +34,17 @@ class NeoBufferDatabase(object):
 
     def get_spikes(self, x, y, p, region, neurons, simulation_time_step_ms,
                    no_indexes):
+        """
+
+        :param int x:
+        :param int y:
+        :param int p:
+        :param int region:
+        :param array(int) neurons:
+        :param float simulation_time_step_ms:
+        :param bool no_indexes:
+        :return:
+        """
         neurons_recording = len(neurons)
         if neurons_recording == 0:
             return [], []
@@ -64,3 +80,47 @@ class NeoBufferDatabase(object):
                     spike_ids.append(neurons[local])
                     spike_times.append(record_time[time_indice])
         return spike_times, spike_ids
+
+    def get_eieio_spikes(
+            self, x, y, p, region, simulation_time_step_ms,
+            base_key, vertex_slice, atoms_shape):
+        """
+
+        :param int x:
+        :param int y:
+        :param int p:
+        :param int region:
+        :param float simulation_time_step_ms:
+        :param int base_key:
+        :param Slice vertex_slice:
+        :param tuple(int) atoms_shape:
+        :return:
+        """
+        spike_data, data_missing = self._db.get_region_data(
+            x, y, p, region)
+
+        number_of_bytes_written = len(spike_data)
+        offset = 0
+        indices = get_field_based_index(base_key, vertex_slice)
+        slice_ids = vertex_slice.get_raster_ids(atoms_shape)
+        results = []
+        while offset < number_of_bytes_written:
+            length, time = _TWO_WORDS.unpack_from(spike_data, offset)
+            time *= simulation_time_step_ms
+            data_offset = offset + 2 * BYTES_PER_WORD
+
+            eieio_header = EIEIODataHeader.from_bytestring(
+                spike_data, data_offset)
+            if eieio_header.eieio_type.payload_bytes > 0:
+                raise Exception("Can only read spikes as keys")
+
+            data_offset += eieio_header.size
+            timestamps = numpy.repeat([time], eieio_header.count)
+            key_bytes = eieio_header.eieio_type.key_bytes
+            keys = numpy.frombuffer(
+                spike_data, dtype="<u{}".format(key_bytes),
+                count=eieio_header.count, offset=data_offset)
+            local_ids = numpy.array([indices[key] for key in keys])
+            neuron_ids = slice_ids[local_ids]
+            offset += length + 2 * BYTES_PER_WORD
+            results.append(numpy.dstack((neuron_ids, timestamps))[0])

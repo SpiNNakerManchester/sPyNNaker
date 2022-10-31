@@ -23,6 +23,7 @@ from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -86,24 +87,12 @@ class EIEIOSpikeRecorder(object):
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
-            # Read the spikes
-            n_buffer_times = 0
-            if vertex.send_buffer_times is not None:
-                for i in vertex.send_buffer_times:
-                    if hasattr(i, "__len__"):
-                        n_buffer_times += len(i)
-                    else:
-                        # assuming this must be a single integer
-                        n_buffer_times += 1
-
-            if n_buffer_times > 0:
-                raw_spike_data, data_missing = \
-                    buffer_manager.get_data_by_placement(placement, region)
-                if data_missing:
-                    missing.append(placement)
-                self._process_spike_data(
-                    vertex_slice, application_vertex.atoms_shape,
-                    raw_spike_data, base_key_function(vertex), results)
+            NeoBufferDatabase().get_eieio_spikes(
+                placement.x, placement.y, placement.p, region,
+                SpynnakerDataView.get_simulation_time_step_ms(),
+                base_key_function(vertex), vertex_slice,
+                application_vertex.atoms_shape
+            )
 
         if missing:
             missing_str = recording_utils.make_missing_string(missing)
@@ -114,37 +103,3 @@ class EIEIOSpikeRecorder(object):
             return numpy.empty(shape=(0, 2))
         result = numpy.vstack(results)
         return result[numpy.lexsort((result[:, 1], result[:, 0]))]
-
-    @staticmethod
-    def _process_spike_data(
-            vertex_slice, atoms_shape, spike_data, base_key, results):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param bytearray spike_data:
-        :param int base_key:
-        :param list(~numpy.ndarray) results:
-        """
-        number_of_bytes_written = len(spike_data)
-        offset = 0
-        indices = get_field_based_index(base_key, vertex_slice)
-        slice_ids = vertex_slice.get_raster_ids(atoms_shape)
-        while offset < number_of_bytes_written:
-            length, time = _TWO_WORDS.unpack_from(spike_data, offset)
-            time *= SpynnakerDataView.get_simulation_time_step_ms()
-            data_offset = offset + 2 * BYTES_PER_WORD
-
-            eieio_header = EIEIODataHeader.from_bytestring(
-                spike_data, data_offset)
-            if eieio_header.eieio_type.payload_bytes > 0:
-                raise Exception("Can only read spikes as keys")
-
-            data_offset += eieio_header.size
-            timestamps = numpy.repeat([time], eieio_header.count)
-            key_bytes = eieio_header.eieio_type.key_bytes
-            keys = numpy.frombuffer(
-                spike_data, dtype="<u{}".format(key_bytes),
-                count=eieio_header.count, offset=data_offset)
-            local_ids = numpy.array([indices[key] for key in keys])
-            neuron_ids = slice_ids[local_ids]
-            offset += length + 2 * BYTES_PER_WORD
-            results.append(numpy.dstack((neuron_ids, timestamps))[0])
