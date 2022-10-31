@@ -56,4 +56,4 @@ void matrix_generator_free(matrix_generator_t generator);
  */
 bool matrix_generator_write_synapse(matrix_generator_t generator,
         uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,
-		accum weight_scale);
+		unsigned long accum weight_scale);

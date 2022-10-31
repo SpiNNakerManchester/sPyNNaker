@@ -227,7 +227,7 @@ static void matrix_generator_static_free(void *generator) {
  */
 static bool matrix_generator_static_write_synapse(void *generator,
         uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,
-		accum weight_scale) {
+		unsigned long accum weight_scale) {
     matrix_genetator_static_data_t *data = generator;
     struct delay_value delay_and_stage = get_delay(delay, data->max_stage,
             data->max_delay_per_stage);

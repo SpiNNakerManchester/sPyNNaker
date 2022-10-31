@@ -90,7 +90,7 @@ typedef accum (generate_param_func)(void *generator);
  */
 typedef bool (write_synapse_func)(void *generator,
         uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,
-		accum weight_scale);
+		unsigned long accum weight_scale);
 
 /**
  * \brief How to generate connections with a connection generator

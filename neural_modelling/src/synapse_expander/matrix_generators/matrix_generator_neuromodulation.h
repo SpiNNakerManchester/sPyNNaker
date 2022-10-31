@@ -143,7 +143,7 @@ void matrix_generator_neuromodulation_free(void *generator) {
 
 static bool matrix_generator_neuromodulation_write_synapse(void *generator,
         uint32_t pre_index, uint16_t post_index, accum weight,
-        UNUSED uint16_t delay, UNUSED accum weight_scale) {
+        UNUSED uint16_t delay, UNUSED unsigned long accum weight_scale) {
     matrix_generator_neuromodulation *conf = generator;
     row_nm_plastic_t *plastic_row = get_nm_row(conf->synaptic_matrix,
             conf->max_row_n_words, pre_index);
