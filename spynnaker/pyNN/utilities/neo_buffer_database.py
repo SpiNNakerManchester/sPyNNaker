@@ -128,7 +128,7 @@ class NeoBufferDatabase(BufferDatabase):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param tuple(int) atoms_shape:
         """
-        raw_data, data_missing = self._db.get_region_data(x, y, p, region)
+        raw_data, data_missing = self.get_region_data(x, y, p, region)
         spike_ids = []
         spike_times = []
 
