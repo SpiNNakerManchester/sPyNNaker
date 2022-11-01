@@ -245,8 +245,6 @@ static bool matrix_generator_static_write_synapse(void *generator,
         row = get_delay_row(data->delayed_synaptic_matrix,
                 data->max_delayed_row_n_words, pre_index, delay_and_stage.stage,
                 data->n_pre_neurons_per_core, data->max_stage);
-        log_info("Writing pre_index %u with delay %u (%u), stage %u to row 0x%08x",
-                pre_index, delay, delay_and_stage.delay, delay_and_stage.stage, row);
         pos = row->fixed_fixed_size;
         if (pos >= data->max_delayed_row_n_words) {
             log_warning("Row %u, stage %u at 0x%08x of delayed matrix 0x%08x"

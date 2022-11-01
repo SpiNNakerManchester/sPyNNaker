@@ -302,10 +302,13 @@ class SynapticMatrixApp(object):
         :return: The data to generate with
         :rtype: GeneratorData
         """
+        pre_vertex = self.__app_edge.pre_vertex
+        max_pre_atoms_per_core = min(pre_vertex.n_atoms,
+                                     pre_vertex.get_max_atoms_per_core())
         return GeneratorData(
             self.__syn_mat_offset, self.__delay_syn_mat_offset,
             self.__app_edge, self.__synapse_info, self.__max_row_info,
-            self.__max_atoms_per_core)
+            max_pre_atoms_per_core)
 
     def get_connections(self, placement):
         """ Get the connections for this matrix from the machine
