@@ -27,11 +27,7 @@ _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
 _TWO_WORDS = struct.Struct("<II")
 
 
-class NeoBufferDatabase(object):
-
-    def __init__(self):
-        # storage area for received data from cores
-        self._db = BufferDatabase()
+class NeoBufferDatabase(BufferDatabase):
 
     def get_spikes(self, x, y, p, region, neurons, simulation_time_step_ms,
                    no_indexes):
@@ -53,8 +49,7 @@ class NeoBufferDatabase(object):
         n_bytes = n_words * BYTES_PER_WORD
         n_words_with_timestamp = n_words + 1
 
-        record_raw, data_missing = self._db.get_region_data(
-            x, y, p, region)
+        record_raw, data_missing = self.get_region_data(x, y, p, region)
 
         if len(record_raw) == 0:
             return [], []
@@ -97,8 +92,7 @@ class NeoBufferDatabase(object):
         :param tuple(int) atoms_shape:
         :return:
         """
-        spike_data, data_missing = self._db.get_region_data(
-            x, y, p, region)
+        spike_data, data_missing = self.get_region_data(x, y, p, region)
 
         number_of_bytes_written = len(spike_data)
         offset = 0
@@ -134,8 +128,7 @@ class NeoBufferDatabase(object):
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param tuple(int) atoms_shape:
         """
-        raw_data, data_missing = self._db.get_region_data(
-            x, y, p, region)
+        raw_data, data_missing = self._db.get_region_data(x, y, p, region)
         spike_ids = []
         spike_times = []
 
@@ -168,8 +161,7 @@ class NeoBufferDatabase(object):
             self, x, y, p, region, neurons, data_type,
             simulation_time_step_ms, sampling_rate):
         # for buffering output info is taken form the buffer manager
-        record_raw, missing_data = self._db.get_region_data(
-            x, y, p, region)
+        record_raw, missing_data = self.get_region_data(x, y, p, region)
         record_length = len(record_raw)
 
         # There is one column for time and one for each neuron recording

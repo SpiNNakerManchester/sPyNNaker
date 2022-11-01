@@ -83,12 +83,13 @@ class EIEIOSpikeRecorder(object):
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
-            results.extend(NeoBufferDatabase().get_eieio_spikes(
-                placement.x, placement.y, placement.p, region,
-                SpynnakerDataView.get_simulation_time_step_ms(),
-                base_key_function(vertex), vertex_slice,
-                application_vertex.atoms_shape
-            ))
+            with NeoBufferDatabase() as db:
+                results.extend(db.get_eieio_spikes(
+                    placement.x, placement.y, placement.p, region,
+                    SpynnakerDataView.get_simulation_time_step_ms(),
+                    base_key_function(vertex), vertex_slice,
+                    application_vertex.atoms_shape
+                ))
 
         if missing:
             missing_str = recording_utils.make_missing_string(missing)

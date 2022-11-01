@@ -351,8 +351,8 @@ class NeuronRecorder(object):
                     application_vertex.atoms_shape)
             else:
                 neurons = [i]
-            neurons, times, data, sampling_interval = \
-                NeoBufferDatabase().get_matrix_data(
+            with NeoBufferDatabase() as db:
+                neurons, times, data, sampling_interval = db.get_matrix_data(
                     placement.x, placement.y, placement.p, region, neurons,
                     data_type, SpynnakerDataView.get_simulation_time_step_ms(),
                     sampling_rate)
@@ -487,10 +487,11 @@ class NeuronRecorder(object):
 
             region = self.__region_ids[variable]
 
-            times, indices = NeoBufferDatabase().get_spikes(
-                placement.x, placement.y, placement.p, region, neurons,
-                SpynnakerDataView.get_simulation_time_step_ms(),
-                (self.__indexes[variable] is None))
+            with NeoBufferDatabase() as db:
+                times, indices = db.get_spikes(
+                    placement.x, placement.y, placement.p, region, neurons,
+                    SpynnakerDataView.get_simulation_time_step_ms(),
+                    (self.__indexes[variable] is None))
 
             spike_ids.extend(indices)
             spike_times.extend(times)

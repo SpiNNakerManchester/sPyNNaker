@@ -84,10 +84,11 @@ class MultiSpikeRecorder(object):
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
-            times, indices = NeoBufferDatabase().get_multi_spikes(
-                placement.x, placement.y, placement.p, region,
-                SpynnakerDataView.get_simulation_time_step_ms(), vertex_slice,
-                application_vertex.atoms_shape)
+            with NeoBufferDatabase() as db:
+                times, indices = db.get_multi_spikes(
+                    placement.x, placement.y, placement.p, region,
+                    SpynnakerDataView.get_simulation_time_step_ms(),
+                    vertex_slice, application_vertex.atoms_shape)
             spike_ids.extend(indices)
             spike_times.extend(times)
 
