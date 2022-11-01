@@ -333,6 +333,43 @@ class NeuronRecorder(object):
     def __read_data(
             self, label, application_vertex,
             sampling_rate, data_type, variable):
+        vertices = (
+            application_vertex.splitter.machine_vertices_for_recording(
+                variable))
+        progress = ProgressBar(
+            vertices, "Getting {} for {}".format(variable, label))
+        region = self.__region_ids[variable]
+
+        pop_data = None
+        pop_times = None
+        pop_neurons = []
+        for i, vertex in enumerate(progress.over(vertices)):
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
+            neurons = self._neurons_recording(
+                variable, vertex.vertex_slice,
+                application_vertex.atoms_shape)
+            neurons, times, data, sampling_interval = \
+                NeoBufferDatabase().get_matrix_data(
+                    placement.x, placement.y, placement.p, region, neurons,
+                    data_type, SpynnakerDataView.get_simulation_time_step_ms(),
+                    sampling_rate)
+
+            pop_neurons.extend(neurons)
+            if pop_data is None:
+                pop_data = data
+                pop_times = times
+            elif numpy.array_equal(pop_times, times):
+                pop_data = numpy.append(
+                    pop_data, data, axis=1)
+            else:
+                raise NotImplementedError("times differ")
+        indexes = numpy.array(pop_neurons)
+        order = numpy.argsort(indexes)
+        return pop_data[:, order], indexes[order], sampling_interval
+
+    def __read_datax(
+            self, label, application_vertex,
+            sampling_rate, data_type, variable):
         n_machine_time_steps = SpynnakerDataView.get_current_run_timesteps()
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
