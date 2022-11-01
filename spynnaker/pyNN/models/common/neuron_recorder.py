@@ -28,8 +28,11 @@ from spynnaker.pyNN.models.abstract_models import RecordingType
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-# The flag to add to generate that all neurons are in the given state
-_REPEAT_PER_NEURON = 0x7FFFFFFF
+# The number to add to generate that all neurons are in the given state
+_REPEAT_PER_NEURON_RECORDED = 0x7FFFFFFF
+
+# The number to add to generate that all neurons are recorded
+_REPEAT_PER_NEURON = 0xFFFFFFFF
 
 # The flag to add to generate that the count is recorded
 _RECORDED_FLAG = 0x80000000
@@ -82,6 +85,7 @@ class NeuronRecorder(object):
     _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     _N_BYTES_PER_RATE = BYTES_PER_WORD
     _N_BYTES_PER_ENUM = BYTES_PER_WORD
+    _N_BYTES_PER_GEN_ITEM = BYTES_PER_WORD
 
     #: size of a index in terms of position into recording array
     _N_BYTES_PER_INDEX = DataType.UINT16.size  # currently uint16
@@ -1192,7 +1196,7 @@ class NeuronRecorder(object):
     def get_metadata_sdram_usage_in_bytes(self, n_atoms):
         """ Get the SDRAM usage of the metadata for recording
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int n_atoms: The number of atoms to record
         :rtype: int
         """
         # This calculates the size of the metadata only; thus no reference to
@@ -1206,6 +1210,26 @@ class NeuronRecorder(object):
         bitfield_bytes = (
             (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
              n_bytes_for_indices) *
+            len(self.__bitfield_variables))
+        return ((self._N_ITEM_TYPES * DataType.UINT32.size) + var_bytes +
+                bitfield_bytes)
+
+    def get_generator_sdram_usage_in_bytes(self, n_atoms):
+        """ Get the SDRAM usage of the generator data for recording metadata
+
+        :param int n_atoms: The number of atoms to be recorded
+        :rtype: int
+        """
+        n_indices = self.__ceil_n_indices(n_atoms)
+        n_bytes_for_indices = n_indices * self._N_BYTES_PER_INDEX
+        var_bytes = (
+            (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
+             self._N_BYTES_PER_ENUM + self._N_BYTES_PER_GEN_ITEM +
+             n_bytes_for_indices) *
+            (len(self.__sampling_rates) - len(self.__bitfield_variables)))
+        bitfield_bytes = (
+            (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
+             self._N_BYTES_PER_GEN_ITEM + n_bytes_for_indices) *
             len(self.__bitfield_variables))
         return ((self._N_ITEM_TYPES * DataType.UINT32.size) + var_bytes +
                 bitfield_bytes)
@@ -1379,7 +1403,7 @@ class NeuronRecorder(object):
             rate = self.__sampling_rates[variable]
             data.extend([rate, self.__data_types[variable].size])
             if rate == 0:
-                data.append(0)
+                data.extend([0, 0])
             else:
                 data.extend(self.__get_generator_indices(
                     variable, vertex_slice, atoms_shape))
@@ -1387,7 +1411,7 @@ class NeuronRecorder(object):
             rate = self.__sampling_rates[variable]
             data.append(rate)
             if rate == 0:
-                data.append(0)
+                data.extend([0, 0])
             else:
                 data.extend(self.__get_generator_indices(
                     variable, vertex_slice, atoms_shape))
@@ -1402,7 +1426,8 @@ class NeuronRecorder(object):
 
         # If there is no index, add that all variables are recorded
         if index is None:
-            return [1, _REPEAT_PER_NEURON | _RECORDED_FLAG]
+            return [_REPEAT_PER_NEURON, 1,
+                    _REPEAT_PER_NEURON_RECORDED | _RECORDED_FLAG]
 
         # This must be non-global data, so we need a slice
         if vertex_slice is None or atoms_shape is None:
@@ -1412,7 +1437,8 @@ class NeuronRecorder(object):
 
         # Generate a run-length-encoded list
         # Initially there are no items, but this will be updated
-        data = [0]
+        # Also keep track of the number recorded, also 0 initially
+        data = [0, 0]
         n_items = 0
 
         # Go through the indices and ids, assuming both are in order (they are)
@@ -1421,7 +1447,8 @@ class NeuronRecorder(object):
         # Keep the id and the position in the id list (as this is a RLE)
         next_id, i = next(id_iter, (None, 0))
         next_index = next(index_iter, None)
-        last_recorded = 0
+        last_recorded = i
+        n_recorded = 0
         while next_id is not None and next_index is not None:
 
             # Find the next index to be recorded
@@ -1434,7 +1461,7 @@ class NeuronRecorder(object):
 
             # If we have moved the index onward, mark not recorded
             if i != last_recorded:
-                data.append((i - last_recorded) | _NOT_RECORDED_FLAG)
+                data.append(((i - last_recorded) - 1) | _NOT_RECORDED_FLAG)
                 n_items += 1
 
             if next_id is not None and next_index is not None:
@@ -1448,6 +1475,7 @@ class NeuronRecorder(object):
 
                 # Add the count of things to be recorded
                 data.append((i - start_i) | _RECORDED_FLAG)
+                n_recorded += (i - start_i)
                 last_recorded = i - 1
                 n_items += 1
 
@@ -1457,5 +1485,6 @@ class NeuronRecorder(object):
             data.append((vertex_slice.n_atoms - i) | _NOT_RECORDED_FLAG)
             n_items += 1
 
-        data[0] = n_items
+        data[0] = n_recorded
+        data[1] = n_items
         return numpy.array(data, dtype="uint32")
