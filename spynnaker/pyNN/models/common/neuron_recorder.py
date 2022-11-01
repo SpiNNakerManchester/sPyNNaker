@@ -345,9 +345,12 @@ class NeuronRecorder(object):
         pop_neurons = []
         for i, vertex in enumerate(progress.over(vertices)):
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            neurons = self._neurons_recording(
-                variable, vertex.vertex_slice,
-                application_vertex.atoms_shape)
+            if variable in self.__sampling_rates:
+                neurons = self._neurons_recording(
+                    variable, vertex.vertex_slice,
+                    application_vertex.atoms_shape)
+            else:
+                neurons = [i]
             neurons, times, data, sampling_interval = \
                 NeoBufferDatabase().get_matrix_data(
                     placement.x, placement.y, placement.p, region, neurons,
