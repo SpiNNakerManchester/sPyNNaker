@@ -23,6 +23,7 @@ from spinn_front_end_common.interface.buffer_management.storage_objects \
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 
+_N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
 _TWO_WORDS = struct.Struct("<II")
 
 
@@ -162,3 +163,30 @@ class NeoBufferDatabase(object):
             spike_times.append(times)
 
         return spike_times, spike_ids
+
+    def get_matrix_data(
+            self, x, y, p, region, neurons, data_type,
+            simulation_time_step_ms, sampling_rate):
+        # for buffering output info is taken form the buffer manager
+        record_raw, missing_data = self._db.get_region_data(
+            x, y, p, region)
+        record_length = len(record_raw)
+
+        # There is one column for time and one for each neuron recording
+        data_row_length = len(neurons) * data_type.size
+        full_row_length = data_row_length + _N_BYTES_FOR_TIMESTAMP
+        n_rows = record_length // full_row_length
+        row_data = numpy.asarray(record_raw, dtype="uint8").reshape(
+            n_rows, full_row_length)
+
+        time_bytes = (
+            row_data[:, 0: _N_BYTES_FOR_TIMESTAMP].reshape(
+                n_rows * _N_BYTES_FOR_TIMESTAMP))
+        times = time_bytes.view("<i4").reshape(n_rows, 1)
+        var_data = (row_data[:, _N_BYTES_FOR_TIMESTAMP:].reshape(
+            n_rows * data_row_length))
+        placement_data = data_type.decode_array(var_data).reshape(
+            n_rows, len(neurons))
+        sampling_interval = sampling_rate * simulation_time_step_ms
+
+        return neurons, times, placement_data, sampling_interval
