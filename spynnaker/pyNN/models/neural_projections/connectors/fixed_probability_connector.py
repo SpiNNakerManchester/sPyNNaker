@@ -15,7 +15,9 @@
 
 import math
 import numpy
+import logging
 from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import (
@@ -26,6 +28,8 @@ from .abstract_generate_connector_on_machine import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 N_GEN_PARAMS = 6
 
@@ -66,9 +70,17 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             .. note::
                 Not supported by sPyNNaker.
         """
-        if not 0.0 <= p_connect <= 1.0:
+        # Support 1.0 by using maximum U032.  Warn the user because this isn't
+        # *quite* the same
+        if p_connect == 1.0:
+            p_connect = float(DataType.U032.max)
+            logger.warning(
+                "Probability of 1.0 in the FixedProbabilityConnector will use"
+                f" {p_connect} instead.  If this is a problem, use the"
+                " AllToAllConnector instead.")
+        if not 0.0 <= p_connect < 1.0:
             raise ConfigurationException(
-                "The probability must be between 0 and 1 (inclusive)")
+                "The probability must be >= 0 and < 1")
         super().__init__(safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
@@ -140,7 +152,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         if not self.__allow_self_connections:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
-        present = items <= self._p_connect
+        present = items < self._p_connect
         ids = numpy.where(present)[0]
         n_connections = numpy.sum(present)
 

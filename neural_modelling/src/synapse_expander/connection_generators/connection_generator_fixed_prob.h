@@ -112,7 +112,7 @@ static bool connection_generator_fixed_prob_generate(
             probability_t value = ulrbits(rng_generator(core_rng));
 
             // If less than our probability, generate a connection
-            if (value <= obj->params.probability) {
+            if (value < obj->params.probability) {
                 uint32_t local_post = post - post_slice_start;
                 accum weight = param_generator_generate(weight_generator);
                 uint16_t delay = rescale_delay(
