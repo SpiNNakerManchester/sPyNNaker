@@ -72,3 +72,8 @@ class AbstractSpikeRecordable(object, metaclass=AbstractBase):
         :return: Sampling interval in microseconds
         :rtype: float
         """
+
+    #@abstractmethod
+    def write_spike_metadata(self, variable):
+        """ TODO """
+

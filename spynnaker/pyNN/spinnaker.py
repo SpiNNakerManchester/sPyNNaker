@@ -33,7 +33,6 @@ from spinn_front_end_common.interface.provenance import (
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
@@ -433,11 +432,17 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         with FecTimer("Finish connection holders", TimerWork.OTHER):
             finish_connection_holders()
 
+    def _execute_write_neo_metadata(self):
+        with FecTimer("Write Neo Metadata", TimerWork.OTHER):
+            for population in SpynnakerDataView.iterate_populations():
+                population._recorder.write_neo_metadata()
+
     @overrides(AbstractSpinnakerBase._do_extra_load_algorithms)
     def _do_extra_load_algorithms(self):
         self._execute_synapse_expander()
         self._execute_on_chip_bit_field_generator()
         self._execute_finish_connection_holders()
+        self._execute_write_neo_metadata()
 
     def _report_write_network_graph(self):
         with FecTimer("SpYNNakerNeuronGraphNetworkSpecificationReport",

@@ -24,7 +24,6 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
-
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -506,6 +505,20 @@ class NeuronRecorder(object):
 
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))]
+
+    def write_spike_metadata(self, application_vertex, variable):
+        vertices = (
+            application_vertex.splitter.machine_vertices_for_recording(
+                variable))
+        region = self.__region_ids[variable]
+
+        with NeoBufferDatabase() as db:
+            db.set_segement_data()
+            for vertex in vertices:
+                neurons = self._neurons_recording(
+                    variable, vertex.vertex_slice,
+                    application_vertex.atoms_shape)
+                db.set_spikes_metadata(vertex, variable, region, neurons)
 
     def get_events(self, label, application_vertex, variable):
         """ Read events mapped to time and neuron IDs from the SpiNNaker\

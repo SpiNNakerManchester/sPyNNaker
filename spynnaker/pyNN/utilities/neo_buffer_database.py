@@ -15,19 +15,66 @@
 
 import math
 import numpy
+import os
 import struct
+import re
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
+from data_specification.enums import DataType
 from pacman.utilities.utility_calls import get_field_based_index
 from spinn_front_end_common.interface.buffer_management.storage_objects \
     import BufferDatabase
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
 _TWO_WORDS = struct.Struct("<II")
+_NEO_DDL_FILE = os.path.join(os.path.dirname(__file__), "db.sql")
 
 
 class NeoBufferDatabase(BufferDatabase):
+
+    def __init__(self, database_file=None):
+        """
+        :param str database_file:
+            The name of a file that contains (or will contain) an SQLite
+            database holding the data.
+            If omitted the default location will be used.
+        """
+        if database_file is None:
+            database_file = self.default_database_file()
+
+        super().__init__(database_file)
+        with open(_NEO_DDL_FILE, encoding="utf-8") as f:
+            sql = f.read()
+
+        self._SQLiteDB__db.executescript(sql)
+
+    def set_segement_data(self):
+        with self.transaction() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO segment 
+                (simulation_time_step_ms)
+                 VALUES (?)
+                """, [SpynnakerDataView.get_simulation_time_step_ms()])
+
+    def get_population_recording(
+            self, cursor, pop_label, variable, data_type, data_function):
+        for row in cursor.execute(
+                """
+                SELECT population_recording_id FROM population_recording
+                WHERE label = ? AND variable = ?
+                LIMIT 1
+                """, (pop_label, variable)):
+            return row["population_recording_id"]
+        cursor.execute(
+            """
+            INSERT INTO population_recording 
+            (label, variable, data_type, function)
+             VALUES (?, ?, ?, ?)
+            """, (pop_label, variable, data_type.name, data_function))
+        return cursor.lastrowid
 
     def get_spikes(self, x, y, p, region, neurons, simulation_time_step_ms,
                    no_indexes):
@@ -76,6 +123,23 @@ class NeoBufferDatabase(BufferDatabase):
                     spike_ids.append(neurons[local])
                     spike_times.append(record_time[time_indice])
         return spike_times, spike_ids
+
+    def set_spikes_metadata(self, vertex, variable, region, neurons):
+        with self.transaction() as cursor:
+            pop_id = self.get_population_recording(
+                cursor, vertex.app_vertex.label, variable, DataType.INT32,
+                "get_spikes")
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
+            region_id = self._get_region_id(
+                cursor, placement.x, placement.y, placement.p, region)
+            neurons_st = self.array_to_string(neurons)
+            simple_indexes = (len(neurons) == vertex.vertex_slice.n_atoms)
+            cursor.execute(
+                """
+                INSERT INTO spikes_metadata 
+                (region_id, neurons_st, simple_indexes)
+                 VALUES (?, ?, ?)
+                """, (region_id, neurons_st, simple_indexes))
 
     def get_eieio_spikes(
             self, x, y, p, region, simulation_time_step_ms,
@@ -182,3 +246,50 @@ class NeoBufferDatabase(BufferDatabase):
         sampling_interval = sampling_rate * simulation_time_step_ms
 
         return neurons, times, placement_data, sampling_interval
+
+    @staticmethod
+    def array_to_string(indexes):
+        if indexes is None or len(indexes) == 0:
+            return ""
+
+        previous = indexes[0]
+        results = str(previous)
+        in_range = False
+        for index in indexes[1:]:
+            if index == previous + 1:
+                if not in_range:
+                    results+= ":"
+                    in_range = True
+            else:
+                if in_range:
+                    results+= str(previous)
+                results+= ","
+                results += str(index)
+                in_range = False
+            previous = index
+        if in_range:
+           results+= str(previous)
+        return results
+
+    @staticmethod
+    def string_to_array(str):
+        if not str:
+            return []
+        results = []
+        parts = re.findall("\d+[,:]*", str)
+        start = None
+        for part in parts:
+            if part.endswith(":"):
+                start = int(part[:-1])
+            else:
+                if part.endswith(","):
+                    val = int(part[:-1])
+                else:
+                    val = int(part)
+                if start:
+                    results.extend(range(start, val+1))
+                    start = None
+                else:
+                    results.append(val)
+
+        return results
