@@ -89,50 +89,6 @@ typedef struct matrix_generator_stdp {
 } matrix_generator_stdp_data_t;
 
 /**
- * \brief Get a synaptic row for a given neuron
- * \param[in] synaptic_matrix the address of the synaptic matrix
- * \param[in] max_row_n_words the maximum number of words (excluding headers)
- *                            in each row of the table
- * \param[in] pre_index the index of the pre-neuron relative to the start of the
- *                      matrix
- * \return A pointer to the row of the matrix to write to
- */
-static row_plastic_t *get_stdp_row(uint32_t *synaptic_matrix, uint32_t max_row_n_words,
-        uint32_t pre_index) {
-    uint32_t idx = pre_index * (max_row_n_words + N_HEADER_WORDS);
-    return (row_plastic_t *) &synaptic_matrix[idx];
-}
-
-/**
- * \brief Get a delayed synaptic row for a given neuron and delay stage
- * \param[in] delayed synaptic_matrix the address of the delayed synaptic matrix
- * \param[in] max_delayed_row_n_words the maximum number of words (excluding headers)
- *                                    in each delayed row of the table
- * \param[in] pre_index the index of the pre-neuron relative to the start of the
- *                      matrix
- * \param[in] delay_stage the delay stage, where 0 means the first stage
- * \param[in] n_pre_neurons_per_core The number of neurons per core in the pre-population
- * \param[in] max_delay_stage The maximum delay stage
- * \return A pointer to the row of the delayed matrix to write to
- */
-static row_plastic_t *get_stdp_delay_row(uint32_t *delayed_synaptic_matrix,
-        uint32_t max_delayed_row_n_words, uint32_t pre_index, uint32_t delay_stage,
-        uint32_t n_pre_neurons_per_core, uint32_t max_delay_stage) {
-	// Work out which core the pre-index is on
-	uint32_t core = 0;
-	while (((core + 1) * n_pre_neurons_per_core) < pre_index) {
-		core++;
-	}
-	uint32_t local_pre_index = pre_index - (core * n_pre_neurons_per_core);
-	uint32_t n_delay_neurons_per_core = n_pre_neurons_per_core * (max_delay_stage - 1);
-	uint32_t delay_core_index = core * n_delay_neurons_per_core;
-	uint32_t delay_local_index = ((delay_stage - 1) * n_pre_neurons_per_core) + local_pre_index;
-	uint32_t pre_row = delay_core_index + delay_local_index;
-	uint32_t idx = pre_row * (max_delayed_row_n_words + N_HEADER_WORDS);
-	return (row_plastic_t *) &delayed_synaptic_matrix[idx];
-}
-
-/**
  * \brief Get the maximum number of plastic half-words in a row
  * \param[in] n_half_words_per_pp_header the number of half-words at the start
  *                                       of each row
@@ -189,7 +145,7 @@ static void setup_stdp_rows(uint32_t *matrix, uint32_t n_rows,
     uint32_t plastic_words = plastic_half_words(n_half_words_per_pp_header,
             n_half_words_per_pp_synapse, max_row_n_synapses) >> 1;
     for (uint32_t i = 0; i < n_rows; i++) {
-        row_plastic_t *row = get_stdp_row(matrix, max_row_n_words, i);
+        row_plastic_t *row = get_row(matrix, max_row_n_words, i);
         // Use word writing for efficiency
         uint32_t *data = (uint32_t *) &row->plastic_plastic_data[0];
         for (uint32_t j = 0; j < plastic_words; j++) {
@@ -302,7 +258,7 @@ static bool matrix_generator_stdp_write_synapse(void *generator,
     row_fixed_t *fixed_row;
     uint32_t pos;
     if (delay_and_stage.stage == 0) {
-        plastic_row = get_stdp_row(data->synaptic_matrix, data->max_row_n_words,
+        plastic_row = get_row(data->synaptic_matrix, data->max_row_n_words,
                 pre_index);
         fixed_row = get_stdp_fixed_row(plastic_row,
                 data->n_half_words_per_pp_row_header,
@@ -315,9 +271,9 @@ static bool matrix_generator_stdp_write_synapse(void *generator,
             return false;
         }
     } else {
-        plastic_row = get_stdp_delay_row(data->delayed_synaptic_matrix,
+        plastic_row = get_delay_row(data->delayed_synaptic_matrix,
                 data->max_delayed_row_n_words, pre_index, delay_and_stage.stage,
-                data->n_pre_neurons_per_core, data->max_stage);
+                data->n_pre_neurons_per_core, data->max_stage, data->n_pre_neurons);
         fixed_row = get_stdp_fixed_row(plastic_row,
                 data->n_half_words_per_pp_row_header,
                 data->n_half_words_per_pp_synapse, data->max_delayed_row_n_synapses);
