@@ -14,12 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotRetinaDevice)
+from spynnaker.pyNN.models.abstract_models import PopulationSpiNNakerLinkVertex
 
 
 class DelayedPayloadMultiCastCommand(MultiCastCommand):
@@ -43,7 +43,7 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
 
 
 class PushBotSpiNNakerLinkRetinaDevice(
-        AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex):
+        AbstractPushBotRetinaDevice, PopulationSpiNNakerLinkVertex):
     __slots__ = ["__new_key_command"]
 
     default_parameters = {'label': None, 'board_address': None}
@@ -63,7 +63,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
         :param label:
         """
         super().__init__(protocol, resolution)
-        ApplicationSpiNNakerLinkVertex.__init__(
+        PopulationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id,
             n_atoms=resolution.value.n_neurons,
             board_address=board_address, label=label)
