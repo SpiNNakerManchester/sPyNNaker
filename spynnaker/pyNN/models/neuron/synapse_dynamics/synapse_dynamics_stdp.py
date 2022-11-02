@@ -20,7 +20,8 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.exceptions import (
+    SynapticConfigurationException, InvalidParameterType)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
@@ -156,6 +157,24 @@ class SynapseDynamicsSTDP(
 
         # Otherwise, it is static or neuromodulation, so return ourselves
         return self
+
+    @overrides(AbstractPlasticSynapseDynamics.get_value)
+    def get_value(self, key):
+        for obj in [self.__timing_dependence, self.__weight_dependence, self]:
+            if hasattr(obj, key):
+                return getattr(obj, key)
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
+
+    @overrides(AbstractPlasticSynapseDynamics.set_value)
+    def set_value(self, key, value):
+        for obj in [self.__timing_dependence, self.__weight_dependence, self]:
+            if hasattr(obj, key):
+                setattr(obj, key, value)
+                SpynnakerDataView.set_requires_mapping()
+                return
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
 
     @property
     def weight_dependence(self):
