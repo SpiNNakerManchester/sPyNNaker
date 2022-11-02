@@ -1461,7 +1461,7 @@ class NeuronRecorder(object):
 
             # If we have moved the index onward, mark not recorded
             if i != last_recorded:
-                data.append(((i - last_recorded) - 1) | _NOT_RECORDED_FLAG)
+                data.append((i - last_recorded) | _NOT_RECORDED_FLAG)
                 n_items += 1
 
             if next_id is not None and next_index is not None:
@@ -1476,7 +1476,7 @@ class NeuronRecorder(object):
                 # Add the count of things to be recorded
                 data.append((i - start_i) | _RECORDED_FLAG)
                 n_recorded += (i - start_i)
-                last_recorded = i - 1
+                last_recorded = i
                 n_items += 1
 
         # If there are more items in the vertex slice, they must be
