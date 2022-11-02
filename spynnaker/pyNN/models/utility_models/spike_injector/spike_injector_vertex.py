@@ -32,9 +32,7 @@ class SpikeInjectorVertex(
         to specify the virtual_key of the population to identify the population
     """
     __slots__ = [
-        "__receive_port",
-        "__spike_recorder",
-        "__virtual_key"]
+        "__spike_recorder"]
 
     default_parameters = {
         'label': "spikeInjector", 'port': None, 'virtual_key': None}
@@ -45,8 +43,6 @@ class SpikeInjectorVertex(
             self, n_neurons, label, port, virtual_key,
             reserve_reverse_ip_tag, splitter):
         # pylint: disable=too-many-arguments
-        self.__receive_port = None
-        self.__virtual_key = None
 
         super().__init__(
             n_keys=n_neurons, label=label, receive_port=port,
@@ -57,22 +53,6 @@ class SpikeInjectorVertex(
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()
-
-    @property
-    def port(self):
-        return self.__receive_port
-
-    @port.setter
-    def port(self, port):
-        self.__receive_port = port
-
-    @property
-    def virtual_key(self):
-        return self.__virtual_key
-
-    @virtual_key.setter
-    def virtual_key(self, virtual_key):
-        self.__virtual_key = virtual_key
 
     @overrides(PopulationApplicationVertex.get_recordable_variables)
     def get_recordable_variables(self):
@@ -88,10 +68,10 @@ class SpikeInjectorVertex(
             raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
-                           "SpikeSourcePoisson so being ignored")
+                           "SpikeInjector so being ignored")
         if indices is not None:
             logger.warning("Indices currently not supported for "
-                           "SpikeSourcePoisson so being ignored")
+                           "SpikeInjector so being ignored")
         self.enable_recording(True)
         self.__spike_recorder.record = True
 
@@ -175,7 +155,7 @@ class SpikeInjectorVertex(
             "default_parameters": self.default_parameters,
             "default_initial_values": self.default_parameters,
             "parameters": {
-                "port": self.__receive_port,
-                "virtual_key": self.__virtual_key},
+                "port": self._receive_port,
+                "virtual_key": self._virtual_key},
         }
         return context
