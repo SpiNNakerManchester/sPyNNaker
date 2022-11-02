@@ -308,7 +308,7 @@ class SynapticMatrixApp(object):
         return GeneratorData(
             self.__syn_mat_offset, self.__delay_syn_mat_offset,
             self.__app_edge, self.__synapse_info, self.__max_row_info,
-            max_pre_atoms_per_core)
+            max_pre_atoms_per_core, self.__max_atoms_per_core)
 
     def get_connections(self, placement):
         """ Get the connections for this matrix from the machine

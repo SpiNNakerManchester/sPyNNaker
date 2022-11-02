@@ -190,11 +190,12 @@ class SynapseDynamicsStatic(
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(
             self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
-            synapse_info, max_row_info, max_atoms_per_core):
+            synapse_info, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core):
         vertex = app_edge.post_vertex
         n_synapse_type_bits = get_n_bits(
             vertex.neuron_impl.get_n_synapse_types())
-        n_synapse_index_bits = get_n_bits(max_atoms_per_core)
+        n_synapse_index_bits = get_n_bits(max_post_atoms_per_core)
         max_delay = app_edge.post_vertex.splitter.max_support_delay()
         max_delay_bits = get_n_bits(max_delay)
         return numpy.array([
@@ -203,14 +204,14 @@ class SynapseDynamicsStatic(
             synapse_info.synapse_type, n_synapse_type_bits,
             n_synapse_index_bits, app_edge.n_delay_stages + 1,
             max_delay, max_delay_bits, app_edge.pre_vertex.n_atoms,
-            max_atoms_per_core],
+            max_pre_atoms_per_core],
             dtype=numpy.uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.
                gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self):
-        return 11 * BYTES_PER_WORD
+        return 12 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractStaticSynapseDynamics.changes_during_run)

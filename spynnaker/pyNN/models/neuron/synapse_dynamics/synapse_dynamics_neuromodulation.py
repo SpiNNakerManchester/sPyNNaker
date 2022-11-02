@@ -239,7 +239,8 @@ class SynapseDynamicsNeuromodulation(
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(
             self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
-            synapse_info, max_row_info, max_atoms_per_core):
+            synapse_info, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core):
         # pylint: disable=unused-argument
         synapse_type = synapse_info.synapse_type
         return numpy.array([
