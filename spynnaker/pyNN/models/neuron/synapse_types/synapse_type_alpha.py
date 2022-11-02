@@ -73,12 +73,12 @@ class SynapseTypeAlpha(AbstractSynapseType):
             [Struct([
                 (DataType.S1615, EXC_RESPONSE),
                 (DataType.S1615, EXC_EXP_RESPONSE),
-                (DataType.S1615, TAU_SYN_E),
                 (DataType.S1615, Q_EXC),
+                (DataType.S1615, TAU_SYN_E),
                 (DataType.S1615, INH_RESPONSE),
                 (DataType.S1615, INH_EXP_RESPONSE),
-                (DataType.S1615, TAU_SYN_I),
                 (DataType.S1615, Q_INH),
+                (DataType.S1615, TAU_SYN_I),
                 (DataType.S1615, TIMESTEP_MS)])],
             {EXC_RESPONSE: "", EXC_EXP_RESPONSE: "", TAU_SYN_E: "ms",
              INH_RESPONSE: "", INH_EXP_RESPONSE: "", TAU_SYN_I: "ms"})

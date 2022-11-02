@@ -64,7 +64,7 @@ typedef struct alpha_state_t {
     input_t lin_buff;           //!< buffer for linear term
     input_t exp_buff;           //!< buffer for exponential term
     //! _&tau;_<sup>-1</sup> pre-multiplied by d<i>t</i>
-    input_t dt_divided_by_tau_sqr;
+    decay_t dt_divided_by_tau_sqr;
     decay_t decay;              //!< Exponential decay multiplier
     input_t q_buff;             //!< Temporary value of input
 } alpha_state_t;
