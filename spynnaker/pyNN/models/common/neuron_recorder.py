@@ -452,59 +452,17 @@ class NeuronRecorder(object):
         return self.__read_data(
             label, application_vertex, sampling_rate, data_type, variable)
 
-    def get_spikes(self, label, application_vertex, variable):
+    def get_spikes(self, label, variable):
         """ Read spikes mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
         :param str variable:
         :return:
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
-        if variable not in self.__bitfield_variables:
-            msg = "Variable {} is not supported, use get_matrix_data".format(
-                variable)
-            raise ConfigurationException(msg)
-
-        spike_times = list()
-        spike_ids = list()
-
-        vertices = (
-            application_vertex.splitter.machine_vertices_for_recording(
-                variable))
-        missing_str = ""
-        progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
-        for vertex in progress.over(vertices):
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            vertex_slice = vertex.vertex_slice
-
-            neurons = numpy.array(self._neurons_recording(
-                variable, vertex_slice, application_vertex.atoms_shape))
-
-            region = self.__region_ids[variable]
-
-            with NeoBufferDatabase() as db:
-                times, indices = db.get_spikes(
-                    placement.x, placement.y, placement.p, region, neurons,
-                    SpynnakerDataView.get_simulation_time_step_ms(),
-                    (self.__indexes[variable] is None))
-
-            spike_ids.extend(indices)
-            spike_times.extend(times)
-
-        if len(missing_str) > 0:
-            logger.warning(
-                "Population {} is missing spike data in region {} from the"
-                " following cores: {}", label, region, missing_str)
-
-        if len(spike_ids) == 0:
-            return numpy.zeros((0, 2), dtype="float")
-
-        result = numpy.column_stack((spike_ids, spike_times))
-        return result[numpy.lexsort((spike_times, spike_ids))]
+        with NeoBufferDatabase() as db:
+            return db.get_deta(label, variable)
 
     def write_spike_metadata(self, application_vertex, variable):
         vertices = (

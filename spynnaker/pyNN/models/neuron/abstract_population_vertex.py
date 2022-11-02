@@ -544,7 +544,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self):
         return self.__neuron_recorder.get_spikes(
-            self.label, self, NeuronRecorder.SPIKES)
+            self.label, NeuronRecorder.SPIKES)
 
     @overrides(AbstractEventRecordable.get_events)
     def get_events(self, variable):

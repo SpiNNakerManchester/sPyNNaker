@@ -59,15 +59,24 @@ class NeoBufferDatabase(BufferDatabase):
                  VALUES (?)
                 """, [SpynnakerDataView.get_simulation_time_step_ms()])
 
-    def get_population_recording(
+    def _get_simulation_time_step_ms(self, cursor):
+        for row in cursor.execute(
+                """
+                SELECT simulation_time_step_ms 
+                FROM segment
+                LIMIT 1
+                """):
+            return row["simulation_time_step_ms"]
+
+    def get_population_recording_id(
             self, cursor, pop_label, variable, data_type, data_function):
         for row in cursor.execute(
                 """
-                SELECT population_recording_id FROM population_recording
+                SELECT pop_rec_id FROM population_recording
                 WHERE label = ? AND variable = ?
                 LIMIT 1
                 """, (pop_label, variable)):
-            return row["population_recording_id"]
+            return row["pop_rec_id"]
         cursor.execute(
             """
             INSERT INTO population_recording 
@@ -76,14 +85,24 @@ class NeoBufferDatabase(BufferDatabase):
             """, (pop_label, variable, data_type.name, data_function))
         return cursor.lastrowid
 
-    def get_spikes(self, x, y, p, region, neurons, simulation_time_step_ms,
-                   no_indexes):
+    def get_population_metadeta(
+            self, cursor, pop_label, variable):
+        for row in cursor.execute(
+                """
+                SELECT pop_rec_id,  data_type, function
+                FROM population_recording
+                WHERE label = ? AND variable = ?
+                LIMIT 1
+                """, (pop_label, variable)):
+            data_type = DataType[str(row["data_type"], 'utf-8')]
+            return (row["pop_rec_id"], data_type, row["function"])
+
+    def _get_spikes_by_region(
+            self, cursor, region_id, neurons, simulation_time_step_ms,
+            no_indexes, spike_times, spike_ids):
         """
 
-        :param int x:
-        :param int y:
-        :param int p:
-        :param int region:
+        :param int region_id:
         :param array(int) neurons:
         :param float simulation_time_step_ms:
         :param bool no_indexes:
@@ -96,13 +115,11 @@ class NeoBufferDatabase(BufferDatabase):
         n_bytes = n_words * BYTES_PER_WORD
         n_words_with_timestamp = n_words + 1
 
-        record_raw, data_missing = self.get_region_data(x, y, p, region)
+        record_raw = self._read_contents(cursor, region_id)
 
         if len(record_raw) == 0:
-            return [], []
+            return
 
-        spike_times = list()
-        spike_ids = list()
         raw_data = (
             numpy.asarray(record_raw, dtype="uint8").view(
                 dtype="<i4")).reshape([-1, n_words_with_timestamp])
@@ -122,11 +139,31 @@ class NeoBufferDatabase(BufferDatabase):
                 if local < neurons_recording:
                     spike_ids.append(neurons[local])
                     spike_times.append(record_time[time_indice])
-        return spike_times, spike_ids
+
+    def _get_spikes(self, cursor, pop_rec_id):
+        spike_times = list()
+        spike_ids = list()
+        simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
+        rows = list(cursor.execute(
+            """
+            SELECT region_id, neurons_st, simple_indexes
+            FROM spikes_metadata 
+            WHERE pop_rec_id = ?
+            """, [pop_rec_id]))
+        for row in rows:
+            neurons_st = str(row["neurons_st"], "utf-8")
+            neurons = numpy.array(self.string_to_array(neurons_st))
+
+            self._get_spikes_by_region(
+                cursor, row["region_id"], neurons, simulation_time_step_ms,
+                row["simple_indexes"], spike_times, spike_ids)
+
+        result = numpy.column_stack((spike_ids, spike_times))
+        return result[numpy.lexsort((spike_times, spike_ids))]
 
     def set_spikes_metadata(self, vertex, variable, region, neurons):
         with self.transaction() as cursor:
-            pop_id = self.get_population_recording(
+            pop_rec_id = self.get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, DataType.INT32,
                 "get_spikes")
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
@@ -137,9 +174,9 @@ class NeoBufferDatabase(BufferDatabase):
             cursor.execute(
                 """
                 INSERT INTO spikes_metadata 
-                (region_id, neurons_st, simple_indexes)
-                 VALUES (?, ?, ?)
-                """, (region_id, neurons_st, simple_indexes))
+                (pop_rec_id, region_id, neurons_st, simple_indexes)
+                 VALUES (?, ?, ?, ?)
+                """, (pop_rec_id, region_id, neurons_st, simple_indexes))
 
     def get_eieio_spikes(
             self, x, y, p, region, simulation_time_step_ms,
@@ -247,6 +284,13 @@ class NeoBufferDatabase(BufferDatabase):
 
         return neurons, times, placement_data, sampling_interval
 
+    def get_deta(self, pop_label, variable):
+        with self.transaction() as cursor:
+            pop_rec_id, data_type, function = self.get_population_metadeta(
+                cursor, pop_label, variable)
+            return self._get_spikes(cursor, pop_rec_id)
+        # assume funct = "get_spikes"
+
     @staticmethod
     def array_to_string(indexes):
         if indexes is None or len(indexes) == 0:
@@ -286,7 +330,7 @@ class NeoBufferDatabase(BufferDatabase):
                     val = int(part[:-1])
                 else:
                     val = int(part)
-                if start:
+                if start is not None:
                     results.extend(range(start, val+1))
                     start = None
                 else:

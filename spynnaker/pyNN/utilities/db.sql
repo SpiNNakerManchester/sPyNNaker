@@ -18,7 +18,7 @@
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS population_recording (
-    population_recording_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pop_rec_id INTEGER PRIMARY KEY AUTOINCREMENT,
     label TEXT NOT NULL,
     variable TEXT NOT NULL,
     data_type TEXT NOT NULL,
@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS segment(
 
 CREATE TABLE IF NOT EXISTS spikes_metadata(
     spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pop_rec_id INTEGER NOT NULL
+		REFERENCES population_recording(pop_rec_id) ON DELETE RESTRICT,
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     neurons_st TEXT NOT NULL,
