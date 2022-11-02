@@ -68,6 +68,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 # fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
 MAX_RING_BUFFER_BITS = 14
 
+# The maximum number of cores to consider acceptable for a single chip
+_MAX_CORES = 16
+
 
 class SplitterAbstractPopulationVertexNeuronsSynapses(
         AbstractSplitterCommon, AbstractSpynnakerSplitterDelay,
@@ -140,6 +143,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         """
         super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__()
         AbstractSpynnakerSplitterDelay.__init__(self)
+
+        if n_synapse_vertices + 1 > _MAX_CORES:
+            raise SynapticConfigurationException(
+                f"At most, there can be {_MAX_CORES - 1} synaptic vertices")
+
         self.__n_synapse_vertices = n_synapse_vertices
         self.__max_delay = max_delay
         self.__user_max_delay = max_delay
@@ -457,6 +465,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 neuron_vertex, SPIKE_PARTITION_ID)
         return None
 
+    @property
+    def __too_many_cores(self):
+        incoming = self._governed_app_vertex.incoming_poisson_projections
+        return len(incoming) + self.__n_synapse_vertices + 1 > _MAX_CORES
+
     def __handle_poisson_sources(self, label):
         """ Go through the incoming projections and find Poisson sources with
             splitters that work with us, and one-to-one connections that will
@@ -466,7 +479,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         """
         self.__poisson_sources = set()
         incoming_direct_poisson = defaultdict(list)
-        for proj in self._governed_app_vertex.incoming_projections:
+        # If there are going to be too many to fit on a chip, don't do direct
+        # Poisson
+        if self.__too_many_cores:
+            return incoming_direct_poisson
+        for proj in self._governed_app_vertex.incoming_poisson_projections:
             # pylint: disable=protected-access
             pre_vertex = proj._projection_edge.pre_vertex
             conn = proj._synapse_information.connector
@@ -488,8 +505,20 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__poisson_sources.add(pre_vertex)
         return incoming_direct_poisson
 
-    @staticmethod
-    def is_direct_poisson_source(pre_vertex, connector, dynamics):
+    @overrides(AbstractSupportsOneToOneSDRAMInput.handles_source_vertex)
+    def handles_source_vertex(self, projection):
+        # If there are too many incoming Poisson sources, we can't do this
+        if self.__too_many_cores:
+            return False
+
+        # pylint: disable=protected-access
+        edge = projection._projection_edge
+        pre_vertex = edge.pre_vertex
+        connector = projection._synapse_information.connector
+        dynamics = projection._synapse_information.synapse_dynamics
+        return self.is_direct_poisson_source(pre_vertex, connector, dynamics)
+
+    def is_direct_poisson_source(self, pre_vertex, connector, dynamics):
         """ Determine if a given Poisson source can be created by this splitter
 
         :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:

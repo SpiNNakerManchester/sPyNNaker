@@ -60,9 +60,9 @@ from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.struct import StructRepeat
 from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 
 from .population_machine_neurons import PopulationMachineNeurons
-from .population_machine_synapses import PopulationMachineSynapses
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
@@ -125,6 +125,7 @@ class AbstractPopulationVertex(
         "__spikes_per_second",
         "__drop_late_spikes",
         "__incoming_projections",
+        "__incoming_poisson_projections",
         "__synapse_dynamics",
         "__max_row_info",
         "__self_projection",
@@ -246,6 +247,7 @@ class AbstractPopulationVertex(
 
         # Set up for incoming
         self.__incoming_projections = defaultdict(list)
+        self.__incoming_poisson_projections = list()
         self.__max_row_info = dict()
         self.__self_projection = None
 
@@ -380,6 +382,8 @@ class AbstractPopulationVertex(
         self.__incoming_projections[pre_vertex].append(projection)
         if pre_vertex == self:
             self.__self_projection = projection
+        if isinstance(pre_vertex, SpikeSourcePoissonVertex):
+            self.__incoming_poisson_projections.append(projection)
 
     @property
     def self_projection(self):
@@ -1343,6 +1347,15 @@ class AbstractPopulationVertex(
         return self.__incoming_projections[source_vertex]
 
     @property
+    def incoming_poisson_projections(self):
+        """ The projections that target this population vertex which
+            originate from a Poisson source
+
+        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)
+        """
+        return self.__incoming_poisson_projections
+
+    @property
     def pop_seed(self):
         """ The seed to use for the population overall
 
@@ -1390,11 +1403,6 @@ class AbstractPopulationVertex(
         for vertex in self.machine_vertices:
             if isinstance(vertex, PopulationMachineNeurons):
                 vertex.set_do_neuron_regeneration()
-
-    def __tell_synapse_vertices_to_regenerate(self):
-        for vertex in self.machine_vertices:
-            if isinstance(vertex, PopulationMachineSynapses):
-                vertex.set_do_synapse_regeneration()
 
 
 class _Stats(object):
