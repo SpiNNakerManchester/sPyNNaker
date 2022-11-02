@@ -20,6 +20,7 @@ import struct
 import re
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from data_specification.enums import DataType
+from pacman.model.graphs.common import Slice
 from pacman.utilities.utility_calls import get_field_based_index
 from spinn_front_end_common.interface.buffer_management.storage_objects \
     import BufferDatabase
@@ -95,7 +96,8 @@ class NeoBufferDatabase(BufferDatabase):
                 LIMIT 1
                 """, (pop_label, variable)):
             data_type = DataType[str(row["data_type"], 'utf-8')]
-            return (row["pop_rec_id"], data_type, row["function"])
+            function = str(row["function"], 'utf-8')
+            return (row["pop_rec_id"], data_type, function)
 
     def _get_spikes_by_region(
             self, cursor, region_id, neurons, simulation_time_step_ms,
@@ -151,8 +153,7 @@ class NeoBufferDatabase(BufferDatabase):
             WHERE pop_rec_id = ?
             """, [pop_rec_id]))
         for row in rows:
-            neurons_st = str(row["neurons_st"], "utf-8")
-            neurons = numpy.array(self.string_to_array(neurons_st))
+            neurons = numpy.array(self.string_to_array(row["neurons_st"]))
 
             self._get_spikes_by_region(
                 cursor, row["region_id"], neurons, simulation_time_step_ms,
@@ -178,9 +179,9 @@ class NeoBufferDatabase(BufferDatabase):
                  VALUES (?, ?, ?, ?)
                 """, (pop_rec_id, region_id, neurons_st, simple_indexes))
 
-    def get_eieio_spikes(
-            self, x, y, p, region, simulation_time_step_ms,
-            base_key, vertex_slice, atoms_shape):
+    def _get_eieio_spike_by_region(
+            self, cursor, region_id, simulation_time_step_ms, base_key,
+            vertex_slice, atoms_shape, results):
         """
 
         :param int x:
@@ -193,13 +194,12 @@ class NeoBufferDatabase(BufferDatabase):
         :param tuple(int) atoms_shape:
         :return:
         """
-        spike_data, data_missing = self.get_region_data(x, y, p, region)
+        spike_data = self._read_contents(cursor, region_id)
 
         number_of_bytes_written = len(spike_data)
         offset = 0
         indices = get_field_based_index(base_key, vertex_slice)
         slice_ids = vertex_slice.get_raster_ids(atoms_shape)
-        results = []
         while offset < number_of_bytes_written:
             length, time = _TWO_WORDS.unpack_from(spike_data, offset)
             time *= simulation_time_step_ms
@@ -220,7 +220,29 @@ class NeoBufferDatabase(BufferDatabase):
             neuron_ids = slice_ids[local_ids]
             offset += length + 2 * BYTES_PER_WORD
             results.append(numpy.dstack((neuron_ids, timestamps))[0])
-        return results
+
+    def _get_eieio_spikes(self, cursor, pop_rec_id):
+        simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
+        results = []
+
+        rows = list(cursor.execute(
+            """
+            SELECT region_id, base_key, vertex_slice, atoms_shape
+            FROM eieio_spikes_metadata 
+            WHERE pop_rec_id = ?
+            """, [pop_rec_id]))
+
+        for row in rows:
+            vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
+            atoms_shape = self.string_to_array(row["atoms_shape"])
+            self._get_eieio_spike_by_region(
+                cursor, row["region_id"], simulation_time_step_ms,
+                row["base_key"], vertex_slice, atoms_shape, results)
+
+        if not results:
+            return numpy.empty(shape=(0, 2))
+        result = numpy.vstack(results)
+        return result[numpy.lexsort((result[:, 1], result[:, 0]))]
 
     def set_eieio_spikes_metadata(
             self, vertex, variable, region, base_key, atoms_shape):
@@ -307,8 +329,12 @@ class NeoBufferDatabase(BufferDatabase):
         with self.transaction() as cursor:
             pop_rec_id, data_type, function = self.get_population_metadeta(
                 cursor, pop_label, variable)
-            return self._get_spikes(cursor, pop_rec_id)
-        # assume funct = "get_spikes"
+            if function == "get_spikes":
+                return self._get_spikes(cursor, pop_rec_id)
+            elif function == "get_eieio_spikes":
+                return self._get_eieio_spikes(cursor, pop_rec_id)
+            else:
+                raise NotImplementedError(function)
 
     @staticmethod
     def array_to_string(indexes):
@@ -335,11 +361,13 @@ class NeoBufferDatabase(BufferDatabase):
         return results
 
     @staticmethod
-    def string_to_array(str):
-        if not str:
+    def string_to_array(string):
+        if not string:
             return []
+        if not isinstance(string, str):
+            string = str(string, "utf-8")
         results = []
-        parts = re.findall("\d+[,:]*", str)
+        parts = re.findall("\d+[,:]*", string)
         start = None
         for part in parts:
             if part.endswith(":"):

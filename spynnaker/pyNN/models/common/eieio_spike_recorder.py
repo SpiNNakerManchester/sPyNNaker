@@ -74,32 +74,8 @@ class EIEIOSpikeRecorder(object):
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
         # pylint: disable=too-many-arguments
-        results = list()
-        missing = []
-        vertices = application_vertex.machine_vertices
-        progress = ProgressBar(vertices,
-                               "Getting spikes for {}".format(label))
-        for vertex in progress.over(vertices):
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            vertex_slice = vertex.vertex_slice
-
-            with NeoBufferDatabase() as db:
-                results.extend(db.get_eieio_spikes(
-                    placement.x, placement.y, placement.p, region,
-                    SpynnakerDataView.get_simulation_time_step_ms(),
-                    base_key_function(vertex), vertex_slice,
-                    application_vertex.atoms_shape
-                ))
-
-        if missing:
-            missing_str = recording_utils.make_missing_string(missing)
-            logger.warning(
-                "Population {} is missing spike data in region {} from the"
-                " following cores: {}", label, region, missing_str)
-        if not results:
-            return numpy.empty(shape=(0, 2))
-        result = numpy.vstack(results)
-        return result[numpy.lexsort((result[:, 1], result[:, 0]))]
+        with NeoBufferDatabase() as db:
+            return db.get_deta(application_vertex.label, "spikes")
 
     def write_spike_metadata(
             self, region, application_vertex, base_key_function):
@@ -107,5 +83,5 @@ class EIEIOSpikeRecorder(object):
             vertices = application_vertex.machine_vertices
             for vertex in vertices:
                 db.set_eieio_spikes_metadata(
-                    vertex, "SPIKES", region, base_key_function(vertex),
+                    vertex, "spikes", region, base_key_function(vertex),
                     application_vertex.atoms_shape)
