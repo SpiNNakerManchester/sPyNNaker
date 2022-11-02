@@ -116,6 +116,7 @@ class SynapseTypeSEMD(AbstractSynapseType):
         parameters[TAU_SYN_I] = self.__tau_syn_I
         parameters[TIMESTEP_MS] = (
             SpynnakerDataView.get_simulation_time_step_ms())
+        parameters[SCALING_FACTOR] = self.__scaling_factor
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -124,7 +125,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
         state_variables[ISYN_INH] = self.__isyn_inh
         state_variables[EXC2_OLD] = self.__exc2_old
         state_variables[MULTIPLICATOR] = self.__multiplicator
-        state_variables[SCALING_FACTOR] = self.__scaling_factor
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):
