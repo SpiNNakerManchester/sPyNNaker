@@ -538,8 +538,8 @@ class AbstractPopulationVertex(
             variable, new_state, sampling_interval, indexes)
 
     @overrides(AbstractSpikeRecordable.write_spike_metadata)
-    def write_spike_metadata(self, variable):
-        return self.__neuron_recorder.write_spike_metadata(self, variable)
+    def write_spike_metadata(self):
+        return self.__neuron_recorder.write_spike_metadata(self)
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self):

@@ -222,6 +222,25 @@ class NeoBufferDatabase(BufferDatabase):
             results.append(numpy.dstack((neuron_ids, timestamps))[0])
         return results
 
+    def set_eieio_spikes_metadata(
+            self, vertex, variable, region, base_key, atoms_shape):
+        with self.transaction() as cursor:
+            pop_rec_id = self.get_population_recording_id(
+                cursor, vertex.app_vertex.label, variable, DataType.INT32,
+                "get_eieio_spikes")
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
+            region_id = self._get_region_id(
+                cursor, placement.x, placement.y, placement.p, region)
+
+            cursor.execute(
+                """
+                INSERT INTO eieio_spikes_metadata 
+                (pop_rec_id, region_id, base_key, vertex_slice, atoms_shape)
+                 VALUES (?, ?, ?, ?, ?)
+                """,
+                (pop_rec_id, region_id, base_key, str(vertex.vertex_slice),
+                 str(atoms_shape)))
+
     def get_multi_spikes(
             self, x, y, p, region, simulation_time_step_ms, vertex_slice,
             atoms_shape):

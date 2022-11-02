@@ -221,6 +221,14 @@ class SpikeSourceArrayVertex(
                 if vertex.virtual_key is not None
                 else 0)
 
+    @overrides(AbstractSpikeRecordable.write_spike_metadata)
+    def write_spike_metadata(self):
+        self.__spike_recorder.write_spike_metadata(
+            0, self, lambda vertex:
+                vertex.virtual_key
+                if vertex.virtual_key is not None
+                else 0)
+
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self):
         buffer_manager = SpynnakerDataView.get_buffer_manager()

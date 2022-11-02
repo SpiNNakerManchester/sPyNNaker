@@ -53,6 +53,7 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_partitioner, spynnaker_splitter_selector)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import (
     moved_in_v7_warning)
 
@@ -434,6 +435,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     def _execute_write_neo_metadata(self):
         with FecTimer("Write Neo Metadata", TimerWork.OTHER):
+            with NeoBufferDatabase() as db:
+                db.set_segement_data()
             for population in SpynnakerDataView.iterate_populations():
                 population._recorder.write_neo_metadata()
 

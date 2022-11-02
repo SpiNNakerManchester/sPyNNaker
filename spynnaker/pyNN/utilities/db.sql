@@ -29,8 +29,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS population_recording_sanity
 
 CREATE TABLE IF NOT EXISTS segment(
     segment_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    simulation_time_step_ms FLOAT NOT NULL
-);
+    simulation_time_step_ms FLOAT NOT NULL);
 
 CREATE TABLE IF NOT EXISTS spikes_metadata(
     spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,5 +38,14 @@ CREATE TABLE IF NOT EXISTS spikes_metadata(
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     neurons_st TEXT NOT NULL,
-    simple_indexes BOOLEAN NOT NULL
-);
+    simple_indexes BOOLEAN NOT NULL);
+
+CREATE TABLE IF NOT EXISTS eieio_spikes_metadata(
+    eieio_spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pop_rec_id INTEGER NOT NULL
+		REFERENCES population_recording(pop_rec_id) ON DELETE RESTRICT,
+    region_id INTEGER NOT NULL
+		REFERENCES region(region_id) ON DELETE RESTRICT,
+    base_key INT NOT NULL,
+    vertex_slice TEXT NOT NULL,
+    atoms_shape TEXT NOT NULL);

@@ -100,3 +100,12 @@ class EIEIOSpikeRecorder(object):
             return numpy.empty(shape=(0, 2))
         result = numpy.vstack(results)
         return result[numpy.lexsort((result[:, 1], result[:, 0]))]
+
+    def write_spike_metadata(
+            self, region, application_vertex, base_key_function):
+        with NeoBufferDatabase() as db:
+            vertices = application_vertex.machine_vertices
+            for vertex in vertices:
+                db.set_eieio_spikes_metadata(
+                    vertex, "SPIKES", region, base_key_function(vertex),
+                    application_vertex.atoms_shape)

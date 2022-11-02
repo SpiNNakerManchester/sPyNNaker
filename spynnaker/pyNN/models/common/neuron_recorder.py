@@ -464,19 +464,18 @@ class NeuronRecorder(object):
         with NeoBufferDatabase() as db:
             return db.get_deta(label, variable)
 
-    def write_spike_metadata(self, application_vertex, variable):
+    def write_spike_metadata(self, application_vertex):
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
-                variable))
-        region = self.__region_ids[variable]
+                self.SPIKES))
+        region = self.__region_ids[self.SPIKES]
 
         with NeoBufferDatabase() as db:
-            db.set_segement_data()
-            for vertex in vertices:
+             for vertex in vertices:
                 neurons = self._neurons_recording(
-                    variable, vertex.vertex_slice,
+                    self.SPIKES, vertex.vertex_slice,
                     application_vertex.atoms_shape)
-                db.set_spikes_metadata(vertex, variable, region, neurons)
+                db.set_spikes_metadata(vertex, self.SPIKES, region, neurons)
 
     def get_events(self, label, application_vertex, variable):
         """ Read events mapped to time and neuron IDs from the SpiNNaker\
