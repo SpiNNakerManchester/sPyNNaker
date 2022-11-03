@@ -251,7 +251,8 @@ static bool read_struct_builder_region(void **region,
 }
 
 static inline void read_index(uint32_t n_items, recording_index_t *items,
-        uint32_t n_neurons, uint32_t n_neurons_max, uint32_t n_neurons_recording,uint16_t *sdram_out) {
+        uint32_t n_neurons, uint32_t n_neurons_max, uint32_t n_neurons_recording,
+		uint16_t *sdram_out) {
     // Go through the data
     uint16_t indices[n_neurons_max];
     uint32_t neuron_id = 0;
