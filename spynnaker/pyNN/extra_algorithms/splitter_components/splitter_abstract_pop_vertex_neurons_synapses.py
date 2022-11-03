@@ -278,9 +278,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             for i in range(1, self.__n_synapse_vertices):
                 self.__add_shared_synapse_core(
                     syn_label, i, vertex_slice, synapse_references,
-                    shared_synapse_sdram, feedback_partition,
+                    shared_synapse_core_sdram, feedback_partition,
                     synapse_vertices, neuron_vertex)
-                chip_counter.add_core(shared_synapse_sdram)
+                chip_counter.add_core(shared_synapse_core_sdram)
 
             # Add resources for Poisson vertices up to core limit
             poisson_vertices = incoming_direct_poisson[vertex_slice]
