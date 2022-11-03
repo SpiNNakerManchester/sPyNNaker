@@ -337,11 +337,11 @@ class NeoBufferDatabase(BufferDatabase):
                 (pop_rec_id, region_id, str(vertex.vertex_slice),
                  str(atoms_shape)))
 
-    def get_matrix_data(
-            self, x, y, p, region, neurons, data_type,
+    def _get_matrix_data_by_region(
+            self, cursor, region_id, neurons, data_type,
             simulation_time_step_ms, sampling_rate):
         # for buffering output info is taken form the buffer manager
-        record_raw, missing_data = self.get_region_data(x, y, p, region)
+        record_raw = self._read_contents(cursor, region_id)
         record_length = len(record_raw)
 
         # There is one column for time and one for each neuron recording
@@ -363,6 +363,57 @@ class NeoBufferDatabase(BufferDatabase):
 
         return neurons, times, placement_data, sampling_interval
 
+    def _get_matrix_data(self, cursor, pop_rec_id, data_type):
+        simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
+        pop_data = None
+        pop_times = None
+        pop_neurons = []
+
+        rows = list(cursor.execute(
+            """
+            SELECT region_id, neurons_st, sampling_rate
+            FROM matrix_metadata 
+            WHERE pop_rec_id = ?
+            """, [pop_rec_id]))
+
+        for row in rows:
+            neurons = numpy.array(self.string_to_array(row["neurons_st"]))
+
+            neurons, times, data, sampling_interval = \
+                self._get_matrix_data_by_region(
+                    cursor, row["region_id"], neurons, data_type,
+                    simulation_time_step_ms, row["sampling_rate"])
+
+            pop_neurons.extend(neurons)
+            if pop_data is None:
+                pop_data = data
+                pop_times = times
+            elif numpy.array_equal(pop_times, times):
+                pop_data = numpy.append(
+                    pop_data, data, axis=1)
+            else:
+                raise NotImplementedError("times differ")
+        indexes = numpy.array(pop_neurons)
+        order = numpy.argsort(indexes)
+        return pop_data[:, order], indexes[order], sampling_interval
+
+    def set_matrix_metadata(self, vertex, variable, region, neurons,
+                            data_type, sampling_rate):
+        with self.transaction() as cursor:
+            pop_rec_id = self.get_population_recording_id(
+                cursor, vertex.app_vertex.label, variable, data_type,
+                "get_matrix")
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
+            region_id = self._get_region_id(
+                cursor, placement.x, placement.y, placement.p, region)
+            neurons_st = self.array_to_string(neurons)
+            cursor.execute(
+                """
+                INSERT INTO matrix_metadata 
+                (pop_rec_id, region_id, neurons_st, sampling_rate)
+                 VALUES (?, ?, ?, ?)
+                """, (pop_rec_id, region_id, neurons_st, sampling_rate))
+
     def get_deta(self, pop_label, variable):
         with self.transaction() as cursor:
             pop_rec_id, data_type, function = self.get_population_metadeta(
@@ -373,6 +424,8 @@ class NeoBufferDatabase(BufferDatabase):
                 return self._get_eieio_spikes(cursor, pop_rec_id)
             elif function == "get_multi_spikes":
                 return self._get_multi_spikes(cursor, pop_rec_id)
+            elif function == "get_matrix":
+                return self._get_matrix_data(cursor, pop_rec_id, data_type)
             else:
                 raise NotImplementedError(function)
 

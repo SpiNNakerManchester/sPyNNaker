@@ -332,96 +332,8 @@ class NeuronRecorder(object):
     def __read_data(
             self, label, application_vertex,
             sampling_rate, data_type, variable):
-        vertices = (
-            application_vertex.splitter.machine_vertices_for_recording(
-                variable))
-        progress = ProgressBar(
-            vertices, "Getting {} for {}".format(variable, label))
-        region = self.__region_ids[variable]
-
-        pop_data = None
-        pop_times = None
-        pop_neurons = []
-        for i, vertex in enumerate(progress.over(vertices)):
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            if variable in self.__sampling_rates:
-                neurons = self._neurons_recording(
-                    variable, vertex.vertex_slice,
-                    application_vertex.atoms_shape)
-            else:
-                neurons = [i]
-            with NeoBufferDatabase() as db:
-                neurons, times, data, sampling_interval = db.get_matrix_data(
-                    placement.x, placement.y, placement.p, region, neurons,
-                    data_type, SpynnakerDataView.get_simulation_time_step_ms(),
-                    sampling_rate)
-
-            pop_neurons.extend(neurons)
-            if pop_data is None:
-                pop_data = data
-                pop_times = times
-            elif numpy.array_equal(pop_times, times):
-                pop_data = numpy.append(
-                    pop_data, data, axis=1)
-            else:
-                raise NotImplementedError("times differ")
-        indexes = numpy.array(pop_neurons)
-        order = numpy.argsort(indexes)
-        return pop_data[:, order], indexes[order], sampling_interval
-
-    def __read_datax(
-            self, label, application_vertex,
-            sampling_rate, data_type, variable):
-        n_machine_time_steps = SpynnakerDataView.get_current_run_timesteps()
-        vertices = (
-            application_vertex.splitter.machine_vertices_for_recording(
-                variable))
-        region = self.__region_ids[variable]
-        missing_str = ""
-        pop_level_data = None
-        sampling_interval = get_sampling_interval(sampling_rate)
-
-        progress = ProgressBar(
-            vertices, "Getting {} for {}".format(variable, label))
-
-        indexes = []
-        for i, vertex in enumerate(progress.over(vertices)):
-            expected_rows = int(
-                math.ceil(n_machine_time_steps / sampling_rate))
-
-            n_items_per_timestep = 1
-            if variable in self.__sampling_rates:
-                neurons = self._neurons_recording(
-                    variable, vertex.vertex_slice,
-                    application_vertex.atoms_shape)
-                n_items_per_timestep = len(neurons)
-                indexes.extend(neurons)
-            else:
-                indexes.append(i)
-            placement_data = self._get_placement_matrix_data(
-                vertex, region, expected_rows,
-                missing_str, sampling_rate, label, data_type,
-                n_items_per_timestep)
-
-            if placement_data is not None:
-                # append to the population data
-                if pop_level_data is None:
-                    pop_level_data = placement_data
-                else:
-                    # Add the slice fragment on axis 1
-                    # which is IDs/channel_index
-                    pop_level_data = numpy.append(
-                        pop_level_data, placement_data, axis=1)
-
-        # warn user of missing data
-        if len(missing_str) > 0:
-            logger.warning(
-                "Population {} is missing recorded data in region {} from the"
-                " following cores: {}", label, region, missing_str)
-
-        indexes = numpy.array(indexes)
-        order = numpy.argsort(indexes)
-        return pop_level_data[:, order], indexes[order], sampling_interval
+        with NeoBufferDatabase() as db:
+            return db.get_deta(label, variable)
 
     def get_matrix_data(self, label, application_vertex, variable):
         """ Read a data mapped to time and neuron IDs from the SpiNNaker\
@@ -451,6 +363,44 @@ class NeuronRecorder(object):
             data_type = self.__data_types[variable]
         return self.__read_data(
             label, application_vertex, sampling_rate, data_type, variable)
+
+    def __write_matrix_metadata(
+            self, application_vertex,
+            sampling_rate, data_type, variable):
+        vertices = (
+            application_vertex.splitter.machine_vertices_for_recording(
+                variable))
+        region = self.__region_ids[variable]
+
+        for i, vertex in enumerate(vertices):
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
+            if variable in self.__sampling_rates:
+                neurons = self._neurons_recording(
+                    variable, vertex.vertex_slice,
+                    application_vertex.atoms_shape)
+            else:
+                neurons = [i]
+            with NeoBufferDatabase() as db:
+                db.set_matrix_metadata(vertex, variable, region, neurons,
+                                       data_type, sampling_rate)
+
+    def write_matrix_metadata(self, application_vertex, variable):
+        if variable in self.__bitfield_variables:
+            msg = ("Variable {} is not supported by get_matrix_data, use "
+                   "get_spikes(...)").format(variable)
+            raise ConfigurationException(msg)
+        if variable in self.__events_per_core_variables:
+            msg = ("Variable {} is not supported by get_matrix_data, use "
+                   "get_events(...)").format(variable)
+            raise ConfigurationException(msg)
+        if variable in self.__per_timestep_variables:
+            sampling_rate = 1
+            data_type = self.__per_timestep_datatypes[variable]
+        else:
+            sampling_rate = self.__sampling_rates[variable]
+            data_type = self.__data_types[variable]
+        self.__write_matrix_metadata(
+            application_vertex, sampling_rate, data_type, variable)
 
     def get_spikes(self, label, variable):
         """ Read spikes mapped to time and neuron IDs from the SpiNNaker\

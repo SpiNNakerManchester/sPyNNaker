@@ -589,6 +589,7 @@ class AbstractPopulationVertex(
         if self.is_recording(variable):
             SpynnakerDataView.set_requires_mapping()
 
+    @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable):
         # pylint: disable=too-many-arguments
         if self.__neuron_recorder.is_recordable(variable):
@@ -597,6 +598,15 @@ class AbstractPopulationVertex(
         elif self.__synapse_recorder.is_recordable(variable):
             return self.__synapse_recorder.get_matrix_data(
                 self.label, self, variable)
+        self.__raise_var_not_supported(variable)
+
+    @overrides(AbstractNeuronRecordable.write_matrix_metadata)
+    def write_matrix_metadata(self, variable):
+        # pylint: disable=too-many-arguments
+        if self.__neuron_recorder.is_recordable(variable):
+            return self.__neuron_recorder.write_matrix_metadata(self, variable)
+        elif self.__synapse_recorder.is_recordable(variable):
+            return self.__synapse_recorder.get_matrix_data(self, variable)
         self.__raise_var_not_supported(variable)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)

@@ -82,3 +82,7 @@ class AbstractNeuronRecordable(object, metaclass=AbstractBase):
         :return: Sampling interval in microseconds
         :rtype: float
         """
+
+    @abstractmethod
+    def write_matrix_metadata(self, variable):
+        """ TODO """

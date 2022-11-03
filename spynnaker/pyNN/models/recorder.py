@@ -261,6 +261,7 @@ class Recorder(object):
         if not SpynnakerDataView.is_ran_last():
             if SpynnakerDataView.is_ran_ever():
                 logger.warning(
+
                     f"The simulation has been reset, therefore {variable} "
                     f"cannot be retrieved, hence the list/last segment list "
                     f"will be empty")
@@ -283,8 +284,7 @@ class Recorder(object):
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
-            results = self.__vertex.get_data(variable)
-            (data, indexes, sampling_interval) = results
+            return self.__vertex.get_data(variable)
 
         return (data, indexes, sampling_interval)
 
@@ -822,9 +822,9 @@ class Recorder(object):
             if variable == SPIKES:
                 self.__vertex.write_spike_metadata()
             #elif variable == REWIRING:
-            #    self.__vertex.write_event_metadata(db, variable)
-            #else:
-            #    self.__vertex.write_matrix_metadata(db, variable)
+            #    self.__vertex.write_event_metadata(variable)
+            else:
+                self.__vertex.write_matrix_metadata(variable)
 
 
 def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
