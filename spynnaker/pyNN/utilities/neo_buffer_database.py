@@ -263,16 +263,14 @@ class NeoBufferDatabase(BufferDatabase):
                 (pop_rec_id, region_id, base_key, str(vertex.vertex_slice),
                  str(atoms_shape)))
 
-    def get_multi_spikes(
-            self, x, y, p, region, simulation_time_step_ms, vertex_slice,
-            atoms_shape):
+    def _get_multi_spikes_by_region(
+            self, cursor, region_id, simulation_time_step_ms, vertex_slice,
+            atoms_shape, spike_times, spike_ids):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param tuple(int) atoms_shape:
         """
-        raw_data, data_missing = self.get_region_data(x, y, p, region)
-        spike_ids = []
-        spike_times = []
+        raw_data = self._read_contents(cursor, region_id)
 
         n_words = int(math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
         n_bytes_per_block = n_words * BYTES_PER_WORD
@@ -297,7 +295,47 @@ class NeoBufferDatabase(BufferDatabase):
             spike_ids.append(indices)
             spike_times.append(times)
 
-        return spike_times, spike_ids
+    def _get_multi_spikes(self, cursor, pop_rec_id):
+        spike_times = list()
+        spike_ids = list()
+        simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
+        rows = list(cursor.execute(
+            """
+            SELECT region_id, vertex_slice, atoms_shape
+            FROM multi_spikes_metadata 
+            WHERE pop_rec_id = ?
+            """, [pop_rec_id]))
+
+        for row in rows:
+            vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
+            atoms_shape = self.string_to_array(row["atoms_shape"])
+
+            self._get_multi_spikes_by_region(
+                cursor, row["region_id"], simulation_time_step_ms,
+                vertex_slice, atoms_shape, spike_times, spike_ids)
+
+        spike_ids = numpy.hstack(spike_ids)
+        spike_times = numpy.hstack(spike_times)
+        result = numpy.dstack((spike_ids, spike_times))[0]
+        return result[numpy.lexsort((spike_times, spike_ids))]
+
+    def set_multi_spikes_metadata(self, vertex, variable, region, atoms_shape):
+        with self.transaction() as cursor:
+            pop_rec_id = self.get_population_recording_id(
+                cursor, vertex.app_vertex.label, variable, DataType.INT32,
+                "get_multi_spikes")
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
+            region_id = self._get_region_id(
+                cursor, placement.x, placement.y, placement.p, region)
+
+            cursor.execute(
+                """
+                INSERT INTO multi_spikes_metadata 
+                (pop_rec_id, region_id, vertex_slice, atoms_shape)
+                 VALUES (?, ?, ?, ?)
+                """,
+                (pop_rec_id, region_id, str(vertex.vertex_slice),
+                 str(atoms_shape)))
 
     def get_matrix_data(
             self, x, y, p, region, neurons, data_type,
@@ -333,6 +371,8 @@ class NeoBufferDatabase(BufferDatabase):
                 return self._get_spikes(cursor, pop_rec_id)
             elif function == "get_eieio_spikes":
                 return self._get_eieio_spikes(cursor, pop_rec_id)
+            elif function == "get_multi_spikes":
+                return self._get_multi_spikes(cursor, pop_rec_id)
             else:
                 raise NotImplementedError(function)
 

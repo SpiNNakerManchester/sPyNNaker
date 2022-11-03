@@ -72,36 +72,12 @@ class MultiSpikeRecorder(object):
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
-        # pylint: disable=too-many-arguments
-        spike_times = list()
-        spike_ids = list()
+        with NeoBufferDatabase() as db:
+            return db.get_deta(application_vertex.label, "spikes")
 
-        vertices = application_vertex.machine_vertices
-        missing = []
-        progress = ProgressBar(
-            vertices, "Getting spikes for {}".format(label))
-        for vertex in progress.over(vertices):
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            vertex_slice = vertex.vertex_slice
-
-            with NeoBufferDatabase() as db:
-                times, indices = db.get_multi_spikes(
-                    placement.x, placement.y, placement.p, region,
-                    SpynnakerDataView.get_simulation_time_step_ms(),
-                    vertex_slice, application_vertex.atoms_shape)
-            spike_ids.extend(indices)
-            spike_times.extend(times)
-
-        if missing:
-            logger.warning(
-                "Population {} is missing spike data in region {} from the "
-                "following cores: {}", label, region,
-                recording_utils.make_missing_string(missing))
-
-        if not spike_ids:
-            return numpy.zeros((0, 2))
-
-        spike_ids = numpy.hstack(spike_ids)
-        spike_times = numpy.hstack(spike_times)
-        result = numpy.dstack((spike_ids, spike_times))[0]
-        return result[numpy.lexsort((spike_times, spike_ids))]
+    def write_spike_metadata(self, application_vertex, region):
+        with NeoBufferDatabase() as db:
+            vertices = application_vertex.machine_vertices
+            for vertex in vertices:
+                db.set_multi_spikes_metadata(
+                    vertex, "spikes", region, application_vertex.atoms_shape)
