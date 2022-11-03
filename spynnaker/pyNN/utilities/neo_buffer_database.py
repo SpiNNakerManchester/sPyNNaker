@@ -399,6 +399,8 @@ class NeoBufferDatabase(BufferDatabase):
 
     def set_matrix_metadata(self, vertex, variable, region, neurons,
                             data_type, sampling_rate):
+        if len(neurons) == 0:
+            return
         with self.transaction() as cursor:
             pop_rec_id = self.get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, data_type,
