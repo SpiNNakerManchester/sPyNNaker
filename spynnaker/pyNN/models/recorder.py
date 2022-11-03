@@ -821,7 +821,8 @@ class Recorder(object):
         for variable in self.get_all_recording_variables():
             if variable == SPIKES:
                 self.__vertex.write_spike_metadata()
-            #elif variable == REWIRING:
+            elif variable == REWIRING:
+                pass
             #    self.__vertex.write_event_metadata(variable)
             else:
                 self.__vertex.write_matrix_metadata(variable)
