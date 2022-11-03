@@ -17,10 +17,6 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.exceptions import PacmanConfigurationException
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
