@@ -326,3 +326,13 @@ class PopulationApplicationVertex(ApplicationVertex):
         """
         raise ConfigurationException(
             "This Population doesn't support injection")
+
+    @property
+    def n_colour_bits(self):
+        """ The number of colour bits sent by this vertex.
+
+            Assumed 0 unless overridden
+
+        :rtype: int
+        """
+        return 0

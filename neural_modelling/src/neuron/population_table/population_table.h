@@ -54,9 +54,9 @@ typedef struct master_population_table_entry {
     //! The mask to select the relevant bits of \p key for matching
     uint32_t mask;
     //! The index into ::address_list for this entry
-    uint32_t start: 15;
-    //! Flag to indicate if core mask etc. is valid
-    uint32_t extra_info_flag: 1;
+    uint32_t start: 13;
+    //! The number of bits of key used for colour (0 if no colour)
+    uint32_t n_colour_bits: 3;
     //! The number of entries in ::address_list for this entry
     uint32_t count: 16;
     //! The mask to apply to the key once shifted to get the core index

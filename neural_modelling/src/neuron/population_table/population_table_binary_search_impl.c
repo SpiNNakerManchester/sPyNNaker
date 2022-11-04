@@ -78,10 +78,8 @@ static inline void print_master_population_table(void) {
         log_info("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
         int count = entry.count;
         int start = entry.start;
-        if (entry.extra_info_flag) {
-            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
-                    entry.core_mask, entry.mask_shift, entry.n_neurons, entry.n_words);
-        }
+		log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
+				entry.core_mask, entry.mask_shift, entry.n_neurons, entry.n_words);
         for (uint16_t j = start; j < (start + count); j++) {
             address_list_entry addr = address_list[j];
             if (addr.address == INVALID_ADDRESS) {
@@ -285,15 +283,15 @@ bool population_table_get_first_address(
     last_spike = spike;
     next_item = entry.start;
     items_to_go = entry.count;
-    if (entry.extra_info_flag) {
-        uint32_t local_neuron_id = get_local_neuron_id(entry, spike);
-        last_colour = local_neuron_id & 0xF;
-        last_neuron_id = (local_neuron_id >> 4) + get_core_sum(entry, spike);
-    } else {
-        uint32_t local_neuron_id = get_neuron_id(entry, spike);
-        last_colour = local_neuron_id & 0xF;
-        last_neuron_id = local_neuron_id >> 4;
-    }
+	uint32_t local_neuron_id = get_local_neuron_id(entry, spike);
+	uint32_t last_colour = 0;
+	if (entry.n_colour_bits) {
+		uint32_t colour_mask = (1 << entry.n_colour_bits) - 1;
+	    last_colour = local_neuron_id & colour_mask;
+	    last_neuron_id = (local_neuron_id >> entry.n_colour_bits) + get_core_sum(entry, spike);
+	} else {
+		last_neuron_id = local_neuron_id + get_core_sum(entry, spike);
+	}
 
     // check we have a entry in the bit field for this (possible not to due to
     // DTCM limitations or router table compression). If not, go to DMA check.
