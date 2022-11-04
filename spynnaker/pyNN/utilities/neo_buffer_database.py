@@ -32,10 +32,16 @@ _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
 _TWO_WORDS = struct.Struct("<II")
 _NEO_DDL_FILE = os.path.join(os.path.dirname(__file__), "db.sql")
 #: number of words per rewiring entry
-_REWIRING_N_WORDS = 2
 
 
 class NeoBufferDatabase(BufferDatabase):
+
+    #: rewiring: shift values to decode recorded value
+    _PRE_ID_SHIFT = 9
+    _POST_ID_SHIFT = 1
+    _POST_ID_FACTOR = 2 ** 8
+    _FIRST_BIT = 1
+    _REWIRING_N_WORDS = 2
 
     def __init__(self, database_file=None):
         """
@@ -434,7 +440,7 @@ class NeoBufferDatabase(BufferDatabase):
         if len(record_raw) > 0:
             raw_data = (
                 numpy.asarray(record_raw, dtype="uint8").view(
-                    dtype="<i4")).reshape([-1, self.REWIRING_N_WORDS])
+                    dtype="<i4")).reshape([-1, self._REWIRING_N_WORDS])
         else:
             return
 

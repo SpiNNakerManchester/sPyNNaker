@@ -112,12 +112,6 @@ class NeuronRecorder(object):
     #: max_rewires
     MAX_REWIRES = "max_rewires"
 
-    #: rewiring: shift values to decode recorded value
-    _PRE_ID_SHIFT = 9
-    _POST_ID_SHIFT = 1
-    _POST_ID_FACTOR = 2 ** 8
-    _FIRST_BIT = 1
-
     _MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     def __init__(
