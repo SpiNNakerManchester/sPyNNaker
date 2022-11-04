@@ -551,6 +551,10 @@ class AbstractPopulationVertex(
         return self.__synapse_recorder.get_events(
             self.label, self, variable)
 
+    @overrides(AbstractEventRecordable.write_events_metadata)
+    def write_events_metadata(self, variable):
+        return self.__synapse_recorder.write_events_metadata(self, variable)
+
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
         variables = list()

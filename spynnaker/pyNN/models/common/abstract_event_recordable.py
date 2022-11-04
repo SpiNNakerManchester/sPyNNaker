@@ -77,3 +77,7 @@ class AbstractEventRecordable(object, metaclass=AbstractBase):
         :return: Sampling interval in microseconds
         :rtype: float
         """
+
+    @abstractmethod
+    def write_events_metadata(self, variable):
+        """ TODOD """

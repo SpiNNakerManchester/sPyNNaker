@@ -31,6 +31,8 @@ from spynnaker.pyNN.data import SpynnakerDataView
 _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
 _TWO_WORDS = struct.Struct("<II")
 _NEO_DDL_FILE = os.path.join(os.path.dirname(__file__), "db.sql")
+#: number of words per rewiring entry
+_REWIRING_N_WORDS = 2
 
 
 class NeoBufferDatabase(BufferDatabase):
@@ -78,12 +80,16 @@ class NeoBufferDatabase(BufferDatabase):
                 LIMIT 1
                 """, (pop_label, variable)):
             return row["pop_rec_id"]
+        if data_type:
+            data_type_name = data_type.name
+        else:
+            data_type_name = None
         cursor.execute(
             """
             INSERT INTO population_recording 
             (label, variable, data_type, function)
              VALUES (?, ?, ?, ?)
-            """, (pop_label, variable, data_type.name, data_function))
+            """, (pop_label, variable, data_type_name, data_function))
         return cursor.lastrowid
 
     def get_population_metadeta(
@@ -95,7 +101,11 @@ class NeoBufferDatabase(BufferDatabase):
                 WHERE label = ? AND variable = ?
                 LIMIT 1
                 """, (pop_label, variable)):
-            data_type = DataType[str(row["data_type"], 'utf-8')]
+            if row["data_type"]:
+                data_type_st = str(row["data_type"], 'utf-8')
+                data_type = DataType[data_type_st]
+            else:
+                data_type = None
             function = str(row["function"], 'utf-8')
             return (row["pop_rec_id"], data_type, function)
         raise Exception(f"No metedata for {variable} on {pop_label}")
@@ -417,6 +427,81 @@ class NeoBufferDatabase(BufferDatabase):
                  VALUES (?, ?, ?, ?)
                 """, (pop_rec_id, region_id, neurons_st, sampling_rate))
 
+    def _get_rewires_by_region(
+            self, cursor, region_id, vertex_slice, rewire_values,
+            rewire_postids, rewire_preids, rewire_times):
+        record_raw = self._read_contents(cursor, region_id)
+        if len(record_raw) > 0:
+            raw_data = (
+                numpy.asarray(record_raw, dtype="uint8").view(
+                    dtype="<i4")).reshape([-1, self.REWIRING_N_WORDS])
+        else:
+            return
+
+        record_time = (raw_data[:, 0] *
+                       SpynnakerDataView.get_simulation_time_step_ms())
+        rewires_raw = raw_data[:, 1:]
+        rew_length = len(rewires_raw)
+        # rewires is 0 (elimination) or 1 (formation) in the first bit
+        rewires = [rewires_raw[i][0] & self._FIRST_BIT
+                   for i in range(rew_length)]
+        # the post-neuron ID is stored in the next 8 bytes
+        post_ids = [((int(rewires_raw[i]) >> self._POST_ID_SHIFT) %
+                    self._POST_ID_FACTOR) + vertex_slice.lo_atom
+                    for i in range(rew_length)]
+        # the pre-neuron ID is stored in the remaining 23 bytes
+        pre_ids = [int(rewires_raw[i]) >> self._PRE_ID_SHIFT
+                   for i in range(rew_length)]
+
+        rewire_values.extend(rewires)
+        rewire_postids.extend(post_ids)
+        rewire_preids.extend(pre_ids)
+        rewire_times.extend(record_time)
+
+    def _get_rewires(self, cursor, pop_rec_id, data_type):
+        simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
+        rewire_times = list()
+        rewire_values = list()
+        rewire_postids = list()
+        rewire_preids = list()
+
+        rows = list(cursor.execute(
+            """
+            SELECT region_id, vertex_slice
+            FROM rewires_metadata 
+            WHERE pop_rec_id = ?
+            """, [pop_rec_id]))
+
+        for row in rows:
+            vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
+
+            self._get_rewires_by_region(
+                cursor,row["region_id"], vertex_slice, rewire_values,
+                rewire_postids, rewire_preids, rewire_times)
+
+            if len(rewire_values) == 0:
+                return numpy.zeros((0, 4), dtype="float")
+
+            result = numpy.column_stack(
+                (rewire_times, rewire_preids, rewire_postids, rewire_values))
+            return result[numpy.lexsort(
+                (rewire_values, rewire_postids, rewire_preids, rewire_times))]
+
+    def set_rewires_metadata(self, vertex, variable, region):
+        with self.transaction() as cursor:
+            pop_rec_id = self.get_population_recording_id(
+                cursor, vertex.app_vertex.label, variable, None,
+                "get_rewires")
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
+            region_id = self._get_region_id(
+                cursor, placement.x, placement.y, placement.p, region)
+            cursor.execute(
+                """
+                INSERT INTO rewires_metadata 
+                (pop_rec_id, region_id, vertex_slice)
+                 VALUES (?, ?, ?)
+                """, (pop_rec_id, region_id, str(vertex.vertex_slice)))
+
     def get_deta(self, pop_label, variable):
         with self.transaction() as cursor:
             pop_rec_id, data_type, function = self.get_population_metadeta(
@@ -429,6 +514,8 @@ class NeoBufferDatabase(BufferDatabase):
                 return self._get_multi_spikes(cursor, pop_rec_id)
             elif function == "get_matrix":
                 return self._get_matrix_data(cursor, pop_rec_id, data_type)
+            elif function == "get_rewires":
+                return self._get_rewires(cursor, pop_rec_id, data_type)
             else:
                 raise NotImplementedError(function)
 

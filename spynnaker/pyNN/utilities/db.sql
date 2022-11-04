@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS population_recording (
     pop_rec_id INTEGER PRIMARY KEY AUTOINCREMENT,
     label TEXT NOT NULL,
     variable TEXT NOT NULL,
-    data_type TEXT NOT NULL,
+    data_type TEXT,
     function TEXT NOT NULL);
 
 CREATE UNIQUE INDEX IF NOT EXISTS population_recording_sanity
@@ -67,3 +67,11 @@ CREATE TABLE IF NOT EXISTS matrix_metadata(
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     neurons_st TEXT NOT NULL,
     sampling_rate float NOT NULL);
+
+CREATE TABLE IF NOT EXISTS rewires_metadata(
+    rewires_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pop_rec_id INTEGER NOT NULL
+		REFERENCES population_recording(pop_rec_id) ON DELETE RESTRICT,
+    region_id INTEGER NOT NULL
+		REFERENCES region(region_id) ON DELETE RESTRICT,
+    vertex_slice TEXT NOT NULL);
