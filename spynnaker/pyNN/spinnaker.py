@@ -416,6 +416,17 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return AbstractSpinnakerBase._do_delayed_compression(
             self, name, compressed)
 
+    def _execute_write_neo_metadata(self):
+        with FecTimer("Write Neo Metadata", TimerWork.OTHER):
+            with NeoBufferDatabase() as db:
+                db.set_segement_data()
+            for population in SpynnakerDataView.iterate_populations():
+                population._recorder.write_neo_metadata()
+
+    @overrides(AbstractSpinnakerBase._do_write_metadata)
+    def _do_write_metadata(self):
+        self._execute_write_neo_metadata()
+
     def _execute_synapse_expander(self):
         with FecTimer("Synapse expander", TimerWork.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
@@ -433,19 +444,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         with FecTimer("Finish connection holders", TimerWork.OTHER):
             finish_connection_holders()
 
-    def _execute_write_neo_metadata(self):
-        with FecTimer("Write Neo Metadata", TimerWork.OTHER):
-            with NeoBufferDatabase() as db:
-                db.set_segement_data()
-            for population in SpynnakerDataView.iterate_populations():
-                population._recorder.write_neo_metadata()
-
     @overrides(AbstractSpinnakerBase._do_extra_load_algorithms)
     def _do_extra_load_algorithms(self):
         self._execute_synapse_expander()
         self._execute_on_chip_bit_field_generator()
         self._execute_finish_connection_holders()
-        self._execute_write_neo_metadata()
 
     def _report_write_network_graph(self):
         with FecTimer("SpYNNakerNeuronGraphNetworkSpecificationReport",
