@@ -98,6 +98,7 @@ class NeoBufferDatabase(BufferDatabase):
             data_type = DataType[str(row["data_type"], 'utf-8')]
             function = str(row["function"], 'utf-8')
             return (row["pop_rec_id"], data_type, function)
+        raise Exception(f"No metedata for {variable} on {pop_label}")
 
     def _get_spikes_by_region(
             self, cursor, region_id, neurons, simulation_time_step_ms,
