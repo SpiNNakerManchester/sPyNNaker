@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,11 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
-from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.model.resources import ConstantSDRAM
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary)
 from spinn_front_end_common.abstract_models import (
@@ -29,6 +27,7 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 
@@ -69,7 +68,7 @@ class MachineMunichMotorDevice(
     def __init__(
             self, speed, sample_time, update_time, delay_time,
             delta_threshold, continue_if_not_different,
-            label=None, constraints=None, app_vertex=None):
+            label=None, app_vertex=None):
         """
         :param int speed:
         :param int sample_time:
@@ -78,11 +77,10 @@ class MachineMunichMotorDevice(
         :param int delta_threshold:
         :param bool continue_if_not_different:
         :param str label:
-        :param constraints:
         :param app_vertex:
         """
         super().__init__(
-            label=label, constraints=constraints, app_vertex=app_vertex,
+            label=label, app_vertex=app_vertex,
             vertex_slice=Slice(0, self._N_ATOMS - 1))
         self.__speed = speed
         self.__sample_time = sample_time
@@ -92,13 +90,11 @@ class MachineMunichMotorDevice(
         self.__continue_if_not_different = bool(continue_if_not_different)
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return ResourceContainer(
-            sdram=ConstantSDRAM(
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return ConstantSDRAM(
                 SYSTEM_BYTES_REQUIREMENT + self._PARAMS_SIZE +
-                self.get_provenance_data_size(self._PROVENANCE_ELEMENTS)),
-            dtcm=DTCMResource(0), cpu_cycles=CPUCyclesPerTickResource(0))
+                self.get_provenance_data_size(self._PROVENANCE_ELEMENTS))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
@@ -136,11 +132,9 @@ class MachineMunichMotorDevice(
                     "Please increase the timer_tic or time_scale_factor "
                     "or decrease the number of neurons per core.")
 
-    @inject_items({"routing_info": "RoutingInfos"})
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_info"})
-    def generate_data_specification(self, spec, placement, routing_info):
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve regions
@@ -155,6 +149,7 @@ class MachineMunichMotorDevice(
             placement.vertex.get_binary_file_name()))
 
         # Get the key
+        routing_info = SpynnakerDataView.get_routing_infos()
         edge_key = routing_info.get_first_key_from_pre_vertex(
             placement.vertex, self.MOTOR_PARTITION_ID)
         if edge_key is None:

@@ -37,7 +37,22 @@ class TestViews(BaseTestCase):
             -65., -63.04931641, -61.19375610, -59.42868042, -57.74966431,
             -60., -58.29315186, -56.66952515, -55.12509155, -53.65597534,
             -65., -64.02465820, -63.09686279, -62.21432495, -61.37481689]
-        assert(numpy.allclose(v1[:, 2], expected))
+        assert numpy.allclose(v1[:, 2], expected)
+
+    def test_initial_value_random(self):
+        sim.setup(timestep=1.0)
+        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
+        self.assertEqual([-65, -65, -65, -65, -65], pop.initial_values["v"])
+        view = sim.PopulationView(pop, [1, 3], label="Odds")
+        rand_distr = sim.RandomDistribution(
+            "uniform", parameters_pos=[-65.0, -55.0],
+            rng=sim.NumpyRNG(seed=85524))
+        view.initialize(v=rand_distr)
+        sim.run(0)
+        for val in view.initial_values["v"]:
+            self.assertGreaterEqual(val, -65.0)
+            self.assertLessEqual(val, -55.0)
+        sim.end()
 
     def test_set_with_views(self):
         self.runsafe(self.set_with_views)

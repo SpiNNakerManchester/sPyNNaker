@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
 from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.data import SpynnakerDataView
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_E2 = 'tau_syn_E2'
@@ -30,12 +28,7 @@ ISYN_INH = "isyn_inh"
 MULTIPLICATOR = "multiplicator"
 EXC2_OLD = "exc2_old"
 SCALING_FACTOR = "scaling_factor"
-DECAY_E = "decay_E"
-DECAY_E2 = "decay_E2"
-DECAY_I = "decay_I"
-INIT_E = "init_E"
-INIT_E2 = "init_E2"
-INIT_I = "init_I"
+TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeSEMD(AbstractSynapseType):
@@ -93,18 +86,16 @@ class SynapseTypeSEMD(AbstractSynapseType):
         """
         super().__init__(
             [Struct([
-                (DataType.U032, DECAY_E),
-                (DataType.U032, INIT_E),
+                (DataType.S1615, TAU_SYN_E),
                 (DataType.S1615, ISYN_EXC),
-                (DataType.U032, DECAY_E2),
-                (DataType.U032, INIT_E2),
+                (DataType.S1615, TAU_SYN_E2),
                 (DataType.S1615, ISYN_EXC2),
-                (DataType.U032, DECAY_I),
-                (DataType.U032, INIT_I),
+                (DataType.S1615, TAU_SYN_I),
                 (DataType.S1615, ISYN_INH),
                 (DataType.S1615, MULTIPLICATOR),
                 (DataType.S1615, EXC2_OLD),
-                (DataType.S1615, SCALING_FACTOR)])],
+                (DataType.S1615, SCALING_FACTOR),
+                (DataType.S1615, TIMESTEP_MS)])],
             {TAU_SYN_E: "mV", TAU_SYN_E2: "mV", TAU_SYN_I: 'mV', ISYN_EXC: "",
              ISYN_EXC2: "", ISYN_INH: "", MULTIPLICATOR: "", EXC2_OLD: "",
              SCALING_FACTOR: ""})
@@ -118,16 +109,13 @@ class SynapseTypeSEMD(AbstractSynapseType):
         self.__exc2_old = exc2_old
         self.__scaling_factor = scaling_factor
 
-    @overrides(AbstractSynapseType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 100 * n_neurons
-
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
         parameters[TAU_SYN_E] = self.__tau_syn_E
         parameters[TAU_SYN_E2] = self.__tau_syn_E2
         parameters[TAU_SYN_I] = self.__tau_syn_I
-        parameters[MULTIPLICATOR] = self.__multiplicator
+        parameters[TIMESTEP_MS] = (
+            SpynnakerDataView.get_simulation_time_step_ms())
         parameters[SCALING_FACTOR] = self.__scaling_factor
 
     @overrides(AbstractSynapseType.add_state_variables)
@@ -136,25 +124,7 @@ class SynapseTypeSEMD(AbstractSynapseType):
         state_variables[ISYN_EXC2] = self.__isyn_exc2
         state_variables[ISYN_INH] = self.__isyn_inh
         state_variables[EXC2_OLD] = self.__exc2_old
-
-    @overrides(AbstractSynapseType.get_precomputed_values)
-    def get_precomputed_values(self, parameters, state_variables, ts):
-        tsfloat = float(ts) / MICRO_TO_MILLISECOND_CONVERSION
-
-        def decay(x):
-            return numpy.exp(-tsfloat / x)
-
-        def init(x):
-            return (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))
-
-        return {
-            DECAY_E: parameters[TAU_SYN_E].apply_operation(decay),
-            DECAY_E2: parameters[TAU_SYN_E2].apply_operation(decay),
-            DECAY_I: parameters[TAU_SYN_I].apply_operation(decay),
-            INIT_E: parameters[TAU_SYN_E].apply_operation(init),
-            INIT_E2: parameters[TAU_SYN_E2].apply_operation(init),
-            INIT_I: parameters[TAU_SYN_I].apply_operation(init)
-        }
+        state_variables[MULTIPLICATOR] = self.__multiplicator
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):

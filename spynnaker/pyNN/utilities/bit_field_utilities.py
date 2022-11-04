@@ -18,6 +18,7 @@ import numpy
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_utilities.ordered_set import OrderedSet
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.data import SpynnakerDataView
 
 #: number of elements
 #  key, n atoms, atoms_per_core, pointer to bitfield
@@ -78,23 +79,31 @@ def get_sdram_for_keys(incoming_projections):
     return sdram
 
 
-def get_bitfield_key_map_data(incoming_projections, routing_info):
+def get_bitfield_key_map_data(incoming_projections):
     """ Get data for the key map region
 
     :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
         The projections to generate bitfields for
-    :param ~pacman.model.routing_info.RoutingInfo routing_info: keys
     :rtype: ~numpy.ndarray
     """
     # Gather the source vertices that target this core
+    routing_infos = SpynnakerDataView.get_routing_infos()
     sources = OrderedSet()
     for proj in incoming_projections:
+        # pylint: disable=protected-access
         in_edge = proj._projection_edge
         if in_edge not in sources:
-            key = routing_info.get_first_key_from_pre_vertex(
+            key = routing_infos.get_first_key_from_pre_vertex(
                 in_edge.pre_vertex, SPIKE_PARTITION_ID)
             if key is not None:
                 sources.add((key, in_edge.pre_vertex.n_atoms))
+            if in_edge.delay_edge is not None:
+                delay_key = routing_infos.get_first_key_from_pre_vertex(
+                    in_edge.delay_edge.pre_vertex, SPIKE_PARTITION_ID)
+                if delay_key is not None:
+                    n_delay_atoms = (
+                        in_edge.pre_vertex.n_atoms * in_edge.n_delay_stages)
+                    sources.add((delay_key, n_delay_atoms))
 
     if not sources:
         return numpy.array([], dtype="uint32")

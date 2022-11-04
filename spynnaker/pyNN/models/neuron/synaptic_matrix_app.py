@@ -16,6 +16,7 @@ import numpy
 
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spynnaker.pyNN.data import SpynnakerDataView
 from .generator_data import GeneratorData
 from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -27,6 +28,8 @@ class SynapticMatrixApp(object):
         app edge
     """
 
+    # pylint: disable=unused-private-member
+    # https://github.com/SpiNNakerManchester/sPyNNaker/issues/1201
     __slots__ = [
         # The synaptic info that these matrices are for
         "__synapse_info",
@@ -229,10 +232,10 @@ class SynapticMatrixApp(object):
         row_data, delay_row_data = self.__get_row_data(post_vertex_slice)
         self.__update_connection_holders(
             row_data, delay_row_data, post_vertex_slice)
-        if self.__syn_mat_offset:
+        if self.__syn_mat_offset is not None:
             spec.set_write_pointer(self.__syn_mat_offset)
             spec.write_array(row_data)
-        if self.__delay_syn_mat_offset:
+        if self.__delay_syn_mat_offset is not None:
             spec.set_write_pointer(self.__delay_syn_mat_offset)
             spec.write_array(delay_row_data)
 
@@ -289,8 +292,8 @@ class SynapticMatrixApp(object):
                 read_all_synapses(
                     data, delayed_data, self.__synapse_info,
                     self.__n_synapse_types, self.__weight_scales,
-                    self.__app_edge.pre_vertex.n_atoms,
-                    post_vertex_slice, post_vertex_max_delay_ticks,
+                    post_vertex_slice, self.__app_edge.pre_vertex.n_atoms,
+                    post_vertex_max_delay_ticks,
                     self.__max_row_info, self.__max_atoms_per_core))
 
     def get_generator_data(self):
@@ -299,67 +302,57 @@ class SynapticMatrixApp(object):
         :return: The data to generate with
         :rtype: GeneratorData
         """
+        pre_vertex = self.__app_edge.pre_vertex
+        max_pre_atoms_per_core = min(pre_vertex.n_atoms,
+                                     pre_vertex.get_max_atoms_per_core())
         return GeneratorData(
             self.__syn_mat_offset, self.__delay_syn_mat_offset,
             self.__app_edge, self.__synapse_info, self.__max_row_info,
-            self.__max_atoms_per_core)
+            max_pre_atoms_per_core, self.__max_atoms_per_core)
 
-    def get_connections(self, transceiver, placement, post_vertex_slice):
+    def get_connections(self, placement):
         """ Get the connections for this matrix from the machine
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post-vertex the matrix is for
         :return: A list of arrays of connections, each with dtype
-            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
         synapses_address = locate_memory_region_for_placement(
-            placement, self.__synaptic_matrix_region, transceiver)
-        return self.__read_connections(
-            transceiver, placement, synapses_address, post_vertex_slice)
+            placement, self.__synaptic_matrix_region)
+        return self.__read_connections(placement, synapses_address)
 
-    def read_generated_connection_holders(
-            self, transceiver, placement, post_vertex_slice):
+    def read_generated_connection_holders(self, placement):
         """ Read any pre-run connection holders after data has been generated
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post-vertex the matrix is for
         """
         if self.__synapse_info.pre_run_connection_holders:
-            connections = self.get_connections(
-                transceiver, placement, post_vertex_slice)
+            connections = self.get_connections(placement)
             if connections:
                 connections = numpy.concatenate(connections)
                 for holder in self.__synapse_info.pre_run_connection_holders:
                     holder.add_connections(connections)
 
-    def __read_connections(
-            self, transceiver, placement, synapses_address, post_vertex_slice):
+    def __read_connections(self, placement, synapses_address):
         """ Read connections from an address on the machine
 
-        :param Transceiver transceiver: How to read the data from the machine
         :param Placement placement: Where the matrix is on the machine
         :param int synapses_address:
             The base address of the synaptic matrix region
         :return: A list of arrays of connections, each with dtype
-            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
         connections = list()
 
         if self.__syn_mat_offset is not None:
-            block = self.__get_block(transceiver, placement, synapses_address)
+            block = self.__get_block(placement, synapses_address)
             splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
-                self.__synapse_info, post_vertex_slice,
+                self.__synapse_info, placement.vertex.vertex_slice,
                 self.__app_edge.pre_vertex.n_atoms,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
@@ -367,11 +360,10 @@ class SynapticMatrixApp(object):
                 self.__max_atoms_per_core))
 
         if self.__delay_syn_mat_offset is not None:
-            block = self.__get_delayed_block(
-                transceiver, placement, synapses_address)
+            block = self.__get_delayed_block(placement, synapses_address)
             splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
-                self.__synapse_info, post_vertex_slice,
+                self.__synapse_info, placement.vertex.vertex_slice,
                 self.__app_edge.pre_vertex.n_atoms,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block, True,
@@ -379,31 +371,29 @@ class SynapticMatrixApp(object):
 
         return connections
 
-    def __get_block(self, transceiver, placement, synapses_address):
+    def __get_block(self, placement, synapses_address):
         """ Get a block of data for undelayed synapses
 
-        :param Transceiver transceiver: How to read the data from the machine
         :param Placement placement: Where the matrix is on the machine
         :param int synapses_address:
             The base address of the synaptic matrix region
         :rtype: bytearray
         """
         address = self.__syn_mat_offset + synapses_address
-        block = transceiver.read_memory(
+        block = SpynnakerDataView.read_memory(
             placement.x, placement.y, address, self.__matrix_size)
         return block
 
-    def __get_delayed_block(self, transceiver, placement, synapses_address):
+    def __get_delayed_block(self, placement, synapses_address):
         """ Get a block of data for delayed synapses
 
-        :param Transceiver transceiver: How to read the data from the machine
         :param Placement placement: Where the matrix is on the machine
         :param int synapses_address:
             The base address of the synaptic matrix region
         :rtype: bytearray
         """
         address = self.__delay_syn_mat_offset + synapses_address
-        block = transceiver.read_memory(
+        block = SpynnakerDataView.read_memory(
             placement.x, placement.y, address, self.__delay_matrix_size)
         return block
 

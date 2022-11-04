@@ -12,15 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
-from pacman.model.partitioner_interfaces import AbstractSlicesConnect
-from spynnaker.pyNN.models.neural_projections\
-    .projection_application_edge import are_dynamics_structural
 
 
-class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
+class DelayedApplicationEdge(ApplicationEdge):
 
     __slots__ = [
         "__synapse_information",
@@ -70,14 +65,3 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         :rtype: ProjectionApplicationEdge
         """
         return self.__undelayed_edge
-
-    @overrides(AbstractSlicesConnect.could_connect)
-    def could_connect(self, src_machine_vertex, dest_machine_vertex):
-        for synapse_info in self.__synapse_information:
-            # Structual Plasticity can learn connection not originally included
-            if are_dynamics_structural(synapse_info.synapse_dynamics):
-                return True
-            if synapse_info.connector.could_connect(
-                    synapse_info, src_machine_vertex, dest_machine_vertex):
-                return True
-        return False

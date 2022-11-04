@@ -19,7 +19,8 @@ BUILDS = synapse_expander \
          robot_motor_control \
          neuron_only \
          synapse_only \
-         neuron 
+         neuron \
+         local_only_combined
 
 DIRS = $(BUILDS:%=makefiles/%)
 

@@ -17,13 +17,11 @@ import math
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spynnaker.pyNN.models.abstract_models import AbstractSettable
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
-    InvalidParameterType, SynapticConfigurationException)
+    SynapticConfigurationException, InvalidParameterType)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
@@ -43,16 +41,13 @@ NEUROMODULATION_TARGETS = {
 
 
 class SynapseDynamicsSTDP(
-        AbstractPlasticSynapseDynamics, AbstractSettable,
-        AbstractChangableAfterRun, AbstractGenerateOnMachine):
+        AbstractPlasticSynapseDynamics,
+        AbstractGenerateOnMachine):
     """ The dynamics of a synapse that changes over time using a \
         Spike Timing Dependent Plasticity (STDP) rule.
     """
 
     __slots__ = [
-        # Flag: whether there is state in this class that is not reflected on
-        # the SpiNNaker system
-        "__change_requires_mapping",
         # Fraction of delay that is dendritic (instead of axonal or synaptic)
         "__dendritic_delay_fraction",
         # timing dependence to use for the STDP rule
@@ -101,12 +96,11 @@ class SynapseDynamicsSTDP(
         weight_dependence.set_a_plus_a_minus(
             timing_dependence.A_plus, timing_dependence.A_minus)
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
-        self.__change_requires_mapping = True
         self.__pad_to_length = pad_to_length
         self.__weight = weight
         if delay is None:
-            delay = get_simulator().min_delay
-        self.__delay = delay
+            delay = SpynnakerDataView.get_min_delay()
+        self.__delay = self._round_delay(delay)
         self.__backprop_delay = backprop_delay
         self.__neuromodulation = None
 
@@ -164,24 +158,7 @@ class SynapseDynamicsSTDP(
         # Otherwise, it is static or neuromodulation, so return ourselves
         return self
 
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping, extend_doc=False)
-    def requires_mapping(self):
-        """ True if changes that have been made require that mapping be\
-            performed.  Note that this should return True the first time it\
-            is called, as the vertex must require mapping as it has been\
-            created!
-        """
-        return self.__change_requires_mapping
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes, extend_doc=False)
-    def mark_no_changes(self):
-        """ Marks the point after which changes are reported.  Immediately\
-            after calling this method, requires_mapping should return False.
-        """
-        self.__change_requires_mapping = False
-
-    @overrides(AbstractSettable.get_value)
+    @overrides(AbstractPlasticSynapseDynamics.get_value)
     def get_value(self, key):
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
@@ -189,12 +166,12 @@ class SynapseDynamicsSTDP(
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
-    @overrides(AbstractSettable.set_value)
+    @overrides(AbstractPlasticSynapseDynamics.set_value)
     def set_value(self, key, value):
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
-                self.__change_requires_mapping = True
+                SpynnakerDataView.set_requires_mapping()
                 return
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
@@ -255,12 +232,6 @@ class SynapseDynamicsSTDP(
                 synapse_dynamics.weight_dependence) and
             (self.__dendritic_delay_fraction ==
              synapse_dynamics.dendritic_delay_fraction))
-
-    def are_weights_signed(self):
-        """
-        :rtype: bool
-        """
-        return False
 
     def get_vertex_executable_suffix(self):
         """
@@ -570,11 +541,12 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(
             self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
-            synapse_info, max_row_info, max_atoms_per_core):
+            synapse_info, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core):
         vertex = app_edge.post_vertex
         n_synapse_type_bits = get_n_bits(
             vertex.neuron_impl.get_n_synapse_types())
-        n_synapse_index_bits = get_n_bits(max_atoms_per_core)
+        n_synapse_index_bits = get_n_bits(max_post_atoms_per_core)
         max_delay = app_edge.post_vertex.splitter.max_support_delay()
         max_delay_bits = get_n_bits(max_delay)
         synapse_struct = self.__timing_dependence.synaptic_structure
@@ -591,14 +563,15 @@ class SynapseDynamicsSTDP(
             synapse_info.synapse_type, n_synapse_type_bits,
             n_synapse_index_bits, app_edge.n_delay_stages + 1,
             max_delay, max_delay_bits, app_edge.pre_vertex.n_atoms,
-            self._n_header_bytes // BYTES_PER_SHORT, n_half_words, half_word],
+            max_pre_atoms_per_core, self._n_header_bytes // BYTES_PER_SHORT,
+            n_half_words, half_word],
             dtype=numpy.uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.
                gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self):
-        return 16 * BYTES_PER_WORD
+        return 17 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)
@@ -615,9 +588,10 @@ class SynapseDynamicsSTDP(
     def delay(self):
         return self.__delay
 
-    @overrides(AbstractPlasticSynapseDynamics.set_delay)
-    def set_delay(self, delay):
-        self.__delay = delay
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.is_single_core_capable)
+    def is_single_core_capable(self):
+        return self.__neuromodulation is None
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)

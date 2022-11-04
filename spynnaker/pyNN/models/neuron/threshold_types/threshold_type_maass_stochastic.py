@@ -17,13 +17,12 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_threshold_type import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.data import SpynnakerDataView
 
 DU_TH = "du_th"
 TAU_TH = "tau_th"
 V_THRESH = "v_thresh"
-INV_DU_TH = "inv_du_th"
-INV_TAU_TH = "inv_tau_th"
-TENTH_TS_MS = "tenth_ts_ms"
+TIMESTEP = "timestep"
 
 
 class ThresholdTypeMaassStochastic(AbstractThresholdType):
@@ -54,36 +53,25 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         """
         super().__init__(
             [Struct([
-                (DataType.S1615, INV_DU_TH),
-                (DataType.S1615, INV_TAU_TH),
+                (DataType.S1615, DU_TH),
+                (DataType.S1615, TAU_TH),
                 (DataType.S1615, V_THRESH),
-                (DataType.S1615, TENTH_TS_MS)])],
+                (DataType.S1615, TIMESTEP)])],
             {DU_TH: "mV", TAU_TH: "ms", V_THRESH: "mV"})
         self.__du_th = du_th
         self.__tau_th = tau_th
         self.__v_thresh = v_thresh
-
-    @overrides(AbstractThresholdType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 30 * n_neurons
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
         parameters[DU_TH] = self.__du_th
         parameters[TAU_TH] = self.__tau_th
         parameters[V_THRESH] = self.__v_thresh
+        parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
         pass
-
-    @overrides(AbstractThresholdType.get_precomputed_values)
-    def get_precomputed_values(self, parameters, state_variables, ts):
-        return {
-            INV_DU_TH: parameters[DU_TH].apply_operation(lambda x: 1.0 / x),
-            INV_TAU_TH: parameters[TAU_TH].apply_operation(lambda x: 1.0 / x),
-            TENTH_TS_MS: [float(ts) / -10000.0]
-        }
 
     @property
     def v_thresh(self):

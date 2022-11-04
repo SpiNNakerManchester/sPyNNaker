@@ -26,17 +26,18 @@ from spinn_utilities.socket_address import SocketAddress
 from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.utility_objs import (
     LivePacketGatherParameters)
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
-    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl)
+    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl,
+    SPIFRetinaDevice, ICUBRetinaDevice)
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
     EthernetCommandConnection, EthernetControlConnection,
     SpynnakerLiveSpikesConnection, SpynnakerPoissonControlConnection)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.external_devices_models.push_bot.control import (
     PushBotLifEthernet, PushBotLifSpinnakerLink)
 from spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link import (
@@ -51,7 +52,6 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLaser, PushBotLED, PushBotMotor, PushBotRetinaResolution,
     PushBotSpeaker, PushBotRetinaViewer)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
-from spynnaker.pyNN.spinnaker import SpiNNaker
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager as
     Plugins)
@@ -66,7 +66,7 @@ activate_live_output_to = Plugins.activate_live_output_to
 activate_live_output_for = Plugins.activate_live_output_for
 add_poisson_live_rate_control = Plugins.add_poisson_live_rate_control
 
-SpiNNaker.register_binary_search_path(
+SpynnakerDataView.register_binary_search_path(
     os.path.dirname(model_binaries.__file__))
 spynnaker_external_devices = Plugins()
 
@@ -76,7 +76,8 @@ __all__ = [
     # General Devices
     "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
     "MunichRetinaDevice", "MunichMotorDevice", "ArbitraryFPGADevice",
-    "PushBotRetinaViewer", "ExternalDeviceLifControl",
+    "PushBotRetinaViewer", "ExternalDeviceLifControl", "SPIFRetinaDevice",
+    "ICUBRetinaDevice",
 
     # PushBot Parameters
     "MunichIoSpiNNakerLinkProtocol",
@@ -105,6 +106,8 @@ __all__ = [
     "run_forever",
     "add_poisson_live_rate_control"
 ]
+# Cache of the simulator provided by pyNN/__init__py
+__simulator = None
 
 
 def run_forever(sync_time=0):
@@ -115,7 +118,8 @@ def run_forever(sync_time=0):
         continue the simulation
     :return: when the application has started running on the SpiNNaker platform
     """
-    get_simulator().run(None, sync_time)
+    SpynnakerDataView.check_user_can_act()
+    __simulator.run(None, sync_time)
 
 
 def run_sync(run_time, sync_time):
@@ -125,20 +129,23 @@ def run_sync(run_time, sync_time):
     :param float run_time: The time in milliseconds to run the simulation for
     :param float sync_time: The time in milliseconds to pause before allowing
     """
-    get_simulator().run(run_time, sync_time)
+    SpynnakerDataView.check_user_can_act()
+    __simulator.run(run_time, sync_time)
 
 
 def continue_simulation():
     """ Continue a synchronised simulation
     """
-    get_simulator().continue_simulation()
+    SpynnakerDataView.check_valid_simulator()
+    __simulator.continue_simulation()
 
 
 def request_stop():
     """ Request a stop in the simulation without a complete stop.  Will stop\
         after the next auto-pause-and-resume cycle
     """
-    get_simulator().stop_run()
+    SpynnakerDataView.check_valid_simulator()
+    __simulator.stop_run()
 
 
 def register_database_notification_request(hostname, notify_port, ack_port):
@@ -148,7 +155,7 @@ def register_database_notification_request(hostname, notify_port, ack_port):
     :param int notify_port: port num for the notify command
     :param int ack_port: port num for the acknowledge command
     """
-    spynnaker_external_devices.add_socket_address(
+    SpynnakerDataView.add_database_socket_address(
         SocketAddress(hostname, notify_port, ack_port))
 
 
@@ -302,3 +309,15 @@ def SpikeInjector(
             database_notify_host, database_notify_port_num,
             database_ack_port_num)
     return ExternalDeviceSpikeInjector()
+
+
+def _set_simulator(simulator):
+    """
+    Should only be called by pyNN/__init__py setup method.
+
+    Any other uses is not supported.
+
+    :param spynnaker.pyNN.spinnaker.SpiNNaker simulator:
+    """
+    global __simulator
+    __simulator = simulator

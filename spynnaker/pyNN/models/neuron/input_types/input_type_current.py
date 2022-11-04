@@ -26,11 +26,7 @@ class InputTypeCurrent(AbstractInputType):
     def __init__(self):
         """
         """
-        super().__init__([Struct([])], {})
-
-    @overrides(AbstractInputType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 0
+        super().__init__([Struct([])], dict())
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters):
@@ -39,14 +35,6 @@ class InputTypeCurrent(AbstractInputType):
     @overrides(AbstractInputType.add_state_variables)
     def add_state_variables(self, state_variables):
         pass
-
-    @overrides(AbstractInputType.get_units)
-    def get_units(self, variable):
-        raise KeyError(variable)
-
-    @overrides(AbstractInputType.has_variable)
-    def has_variable(self, variable):
-        return False
 
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):

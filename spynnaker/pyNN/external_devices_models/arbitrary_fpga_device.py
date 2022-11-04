@@ -13,24 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.graphs.application import ApplicationFPGAVertex
+from spynnaker.pyNN.models.abstract_models import PopulationFPGAVertex
+from pacman.model.graphs.application import FPGAConnection
 
 
-class ArbitraryFPGADevice(ApplicationFPGAVertex):
+class ArbitraryFPGADevice(PopulationFPGAVertex):
     __slots__ = []
 
     def __init__(
             self, n_neurons, fpga_link_id, fpga_id, board_address=None,
-            label=None):
+            chip_coords=None, label=None):
         """
         :param int n_neurons: Number of neurons
         :param int fpga_link_id:
         :param int fpga_id:
         :param board_address:
         :type board_address: str or None
+        :param chip_coords:
+        :type chip_coords: tuple(int, int) or None
         :param label:
         :type label: str or None
         """
         # pylint: disable=too-many-arguments
-        super().__init__(
-            n_neurons, fpga_id, fpga_link_id, board_address, label)
+        conn = FPGAConnection(
+            fpga_id, fpga_link_id, board_address, chip_coords)
+        super().__init__(n_neurons, [conn], conn, label)

@@ -16,12 +16,16 @@
 from enum import Enum
 import numpy
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.common.param_generator_data import (
     param_generator_params, param_generator_params_size_in_bytes,
     param_generator_id, is_param_generatable)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 
 # Hashes of the connection generators supported by the synapse expander
@@ -52,6 +56,17 @@ class AbstractGenerateConnectorOnMachine(
         """
         super().__init__(safe=safe, callback=callback, verbose=verbose)
         self.__connector_seed = dict()
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        # If we can't generate on machine, we must be able to generate on host
+        if not self.generate_on_machine(
+                synapse_info.weights, synapse_info.delays):
+            if not isinstance(self, AbstractGenerateConnectorOnHost):
+                raise SynapticConfigurationException(
+                    "The parameters of this connection do not allow it to be"
+                    " generated on the machine, but the connector cannot"
+                    " be generated on host!")
 
     def _get_connector_seed(self, pre_vertex_slice, post_vertex_slice, rng):
         """ Get the seed of the connector for a given pre-post pairing
@@ -161,16 +176,3 @@ class AbstractGenerateConnectorOnMachine(
         :rtype: int
         """
         return 0
-
-    @staticmethod
-    def _get_view_lo_hi(view):
-        """ Get the range of neuron IDs covered by a view.
-
-        :param ~spynnaker.pyNN.models.populations.PopulationView view:
-        :rtype: tuple(int,int)
-        """
-        # Evil forward reference to subpackage implementation of type!
-        indexes = view._indexes
-        view_lo = indexes[0]
-        view_hi = indexes[-1]
-        return view_lo, view_hi

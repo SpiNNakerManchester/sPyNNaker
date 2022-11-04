@@ -20,8 +20,7 @@ from pacman.model.routing_info import BaseKeyAndMask
 from data_specification.enums.data_type import DataType
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_per_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -88,10 +87,10 @@ class SynapticMatrices(object):
         "__generated_data",
         # The size needed for generated data
         "__generated_data_size",
-        # The number of generated matrices
-        "__n_generated_matrices",
         # The matrices that need to be generated on host
         "__on_host_matrices",
+        # The matrices that have been generated on machine
+        "__on_machine_matrices",
         # The application vertex
         "__app_vertex",
         # The weight scales
@@ -132,6 +131,13 @@ class SynapticMatrices(object):
         self.__gen_on_machine = False
         self.__data_generated = False
         self.__max_gen_data = 0
+        self.__on_host_matrices = None
+        self.__on_machine_matrices = None
+        self.__generated_data = None
+        self.__generated_data_size = 0
+        self.__master_pop_data = None
+        self.__bit_field_size = 0
+        self.__bit_field_key_map = None
 
     @property
     def max_gen_data(self):
@@ -171,7 +177,7 @@ class SynapticMatrices(object):
         return (self.__on_chip_generated_block_addr -
                 self.__host_generated_block_addr)
 
-    def generate_data(self, routing_info):
+    def generate_data(self):
         # If the data has already been generated, stop
         if self.__data_generated:
             return
@@ -190,23 +196,23 @@ class SynapticMatrices(object):
 
         # Set up other lists
         self.__on_host_matrices = list()
+        self.__on_machine_matrices = list()
         generated_data = list()
 
         # Keep on-machine generated blocks together at the end
-        generate_on_machine = list()
         self.__generated_data_size = (
             SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
             (self.__n_synapse_types * DataType.U3232.size))
 
         # For each incoming machine vertex, reserve pop table space
         for proj in self.__app_vertex.incoming_projections:
+            # pylint: disable=protected-access
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
-            app_key_info = self.__app_key_and_mask(app_edge, routing_info)
+            app_key_info = self.__app_key_and_mask(app_edge)
             if app_key_info is None:
                 continue
-            d_app_key_info = self.__delay_app_key_and_mask(
-                app_edge, routing_info)
+            d_app_key_info = self.__delay_app_key_and_mask(app_edge)
             app_matrix = SynapticMatrixApp(
                 synapse_info, app_edge, self.__n_synapse_types,
                 self.__regions.synaptic_matrix, self.__max_atoms_per_core,
@@ -216,7 +222,7 @@ class SynapticMatrices(object):
 
             # If we can generate on machine, store until end
             if synapse_info.may_generate_on_machine():
-                generate_on_machine.append(app_matrix)
+                self.__on_machine_matrices.append(app_matrix)
             else:
                 block_addr = app_matrix.reserve_matrices(block_addr, poptable)
                 self.__on_host_matrices.append(app_matrix)
@@ -225,7 +231,7 @@ class SynapticMatrices(object):
 
         # Now add the blocks on machine to keep these all together
         self.__max_gen_data = 0
-        for app_matrix in generate_on_machine:
+        for app_matrix in self.__on_machine_matrices:
             block_addr = app_matrix.reserve_matrices(block_addr, poptable)
             gen_data = app_matrix.get_generator_data()
             self.__generated_data_size += gen_data.size
@@ -233,10 +239,10 @@ class SynapticMatrices(object):
             self.__max_gen_data += app_matrix.gen_size
         if generated_data:
             self.__gen_on_machine = True
-            self.__n_generated_matrices = len(generate_on_machine)
             self.__generated_data = numpy.concatenate(generated_data)
         else:
-            self.__generated_data = None
+            self.__gen_on_machine = True
+            self.__generated_data = numpy.zeros(0, dtype="uint32")
 
         self.__on_chip_generated_block_addr = block_addr
 
@@ -247,7 +253,7 @@ class SynapticMatrices(object):
         self.__bit_field_size = get_sdram_for_bit_field_region(
             self.__app_vertex.incoming_projections)
         self.__bit_field_key_map = get_bitfield_key_map_data(
-            self.__app_vertex.incoming_projections, routing_info)
+            self.__app_vertex.incoming_projections)
         self.__generated_data_size += (
             len(self.__bit_field_key_map) * BYTES_PER_WORD)
 
@@ -265,13 +271,11 @@ class SynapticMatrices(object):
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to
-        :param list(~spynnaker8.models.Projection) incoming_projection:
-            The projections to generate data for
-        :param int all_syn_block_sz:
-            The size in bytes of the space reserved for synapses
-        :param list(float) weight_scales: The weight scale of each synapse
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post-vertex the matrix is for
+        :param SynapseRegions references:
+            Regions which are referenced; each region which is not referenced
+            can be None.
         """
 
         # Reserve the region
@@ -329,17 +333,17 @@ class SynapticMatrices(object):
             spec.write_value(self.__regions.structural_dynamics)
         else:
             spec.write_value(INVALID_REGION_ID)
-        spec.write_value(self.__n_generated_matrices)
+        spec.write_value(len(self.__on_machine_matrices))
         spec.write_value(post_vertex_slice.lo_atom)
         spec.write_value(post_vertex_slice.n_atoms)
         spec.write_value(0)  # TODO: The index if needed
         spec.write_value(self.__n_synapse_types)
-        spec.write_value(
-            DataType.S1615.encode_as_int(machine_time_step_per_ms()))
+        spec.write_value(DataType.S1615.encode_as_int(
+            SpynnakerDataView.get_simulation_time_step_per_ms()))
         # Per-Population RNG
         spec.write_array(self.__app_vertex.pop_seed)
         # Per-Core RNG
-        spec.write_array(self.__app_vertex.core_seed)
+        spec.write_array(self.__app_vertex.core_seed(post_vertex_slice))
         for w in self.__weight_scales:
             # if the weights are high enough and the population size large
             # enough, then weight_scales < 1 will result in a zero scale
@@ -351,7 +355,7 @@ class SynapticMatrices(object):
         spec.write_array(self.__generated_data)
         spec.write_array(self.__bit_field_key_map)
 
-    def __get_app_key_and_mask(self, r_info, n_stages):
+    def __get_app_key_and_mask(self, r_info, n_stages, max_atoms_per_core):
         """ Get a key and mask for an incoming application vertex as a whole
 
         :param list(tuple(int, Slice)) keys:
@@ -364,27 +368,29 @@ class SynapticMatrices(object):
 
         # Find the bit that is just for the core
         mask_size = r_info.n_bits_atoms
-        core_mask = (r_info.machine_mask - r_info.first_mask) >> mask_size
+        core_mask = (r_info.machine_mask - r_info.mask) >> mask_size
         pre = r_info.vertex
-        n_atoms = min(pre.get_max_atoms_per_core(), pre.n_atoms)
+        n_atoms = min(max_atoms_per_core, pre.n_atoms)
 
-        return _AppKeyInfo(r_info.first_key, r_info.first_mask, core_mask,
+        return _AppKeyInfo(r_info.key, r_info.mask, core_mask,
                            mask_size, n_atoms * n_stages)
 
-    def __app_key_and_mask(self, app_edge, routing_info):
+    def __app_key_and_mask(self, app_edge):
         """ Get a key and mask for an incoming application vertex as a whole
 
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
         :param RoutingInfo routing_info: The routing information of all edges
         """
+        routing_info = SpynnakerDataView.get_routing_infos()
         r_info = routing_info.get_routing_info_from_pre_vertex(
             app_edge.pre_vertex, SPIKE_PARTITION_ID)
         if r_info is None:
             return None
-        return self.__get_app_key_and_mask(r_info, 1)
+        return self.__get_app_key_and_mask(
+            r_info, 1, app_edge.pre_vertex.get_max_atoms_per_core())
 
-    def __delay_app_key_and_mask(self, app_edge, routing_info):
+    def __delay_app_key_and_mask(self, app_edge):
         """ Get a key and mask for a whole incoming delayed application\
             vertex, or return None if no delay edge exists
 
@@ -395,49 +401,41 @@ class SynapticMatrices(object):
         delay_edge = app_edge.delay_edge
         if delay_edge is None:
             return None
+        routing_info = SpynnakerDataView.get_routing_infos()
         r_info = routing_info.get_routing_info_from_pre_vertex(
             delay_edge.pre_vertex, SPIKE_PARTITION_ID)
 
-        return self.__get_app_key_and_mask(r_info, app_edge.n_delay_stages)
+        # We use the app_edge pre-vertex max atoms here as the delay vertex
+        # is split according to this
+        return self.__get_app_key_and_mask(
+            r_info, app_edge.n_delay_stages,
+            app_edge.pre_vertex.get_max_atoms_per_core())
 
-    def get_connections_from_machine(
-            self, transceiver, placement, app_edge, synapse_info,
-            post_vertex_slice):
+    def get_connections_from_machine(self, placement, app_edge, synapse_info):
         """ Get the synaptic connections from the machine
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            Used to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the vertices are on the machine
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post-vertex the matrix is for
         :return: A list of arrays of connections, each with dtype
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
         matrix = self.__matrices[app_edge, synapse_info]
-        return matrix.get_connections(
-            transceiver, placement, post_vertex_slice)
+        return matrix.get_connections(placement)
 
-    def read_generated_connection_holders(
-            self, transceiver, placement, post_vertex_slice):
+    def read_generated_connection_holders(self, placement):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post-vertex the matrix is for
         """
-        for matrix in self.__matrices.values():
-            matrix.read_generated_connection_holders(
-                transceiver, placement, post_vertex_slice)
+        for matrix in self.__on_machine_matrices:
+            matrix.read_generated_connection_holders(placement)
 
     @property
     def gen_on_machine(self):

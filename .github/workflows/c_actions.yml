@@ -23,15 +23,15 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Checkout SupportScripts
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
     - name: Set up Python 3.8
       # Note: Python is needed for spinn_utilities.make_tools when building
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.8
     - name: Install Ubuntu dependencies
@@ -64,6 +64,12 @@ jobs:
 
     - name: Build C code
       run: make
+      working-directory: neural_modelling
+      env:
+        CFLAGS: -fdiagnostics-color=always
+
+    - name: Build C code in DEBUG mode
+      run: make clean; make SPYNNAKER_DEBUG=DEBUG
       working-directory: neural_modelling
       env:
         CFLAGS: -fdiagnostics-color=always

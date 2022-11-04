@@ -23,14 +23,22 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.abstract_models import RecordingType
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-_REPEAT_PER_NEURON = 0x7FFFFFFF
+# The number to add to generate that all neurons are in the given state
+_REPEAT_PER_NEURON_RECORDED = 0x7FFFFFFF
 
+# The number to add to generate that all neurons are recorded
+_REPEAT_PER_NEURON = 0xFFFFFFFF
+
+# The flag to add to generate that the count is recorded
 _RECORDED_FLAG = 0x80000000
+
+# The flag (or lack thereof) to add to generate that the count is not recorded
+_NOT_RECORDED_FLAG = 0x00000000
 
 
 class _ReadOnlyDict(dict):
@@ -54,7 +62,7 @@ def get_sampling_interval(sampling_rate):
     :return: Sampling interval in microseconds
     :rtype: float
     """
-    return sampling_rate * machine_time_step_ms()
+    return sampling_rate * SpynnakerDataView.get_simulation_time_step_ms()
 
 
 class NeuronRecorder(object):
@@ -77,17 +85,18 @@ class NeuronRecorder(object):
     _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     _N_BYTES_PER_RATE = BYTES_PER_WORD
     _N_BYTES_PER_ENUM = BYTES_PER_WORD
+    _N_BYTES_PER_GEN_ITEM = BYTES_PER_WORD
 
     #: size of a index in terms of position into recording array
-    _N_BYTES_PER_INDEX = DataType.UINT8.size  # currently uint8
+    _N_BYTES_PER_INDEX = DataType.UINT16.size  # currently uint16
 
     #: size of the counter for spike recording
     _N_BYTES_PER_COUNT = BYTES_PER_WORD
 
     #: size of the increment for spike recording
     _N_BYTES_PER_INCREMENT = BYTES_PER_WORD
-
     _N_BYTES_PER_SIZE = BYTES_PER_WORD
+
     # sampling temporal value size (how many ticks between recordings)
     _N_CPU_CYCLES_PER_NEURON = 8
     _N_BYTES_PER_POINTER = BYTES_PER_WORD
@@ -181,6 +190,14 @@ class NeuronRecorder(object):
 
         self.__offset_added = True
 
+    def get_region(self, variable):
+        """ Get the region of a variable
+
+        :param str variable: The variable to get the region of
+        :rtype: int
+        """
+        return self.__region_ids[variable]
+
     def _count_recording_per_slice(
             self, variable, vertex_slice):
         """
@@ -214,31 +231,21 @@ class NeuronRecorder(object):
         split_array = numpy.array_split(existence, splits)
         return max([numpy.sum(s) for s in split_array])
 
-    def _neurons_recording(self, variable, vertex_slice):
+    def _neurons_recording(self, variable, vertex_slice, atoms_shape):
         """
         :param str variable:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param tuple(int) atoms_shape:
         :rtype: iterable(int)
         """
         if self.__sampling_rates[variable] == 0:
             return []
         if self.__indexes[variable] is None:
-            return range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
+            return vertex_slice.get_raster_ids(atoms_shape)
         indexes = self.__indexes[variable]
         return [
-            i for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
+            i for i in vertex_slice.get_raster_ids(atoms_shape)
             if i in indexes]
-
-    def get_neuron_sampling_interval(self, variable):
-        """ Return the current sampling interval for this variable
-
-        :param str variable: PyNN name of the variable
-        :return: Sampling interval in microseconds
-        :rtype: float
-        """
-        if variable in self.__per_timestep_variables:
-            return get_sampling_interval(1)
-        return get_sampling_interval(self.__sampling_rates[variable])
 
     def _convert_placement_matrix_data(
             self, row_data, n_rows, data_row_length, n_neurons, data_type):
@@ -275,7 +282,7 @@ class NeuronRecorder(object):
         return fragment
 
     def _get_placement_matrix_data(
-            self, placements, vertex, region, buffer_manager, expected_rows,
+            self, vertex, region, expected_rows,
             missing_str, sampling_rate, label, data_type, n_per_timestep):
         """ processes a placement for matrix data
 
@@ -284,7 +291,6 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.machine.MachineVertex vertex:
             the vertex to read from
         :param int region: the recording region id
-        :param ~.BufferManager buffer_manager: the buffer manager
         :param int expected_rows:
             how many rows the tools think should be recorded
         :param str missing_str: string for reporting missing stuff
@@ -293,12 +299,12 @@ class NeuronRecorder(object):
         :return: placement data
         :rtype: ~numpy.ndarray
         """
-
-        placement = placements.get_placement_of_vertex(vertex)
+        placement = SpynnakerDataView.get_placement_of_vertex(vertex)
         if n_per_timestep == 0:
             return None
 
         # for buffering output info is taken form the buffer manager
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         record_raw, missing_data = buffer_manager.get_data_by_placement(
             placement, region)
         record_length = len(record_raw)
@@ -333,16 +339,41 @@ class NeuronRecorder(object):
             sampling_rate, label, placement_data, region)
         return placement_data
 
+    def get_recorded_indices(self, application_vertex, variable):
+        """ Get the indices being recorded for a given variable
+
+        :param ApplicationVertex application_vertex: The vertex being recorded
+        :param str variable: The name of the variable to get the indices of
+        :rtype: list(int)
+        """
+        if variable not in self.__sampling_rates:
+            return []
+        if self.__indexes[variable] is None:
+            return range(application_vertex.n_atoms)
+        return self.__indexes[variable]
+
+    def get_sampling_interval(self, variable):
+        """ Get the sampling interval of a variable
+
+        :param str variable: The variable to get the sampling interval of
+        :rtype: float
+        """
+        if (variable in self.__per_timestep_variables or
+                variable in self.__events_per_core_variables):
+            return get_sampling_interval(1)
+
+        return get_sampling_interval(self.__sampling_rates[variable])
+
     def __read_data(
-            self, label, buffer_manager, placements, application_vertex,
-            sampling_rate, data_type, variable, n_machine_time_steps):
+            self, label, application_vertex,
+            sampling_rate, data_type, variable):
+        n_machine_time_steps = SpynnakerDataView.get_current_run_timesteps()
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
                 variable))
         region = self.__region_ids[variable]
         missing_str = ""
         pop_level_data = None
-        sampling_interval = get_sampling_interval(sampling_rate)
 
         progress = ProgressBar(
             vertices, "Getting {} for {}".format(variable, label))
@@ -355,13 +386,14 @@ class NeuronRecorder(object):
             n_items_per_timestep = 1
             if variable in self.__sampling_rates:
                 neurons = self._neurons_recording(
-                    variable, vertex.vertex_slice)
+                    variable, vertex.vertex_slice,
+                    application_vertex.atoms_shape)
                 n_items_per_timestep = len(neurons)
                 indexes.extend(neurons)
             else:
                 indexes.append(i)
             placement_data = self._get_placement_matrix_data(
-                placements, vertex, region, buffer_manager, expected_rows,
+                vertex, region, expected_rows,
                 missing_str, sampling_rate, label, data_type,
                 n_items_per_timestep)
 
@@ -381,27 +413,51 @@ class NeuronRecorder(object):
                 "Population {} is missing recorded data in region {} from the"
                 " following cores: {}", label, region, missing_str)
 
-        return pop_level_data, indexes, sampling_interval
+        indexes = numpy.array(indexes)
+        order = numpy.argsort(indexes)
+        return pop_level_data[:, order]
 
-    def get_matrix_data(
-            self, label, buffer_manager, placements,
-            application_vertex, variable, n_machine_time_steps):
-        """ Read a data mapped to time and neuron IDs from the SpiNNaker\
-            machine and converts to required data types with scaling if needed.
+    def get_recorded_data(self, label, application_vertex, variable):
+        """ Get recorded data based on type
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
-        :param int n_machine_time_steps:
-        :return: (data, recording_indices, sampling_interval)
-        :rtype: tuple(~numpy.ndarray, list(int), float)
+        :rtype: ~numpy.ndarray
+        """
+        if not self.is_recording(variable):
+            raise KeyError(f"Variable {variable} was not recorded")
+        if variable in self.__bitfield_variables:
+            return self.get_spikes(label, application_vertex, variable)
+        if variable in self.__events_per_core_variables:
+            return self.get_events(label, application_vertex, variable)
+        if (variable in self.__sampling_rates or
+                variable in self.__per_timestep_variables):
+            return self.get_matrix_data(label, application_vertex, variable)
+        raise KeyError(f"This vertex cannot record {variable}")
+
+    def get_recorded_data_type(self, variable):
+        if variable in self.__bitfield_variables:
+            return RecordingType.BIT_FIELD
+        if variable in self.__events_per_core_variables:
+            return RecordingType.EVENT
+        if (variable in self.__sampling_rates or
+                variable in self.__per_timestep_variables):
+            return RecordingType.MATRIX
+        raise KeyError(f"This vertex cannot record {variable}")
+
+    def get_matrix_data(self, label, application_vertex, variable):
+        """ Read a data mapped to time and neuron IDs from the SpiNNaker\
+            machine and converts to required data types with scaling if needed.
+
+        :param str label: vertex label
+        :param application_vertex:
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
+        :rtype: ~numpy.ndarray
         """
         if variable in self.__bitfield_variables:
             msg = ("Variable {} is not supported by get_matrix_data, use "
@@ -418,21 +474,13 @@ class NeuronRecorder(object):
             sampling_rate = self.__sampling_rates[variable]
             data_type = self.__data_types[variable]
         return self.__read_data(
-            label, buffer_manager, placements, application_vertex,
-            sampling_rate, data_type, variable, n_machine_time_steps)
+            label, application_vertex, sampling_rate, data_type, variable)
 
-    def get_spikes(
-            self, label, buffer_manager, placements, application_vertex,
-            variable):
+    def get_spikes(self, label, application_vertex, variable):
         """ Read spikes mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -454,10 +502,11 @@ class NeuronRecorder(object):
         missing_str = ""
         progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
-            neurons = list(self._neurons_recording(variable, vertex_slice))
+            neurons = numpy.array(self._neurons_recording(
+                variable, vertex_slice, application_vertex.atoms_shape))
             neurons_recording = len(neurons)
             if neurons_recording == 0:
                 continue
@@ -469,6 +518,7 @@ class NeuronRecorder(object):
 
             # for buffering output info is taken form the buffer manager
             region = self.__region_ids[variable]
+            buffer_manager = SpynnakerDataView.get_buffer_manager()
             record_raw, data_missing = buffer_manager.get_data_by_placement(
                     placement, region)
             if data_missing:
@@ -481,13 +531,14 @@ class NeuronRecorder(object):
             else:
                 raw_data = record_raw
             if len(raw_data) > 0:
-                record_time = raw_data[:, 0] * machine_time_step_ms()
+                record_time = (raw_data[:, 0] *
+                               SpynnakerDataView.get_simulation_time_step_ms())
                 spikes = raw_data[:, 1:].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
                 time_indices, local_indices = numpy.where(bits == 1)
                 if self.__indexes[variable] is None:
-                    indices = local_indices + vertex_slice.lo_atom
+                    indices = neurons[local_indices]
                     times = record_time[time_indices].reshape((-1))
                     spike_ids.extend(indices)
                     spike_times.extend(times)
@@ -508,18 +559,11 @@ class NeuronRecorder(object):
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))]
 
-    def get_events(
-            self, label, buffer_manager, placements,
-            application_vertex, variable):
+    def get_events(self, label, application_vertex, variable):
         """ Read events mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -529,8 +573,7 @@ class NeuronRecorder(object):
         """
         if variable == self.REWIRING:
             return self._get_rewires(
-                label, buffer_manager, placements, application_vertex,
-                variable)
+                label, application_vertex, variable)
         else:
             # Unspecified event variable
             msg = (
@@ -539,17 +582,11 @@ class NeuronRecorder(object):
             raise ConfigurationException(msg)
 
     def _get_rewires(
-            self, label, buffer_manager, placements, application_vertex,
-            variable):
+            self, label, application_vertex, variable):
         """ Read rewires mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -557,6 +594,7 @@ class NeuronRecorder(object):
         :return:
         :rtype: ~numpy.ndarray(tuple(int,int,int,int))
         """
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         rewire_times = list()
         rewire_values = list()
         rewire_postids = list()
@@ -569,7 +607,7 @@ class NeuronRecorder(object):
         progress = ProgressBar(
             vertices, "Getting rewires for {}".format(label))
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
             neurons = list(
@@ -593,7 +631,9 @@ class NeuronRecorder(object):
                 raw_data = record_raw
 
             if len(raw_data) > 0:
-                record_time = raw_data[:, 0] * machine_time_step_ms()
+                record_time = (
+                        raw_data[:, 0] *
+                        SpynnakerDataView.get_simulation_time_step_ms())
                 rewires_raw = raw_data[:, 1:]
                 rew_length = len(rewires_raw)
                 # rewires is 0 (elimination) or 1 (formation) in the first bit
@@ -756,7 +796,7 @@ class NeuronRecorder(object):
         if sampling_interval is None:
             return 1
 
-        step = machine_time_step_ms()
+        step = SpynnakerDataView.get_simulation_time_step_ms()
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:
             msg = "sampling_interval {} is not an an integer multiple of the "\
@@ -972,12 +1012,11 @@ class NeuronRecorder(object):
             raise ConfigurationException("Variable {} is not supported".format(
                 variable))
 
-    def get_region_sizes(self, vertex_slice, n_machine_time_steps):
+    def get_region_sizes(self, vertex_slice):
         """ Get the sizes of the regions for the variables, whether they are
             recorded or not, with those that are not having a size of 0
 
         :param ~pacman.model.graphs.commmon.Slice vertex_slice:
-        :param int n_machine_time_steps:
         :rtype: list(int)
         """
         values = list()
@@ -985,17 +1024,19 @@ class NeuronRecorder(object):
                 self.__sampling_rates, self.__events_per_core_variables,
                 self.__per_timestep_variables):
             values.append(self.get_buffered_sdram(
-                variable, vertex_slice, n_machine_time_steps))
+                variable, vertex_slice))
         return values
 
     def write_neuron_recording_region(
-            self, spec, neuron_recording_region, vertex_slice):
+            self, spec, neuron_recording_region, vertex_slice, atoms_shape):
         """ recording data specification
 
         :param ~data_specification.DataSpecificationGenerator spec: dsg spec
         :param int neuron_recording_region: the recording region
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the vertex slice
+        :param tuple(int) atoms_shape:
+            the shape of the atoms in the application vertex
         :rtype: None
         """
         spec.switch_write_focus(neuron_recording_region)
@@ -1006,7 +1047,7 @@ class NeuronRecorder(object):
         spec.write_value(data=len(self.__bitfield_variables))
 
         # Write the recording data
-        recording_data = self._get_data(vertex_slice)
+        recording_data = self._get_data(vertex_slice, atoms_shape)
         spec.write_array(recording_data)
 
     def _get_buffered_sdram_per_record(self, variable, n_neurons):
@@ -1121,18 +1162,17 @@ class NeuronRecorder(object):
         return overflow
 
     def get_buffered_sdram(
-            self, variable, vertex_slice, n_machine_time_steps):
+            self, variable, vertex_slice):
         """ Returns the SDRAM used for this many time steps for a variable
 
         If required the total is rounded up so the space will always fit
 
         :param str variable: The PyNN variable name to get buffered sdram of
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int n_machine_time_steps:
-            how many machine time steps to run for
         :return: data size
         :rtype: int
         """
+        n_machine_time_steps = SpynnakerDataView.get_max_run_time_steps()
         # Per timestep variables can't be done at a specific rate
         if variable in self.__per_timestep_variables:
             item = self.get_buffered_sdram_per_record(variable, vertex_slice)
@@ -1153,49 +1193,46 @@ class NeuronRecorder(object):
             records = records + 1
         return data_size * records
 
-    @staticmethod
-    def __n_bytes_to_n_words(n_bytes):
-        """
-        :param int n_bytes:
-        :rtype: int
-        """
-        return (n_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
-
     def get_metadata_sdram_usage_in_bytes(self, n_atoms):
         """ Get the SDRAM usage of the metadata for recording
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int n_atoms: The number of atoms to record
         :rtype: int
         """
         # This calculates the size of the metadata only; thus no reference to
         # per-timestep variables which have no metadata
-        n_words_for_n_neurons = self.__n_bytes_to_n_words(n_atoms)
-        n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
+        n_indices = self.__ceil_n_indices(n_atoms)
+        n_bytes_for_indices = n_indices * self._N_BYTES_PER_INDEX
         var_bytes = (
             (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
-             self._N_BYTES_PER_ENUM + n_bytes_for_n_neurons) *
+             self._N_BYTES_PER_ENUM + n_bytes_for_indices) *
             (len(self.__sampling_rates) - len(self.__bitfield_variables)))
         bitfield_bytes = (
             (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
-             n_bytes_for_n_neurons) *
+             n_bytes_for_indices) *
             len(self.__bitfield_variables))
         return ((self._N_ITEM_TYPES * DataType.UINT32.size) + var_bytes +
                 bitfield_bytes)
 
-    def _get_fixed_sdram_usage(self, n_atoms):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
+    def get_generator_sdram_usage_in_bytes(self, n_atoms):
+        """ Get the SDRAM usage of the generator data for recording metadata
+
+        :param int n_atoms: The number of atoms to be recorded
         :rtype: int
         """
-        fixed_sdram = 0
-        # Recording rate for each neuron
-        fixed_sdram += self._N_BYTES_PER_RATE
-        # Number of recording neurons
-        fixed_sdram += self._N_BYTES_PER_INDEX
-        # index_parameters one per neuron
-        # even if not recording as also act as a gate
-        fixed_sdram += self._N_BYTES_PER_INDEX * n_atoms
-        return fixed_sdram
+        n_indices = self.__ceil_n_indices(n_atoms)
+        n_bytes_for_indices = n_indices * self._N_BYTES_PER_INDEX
+        var_bytes = (
+            (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
+             self._N_BYTES_PER_ENUM + self._N_BYTES_PER_GEN_ITEM +
+             n_bytes_for_indices) *
+            (len(self.__sampling_rates) - len(self.__bitfield_variables)))
+        bitfield_bytes = (
+            (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
+             self._N_BYTES_PER_GEN_ITEM + n_bytes_for_indices) *
+            len(self.__bitfield_variables))
+        return ((self._N_ITEM_TYPES * DataType.UINT32.size) + var_bytes +
+                bitfield_bytes)
 
     def get_variable_sdram_usage(self, vertex_slice):
         """
@@ -1206,7 +1243,6 @@ class NeuronRecorder(object):
         per_timestep_sdram = 0
         for variable in self.__sampling_rates:
             rate = self.__sampling_rates[variable]
-            fixed_sdram += self._get_fixed_sdram_usage(vertex_slice.n_atoms)
             if rate > 0:
                 fixed_sdram += self._SARK_BLOCK_SIZE
                 per_record = self.get_buffered_sdram_per_record(
@@ -1237,7 +1273,7 @@ class NeuronRecorder(object):
         per_timestep_sdram = 0
         for variable in self.__sampling_rates:
             rate = self.__sampling_rates[variable]
-            fixed_sdram += self._get_fixed_sdram_usage(n_atoms)
+            # fixed_sdram += self._get_fixed_sdram_usage(n_atoms)
             if rate > 0:
                 fixed_sdram += self._SARK_BLOCK_SIZE
                 per_record = self.get_max_buffered_sdram_per_record(
@@ -1259,44 +1295,16 @@ class NeuronRecorder(object):
                 variable, n_atoms)
         return VariableSDRAM(fixed_sdram, per_timestep_sdram)
 
-    def get_dtcm_usage_in_bytes(self, n_atoms):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
+    def __ceil_n_indices(self, n_neurons):
+        """ The number of indices rounded up to a whole number of words
+
+        :param int n_neurons: The number of neurons to account for
         :rtype: int
         """
-        # Note: Per-timestep variables uses no DTCM
-        # *_rate + n_neurons_recording_* + *_indexes
-        usage = self.get_metadata_sdram_usage_in_bytes(n_atoms)
-
-        # *_count + *_increment
-        usage += (len(self.__sampling_rates) * (
-            self._N_BYTES_PER_POINTER + self._N_BYTES_PER_COUNT +
-            self._N_BYTES_PER_INCREMENT))
-
-        # out_spikes, *_values
-        for variable in self.__sampling_rates:
-            if variable in self.__bitfield_variables:
-                out_spike_words = int(math.ceil(n_atoms / BITS_PER_WORD))
-                out_spike_bytes = out_spike_words * BYTES_PER_WORD
-                usage += self._N_BYTES_FOR_TIMESTAMP + out_spike_bytes
-            else:
-                size = self.__data_types[variable].size
-                usage += self._N_BYTES_FOR_TIMESTAMP + (n_atoms * size)
-
-        # *_size
-        usage += len(self.__sampling_rates) * self._N_BYTES_PER_SIZE
-
-        # n_recordings_outstanding
-        usage += self._N_BYTES_PER_OUTSTANDING_RECORDING
-        return usage
-
-    def get_n_cpu_cycles(self, n_neurons):
-        """
-        :param int n_neurons:
-        :rtype: int
-        """
-        return n_neurons * self._N_CPU_CYCLES_PER_NEURON * \
-            len(self.recording_variables)
+        # Assumes that BYTES_PER_WORD is divisible by _N_BYTES_PER_INDEX
+        n_bytes = n_neurons * self._N_BYTES_PER_INDEX
+        ceil_bytes = int(math.ceil(n_bytes / BYTES_PER_WORD)) * BYTES_PER_WORD
+        return ceil_bytes // self._N_BYTES_PER_INDEX
 
     def __add_indices(self, data, variable, rate, n_recording, vertex_slice):
         """
@@ -1306,19 +1314,16 @@ class NeuronRecorder(object):
         :param int n_recording:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
-        n_words_for_n_neurons = int(
-            math.ceil(vertex_slice.n_atoms / BYTES_PER_WORD))
-        n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
+        n_indices = self.__ceil_n_indices(vertex_slice.n_atoms)
         if rate == 0:
-            data.append(numpy.zeros(n_words_for_n_neurons, dtype="uint32"))
+            data.append(numpy.zeros(n_indices, dtype="uint16").view("uint32"))
         elif self.__indexes[variable] is None:
-            data.append(numpy.arange(
-                n_bytes_for_n_neurons, dtype="uint8").view("uint32"))
+            data.append(numpy.arange(n_indices, dtype="uint16").view("uint32"))
         else:
             indexes = self.__indexes[variable]
             local_index = 0
             local_indexes = list()
-            for index in range(n_bytes_for_n_neurons):
+            for index in range(n_indices):
                 if index + vertex_slice.lo_atom in indexes:
                     local_indexes.append(local_index)
                     local_index += 1
@@ -1326,9 +1331,9 @@ class NeuronRecorder(object):
                     # write to one beyond recording range
                     local_indexes.append(n_recording)
             data.append(
-                numpy.array(local_indexes, dtype="uint8").view("uint32"))
+                numpy.array(local_indexes, dtype="uint16").view("uint32"))
 
-    def _get_data(self, vertex_slice):
+    def _get_data(self, vertex_slice, atoms_shape):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: ~numpy.ndarray
@@ -1378,13 +1383,16 @@ class NeuronRecorder(object):
                 return False
         return True
 
-    def get_generator_data(self, vertex_slice=None):
+    def get_generator_data(self, vertex_slice=None, atoms_shape=None):
         """ Get the recorded data as a generatable data set
 
         :param vertex_slice:
             The slice to generate the data for, or None to generate for
             all neurons (assuming all the same, otherwise error)
         :type vertex_slice: Slice or None
+        :param atoms_shape:
+            The shape of the atoms in the vertex; if vertex_slice is not None,
+            atoms_shape must be not None
         :rtype: numpy.ndarray
         """
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
@@ -1395,69 +1403,88 @@ class NeuronRecorder(object):
             rate = self.__sampling_rates[variable]
             data.extend([rate, self.__data_types[variable].size])
             if rate == 0:
-                data.append(0)
+                data.extend([0, 0])
             else:
                 data.extend(self.__get_generator_indices(
-                    variable, vertex_slice))
+                    variable, vertex_slice, atoms_shape))
         for variable in self.__bitfield_variables:
             rate = self.__sampling_rates[variable]
             data.append(rate)
             if rate == 0:
-                data.append(0)
+                data.extend([0, 0])
             else:
                 data.extend(self.__get_generator_indices(
-                    variable, vertex_slice))
+                    variable, vertex_slice, atoms_shape))
         return numpy.array(data, dtype="uint32")
 
-    def __get_generator_indices(self, variable, vertex_slice=None):
+    def __get_generator_indices(
+            self, variable, vertex_slice=None, atoms_shape=None):
+        """ Get the indices of the variables to record in run-length-encoded
+            form
+        """
         index = self.__indexes.get(variable)
+
+        # If there is no index, add that all variables are recorded
         if index is None:
-            return [1, _REPEAT_PER_NEURON | _RECORDED_FLAG]
+            return [_REPEAT_PER_NEURON, 1,
+                    _REPEAT_PER_NEURON_RECORDED | _RECORDED_FLAG]
 
         # This must be non-global data, so we need a slice
-        if vertex_slice is None:
-            raise ValueError("There must be a vertex slice!")
+        if vertex_slice is None or atoms_shape is None:
+            raise ValueError(
+                "The parameters vertex_slice and atoms_shape must both not be"
+                " None")
 
+        # Generate a run-length-encoded list
         # Initially there are no items, but this will be updated
-        data = [0]
-        last_i = None
+        # Also keep track of the number recorded, also 0 initially
+        data = [0, 0]
         n_items = 0
-        start_i = None
-        for i in index:
-            # Ignore before slice
-            if i < vertex_slice.lo_atom:
-                continue
-            # Finish after slice
-            if i > vertex_slice.hi_atom:
-                break
 
-            # This is the first item, but not the first index, add not recorded
-            if last_i is None and i != vertex_slice.lo_atom:
-                data.append(i - vertex_slice.lo_atom)
+        # Go through the indices and ids, assuming both are in order (they are)
+        id_iter = iter(enumerate(vertex_slice.get_raster_ids(atoms_shape)))
+        index_iter = iter(index)
+        # Keep the id and the position in the id list (as this is a RLE)
+        next_id, i = next(id_iter, (None, 0))
+        next_index = next(index_iter, None)
+        last_recorded = i
+        n_recorded = 0
+        while next_id is not None and next_index is not None:
 
-            # This is the first item, store it
-            if start_i is None:
+            # Find the next index to be recorded
+            while (next_id is not None and next_index is not None and
+                   next_id != next_index):
+                if next_index < next_id:
+                    next_index = next(index_iter, None)
+                elif next_id < next_index:
+                    next_id, i = next(id_iter, (None, i + 1))
+
+            # If we have moved the index onward, mark not recorded
+            if i != last_recorded:
+                data.append((i - last_recorded) | _NOT_RECORDED_FLAG)
+                n_items += 1
+
+            if next_id is not None and next_index is not None:
                 start_i = i
 
-            # The sequence is broken, record the ranges
-            elif i != last_i + 1:
-                n_items += 2
-                # Everything from start to last is recorded
-                data.append((last_i - start_i + 1) | _RECORDED_FLAG)
-                # Everything from last to this is not recorded
-                data.append((i - last_i) - 1)
-                # Start a new run
-                start_i = i
+                # Find the next index not recorded
+                while (next_id is not None and next_index is not None and
+                       next_id == next_index):
+                    next_index = next(index_iter, None)
+                    next_id, i = next(id_iter, (None, i + 1))
 
-            # Store last i
-            last_i = i
+                # Add the count of things to be recorded
+                data.append((i - start_i) | _RECORDED_FLAG)
+                n_recorded += (i - start_i)
+                last_recorded = i
+                n_items += 1
 
-        # If we found at least one start item in range, we need to finish it
-        if start_i is not None:
+        # If there are more items in the vertex slice, they must be
+        # non-recorded items
+        if next_id is not None:
+            data.append((vertex_slice.n_atoms - i) | _NOT_RECORDED_FLAG)
             n_items += 1
-            data.append(((last_i - start_i) + 1) | _RECORDED_FLAG)
-        if last_i != vertex_slice.hi_atom:
-            n_items += 1
-            data.append(vertex_slice.hi_atom - last_i)
-        data[0] = n_items
+
+        data[0] = n_recorded
+        data[1] = n_items
         return numpy.array(data, dtype="uint32")

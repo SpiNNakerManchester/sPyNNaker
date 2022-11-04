@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.data import SpynnakerDataView
 
 EXC_RESPONSE = "exc_response"
 EXC_EXP_RESPONSE = "exc_exp_response"
@@ -27,10 +27,7 @@ INH_EXP_RESPONSE = "inh_exp_response"
 TAU_SYN_I = "tau_syn_I"
 Q_EXC = "q_exc"
 Q_INH = "q_inh"
-INV_TAU_SYN_E_SQ = "inv_tau_syn_E_sq"
-EXP_TAU_SYN_E = "exp_tau_syn_E"
-INV_TAU_SYN_I_SQ = "inv_tau_syn_I_sq"
-EXP_TAU_SYN_I = "exp_tau_syn_I"
+TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeAlpha(AbstractSynapseType):
@@ -76,17 +73,15 @@ class SynapseTypeAlpha(AbstractSynapseType):
             [Struct([
                 (DataType.S1615, EXC_RESPONSE),
                 (DataType.S1615, EXC_EXP_RESPONSE),
-                (DataType.S1615, INV_TAU_SYN_E_SQ),
-                (DataType.U032, EXP_TAU_SYN_E),
                 (DataType.S1615, Q_EXC),
+                (DataType.S1615, TAU_SYN_E),
                 (DataType.S1615, INH_RESPONSE),
                 (DataType.S1615, INH_EXP_RESPONSE),
-                (DataType.S1615, INV_TAU_SYN_I_SQ),
-                (DataType.U032, EXP_TAU_SYN_I),
-                (DataType.S1615, Q_INH)])],
+                (DataType.S1615, Q_INH),
+                (DataType.S1615, TAU_SYN_I),
+                (DataType.S1615, TIMESTEP_MS)])],
             {EXC_RESPONSE: "", EXC_EXP_RESPONSE: "", TAU_SYN_E: "ms",
-             Q_EXC: "", INH_RESPONSE: "", INH_EXP_RESPONSE: "",
-             TAU_SYN_I: "ms", Q_INH: ""})
+             INH_RESPONSE: "", INH_EXP_RESPONSE: "", TAU_SYN_I: "ms"})
 
         # pylint: disable=too-many-arguments
         self.__exc_response = exc_response
@@ -95,10 +90,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
         self.__inh_response = inh_response
         self.__inh_exp_response = inh_exp_response
         self.__tau_syn_I = tau_syn_I
-
-    @overrides(AbstractSynapseType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 100 * n_neurons
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
@@ -113,16 +104,8 @@ class SynapseTypeAlpha(AbstractSynapseType):
         state_variables[INH_RESPONSE] = self.__inh_response
         state_variables[INH_EXP_RESPONSE] = self.__inh_exp_response
         state_variables[Q_INH] = 0
-
-    @overrides(AbstractSynapseType.get_precomputed_values)
-    def get_precomputed_values(self, parameters, state_variables, ts):
-        init = lambda x: (float(ts) / 1000.0) / (x * x)  # noqa
-        decay = lambda x: numpy.exp((-float(ts) / 1000.0) / x)  # noqa
-
-        return {INV_TAU_SYN_E_SQ: parameters[TAU_SYN_E].apply_operation(init),
-                INV_TAU_SYN_I_SQ: parameters[TAU_SYN_I].apply_operation(init),
-                EXP_TAU_SYN_E: parameters[TAU_SYN_E].apply_operation(decay),
-                EXP_TAU_SYN_I: parameters[TAU_SYN_I].apply_operation(decay)}
+        state_variables[TIMESTEP_MS] = (
+            SpynnakerDataView.get_simulation_time_step_ms())
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):

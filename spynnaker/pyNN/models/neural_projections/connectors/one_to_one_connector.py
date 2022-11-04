@@ -21,6 +21,9 @@ from spinn_utilities.safe_eval import SafeEval
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 _expr_context = SafeEval(
     math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
     numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
@@ -29,7 +32,8 @@ _expr_context = SafeEval(
     numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
-class OneToOneConnector(AbstractGenerateConnectorOnMachine):
+class OneToOneConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractGenerateConnectorOnHost):
     """ Where the pre- and postsynaptic populations have the same size,\
         connect cell *i* in the presynaptic population to cell *i* in\
         the postsynaptic population, for all *i*.
@@ -109,7 +113,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
             synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
 
@@ -155,53 +159,53 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_params_size_in_bytes(self):
         return 0
 
-    @overrides(AbstractConnector.could_connect)
-    def could_connect(
-            self, synapse_info, src_machine_vertex, dest_machine_vertex):
-        pre_slice = src_machine_vertex.vertex_slice
-        post_slice = dest_machine_vertex.vertex_slice
-        # Filter edge if both are views and outside limits
-        if (synapse_info.prepop_is_view and
+    @overrides(AbstractGenerateConnectorOnMachine.get_connected_vertices)
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        pre_lo = 0
+        pre_hi = source_vertex.n_atoms - 1
+        post_lo = 0
+        post_hi = target_vertex.n_atoms - 1
+        if s_info.prepop_is_view:
+            # pylint: disable=protected-access
+            pre_lo = s_info.pre_population._indexes[0]
+            pre_hi = s_info.pre_population._indexes[-1]
+        if s_info.postpop_is_view:
+            # pylint: disable=protected-access
+            post_lo = s_info.post_population._indexes[0]
+            post_hi = s_info.post_population._indexes[-1]
 
-                synapse_info.postpop_is_view):
-            # pylint: disable=protected-access
-            pre_lo = synapse_info.pre_population._indexes[0]
-            pre_hi = synapse_info.pre_population._indexes[-1]
-            post_lo = synapse_info.post_population._indexes[0]
-            post_hi = synapse_info.post_population._indexes[-1]
-            if ((pre_slice.hi_atom - pre_lo <
-                    post_slice.lo_atom - post_lo) or
-                    (pre_slice.lo_atom - pre_lo >
-                     post_slice.hi_atom - post_lo) or
-                    (pre_slice.hi_atom < pre_lo) or
-                    (pre_slice.lo_atom > pre_hi) or
-                    (post_slice.hi_atom < post_lo) or
-                    (post_slice.lo_atom > post_hi)):
-                return False
-        # Filter edge if pre-pop is outside limit and post_lo is bigger
-        # than n_pre_neurons
-        elif synapse_info.prepop_is_view:
-            # pylint: disable=protected-access
-            pre_lo = synapse_info.pre_population._indexes[0]
-            pre_hi = synapse_info.pre_population._indexes[-1]
-            if ((pre_slice.hi_atom - pre_lo < post_slice.lo_atom) or
-                    (pre_slice.lo_atom - pre_lo > post_slice.hi_atom) or
-                    (pre_slice.hi_atom < pre_lo) or
-                    (pre_slice.lo_atom > pre_hi)):
-                return False
-        # Filter edge if post-pop is outside limit and pre_lo is bigger
-        # than n_post_neurons
-        elif synapse_info.postpop_is_view:
-            # pylint: disable=protected-access
-            post_lo = synapse_info.post_population._indexes[0]
-            post_hi = synapse_info.post_population._indexes[-1]
-            if ((pre_slice.hi_atom < post_slice.lo_atom - post_lo) or
-                    (pre_slice.lo_atom > post_slice.hi_atom - post_lo) or
-                    (post_slice.hi_atom < post_lo) or
-                    (post_slice.lo_atom > post_hi)):
-                return False
-        # Filter edge in the usual scenario with normal populations
-        elif pre_slice.hi_atom < post_slice.lo_atom or \
-                pre_slice.lo_atom > post_slice.hi_atom:
+        src_splitter = source_vertex.splitter
+        return [(t_vert,
+                 [s_vert for s_vert in src_splitter.get_out_going_vertices(
+                              SPIKE_PARTITION_ID)
+                  if self.__connects(
+                      s_vert, pre_lo, pre_hi, t_vert, post_lo, post_hi)])
+                for t_vert in target_vertex.splitter.get_in_coming_vertices(
+                    SPIKE_PARTITION_ID)]
+
+    def __connects(self, s_vert, pre_lo, pre_hi, t_vert, post_lo, post_hi):
+        pre_slice = s_vert.vertex_slice
+        post_slice = t_vert.vertex_slice
+
+        # Check range of slices
+        if pre_slice.hi_atom < pre_lo:
             return False
+        if post_slice.hi_atom < post_lo:
+            return False
+        if pre_slice.lo_atom > pre_hi:
+            return False
+        if post_slice.lo_atom > post_hi:
+            return False
+
+        # Get slice range relative to view
+        pre_s_hi = pre_slice.hi_atom - pre_lo
+        post_s_hi = post_slice.hi_atom - post_lo
+        pre_s_lo = pre_slice.lo_atom - pre_lo
+        post_s_lo = post_slice.lo_atom - post_lo
+
+        if pre_s_hi < post_s_lo:
+            return False
+        if pre_s_lo > post_s_hi:
+            return False
+
         return True

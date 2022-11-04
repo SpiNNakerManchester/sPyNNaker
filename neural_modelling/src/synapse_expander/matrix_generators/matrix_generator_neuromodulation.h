@@ -44,9 +44,9 @@ typedef struct {
 //! The layout of the initial plastic synapse part of the row
 typedef struct {
     uint32_t plastic_plastic_size;   //!< the plastic-plastic size within the row
-    uint32_t is_neuromodulation:1;   //!< is the row neuromodulation
-    uint32_t is_reward:1;            //!< is the row reward
     uint32_t synapse_type:30;        //!< the synapse type of the row
+    uint32_t is_reward:1;            //!< is the row reward
+    uint32_t is_neuromodulation:1;   //!< is the row neuromodulation
 } row_nm_plastic_t;
 
 //! The layout of the fixed synapse region of the row; the fixed-fixed region is empty
@@ -55,6 +55,10 @@ typedef struct {
     uint32_t fixed_plastic_size;    //!< the fixed-plastic size within the fixed region
     uint32_t fixed_plastic_data[];  //!< the fixed-plastic data within the fixed region
 } row_nm_fixed_t;
+
+// This is the amount to scale neuromodulation weights by to put them in STDP
+// fixed point format
+static const unsigned long accum WEIGHT_SCALE = 2048.0ulk;
 
 /**
  * \brief Get a synaptic row for a given neuron
@@ -138,8 +142,8 @@ void matrix_generator_neuromodulation_free(void *generator) {
 }
 
 static bool matrix_generator_neuromodulation_write_synapse(void *generator,
-        uint32_t pre_index, uint16_t post_index, uint16_t weight,
-        UNUSED uint16_t delay) {
+        uint32_t pre_index, uint16_t post_index, accum weight,
+        UNUSED uint16_t delay, UNUSED unsigned long accum weight_scale) {
     matrix_generator_neuromodulation *conf = generator;
     row_nm_plastic_t *plastic_row = get_nm_row(conf->synaptic_matrix,
             conf->max_row_n_words, pre_index);
@@ -147,10 +151,12 @@ static bool matrix_generator_neuromodulation_write_synapse(void *generator,
     uint32_t pos = fixed_row->fixed_plastic_size;
     if (pos >= conf->max_row_n_synapses) {
         log_warning("Row %u at 0x%08x, 0x%08x of matrix 0x%08x is already full (%u of %u)",
-                pre_index, plastic_row, fixed_row, conf->synaptic_matrix, pos, conf->max_row_n_synapses);
+                pre_index, plastic_row, fixed_row, conf->synaptic_matrix, pos,
+				conf->max_row_n_synapses);
         return false;
     }
+    uint16_t scaled_weight = rescale_weight(weight, WEIGHT_SCALE);
     fixed_row->fixed_plastic_size = pos + 1;
-    fixed_row->fixed_plastic_data[pos] = (weight << 16) | post_index;
+    fixed_row->fixed_plastic_data[pos] = (scaled_weight << 16) | post_index;
     return true;
 }

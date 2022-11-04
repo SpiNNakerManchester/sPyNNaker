@@ -20,6 +20,7 @@ from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
@@ -140,26 +141,21 @@ class PopulationSynapsesMachineVertexCommon(
         4: "PROCESS_PLASTIC_SYNAPSES"}
 
     def __init__(
-            self, resources_required, label, constraints, app_vertex,
-            vertex_slice):
+            self, sdram, label, app_vertex,  vertex_slice):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param str label: The label of the vertex
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints for the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
         """
         super(PopulationSynapsesMachineVertexCommon, self).__init__(
-            label, constraints, app_vertex, vertex_slice, resources_required,
-            self.COMMON_REGIONS,
+            label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__sdram_partition = None
-        self.__neuron_to_synapse_edge = None
         self.__neuron_vertex = None
         self.__partition_id = None
 
@@ -221,13 +217,11 @@ class PopulationSynapsesMachineVertexCommon(
         spec.write_value(get_config_int(
             "Simulation", "transfer_overhead_clocks"))
 
-    def _write_key_spec(self, spec, routing_info):
+    def _write_key_spec(self, spec):
         """ Write key config region
 
         :param DataSpecificationGenerator spec:
             The generator of the specification to write
-        :param RoutingInfo routing_info:
-            Container of keys and masks for edges
         """
         spec.reserve_memory_region(
             region=self.REGIONS.KEY_REGION.value, size=KEY_CONFIG_SIZE,
@@ -240,11 +234,12 @@ class PopulationSynapsesMachineVertexCommon(
             spec.write_value(0)
             spec.write_value(0)
         else:
+            routing_info = SpynnakerDataView.get_routing_infos()
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 self.__neuron_vertex, self.__partition_id)
-            spec.write_value(r_info.first_key)
-            spec.write_value(r_info.first_mask)
-            spec.write_value(~r_info.first_mask & 0xFFFFFFFF)
+            spec.write_value(r_info.key)
+            spec.write_value(r_info.mask)
+            spec.write_value(~r_info.mask & 0xFFFFFFFF)
             spec.write_value(int(self._app_vertex.self_projection is not None))
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)

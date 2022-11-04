@@ -15,10 +15,12 @@
 
 from collections import defaultdict
 import sys
+import numpy
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spynnaker.pyNN.models.defaults import get_dict_from_init
+from spynnaker.pyNN.exceptions import SpynnakerException
 
 
 class AbstractPyNNModel(object, metaclass=AbstractBase):
@@ -26,24 +28,54 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
     """
 
     __slots__ = []
-    _max_atoms_per_core = defaultdict(lambda: sys.maxsize)
+    _max_atoms_per_core = defaultdict(lambda: None)
 
     @classmethod
-    def set_model_max_atoms_per_core(cls, n_atoms=sys.maxsize):
-        """ Set the maximum number of atoms per core for this model
+    def set_model_max_atoms_per_dimension_per_core(cls, n_atoms=None):
+        """ Set the default maximum number of atoms per dimension per core for
+            this model.  This can be overridden by the individual Population.
+            The new value can be None, meaning that the maximum is the same as
+            the number of atoms, an int, meaning all Populations of this model
+            must have one dimension, or a tuple of n integers, meaning all
+            Populations of this model must have n dimensions.
+            If not all Populations of this model have the same number of
+            dimensions, it is recommended to set this to None here and then
+            set the maximum on each Population.
 
         :param n_atoms: The new maximum, or None for the largest possible
-        :type n_atoms: int or None
+        :type n_atoms: int or tuple or None
         """
-        AbstractPyNNModel._max_atoms_per_core[cls] = int(n_atoms)
+        abs_max = cls.absolute_max_atoms_per_core
+        if n_atoms is not None and numpy.prod(n_atoms) > abs_max:
+            raise SpynnakerException(
+                "The absolute maximum neurons per core for this model is"
+                f" {abs_max}")
+        AbstractPyNNModel._max_atoms_per_core[cls] = n_atoms
 
     @classmethod
-    def get_max_atoms_per_core(cls):
-        """ Get the maximum number of atoms per core for this model
+    def get_model_max_atoms_per_dimension_per_core(cls):
+        """ Get the maximum number of atoms per dimension per core for this
+            model
+
+        :rtype: int or tuple or None
+        """
+        # If there is a stored value, use it
+        max_stored = AbstractPyNNModel._max_atoms_per_core.get(cls)
+        if max_stored is not None:
+            return max_stored
+
+        # Otherwise return the absolute maximum
+        return cls.absolute_max_atoms_per_core
+
+    @classproperty
+    def absolute_max_atoms_per_core(cls):  # pylint: disable=no-self-argument
+        """ The absolute maximum number of atoms per core.
+            This is an integer regardless of the number of dimensions
+            in any vertex.
 
         :rtype: int
         """
-        return AbstractPyNNModel._max_atoms_per_core[cls]
+        return sys.maxsize
 
     @staticmethod
     def __get_init_params_and_svars(the_cls):
@@ -105,15 +137,11 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def create_vertex(self, n_neurons, label, constraints):
+    def create_vertex(self, n_neurons, label):
         """ Create a vertex for a population of the model
 
         :param int n_neurons: The number of neurons in the population
         :param str label: The label to give to the vertex
-        :param constraints:
-            A list of constraints to give to the vertex, or None
-        :type constraints:
-            list(~pacman.model.constraints.AbstractConstraint) or None
         :return: An application vertex for the population
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """

@@ -48,3 +48,11 @@ class AbstractNeuronExpandable(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+
+    @abstractmethod
+    def read_generated_initial_values(self, placement):
+        """ Fill in any requested initial values
+
+        :param ~pacman.model.placements.Placement placement:
+            Where the data is on the machine
+        """

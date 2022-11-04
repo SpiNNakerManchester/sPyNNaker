@@ -20,48 +20,42 @@ from spinn_front_end_common.utilities.system_control_logic import \
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractNeuronExpandable, NEURON_EXPANDER_APLX)
 from spinn_front_end_common.utilities.helpful_functions import (
     write_address_to_user1)
+from spinn_utilities.config_holder import get_config_bool
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def neuron_expander(
-        placements, transceiver, executable_finder, extract_iobuf):
+def neuron_expander():
     """ Run the neuron expander.
 
     .. note::
         Needs to be done after data has been loaded.
-
-    :param ~pacman.model.placements.Placements placements:
-        Where all vertices are on the machine.
-    :param ~spinnman.transceiver.Transceiver transceiver:
-        How to talk to the machine.
-    :param executable_finder:
-        How to find the synapse expander binaries.
-    :param bool extract_iobuf: flag for extracting iobuf
-    :type executable_finder:
-        ~spinn_utilities.executable_finder.ExecutableFinder
     """
-    neuron_bin = executable_finder.get_executable_path(NEURON_EXPANDER_APLX)
+    neuron_bin = SpynnakerDataView.get_executable_path(NEURON_EXPANDER_APLX)
 
     # Find the places where the neuron expander should run
-    expander_cores = _plan_expansion(placements, neuron_bin, transceiver)
+    expander_cores, expanded_pop_vertices = _plan_expansion(neuron_bin)
 
     progress = ProgressBar(expander_cores.total_processors,
                            "Expanding Neuron Data")
-    expander_app_id = transceiver.app_id_tracker.get_new_id()
+    expander_app_id = SpynnakerDataView.get_new_id()
     run_system_application(
-        expander_cores, expander_app_id, transceiver, executable_finder,
-        extract_iobuf, None, [CPUState.FINISHED], False,
+        expander_cores, expander_app_id,
+        get_config_bool("Reports", "write_expander_iobuf"),
+        None, [CPUState.FINISHED], False,
         "neuron_expander_on_{}_{}_{}.txt", progress_bar=progress,
         logger=logger)
     progress.end()
 
+    _fill_in_initial_data(expanded_pop_vertices)
 
-def _plan_expansion(placements, synapse_expander_bin, transceiver):
+
+def _plan_expansion(synapse_expander_bin):
     """ Plan the expansion of synapses and set up the regions using USER1
 
     :param ~pacman.model.placements.Placements: The placements of the vertices
@@ -73,21 +67,41 @@ def _plan_expansion(placements, synapse_expander_bin, transceiver):
     :rtype: (ExecutableTargets, list(MachineVertex, Placement))
     """
     expander_cores = ExecutableTargets()
+    expanded_pop_vertices = list()
 
-    progress = ProgressBar(len(placements), "Preparing to Expand Neuron Data")
-    for placement in progress.over(placements):
+    progress = ProgressBar(
+        SpynnakerDataView.get_n_placements(),
+        "Preparing to Expand Neuron Data")
+    for placement in progress.over(SpynnakerDataView.iterate_placemements()):
         # Add all machine vertices of the population vertex to ones
         # that need synapse expansion
         vertex = placement.vertex
         if isinstance(vertex, AbstractNeuronExpandable):
             if vertex.gen_neurons_on_machine():
+                expanded_pop_vertices.append((vertex, placement))
                 expander_cores.add_processor(
                     synapse_expander_bin,
                     placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
                 # Write the region to USER1, as that is the best we can do
                 write_address_to_user1(
-                    transceiver, placement.x, placement.y, placement.p,
+                    placement.x, placement.y, placement.p,
                     vertex.neuron_generator_region)
 
-    return expander_cores
+    return expander_cores, expanded_pop_vertices
+
+
+def _fill_in_initial_data(expanded_pop_vertices):
+    """ Once expander has run, fill in the connection data
+
+    :param list(MachineVertex, Placement) expanded_pop_vertices:
+        List of machine vertices to read data from
+    :param ~spinnman.transceiver.Transceiver transceiver:
+        How to talk to the machine
+
+    :rtype: None
+    """
+    progress = ProgressBar(
+        len(expanded_pop_vertices), "Getting initial values")
+    for vertex, placement in progress.over(expanded_pop_vertices):
+        vertex.read_generated_initial_values(placement)

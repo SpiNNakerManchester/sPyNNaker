@@ -164,10 +164,11 @@ static inline void print_ring_buffers(uint32_t time) {
     log_debug("Ring Buffer at %u", time);
 #if LOG_LEVEL >= LOG_DEBUG
     io_printf(IO_BUF, "----------------------------------------\n");
+    uint32_t n_delay_bits = (1 << synapse_delay_bits);
     for (uint32_t n = 0; n < n_neurons; n++) {
         for (uint32_t t = 0; t < n_synapse_types; t++) {
             // Determine if this row can be omitted
-            for (uint32_t d = 0; d < (1 << synapse_delay_bits); d++) {
+            for (uint32_t d = 0; d < n_delay_bits; d++) {
                 if (ring_buffers[synapse_row_get_ring_buffer_index(
                         d + time, t, n, synapse_type_index_bits,
                         synapse_index_bits, synapse_delay_mask)] != 0) {
@@ -178,7 +179,7 @@ static inline void print_ring_buffers(uint32_t time) {
         doPrint:
             // Have to print the row
             io_printf(IO_BUF, "%3d(%s):", n, get_type_char(t));
-            for (uint32_t d = 0; d < (1 << synapse_delay_bits); d++) {
+            for (uint32_t d = 0; d < n_delay_bits; d++) {
                 io_printf(IO_BUF, " ");
                 uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index(
                         d + time, t, n, synapse_type_index_bits,
@@ -250,16 +251,6 @@ static inline bool process_fixed_synapses(
     return true;
 }
 
-//! Print output debug data on the synapses
-static inline void print_synapse_parameters(void) {
-// only if the models are compiled in debug mode will this method contain
-// said lines.
-#if LOG_LEVEL >= LOG_DEBUG
-    // again neuron_synapse_shaping_params has moved to implementation
-    neuron_print_synapse_parameters();
-#endif // LOG_LEVEL >= LOG_DEBUG
-}
-
 //! The layout of the synapse parameters region
 struct synapse_params {
     uint32_t n_neurons;
@@ -280,7 +271,6 @@ bool synapses_initialise(
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         bool* clear_input_buffers_of_late_packets_init,
         uint32_t *incoming_spike_buffer_size) {
-    log_debug("synapses_initialise: starting");
     struct synapse_params *params = (struct synapse_params *) synapse_params_address;
     *clear_input_buffers_of_late_packets_init = params->drop_late_packets;
     *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
@@ -308,10 +298,6 @@ bool synapses_initialise(
     *ring_buffer_to_input_buffer_left_shifts =
             ring_buffer_to_input_left_shifts;
 
-    log_debug("synapses_initialise: completed successfully");
-    print_synapse_parameters();
-
-
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
     synapse_index_bits = log_n_neurons;
@@ -330,8 +316,8 @@ bool synapses_initialise(
 
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(weight_t));
     if (ring_buffers == NULL) {
-        log_error("Could not allocate %u entries for ring buffers",
-                ring_buffer_size);
+        log_error("Could not allocate %u entries for ring buffers; Biggest space %u",
+                ring_buffer_size, sark_heap_max(sark.heap, 0));
         return false;
     }
     for (uint32_t i = 0; i < ring_buffer_size; i++) {

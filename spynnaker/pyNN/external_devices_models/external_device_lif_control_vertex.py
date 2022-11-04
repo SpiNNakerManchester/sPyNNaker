@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import (
     AbstractVertexWithEdgeToDependentVertices, HasCustomAtomKeyMap)
@@ -36,6 +34,7 @@ class ExternalDeviceLifControlVertex(
     __slots__ = [
         "__dependent_vertices",
         "__devices",
+        "__indices",
         "__message_translator"]
 
     # all commands will use this mask
@@ -45,7 +44,7 @@ class ExternalDeviceLifControlVertex(
             self, devices, create_edges, max_atoms_per_core, neuron_impl,
             pynn_model, translator=None, spikes_per_second=None, label=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-            drop_late_spikes=None, constraints=None, splitter=None, seed=None):
+            drop_late_spikes=None, splitter=None, seed=None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
             The AbstractMulticastControllableDevice instances to be controlled
@@ -67,30 +66,26 @@ class ExternalDeviceLifControlVertex(
         :param splitter: splitter from app to machine
         :type splitter: None or
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
         # pylint: disable=too-many-arguments
         super().__init__(
-            len(devices), label, constraints, max_atoms_per_core,
+            len(devices), label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes, splitter)
+            neuron_impl, pynn_model, drop_late_spikes, splitter, seed)
 
         if not devices:
             raise ConfigurationException("No devices specified")
 
-        self.__devices = devices
+        self.__devices = {dev.device_control_partition_id: dev
+                          for dev in devices}
+        self.__indices = {dev.device_control_partition_id: i
+                          for i, dev in enumerate(devices)}
         self.__message_translator = translator
 
         # Add the edges to the devices if required
         self.__dependent_vertices = list()
         if create_edges:
             self.__dependent_vertices = devices
-
-        for dev in devices:
-            self.add_constraint(FixedKeyAndMaskConstraint([
-                BaseKeyAndMask(
-                    dev.device_control_key, self._DEFAULT_COMMAND_MASK)],
-                partition=dev.device_control_partition_id))
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self):
@@ -103,7 +98,7 @@ class ExternalDeviceLifControlVertex(
 
     @overrides(AbstractEthernetController.get_external_devices)
     def get_external_devices(self):
-        return self.__devices
+        return self.__devices.values()
 
     @overrides(AbstractEthernetController.get_message_translator)
     def get_message_translator(self):
@@ -116,10 +111,16 @@ class ExternalDeviceLifControlVertex(
 
     @overrides(AbstractEthernetController.get_outgoing_partition_ids)
     def get_outgoing_partition_ids(self):
-        return [dev.device_control_partition_id for dev in self.__devices]
+        return list(self.__devices.keys())
 
     @overrides(HasCustomAtomKeyMap.get_atom_key_map)
     def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
-        for i, device in enumerate(self.__devices):
-            if device.device_control_partition_id == partition_id:
-                return [(i, device.device_control_key)]
+        index = self.__indices[partition_id]
+        device = self.__devices[partition_id]
+        return [(index, device.device_control_key)]
+
+    @overrides(AbstractPopulationVertex.get_fixed_key_and_mask)
+    def get_fixed_key_and_mask(self, partition_id):
+        return BaseKeyAndMask(
+            self.__devices[partition_id].device_control_key,
+            self._DEFAULT_COMMAND_MASK)

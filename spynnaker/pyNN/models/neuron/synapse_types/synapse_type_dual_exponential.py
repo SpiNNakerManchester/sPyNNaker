@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.data import SpynnakerDataView
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_E2 = 'tau_syn_E2'
@@ -25,12 +25,7 @@ TAU_SYN_I = 'tau_syn_I'
 ISYN_EXC = "isyn_exc"
 ISYN_EXC2 = "isyn_exc2"
 ISYN_INH = "isyn_inh"
-DECAY_E = "decay_E"
-DECAY_E2 = "decay_E2"
-DECAY_I = "decay_I"
-INIT_E = "init_E"
-INIT_E2 = "init_E2"
-INIT_I = "init_I"
+TIMESTEP_MS = "timestep_ms"
 
 
 class SynapseTypeDualExponential(AbstractSynapseType):
@@ -73,15 +68,13 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         """
         super().__init__(
             [Struct([
-                (DataType.U032, DECAY_E),
-                (DataType.U032, INIT_E),
+                (DataType.S1615, TAU_SYN_E),
                 (DataType.S1615, ISYN_EXC),
-                (DataType.U032, DECAY_E2),
-                (DataType.U032, INIT_E2),
+                (DataType.S1615, TAU_SYN_E2),
                 (DataType.S1615, ISYN_EXC2),
-                (DataType.U032, DECAY_I),
-                (DataType.U032, INIT_I),
-                (DataType.S1615, ISYN_INH)])],
+                (DataType.S1615, TAU_SYN_I),
+                (DataType.S1615, ISYN_INH),
+                (DataType.S1615, TIMESTEP_MS)])],
             {TAU_SYN_E: "mV", TAU_SYN_E2: "mV", TAU_SYN_I: 'mV', ISYN_EXC: "",
              ISYN_EXC2: "", ISYN_INH: ""})
         self.__tau_syn_E = tau_syn_E
@@ -91,36 +84,19 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         self.__isyn_exc2 = isyn_exc2
         self.__isyn_inh = isyn_inh
 
-    @overrides(AbstractSynapseType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 100 * n_neurons
-
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
         parameters[TAU_SYN_E] = self.__tau_syn_E
         parameters[TAU_SYN_E2] = self.__tau_syn_E2
         parameters[TAU_SYN_I] = self.__tau_syn_I
+        parameters[TIMESTEP_MS] = (
+            SpynnakerDataView.get_simulation_time_step_ms())
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[ISYN_EXC] = self.__isyn_exc
         state_variables[ISYN_EXC2] = self.__isyn_exc2
         state_variables[ISYN_INH] = self.__isyn_inh
-
-    @overrides(AbstractSynapseType.get_precomputed_values)
-    def get_precomputed_values(self, parameters, state_variables, ts):
-        tsfloat = float(ts) / 1000.0
-        decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
-        init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731
-
-        return {
-            DECAY_E: parameters[TAU_SYN_E].apply_operation(decay),
-            DECAY_E2: parameters[TAU_SYN_E2].apply_operation(decay),
-            DECAY_I: parameters[TAU_SYN_I].apply_operation(decay),
-            INIT_E: parameters[TAU_SYN_E].apply_operation(init),
-            INIT_E2: parameters[TAU_SYN_E2].apply_operation(init),
-            INIT_I: parameters[TAU_SYN_I].apply_operation(init)
-        }
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):

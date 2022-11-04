@@ -91,14 +91,14 @@ def split_structural_without_stdp():
     print(conns_4)
 
     # These should be formed with specified parameters
-    assert(len(conns) == 1)
-    assert(tuple(conns[0]) == (0, 0, 2.0, 5.0))
-    assert(len(conns_2) == 1)
-    assert(tuple(conns_2[0]) == (0, 0, 4.0, 3.0))
+    assert len(conns) == 1
+    assert tuple(conns[0]) == (0, 0, 2.0, 5.0)
+    assert len(conns_2) == 1
+    assert tuple(conns_2[0]) == (0, 0, 4.0, 3.0)
 
     # These should have no connections since eliminated
-    assert(len(conns_3) == 0)
-    assert(len(conns_4) == 0)
+    assert len(conns_3) == 0
+    assert len(conns_4) == 0
 
 
 class TestStructuralWithoutSTDP(BaseTestCase):

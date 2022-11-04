@@ -22,9 +22,12 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 
-class MultapseConnector(AbstractGenerateConnectorOnMachine):
+class MultapseConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractGenerateConnectorOnHost):
     """ Create a multapse connector. The size of the source and destination\
         populations are obtained when the projection is connected. The number\
         of synapses is specified. when instantiated, the required number of\
@@ -72,6 +75,21 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         self.__post_slices = None
         self.__synapses_per_edge = None
         self._rng = rng
+
+    def set_projection_information(self, synapse_info):
+        super().set_projection_information(synapse_info)
+        n_pairs = synapse_info.n_post_neurons * synapse_info.n_pre_neurons
+        if not self.__with_replacement and self.__num_synapses > n_pairs:
+            raise SpynnakerException(
+                "FixedTotalNumberConnector will not work when "
+                "with_replacement=False and n > n_pre * n_post")
+        if (not self.__with_replacement and
+                not self.__allow_self_connections and
+                self.__num_synapses == n_pairs):
+            raise SpynnakerException(
+                "FixedNumberPostConnector will not work when "
+                "with_replacement=False, allow_self_connections=False "
+                "and n = n_pre * n_post")
 
     def get_rng_next(self, num_synapses, prob_connect):
         """ Get the required RNGs
@@ -184,7 +202,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         return self._get_weight_maximum(
             synapse_info.weights, self.__num_synapses, synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments

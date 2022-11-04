@@ -15,12 +15,12 @@
 
 import numpy
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
@@ -28,7 +28,7 @@ _TARGET = 1
 _FIRST_PARAM = 2
 
 
-class FromListConnector(AbstractConnector):
+class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     """ Make connections according to a list.
     """
     __slots__ = [
@@ -87,6 +87,8 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         if self.__delays is None:
+            if hasattr(synapse_info.delays, "__len__"):
+                return numpy.max(synapse_info.delays)
             return self._get_delay_maximum(
                 synapse_info.delays, len(self.__targets), synapse_info)
         else:
@@ -95,6 +97,8 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
         if self.__delays is None:
+            if hasattr(synapse_info.delays, "__len__"):
+                return numpy.min(synapse_info.delays)
             return self._get_delay_minimum(
                 synapse_info.delays, len(self.__targets), synapse_info)
         else:
@@ -103,6 +107,8 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self, delays, synapse_info):
         if self.__delays is None:
+            if hasattr(synapse_info.delays, "__len__"):
+                return numpy.var(synapse_info.delays)
             return AbstractConnector.get_delay_variance(
                 self, delays, synapse_info)
         else:
@@ -125,29 +131,26 @@ class FromListConnector(AbstractConnector):
         self.__split_post_slices = list(post_slices)
 
         # Create bins into which connections are to be grouped
-        post_bins = numpy.concatenate((
-            [0], numpy.sort([s.hi_atom + 1 for s in post_slices])))
+        post_bins = numpy.sort([s.hi_atom + 1 for s in post_slices])
 
         # Find the index of the top of each bin in the sorted data
         post_indices = numpy.searchsorted(
             post_bins, self.__targets, side="right")
 
-        # Get a count of the indices in each bin
+        # Get a count of the indices in each bin, ignoring those outside
+        # the allowed number of bins
         n_bins = len(post_bins)
-        index_count = numpy.bincount(post_indices, minlength=n_bins)
+        index_count = numpy.bincount(post_indices, minlength=n_bins)[:n_bins]
 
         # Get a sort order on the connections
         sort_indices = numpy.argsort(post_indices)
 
         # Split the sort order in to groups of connection indices
         split_indices = numpy.array(numpy.split(
-            sort_indices, numpy.cumsum(index_count)))
-
-        # Ignore the outliers
-        split_indices = split_indices[1:-1]
+            sort_indices, numpy.cumsum(index_count)))[:-1]
 
         # Get the results indexed by hi_atom in the slices
-        post_bins = [(post - 1) for post in post_bins[1:]]
+        post_bins = [(post - 1) for post in post_bins]
         self.__split_conn_list = {
             post: indices
             for post, indices in zip(post_bins, split_indices)
@@ -162,10 +165,15 @@ class FromListConnector(AbstractConnector):
             max_delay=None):
 
         mask = None
+        delays_handled = False
         if (min_delay is not None and max_delay is not None and
-                self.__delays is not None):
-            mask = ((self.__delays >= min_delay) &
-                    (self.__delays <= max_delay))
+                (self.__delays is not None or
+                 hasattr(synapse_info.delays, "__len__"))):
+            delays = self.__delays
+            if delays is None:
+                delays = synapse_info.delays
+            mask = ((delays >= min_delay) & (delays <= max_delay))
+            delays_handled = True
         if mask is None:
             conns = self.__conn_list.copy()
         else:
@@ -188,7 +196,7 @@ class FromListConnector(AbstractConnector):
 
         # If no delays just return max targets as this is for all delays
         # If there are delays in the list, this was also handled above
-        if min_delay is None or max_delay is None or self.__delays is not None:
+        if min_delay is None or max_delay is None or delays_handled:
             return max_targets
 
         # If here, there must be no delays in the list, so use the passed in
@@ -221,6 +229,8 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights, synapse_info):
         if self.__weights is None:
+            if hasattr(synapse_info.weights, "__len__"):
+                return numpy.mean(synapse_info.weights)
             return AbstractConnector.get_weight_mean(
                 self, weights, synapse_info)
         else:
@@ -230,6 +240,8 @@ class FromListConnector(AbstractConnector):
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
+            if hasattr(synapse_info.weights, "__len__"):
+                return numpy.amax(synapse_info.weights)
             return self._get_weight_maximum(
                 synapse_info.weights, len(self.__targets), synapse_info)
         else:
@@ -239,12 +251,14 @@ class FromListConnector(AbstractConnector):
     def get_weight_variance(self, weights, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
+            if hasattr(synapse_info.weights, "__len__"):
+                return numpy.var(synapse_info.weights)
             return AbstractConnector.get_weight_variance(
                 self, weights, synapse_info)
         else:
             return numpy.var(numpy.abs(self.__weights))
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
@@ -349,9 +363,9 @@ class FromListConnector(AbstractConnector):
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
             self.__delays = (numpy.rint(
-                numpy.array(self.__conn_list[:, delay_column]) * (
-                    MICRO_TO_MILLISECOND_CONVERSION / machine_time_step())) *
-                    (machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION))
+                numpy.array(self.__conn_list[:, delay_column]) *
+                SpynnakerDataView.get_simulation_time_step_per_ms()) *
+                SpynnakerDataView.get_simulation_time_step_ms())
         except ValueError:
             pass
 
@@ -410,14 +424,52 @@ class FromListConnector(AbstractConnector):
         """
         return self.__extra_parameter_names
 
-    @overrides(AbstractConnector.could_connect)
-    def could_connect(
-            self, synapse_info, src_machine_vertex, dest_machine_vertex):
-        post_slices = \
-            dest_machine_vertex.app_vertex.splitter.get_in_coming_slices()
-        self._split_connections(post_slices)
-        post_hi = dest_machine_vertex.vertex_slice.hi_atom
-        return post_hi in self.__split_conn_list
+    @overrides(AbstractConnector.get_connected_vertices)
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        # This is similar to get_split_connections, but not because
+        # 1. We need to combine pre and post vertices and
+        # 2. We don't need to go as far as we only need the counts
+
+        # Divide the targets into bins based on post slices
+        post_slices = target_vertex.splitter.get_in_coming_slices()
+        post_bins = numpy.sort([s.hi_atom + 1 for s in post_slices])
+        post_indices = numpy.searchsorted(
+            post_bins, self.__targets, side="right")
+
+        # Divide the sources into bins based on pre slices
+        pre_vertices = source_vertex.splitter.get_out_going_vertices(
+            SPIKE_PARTITION_ID)
+        pre_bins = numpy.sort([m.vertex_slice.hi_atom + 1
+                              for m in pre_vertices])
+        pre_indices = numpy.searchsorted(
+            pre_bins, self.__sources, side="right")
+
+        # Join the groups from both axes
+        n_bins = (len(pre_bins), len(post_bins))
+        joined_indices = numpy.ravel_multi_index(
+            (pre_indices, post_indices), n_bins, mode="clip")
+
+        # Get a count of the indices in each bin
+        index_count = numpy.bincount(
+            joined_indices, minlength=numpy.prod(n_bins))
+
+        pre_post_hi = [(pre - 1, post - 1) for pre in pre_bins
+                       for post in post_bins]
+
+        # Put the counts into a dict by hi-atom
+        split_counts = {
+            pre_post: count
+            for pre_post, count in zip(pre_post_hi, index_count)
+            if count > 0
+        }
+
+        return [
+            (m_vert, [s_vert for s_vert in pre_vertices
+                      if (s_vert.vertex_slice.hi_atom,
+                          m_vert.vertex_slice.hi_atom) in split_counts])
+            for m_vert in target_vertex.splitter.get_in_coming_vertices(
+                SPIKE_PARTITION_ID)
+        ]
 
     def _apply_parameters_to_synapse_type(self, synapse_type):
         """

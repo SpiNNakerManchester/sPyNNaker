@@ -37,7 +37,6 @@
 #include "c_main_common.h"
 #include "profile_tags.h"
 #include "dma_common.h"
-#include <tdma_processing.h>
 #include <spin1_api_params.h>
 
 //! values for the priority for each callback
@@ -55,7 +54,8 @@ enum regions {
     NEURON_PARAMS_REGION,
     CURRENT_SOURCE_PARAMS_REGION,
     NEURON_RECORDING_REGION,
-    SDRAM_PARAMS_REGION
+    SDRAM_PARAMS_REGION,
+	INITIAL_VALUES_REGION
 };
 
 //! From the regions, select those that are common
@@ -80,7 +80,8 @@ const struct neuron_regions NEURON_REGIONS = {
     .core_params = CORE_PARAMS_REGION,
     .neuron_params = NEURON_PARAMS_REGION,
     .current_source_params = CURRENT_SOURCE_PARAMS_REGION,
-    .neuron_recording = NEURON_RECORDING_REGION
+    .neuron_recording = NEURON_RECORDING_REGION,
+	.initial_values = INITIAL_VALUES_REGION
 };
 
 //! A region of SDRAM used to transfer synapses
@@ -150,7 +151,8 @@ void resume_callback(void) {
     recording_reset();
 
     // try resuming neuron
-    if (!neuron_resume()) {
+    // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
+    if (!neuron_resume(time + 1)) {
         log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }
@@ -248,8 +250,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 //!        recording data.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(void) {
-    log_debug("Initialise: started");
-
     data_specification_metadata_t *ds_regions;
     if (!initialise_common_regions(
             &timer_period, &simulation_ticks, &infinite_run, &time,
@@ -305,7 +305,6 @@ static bool initialise(void) {
     log_debug("setting timer tick callback for %d microseconds", timer_period);
     spin1_set_timer_tick(timer_period);
 
-    log_debug("Initialise: finished");
     return true;
 }
 

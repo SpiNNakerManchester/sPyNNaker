@@ -346,7 +346,7 @@ def get_n_bits(n_values):
         return 0
     if n_values == 1:
         return 1
-    return int(math.ceil(math.log(n_values, 2)))
+    return int(math.ceil(math.log2(n_values)))
 
 
 def moved_in_v6(old_location, _):
@@ -374,6 +374,19 @@ def moved_in_v7(old_location, new_location):
     logger.warning("File {} moved to {}. Please fix your imports. "
                    "In version 8 this will fail completely."
                    "".format(old_location, new_location))
+
+
+def moved_in_v7_warning(message):
+    """
+    Warns the user that they are using old code
+
+    In version 8 this will be upgraded to a exception and then later removed
+
+    :param str message:
+    """
+    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
+        raise NotImplementedError(message)
+    logger.warning(f"{message} In version 8 old call will fail completely.")
 
 
 def get_time_to_write_us(n_bytes, n_cores):

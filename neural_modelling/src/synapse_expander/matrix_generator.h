@@ -50,8 +50,10 @@ void matrix_generator_free(matrix_generator_t generator);
  * \param[in] pre_index: The index of the pre-neuron relative to the start of
  *                       the matrix
  * \param[in] post_index: The index of the post-neuron on this core
- * \param[in] weight: The weight of the synapse pre-encoded as a uint16_t
+ * \param[in] weight: The weight of the synapse in raw form
  * \param[in] delay: The delay of the synapse in time steps
+ * \param[in] weight_scale: The scale to apply to the weight if needed
  */
 bool matrix_generator_write_synapse(matrix_generator_t generator,
-        uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay);
+        uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,
+		unsigned long accum weight_scale);

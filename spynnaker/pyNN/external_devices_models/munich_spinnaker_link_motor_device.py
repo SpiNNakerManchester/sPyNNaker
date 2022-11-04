@@ -21,6 +21,7 @@ from pacman.model.graphs.application.abstract import (
 from spinn_front_end_common.abstract_models import (
     AbstractVertexWithEdgeToDependentVertices)
 from spynnaker.pyNN.models.defaults import defaults
+from spynnaker.pyNN.models.abstract_models import PopulationApplicationVertex
 from .machine_munich_motor_device import MachineMunichMotorDevice
 
 
@@ -30,14 +31,14 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
     def __init__(self, spinnaker_link_id, board_address=None):
         super().__init__(
             n_atoms=6, spinnaker_link_id=spinnaker_link_id,
-            label="External Munich Motor", max_atoms_per_core=6,
-            board_address=board_address)
+            label="External Munich Motor", board_address=board_address)
 
 
 @defaults
 class MunichMotorDevice(
         AbstractOneAppOneMachineVertex,
-        AbstractVertexWithEdgeToDependentVertices):
+        AbstractVertexWithEdgeToDependentVertices,
+        PopulationApplicationVertex):
     """ An Omnibot motor control device. This has a real vertex and an \
         external device vertex.
     """
@@ -68,7 +69,7 @@ class MunichMotorDevice(
             speed, sample_time, update_time, delay_time, delta_threshold,
             continue_if_not_different, label, app_vertex=self)
         super().__init__(
-            m_vertex, label, None, MachineMunichMotorDevice._N_ATOMS)
+            m_vertex, label, MachineMunichMotorDevice._N_ATOMS)
         self.__dependent_vertices = [
             _MunichMotorDevice(spinnaker_link_id, board_address)]
 

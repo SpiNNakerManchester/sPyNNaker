@@ -184,8 +184,8 @@ static bool connection_generator_fixed_total_generate(
         matrix_generator_t matrix_generator) {
     struct fixed_total *obj = generator;
 
-    uint32_t n_pre = pre_hi - pre_lo;
-    uint32_t n_post = post_hi - post_lo;
+    uint32_t n_pre = pre_hi - pre_lo + 1;
+    uint32_t n_post = post_hi - post_lo + 1;
     uint32_t post_slice_end = post_slice_start + post_slice_count;
     uint32_t n_conns = obj->params.n_synapses_total;
 
@@ -195,8 +195,7 @@ static bool connection_generator_fixed_total_generate(
             uint32_t post = random_in_range(population_rng, n_post) + post_lo;
             if (post >= post_slice_start && post < post_slice_end) {
                 uint32_t local_post = post - post_slice_start;
-                uint16_t weight = rescale_weight(
-                        param_generator_generate(weight_generator), weight_scale);
+                accum weight = param_generator_generate(weight_generator);
                 uint16_t delay = rescale_delay(
                         param_generator_generate(delay_generator), timestep_per_delay);
 
@@ -207,7 +206,7 @@ static bool connection_generator_fixed_total_generate(
                     pre = random_in_range(core_rng, n_pre) + pre_lo;
                     if (obj->params.allow_self_connections || pre != post) {
                         written = matrix_generator_write_synapse(matrix_generator,
-                            pre, local_post, weight, delay);
+                            pre, local_post, weight, delay, weight_scale);
                         n_retries++;
                     }
                 } while (!written && n_retries < 10);
@@ -250,12 +249,11 @@ static bool connection_generator_fixed_total_generate(
             if (local_post >= post_slice_start && local_post < post_slice_end) {
                 local_post -= post_slice_start;
                 uint32_t local_pre = conns[i].pre;
-                uint16_t weight = rescale_weight(
-                        param_generator_generate(weight_generator), weight_scale);
+                accum weight = param_generator_generate(weight_generator);
                 uint16_t delay = rescale_delay(
                         param_generator_generate(delay_generator), timestep_per_delay);
                 if (!matrix_generator_write_synapse(matrix_generator, local_pre, local_post,
-                        weight, delay)) {
+                        weight, delay, weight_scale)) {
                     // Not a lot we can do here...
                     log_error("Couldn't write matrix!");
                     return false;

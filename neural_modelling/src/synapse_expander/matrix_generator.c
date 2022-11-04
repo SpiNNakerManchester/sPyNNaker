@@ -126,7 +126,8 @@ void matrix_generator_free(matrix_generator_t generator) {
 
 bool matrix_generator_write_synapse(
         matrix_generator_t generator,
-        uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay) {
+        uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,
+		unsigned long accum weight_scale) {
     return generator->type->write_synapse(
-            generator->data, pre_index, post_index, weight, delay);
+            generator->data, pre_index, post_index, weight, delay, weight_scale);
 }

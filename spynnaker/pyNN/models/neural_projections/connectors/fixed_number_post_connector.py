@@ -21,11 +21,14 @@ from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 N_GEN_PARAMS = 8
 
 
-class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
+class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
+                               AbstractGenerateConnectorOnHost):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
     """
@@ -35,8 +38,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         "__n_post",
         "__post_neurons",
         "__post_neurons_set",
-        "__with_replacement",
-        "__post_connector_seed"]
+        "__with_replacement"]
 
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False,
@@ -77,7 +79,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         self.__with_replacement = with_replacement
         self.__post_neurons = None
         self.__post_neurons_set = False
-        self.__post_connector_seed = dict()
         self._rng = rng
 
     def set_projection_information(self, synapse_info):
@@ -237,13 +238,13 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         return self._get_weight_maximum(
             synapse_info.weights, n_connections, synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         # Get lo and hi for the pre vertex
         lo = 0
-        hi = synapse_info.n_pre_neurons
+        hi = synapse_info.n_pre_neurons - 1
 
         # Get number of connections
         n_connections = sum(

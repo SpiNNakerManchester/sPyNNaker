@@ -24,8 +24,7 @@ from spynnaker.pyNN.models.common import recording_utils
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -61,33 +60,10 @@ class MultiSpikeRecorder(object):
         return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
             out_spike_bytes * spikes_per_timestep))
 
-    def get_dtcm_usage_in_bytes(self):
-        """
-        :rtype: int
-        """
-        if not self.__record:
-            return 0
-        return BYTES_PER_WORD
-
-    def get_n_cpu_cycles(self, n_neurons):
-        """
-        :param int n_neurons:
-        :rtype: int
-        """
-        if not self.__record:
-            return 0
-        return n_neurons * 4
-
-    def get_spikes(
-            self, label, buffer_manager, region,
-            placements, application_vertex):
+    def get_spikes(self, label, region, application_vertex):
         """
         :param str label:
-        :param buffer_manager: the buffer manager object
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param int region:
-        :param ~pacman.model.placements.Placements placements:
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -96,6 +72,7 @@ class MultiSpikeRecorder(object):
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
         # pylint: disable=too-many-arguments
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         spike_times = list()
         spike_ids = list()
 
@@ -104,7 +81,7 @@ class MultiSpikeRecorder(object):
         progress = ProgressBar(
             vertices, "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
             # Read the spikes from the buffer manager
@@ -113,7 +90,7 @@ class MultiSpikeRecorder(object):
             if data_missing:
                 missing.append(placement)
             self._process_spike_data(
-                vertex_slice,
+                vertex_slice, application_vertex.atoms_shape,
                 int(math.ceil(vertex_slice.n_atoms / BITS_PER_WORD)),
                 neuron_param_data, spike_ids, spike_times)
 
@@ -133,9 +110,11 @@ class MultiSpikeRecorder(object):
 
     @staticmethod
     def _process_spike_data(
-            vertex_slice, n_words, raw_data, spike_ids, spike_times):
+            vertex_slice, atoms_shape, n_words, raw_data, spike_ids,
+            spike_times):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param tuple(int) atoms_shape:
         :param int n_words:
         :param bytearray raw_data:
         :param list(~numpy.ndarray) spike_ids:
@@ -144,6 +123,7 @@ class MultiSpikeRecorder(object):
         # pylint: disable=too-many-arguments
         n_bytes_per_block = n_words * BYTES_PER_WORD
         offset = 0
+        neurons = vertex_slice.get_raster_ids(atoms_shape)
         while offset < len(raw_data):
             time, n_blocks = _TWO_WORDS.unpack_from(raw_data, offset)
             offset += _TWO_WORDS.size
@@ -155,8 +135,10 @@ class MultiSpikeRecorder(object):
             spikes = spike_data.view("<i4").byteswap().view("uint8")
             bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                 (-1, 32))).reshape((-1, n_bytes_per_block * 8))
-            indices = numpy.nonzero(bits)[1]
-            times = numpy.repeat([time * machine_time_step_ms()], len(indices))
-            indices = indices + vertex_slice.lo_atom
+            local_indices = numpy.nonzero(bits)[1]
+            indices = neurons[local_indices]
+            times = numpy.repeat(
+                [time * SpynnakerDataView.get_simulation_time_step_ms()],
+                len(indices))
             spike_ids.append(indices)
             spike_times.append(times)

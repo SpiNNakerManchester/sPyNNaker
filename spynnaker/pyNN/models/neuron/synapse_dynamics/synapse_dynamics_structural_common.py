@@ -22,8 +22,7 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
+from spynnaker.pyNN.data import SpynnakerDataView
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -88,7 +87,7 @@ class SynapseDynamicsStructuralCommon(
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
             self, spec, region, weight_scales, app_vertex,
-            vertex_slice, routing_info, synaptic_matrices):
+            vertex_slice, synaptic_matrices):
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
 
@@ -102,13 +101,15 @@ class SynapseDynamicsStructuralCommon(
             len(structural_projections))
 
         # Write the pre-population info
-        pop_index, subpop_index = self.__write_prepopulation_info(
-            spec, app_vertex, structural_projections, routing_info,
-            weight_scales, synaptic_matrices)
+        pop_index, subpop_index, lo_atom_index = \
+            self.__write_prepopulation_info(
+                spec, app_vertex, structural_projections,
+                weight_scales, synaptic_matrices)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
-            spec, pop_index, subpop_index, app_vertex, vertex_slice)
+            spec, pop_index, subpop_index, lo_atom_index, app_vertex,
+            vertex_slice)
 
         # Write the component parameters
         # pylint: disable=no-member, protected-access
@@ -162,20 +163,21 @@ class SynapseDynamicsStructuralCommon(
         :return: None
         :rtype: None
         """
+        time_step_us = SpynnakerDataView.get_simulation_time_step_us()
         spec.comment("Writing common rewiring data")
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION):
+                time_step_us / MICRO_TO_MILLISECOND_CONVERSION):
             # Fast rewiring
             spec.write_value(data=1)
             spec.write_value(data=int(
-                machine_time_step() / (
+                time_step_us / (
                     self.p_rew * MICRO_TO_SECOND_CONVERSION)))
         else:
             # Slow rewiring
             spec.write_value(data=0)
             spec.write_value(data=int((
                 self.p_rew * MICRO_TO_SECOND_CONVERSION) /
-                machine_time_step()))
+                time_step_us))
         # write s_max
         spec.write_value(data=int(self.s_max))
         # write total number of atoms in the application vertex
@@ -199,7 +201,7 @@ class SynapseDynamicsStructuralCommon(
         spec.write_value(data=n_pre_pops)
 
     def __write_prepopulation_info(
-            self, spec, app_vertex, structural_projections, routing_info,
+            self, spec, app_vertex, structural_projections,
             weight_scales, synaptic_matrices):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -213,14 +215,15 @@ class SynapseDynamicsStructuralCommon(
         :type machine_edges_by_app:
             dict(~pacman.model.graphs.application.ApplicationEdge,
             list(~pacman.model.graphs.machine.MachineEdge))
-        :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
         spec.comment("Writing pre-population info")
         pop_index = dict()
+        routing_info = SpynnakerDataView.get_routing_infos()
         subpop_index = dict()
+        lo_atom_index = dict()
         index = 0
         for proj in structural_projections:
             spec.comment("Writing pre-population info for {}".format(
@@ -241,9 +244,7 @@ class SynapseDynamicsStructuralCommon(
             self_connected = app_vertex == app_edge.pre_vertex
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
             # Delay
-            delay_scale = (
-                    MICRO_TO_MILLISECOND_CONVERSION /
-                    machine_time_step())
+            delay_scale = SpynnakerDataView.get_simulation_time_step_per_ms()
             if isinstance(dynamics.initial_delay, Iterable):
                 spec.write_value(int(dynamics.initial_delay[0] * delay_scale),
                                  data_type=DataType.UINT16)
@@ -266,18 +267,21 @@ class SynapseDynamicsStructuralCommon(
                 r_info = routing_info.get_routing_info_from_pre_vertex(
                     m_vertex, SPIKE_PARTITION_ID)
                 vertex_slice = m_vertex.vertex_slice
-                spec.write_value(r_info.first_key)
-                spec.write_value(r_info.first_mask)
+                spec.write_value(r_info.key)
+                spec.write_value(r_info.mask)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
                     app_edge, synapse_info))
+                lo = m_vertex.vertex_slice.lo_atom
                 for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
                     subpop_index[app_edge.pre_vertex, synapse_info, i] = sub
-        return pop_index, subpop_index
+                    lo_atom_index[app_edge.pre_vertex, synapse_info, i] = lo
+        return pop_index, subpop_index, lo_atom_index
 
     def __write_post_to_pre_table(
-            self, spec, pop_index, subpop_index, app_vertex, vertex_slice):
+            self, spec, pop_index, subpop_index, lo_atom_index, app_vertex,
+            vertex_slice):
         """ Post to pre table is basically the transpose of the synaptic\
             matrix.
 
@@ -305,12 +309,12 @@ class SynapseDynamicsStructuralCommon(
              for (_, a_edge, s_info) in slice_conns], conn_lens)
         # Make a single large array of sub-population index
         subpop_indices = numpy.array([
-            subpop_index[a_edge, s_info, c["source"]]
+            subpop_index[a_edge.pre_vertex, s_info, c["source"]]
             for (conns, a_edge, s_info) in slice_conns for c in conns])
         # Get the low atom for each source and subtract
-        lo_atoms = numpy.repeat(
-            [pre_slice.lo_atom
-             for (_, _, _, pre_slice, _) in slice_conns], conn_lens)
+        lo_atoms = numpy.array([
+            lo_atom_index[a_edge.pre_vertex, s_info, c["source"]]
+            for (conns, a_edge, s_info) in slice_conns for c in conns])
         connections["source"] = connections["source"] - lo_atoms
         connections["target"] = connections["target"] - vertex_slice.lo_atom
 
@@ -446,9 +450,10 @@ class SynapseDynamicsStructuralCommon(
     def get_max_rewires_per_ts(self):
         max_rewires_per_ts = 1
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION):
+                SpynnakerDataView.get_simulation_time_step_ms()):
             # fast rewiring, so need to set max_rewires_per_ts
-            max_rewires_per_ts = int(machine_time_step() / (
-                self.p_rew * MICRO_TO_SECOND_CONVERSION))
+            max_rewires_per_ts = int(
+                SpynnakerDataView.get_simulation_time_step_us() / (
+                        self.p_rew * MICRO_TO_SECOND_CONVERSION))
 
         return max_rewires_per_ts

@@ -19,7 +19,8 @@ import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions.network_specification \
     import _FILENAME as network_specification_file_name
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.report_functions.drift_report import (
+    CLOCK_DRIFT_REPORT)
 from spinn_front_end_common.utilities.report_functions.\
     routing_table_from_machine_report import _FOLDER_NAME as \
     routing_tables_from_machine_report
@@ -33,6 +34,7 @@ from spinn_front_end_common.utilities.report_functions.board_chip_report \
 from spinn_front_end_common.utility_models import \
      DataSpeedUpPacketGatherMachineVertex
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_neuron_network_specification_report import (
         _GRAPH_NAME, _GRAPH_FORMAT)
@@ -43,7 +45,7 @@ class CheckDebug(BaseTestCase):
     """
     that it does not crash in debug mode. All reports on.
     """
-    def debug(self, run_zero):
+    def debug(self):
         # pylint: disable=protected-access
         reports = [
             # write_energy_report
@@ -76,8 +78,8 @@ class CheckDebug(BaseTestCase):
             "provenance_data",
             # write_tag_allocation_reports
             reports_names._TAGS_FILENAME,
-            # write_algorithm_timings
-            # "provenance_data/pacman.xml"  = different test
+            # write_drift_report_end or start
+            CLOCK_DRIFT_REPORT,
             # write_board_chip_report
             AREA_CODE_REPORT_NAME,
             _GRAPH_NAME,
@@ -98,13 +100,29 @@ class CheckDebug(BaseTestCase):
             spike_times=[0]), label="input")
         sim.Projection(inp, pop, sim.AllToAllConnector(),
                        synapse_type=sim.StaticSynapse(weight=5))
-        if run_zero:
-            sim.run(0)
-        sim.run(1000)
+        sim.run(0)
         pop.get_data("v")
-        sim.end()
-
-        report_directory = globals_variables.report_default_directory()
-        found = os.listdir(report_directory)
+        found = os.listdir(SpynnakerDataView.get_run_dir_path())
         for report in reports:
             self.assertIn(report, found)
+
+        sim.run(10)
+        pop.get_data("v")
+        # No point in checking files they are already there
+
+        sim.reset()
+        pop.get_data("v")
+        SpynnakerDataView.set_requires_data_generation()
+        sim.run(10)
+        pop.get_data("v")
+        # No point in checking files they are already there
+
+        sim.reset()
+        SpynnakerDataView.set_requires_mapping()
+        sim.run(10)
+        pop.get_data("v")
+        found = os.listdir(SpynnakerDataView.get_run_dir_path())
+        for report in reports:
+            self.assertIn(report, found)
+
+        sim.end()

@@ -37,11 +37,11 @@
 // Mask to work out MOD 4
 #define MOD_4 0x3
 
-//! When bitwise anded with a number will floor to the nearest multiple of 4
-#define FLOOR_TO_4 0xFFFFFFFC
+//! When bitwise anded with a number will floor to the nearest multiple of 2
+#define FLOOR_TO_2 0xFFFFFFFE
 
-//! Add to a number before applying floor to 4 to turn it into a ceil operation
-#define CEIL_TO_4 3
+//! Add to a number before applying floor to 2 to turn it into a ceil operation
+#define CEIL_TO_2 1
 
 // An array of how much to add to align data to 4-bytes
 // indexed by [current offset % 4][size to write % 4].
@@ -102,13 +102,13 @@ typedef struct sdram_variable_recording_data {
     uint32_t rate;
     uint32_t n_recording;
     uint32_t element_size;
-    uint8_t indices[];
+    uint16_t indices[];
 } sdram_variable_recording_data_t;
 
 typedef struct sdram_bitfield_recording_data {
     uint32_t rate;
     uint32_t n_recording;
-    uint8_t indices[];
+    uint16_t indices[];
 } sdram_bitfield_recording_data_t;
 
 typedef struct recording_index {
@@ -119,12 +119,14 @@ typedef struct recording_index {
 typedef struct variable_recording {
     uint32_t rate;
     uint32_t element_size;
+    uint32_t n_recording;
     uint32_t n_index_items;
     recording_index_t index_items[];
 } variable_recording_t;
 
 typedef struct bitfield_recording {
     uint32_t rate;
+    uint32_t n_recording;
     uint32_t n_index_items;
     recording_index_t index_items[];
 } bitfield_recording_t;
@@ -248,14 +250,18 @@ static bool read_struct_builder_region(void **region,
     return true;
 }
 
-static inline uint32_t read_index(uint32_t n_items, recording_index_t *items,
-        uint32_t n_neurons, uint32_t n_neurons_max, uint8_t *sdram_out) {
+static inline void read_index(uint32_t n_items, recording_index_t *items,
+        uint32_t n_neurons, uint32_t n_neurons_max, uint32_t n_neurons_recording,
+		uint16_t *sdram_out) {
     // Go through the data
-    uint8_t indices[n_neurons_max];
+    uint16_t indices[n_neurons_max];
     uint32_t neuron_id = 0;
-    uint32_t next_index = 0;
-    uint32_t n_recording = 0;
+    uint16_t next_index = 0;
     for (uint32_t i = 0; i < n_items; i++) {
+    	if (neuron_id >= n_neurons) {
+    		log_error("The next neuron %u >= the maximum %u", neuron_id, n_neurons);
+    		rt_error(RTE_SWERR);
+    	}
         recording_index_t item = items[i];
         uint32_t n_repeats = item.n_repeats;
         if (n_repeats == REPEAT_PER_NEURON_RECORDED) {
@@ -263,12 +269,16 @@ static inline uint32_t read_index(uint32_t n_items, recording_index_t *items,
         }
         if (item.is_recording) {
             for (uint32_t r = 0; r < n_repeats; r++) {
+            	if (next_index >= n_neurons_recording) {
+            		log_error("The next index %u >= the maximum %u", next_index,
+            				n_neurons_recording);
+            		rt_error(RTE_SWERR);
+            	}
                 indices[neuron_id++] = next_index++;
             }
-            n_recording += n_repeats;
         } else {
             for (uint32_t r = 0; r < n_repeats; r++) {
-                indices[neuron_id++] = n_neurons;
+                indices[neuron_id++] = (uint16_t) n_neurons_recording;
             }
         }
     }
@@ -276,17 +286,23 @@ static inline uint32_t read_index(uint32_t n_items, recording_index_t *items,
     // Copy to SDRAM
     uint32_t *index_words = (uint32_t *) &(indices[0]);
     uint32_t *sdram_out_words = (uint32_t *) sdram_out;
-    for (uint32_t i = 0; i < (n_neurons_max >> 2); i++) {
+    for (uint32_t i = 0; i < (n_neurons_max >> 1); i++) {
         sdram_out_words[i] = index_words[i];
     }
-    return n_recording;
 }
 
-static void write_zero_index(uint32_t n_neurons_max, uint8_t *sdram_out) {
+static void write_zero_index(uint32_t n_neurons_max, uint16_t *sdram_out) {
     uint32_t *sdram_out_words = (uint32_t *) sdram_out;
-    for (uint32_t i = 0; i < (n_neurons_max >> 2); i++) {
+    for (uint32_t i = 0; i < (n_neurons_max >> 1); i++) {
         sdram_out_words[i] = 0;
     }
+}
+
+static inline uint32_t get_n_recording(uint32_t n_recording, uint32_t n_neurons) {
+	if (n_recording == REPEAT_PER_NEURON) {
+		return n_neurons;
+	}
+	return n_recording;
 }
 
 static void read_recorded_variable(void **region, void **recording_region,
@@ -302,15 +318,16 @@ static void read_recorded_variable(void **region, void **recording_region,
 
     // Do the simple things
     uint32_t rate = rec->rate;
+    uint32_t n_recording = get_n_recording(rec->n_recording, n_neurons);
     sdram_out->rate = rate;
     sdram_out->element_size = rec->element_size;
+    sdram_out->n_recording = n_recording;
 
     if (rate == 0) {
-        sdram_out->n_recording = 0;
         write_zero_index(n_neurons_max, &sdram_out->indices[0]);
     } else {
-        sdram_out->n_recording = read_index(n_items, &rec->index_items[0],
-                n_neurons, n_neurons_max, &sdram_out->indices[0]);
+        read_index(n_items, &rec->index_items[0], n_neurons, n_neurons_max,
+        		n_recording, &sdram_out->indices[0]);
     }
 }
 
@@ -327,14 +344,15 @@ static void read_recorded_bitfield(void **region, void **recording_region,
 
     // Do the simple things
     uint32_t rate = rec->rate;
+    uint32_t n_recording = get_n_recording(rec->n_recording, n_neurons);
     sdram_out->rate = rate;
+    sdram_out->n_recording = n_recording;
 
     if (rate == 0) {
-        sdram_out->n_recording = 0;
         write_zero_index(n_neurons_max, &sdram_out->indices[0]);
     } else {
-        sdram_out->n_recording = read_index(n_items, &rec->index_items[0],
-                n_neurons, n_neurons_max, &sdram_out->indices[0]);
+        read_index(n_items, &rec->index_items[0], n_neurons, n_neurons_max,
+        		n_recording, &sdram_out->indices[0]);
     }
 }
 
@@ -396,8 +414,8 @@ static bool run_neuron_expander(data_specification_metadata_t *ds_regions,
     address = &(recording_params[1]);
     void *sdram_address = &(sdram_recording_params[1]);
 
-    // Round up the number of neurons to the next multiple of 4
-    uint32_t n_neurons_max = (n_neurons + CEIL_TO_4) & FLOOR_TO_4;
+    // Round up the number of neurons to the next multiple of 2
+    uint32_t n_neurons_max = (n_neurons + CEIL_TO_2) & FLOOR_TO_2;
 
     // Do variables
     for (uint32_t i = 0; i < n_variables; i++) {

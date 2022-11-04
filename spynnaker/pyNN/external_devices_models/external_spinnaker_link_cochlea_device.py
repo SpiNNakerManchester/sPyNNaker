@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+from spynnaker.pyNN.models.abstract_models import PopulationSpiNNakerLinkVertex
 
 
-class ExternalCochleaDevice(ApplicationSpiNNakerLinkVertex):
+class ExternalCochleaDevice(PopulationSpiNNakerLinkVertex):
     __slots__ = []
 
     def __init__(
@@ -30,5 +30,4 @@ class ExternalCochleaDevice(ApplicationSpiNNakerLinkVertex):
         """
         super().__init__(
             n_atoms=n_neurons, spinnaker_link_id=spinnaker_link,
-            label=label, max_atoms_per_core=n_neurons,
-            board_address=board_address)
+            label=label, board_address=board_address)

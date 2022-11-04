@@ -17,14 +17,14 @@ from unittest import SkipTest
 import numpy
 import pytest
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.recorder import Recorder
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
 
-def mock_spikes(_self):
+def mock_spikes(_self, _variable):
     return numpy.array(
         [[0, 7], [0, 20], [0, 24], [0, 34], [0, 53], [0, 67], [0, 77],
          [1, 8], [1, 20], [1, 53],
@@ -37,8 +37,7 @@ def mock_v_all(_self, _variable):
     for i in range(100):
         for j in indexes:
             data[i][j] = -65 + j + i/100
-    sampling_interval = 1
-    return (data, indexes, sampling_interval)
+    return data
 
 
 def mock_v_one_two(_self, _variable):
@@ -47,12 +46,7 @@ def mock_v_one_two(_self, _variable):
     for i in range(100):
         for j in range(len(indexes)):
             data[i][j] = -65 + indexes[j] + i/100
-    sampling_interval = 1
-    return (data, indexes, sampling_interval)
-
-
-def mock_time():
-    return 100
+    return data
 
 
 def trim_spikes(spikes, indexes):
@@ -63,37 +57,39 @@ class TestGetting(BaseTestCase):
     def setUp(self):
         """ Save the real methods that we mock out """
         # NO unittest_setup() as sim.setup is called
-        self.__get_spikes = Recorder.get_spikes
-        self.__get_recorded_matrix = Recorder.get_recorded_matrix
+        self.__get_data = Recorder.get_data
 
     def tearDown(self):
         """ Restore the real methods that we may have mocked out """
-        Recorder.get_spikes = self.__get_spikes
-        Recorder.get_recorded_matrix = self.__get_recorded_matrix
+        Recorder.get_data = self.__get_data
 
     def test_simple_spikes(self):
+        view = SpynnakerDataView()
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        Recorder.get_spikes = mock_spikes
-        Recorder.get_recorded_matrix = mock_v_all
-        get_simulator().get_current_time = mock_time
+        Recorder.get_data = mock_spikes
+        # Hack method not supported
+        view._FecDataView__fec_data._first_machine_time_step = \
+            view._FecDataView__fec_data._current_run_timesteps
+        view._FecDataView__fec_data._current_run_timesteps += 100
 
-        neo = pop.getSpikes()
+        neo = pop.get_data("spikes")
         spikes = neo_convertor.convert_spikes(neo)
-        assert numpy.array_equal(spikes,  mock_spikes(None))
+        assert numpy.array_equal(spikes,  mock_spikes(None, None))
         spiketrains = neo.segments[0].spiketrains
         assert 4 == len(spiketrains)
 
         #  gather False has not effect testing that here
         neo = pop.get_data("spikes", gather=False)
         spikes = neo_convertor.convert_spikes(neo)
-        assert numpy.array_equal(spikes,  mock_spikes(None))
+        assert numpy.array_equal(spikes,  mock_spikes(None, None))
         spiketrains = neo.segments[0].spiketrains
         assert 4 == len(spiketrains)
 
+        Recorder.get_data = mock_v_all
         neo = pop.get_v()
         v = neo.segments[0].filter(name='v')[0].magnitude
-        (target, _, _) = mock_v_all(None, "any")
+        target = mock_v_all(None, "any")
         assert numpy.array_equal(v,  target)
 
         neo = pop.get_gsyn()
@@ -109,12 +105,16 @@ class TestGetting(BaseTestCase):
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
         pop.record("spikes")
 
-        Recorder.get_spikes = mock_spikes
-        get_simulator().get_current_time = mock_time
+        Recorder.get_data = mock_spikes
+        view = SpynnakerDataView()
+        # Hack method not supported
+        view._FecDataView__fec_data._first_machine_time_step = \
+            view._FecDataView__fec_data._current_run_timesteps
+        view._FecDataView__fec_data._current_run_timesteps += 100
 
-        neo = pop.get_data_by_indexes("spikes", [1, 2])
+        neo = pop[1, 2].get_data("spikes")
         spikes = neo_convertor.convert_spikes(neo)
-        target = trim_spikes(mock_spikes(None), [1, 2])
+        target = trim_spikes(mock_spikes(None, None), [1, 2])
         assert numpy.array_equal(spikes, target)
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
@@ -124,14 +124,18 @@ class TestGetting(BaseTestCase):
     def test_get_spikes_by_view(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        Recorder.get_spikes = mock_spikes
-        get_simulator().get_current_time = mock_time
+        Recorder.get_data = mock_spikes
+        view = SpynnakerDataView()
+        # Hack method not supported
+        view._FecDataView__fec_data._first_machine_time_step = \
+            view._FecDataView__fec_data._current_run_timesteps
+        view._FecDataView__fec_data._current_run_timesteps += 100
 
         view = pop[1:3]
         view.record("spikes")
         neo = view.get_data("spikes", gather=False)
         spikes = neo_convertor.convert_spikes(neo)
-        target = trim_spikes(mock_spikes(None), [1, 2])
+        target = trim_spikes(mock_spikes(None, None), [1, 2])
         assert numpy.array_equal(spikes, target)
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
@@ -141,14 +145,17 @@ class TestGetting(BaseTestCase):
     def test_get_spikes_view_missing(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        Recorder.get_spikes = mock_spikes
-        Recorder.get_recorded_matrix = mock_v_all
-        get_simulator().get_current_time = mock_time
+        Recorder.get_data = mock_spikes
+        view = SpynnakerDataView()
+        # Hack method not supported
+        view._FecDataView__fec_data._first_machine_time_step = \
+            view._FecDataView__fec_data._current_run_timesteps
+        view._FecDataView__fec_data._current_run_timesteps += 100
 
         view = pop[2:4]
         neo = view.get_data("spikes")
         spikes = neo_convertor.convert_spikes(neo)
-        target = trim_spikes(mock_spikes(None), [2])
+        target = trim_spikes(mock_spikes(None, None), [2])
         assert numpy.array_equal(spikes, target)
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
@@ -163,14 +170,17 @@ class TestGetting(BaseTestCase):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
         pop.record("spikes")
-        Recorder.get_spikes = mock_spikes
-        Recorder.get_recorded_matrix = mock_v_all
-        get_simulator().get_current_time = mock_time
+        Recorder.get_data = mock_v_all
+        view = SpynnakerDataView()
+        # Hack method not supported
+        view._FecDataView__fec_data._first_machine_time_step = \
+            view._FecDataView__fec_data._current_run_timesteps
+        view._FecDataView__fec_data._current_run_timesteps += 100
 
         view = pop[1:3]
         neo = view.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
-        (target, _, _) = mock_v_one_two(None, "v")
+        target = mock_v_one_two(None, "v")
         assert v.shape == target.shape
         assert numpy.array_equal(v,  target)
 
@@ -179,13 +189,18 @@ class TestGetting(BaseTestCase):
     def test_get_v_missing(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        Recorder.get_recorded_matrix = mock_v_one_two
-        get_simulator().get_current_time = mock_time
+        pop[1:3].record("v")
+        Recorder.get_data = mock_v_one_two
+        data_view = SpynnakerDataView()
+        # Hack method not supported
+        data_view._FecDataView__fec_data._first_machine_time_step = \
+            data_view._FecDataView__fec_data._current_run_timesteps
+        data_view._FecDataView__fec_data._current_run_timesteps += 100
 
         view = pop[0:3]
         neo = view.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
-        (target, _, _) = mock_v_one_two(None, "v")
+        target = mock_v_one_two(None, "v")
         assert numpy.array_equal(
             [1, 2], neo.segments[0].filter(name='v')[0].channel_index.index)
         assert v.shape == target.shape
@@ -197,8 +212,12 @@ class TestGetting(BaseTestCase):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
         pop.record("spikes")
-        Recorder.get_spikes = mock_spikes
-        get_simulator().get_current_time = mock_time
+        Recorder.get_data = mock_spikes
+        view = SpynnakerDataView()
+        # Hack method not supported
+        view._FecDataView__fec_data._first_machine_time_step = \
+            view._FecDataView__fec_data._current_run_timesteps
+        view._FecDataView__fec_data._current_run_timesteps += 100
 
         assert {0: 7, 1: 3, 2: 2, 3: 0} == pop.get_spike_counts()
 
@@ -213,9 +232,13 @@ class TestGetting(BaseTestCase):
     def test_write(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        Recorder.get_spikes = mock_spikes
-        Recorder.get_recorded_matrix = mock_v_all
-        get_simulator().get_current_time = mock_time
+        pop.record(["spikes", "v"])
+        Recorder.get_data = mock_spikes
+        view = SpynnakerDataView()
+        # Hack method not supported
+        view._FecDataView__fec_data._first_machine_time_step = \
+            view._FecDataView__fec_data._current_run_timesteps
+        view._FecDataView__fec_data._current_run_timesteps += 100
 
         # Note gather=False will be ignored just testing it can be
         pop.write_data("spikes.pkl", "spikes", gather=False)
@@ -240,6 +263,7 @@ class TestGetting(BaseTestCase):
                 "https://github.com/NeuralEnsemble/python-neo/issues/529"
                 ) from e
 
+        Recorder.get_data = mock_v_all
         (target, _, _) = mock_v_all(None, "any")
 
         pop.print_v("v.pkl")
@@ -262,9 +286,13 @@ class TestGetting(BaseTestCase):
     def test_spinnaker_get_data(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        Recorder.get_spikes = mock_spikes
-        Recorder.get_recorded_matrix = mock_v_all
-        get_simulator().get_current_time = mock_time
+        pop.record("v")
+        Recorder.get_data = mock_v_all
+        view = SpynnakerDataView()
+        # Hack method not supported
+        view._FecDataView__fec_data._first_machine_time_step = \
+            view._FecDataView__fec_data._current_run_timesteps
+        view._FecDataView__fec_data._current_run_timesteps += 100
 
         v = pop.spinnaker_get_data("v")
         assert 400 == len(v)

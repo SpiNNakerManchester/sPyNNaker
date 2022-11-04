@@ -46,12 +46,14 @@
 //!            start of the current sources data region in SDRAM
 //! \param[in] recording_address: the recording parameters in SDRAM
 //!            (contains which regions are active and how big they are)
+//! \param[in] initial_values_address: The address where initial values can be
+//!            written to for later reading.
 //! \param[out] n_rec_regions_used: The number of regions used by neuron recording
 //! \return True if the translation was successful, otherwise False
 bool neuron_initialise(
         void *core_params_address, void *neuron_params_address,
         void *current_sources_address, void *recording_address,
-        uint32_t *n_rec_regions_used);
+        void *initial_values_address, uint32_t *n_rec_regions_used);
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.
@@ -60,8 +62,9 @@ bool neuron_initialise(
 void neuron_do_timestep_update(timer_t time, uint timer_count);
 
 //! \brief Prepare to resume simulation of the neurons
+//! \param[in] time: The time of the resume
 //! \return bool which is true if the resume was successful or not
-bool neuron_resume(void);
+bool neuron_resume(uint32_t time);
 
 //! \brief Perform steps needed before pausing a simulation.
 //! \details Stores neuron parameters back into SDRAM.

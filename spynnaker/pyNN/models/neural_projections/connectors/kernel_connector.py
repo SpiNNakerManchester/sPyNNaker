@@ -21,6 +21,9 @@ from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
@@ -35,7 +38,8 @@ def shape2word(sw, sh):
             (numpy.uint32(sw) & 0xFFFF))
 
 
-class KernelConnector(AbstractGenerateConnectorOnMachine):
+class KernelConnector(AbstractGenerateConnectorOnMachine,
+                      AbstractGenerateConnectorOnHost):
     """
     Where the pre- and post-synaptic populations are considered as a 2D\
     array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
@@ -309,13 +313,13 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
+        # Use the kernel delays if user has supplied them
+        if self._krn_delays is not None:
+            return numpy.max(self._krn_delays)
+
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel delays if user has supplied them
-        if self._krn_delays is not None:
-            return self._get_delay_maximum(
-                self._krn_delays, n_conns, synapse_info)
 
         # if not then use the values that came in
         return self._get_delay_maximum(
@@ -323,17 +327,25 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
+        # Use the kernel delays if user has supplied them
+        if self._krn_delays is not None:
+            return numpy.min(self._krn_delays)
+
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel delays if user has supplied them
-        if self._krn_delays is not None:
-            return self._get_delay_minimum(
-                self._krn_delays, n_conns, synapse_info)
 
         # if not then use the values that came in
         return self._get_delay_minimum(
             synapse_info.delays, n_conns, synapse_info)
+
+    @overrides(AbstractConnector.get_delay_variance)
+    def get_delay_variance(self, delays, synapse_info):
+        if self._krn_delays is not None:
+            return numpy.var(self._krn_delays)
+
+        return super(KernelConnector, self).get_delay_variance(
+            delays, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -349,22 +361,41 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self._krn_weights is not None:
+            return numpy.max(self._krn_weights)
+
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel weights if user has supplied them
-        if self._krn_weights is not None:
-            return self._get_weight_maximum(
-                self._krn_weights, n_conns, synapse_info)
-
         return self._get_weight_maximum(
             synapse_info.weights, n_conns, synapse_info)
+
+    @overrides(AbstractConnector.get_weight_mean)
+    def get_weight_mean(self, weights, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self._krn_weights is not None:
+            return numpy.mean(self._krn_weights)
+
+        # I think this is overestimated, but not by much
+        return super(KernelConnector, self).get_weight_mean(
+            weights, synapse_info)
+
+    @overrides(AbstractConnector.get_weight_variance)
+    def get_weight_variance(self, weights, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self._krn_weights is not None:
+            return numpy.var(self._krn_weights)
+
+        # I think this is overestimated, but not by much
+        return super(KernelConnector, self).get_weight_variance(
+            weights, synapse_info)
 
     def __repr__(self):
         return "KernelConnector(shape_kernel[{},{}])".format(
             self._kernel_w, self._kernel_h)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         (n_connections, all_post, all_pre_in_range, all_pre_in_range_delays,
@@ -408,10 +439,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         extra_data = []
         if self._krn_weights is not None:
             extra_data.append(DataType.S1615.encode_as_numpy_int_array(
-                self._krn_weights))
+                self._krn_weights.flatten()))
         if self._krn_delays is not None:
             extra_data.append(DataType.S1615.encode_as_numpy_int_array(
-                self._krn_delays))
+                self._krn_delays.flatten()))
 
         if extra_data:
             return numpy.concatenate((data, *extra_data))
@@ -422,3 +453,42 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return N_KERNEL_PARAMS * BYTES_PER_WORD
+
+    @overrides(AbstractGenerateConnectorOnMachine.get_connected_vertices)
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        src_splitter = source_vertex.splitter
+        return [
+            (t_vert,
+             [s_vert for s_vert in src_splitter.get_out_going_vertices(
+                 SPIKE_PARTITION_ID) if self.__connects(s_vert, t_vert)])
+            for t_vert in target_vertex.splitter.get_in_coming_vertices(
+                SPIKE_PARTITION_ID)]
+
+    def __connects(self, src_machine_vertex, dest_machine_vertex):
+        # If the pre- and post-slices are not 2-dimensional slices, we have
+        # to let them pass
+        pre_slice = src_machine_vertex.vertex_slice
+        post_slice = dest_machine_vertex.vertex_slice
+        if (pre_slice.shape is None or len(pre_slice.shape) != 2 or
+                post_slice.shape is None or len(post_slice.shape) != 2):
+            return True
+
+        pre_slice_x = pre_slice.get_slice(0)
+        pre_slice_y = pre_slice.get_slice(1)
+        post_slice_x = post_slice.get_slice(0)
+        post_slice_y = post_slice.get_slice(1)
+
+        min_pre_x = post_slice_x.start - self._hlf_k_w
+        max_pre_x = (post_slice_x.stop + self._hlf_k_w) - 1
+        min_pre_y = post_slice_y.start - self._hlf_k_h
+        max_pre_y = (post_slice_y.stop + self._hlf_k_h) - 1
+
+        # No part of the pre square overlaps the post-square, don't connect
+        if (pre_slice_x.stop <= min_pre_x or
+                pre_slice_x.start > max_pre_x or
+                pre_slice_y.stop <= min_pre_y or
+                pre_slice_y.start > max_pre_y):
+            return False
+
+        # Otherwise, they do
+        return True

@@ -26,14 +26,14 @@ from spinn_utilities.config_holder import load_config
 from spinnman.model import CPUInfo
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
-from pacman.executor.injection_decorator import injection_context
 from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
-from spinn_front_end_common.utilities import globals_variables
-from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
+from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices,\
+    SynapseRegions
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic,
@@ -56,10 +56,11 @@ from spynnaker.pyNN.extra_algorithms import delay_support_adder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.config_setup import unittest_setup
+from spynnaker.pyNN.utilities import constants
 import pyNN.spiNNaker as p
 
 
-class MockTransceiverRawData(object):
+class MockTransceiverRawData(Transceiver):
     def __init__(self, data_to_read):
         self._data_to_read = data_to_read
 
@@ -84,6 +85,7 @@ def say_false(self, weights, delays):
 
 def test_write_data_spec():
     unittest_setup()
+    writer = SpynnakerDataWriter.mock()
     SDRAM()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
@@ -114,15 +116,17 @@ def test_write_data_spec():
         pre_pop, post_pop, p.FromListConnector(from_list_list),
         p.StaticSynapse())
 
-    app_graph = globals_variables.get_simulator().original_application_graph
-    context = {
-        "ApplicationGraph": app_graph
-    }
-    with (injection_context(context)):
-        delay_support_adder(app_graph)
-        spynnaker_splitter_partitioner(app_graph, 100)
-        allocator = ZonedRoutingInfoAllocator()
-        routing_info = allocator.__call__(app_graph, [], flexible=False)
+    writer.start_run()
+    writer.set_plan_n_timesteps(100)
+    d_vertices, d_edges = delay_support_adder()
+    for vertex in d_vertices:
+        writer.add_vertex(vertex)
+    for edge in d_edges:
+        writer.add_edge(
+            edge, constants.SPIKE_PARTITION_ID)
+    spynnaker_splitter_partitioner()
+    allocator = ZonedRoutingInfoAllocator()
+    writer.set_routing_infos(allocator.__call__([], flexible=False))
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -131,13 +135,19 @@ def test_write_data_spec():
     temp_spec = tempfile.mktemp()
     spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
 
+    regions = SynapseRegions(
+        synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
+        bitfield_filter=8,
+        synaptic_matrix=1, pop_table=3, connection_builder=4)
+    references = SynapseRegions(
+        synapse_params=None, synapse_dynamics=None, structural_dynamics=None,
+        bitfield_filter=None, synaptic_matrix=None, pop_table=None,
+        connection_builder=None)
     synaptic_matrices = SynapticMatrices(
-        post_vertex, n_synapse_types=2, synaptic_matrix_region=1,
-        direct_matrix_region=2, poptable_region=3,
-        connection_builder_region=4, max_atoms_per_core=10,
+        post_pop._vertex, regions, max_atoms_per_core=10,
         weight_scales=[32, 32], all_syn_block_sz=10000)
-    synaptic_matrices.generate_data(routing_info)
-    synaptic_matrices.write_synaptic_data(spec, post_vertex_slice)
+    synaptic_matrices.generate_data()
+    synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
     spec.end_specification()
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
@@ -151,15 +161,17 @@ def test_write_data_spec():
         region = executor.get_region(r)
         if region is not None:
             all_data.extend(region.region_data)
-    transceiver = MockTransceiverRawData(all_data)
+        if r == regions.synaptic_matrix:
+            assert len(region.region_data) > 0
+
+    writer.set_transceiver(MockTransceiverRawData(all_data))
     report_folder = mkdtemp()
     try:
         connections_1 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_one_to_one_1._projection_edge,
-                proj_one_to_one_1._synapse_information,
-                post_vertex_slice))
+                proj_one_to_one_1._synapse_information))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_1) == post_vertex_slice.n_atoms
@@ -168,10 +180,9 @@ def test_write_data_spec():
 
         connections_2 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_one_to_one_2._projection_edge,
-                proj_one_to_one_2._synapse_information,
-                post_vertex_slice))
+                proj_one_to_one_2._synapse_information))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_2) == post_vertex_slice.n_atoms
@@ -180,22 +191,20 @@ def test_write_data_spec():
 
         connections_3 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_all_to_all._projection_edge,
-                proj_all_to_all._synapse_information,
-                post_vertex_slice))
+                proj_all_to_all._synapse_information))
 
         # Check that all the connections have the right weight and delay
-        assert len(connections_3) == 100
+        assert len(connections_3) == 90
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
 
         connections_4 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_from_list._projection_edge,
-                proj_from_list._synapse_information,
-                post_vertex_slice))
+                proj_from_list._synapse_information))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_4) == len(from_list_list)
@@ -212,9 +221,10 @@ def test_set_synapse_dynamics():
     p.setup(1.0)
     post_app_model = IFCurrExpBase()
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
+        seed=None)
 
     static = SynapseDynamicsStatic()
     stdp = SynapseDynamicsSTDP(
@@ -322,9 +332,10 @@ def test_set_synapse_dynamics():
 
     # Try starting again to get a couple more combinations
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
+        seed=None)
 
     # STDP followed by structural STDP should result in Structural STDP
     post_app_vertex.synapse_dynamics = stdp
@@ -344,9 +355,10 @@ def test_set_synapse_dynamics():
 
     # One more time!
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
+        seed=None)
 
     # Static followed by static structural should result in static
     # structural
@@ -381,43 +393,43 @@ def test_set_synapse_dynamics():
 
     # OK, just one more, honest
     post_app_vertex = post_app_model.create_vertex(
-        n_neurons=10, label="post", constraints=None, spikes_per_second=None,
+        n_neurons=10, label="post", spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
+        seed=None)
     post_app_vertex.synapse_dynamics = static_struct
     post_app_vertex.synapse_dynamics = stdp_struct
 
 
 @pytest.mark.parametrize(
     "undelayed_indices_connected,delayed_indices_connected,n_pre_neurons,"
-    "neurons_per_core,expect_app_keys,max_delay", [
+    "neurons_per_core,max_delay", [
         # Only undelayed, all edges exist
-        (range(10), [], 1000, 100, True, None),
+        (range(10), [], 1000, 100, None),
         # Only delayed, all edges exist
-        ([], range(10), 1000, 100, True, 20),
+        ([], range(10), 1000, 100, 20),
         # All undelayed and delayed edges exist
-        (range(10), range(10), 1000, 100, True, 20),
+        (range(10), range(10), 1000, 100, 20),
         # Only undelayed, some connections missing but app keys can still work
-        ([0, 1, 2, 3, 4], [], 1000, 100, True, None),
+        ([0, 1, 2, 3, 4], [], 1000, 100, None),
         # Only delayed, some connections missing but app keys can still work
-        ([], [5, 6, 7, 8, 9], 1000, 100, True, 20),
+        ([], [5, 6, 7, 8, 9], 1000, 100, 20),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
-        ([3, 4, 5, 6, 7], range(10), 1000, 100, True, 20),
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, 20),
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
-        (range(10), [4, 5, 6, 7], 1000, 100, True, 20),
-        # Should work but number of neurons don't work out
-        (range(5), [], 10000, 2048, False, None),
+        (range(10), [4, 5, 6, 7], 1000, 100, 20),
         # Should work but number of cores doesn't work out
-        (range(2000), [], 10000, 5, False, None),
+        (range(2000), [], 10000, 5, None),
         # Should work but number of neurons with delays don't work out
-        ([], range(4), 1024, 256, False, 144)
+        ([], range(4), 1024, 256, 144)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
-        n_pre_neurons, neurons_per_core, expect_app_keys, max_delay):
+        n_pre_neurons, neurons_per_core, max_delay):
     unittest_setup()
+    writer = SpynnakerDataWriter.mock()
     SDRAM()
 
     # Build a from list connector with the delays we want
@@ -437,7 +449,7 @@ def test_pop_based_master_pop_table_standard(
         100, p.IF_curr_exp(), label="Post",
         additional_parameters={
             "splitter": SplitterAbstractPopulationVertexFixed()})
-    p.IF_curr_exp.set_model_max_atoms_per_core(neurons_per_core)
+    p.IF_curr_exp.set_model_max_atoms_per_dimension_per_core(neurons_per_core)
     pre_pop = p.Population(
         n_pre_neurons, p.IF_curr_exp(), label="Pre",
         additional_parameters={
@@ -445,15 +457,17 @@ def test_pop_based_master_pop_table_standard(
     p.Projection(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
-    app_graph = globals_variables.get_simulator().original_application_graph
-    context = {
-        "ApplicationGraph": app_graph
-    }
-    with (injection_context(context)):
-        delay_support_adder(app_graph)
-        spynnaker_splitter_partitioner(app_graph, 100)
-        allocator = ZonedRoutingInfoAllocator()
-        routing_info = allocator.__call__(app_graph, [], flexible=False)
+    writer.start_run()
+    writer.set_plan_n_timesteps(100)
+    d_vertices, d_edges = delay_support_adder()
+    for vertex in d_vertices:
+        writer.add_vertex(vertex)
+    for edge in d_edges:
+        writer.add_edge(
+            edge, constants.SPIKE_PARTITION_ID)
+    spynnaker_splitter_partitioner()
+    allocator = ZonedRoutingInfoAllocator()
+    writer.set_routing_infos(allocator.__call__([], flexible=False))
 
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice
@@ -462,13 +476,19 @@ def test_pop_based_master_pop_table_standard(
     temp_spec = tempfile.mktemp()
     spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
 
+    regions = SynapseRegions(
+        synapse_params=5, synapse_dynamics=6, structural_dynamics=7,
+        bitfield_filter=8,
+        synaptic_matrix=1, pop_table=3, connection_builder=4)
+    references = SynapseRegions(
+        synapse_params=None, synapse_dynamics=None, structural_dynamics=None,
+        bitfield_filter=None,
+        synaptic_matrix=None, pop_table=None, connection_builder=None)
     synaptic_matrices = SynapticMatrices(
-        post_pop._vertex, n_synapse_types=2, synaptic_matrix_region=1,
-        direct_matrix_region=2, poptable_region=3,
-        connection_builder_region=4, max_atoms_per_core=neurons_per_core,
+        post_pop._vertex, regions, max_atoms_per_core=neurons_per_core,
         weight_scales=[32, 32], all_syn_block_sz=10000000)
-    synaptic_matrices.generate_data(routing_info)
-    synaptic_matrices.write_synaptic_data(spec, post_vertex_slice)
+    synaptic_matrices.generate_data()
+    synaptic_matrices.write_synaptic_data(spec, post_vertex_slice, references)
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(
@@ -482,34 +502,10 @@ def test_pop_based_master_pop_table_standard(
     n_entries = mpop_data[0]
     n_addresses = mpop_data[1]
 
-    # Compute how many entries and addresses there should be
-    expected_n_entries = 0
-    expected_n_addresses = 0
-    if expect_app_keys:
-        # Always one for undelayed, maybe one for delayed if present
-        n_app_entries = 1 + int(bool(delayed_indices_connected))
-        expected_n_entries += n_app_entries
-        # 2 address list entries for each entry, as there is also extra_info
-        expected_n_addresses += 2 * n_app_entries
+    # Always one for undelayed, maybe one for delayed if present
+    n_app_entries = 1 + int(bool(delayed_indices_connected))
+    expected_n_entries = n_app_entries
+    expected_n_addresses = n_app_entries
 
-    # If both delayed and undelayed, there is an entry for each incoming
-    # machine edge
-    elif delayed_indices_connected and undelayed_indices_connected:
-        all_connected = set(undelayed_indices_connected)
-        all_connected.update(delayed_indices_connected)
-        expected_n_entries += len(all_connected)
-        expected_n_addresses += len(all_connected)
-
-    # If there are only undelayed indices, there is an entry for each
-    elif undelayed_indices_connected:
-        expected_n_entries += len(undelayed_indices_connected)
-        expected_n_addresses += len(undelayed_indices_connected)
-
-    # If there are only delayed indices, there are two entries for each because
-    # the undelayed ones are still connected
-    else:
-        expected_n_entries += 2 * len(delayed_indices_connected)
-        expected_n_addresses += 2 * len(delayed_indices_connected)
-
-    assert(n_entries == expected_n_entries)
-    assert(n_addresses == expected_n_addresses)
+    assert n_entries == expected_n_entries
+    assert n_addresses == expected_n_addresses

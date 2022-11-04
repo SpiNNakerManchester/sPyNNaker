@@ -17,4 +17,4 @@ from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_extension_vertex import DelayExtensionVertex
 
 __all__ = ["DelayExtensionMachineVertex",
-           "DelayExtensionVertex", "DELAY_EXPANDER_APLX"]
+           "DelayExtensionVertex"]

@@ -29,11 +29,8 @@ class KeySpaceTracker(ElementAllocatorAlgorithm):
 
         :param PartitionRoutingInfo r_info: The routing information to add
         """
-        for key_and_mask in r_info.keys_and_masks:
-            key = key_and_mask.key
-            mask = key_and_mask.mask
-            n_keys = 2 ** self.count_trailing_0s(mask)
-            self._allocate_elements(key, n_keys)
+        n_keys = 2 ** self.count_trailing_0s(r_info.mask)
+        self._allocate_elements(r_info.key, n_keys)
 
     def is_allocated(self, key, n_keys):
         """ Determine if any of the keys in the mask are allocated

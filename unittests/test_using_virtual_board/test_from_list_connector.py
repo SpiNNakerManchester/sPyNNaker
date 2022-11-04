@@ -50,7 +50,7 @@ class TestFromListConnector(BaseTestCase):
             as_index += 1
         while as_index < len(aslist):
             from_as = aslist[as_index]
-            assert(from_as[0] >= sources or from_as[1] >= destinations)
+            assert from_as[0] >= sources or from_as[1] >= destinations
             as_index += 1
 
     def check_other_connect(

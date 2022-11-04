@@ -23,7 +23,7 @@
  */
 
 #include <common/maths-util.h>
-
+#include <common/send_mc.h>
 #include <data_specification.h>
 #include <recording.h>
 #include <debug.h>
@@ -33,7 +33,6 @@
 #include <bit_field.h>
 #include <stdfix-full-iso.h>
 #include <limits.h>
-#include <tdma_processing.h>
 #include <circular_buffer.h>
 
 #include "profile_tags.h"
@@ -87,7 +86,6 @@ typedef enum region {
     SPIKE_HISTORY_REGION, //!< spike history recording region
     PROVENANCE_REGION,    //!< provenance region
     PROFILER_REGION,      //!< profiling region
-    TDMA_REGION,          //!< tdma processing region
     SDRAM_PARAMS_REGION,  //!< SDRAM transfer parameters region
     EXPANDER_REGION       //!< Expanding of parameters
 } region;
@@ -123,8 +121,6 @@ typedef struct {
 typedef struct global_parameters {
     //! True if there is a key to transmit, False otherwise
     uint32_t has_key;
-    //! The base key to send with (neuron ID to be added to it), or 0 if no key
-    uint32_t key;
     //! The mask to work out the neuron ID when setting the rate
     uint32_t set_rate_neuron_id_mask;
     //! The time between ticks in seconds for setting the rate
@@ -157,6 +153,9 @@ typedef struct source_details {
     unsigned long accum start;
     unsigned long accum duration;
 } source_details;
+
+//! The keys to send spikes with
+static uint32_t *keys;
 
 //! Collection of rates to apply over time to a particular spike source
 typedef struct source_info {
@@ -401,7 +400,7 @@ static void store_provenance_data(address_t provenance_region) {
     struct poisson_extension_provenance *prov = (void *) provenance_region;
 
     // store the data into the provenance data region
-    prov->times_tdma_fell_behind = tdma_processing_times_behind();
+    prov->times_tdma_fell_behind = 0;
     log_debug("finished other provenance data");
 }
 
@@ -414,13 +413,13 @@ static inline void set_spike_source_details(uint32_t id, bool rate_changed) {
     log_debug("Source %u is at index %u", id, index);
     source_details details = source_data[id]->details[index];
     if (rate_changed) {
-        log_debug("Setting rate of %u to %k", id, (s1615) details.rate);
+        log_debug("Setting rate of %u to %k at %u", id, (s1615) details.rate, time);
         set_spike_source_rate(id, details.rate);
     }
     spike_source_t *p = &(source[id]);
     p->start_ticks = ms_to_ticks(details.start);
     log_debug("Start of %u is %u", id, p->start_ticks);
-    if (details.duration == 0) {
+    if (details.duration == END_OF_TIME) {
         log_debug("Duration of %u is forever", id);
         p->end_ticks = END_OF_TIME;
     } else {
@@ -487,8 +486,16 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
     ssp_params = *sdram_globals;
     ts_per_second = ukbits(1000 * bitsuk(ssp_params.ticks_per_ms));
 
-    log_info("\tkey = %08x, set rate mask = %08x",
-            ssp_params.key, ssp_params.set_rate_neuron_id_mask);
+    uint32_t keys_size = sizeof(uint32_t) * ssp_params.n_spike_sources;
+    keys = spin1_malloc(keys_size);
+    if (keys == NULL) {
+        log_error("Couldn't allocate space %u for %u keys",
+                keys_size, ssp_params.n_spike_sources);
+    }
+    spin1_memcpy(keys, &(sdram_globals[1]), keys_size);
+
+    log_info("\tset rate mask = %08x",
+            ssp_params.set_rate_neuron_id_mask);
     log_info("\tseed = %u %u %u %u", ssp_params.spike_source_seed.c,
             ssp_params.spike_source_seed.x,
             ssp_params.spike_source_seed.y,
@@ -503,6 +510,11 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
             ssp_params.slow_rate_per_tick_cutoff);
     log_info("fast_rate_per_tick_cutoff = %k\n",
             ssp_params.fast_rate_per_tick_cutoff);
+#if LOG_LEVEL >= LOG_DEBUG
+    for (uint32_t i = 0; i < ssp_params.n_spike_sources; i++) {
+        log_debug("Key %u: 0x%08x", i, keys[i]);
+    }
+#endif
 
     log_info("read_global_parameters: completed successfully");
     return true;
@@ -519,8 +531,10 @@ static inline void read_next_rates(uint32_t id) {
 
 //! \brief Read the rates of the Poisson.
 //! \param[in] sdram_sources: the configuration in SDRAM
+//! \param[in] rate_changed: whether any rates have actually changed
+//! \param[in] next_time: the time which will be the next timestep to run
 //! \return Whether the rates were read successfully.
-static bool read_rates(source_info *sdram_sources, bool rate_changed) {
+static bool read_rates(source_info *sdram_sources, bool rate_changed, uint32_t next_time) {
     // Allocate DTCM for array of spike sources and copy block of data
     if (ssp_params.n_spike_sources > 0) {
         // the first time around, the array is set to NULL, afterwards,
@@ -556,11 +570,12 @@ static bool read_rates(source_info *sdram_sources, bool rate_changed) {
             uint32_t index = 0;
             uint32_t n_rates = source_data[i]->n_rates;
             while ((index + 1) < n_rates
-                    && time >= ms_to_ticks(source_data[i]->details[index + 1].start)) {
+                    && next_time >= ms_to_ticks(source_data[i]->details[index + 1].start)) {
                 index++;
             }
+            bool new_index = source_data[i]->index != index;
             source_data[i]->index = index;
-            set_spike_source_details(i, rate_changed);
+            set_spike_source_details(i, rate_changed || new_index);
         }
     }
     log_info("read_poisson_parameters: completed successfully");
@@ -568,6 +583,10 @@ static bool read_rates(source_info *sdram_sources, bool rate_changed) {
 }
 
 static bool expand_rates(source_expand_region *items, source_info *sdram_sources) {
+
+	if (!items->rate_changed) {
+		return false;
+	}
 
     // We need a pointer here as each item is dynamically sized.  This pointer
     // will be updated each time with the start of the next item to be read
@@ -605,7 +624,8 @@ static bool expand_rates(source_expand_region *items, source_info *sdram_sources
         item = (source_expand_details *) &(item->info.details[n_rates]);
     }
 
-    return items->rate_changed;
+    items->rate_changed = false;
+    return true;
 }
 
 //! \brief Initialise the recording parts of the model.
@@ -692,13 +712,7 @@ static bool initialize(void) {
     bool rates_changed = expand_rates(
             data_specification_get_region(EXPANDER_REGION, ds_regions),
             rates_region);
-    if (!read_rates(rates_region, rates_changed)) {
-        return false;
-    }
-
-    // set up tdma processing
-    void *data_addr = data_specification_get_region(TDMA_REGION, ds_regions);
-    if (!tdma_processing_initialise(&data_addr)) {
+    if (!read_rates(rates_region, rates_changed, 0)) {
         return false;
     }
 
@@ -766,12 +780,24 @@ static void resume_callback(void) {
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
 
+    // If we are resetting, re-read the seed
+    bool rates_changed = false;
+    if (time == UINT32_MAX) {
+    	if (!read_global_parameters(data_specification_get_region(
+    			POISSON_PARAMS, ds_regions))) {
+    		log_error("failed to reread the Poisson params");
+    		rt_error(RTE_SWERR);
+    	}
+    	rates_changed = true;
+    }
+
     void *rates_region = data_specification_get_region(RATES, ds_regions);
-    bool rates_changed = expand_rates(
+    bool expand_rates_changed = expand_rates(
             data_specification_get_region(EXPANDER_REGION, ds_regions),
             rates_region);
+    rates_changed = rates_changed || expand_rates_changed;
 
-    if (!read_rates(rates_region, rates_changed)) {
+    if (!read_rates(rates_region, rates_changed, time + 1)) {
         log_error("failed to reread the Poisson rates from SDRAM");
         rt_error(RTE_SWERR);
     }
@@ -814,9 +840,7 @@ static inline void record_spikes(uint32_t time) {
 //! \brief Handle a fast spike source
 //! \param s_id: Source ID
 //! \param source: Source descriptor
-//! \param[in] timer_count: Time to send spike at
-static void process_fast_source(
-        index_t s_id, spike_source_t *source, uint timer_count) {
+static void process_fast_source(index_t s_id, spike_source_t *source) {
     if ((time >= source->start_ticks) && (time < source->end_ticks)) {
         // Get number of spikes to send this tick
         uint32_t num_spikes = 0;
@@ -850,9 +874,8 @@ static void process_fast_source(
             // If no key has been given, do not send spikes to fabric
             if (ssp_params.has_key) {
                 // Send spikes
-                const uint32_t spike_key = ssp_params.key | (s_id << 4) | colour;
-                tdma_processing_send_packet(
-                    spike_key, num_spikes, WITH_PAYLOAD, timer_count);
+                const uint32_t spike_key = keys[s_id] | colour;
+                send_spike_mc_payload(spike_key, num_spikes);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
                      sdram_inputs->weights[s_id] * num_spikes;
@@ -864,9 +887,7 @@ static void process_fast_source(
 //! \brief Handle a slow spike source
 //! \param s_id: Source ID
 //! \param source: Source descriptor
-//! \param[in] timer_count: Time to send spike at
-static void process_slow_source(
-        index_t s_id, spike_source_t *source, uint timer_count) {
+static void process_slow_source(index_t s_id, spike_source_t *source) {
     if ((time >= source->start_ticks) && (time < source->end_ticks)
             && (source->mean_isi_ticks != 0)) {
         uint32_t count = 0;
@@ -890,12 +911,11 @@ static void process_slow_source(
             // if no key has been given, do not send spike to fabric.
             if (ssp_params.has_key) {
                 // Send package
-                const uint32_t spike_key = ssp_params.key | (s_id << 4) | colour;
-                tdma_processing_send_packet(
-                    spike_key, count, WITH_PAYLOAD, timer_count);
+                const uint32_t spike_key = keys[s_id] | colour;
+                send_spike_mc_payload(spike_key, count);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
-                     sdram_inputs->weights[s_id] * count;
+                    sdram_inputs->weights[s_id] * count;
             }
         }
 
@@ -910,7 +930,7 @@ static void process_slow_source(
 //! \param[in] unused: for consistency sake of the API always returning two
 //!     parameters, this parameter has no semantics currently and thus
 //!     is set to 0
-static void timer_callback(uint timer_count, UNUSED uint unused) {
+static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
@@ -953,23 +973,31 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
         sark_word_set(input_this_timestep, 0, sdram_inputs->size_in_bytes);
     }
 
-    // Loop through spike sources
-    tdma_processing_reset_phase();
+    // Loop through spike sources and see if they need updating
+    // NOTE: This full loop needs to happen first with processing in a second
+    // separate loop.  This is to ensure that the random generator use matches
+    // between a single run and a split run (as slow sources can produce
+    // multiple spikes in a single time step).
     for (index_t s_id = 0; s_id < ssp_params.n_spike_sources; s_id++) {
-        // If this spike source is active this tick
         spike_source_t *spike_source = &source[s_id];
-        if (spike_source->is_fast_source) {
-            process_fast_source(s_id, spike_source, timer_count);
-        } else {
-            process_slow_source(s_id, spike_source, timer_count);
-        }
 
-        if ((time + 1) >= spike_source->next_ticks) {
+        // Move to the next tick now if needed
+        if (time >= spike_source->next_ticks) {
             log_debug("Moving to next rate at time %d", time);
             read_next_rates(s_id);
 #if LOG_LEVEL >= LOG_DEBUG
-            // print_spike_source(s_id);
+            print_spike_source(s_id);
 #endif
+        }
+    }
+
+    // Loop through the sources and process them
+    for (index_t s_id = 0; s_id < ssp_params.n_spike_sources; s_id++) {
+        spike_source_t *spike_source = &source[s_id];
+        if (spike_source->is_fast_source) {
+            process_fast_source(s_id, spike_source);
+        } else {
+            process_slow_source(s_id, spike_source);
         }
     }
 
@@ -988,8 +1016,6 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
 
     colour = (colour + 1) & 0xF;
 }
-
-
 
 //! \brief Multicast callback used to set rate when injected in a live example
 //! \param[in] key: Received multicast key

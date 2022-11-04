@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import pyNN.spiNNaker as p
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    DURATION_FOREVER)
 from spinnaker_testbase import BaseTestCase
 import scipy
 import numpy
@@ -95,7 +97,7 @@ def variable_rate_options():
 
     pops.append(
         p.Population(n_neurons, p.SpikeSourcePoisson(rate=[1, 10]),
-                     label="pop_j", additional_parameters={"seed": seed}))
+                     label="pop_j", additional_parameters={"seed": seed + 1}))
 
     pops.append(
         p.Population(
@@ -158,9 +160,9 @@ def variable_rate_options():
                 array(values[0]), array(values[1]), array(values[2]))
             ends = list()
             for j, (start, duration) in enumerate(zip(starts, durations)):
-                if duration == 0 and (j + 1) >= len(starts):
+                if duration == DURATION_FOREVER and (j + 1) >= len(starts):
                     ends.append(run_time)
-                elif duration == 0:
+                elif duration == DURATION_FOREVER:
                     ends.append(starts[j + 1])
                 else:
                     ends.append(start + duration)
@@ -174,8 +176,8 @@ def variable_rate_options():
                       " (with tolerance {}) for rate {}"
                       " for duration {}".format(
                           n_spikes, expected, tolerance, rate, (end - start)))
-                assert(n_spikes >= (expected - tolerance))
-                assert(n_spikes <= (expected + tolerance))
+                assert n_spikes >= (expected - tolerance)
+                assert n_spikes <= (expected + tolerance)
 
 
 def variable_rate_reset():
@@ -220,8 +222,8 @@ def variable_rate_reset():
     numpy.savetxt("spikesp2.txt", spikes_p_2[0])
 
     for s1, s2, s3 in zip(spikes_1, spikes_2, spikes_p_2):
-        assert(numpy.array_equal(s1, s2))
-        assert(numpy.array_equal(s2, s3))
+        assert numpy.array_equal(s1, s2)
+        assert numpy.array_equal(s2, s3)
 
 
 def variable_rate_100us():
@@ -258,8 +260,8 @@ def variable_rate_100us():
               " (with tolerance {}) for rate {}"
               " for duration {}".format(
                   n_spikes_rate, expected, tolerance, rate, (end - start)))
-        assert(n_spikes_rate >= (expected - tolerance))
-        assert(n_spikes_rate <= (expected + tolerance))
+        assert n_spikes_rate >= (expected - tolerance)
+        assert n_spikes_rate <= (expected + tolerance)
 
 
 class TestCreatePoissons(BaseTestCase):

@@ -282,20 +282,13 @@ class _MasterPopEntry(object):
         next_addr = start
         n_entries = count
 
-        # If there is a core mask, add a special entry for it
-        if self.__core_mask != 0:
-            entry.extra_info_flag = True
-            entry.core_mask = self.__core_mask
-            entry.n_words = int(math.ceil(
-                self.__n_neurons / BIT_IN_A_WORD))
-            entry.n_neurons = self.__n_neurons
-            entry.mask_shift = self.__core_shift
-        else:
-            entry.extra_info_flag = False
-            entry.core_mask = 0
-            entry.n_words = 0
-            entry.n_neurons = 0
-            entry.mask_shift = 0
+        # Add extra info
+        entry.extra_info_flag = True
+        entry.core_mask = self.__core_mask
+        entry.n_words = int(math.ceil(
+            self.__n_neurons / BIT_IN_A_WORD))
+        entry.n_neurons = self.__n_neurons
+        entry.mask_shift = self.__core_shift
 
         for j, (address, row_length, is_valid) in enumerate(
                 self.__addresses_and_row_lengths):
@@ -329,13 +322,12 @@ class MasterPopTableAsBinarySearch(object):
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int
         """
-        # There will be an address list entry for each incoming projection
-        n_entries = len(incoming_projections)
-
         # Count the pre-machine-vertices
+        n_entries = 0
         n_vertices = 0
         seen_edges = set()
         for proj in incoming_projections:
+            n_entries += 1
             # pylint: disable=protected-access
             in_edge = proj._projection_edge
 

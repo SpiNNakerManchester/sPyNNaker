@@ -17,10 +17,11 @@ from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.exceptions import (
+    SynapticConfigurationException, InvalidParameterType)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
@@ -37,7 +38,8 @@ LOOKUP_TAU_C_SHIFT = 4
 LOOKUP_TAU_D_SHIFT = 2
 
 
-class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
+class SynapseDynamicsNeuromodulation(
+        AbstractPlasticSynapseDynamics, AbstractGenerateOnMachine):
     """ Synapses that target a neuromodulation receptor
     """
 
@@ -55,7 +57,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         self.__weight = weight
         self.__tau_c = tau_c
         self.__tau_d = tau_d
-        ts = get_simulator().machine_time_step / 1000.0
+        ts = SpynnakerDataView.get_simulation_time_step_ms()
         self.__tau_c_data = get_exp_lut_array(
             ts, self.__tau_c, shift=LOOKUP_TAU_C_SHIFT)
         self.__tau_d_data = get_exp_lut_array(
@@ -132,6 +134,20 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         # Write the LUT arrays
         spec.write_array(self.__tau_c_data)
         spec.write_array(self.__tau_d_data)
+
+    @overrides(AbstractPlasticSynapseDynamics.get_value)
+    def get_value(self, key):
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
+
+    @overrides(AbstractPlasticSynapseDynamics.set_value)
+    def set_value(self, key, value):
+        if hasattr(self, key):
+            setattr(self, key, value)
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractPlasticSynapseDynamics
                .get_n_words_for_plastic_connections)
@@ -220,11 +236,12 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     def gen_matrix_id(self):
         return MatrixGeneratorID.NEUROMODULATION_MATRIX.value
 
-    @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(
             self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
-            synapse_info, max_row_info, max_atoms_per_core):
+            synapse_info, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core):
+        # pylint: disable=unused-argument
         synapse_type = synapse_info.synapse_type
         return numpy.array([
             synaptic_matrix_offset, max_row_info.undelayed_max_words,
@@ -254,12 +271,6 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         # Delay is always 1!
         return 1
 
-    @overrides(AbstractPlasticSynapseDynamics.set_delay)
-    def set_delay(self, delay):
-        if delay != 1:
-            raise SynapticConfigurationException(
-                "Neuromodulation delay must be 0")
-
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self):
@@ -269,6 +280,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     def get_synapse_id_by_target(self, target):
         return NEUROMODULATION_TARGETS.get(target, None)
 
-    @overrides(AbstractPlasticSynapseDynamics.are_weights_signed)
-    def are_weights_signed(self):
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.is_single_core_capable)
+    def is_single_core_capable(self):
         return False

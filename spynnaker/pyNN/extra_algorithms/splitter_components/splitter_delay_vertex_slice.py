@@ -14,16 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
-from pacman.model.constraints.partitioner_constraints import (
-    AbstractPartitionerConstraint)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.model.resources import (
-    ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
-from pacman.utilities import utility_calls
-from pacman.utilities.algorithm_utilities.\
-    partition_algorithm_utilities import (
-        get_remaining_constraints)
+from pacman.model.resources import ConstantSDRAM
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
 from spinn_utilities.overrides import overrides
@@ -38,11 +31,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
     __slots__ = [
         "_machine_vertex_by_slice"]
 
-    ESTIMATED_CPU_CYCLES = 128
-    WORDS_PER_ATOM = 11 + 16
     _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
-
-    SPLITTER_NAME = "SplitterDelayVertexSlice"
 
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
@@ -63,7 +52,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         """ splitter for delay extensions
 
         """
-        super().__init__(self.SPLITTER_NAME)
+        super().__init__()
         self._machine_vertex_by_slice = dict()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
@@ -87,14 +76,13 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         # pylint: disable=arguments-differ
         source_app_vertex = self._governed_app_vertex.source_vertex
         slices = source_app_vertex.splitter.get_out_going_slices()
-        constraints = get_remaining_constraints(self._governed_app_vertex)
 
         # create vertices correctly
         for vertex_slice in slices:
             vertex = self.create_machine_vertex(
-                source_app_vertex, vertex_slice, constraints)
+                source_app_vertex, vertex_slice)
             self._governed_app_vertex.remember_machine_vertex(vertex)
-            chip_counter.add_core(vertex.resources_required)
+            chip_counter.add_core(vertex.sdram_required)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
@@ -114,81 +102,32 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     def create_machine_vertex(
-            self, source_app_vertex, vertex_slice, remaining_constraints):
+            self, source_app_vertex, vertex_slice):
         """ creates a delay extension machine vertex and adds to the tracker.
 
         :param MachineVertex source_vertex: The source of the delay
-        :param remaining_constraints: none partitioner constraints.
-        :type remaining_constraints:
-            iterable(~pacman.model.constraints.AbstractConstraint)
         :return: machine vertex
         :rtype: DelayExtensionMachineVertex
         """
         label = f"Delay extension for {source_app_vertex}"
-        resources = self.get_resources_used_by_atoms(vertex_slice)
+        sdram = self.get_sdram_used_by_atoms()
 
         machine_vertex = DelayExtensionMachineVertex(
-            resources, label, vertex_slice, remaining_constraints,
-            self._governed_app_vertex)
+            sdram, label, vertex_slice, self._governed_app_vertex)
 
         self._machine_vertex_by_slice[vertex_slice] = machine_vertex
         return machine_vertex
 
-    def get_resources_used_by_atoms(self, vertex_slice):
-        """ ger res for a APV
-
-        :param vertex_slice: the slice
-        :rtype: ResourceContainer
-        """
-        constant_sdram = self.constant_sdram()
-
-        # set resources required from this object
-        container = ResourceContainer(
-            sdram=constant_sdram,
-            dtcm=self.dtcm_cost(vertex_slice),
-            cpu_cycles=self.cpu_cost(vertex_slice))
-
-        # return the total resources.
-        return container
-
-    def constant_sdram(self):
+    def get_sdram_used_by_atoms(self):
         """ returns the sdram used by the delay extension
 
-        :param ApplicationGraph graph: app graph
-        :param Slice vertex_slice: The slice to get the size of
         :rtype: ConstantSDRAM
         """
         return ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             self._governed_app_vertex.delay_params_size() +
-            self._governed_app_vertex.tdma_sdram_size_in_bytes +
             DelayExtensionMachineVertex.get_provenance_data_size(
                 DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES))
-
-    def dtcm_cost(self, vertex_slice):
-        """ returns the dtcm used by the delay extension slice.
-
-        :param Slice vertex_slice: vertex slice
-        :rtype: DTCMResource
-        """
-        return DTCMResource(
-            self.WORDS_PER_ATOM * BYTES_PER_WORD * vertex_slice.n_atoms)
-
-    def cpu_cost(self, vertex_slice):
-        """ returns the cpu cost of the delay extension for a slice of atoms
-
-        :param Slice vertex_slice: slice of atoms
-        :rtype: CPUCyclesPerTickResource
-        """
-        return CPUCyclesPerTickResource(
-            self.ESTIMATED_CPU_CYCLES * vertex_slice.n_atoms)
-
-    @overrides(AbstractSplitterCommon.check_supported_constraints)
-    def check_supported_constraints(self):
-        utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[],
-            abstract_constraint_type=AbstractPartitionerConstraint)
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):

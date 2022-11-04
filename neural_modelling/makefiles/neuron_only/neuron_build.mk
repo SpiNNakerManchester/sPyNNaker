@@ -94,12 +94,6 @@ else
 		    ADDITIONAL_INPUT_H := $(call replace_source_dirs,$(ADDITIONAL_INPUT_H))
 		endif
 		
-		ifndef NEURON_MODEL
-		    $(error NEURON_MODEL is not set.  Please choose a neuron model to compile)
-		else
-		    NEURON_MODEL := $(call strip_source_dirs,$(NEURON_MODEL))
-		endif
-		
 		ifndef NEURON_MODEL_H
 		    $(error NEURON_MODEL_H is not set.  Please select a neuron model header file)
 		else
@@ -146,9 +140,8 @@ OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 # List all the sources relative to one of SOURCE_DIRS
 SOURCES = neuron/c_main_neurons.c \
           neuron/neuron.c \
-          neuron/neuron_recording.c \
           neuron/plasticity/synapse_dynamics_remote.c \
-          $(NEURON_MODEL) $(OTHER_SOURCES_CONVERTED)
+          $(OTHER_SOURCES_CONVERTED)
 
 include $(SPINN_DIRS)/make/local.mk
 
@@ -162,12 +155,6 @@ $(BUILD_DIR)neuron/c_main_neurons.o: $(MODIFIED_DIR)neuron/c_main_neurons.c
 $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)
 	# neuron.o
-	-@mkdir -p $(dir $@)
-	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
-	
-$(BUILD_DIR)neuron/neuron_recording.o: $(MODIFIED_DIR)neuron/neuron_recording.c $(NEURON_MODEL_H) \
-                             $(SYNAPSE_TYPE_H)
-	# neuron_recording.o
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
 

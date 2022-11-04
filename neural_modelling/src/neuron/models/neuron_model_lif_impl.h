@@ -22,9 +22,39 @@
 
 #include "neuron_model.h"
 
-/////////////////////////////////////////////////////////////
 //! definition for LIF neuron parameters
-typedef struct neuron_t {
+struct neuron_params_t {
+    //! membrane voltage [mV]
+    REAL     V_init;
+
+    //! membrane resting voltage [mV]
+    REAL     V_rest;
+
+    //! membrane capacitance [nF]
+    REAL     c_m;
+
+    //! membrane decay time constant
+    REAL     tau_m;
+
+    //! offset current [nA]
+    REAL     I_offset;
+
+    //! post-spike reset membrane voltage [mV]
+    REAL     V_reset;
+
+    //! refractory time of neuron [ms]
+    REAL     T_refract_ms;
+
+    //! initial refractory timer value (saved)
+    int32_t  refract_timer_init;
+
+    //! The time step in milliseconds
+    REAL     time_step;
+};
+
+
+//! definition for LIF neuron state
+struct neuron_t {
     //! membrane voltage [mV]
     REAL     V_membrane;
 
@@ -50,11 +80,36 @@ typedef struct neuron_t {
 
     //! refractory time of neuron [timesteps]
     int32_t  T_refract;
-} neuron_t;
+};
 
-//! LIF global parameters
-typedef struct global_neuron_params_t {
-} global_neuron_params_t;
+static inline int32_t lif_ceil(REAL value) {
+	int32_t bits = bitsk(value);
+	int32_t integer = bits >> 15;
+	int32_t fraction = bits & 0x7FFF;
+	if (fraction > 0) {
+	    return integer + 1;
+	}
+	return integer;
+}
+
+static inline void neuron_model_initialise(
+		neuron_t *state, neuron_params_t *params, uint32_t n_steps_per_timestep) {
+	REAL ts = kdivui(params->time_step, n_steps_per_timestep);
+	log_info("Time step %k after division by %u = %k", params->time_step, n_steps_per_timestep, ts);
+	state->V_membrane = params->V_init;
+	state->V_rest = params->V_rest;
+    state->R_membrane = kdivk(params->tau_m, params->c_m);
+	state->exp_TC = expk(-kdivk(ts, params->tau_m));
+	state->I_offset = params->I_offset;
+    state->refract_timer = params->refract_timer_init;
+	state->V_reset = params->V_reset;
+	state->T_refract = lif_ceil(kdivk(params->T_refract_ms, ts));
+}
+
+static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *params) {
+	params->V_init = state->V_membrane;
+	params->refract_timer_init = state->refract_timer;
+}
 
 //! \brief simple Leaky I&F ODE
 //! \param[in,out] neuron: The neuron to update
@@ -83,7 +138,7 @@ static inline void lif_neuron_closed_form(
 //!     contains all the parameters for a specific neuron
 //! \return the value to be compared with a threshold value to determine if the
 //!     neuron has spiked
-static state_t neuron_model_state_update(
+static inline state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
         uint16_t num_inhibitory_inputs, const input_t *inh_input,
         input_t external_bias, REAL current_offset, neuron_t *restrict neuron) {
@@ -115,7 +170,7 @@ static state_t neuron_model_state_update(
 //! \brief Indicates that the neuron has spiked
 //! \param[in, out] neuron pointer to a neuron parameter struct which contains
 //!     all the parameters for a specific neuron
-static void neuron_model_has_spiked(neuron_t *restrict neuron) {
+static inline void neuron_model_has_spiked(neuron_t *restrict neuron) {
     // reset membrane voltage
     neuron->V_membrane = neuron->V_reset;
 
@@ -128,8 +183,26 @@ static void neuron_model_has_spiked(neuron_t *restrict neuron) {
 //!     all the parameters for a specific neuron
 //! \return the membrane voltage for a given neuron with the neuron
 //!     parameters specified in neuron
-static state_t neuron_model_get_membrane_voltage(const neuron_t *neuron) {
+static inline state_t neuron_model_get_membrane_voltage(const neuron_t *neuron) {
     return neuron->V_membrane;
 }
+
+static inline void neuron_model_print_state_variables(const neuron_t *neuron) {
+	log_info("V membrane    = %11.4k mv", neuron->V_membrane);
+	log_info("Refract timer = %u timesteps", neuron->refract_timer);
+}
+
+static inline void neuron_model_print_parameters(const neuron_t *neuron) {
+    log_info("V reset       = %11.4k mv", neuron->V_reset);
+    log_info("V rest        = %11.4k mv", neuron->V_rest);
+
+    log_info("I offset      = %11.4k nA", neuron->I_offset);
+    log_info("R membrane    = %11.4k Mohm", neuron->R_membrane);
+
+    log_info("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
+
+    log_info("T refract     = %u timesteps", neuron->T_refract);
+}
+
 
 #endif // _NEURON_MODEL_LIF_CURR_IMPL_H_

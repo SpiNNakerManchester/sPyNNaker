@@ -24,20 +24,20 @@ def test_selector():
     sim.setup()
     model = IFCurrExpBase()
     pop_1 = Population(
-        size=5, label="Test", constraints=None, cellclass=model,
+        size=5, label="Test", cellclass=model,
         structure=None, initial_values={})
     pop_1.set(tau_m=2)
     values = pop_1.get("tau_m")
     assert [2, 2, 2, 2, 2] == values
-    values = pop_1._get_by_selector(slice(1, 3), "tau_m")
+    values = pop_1[1:3].get("tau_m")
     assert [2, 2] == values
-    pop_1.set_by_selector(slice(1, 3), "tau_m", 3)
+    pop_1[1:3].set(tau_m=3)
     values = pop_1.get("tau_m")
     assert [2, 3, 3, 2, 2] == values
     values = pop_1.get(["cm", "v_thresh"])
     assert [1.0, 1.0, 1.0, 1.0, 1.0] == values['cm']
     assert [-50.0, -50.0, -50.0, -50.0, -50.0] == values["v_thresh"]
-    values = pop_1._get_by_selector([1, 3, 4], ["cm", "v_thresh"])
+    values = pop_1[1, 3, 4].get(["cm", "v_thresh"])
     assert [1.0, 1.0, 1.0] == values['cm']
     assert [-50.0, -50.0, -50.0] == values["v_thresh"]
 
@@ -47,5 +47,5 @@ def test_round():
     model = IFCurrExpBase()
     pop_1 = Population(
         size=4.999999, label="Test", cellclass=model,
-        constraints=None, structure=None, initial_values={})
+        structure=None, initial_values={})
     assert pop_1.size == 5

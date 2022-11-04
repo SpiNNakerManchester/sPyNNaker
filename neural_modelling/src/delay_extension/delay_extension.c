@@ -27,7 +27,7 @@
 #include <debug.h>
 #include <simulation.h>
 #include <spin1_api.h>
-#include <tdma_processing.h>
+#include <common/send_mc.h>
 
 //! the size of the circular queue for packets.
 #define IN_BUFFER_SIZE 256
@@ -264,7 +264,7 @@ static void store_provenance_data(address_t provenance_region) {
     prov->n_packets_sent = n_spikes_sent;
     prov->n_buffer_overflows = in_spikes_get_n_buffer_overflows();
     prov->n_delays = n_delays;
-    prov->times_tdma_fell_behind = tdma_processing_times_behind();
+    prov->times_tdma_fell_behind = 0;
     prov->n_packets_lost_due_to_count_saturation = saturation_count;
     prov->n_packets_dropped_due_to_invalid_neuron_value =
         n_packets_dropped_due_to_invalid_neuron_value;
@@ -306,12 +306,6 @@ static bool initialize(void) {
     // Get the parameters
     if (!read_parameters(data_specification_get_region(
             DELAY_PARAMS, ds_regions))) {
-        return false;
-    }
-
-    // get TDMA parameters
-    void *data_addr = data_specification_get_region(TDMA_REGION, ds_regions);
-    if (!tdma_processing_initialise(&data_addr)) {
         return false;
     }
 
@@ -414,9 +408,6 @@ static void user_callback(UNUSED uint unused0, UNUSED uint unused1) {
 //! \param[in] local_time: current simulation time
 //! \param[in] timer_count: unused
 static void background_callback(uint local_time, UNUSED uint timer_count) {
-    // reset the TDMA for this next cycle.
-    tdma_processing_reset_phase();
-
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
         uint32_t delay_stage_delay = (d + 1) * n_delay_in_a_stage;
@@ -426,8 +417,8 @@ static void background_callback(uint local_time, UNUSED uint timer_count) {
             uint8_t *delay_stage_spike_counters =
                     spike_counters[delay_stage_time_slot];
 
-            log_debug("%u: Checking time slot %u for delay stage %u",
-                    local_time, delay_stage_time_slot, d);
+            log_debug("%u: Checking time slot %u for delay stage %u (delay %u)",
+                    local_time, delay_stage_time_slot, d, delay_stage_delay);
 
             // Loop through neurons
             for (uint32_t n = 0; n < num_neurons; n++) {
@@ -451,20 +442,17 @@ static void background_callback(uint local_time, UNUSED uint timer_count) {
                 if (has_key) {
                     if (delay_stage_spike_counters[n] > 1) {
                         log_debug(
-                            "%d: sending packet with key %d and payload %d",
+                            "%d: sending packet with key 0x%08x and payload %d",
                             time, spike_key, delay_stage_spike_counters[n]);
 
-                        tdma_processing_send_packet(
-                            spike_key, delay_stage_spike_counters[n],
-                            WITH_PAYLOAD, timer_count);
+                        send_spike_mc_payload(spike_key, delay_stage_spike_counters[n]);
 
                         // update counter
                         n_spikes_sent += delay_stage_spike_counters[n];
                     } else if (delay_stage_spike_counters[n] == 1) {
-                        log_debug("%d: sending spike with key %d", time, spike_key);
+                        log_debug("%d: sending spike with key 0x%08x", time, spike_key);
 
-                        tdma_processing_send_packet(
-                            spike_key, 0, NO_PAYLOAD, timer_count);
+                        send_spike_mc(spike_key);
 
                         // update counter
                         n_spikes_sent++;

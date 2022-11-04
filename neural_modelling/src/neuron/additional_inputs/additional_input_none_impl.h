@@ -23,8 +23,22 @@
 #include "additional_input.h"
 
 //! An empty additional input that makes no contribution
+struct additional_input_params_t {
+
+};
+
+//! An empty additional input that makes no contribution
 struct additional_input_t {
 };
+
+static inline void additional_input_initialise(
+		UNUSED additional_input_t *state, UNUSED additional_input_params_t *params,
+		UNUSED uint32_t n_steps_per_timestep) {
+}
+
+static inline void additional_input_save_state(UNUSED additional_input_t *state,
+		UNUSED additional_input_params_t *params) {
+}
 
 //! \brief Gets the value of current provided by the additional input this
 //!     timestep
@@ -34,7 +48,7 @@ struct additional_input_t {
 //! \param[in] membrane_voltage: The membrane voltage of the neuron
 //! \return The value of the input after scaling
 static inline input_t additional_input_get_input_value_as_current(
-        UNUSED struct additional_input_t *additional_input,
+        UNUSED additional_input_t *additional_input,
         UNUSED state_t membrane_voltage) {
     return 0;
 }
@@ -49,7 +63,7 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \param[in] additional_input: The additional input type pointer to the
 //!     parameters
 static inline void additional_input_has_spiked(
-        UNUSED struct additional_input_t *additional_input) {
+        UNUSED additional_input_t *additional_input) {
 }
 
 #endif // _ADDITIONAL_INPUT_TYPE_NONE_H_

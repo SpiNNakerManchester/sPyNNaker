@@ -13,13 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+from spynnaker.pyNN.models.abstract_models import PopulationSpiNNakerLinkVertex
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetMotorDevice)
 
 
 class PushBotSpiNNakerLinkMotorDevice(
-        PushBotEthernetMotorDevice, ApplicationSpiNNakerLinkVertex):
+        PushBotEthernetMotorDevice, PopulationSpiNNakerLinkVertex):
     """ The motor of a PushBot
     """
     __slots__ = []
@@ -49,6 +49,6 @@ class PushBotSpiNNakerLinkMotorDevice(
         """
         # pylint: disable=too-many-arguments
         super().__init__(motor, protocol)
-        ApplicationSpiNNakerLinkVertex.__init__(
+        PopulationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id, n_atoms=n_neurons,
             board_address=board_address, label=label)

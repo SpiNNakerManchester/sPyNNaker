@@ -22,11 +22,10 @@ from spinn_front_end_common.interface.buffer_management import (
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_SECOND_CONVERSION, SIMULATION_N_BYTES, BYTES_PER_WORD,
-    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_SHORT)
+    SIMULATION_N_BYTES, BYTES_PER_WORD, BYTES_PER_SHORT)
 from spinn_utilities.overrides import overrides
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
+from pacman.utilities.utility_calls import get_field_based_keys
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary,
     AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
@@ -36,15 +35,13 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
     AbstractReceiveBuffersToHost)
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.profiling import (
     AbstractHasProfileData, profile_utils)
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractMaxSpikes, AbstractReadParametersBeforeSet)
+from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
     SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
@@ -68,10 +65,20 @@ def get_n_rates(vertex_slice, rate_data):
         vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
 
 
+def get_params_bytes(n_atoms):
+    """ Gets the size of the Poisson parameters in bytes
+
+    :param int n_atoms: How many atoms to account for
+    :rtype: int
+    """
+    return (PARAMS_BASE_WORDS + n_atoms) * BYTES_PER_WORD
+
+
 def get_rates_bytes(n_atoms, n_rates):
     """ Gets the size of the Poisson rates in bytes
 
-    :param ~pacman.model.graphs.common.Slice vertex_slice:
+    :param int n_atoms: How many atoms to account for
+    :param int n_rates: How many rates to account for
     :rtype: int
     """
     return ((n_atoms * PARAMS_WORDS_PER_NEURON) +
@@ -81,7 +88,8 @@ def get_rates_bytes(n_atoms, n_rates):
 def get_expander_rates_bytes(n_atoms, n_rates):
     """ Gets the size of the Poisson rates in bytes
 
-    :param ~pacman.model.graphs.common.Slice vertex_slice:
+    :param int n_atoms: How many atoms to account for
+    :param int n_rates: How many rates to account for
     :rtype: int
     """
     return ((n_atoms * PARAMS_WORDS_PER_NEURON) +
@@ -103,6 +111,16 @@ def _u3232_to_uint64(array):
     return numpy.round(array * float(DataType.U3232.scale)).astype(
         DataType.U3232.numpy_typename)
 
+
+# 1. uint32_t has_key;
+# 2. uint32_t set_rate_neuron_id_mask;
+# 3. UFRACT seconds_per_tick; 4. REAL ticks_per_second;
+# 5. REAL slow_rate_per_tick_cutoff; 6. REAL fast_rate_per_tick_cutoff;
+# 7. unt32_t first_source_id; 8. uint32_t n_spike_sources;
+# 9. uint32_t max_spikes_per_timestep;
+# 10,11,12,13 mars_kiss64_seed_t (uint[4]) spike_source_seed;
+# 14. Rate changed flag
+PARAMS_BASE_WORDS = 14
 
 # uint32_t n_rates; uint32_t index
 PARAMS_WORDS_PER_NEURON = 2
@@ -133,15 +151,14 @@ class SpikeSourcePoissonMachineVertex(
         ProvidesProvenanceDataFromMachineImpl,
         AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
-        AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet,
+        AbstractGeneratesDataSpecification,
         SendsSynapticInputsOverSDRAM):
 
     __slots__ = [
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
-        "__resources",
-        "__change_requires_neuron_parameters_reload",
+        "__sdram",
         "__sdram_partition",
         "__rate_changed"]
 
@@ -152,9 +169,8 @@ class SpikeSourcePoissonMachineVertex(
         SPIKE_HISTORY_REGION = 3
         PROVENANCE_REGION = 4
         PROFILER_REGION = 5
-        TDMA_REGION = 6
-        SDRAM_EDGE_PARAMS = 7
-        EXPANDER_REGION = 8
+        SDRAM_EDGE_PARAMS = 6
+        EXPANDER_REGION = 7
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -176,41 +192,28 @@ class SpikeSourcePoissonMachineVertex(
     # between Knuth algorithm and Gaussian approx.
     FAST_RATE_PER_TICK_CUTOFF = 10
 
-    # 1. uint32_t has_key; 2. uint32_t key;
-    # 3. uint32_t set_rate_neuron_id_mask;
-    # 4. UFRACT seconds_per_tick; 5. REAL ticks_per_second;
-    # 6. REAL slow_rate_per_tick_cutoff; 7. REAL fast_rate_per_tick_cutoff;
-    # 8. uint32_t first_source_id; 9. uint32_t n_spike_sources;
-    # 10. uint32_t max_spikes_per_timestep;
-    # 11,12,13,14 mars_kiss64_seed_t (uint[4]) spike_source_seed;
-    # 15. Rate changed flag
-    PARAMS_BASE_WORDS = 15
-
     # Seed offset in parameters and size on bytes
-    SEED_OFFSET_BYTES = 10 * 4
-    SEED_SIZE_BYTES = 4 * 4
+    SEED_SIZE_BYTES = 4 * BYTES_PER_WORD
+    SEED_OFFSET_BYTES = (PARAMS_BASE_WORDS * 4) - SEED_SIZE_BYTES
 
     def __init__(
-            self, resources_required, is_recording, constraints=None,
-            label=None, app_vertex=None, vertex_slice=None, slice_index=None):
+            self, sdram, is_recording,
+            label=None, app_vertex=None, vertex_slice=None):
         # pylint: disable=too-many-arguments
         super().__init__(
-            label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=vertex_slice)
+            label, app_vertex=app_vertex, vertex_slice=vertex_slice)
         self.__is_recording = is_recording
-        self.__resources = resources_required
-        self.__change_requires_neuron_parameters_reload = False
+        self.__sdram = sdram
         self.__sdram_partition = None
-        self.__slice_index = slice_index
         self.__rate_changed = True
 
     def set_sdram_partition(self, sdram_partition):
         self.__sdram_partition = sdram_partition
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return self.__resources
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return self.__sdram
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
@@ -229,17 +232,16 @@ class SpikeSourcePoissonMachineVertex(
         return []
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
-    def get_recording_region_base_address(self, txrx, placement):
+    def get_recording_region_base_address(self, placement):
         return locate_memory_region_for_placement(
             placement,
-            self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            txrx)
+            self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
 
     @overrides(AbstractHasProfileData.get_profile_data)
-    def get_profile_data(self, transceiver, placement):
+    def get_profile_data(self, placement):
         return get_profiling_data(
             self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION.value,
-            self.PROFILE_TAG_LABELS, transceiver, placement)
+            self.PROFILE_TAG_LABELS, placement)
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)
@@ -266,46 +268,30 @@ class SpikeSourcePoissonMachineVertex(
     def max_spikes_per_ts(self):
         return self.app_vertex.max_spikes_per_ts()
 
-    @inject_items({"first_machine_time_step": "FirstMachineTimeStep"})
-    @overrides(AbstractRewritesDataSpecification.reload_required,
-               additional_arguments={"first_machine_time_step"})
-    def reload_required(self, first_machine_time_step):
+    @overrides(AbstractRewritesDataSpecification.reload_required)
+    def reload_required(self):
         # pylint: disable=arguments-differ
-        return (self.__change_requires_neuron_parameters_reload or
-                first_machine_time_step == 0)
+        if self.__rate_changed:
+            return True
+        return SpynnakerDataView.get_first_machine_time_step() == 0
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        self.__change_requires_neuron_parameters_reload = new_value
+        self.__rate_changed = new_value
 
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
-    def regenerate_data_specification(
-            self, spec, placement):
-        """
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param int first_machine_time_step:
-        """
+    def regenerate_data_specification(self, spec, placement):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # write rates
-        self._write_poisson_rates(spec, placement)
+        self._write_poisson_rates(spec)
 
         # end spec
         spec.end_specification()
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps"
-    })
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "routing_info", "data_n_time_steps",
-        }
-    )
-    def generate_data_specification(
-            self, spec, placement, routing_info, data_n_time_steps):
+    @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param int data_n_time_steps:
@@ -323,7 +309,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            placement.vertex.get_binary_file_name()))
+            self.get_binary_file_name()))
 
         # write recording data
         spec.reserve_memory_region(
@@ -334,18 +320,19 @@ class SpikeSourcePoissonMachineVertex(
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
         sdram = self._app_vertex.get_recording_sdram_usage(self.vertex_slice)
-        recorded_region_sizes = [sdram.get_total_sdram(data_n_time_steps)]
+        recorded_region_sizes = [sdram.get_total_sdram(
+            SpynnakerDataView.get_max_run_time_steps())]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
 
         # Write provenence space
-        placement.vertex.reserve_provenance_data_region(spec)
+        self.reserve_provenance_data_region(spec)
 
         # write parameters
-        self._write_poisson_parameters(spec, placement, routing_info)
+        self._write_poisson_parameters(spec)
 
         # write rates
-        self._write_poisson_rates(spec, placement)
+        self._write_poisson_rates(spec)
 
         # write profile data
         profile_utils.reserve_profile_region(
@@ -354,17 +341,6 @@ class SpikeSourcePoissonMachineVertex(
         profile_utils.write_profile_region_data(
             spec, self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION.value,
             self._app_vertex.n_profile_samples)
-
-        # write tdma params
-        spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.TDMA_REGION.value,
-            label="tdma_region",
-            size=self._app_vertex.tdma_sdram_size_in_bytes)
-        spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.TDMA_REGION.value)
-        spec.write_array(
-            self._app_vertex.generate_tdma_data_specification_data(
-                self.__slice_index))
 
         # write SDRAM edge parameters
         spec.reserve_memory_region(
@@ -407,19 +383,16 @@ class SpikeSourcePoissonMachineVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_poisson_rates(self, spec, placement):
+    def _write_poisson_rates(self, spec):
         """ Generate Rate data for Poisson spike sources
 
         :param ~data_specification.DataSpecification spec:
             the data specification writer
-        :param int first_machine_time_step:
-            First machine time step to start from the correct index
         """
         spec.comment("\nWriting Rates for {} poisson sources:\n"
                      .format(self.vertex_slice.n_atoms))
 
-        vertex_slice = placement.vertex.vertex_slice
-        n_atoms = vertex_slice.n_atoms
+        n_atoms = self.vertex_slice.n_atoms
         n_rates = n_atoms * self._app_vertex.max_n_rates
         spec.reserve_memory_region(
             region=self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value,
@@ -431,13 +404,14 @@ class SpikeSourcePoissonMachineVertex(
         data_items.append([int(self.__rate_changed)])
         data_items.append([0])
         n_items = 0
-        data_slice = self._app_vertex.data[vertex_slice.as_slice]
-        for (start, stop, data) in data_slice.iter_ranges():
+        data = self._app_vertex.data
+        ids = self.vertex_slice.get_raster_ids(self.app_vertex.atoms_shape)
+        for (start, stop, item) in data.iter_ranges_by_ids(ids):
             count = stop - start
             items = numpy.dstack(
-                (_u3232_to_uint64(data['rates']),
-                 _u3232_to_uint64(data['starts']),
-                 _u3232_to_uint64(data['durations']))
+                (_u3232_to_uint64(item['rates']),
+                 _u3232_to_uint64(item['starts']),
+                 _u3232_to_uint64(item['durations']))
                 )[0]
             data_items.extend([[count], [len(items)], [0],
                                numpy.ravel(items).view("uint32")])
@@ -453,13 +427,11 @@ class SpikeSourcePoissonMachineVertex(
 
         self.__rate_changed = False
 
-    def _write_poisson_parameters(self, spec, placement, routing_info):
+    def _write_poisson_parameters(self, spec):
         """ Generate Parameter data for Poisson spike sources
 
         :param ~data_specification.DataSpecification spec:
             the data specification writer
-        :param ~pacman.model.placements.Placement placement:
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
         """
         # pylint: disable=too-many-arguments
         spec.comment("\nWriting Parameters for {} poisson sources:\n"
@@ -468,34 +440,40 @@ class SpikeSourcePoissonMachineVertex(
         spec.reserve_memory_region(
             region=(
                 self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value),
-            size=self.PARAMS_BASE_WORDS * BYTES_PER_WORD,
+            size=get_params_bytes(self.vertex_slice.n_atoms),
             label="PoissonParams")
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value)
 
         # Write Key info for this core:
+        routing_info = SpynnakerDataView.get_routing_infos()
         key = routing_info.get_first_key_from_pre_vertex(
-            placement.vertex, constants.SPIKE_PARTITION_ID)
-        spec.write_value(data=1 if key is not None else 0)
-        spec.write_value(data=key if key is not None else 0)
+            self, constants.SPIKE_PARTITION_ID)
+        if key is None:
+            spec.write_value(0)
+            keys = [0] * self.vertex_slice.n_atoms
+        else:
+            spec.write_value(1)
+            keys = get_field_based_keys(key, self.vertex_slice)
 
         # Write the incoming mask if there is one
         incoming_mask = 0
         if self._app_vertex.incoming_control_edge is not None:
+            routing_info = SpynnakerDataView.get_routing_infos()
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 self._app_vertex.incoming_control_edge.pre_vertex,
                 LIVE_POISSON_CONTROL_PARTITION_ID)
-            incoming_mask = ~r_info.first_mask & 0xFFFFFFFF
+            incoming_mask = ~r_info.mask & 0xFFFFFFFF
         spec.write_value(incoming_mask)
 
         # Write the number of seconds per timestep (unsigned long fract)
         spec.write_value(
-            data=machine_time_step() / MICRO_TO_SECOND_CONVERSION,
+            data=SpynnakerDataView.get_simulation_time_step_s(),
             data_type=DataType.U032)
 
         # Write the number of timesteps per ms (accum)
         spec.write_value(
-            data=MICRO_TO_MILLISECOND_CONVERSION / machine_time_step(),
+            data=SpynnakerDataView.get_simulation_time_step_per_ms(),
             data_type=DataType.U1616)
 
         # Write the slow-rate-per-tick-cutoff (accum)
@@ -518,31 +496,17 @@ class SpikeSourcePoissonMachineVertex(
         # Write the random seed (4 words), generated randomly!
         spec.write_array(self._app_vertex.kiss_seed(self.vertex_slice))
 
+        spec.write_array(keys)
+
     def set_rate_changed(self):
         self.__rate_changed = True
 
-    @staticmethod
-    def _convert_ms_to_n_timesteps(value):
-        return numpy.round(
-            value * (MICRO_TO_MILLISECOND_CONVERSION /
-                     machine_time_step())).astype("uint32")
-
-    def poisson_param_region_address(self, placement, transceiver):
+    def __poisson_rate_region_address(self, placement):
         return helpful_functions.locate_memory_region_for_placement(
             placement,
-            self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value,
-            transceiver)
+            self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value)
 
-    def poisson_rate_region_address(self, placement, transceiver):
-        return helpful_functions.locate_memory_region_for_placement(
-            placement,
-            self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value,
-            transceiver)
-
-    @overrides(
-        AbstractReadParametersBeforeSet.read_parameters_from_machine)
-    def read_parameters_from_machine(
-            self, transceiver, placement, vertex_slice):
+    def read_parameters_from_machine(self, placement):
 
         # It is only worth updating the rates when there is a control edge
         # that can change them
@@ -550,27 +514,28 @@ class SpikeSourcePoissonMachineVertex(
 
             # locate SDRAM address where the rates are stored
             poisson_rate_region_sdram_address = (
-                self.poisson_rate_region_address(placement, transceiver))
+                self.__poisson_rate_region_address(placement))
 
             # get size of poisson params
-            n_atoms = vertex_slice.n_atoms
+            n_atoms = self._vertex_slice.n_atoms
             n_rates = n_atoms * self._app_vertex.max_n_rates
             size_of_region = get_rates_bytes(n_atoms, n_rates)
 
             # get data from the machine
-            byte_array = transceiver.read_memory(
+            byte_array = SpynnakerDataView.read_memory(
                 placement.x, placement.y,
                 poisson_rate_region_sdram_address, size_of_region)
 
             # For each atom, read the number of rates and the rate parameters
             offset = 0
-            for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+            for i in range(self._vertex_slice.lo_atom,
+                           self._vertex_slice.hi_atom + 1):
                 n_rates, = _ONE_WORD.unpack_from(byte_array, offset)
                 # Skip the count and index
                 offset += PARAMS_WORDS_PER_NEURON * BYTES_PER_WORD
                 rates = list()
-                for j in range(n_rates):
-                    rate_int = _ONE_WORD.unpack_from(byte_array, offset)
+                for _ in range(n_rates):
+                    rate_int = _ONE_WORD.unpack_from(byte_array, offset)[0]
                     rates.append(rate_int / DataType.S1615.scale)
                     # Skip the start and duration as they can't change
                     offset += PARAMS_WORDS_PER_RATE * BYTES_PER_WORD

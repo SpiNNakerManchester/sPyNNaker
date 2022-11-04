@@ -277,9 +277,6 @@ static inline void setup_synaptic_dma_write(
         dtcm_start_address = synapse_row_plastic_region(buffer->row);
     }
 
-    log_debug("Writing back %u bytes of plastic region to %08x for spike %u",
-            write_size, sdram_start_address, buffer->originating_spike);
-
     // Start transfer
     while (!spin1_dma_transfer(DMA_TAG_WRITE_PLASTIC_REGION, sdram_start_address,
             dtcm_start_address, DMA_WRITE, write_size)) {
@@ -293,7 +290,6 @@ static inline void start_dma_loop(void) {
     // flag pipeline as busy and trigger a feed event
     // NOTE: locking is not used here because this is assumed to be FIQ
     if (!dma_busy) {
-        log_debug("Sending user event for new spike");
         // Only set busy if successful.
         // NOTE: Counts when unsuccessful are handled by the API
         if (spin1_trigger_user_event(0, 0)) {
@@ -307,7 +303,6 @@ static inline void start_dma_loop(void) {
 //! \param[in] unused: Only specified to match API
 static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
     p_per_ts_struct.packets_this_time_step += 1;
-    log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
     if (in_spikes_add_spike(key)) {
         start_dma_loop();
     }
@@ -318,8 +313,6 @@ static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
 //! \param[in] payload: the payload of the packet. The count.
 static void multicast_packet_pl_received_callback(uint key, uint payload) {
     p_per_ts_struct.packets_this_time_step += 1;
-    log_debug("Received spike %x with payload %d at %d, DMA Busy = %d",
-        key, payload, time, dma_busy);
 
     // cycle through the packet insertion
     bool added = false;
@@ -334,12 +327,10 @@ static void multicast_packet_pl_received_callback(uint key, uint payload) {
 //! \brief Called when a DMA completes
 //! \param unused: unused
 //! \param[in] tag: What sort of DMA has finished?
-static void dma_complete_callback(UNUSED uint unused, uint tag) {
+static void dma_complete_callback(UNUSED uint unused, UNUSED uint tag) {
 
     // increment the dma complete count for provenance generation
     dma_complete_count++;
-
-    log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;
@@ -447,11 +438,9 @@ bool spike_processing_initialise( // EXPORTED
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
         if (dma_buffers[i].row == NULL) {
-            log_error("Could not initialise DMA buffers");
+            log_error("Could not initialise DMA buffers with %u words", row_max_n_words);
             return false;
         }
-        log_debug("DMA buffer %u allocated at 0x%08x",
-                i, dma_buffers[i].row);
     }
     dma_busy = false;
     clear_input_buffers_of_late_packets =

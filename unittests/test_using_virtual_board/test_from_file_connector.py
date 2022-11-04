@@ -29,7 +29,7 @@ class TestFromFileConnector(BaseTestCase):
 
     def check_weights(
             self, projection, aslist, w_index, d_index, sources, destinations):
-        from_pro = projection.get(["weight", "delay"], "list")
+        from_pro = list(projection.get(["weight", "delay"], "list"))
         aslist.sort()
         as_index = 0
         for (source, dest, weight, delay) in from_pro:
@@ -53,7 +53,7 @@ class TestFromFileConnector(BaseTestCase):
             as_index += 1
         while as_index < len(aslist):
             from_as = aslist[as_index]
-            assert(from_as[0] >= sources or from_as[1] >= destinations)
+            assert from_as[0] >= sources or from_as[1] >= destinations
             as_index += 1
 
     def check_other_connect(

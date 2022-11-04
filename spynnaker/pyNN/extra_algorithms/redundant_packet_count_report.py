@@ -18,8 +18,7 @@ import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.interface.provenance import (
     ProvenanceReader, ProvenanceWriter)
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -77,7 +76,7 @@ def redundant_packet_count_report():
 
     :return:
     """
-    file_name = os.path.join(report_default_directory(), _FILE_NAME)
+    file_name = os.path.join(SpynnakerDataView.get_run_dir_path(), _FILE_NAME)
 
     try:
         _create_views()

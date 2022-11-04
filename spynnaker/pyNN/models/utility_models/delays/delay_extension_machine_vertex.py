@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from enum import Enum
 
-from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 from spinn_utilities.overrides import overrides
@@ -24,6 +23,7 @@ from spinn_front_end_common.interface.provenance import (
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 
@@ -32,7 +32,7 @@ class DelayExtensionMachineVertex(
         AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification):
 
     __slots__ = [
-        "__resources",
+        "__sdram",
         "__drop_late_spikes"]
 
     class _DELAY_EXTENSION_REGIONS(Enum):
@@ -72,24 +72,19 @@ class DelayExtensionMachineVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    def __init__(self, resources_required, label, vertex_slice,
-                 constraints=None, app_vertex=None):
+    def __init__(self, sdram, label, vertex_slice, app_vertex=None):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources required by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram required by the vertex
         :param str label: The name of the vertex
         :param Slice vertex_slice: The slice of the vertex
-        :param iterable(~pacman.model.constraints.AbstractConstraint) \
-                constraints:
-            The optional initial constraints of the vertex
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             The application vertex that caused this machine vertex to be
             created. If None, there is no such application vertex.
         """
         super().__init__(
-            label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=vertex_slice)
-        self.__resources = resources_required
+            label, app_vertex=app_vertex, vertex_slice=vertex_slice)
+        self.__sdram = sdram
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
@@ -103,19 +98,17 @@ class DelayExtensionMachineVertex(
         return self.N_EXTRA_PROVENANCE_DATA_ENTRIES
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return self.__resources
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return self.__sdram
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)
     def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
-         n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
+         _n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
          max_bg, n_bg_overloads) = provenance_data
 
-        self._app_vertex.get_tdma_provenance_item(
-            x, y, p, label, n_tdma_behind)
         with ProvenanceWriter() as db:
             db.insert_core(
                 x, y, p, self.COUNT_SATURATION_NAME, n_sat)
@@ -217,7 +210,8 @@ class DelayExtensionMachineVertex(
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id):
-        return self._vertex_slice.n_atoms * self.app_vertex.n_delay_stages
+        n_keys = super().get_n_keys_for_partition(partition_id)
+        return n_keys * self.app_vertex.n_delay_stages
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
@@ -227,15 +221,9 @@ class DelayExtensionMachineVertex(
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
 
-    @inject_items({
-        "routing_infos": "RoutingInfos"})
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_infos"})
-    def generate_data_specification(self, spec, placement, routing_infos):
-        """
-        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        """
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         # pylint: disable=arguments-differ
 
         vertex = placement.vertex
@@ -255,10 +243,6 @@ class DelayExtensionMachineVertex(
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
-        spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.TDMA_REGION.value,
-            size=self._app_vertex.tdma_sdram_size_in_bytes, label="tdma data")
-
         # reserve region for provenance
         self.reserve_provenance_data_region(spec)
 
@@ -266,6 +250,7 @@ class DelayExtensionMachineVertex(
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
+        routing_infos = SpynnakerDataView.get_routing_infos()
         key = routing_infos.get_first_key_from_pre_vertex(
             vertex, SPIKE_PARTITION_ID)
 
@@ -275,19 +260,12 @@ class DelayExtensionMachineVertex(
             if source_vertex.vertex_slice == self.vertex_slice:
                 r_info = routing_infos.get_routing_info_from_pre_vertex(
                     source_vertex, SPIKE_PARTITION_ID)
-                incoming_key = r_info.first_key
-                incoming_mask = r_info.first_mask
+                incoming_key = r_info.key
+                incoming_mask = r_info.mask
                 break
 
         self.write_delay_parameters(
             spec, self._vertex_slice, key, incoming_key, incoming_mask)
-
-        # add tdma data
-        spec.switch_write_focus(
-            self._DELAY_EXTENSION_REGIONS.TDMA_REGION.value)
-        spec.write_array(
-            self._app_vertex.generate_tdma_data_specification_data(
-                self.index))
 
         # End-of-Spec:
         spec.end_specification()

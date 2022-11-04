@@ -52,8 +52,8 @@ class PopulationMachineCommon(
     """
 
     __slots__ = [
-        # Resources used by the machine vertex
-        "__resources",
+        # Sdram used by the machine vertex
+        "__sdram",
         # Regions to be used
         "__regions",
         # The total number of provenance items returned by this core
@@ -65,18 +65,16 @@ class PopulationMachineCommon(
     ]
 
     def __init__(
-            self, label, constraints, app_vertex, vertex_slice, resources,
+            self, label, app_vertex, vertex_slice, sdram,
             regions, n_provenance_items, profile_tags, binary_file_name):
         """
         :param str label: The label of the vertex
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints for the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
-        :param ~pacman.model.resources.ResourceContainer resources:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param .CommonRegions regions: The regions to be assigned
         :param int n_provenance_items:
             The number of additional provenance items to be read
@@ -85,17 +83,17 @@ class PopulationMachineCommon(
         :param str binary_file_name: The name of the binary file
         """
         super(PopulationMachineCommon, self).__init__(
-            label, constraints, app_vertex, vertex_slice)
-        self.__resources = resources
+            label, app_vertex, vertex_slice)
+        self.__sdram = sdram
         self.__regions = regions
         self.__n_provenance_items = n_provenance_items
         self.__profile_tags = profile_tags
         self.__binary_file_name = binary_file_name
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return self.__resources
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return self.__sdram
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
@@ -108,15 +106,14 @@ class PopulationMachineCommon(
         return self.__n_provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
-    def get_recording_region_base_address(self, txrx, placement):
+    def get_recording_region_base_address(self, placement):
         return locate_memory_region_for_placement(
-            placement, self.__regions.recording, txrx)
+            placement, self.__regions.recording)
 
     @overrides(AbstractHasProfileData.get_profile_data)
-    def get_profile_data(self, transceiver, placement):
+    def get_profile_data(self, placement):
         return get_profiling_data(
-            self.__regions.profile, self.__profile_tags, transceiver,
-            placement)
+            self.__regions.profile, self.__profile_tags, placement)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):

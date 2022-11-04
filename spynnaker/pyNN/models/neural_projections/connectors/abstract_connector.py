@@ -22,12 +22,12 @@ from pyNN.random import NumpyRNG, RandomDistribution
 
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 # global objects
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -96,7 +96,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param SynapseInformation synapse_info: the synapse info
         """
         self._rng = (self._rng or NumpyRNG())
-        self.__min_delay = machine_time_step_ms()
+        self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
     def _check_parameter(self, values, name):
         """ Check that the types of the values is supported.
@@ -169,8 +169,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
-        raise SpynnakerException("Unrecognised delay format: {:s}".format(
-            type(delays)))
+        raise SpynnakerException(f"Unrecognised delay format: {type(delays)}")
 
     @abstractmethod
     def get_delay_maximum(self, synapse_info):
@@ -503,20 +502,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         return self._clip_delays(delays)
 
-    @abstractmethod
-    def create_synaptic_block(
-            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        """ Create a synaptic block from the data.
-
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param int synapse_type:
-        :param SynapseInformation synapse_info:
-        :returns:
-            The synaptic matrix data to go to the machine, as a Numpy array
-        :rtype: ~numpy.ndarray
-        """
-
     def get_provenance_data(self, synapse_info):
         """
         :param SynapseInformation synapse_info:
@@ -592,26 +577,22 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         return False
 
-    def could_connect(
-            self, synapse_info, src_machine_vertex, dest_machine_vertex):
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        """ Get the machine vertices that are connected to each other with
+            this connector
+
+        :param SynapseInformation s_info:
+            The synapse information of the connection
+        :param ApplicationVertex source_vertex: The source of the spikes
+        :param ApplicationVertex target_vertex: The target of the spikes
+        :return: A list of tuples of (target machine vertex, source
+        :rtype: list(tuple(MachineVertex, list(AbstractVertex)))
         """
-        Checks if a pre slice and a post slice could connect.
-
-        Typically used to determine if a Machine Edge should be created by
-        checking that at least one of the indexes in the pre slice could
-        over time connect to at least one of the indexes in the post slice.
-
-        .. note::
-            This method should never return a false negative,
-            but may return a false positives
-
-        :param SynapseInformation synapse_info:
-        :param ~pacman.model.graphs.machine.MachineVertex src_machine_vertex:
-        :param ~pacman.model.graphs.machine.MachineVertex dest_machine_vertex:
-        :rtype: bool
-        """
-        # Unless we know for sure we must say they could connect
-        return True
+        # By default, just return that the whole target connects to the
+        # whole source
+        return [(m_vertex, [source_vertex])
+                for m_vertex in target_vertex.splitter.get_in_coming_vertices(
+                    SPIKE_PARTITION_ID)]
 
     def connect(self, projection):
         """ Apply this connector to a projection.
@@ -646,3 +627,14 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return temp
         raise SpynnakerException(
             "Size of {} must be an int, received {}".format(label, size))
+
+    def validate_connection(self, application_edge, synapse_info):
+        """ Checks that the edge supports the connector.  By default this does
+            nothing i.e. assumes the edge is OK, but can be overridden if the
+            connector has rules that need to be checked.  Returns nothing; it
+            is assumed that an Exception will be raised if anything is wrong.
+
+        :param ApplicationEdge application_edge: The edge of the connection
+        :param SynapseInformation synapse_info: The synaptic information
+        """
+        return

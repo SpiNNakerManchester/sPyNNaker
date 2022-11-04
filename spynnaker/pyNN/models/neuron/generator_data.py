@@ -31,7 +31,8 @@ class GeneratorData(object):
 
     def __init__(
             self, synaptic_matrix_offset, delayed_synaptic_matrix_offset,
-            app_edge, synapse_information, max_row_info, max_atoms_per_core):
+            app_edge, synapse_information, max_row_info,
+            max_pre_atoms_per_core, max_post_atoms_per_core):
         # Offsets are used in words in the generator, but only
         # if the values are valid
         if synaptic_matrix_offset is not None:
@@ -73,7 +74,8 @@ class GeneratorData(object):
             ], dtype=numpy.uint32))
         self.__data.append(synapse_dynamics.gen_matrix_params(
             synaptic_matrix_offset, delayed_synaptic_matrix_offset, app_edge,
-            synapse_information, max_row_info, max_atoms_per_core))
+            synapse_information, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core))
         self.__data.append(connector.gen_connector_params())
         self.__data.append(connector.gen_weights_params(
             synapse_information.weights))

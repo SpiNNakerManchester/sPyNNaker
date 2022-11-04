@@ -76,7 +76,8 @@ const struct neuron_regions NEURON_REGIONS = {
     .core_params = CORE_PARAMS_REGION,
     .neuron_params = NEURON_PARAMS_REGION,
     .current_source_params = CURRENT_SOURCE_PARAMS_REGION,
-    .neuron_recording = NEURON_RECORDING_REGION
+    .neuron_recording = NEURON_RECORDING_REGION,
+	.initial_values = INITIAL_VALUES_REGION
 };
 
 //! From the regions, extract those that are synapse-specific
@@ -135,7 +136,8 @@ void resume_callback(void) {
     recording_reset();
 
     // try resuming neuron
-    if (!neuron_resume()) {
+    // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
+    if (!neuron_resume(time + 1)) {
         log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }
@@ -153,7 +155,6 @@ static inline void process_ring_buffers(void) {
 
     // Print the neuron inputs.
     #if LOG_LEVEL >= LOG_DEBUG
-        log_debug("Inputs");
         neuron_print_inputs();
     #endif // LOG_LEVEL >= LOG_DEBUG
 }
@@ -164,8 +165,6 @@ static inline void process_ring_buffers(void) {
 //! \param[in] local_time: The time step being executed
 void background_callback(uint timer_count, uint local_time) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
-
-    log_debug("Timer tick %u \n", local_time);
 
     spike_processing_do_rewiring(synaptogenesis_n_updates());
 
@@ -237,8 +236,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 //!        recording data.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(void) {
-    log_debug("Initialise: started");
-
     data_specification_metadata_t *ds_regions;
     if (!initialise_common_regions(
             &timer_period, &simulation_ticks, &infinite_run, &time,
@@ -279,10 +276,8 @@ static bool initialise(void) {
     }
 
     // Set timer tick (in microseconds)
-    log_debug("setting timer tick callback for %d microseconds", timer_period);
     spin1_set_timer_tick(timer_period);
 
-    log_debug("Initialise: finished");
     return true;
 }
 

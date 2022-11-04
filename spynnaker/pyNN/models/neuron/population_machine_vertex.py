@@ -16,7 +16,6 @@ from enum import Enum
 import os
 import ctypes
 
-from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
@@ -72,7 +71,6 @@ class PopulationMachineVertex(
     """
 
     __slots__ = [
-        "__change_requires_neuron_parameters_reload",
         "__synaptic_matrices",
         "__neuron_data",
         "__key",
@@ -80,7 +78,9 @@ class PopulationMachineVertex(
         "__weight_scales",
         "__structural_sz",
         "__slice_index",
-        "__max_atoms_per_core"]
+        "__max_atoms_per_core",
+        "__regenerate_neuron_data",
+        "__regenerate_synapse_data"]
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
     DMA_COMPLETE = "DMA's that were completed"
@@ -109,6 +109,7 @@ class PopulationMachineVertex(
         NEURON_BUILDER = 13
         BIT_FIELD_FILTER = 14
         RECORDING = 15
+        INITIAL_VALUES = 16
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -123,7 +124,8 @@ class PopulationMachineVertex(
         neuron_params=REGIONS.NEURON_PARAMS.value,
         current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
         neuron_recording=REGIONS.NEURON_RECORDING.value,
-        neuron_builder=REGIONS.NEURON_BUILDER.value
+        neuron_builder=REGIONS.NEURON_BUILDER.value,
+        initial_values=REGIONS.INITIAL_VALUES.value
     )
 
     # Regions for this vertex used by synapse parts
@@ -145,15 +147,13 @@ class PopulationMachineVertex(
         4: "PROCESS_PLASTIC_SYNAPSES"}
 
     def __init__(
-            self, resources_required, label, constraints, app_vertex,
-            vertex_slice, slice_index, ring_buffer_shifts, weight_scales,
+            self, sdram, label, app_vertex, vertex_slice, slice_index,
+            ring_buffer_shifts, weight_scales,
             structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param str label: The label of the vertex
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Constraints for the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -170,13 +170,12 @@ class PopulationMachineVertex(
         :param NeuronData neuron_data: The handler of neuron data
         """
         super(PopulationMachineVertex, self).__init__(
-            label, constraints, app_vertex, vertex_slice, resources_required,
+            label, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
             SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None
-        self.__change_requires_neuron_parameters_reload = False
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
@@ -184,6 +183,8 @@ class PopulationMachineVertex(
         self.__max_atoms_per_core = max_atoms_per_core
         self.__synaptic_matrices = synaptic_matrices
         self.__neuron_data = neuron_data
+        self.__regenerate_neuron_data = False
+        self.__regenerate_synapse_data = False
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
@@ -246,7 +247,7 @@ class PopulationMachineVertex(
         proc_offset = syn_offset + SynapseProvenance.N_ITEMS
         end_proc_offset = proc_offset + SpikeProcessingProvenance.N_ITEMS
         self._parse_neuron_provenance(
-            label, x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
+            x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
         self._parse_synapse_provenance(
             label, x, y, p, provenance_data[syn_offset:proc_offset])
         self._parse_spike_processing_provenance(
@@ -283,33 +284,20 @@ class PopulationMachineVertex(
             self.vertex_slice))
         return ids
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps"
-    })
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "routing_info", "data_n_time_steps"
-        })
-    def generate_data_specification(
-            self, spec, placement, routing_info, data_n_time_steps):
-        """
-        :param routing_info: (injected)
-        :param data_n_time_steps: (injected)
-        """
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
-            self.vertex_slice, data_n_time_steps)
+            self.vertex_slice)
         rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
-            self.vertex_slice, data_n_time_steps))
+            self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
-        self._write_neuron_data_spec(
-            spec, routing_info, self.__ring_buffer_shifts)
+        self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
 
         self._write_synapse_data_spec(
-            spec, routing_info, self.__ring_buffer_shifts,
+            spec, self.__ring_buffer_shifts,
             self.__weight_scales, self.__structural_sz)
 
         # End the writing of this specification:
@@ -318,22 +306,27 @@ class PopulationMachineVertex(
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # write the neuron params into the new DSG region
-        self._write_neuron_parameters(spec, self.__ring_buffer_shifts)
+        if self.__regenerate_neuron_data:
+            self._rewrite_neuron_data_spec(spec)
+            self.__regenerate_neuron_data = False
 
-        # write the current source params into the new DSG region
-        self._write_current_source_parameters(spec)
+        if self.__regenerate_synapse_data:
+            self._write_synapse_data_spec(
+                spec, self.__ring_buffer_shifts,
+                self.__weight_scales, self.__structural_sz)
+            self.__regenerate_synapse_data = False
 
         # close spec
         spec.end_specification()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
-        return self.__change_requires_neuron_parameters_reload
+        return self.__regenerate_neuron_data or self.__regenerate_synapse_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        self.__change_requires_neuron_parameters_reload = new_value
+        # These are set elsewhere once data is generated
+        pass
 
     def _parse_spike_processing_provenance(
             self, label, x, y, p, provenance_data):
@@ -395,3 +388,12 @@ class PopulationMachineVertex(
             db.insert_core(
                 x, y, p, self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME,
                 prov.max_size_input_buffer)
+
+    @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
+    def set_do_neuron_regeneration(self):
+        self.__regenerate_neuron_data = True
+        self.__neuron_data.reset_generation()
+
+    @overrides(PopulationMachineSynapses.set_do_synapse_regeneration)
+    def set_do_synapse_regeneration(self):
+        self.__regenerate_synapse_data = True

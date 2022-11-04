@@ -55,7 +55,7 @@ def record_weights_using_callback():
     LIFLayer = sim.Population(
         popNeurons["LIFLayer"], sim.IF_curr_exp(**neuronParameters["LIFL"]),
         label="LIFLayer")
-    LIFLayer.set(v=initNeuronParameters["LIFL"]["vInit"])
+    LIFLayer.initialize(v=initNeuronParameters["LIFL"]["vInit"])
 
     ######################################
     # Synapses
@@ -159,7 +159,7 @@ def record_weights_using_multirun():
     LIFLayer = sim.Population(
         popNeurons["LIFLayer"], sim.IF_curr_exp(**neuronParameters["LIFL"]),
         label="LIFLayer")
-    LIFLayer.set(v=initNeuronParameters["LIFL"]["vInit"])
+    LIFLayer.initialize(v=initNeuronParameters["LIFL"]["vInit"])
 
     ######################################
     # Synapses
@@ -228,8 +228,8 @@ class TestSTDPRecordWeights(BaseTestCase):
 
         ILSpike_r, LIFLS_r, v_r, w_multirun = record_weights_using_multirun()
 
-        assert(all(wc[0] == wm[0] for wc, wm in zip(w_callback, w_multirun)))
-        assert(all(wc[1] == wm[1] for wc, wm in zip(w_callback, w_multirun)))
+        assert all(wc[0] == wm[0] for wc, wm in zip(w_callback, w_multirun))
+        assert all(wc[1] == wm[1] for wc, wm in zip(w_callback, w_multirun))
 
     def test_STDP_record_weights(self):
         self.runsafe(self.do_run)
