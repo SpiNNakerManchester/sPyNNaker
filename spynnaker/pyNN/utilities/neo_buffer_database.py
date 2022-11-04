@@ -28,19 +28,18 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
 
-_N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
-_TWO_WORDS = struct.Struct("<II")
-_NEO_DDL_FILE = os.path.join(os.path.dirname(__file__), "db.sql")
-#: number of words per rewiring entry
-
 
 class NeoBufferDatabase(BufferDatabase):
 
+    _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
+    _TWO_WORDS = struct.Struct("<II")
+    _NEO_DDL_FILE = os.path.join(os.path.dirname(__file__), "db.sql")
     #: rewiring: shift values to decode recorded value
     _PRE_ID_SHIFT = 9
     _POST_ID_SHIFT = 1
     _POST_ID_FACTOR = 2 ** 8
     _FIRST_BIT = 1
+    #: number of words per rewiring entry
     _REWIRING_N_WORDS = 2
 
     def __init__(self, database_file=None):
@@ -54,7 +53,7 @@ class NeoBufferDatabase(BufferDatabase):
             database_file = self.default_database_file()
 
         super().__init__(database_file)
-        with open(_NEO_DDL_FILE, encoding="utf-8") as f:
+        with open(self._NEO_DDL_FILE, encoding="utf-8") as f:
             sql = f.read()
 
         self._SQLiteDB__db.executescript(sql)
@@ -218,7 +217,7 @@ class NeoBufferDatabase(BufferDatabase):
         indices = get_field_based_index(base_key, vertex_slice)
         slice_ids = vertex_slice.get_raster_ids(atoms_shape)
         while offset < number_of_bytes_written:
-            length, time = _TWO_WORDS.unpack_from(spike_data, offset)
+            length, time = self._TWO_WORDS.unpack_from(spike_data, offset)
             time *= simulation_time_step_ms
             data_offset = offset + 2 * BYTES_PER_WORD
 
@@ -294,8 +293,8 @@ class NeoBufferDatabase(BufferDatabase):
         offset = 0
         neurons = vertex_slice.get_raster_ids(atoms_shape)
         while offset < len(raw_data):
-            time, n_blocks = _TWO_WORDS.unpack_from(raw_data, offset)
-            offset += _TWO_WORDS.size
+            time, n_blocks = self._TWO_WORDS.unpack_from(raw_data, offset)
+            offset += self._TWO_WORDS.size
             spike_data = numpy.frombuffer(
                 raw_data, dtype="uint8",
                 count=n_bytes_per_block * n_blocks, offset=offset)
@@ -363,16 +362,16 @@ class NeoBufferDatabase(BufferDatabase):
 
         # There is one column for time and one for each neuron recording
         data_row_length = len(neurons) * data_type.size
-        full_row_length = data_row_length + _N_BYTES_FOR_TIMESTAMP
+        full_row_length = data_row_length + self._N_BYTES_FOR_TIMESTAMP
         n_rows = record_length // full_row_length
         row_data = numpy.asarray(record_raw, dtype="uint8").reshape(
             n_rows, full_row_length)
 
         time_bytes = (
-            row_data[:, 0: _N_BYTES_FOR_TIMESTAMP].reshape(
-                n_rows * _N_BYTES_FOR_TIMESTAMP))
+            row_data[:, 0: self._N_BYTES_FOR_TIMESTAMP].reshape(
+                n_rows * self._N_BYTES_FOR_TIMESTAMP))
         times = time_bytes.view("<i4").reshape(n_rows, 1)
-        var_data = (row_data[:, _N_BYTES_FOR_TIMESTAMP:].reshape(
+        var_data = (row_data[:, self._N_BYTES_FOR_TIMESTAMP:].reshape(
             n_rows * data_row_length))
         placement_data = data_type.decode_array(var_data).reshape(
             n_rows, len(neurons))
