@@ -66,7 +66,8 @@ struct neuron_t {
     REAL reset_h;
 };
 
-static inline void neuron_model_initialise(neuron_t *state, neuron_params_t *params) {
+static inline void neuron_model_initialise(neuron_t *state, neuron_params_t *params,
+		uint32_t n_steps_per_timestep) {
 	state->A = params->A;
     state->B = params->B;
 	state->C = params->C;
@@ -75,7 +76,7 @@ static inline void neuron_model_initialise(neuron_t *state, neuron_params_t *par
 	state->U = params->U;
 	state->I_offset = params->I_offset;
 	state->this_h = params->next_h;
-	state->reset_h = params->time_step;
+	state->reset_h = kdivui(params->time_step, n_steps_per_timestep);
 }
 
 static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *params) {

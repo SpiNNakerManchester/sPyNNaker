@@ -53,7 +53,9 @@ typedef struct input_type_t input_type_t;
 //! \brief initialise the structure from the parameters
 //! \param[out] state: Pointer to the state to set up
 //! \param[in] params: Pointer to the parameters passed in from host
-static void input_type_initialise(input_type_t *state, input_type_params_t *params);
+//! \param[in] n_steps_per_timestep: The number of steps to perform each update
+static void input_type_initialise(input_type_t *state, input_type_params_t *params,
+		uint32_t n_steps_per_timestep);
 
 //! \brief save parameters and state back to SDRAM for reading by host and recovery
 //!        on restart

@@ -32,7 +32,8 @@ struct additional_input_t {
 };
 
 static inline void additional_input_initialise(
-		UNUSED additional_input_t *state, UNUSED additional_input_params_t *params) {
+		UNUSED additional_input_t *state, UNUSED additional_input_params_t *params,
+		UNUSED uint32_t n_steps_per_timestep) {
 }
 
 static inline void additional_input_save_state(UNUSED additional_input_t *state,

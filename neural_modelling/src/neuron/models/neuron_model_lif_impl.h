@@ -92,15 +92,18 @@ static inline int32_t lif_ceil(REAL value) {
 	return integer;
 }
 
-static inline void neuron_model_initialise(neuron_t *state, neuron_params_t *params) {
+static inline void neuron_model_initialise(
+		neuron_t *state, neuron_params_t *params, uint32_t n_steps_per_timestep) {
+	REAL ts = kdivui(params->time_step, n_steps_per_timestep);
+	log_info("Time step %k after division by %u = %k", params->time_step, n_steps_per_timestep, ts);
 	state->V_membrane = params->V_init;
 	state->V_rest = params->V_rest;
     state->R_membrane = kdivk(params->tau_m, params->c_m);
-	state->exp_TC = expk(-kdivk(params->time_step, params->tau_m));
+	state->exp_TC = expk(-kdivk(ts, params->tau_m));
 	state->I_offset = params->I_offset;
     state->refract_timer = params->refract_timer_init;
 	state->V_reset = params->V_reset;
-	state->T_refract = lif_ceil(kdivk(params->T_refract_ms, params->time_step));
+	state->T_refract = lif_ceil(kdivk(params->T_refract_ms, ts));
 }
 
 static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *params) {

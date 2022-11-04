@@ -85,9 +85,10 @@ typedef enum {
 //---------------------------------------
 
 static inline void get_alpha_state(alpha_state_t *state, alpha_params_t *params,
-		REAL time_step_ms) {
-	decay_t decay = expulr(-kdivk(time_step_ms, params->tau));
-	decay_t init = kdivk(time_step_ms, (params->tau * params->tau));
+		REAL time_step_ms, uint32_t n_steps_per_timestep) {
+	REAL ts = kdivui(time_step_ms, n_steps_per_timestep);
+	decay_t decay = expulr(-kdivk(ts, params->tau));
+	decay_t init = kdivk(ts, (params->tau * params->tau));
 	state->lin_buff = params->lin_init;
 	state->exp_buff = params->exp_init;
 	state->q_buff = params->q_init;
@@ -96,9 +97,9 @@ static inline void get_alpha_state(alpha_state_t *state, alpha_params_t *params,
 }
 
 static inline void synapse_types_initialise(synapse_types_t *state,
-		synapse_types_params_t *params) {
-	get_alpha_state(&state->exc, &params->exc, params->time_step_ms);
-	get_alpha_state(&state->inh, &params->inh, params->time_step_ms);
+		synapse_types_params_t *params, uint32_t n_steps_per_timestep) {
+	get_alpha_state(&state->exc, &params->exc, params->time_step_ms, n_steps_per_timestep);
+	get_alpha_state(&state->inh, &params->inh, params->time_step_ms, n_steps_per_timestep);
 }
 
 static void synapse_types_save_state(synapse_types_t *state, synapse_types_params_t *params) {

@@ -176,7 +176,8 @@ static void neuron_impl_load_neuron_parameters(
     if (sizeof(neuron_t)) {
     	neuron_params_t *params = (neuron_params_t *) &address[next];
 		for (uint32_t i = 0; i < n_neurons; i++) {
-			neuron_model_initialise(&neuron_array[i], &params[i]);
+			neuron_model_initialise(&neuron_array[i], &params[i],
+					n_steps_per_timestep);
 		}
         next += n_words_needed(n_neurons * sizeof(neuron_params_t));
     }
@@ -184,7 +185,8 @@ static void neuron_impl_load_neuron_parameters(
     if (sizeof(input_type_t)) {
     	input_type_params_t *params = (input_type_params_t *) &address[next];
 		for (uint32_t i = 0; i < n_neurons; i++) {
-			input_type_initialise(&input_type_array[i], &params[i]);
+			input_type_initialise(&input_type_array[i], &params[i],
+					n_steps_per_timestep);
 		}
         next += n_words_needed(n_neurons * sizeof(input_type_params_t));
     }
@@ -192,7 +194,8 @@ static void neuron_impl_load_neuron_parameters(
     if (sizeof(threshold_type_t)) {
     	threshold_type_params_t *params = (threshold_type_params_t *) &address[next];
         for (uint32_t i = 0; i < n_neurons; i++) {
-        	threshold_type_initialise(&threshold_type_array[i], &params[i]);
+        	threshold_type_initialise(&threshold_type_array[i], &params[i],
+        			n_steps_per_timestep);
         }
         next += n_words_needed(n_neurons * sizeof(threshold_type_params_t));
     }
@@ -200,7 +203,8 @@ static void neuron_impl_load_neuron_parameters(
     if (sizeof(synapse_types_t)) {
     	synapse_types_params_t *params = (synapse_types_params_t *) &address[next];
 		for (uint32_t i = 0; i < n_neurons; i++) {
-			synapse_types_initialise(&synapse_types_array[i], &params[i]);
+			synapse_types_initialise(&synapse_types_array[i], &params[i],
+					n_steps_per_timestep);
 		}
         next += n_words_needed(n_neurons * sizeof(synapse_types_params_t));
     }
@@ -208,7 +212,8 @@ static void neuron_impl_load_neuron_parameters(
     if (sizeof(additional_input_t)) {
     	additional_input_params_t *params = (additional_input_params_t *) &address[next];
         for (uint32_t i = 0; i < n_neurons; i++) {
-        	additional_input_initialise(&additional_input_array[i], &params[i]);
+        	additional_input_initialise(&additional_input_array[i], &params[i],
+        			n_steps_per_timestep);
         }
         next += n_words_needed(n_neurons * sizeof(additional_input_params_t));
     }

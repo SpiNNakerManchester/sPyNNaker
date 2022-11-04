@@ -71,7 +71,7 @@ typedef enum {
 //---------------------------------------
 
 static inline void synapse_types_initialise(synapse_types_t *state,
-		synapse_types_params_t *params) {
+		synapse_types_params_t *params, UNUSED uint32_t n_steps_per_timestep) {
 	state->exc = params->exc;
 	state->inh = params->inh;
 }

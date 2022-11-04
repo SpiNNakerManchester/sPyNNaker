@@ -36,7 +36,9 @@ typedef struct threshold_type_t threshold_type_t;
 //! \brief initialise the state from the parameters
 //! \param[out] state: Pointer to the state to initialise
 //! \param[in] params: Pointer to the parameters passed in from host
-static void threshold_type_initialise(threshold_type_t *state, threshold_type_params_t *params);
+//! \param[in] n_steps_per_timestep: The number of steps to run each update
+static void threshold_type_initialise(threshold_type_t *state, threshold_type_params_t *params,
+		uint32_t n_steps_per_timestep);
 
 //! \brief save parameters and state back to SDRAM for reading by host and recovery
 //!        on restart

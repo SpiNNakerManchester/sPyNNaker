@@ -87,10 +87,10 @@ typedef enum {
 //---------------------------------------
 
 static inline void synapse_types_initialise(synapse_types_t *state,
-		synapse_types_params_t *params) {
-    decay_and_init(&state->exc, &params->exc, params->timestep_ms);
-    decay_and_init(&state->exc2, &params->exc2, params->timestep_ms);
-    decay_and_init(&state->inh, &params->inh, params->timestep_ms);
+		synapse_types_params_t *params, uint32_t n_steps_per_timestep) {
+    decay_and_init(&state->exc, &params->exc, params->timestep_ms, n_steps_per_timestep);
+    decay_and_init(&state->exc2, &params->exc2, params->timestep_ms, n_steps_per_timestep);
+    decay_and_init(&state->inh, &params->inh, params->timestep_ms, n_steps_per_timestep);
     state->multiplicator = params->multiplicator_init;
 	state->exc2_old = params->exc2_old_init;
 	state->scaling_factor = params->scaling_factor;

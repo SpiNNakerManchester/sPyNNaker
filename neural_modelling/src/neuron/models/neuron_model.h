@@ -44,7 +44,8 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief initialise the structure from the parameters
 //! \param[out] state: Pointer to the state to be filled in
 //! \param[in] params: Pointer to the parameters passed in from host
-static void neuron_model_initialise(neuron_t *state, neuron_params_t *params);
+//! \param[in] n_steps_per_timestep: Number of time steps to be done each full update
+static void neuron_model_initialise(neuron_t *state, neuron_params_t *params, uint32_t n_steps_per_timestep);
 
 //! \brief save parameters and state back to SDRAM for reading by host and recovery
 //!        on restart

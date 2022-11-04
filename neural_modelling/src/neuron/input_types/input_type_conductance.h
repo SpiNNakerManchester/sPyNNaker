@@ -38,7 +38,8 @@ struct input_type_t {
     REAL     V_rev_I;
 };
 
-static inline void input_type_initialise(input_type_t *state, input_type_params_t *params) {
+static inline void input_type_initialise(input_type_t *state, input_type_params_t *params,
+		UNUSED uint32_t n_steps_per_timestep) {
 	state->V_rev_E = params->V_rev_E;
 	state->V_rev_I = params->V_rev_I;
 }

@@ -29,7 +29,8 @@ struct input_type_t {
 };
 
 static inline void input_type_initialise(UNUSED input_type_t *state,
-		UNUSED input_type_params_t *params) {
+		UNUSED input_type_params_t *params,
+	    UNUSED uint32_t n_steps_per_timestep) {
 }
 
 static inline void input_type_save_state(UNUSED input_type_t *state,

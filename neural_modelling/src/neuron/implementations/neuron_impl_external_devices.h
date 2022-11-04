@@ -208,7 +208,7 @@ static void neuron_impl_load_neuron_parameters(
 
 	neuron_params_t *neuron_params = (neuron_params_t *) &address[next];
 	for (uint32_t i = 0; i < n_neurons; i++) {
-		neuron_model_initialise(&neuron_array[i], &neuron_params[i]);
+		neuron_model_initialise(&neuron_array[i], &neuron_params[i], n_steps_per_timestep);
 	}
 	next += n_words_needed(n_neurons * sizeof(neuron_params_t));
 
@@ -218,7 +218,7 @@ static void neuron_impl_load_neuron_parameters(
 
 	synapse_types_params_t *synapse_params = (synapse_types_params_t *) &address[next];
 	for (uint32_t i = 0; i < n_neurons; i++) {
-		synapse_types_initialise(&synapse_types_array[i], &synapse_params[i]);
+		synapse_types_initialise(&synapse_types_array[i], &synapse_params[i], n_steps_per_timestep);
 	}
 	next += n_words_needed(n_neurons * sizeof(synapse_types_params_t));
 

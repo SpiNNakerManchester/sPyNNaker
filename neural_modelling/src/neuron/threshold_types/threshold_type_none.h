@@ -28,8 +28,8 @@ struct threshold_type_params_t {
 struct threshold_type_t {
 };
 
-static threshold_type_t threshold_type_initialise(UNUSED threshold_type_t *state,
-		UNUSED threshold_type_params_t *params) {
+static void threshold_type_initialise(UNUSED threshold_type_t *state,
+		UNUSED threshold_type_params_t *params, UNUSED uint32_t n_steps_per_timestep) {
 }
 
 static void threshold_type_save_state(UNUSED threshold_type_t *state,

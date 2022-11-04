@@ -74,9 +74,9 @@ typedef enum {
 //---------------------------------------
 
 static inline void synapse_types_initialise(synapse_types_t *state,
-		synapse_types_params_t *params) {
-	decay_and_init(&state->exc, &params->exc, params->time_step_ms);
-    decay_and_init(&state->inh, &params->inh, params->time_step_ms);
+		synapse_types_params_t *params, uint32_t n_steps_per_timestep) {
+	decay_and_init(&state->exc, &params->exc, params->time_step_ms, n_steps_per_timestep);
+    decay_and_init(&state->inh, &params->inh, params->time_step_ms, n_steps_per_timestep);
 }
 
 static inline void synapse_types_save_state(synapse_types_t *state,

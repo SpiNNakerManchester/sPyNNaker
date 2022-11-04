@@ -51,8 +51,10 @@ struct additional_input_t {
 };
 
 static inline void additional_input_initialise(
-		additional_input_t *state, additional_input_params_t *params) {
-	state->exp_tau_ca2 = expk(-kdivk(params->time_step, params->tau_ca2));
+		additional_input_t *state, additional_input_params_t *params,
+		uint32_t n_steps_per_timestep) {
+	REAL ts = kdivui(params->time_step, n_steps_per_timestep);
+	state->exp_tau_ca2 = expk(-kdivk(ts, params->tau_ca2));
 	state->i_ca2 = params->i_ca2;
 	state->i_alpha = params->i_alpha;
 }

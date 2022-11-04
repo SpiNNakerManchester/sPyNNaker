@@ -32,8 +32,9 @@ struct input_type_t {
 	REAL scale_factor;
 };
 
-static inline void input_type_initialise(input_type_t *state, input_type_params_t *params) {
-	state->scale_factor = 1.0k / params->time_step;
+static inline void input_type_initialise(input_type_t *state, input_type_params_t *params,
+		uint32_t n_steps_per_time_step) {
+	state->scale_factor = kdivk(1.0, kdivui(params->time_step, n_steps_per_time_step));
 }
 
 static inline void input_type_save_state(UNUSED input_type_t *state,

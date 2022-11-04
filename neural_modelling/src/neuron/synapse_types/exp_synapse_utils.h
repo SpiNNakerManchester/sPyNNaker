@@ -38,12 +38,18 @@ typedef struct exp_state_t {
     input_t synaptic_input_value;   //!< The actual synaptic contribution
 } exp_state_t;
 
-//! \brief
-static inline void decay_and_init(exp_state_t *state, exp_params_t *params, REAL time_step_ms) {
-	REAL ts_over_tau = kdivk(time_step_ms, params->tau);
+//! \brief Calculate the exponential state from the exponential parameters
+//! \param[out] state The state to initialise
+//! \param[in] params The parameters to use to do the initialisation
+//! \param[in] time_step_ms The time step of the simulation overall
+//! \param[in] n_steps_per_timestep The sub-stepping of the simulation
+static inline void decay_and_init(exp_state_t *state, exp_params_t *params,
+		REAL time_step_ms, uint32_t n_steps_per_timestep) {
+	REAL ts = kdivui(time_step_ms, n_steps_per_timestep);
+	REAL ts_over_tau = kdivk(ts, params->tau);
 	decay_t decay = expulr(-ts_over_tau);
 	decay_t inv_decay = 1.0ulr - decay;
-	REAL tau_over_ts = kdivk(params->tau, time_step_ms);
+	REAL tau_over_ts = kdivk(params->tau, ts);
 	decay_t init = decay_s1615_to_u032(tau_over_ts, inv_decay);
 	state->decay = decay;
 	state->init = init;

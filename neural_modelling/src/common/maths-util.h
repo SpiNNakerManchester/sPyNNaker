@@ -225,4 +225,8 @@ static inline int32_t udivk(int32_t a, REAL b) {
     return __LI(udiv64(__U64(a) << 15, __U64(bitsk(b))));
 }
 
+static inline REAL kdivui(REAL a, uint32_t b) {
+	return kbits((uint32_t) __LI(udiv64(__U64(bitsk(a)), __U64(b))));
+}
+
 #endif  // _MATHS_UTIL_

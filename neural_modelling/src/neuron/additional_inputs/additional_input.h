@@ -35,8 +35,10 @@ typedef struct additional_input_t additional_input_t;
 //! \brief initialise the structure from the parameters
 //! \param[out] state: Pointer to the state to be set up
 //! \param[in] params: Pointer to the parameters passed in from host
+//! \param[in] n_steps_per_timestep: The number of steps to run each update
 static void additional_input_initialise(
-		additional_input_t *state, additional_input_params_t *params);
+		additional_input_t *state, additional_input_params_t *params,
+		uint32_t n_steps_per_timestep);
 
 //! \brief save parameters and state back to SDRAM for reading by host and recovery
 //!        on restart

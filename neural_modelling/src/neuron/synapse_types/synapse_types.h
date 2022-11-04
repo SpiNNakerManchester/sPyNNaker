@@ -37,7 +37,9 @@ typedef struct synapse_types_t synapse_types_t;
 //! \brief initialise the structure from the parameters
 //! \param[out] state: Pointer to the state to set up
 //! \param[in] params: Pointer to the parameters passed in from host
-static void synapse_types_initialise(synapse_types_t *state, synapse_types_params_t *params);
+//! \param[in] n_steps_per_timestep: The number of steps to run each update
+static void synapse_types_initialise(synapse_types_t *state, synapse_types_params_t *params,
+		uint32_t n_steps_per_time_step);
 
 //! \brief save parameters and state back to SDRAM for reading by host and recovery
 //!        on restart
