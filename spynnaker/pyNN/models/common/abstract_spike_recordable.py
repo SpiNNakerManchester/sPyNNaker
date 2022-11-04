@@ -76,4 +76,3 @@ class AbstractSpikeRecordable(object, metaclass=AbstractBase):
     @abstractmethod
     def write_spike_metadata(self):
         """ TODO """
-

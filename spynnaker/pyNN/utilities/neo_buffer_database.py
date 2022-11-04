@@ -545,7 +545,7 @@ class NeoBufferDatabase(BufferDatabase):
                 in_range = False
             previous = index
         if in_range:
-           results += str(previous)
+            results += str(previous)
         return results
 
     @staticmethod
