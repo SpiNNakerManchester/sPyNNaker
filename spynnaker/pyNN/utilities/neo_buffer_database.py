@@ -57,7 +57,7 @@ class NeoBufferDatabase(BufferDatabase):
         with self.transaction() as cursor:
             cursor.execute(
                 """
-                INSERT INTO segment 
+                INSERT INTO segment
                 (simulation_time_step_ms)
                  VALUES (?)
                 """, [SpynnakerDataView.get_simulation_time_step_ms()])
@@ -65,7 +65,7 @@ class NeoBufferDatabase(BufferDatabase):
     def _get_simulation_time_step_ms(self, cursor):
         for row in cursor.execute(
                 """
-                SELECT simulation_time_step_ms 
+                SELECT simulation_time_step_ms
                 FROM segment
                 LIMIT 1
                 """):
@@ -86,7 +86,7 @@ class NeoBufferDatabase(BufferDatabase):
             data_type_name = None
         cursor.execute(
             """
-            INSERT INTO population_recording 
+            INSERT INTO population_recording
             (label, variable, data_type, function)
              VALUES (?, ?, ?, ?)
             """, (pop_label, variable, data_type_name, data_function))
@@ -160,7 +160,7 @@ class NeoBufferDatabase(BufferDatabase):
         rows = list(cursor.execute(
             """
             SELECT region_id, neurons_st, simple_indexes
-            FROM spikes_metadata 
+            FROM spikes_metadata
             WHERE pop_rec_id = ?
             """, [pop_rec_id]))
         for row in rows:
@@ -185,7 +185,7 @@ class NeoBufferDatabase(BufferDatabase):
             simple_indexes = (len(neurons) == vertex.vertex_slice.n_atoms)
             cursor.execute(
                 """
-                INSERT INTO spikes_metadata 
+                INSERT INTO spikes_metadata
                 (pop_rec_id, region_id, neurons_st, simple_indexes)
                  VALUES (?, ?, ?, ?)
                 """, (pop_rec_id, region_id, neurons_st, simple_indexes))
@@ -239,7 +239,7 @@ class NeoBufferDatabase(BufferDatabase):
         rows = list(cursor.execute(
             """
             SELECT region_id, base_key, vertex_slice, atoms_shape
-            FROM eieio_spikes_metadata 
+            FROM eieio_spikes_metadata
             WHERE pop_rec_id = ?
             """, [pop_rec_id]))
 
@@ -267,7 +267,7 @@ class NeoBufferDatabase(BufferDatabase):
 
             cursor.execute(
                 """
-                INSERT INTO eieio_spikes_metadata 
+                INSERT INTO eieio_spikes_metadata
                 (pop_rec_id, region_id, base_key, vertex_slice, atoms_shape)
                  VALUES (?, ?, ?, ?, ?)
                 """,
@@ -313,7 +313,7 @@ class NeoBufferDatabase(BufferDatabase):
         rows = list(cursor.execute(
             """
             SELECT region_id, vertex_slice, atoms_shape
-            FROM multi_spikes_metadata 
+            FROM multi_spikes_metadata
             WHERE pop_rec_id = ?
             """, [pop_rec_id]))
 
@@ -341,7 +341,7 @@ class NeoBufferDatabase(BufferDatabase):
 
             cursor.execute(
                 """
-                INSERT INTO multi_spikes_metadata 
+                INSERT INTO multi_spikes_metadata
                 (pop_rec_id, region_id, vertex_slice, atoms_shape)
                  VALUES (?, ?, ?, ?)
                 """,
@@ -383,7 +383,7 @@ class NeoBufferDatabase(BufferDatabase):
         rows = list(cursor.execute(
             """
             SELECT region_id, neurons_st, sampling_rate
-            FROM matrix_metadata 
+            FROM matrix_metadata
             WHERE pop_rec_id = ?
             """, [pop_rec_id]))
 
@@ -422,7 +422,7 @@ class NeoBufferDatabase(BufferDatabase):
             neurons_st = self.array_to_string(neurons)
             cursor.execute(
                 """
-                INSERT INTO matrix_metadata 
+                INSERT INTO matrix_metadata
                 (pop_rec_id, region_id, neurons_st, sampling_rate)
                  VALUES (?, ?, ?, ?)
                 """, (pop_rec_id, region_id, neurons_st, sampling_rate))
@@ -459,7 +459,6 @@ class NeoBufferDatabase(BufferDatabase):
         rewire_times.extend(record_time)
 
     def _get_rewires(self, cursor, pop_rec_id, data_type):
-        simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
         rewire_times = list()
         rewire_values = list()
         rewire_postids = list()
@@ -468,7 +467,7 @@ class NeoBufferDatabase(BufferDatabase):
         rows = list(cursor.execute(
             """
             SELECT region_id, vertex_slice
-            FROM rewires_metadata 
+            FROM rewires_metadata
             WHERE pop_rec_id = ?
             """, [pop_rec_id]))
 
@@ -476,7 +475,7 @@ class NeoBufferDatabase(BufferDatabase):
             vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
 
             self._get_rewires_by_region(
-                cursor,row["region_id"], vertex_slice, rewire_values,
+                cursor, row["region_id"], vertex_slice, rewire_values,
                 rewire_postids, rewire_preids, rewire_times)
 
             if len(rewire_values) == 0:
@@ -497,7 +496,7 @@ class NeoBufferDatabase(BufferDatabase):
                 cursor, placement.x, placement.y, placement.p, region)
             cursor.execute(
                 """
-                INSERT INTO rewires_metadata 
+                INSERT INTO rewires_metadata
                 (pop_rec_id, region_id, vertex_slice)
                  VALUES (?, ?, ?)
                 """, (pop_rec_id, region_id, str(vertex.vertex_slice)))
@@ -530,17 +529,17 @@ class NeoBufferDatabase(BufferDatabase):
         for index in indexes[1:]:
             if index == previous + 1:
                 if not in_range:
-                    results+= ":"
+                    results += ":"
                     in_range = True
             else:
                 if in_range:
-                    results+= str(previous)
-                results+= ","
+                    results += str(previous)
+                results += ","
                 results += str(index)
                 in_range = False
             previous = index
         if in_range:
-           results+= str(previous)
+           results += str(previous)
         return results
 
     @staticmethod
@@ -550,7 +549,7 @@ class NeoBufferDatabase(BufferDatabase):
         if not isinstance(string, str):
             string = str(string, "utf-8")
         results = []
-        parts = re.findall("\d+[,:]*", string)
+        parts = re.findall(r"\d+[,:]*", string)
         start = None
         for part in parts:
             if part.endswith(":"):

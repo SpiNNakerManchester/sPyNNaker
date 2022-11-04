@@ -17,7 +17,6 @@ import logging
 import math
 import numpy
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -359,7 +358,7 @@ class NeuronRecorder(object):
         region = self.__region_ids[self.SPIKES]
 
         with NeoBufferDatabase() as db:
-             for vertex in vertices:
+            for vertex in vertices:
                 neurons = self._neurons_recording(
                     self.SPIKES, vertex.vertex_slice,
                     application_vertex.atoms_shape)
