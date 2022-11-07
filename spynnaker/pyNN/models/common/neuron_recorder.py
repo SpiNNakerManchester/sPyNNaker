@@ -357,7 +357,8 @@ class NeuronRecorder(object):
         """
         Write the metadata to retreive spikes based on just the database
 
-        :param ApplicationVertex application_vertex: vertex which will supply the data
+        :param ApplicationVertex application_vertex:
+            vertex which will supply the data
         """
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
