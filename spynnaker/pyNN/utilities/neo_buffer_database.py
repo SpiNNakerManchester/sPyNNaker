@@ -56,6 +56,7 @@ class NeoBufferDatabase(BufferDatabase):
         with open(self._NEO_DDL_FILE, encoding="utf-8") as f:
             sql = f.read()
 
+        # pylint: disable=no-member
         self._SQLiteDB__db.executescript(sql)
 
     def set_segement_data(self):
