@@ -75,4 +75,7 @@ class AbstractSpikeRecordable(object, metaclass=AbstractBase):
 
     @abstractmethod
     def write_spike_metadata(self):
-        """ TODO """
+        """
+        Write the metadata to retreive spikes based on just the database
+
+        """

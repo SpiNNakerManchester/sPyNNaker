@@ -80,4 +80,8 @@ class AbstractEventRecordable(object, metaclass=AbstractBase):
 
     @abstractmethod
     def write_events_metadata(self, variable):
-        """ TODOD """
+        """
+        Write the metadata to retrieve rewires data based on just the database
+
+        :param str variable:
+        """

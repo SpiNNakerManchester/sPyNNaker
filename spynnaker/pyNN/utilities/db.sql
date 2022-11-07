@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS spikes_metadata(
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     neurons_st TEXT NOT NULL,
-    simple_indexes BOOLEAN NOT NULL);
+    selective_recording BOOLEAN NOT NULL);
 
 CREATE TABLE IF NOT EXISTS eieio_spikes_metadata(
     eieio_spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,

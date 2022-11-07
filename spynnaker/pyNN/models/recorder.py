@@ -818,6 +818,9 @@ class Recorder(object):
         return channel_index
 
     def write_neo_metadata(self):
+        """
+        Write the metdatabase to the database so it can be used standalone
+        """
         for variable in self.get_all_recording_variables():
             if variable == SPIKES:
                 self.__vertex.write_spike_metadata()

@@ -75,9 +75,16 @@ class EIEIOSpikeRecorder(object):
 
     def write_spike_metadata(
             self, region, application_vertex, base_key_function):
+        """
+         Write the metadata to retrieve spikes based on just the data
+
+        :param int region: local region this vertex will write to
+        :param ApplicationVertex application_vertex:
+            vertex which will supply the data
+        :param method base_key_function: Function to calulate the base key
+        """
         with NeoBufferDatabase() as db:
             vertices = application_vertex.machine_vertices
             for vertex in vertices:
-                db.set_eieio_spikes_metadata(
-                    vertex, "spikes", region, base_key_function(vertex),
-                    application_vertex.atoms_shape)
+                db.write_eieio_spikes_metadata(
+                    vertex, "spikes", region, base_key_function(vertex))

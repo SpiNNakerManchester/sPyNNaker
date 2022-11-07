@@ -72,8 +72,13 @@ class MultiSpikeRecorder(object):
             return db.get_deta(application_vertex.label, "spikes")
 
     def write_spike_metadata(self, application_vertex, region):
+        """
+        Write the metadata to retrieve spikes based on just the data
+
+        :param ApplicatioNvertex application_vertex:
+        :param int region: local region this vertex will write to
+        """
         with NeoBufferDatabase() as db:
             vertices = application_vertex.machine_vertices
             for vertex in vertices:
-                db.set_multi_spikes_metadata(
-                    vertex, "spikes", region, application_vertex.atoms_shape)
+                db.write_multi_spikes_metadata(vertex, "spikes", region)

@@ -299,6 +299,14 @@ class NeuronRecorder(object):
     def __write_matrix_metadata(
             self, application_vertex,
             sampling_rate, data_type, variable):
+        """
+        Write the metadata to retrieve matrix data based on just the database
+
+        :param ApplicationVertex application_vertex:
+        :param int sampling_rate: Sampling rate in timesteps
+        :param DataType data_type: type of data being recorded
+        :param str variable: name of the variable.
+        """
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
                 variable))
@@ -312,8 +320,8 @@ class NeuronRecorder(object):
             else:
                 neurons = [i]
             with NeoBufferDatabase() as db:
-                db.set_matrix_metadata(vertex, variable, region, neurons,
-                                       data_type, sampling_rate)
+                db.write_matrix_metadata(vertex, variable, region, neurons,
+                                         data_type, sampling_rate)
 
     def write_matrix_metadata(self, application_vertex, variable):
         if variable in self.__bitfield_variables:
@@ -346,6 +354,11 @@ class NeuronRecorder(object):
             return db.get_deta(label, variable)
 
     def write_spike_metadata(self, application_vertex):
+        """
+        Write the metadata to retreive spikes based on just the database
+
+        :param ApplicationVertex application_vertex: vertex which will supply the data
+        """
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
                 self.SPIKES))
@@ -356,9 +369,15 @@ class NeuronRecorder(object):
                 neurons = self._neurons_recording(
                     self.SPIKES, vertex.vertex_slice,
                     application_vertex.atoms_shape)
-                db.set_spikes_metadata(vertex, self.SPIKES, region, neurons)
+                db.write_spikes_metadata(vertex, self.SPIKES, region, neurons)
 
     def write_events_metadata(self, application_vertex, variable):
+        """
+        Write the metadata to retrieve rewires data based on just the database
+
+        :param ApplicatioNVertex application_vertex:
+        :param str variable:
+        """
         if variable == self.REWIRING:
             return self.__write_rewires_metadata(application_vertex, variable)
         else:
@@ -407,6 +426,12 @@ class NeuronRecorder(object):
             return db.get_deta(label, variable)
 
     def __write_rewires_metadata(self, application_vertex, variable):
+        """
+        Write the metadata to retrieve rewires data based on just the database
+
+        :param ApplicationVeretx application_vertex:
+        :param str variable: name of the variable.
+        """
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
                 variable))
@@ -414,7 +439,7 @@ class NeuronRecorder(object):
 
         for i, vertex in enumerate(vertices):
             with NeoBufferDatabase() as db:
-                db.set_rewires_metadata(vertex, variable, region)
+                db.write_rewires_metadata(vertex, variable, region)
 
     def get_recordable_variables(self):
         """

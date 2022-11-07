@@ -181,21 +181,17 @@ class NeoBufferDatabase(BufferDatabase):
 
     def _get_spikes_by_region(
             self, cursor, region_id, neurons, simulation_time_step_ms,
-            no_indexes, spike_times, spike_ids):
+            selective_recording, spike_times, spike_ids):
         """
-        Adds spike data for this region to the list
+        Adds spike data for this region to the lists
 
+        :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
         :param array(int) neurons: mapping of local id to global id
         :param float simulation_time_step_ms:
-        :param bool no_indexes: flag to say if
+        :param bool selective_recording: flag to say if
         :param list(float) spike_times: List to add spike times to
         :param list(int) spike_ids: List to add spike ids to
-        :return:
-        """
-        """
-
-        :return:
         """
         neurons_recording = len(neurons)
         if neurons_recording == 0:
@@ -218,24 +214,32 @@ class NeoBufferDatabase(BufferDatabase):
         bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
             (-1, 32))).reshape((-1, n_bytes * 8))
         time_indices, local_indices = numpy.where(bits == 1)
-        if no_indexes:
-            indices = neurons[local_indices]
-            times = record_time[time_indices].reshape((-1))
-            spike_ids.extend(indices)
-            spike_times.extend(times)
-        else:
+        if selective_recording:
             for time_indice, local in zip(time_indices, local_indices):
                 if local < neurons_recording:
                     spike_ids.append(neurons[local])
                     spike_times.append(record_time[time_indice])
+        else:
+            indices = neurons[local_indices]
+            times = record_time[time_indices].reshape((-1))
+            spike_ids.extend(indices)
+            spike_times.extend(times)
 
     def _get_spikes(self, cursor, pop_rec_id):
+        """
+        Gets the spikes for this population/recording id
+
+        :param ~sqlite3.Cursor cursor:
+        :param int pop_rec_id:
+        :return: numpy array of spike ids and spike times
+        :rtype  ~numpy.ndarray
+        """
         spike_times = list()
         spike_ids = list()
         simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
         rows = list(cursor.execute(
             """
-            SELECT region_id, neurons_st, simple_indexes
+            SELECT region_id, neurons_st, selective_recording
             FROM spikes_metadata
             WHERE pop_rec_id = ?
             """, [pop_rec_id]))
@@ -244,12 +248,21 @@ class NeoBufferDatabase(BufferDatabase):
 
             self._get_spikes_by_region(
                 cursor, row["region_id"], neurons, simulation_time_step_ms,
-                row["simple_indexes"], spike_times, spike_ids)
+                row["selective_recording"], spike_times, spike_ids)
 
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))]
 
-    def set_spikes_metadata(self, vertex, variable, region, neurons):
+    def write_spikes_metadata(self, vertex, variable, region, neurons):
+        """
+        Write the metadata to retrieve spikes based on just the data
+
+        :param MachineVertex vertex: vertex which will supply the data
+        :param str variable: name of the variable. typically "spikes"
+        :param int region: local region this vertex will write to
+        :param list(int) neurons: mapping of global neuron ids to local one
+            based on position in the list
+        """
         with self.transaction() as cursor:
             pop_rec_id = self._get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, DataType.INT32,
@@ -258,23 +271,22 @@ class NeoBufferDatabase(BufferDatabase):
             region_id = self._get_region_id(
                 cursor, placement.x, placement.y, placement.p, region)
             neurons_st = self.array_to_string(neurons)
-            simple_indexes = (len(neurons) == vertex.vertex_slice.n_atoms)
+            selective_recording = (len(neurons) != vertex.vertex_slice.n_atoms)
             cursor.execute(
                 """
                 INSERT INTO spikes_metadata
-                (pop_rec_id, region_id, neurons_st, simple_indexes)
+                (pop_rec_id, region_id, neurons_st, selective_recording)
                  VALUES (?, ?, ?, ?)
-                """, (pop_rec_id, region_id, neurons_st, simple_indexes))
+                """, (pop_rec_id, region_id, neurons_st, selective_recording))
 
     def _get_eieio_spike_by_region(
             self, cursor, region_id, simulation_time_step_ms, base_key,
             vertex_slice, atoms_shape, results):
         """
+        Adds spike data for this region to the list
 
-        :param int x:
-        :param int y:
-        :param int p:
-        :param int region:
+        :param ~sqlite3.Cursor cursor:
+        :param int region_id: Region data came from
         :param float simulation_time_step_ms:
         :param int base_key:
         :param Slice vertex_slice:
@@ -309,6 +321,14 @@ class NeoBufferDatabase(BufferDatabase):
             results.append(numpy.dstack((neuron_ids, timestamps))[0])
 
     def _get_eieio_spikes(self, cursor, pop_rec_id):
+        """
+        Gets the spikes for this population/recording id
+
+        :param ~sqlite3.Cursor cursor:
+        :param int pop_rec_id:
+        :return: numpy array of spike ids and spike times
+        :rtype  ~numpy.ndarray
+        """
         simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
         results = []
 
@@ -331,8 +351,17 @@ class NeoBufferDatabase(BufferDatabase):
         result = numpy.vstack(results)
         return result[numpy.lexsort((result[:, 1], result[:, 0]))]
 
-    def set_eieio_spikes_metadata(
-            self, vertex, variable, region, base_key, atoms_shape):
+    def write_eieio_spikes_metadata(
+            self, vertex, variable, region, base_key):
+        """
+
+         Write the metadata to retrieve spikes based on just the data
+
+        :param MachineVertex vertex: vertex which will supply the data
+        :param str variable: name of the variable. typically "spikes"
+        :param int region: local region this vertex will write to
+        :param int base_key:base key to add to each spike index
+        """
         with self.transaction() as cursor:
             pop_rec_id = self._get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, DataType.INT32,
@@ -348,14 +377,21 @@ class NeoBufferDatabase(BufferDatabase):
                  VALUES (?, ?, ?, ?, ?)
                 """,
                 (pop_rec_id, region_id, base_key, str(vertex.vertex_slice),
-                 str(atoms_shape)))
+                 str(vertex.app_vertex.atoms_shape)))
 
     def _get_multi_spikes_by_region(
             self, cursor, region_id, simulation_time_step_ms, vertex_slice,
             atoms_shape, spike_times, spike_ids):
         """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param tuple(int) atoms_shape:
+        Adds spike data for this region to the lists
+
+        :param ~sqlite3.Cursor cursor:
+        :param int region_id: Region data came from
+        :param float simulation_time_step_ms:
+        :param Slice vertex_slice:
+        :param tuple(int, int) atoms_shape:
+        :param list(float) spike_times: List to add spike times to
+        :param list(int) spike_ids: List to add spike ids to
         """
         raw_data = self._read_contents(cursor, region_id)
 
@@ -383,6 +419,14 @@ class NeoBufferDatabase(BufferDatabase):
             spike_times.append(times)
 
     def _get_multi_spikes(self, cursor, pop_rec_id):
+        """
+        Gets the spikes for this population/recording id
+
+        :param ~sqlite3.Cursor cursor:
+        :param int pop_rec_id:
+        :return: numpy array of spike ids and spike times
+        :rtype  ~numpy.ndarray
+        """
         spike_times = list()
         spike_ids = list()
         simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
@@ -409,7 +453,14 @@ class NeoBufferDatabase(BufferDatabase):
         result = numpy.dstack((spike_ids, spike_times))[0]
         return result[numpy.lexsort((spike_times, spike_ids))]
 
-    def set_multi_spikes_metadata(self, vertex, variable, region, atoms_shape):
+    def write_multi_spikes_metadata(self, vertex, variable, region):
+        """
+        Write the metadata to retrieve spikes based on just the data
+
+        :param MachineVertex vertex: vertex which will supply the data
+        :param str variable: name of the variable. typically "spikes"
+        :param int region: local region this vertex will write to
+        """
         with self.transaction() as cursor:
             pop_rec_id = self._get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, DataType.INT32,
@@ -425,11 +476,24 @@ class NeoBufferDatabase(BufferDatabase):
                  VALUES (?, ?, ?, ?)
                 """,
                 (pop_rec_id, region_id, str(vertex.vertex_slice),
-                 str(atoms_shape)))
+                 str(vertex.app_vertex.atoms_shape)))
 
     def _get_matrix_data_by_region(
             self, cursor, region_id, neurons, data_type,
             simulation_time_step_ms, sampling_rate):
+        """
+        Extracts data for this region
+
+        :param ~sqlite3.Cursor cursor:
+        :param int region_id: Region data came from
+        :param array(int) neurons: mapping of local id to global id
+        :param DataType data_type: type of data to extract
+        :param float simulation_time_step_ms:
+        :param float sampling_rate:
+        :return:  neurons, times, data, sampling_interval
+        :rtype: (list(int), list(float ), numpy.array, float
+        """
+
         # for buffering output info is taken form the buffer manager
         record_raw = self._read_contents(cursor, region_id)
         record_length = len(record_raw)
@@ -454,6 +518,15 @@ class NeoBufferDatabase(BufferDatabase):
         return neurons, times, placement_data, sampling_interval
 
     def _get_matrix_data(self, cursor, pop_rec_id, data_type):
+        """
+        Gets the matrix data  for this population/recording id
+
+        :param ~sqlite3.Cursor cursor:
+        :param int pop_rec_id:
+        :param DataType data_type: type of data to extract
+        :return: numpy array of the data, neurons, sampling_interval
+        ;rtype: tuple(~numpy.ndarray,list(int), float)
+        """
         simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
         pop_data = None
         pop_times = None
@@ -487,8 +560,19 @@ class NeoBufferDatabase(BufferDatabase):
         order = numpy.argsort(indexes)
         return pop_data[:, order], indexes[order], sampling_interval
 
-    def set_matrix_metadata(self, vertex, variable, region, neurons,
-                            data_type, sampling_rate):
+    def write_matrix_metadata(self, vertex, variable, region, neurons,
+                              data_type, sampling_rate):
+        """
+        Write the metadata to retrieve matrix data based on just the database
+
+        :param MachineVertex vertex: vertex which will supply the data
+        :param str variable: name of the variable.
+        :param int region: local region this vertex will write to
+        :param list(int) neurons: mapping of global neuron ids to local one
+            based on position in the list
+        :param DataType data_type: type of data being recorded
+        :param int sampling_rate: Sampling rate in timesteps
+        """
         if len(neurons) == 0:
             return
         with self.transaction() as cursor:
@@ -509,6 +593,17 @@ class NeoBufferDatabase(BufferDatabase):
     def _get_rewires_by_region(
             self, cursor, region_id, vertex_slice, rewire_values,
             rewire_postids, rewire_preids, rewire_times):
+        """
+        Extracts rewires data for this region and adds it to the lists
+
+        :param ~sqlite3.Cursor cursor:
+        :param int region_id: Region data came from
+        :param Slice vertex_slice: slice of this region
+        :param list(int) rewire_values:
+        :param list(int) rewire_postids:
+        :param list(int) rewire_preids:
+        :param list(int) rewire_times:
+        """
         record_raw = self._read_contents(cursor, region_id)
         if len(record_raw) > 0:
             raw_data = (
@@ -537,7 +632,15 @@ class NeoBufferDatabase(BufferDatabase):
         rewire_preids.extend(pre_ids)
         rewire_times.extend(record_time)
 
-    def _get_rewires(self, cursor, pop_rec_id, data_type):
+    def _get_rewires(self, cursor, pop_rec_id):
+        """
+        Extracts rewires data for this region a
+
+        :param ~sqlite3.Cursor cursor:
+        :param int pop_rec_id:
+        :return: (rewire_values, rewire_postids, rewire_preids, rewire_times)
+        :rtype: ~numpy.ndarray(tuple(int, int, int, int))
+        """
         rewire_times = list()
         rewire_values = list()
         rewire_postids = list()
@@ -565,7 +668,14 @@ class NeoBufferDatabase(BufferDatabase):
             return result[numpy.lexsort(
                 (rewire_values, rewire_postids, rewire_preids, rewire_times))]
 
-    def set_rewires_metadata(self, vertex, variable, region):
+    def write_rewires_metadata(self, vertex, variable, region):
+        """
+        Write the metadata to retrieve rewires data based on just the database
+
+        :param MachineVertex vertex: vertex which will supply the data
+        :param str variable: name of the variable.
+        :param int region: local region this vertex will write to
+        """
         with self.transaction() as cursor:
             pop_rec_id = self._get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, None,
@@ -581,6 +691,14 @@ class NeoBufferDatabase(BufferDatabase):
                 """, (pop_rec_id, region_id, str(vertex.vertex_slice)))
 
     def get_deta(self, pop_label, variable):
+        """
+        Gets the data as a Numpy array for one opulation and variable
+
+        :param str pop_label:
+        :param str variable:
+        :return: a numpy array with data or this variable
+        :rtype  ~numpy.ndarray
+        """
         with self.transaction() as cursor:
             pop_rec_id, data_type, function = self._get_population_metadeta(
                 cursor, pop_label, variable)
@@ -593,12 +711,23 @@ class NeoBufferDatabase(BufferDatabase):
             elif function == RetrievalFunction.Matrix:
                 return self._get_matrix_data(cursor, pop_rec_id, data_type)
             elif function == RetrievalFunction.Rewires:
-                return self._get_rewires(cursor, pop_rec_id, data_type)
+                return self._get_rewires(cursor, pop_rec_id)
             else:
                 raise NotImplementedError(function)
 
     @staticmethod
     def array_to_string(indexes):
+        """
+        Converts a list of ints into a compact string
+
+        Works best if the list is sorted.
+
+        Ids are comman seperate except when a series of ids is seqential when
+        the start:end is used.
+
+        :param list(int) indexes:
+        :rtype str:
+        """
         if indexes is None or len(indexes) == 0:
             return ""
 
@@ -623,6 +752,14 @@ class NeoBufferDatabase(BufferDatabase):
 
     @staticmethod
     def string_to_array(string):
+        """
+        Converts a string into a list of ints
+
+        Assumes the wtring was created by array_to_string
+
+        :param str string:
+        :rtype: list(int
+        """
         if not string:
             return []
         if not isinstance(string, str):

@@ -83,6 +83,5 @@ class AbstractNeuronRecordable(object, metaclass=AbstractBase):
         :rtype: float
         """
 
-    @abstractmethod
     def write_matrix_metadata(self, variable):
         """ TODO """
