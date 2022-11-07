@@ -419,7 +419,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def _execute_write_neo_metadata(self):
         with FecTimer("Write Neo Metadata", TimerWork.OTHER):
             with NeoBufferDatabase() as db:
-                db.set_segement_data()
+                db.write_segement_data()
             for population in SpynnakerDataView.iterate_populations():
                 population._recorder.write_neo_metadata()
 

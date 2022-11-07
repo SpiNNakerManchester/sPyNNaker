@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from enum import (auto, Enum)
 import math
 import numpy
 import os
@@ -27,6 +28,22 @@ from spinn_front_end_common.interface.buffer_management.storage_objects \
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
+
+
+class RetrievalFunction(Enum):
+    """
+    Different functions to retrieve the data.
+
+    This class is designed to used internally by NeoBufferDatabase
+    """
+    Neuron_spikes = (auto())
+    EIEIO_spikes = (auto())
+    Multi_spike = (auto())
+    Matrix = (auto())
+    Rewires = (auto())
+
+    def __str__(self):
+        return self.name
 
 
 class NeoBufferDatabase(BufferDatabase):
@@ -44,10 +61,16 @@ class NeoBufferDatabase(BufferDatabase):
 
     def __init__(self, database_file=None):
         """
-        :param str database_file:
+        Extra support for Neo on top of the Database for SQLite 3.
+
+        This is the same database as used by BufferManager but with
+        extra tables and access methods added.
+
+        :param database_file:
             The name of a file that contains (or will contain) an SQLite
             database holding the data.
             If omitted the default location will be used.
+        :type database_file: None or str
         """
         if database_file is None:
             database_file = self.default_database_file()
@@ -59,7 +82,14 @@ class NeoBufferDatabase(BufferDatabase):
         # pylint: disable=no-member
         self._SQLiteDB__db.executescript(sql)
 
-    def set_segement_data(self):
+    def write_segement_data(self):
+        """
+        Writes the global information from the Views
+
+        This writes information held in SpynnakerDataView so that the database
+        is usable standalone
+
+        """
         with self.transaction() as cursor:
             cursor.execute(
                 """
@@ -69,6 +99,15 @@ class NeoBufferDatabase(BufferDatabase):
                 """, [SpynnakerDataView.get_simulation_time_step_ms()])
 
     def _get_simulation_time_step_ms(self, cursor):
+        """
+        The simulation time step, in milliseconds
+
+        The value that would be/have been returned by
+        SpynnakerDataView.get_simulation_time_step_ms()
+
+        :param ~sqlite3.Cursor cursor:
+        :type: Float
+        """
         for row in cursor.execute(
                 """
                 SELECT simulation_time_step_ms
@@ -77,8 +116,22 @@ class NeoBufferDatabase(BufferDatabase):
                 """):
             return row["simulation_time_step_ms"]
 
-    def get_population_recording_id(
+    def _get_population_recording_id(
             self, cursor, pop_label, variable, data_type, data_function):
+        """
+        Gets an id for this population and recording label combination.
+
+        Will create a new population/recording record if required.
+
+        For speed does not verify the additional fields if a record already
+        exists.
+
+        :param ~sqlite3.Cursor cursor:
+        :param str pop_label:
+        :param str variable:
+        :type data_type: DataType or None
+        :param RetrievalFunction data_function:
+        """
         for row in cursor.execute(
                 """
                 SELECT pop_rec_id FROM population_recording
@@ -95,11 +148,21 @@ class NeoBufferDatabase(BufferDatabase):
             INSERT INTO population_recording
             (label, variable, data_type, function)
              VALUES (?, ?, ?, ?)
-            """, (pop_label, variable, data_type_name, data_function))
+            """, (pop_label, variable, data_type_name, str(data_function)))
         return cursor.lastrowid
 
-    def get_population_metadeta(
+    def _get_population_metadeta(
             self, cursor, pop_label, variable):
+        """
+        Gets the metadata id for this population and recording label
+        combination.
+
+        :param ~sqlite3.Cursor cursor:
+        :param str pop_label:
+        :param str variable:
+        :return: id, datatype, retrieval function type
+        :rtype: (int, DataType, RetrievalFunction)
+        """
         for row in cursor.execute(
                 """
                 SELECT pop_rec_id,  data_type, function
@@ -112,7 +175,7 @@ class NeoBufferDatabase(BufferDatabase):
                 data_type = DataType[data_type_st]
             else:
                 data_type = None
-            function = str(row["function"], 'utf-8')
+            function = RetrievalFunction[str(row["function"], 'utf-8')]
             return (row["pop_rec_id"], data_type, function)
         raise Exception(f"No metedata for {variable} on {pop_label}")
 
@@ -120,11 +183,18 @@ class NeoBufferDatabase(BufferDatabase):
             self, cursor, region_id, neurons, simulation_time_step_ms,
             no_indexes, spike_times, spike_ids):
         """
+        Adds spike data for this region to the list
 
-        :param int region_id:
-        :param array(int) neurons:
+        :param int region_id: Region data came from
+        :param array(int) neurons: mapping of local id to global id
         :param float simulation_time_step_ms:
-        :param bool no_indexes:
+        :param bool no_indexes: flag to say if
+        :param list(float) spike_times: List to add spike times to
+        :param list(int) spike_ids: List to add spike ids to
+        :return:
+        """
+        """
+
         :return:
         """
         neurons_recording = len(neurons)
@@ -181,9 +251,9 @@ class NeoBufferDatabase(BufferDatabase):
 
     def set_spikes_metadata(self, vertex, variable, region, neurons):
         with self.transaction() as cursor:
-            pop_rec_id = self.get_population_recording_id(
+            pop_rec_id = self._get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, DataType.INT32,
-                "get_spikes")
+                RetrievalFunction.Neuron_spikes)
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             region_id = self._get_region_id(
                 cursor, placement.x, placement.y, placement.p, region)
@@ -264,9 +334,9 @@ class NeoBufferDatabase(BufferDatabase):
     def set_eieio_spikes_metadata(
             self, vertex, variable, region, base_key, atoms_shape):
         with self.transaction() as cursor:
-            pop_rec_id = self.get_population_recording_id(
+            pop_rec_id = self._get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, DataType.INT32,
-                "get_eieio_spikes")
+                RetrievalFunction.EIEIO_spikes)
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             region_id = self._get_region_id(
                 cursor, placement.x, placement.y, placement.p, region)
@@ -331,6 +401,9 @@ class NeoBufferDatabase(BufferDatabase):
                 cursor, row["region_id"], simulation_time_step_ms,
                 vertex_slice, atoms_shape, spike_times, spike_ids)
 
+        if not spike_ids:
+            return numpy.zeros((0, 2))
+
         spike_ids = numpy.hstack(spike_ids)
         spike_times = numpy.hstack(spike_times)
         result = numpy.dstack((spike_ids, spike_times))[0]
@@ -338,9 +411,9 @@ class NeoBufferDatabase(BufferDatabase):
 
     def set_multi_spikes_metadata(self, vertex, variable, region, atoms_shape):
         with self.transaction() as cursor:
-            pop_rec_id = self.get_population_recording_id(
+            pop_rec_id = self._get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, DataType.INT32,
-                "get_multi_spikes")
+                RetrievalFunction.Multi_spike)
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             region_id = self._get_region_id(
                 cursor, placement.x, placement.y, placement.p, region)
@@ -419,9 +492,9 @@ class NeoBufferDatabase(BufferDatabase):
         if len(neurons) == 0:
             return
         with self.transaction() as cursor:
-            pop_rec_id = self.get_population_recording_id(
+            pop_rec_id = self._get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, data_type,
-                "get_matrix")
+                RetrievalFunction.Matrix)
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             region_id = self._get_region_id(
                 cursor, placement.x, placement.y, placement.p, region)
@@ -494,9 +567,9 @@ class NeoBufferDatabase(BufferDatabase):
 
     def set_rewires_metadata(self, vertex, variable, region):
         with self.transaction() as cursor:
-            pop_rec_id = self.get_population_recording_id(
+            pop_rec_id = self._get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, None,
-                "get_rewires")
+                RetrievalFunction.Rewires)
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             region_id = self._get_region_id(
                 cursor, placement.x, placement.y, placement.p, region)
@@ -509,17 +582,17 @@ class NeoBufferDatabase(BufferDatabase):
 
     def get_deta(self, pop_label, variable):
         with self.transaction() as cursor:
-            pop_rec_id, data_type, function = self.get_population_metadeta(
+            pop_rec_id, data_type, function = self._get_population_metadeta(
                 cursor, pop_label, variable)
-            if function == "get_spikes":
+            if function == RetrievalFunction.Neuron_spikes:
                 return self._get_spikes(cursor, pop_rec_id)
-            elif function == "get_eieio_spikes":
+            elif function == RetrievalFunction.EIEIO_spikes:
                 return self._get_eieio_spikes(cursor, pop_rec_id)
-            elif function == "get_multi_spikes":
+            elif function == RetrievalFunction.Multi_spike:
                 return self._get_multi_spikes(cursor, pop_rec_id)
-            elif function == "get_matrix":
+            elif function == RetrievalFunction.Matrix:
                 return self._get_matrix_data(cursor, pop_rec_id, data_type)
-            elif function == "get_rewires":
+            elif function == RetrievalFunction.Rewires:
                 return self._get_rewires(cursor, pop_rec_id, data_type)
             else:
                 raise NotImplementedError(function)
