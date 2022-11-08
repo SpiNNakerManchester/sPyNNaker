@@ -86,5 +86,6 @@ class EIEIOSpikeRecorder(object):
         with NeoBufferDatabase() as db:
             vertices = application_vertex.machine_vertices
             for vertex in vertices:
+                vertex._update_virtual_key()
                 db.write_eieio_spikes_metadata(
                     vertex, "spikes", region, base_key_function(vertex))
