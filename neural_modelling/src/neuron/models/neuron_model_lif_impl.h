@@ -95,7 +95,6 @@ static inline int32_t lif_ceil(REAL value) {
 static inline void neuron_model_initialise(
 		neuron_t *state, neuron_params_t *params, uint32_t n_steps_per_timestep) {
 	REAL ts = kdivui(params->time_step, n_steps_per_timestep);
-	log_info("Time step %k after division by %u = %k", params->time_step, n_steps_per_timestep, ts);
 	state->V_membrane = params->V_init;
 	state->V_rest = params->V_rest;
     state->R_membrane = kdivk(params->tau_m, params->c_m);

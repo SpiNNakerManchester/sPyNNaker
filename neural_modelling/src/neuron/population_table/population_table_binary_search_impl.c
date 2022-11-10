@@ -123,7 +123,6 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
     }
     // No filters = nothing to load
     if (filter_region->n_filters == 0) {
-        log_info("No bitfields detected!");
         return true;
     }
     // try allocating DTCM for starting array for bitfields
@@ -164,13 +163,6 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
              uint32_t size = sizeof(bit_field_t) * n_words;
              connectivity_bit_field[mp_i] = spin1_malloc(size);
              if (connectivity_bit_field[mp_i] == NULL) {
-                 // If allocation fails, we can still continue
-                 log_info(
-                         "Could not initialise bit field for key %d, packets with "
-                         "that key will use a DMA to check if the packet targets "
-                         "anything within this core. Potentially slowing down the "
-                         "execution of neurons on this core.",
-                         master_population_table[mp_i].key);
                  // There might be more than one that has failed
                  failed_bit_field_reads += 1;
              } else {
