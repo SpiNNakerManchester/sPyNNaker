@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <spin1_api.h>
 #include <spin1_api_params.h>
+#include <debug.h>
 
 //! Mask to recognise the Comms Controller "not full" flag
 #define TX_NOT_FULL_MASK 0x10000000
@@ -33,7 +34,7 @@ static inline void wait_for_cc(void) {
         n_loops++;
     }
     if (!(cc[CC_TCR] & TX_NOT_FULL_MASK)) {
-        io_printf(IO_BUF, "[ERROR] Couldn't send spike; TCR=0x%08x\n", cc[CC_TCR]);
+        log_error("Couldn't send spike; TCR=0x%08x\n", cc[CC_TCR]);
         rt_error(RTE_SWERR);
     }
 }
