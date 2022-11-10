@@ -347,18 +347,20 @@ void synapses_flush_ring_buffers(timer_t time) {
 }
 
 bool synapses_process_synaptic_row(
-        uint32_t time, uint32_t spike_colour, synaptic_row_t row, bool *write_back) {
+        uint32_t time, uint32_t spike_colour, uint32_t colour_mask,
+		synaptic_row_t row, bool *write_back) {
 
     // Work out how much delay take off or add on to the actual delay because
     // of a delayed spike arrival time, or delayed change of time step in the
-    // current core.  Spikes can be at most 15 step late.  Masked difference is
-    // used to calculate this, which will always be positive because the mask
-    // removes the negative bit. Example: time colour 8, spike colour 13 means
-    // time colour has gone up to 15 and then wrapped since spike was sent.
+    // current core.  Spikes can be as late as the bits in colour_mask dictates.
+	/// Masked difference is used to calculate this, which will always be
+	// positive because the mask removes the negative bit.
+	// Example: time colour 8, spike colour 13, colour mask 0xF means time
+	// colour has gone up to 15 and then wrapped since spike was sent.
     // 8 - 13 = -5; -5 & 0xF = 11, so spike was sent 11 steps ago.
-    uint32_t time_colour = time & 0xF;
+    uint32_t time_colour = time & colour_mask;
     int32_t colour_diff = time_colour - spike_colour;
-    uint32_t colour_delay = colour_diff & 0xF;
+    uint32_t colour_delay = colour_diff & colour_mask;
 
     late_spikes += colour_delay & 0x1;
     if (colour_delay > max_late_spike) {

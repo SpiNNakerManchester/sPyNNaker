@@ -43,6 +43,9 @@ typedef struct dma_buffer {
     //! Spike colour
     uint32_t colour;
 
+    //! Spike colour mask
+    uint32_t colour_mask;
+
     //! Row data
     synaptic_row_t row;
 } dma_buffer;
@@ -121,9 +124,11 @@ static uint32_t p_per_ts_region;
 //! \param[in] row: Where in SDRAM to read the row from
 //! \param[in] n_bytes_to_transfer: The size of the synaptic row
 //! \param[in] spike: The spike that triggered this read
+//! \param[in] colour The spike colour to indicate delay
+//! \param[in] colour_mask The spike colour mask to apply
 static inline void do_dma_read(
         synaptic_row_t row, size_t n_bytes_to_transfer, spike_t spike,
-        uint32_t colour) {
+        uint32_t colour, uint32_t colour_mask) {
     // Write the SDRAM address of the plastic region and the
     // Key of the originating spike to the beginning of DMA buffer
     dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
@@ -131,6 +136,7 @@ static inline void do_dma_read(
     next_buffer->originating_spike = spike;
     next_buffer->n_bytes_transferred = n_bytes_to_transfer;
     next_buffer->colour = colour;
+    next_buffer->colour_mask = colour_mask;
 
     // Start a DMA transfer to fetch this synaptic row into current
     // buffer
@@ -151,9 +157,11 @@ static inline void do_dma_read(
 //! \param[in,out] n_rewire: Accumulator of number of rewirings
 //! \param[in,out] n_process_spike: Accumulator of number of processed spikes
 //! \return True if there's something to do
+//! \param[out] colour The spike colour to indicate delay
+//! \param[out] colour_mask The spike colour mask to apply
 static inline bool is_something_to_do(
         synaptic_row_t *row, size_t *n_bytes_to_transfer, spike_t *spike,
-        uint32_t *colour, uint32_t *n_rewire, uint32_t *n_process_spike) {
+        uint32_t *colour, uint32_t *colour_mask, uint32_t *n_rewire, uint32_t *n_process_spike) {
     // Disable interrupts here as dma_busy modification is a critical section
     uint cpsr = spin1_int_disable();
 
@@ -171,7 +179,7 @@ static inline bool is_something_to_do(
 
     // Is there another address in the population table?
     spin1_mode_restore(cpsr);
-    if (population_table_get_next_address(spike, row, n_bytes_to_transfer, colour)) {
+    if (population_table_get_next_address(spike, row, n_bytes_to_transfer, colour, colour_mask)) {
         *n_process_spike += 1;
         return true;
     }
@@ -189,7 +197,7 @@ static inline bool is_something_to_do(
         // as this can be slow
         spin1_mode_restore(cpsr);
         if (population_table_get_first_address(
-                *spike, row, n_bytes_to_transfer, colour)) {
+                *spike, row, n_bytes_to_transfer, colour, colour_mask)) {
             synaptogenesis_spike_received(time, *spike);
             *n_process_spike += 1;
             return true;
@@ -227,13 +235,14 @@ static bool setup_synaptic_dma_read(dma_buffer *current_buffer,
     size_t n_bytes_to_transfer;
     spike_t spike;
     uint32_t colour;
+    uint32_t colour_mask;
     dma_n_spikes = 0;
     dma_n_rewires = 0;
 
     // Keep looking if there is something to do until a DMA can be done
     bool setup_done = false;
     while (!setup_done && is_something_to_do(&row, &n_bytes_to_transfer,
-            &spike, &colour, &dma_n_rewires, &dma_n_spikes)) {
+            &spike, &colour, &colour_mask, &dma_n_rewires, &dma_n_spikes)) {
         if (current_buffer != NULL &&
                 current_buffer->sdram_writeback_address == row) {
             // If we can reuse the row, add on what we can use it for
@@ -245,7 +254,7 @@ static bool setup_synaptic_dma_read(dma_buffer *current_buffer,
             dma_n_spikes = 0;
         } else {
             // If the row is in SDRAM, set up the transfer and we are done
-            do_dma_read(row, n_bytes_to_transfer, spike, colour);
+            do_dma_read(row, n_bytes_to_transfer, spike, colour, colour_mask);
             setup_done = true;
         }
 
@@ -366,7 +375,8 @@ static void dma_complete_callback(UNUSED uint unused, UNUSED uint tag) {
         // it's going to be processed
         bool write_back_now = false;
         if (!synapses_process_synaptic_row(
-                time, current_buffer->colour, current_buffer->row, &write_back_now)) {
+                time, current_buffer->colour, current_buffer->colour_mask,
+				current_buffer->row, &write_back_now)) {
             log_error(
                     "Error processing spike 0x%.8x for address 0x%.8x"
                     " (local=0x%.8x)",

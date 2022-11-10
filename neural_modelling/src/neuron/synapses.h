@@ -99,11 +99,14 @@ bool synapses_initialise(
 
 //! \brief process a synaptic row
 //! \param[in] time: the simulated time
+//! \param[in] spike_colour: the colour extracted from the spike key
+//! \param[in] colour_mask: the colour mask extracted from the pop table
 //! \param[in] row: the synaptic row in question
 //! \param[out] write_back: whether to write back to SDRAM
 //! \return True if successful
 bool synapses_process_synaptic_row(
-        uint32_t time, uint32_t spike_colour, synaptic_row_t row, bool *write_back);
+        uint32_t time, uint32_t spike_colour, uint32_t colour_mask,
+		synaptic_row_t row, bool *write_back);
 
 //! \brief returns the counters for plastic and fixed pre synaptic events based
 //!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or

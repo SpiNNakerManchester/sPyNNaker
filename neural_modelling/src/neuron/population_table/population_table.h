@@ -227,10 +227,13 @@ bool population_table_load_bitfields(filter_region_t *filter_region);
 //! \param[in] spike: The spike received
 //! \param[out] row_address: Updated with the address of the row
 //! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
+//! \param[out] colour: Updated with the spike colour
+//! \param[out] colour_mask: Updated with the spike colour mask
 //! \return True if there is a row to read, False if not
 bool population_table_get_first_address(
         spike_t spike, synaptic_row_t* row_address,
-        size_t* n_bytes_to_transfer, uint32_t *colour);
+        size_t* n_bytes_to_transfer, uint32_t *colour,
+		uint32_t *colour_mask);
 
 //! \brief Determine if there are more items with the same key
 //! \return Whether there are more items
@@ -243,9 +246,12 @@ static inline bool population_table_is_next(void) {
 //! \param[out] spike: The initiating spike
 //! \param[out] row_address: Updated with the address of the row
 //! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
+//! \param[out] colour: Updated with the spike colour
+//! \param[out] colour_mask: Updated with the spike colour mask
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
         spike_t *spike, synaptic_row_t* row_address,
-        size_t* n_bytes_to_transfer, uint32_t *colour);
+        size_t* n_bytes_to_transfer, uint32_t *colour,
+		uint32_t *colour_mask);
 
 #endif // _POPULATION_TABLE_H_

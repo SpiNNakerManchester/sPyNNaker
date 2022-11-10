@@ -43,6 +43,9 @@ typedef struct dma_buffer {
     //! Spike colour
     uint32_t colour;
 
+    //! Spike colour mask
+    uint32_t colour_mask;
+
     //! Row data
     synaptic_row_t row;
 } dma_buffer;
@@ -206,12 +209,13 @@ static inline void process_end_of_time_step(uint32_t time) {
 
 //! \brief Read a synaptic row from SDRAM into a local buffer.
 static inline void read_synaptic_row(spike_t spike, uint32_t colour,
-        synaptic_row_t row, uint32_t n_bytes) {
+        uint32_t colour_mask, synaptic_row_t row, uint32_t n_bytes) {
     dma_buffer *buffer = &dma_buffers[next_buffer_to_fill];
     buffer->sdram_writeback_address = row;
     buffer->originating_spike = spike;
     buffer->n_bytes_transferred = n_bytes;
     buffer->colour = colour;
+    buffer->colour_mask = colour_mask;
     do_fast_dma_read(row, buffer->row, n_bytes);
     next_buffer_to_fill = (next_buffer_to_fill + 1) & DMA_BUFFER_MOD_MASK;
 }
@@ -245,14 +249,17 @@ static inline bool get_next_spike(uint32_t time, spike_t *spike) {
 //! \param[in] time Simulation time step
 //! \param[in/out] spike Starts as the first spike received, but might change
 //!                      if the first spike doesn't cause a DMA
+//! \param[out] colour The spike colour to indicate delay
+//! \param[out] colour_mask The spike colour mask to apply
 //! \return True if a DMA was started
-static inline bool start_first_dma(uint32_t time, spike_t *spike, uint32_t *colour) {
+static inline bool start_first_dma(uint32_t time, spike_t *spike, uint32_t *colour,
+		uint32_t *colour_mask) {
     synaptic_row_t row;
     uint32_t n_bytes;
 
     do {
-        if (population_table_get_first_address(*spike, &row, &n_bytes, colour)) {
-            read_synaptic_row(*spike, *colour, row, n_bytes);
+        if (population_table_get_first_address(*spike, &row, &n_bytes, colour, colour_mask)) {
+            read_synaptic_row(*spike, *colour, *colour_mask, row, n_bytes);
             return true;
         }
     } while (!is_end_of_time_step() && get_next_spike(time, spike));
@@ -265,16 +272,18 @@ static inline bool start_first_dma(uint32_t time, spike_t *spike, uint32_t *colo
 //! \param[out] spike Pointer to receive the spike the DMA relates to
 //! \param[out] row Pointer to receive the address to be transferred
 //! \param[out] n_bytes Pointer to receive the number of bytes to transfer
+//! \param[out] colour The spike colour to indicate delay
+//! \param[out] colour_mask The spike colour mask to apply
 //! \return True if there is a DMA to do
 static inline bool get_next_dma(uint32_t time, spike_t *spike, synaptic_row_t *row,
-        uint32_t *n_bytes, uint32_t *colour) {
+        uint32_t *n_bytes, uint32_t *colour, uint32_t *colour_mask) {
     if (population_table_is_next() && population_table_get_next_address(
-            spike, row, n_bytes, colour)) {
+            spike, row, n_bytes, colour, colour_mask)) {
         return true;
     }
 
     while (!is_end_of_time_step() && get_next_spike(time, spike)) {
-        if (population_table_get_first_address(*spike, row, n_bytes, colour)) {
+        if (population_table_get_first_address(*spike, row, n_bytes, colour, colour_mask)) {
             return true;
         }
     }
@@ -325,7 +334,8 @@ static inline void process_current_row(uint32_t time, bool dma_in_progress) {
     bool write_back = false;
     dma_buffer *buffer = &dma_buffers[next_buffer_to_process];
 
-    if (!synapses_process_synaptic_row(time, buffer->colour, buffer->row, &write_back)) {
+    if (!synapses_process_synaptic_row(time, buffer->colour, buffer->colour_mask,
+    		buffer->row, &write_back)) {
         handle_row_error(buffer);
     }
     synaptogenesis_spike_received(time, buffer->originating_spike);
@@ -515,6 +525,7 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
         // Wait for a spike, or the timer to expire
         uint32_t spike;
         uint32_t colour;
+        uint32_t colour_mask;
         while (!is_end_of_time_step() && !get_next_spike(time, &spike)) {
             // This doesn't wait for interrupt currently because there isn't
             // a way to have a T2 interrupt without a callback function, and
@@ -530,7 +541,7 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
         }
 
         // There must be a spike!  Start a DMA processing loop...
-        bool dma_in_progress = start_first_dma(time, &spike, &colour);
+        bool dma_in_progress = start_first_dma(time, &spike, &colour, &colour_mask);
         while (dma_in_progress && !is_end_of_time_step()) {
 
             // If self-connected looped back spike then process post event here
@@ -543,7 +554,7 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
             // See if there is another DMA to do
             synaptic_row_t row;
             uint32_t n_bytes;
-            dma_in_progress = get_next_dma(time, &spike, &row, &n_bytes, &colour);
+            dma_in_progress = get_next_dma(time, &spike, &row, &n_bytes, &colour, &colour_mask);
 
             // Finish the current DMA before starting the next
             if (!wait_for_dma_to_complete_or_end()) {
@@ -552,7 +563,7 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
             }
             dma_complete_count++;
             if (dma_in_progress) {
-                read_synaptic_row(spike, colour, row, n_bytes);
+                read_synaptic_row(spike, colour, colour_mask, row, n_bytes);
             }
 
             // Process the row we already have while the DMA progresses

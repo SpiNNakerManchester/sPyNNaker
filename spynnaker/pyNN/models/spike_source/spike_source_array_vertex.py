@@ -16,8 +16,10 @@
 from collections import Counter
 import logging
 import numpy
+from pyNN.space import Grid2D, Grid3D
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
@@ -26,7 +28,7 @@ from spynnaker.pyNN.models.abstract_models import (
     PopulationApplicationVertex, RecordingType, ParameterHolder,
     SupportsStructure)
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
-from pyNN.space import Grid2D, Grid3D
+from .spike_source_array_machine_vertex import SpikeSourceArrayMachineVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -60,13 +62,14 @@ class SpikeSourceArrayVertex(
                  "__model",
                  "__structure",
                  "_spike_times",
-                 "__spike_recorder"]
+                 "__spike_recorder",
+                 "__n_colour_bits"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
             self, n_neurons, spike_times, label,
-            max_atoms_per_core, model, splitter):
+            max_atoms_per_core, model, splitter, n_colour_bits):
         # pylint: disable=too-many-arguments
         self.__model_name = "SpikeSourceArray"
         self.__model = model
@@ -91,6 +94,34 @@ class SpikeSourceArrayVertex(
         self._check_spike_density(spike_times)
         # handle recording
         self.__spike_recorder = EIEIOSpikeRecorder()
+        # Do colouring
+        self.__n_colour_bits = n_colour_bits
+        if self.__n_colour_bits is None:
+            self.__n_colour_bits = get_config_int(
+                "Simulation", "n_colour_bits")
+
+    @overrides(ReverseIpTagMultiCastSource.create_machine_vertex)
+    def create_machine_vertex(
+            self, vertex_slice, sdram, label=None):
+        send_buffer_times = self._filtered_send_buffer_times(vertex_slice)
+        machine_vertex = SpikeSourceArrayMachineVertex(
+            vertex_slice=vertex_slice,
+            label=label, app_vertex=self,
+            receive_port=self._receive_port,
+            receive_sdp_port=self._receive_sdp_port,
+            receive_tag=self._receive_tag,
+            receive_rate=self._receive_rate,
+            virtual_key=self._virtual_key, prefix=self._prefix,
+            prefix_type=self._prefix_type, check_keys=self._check_keys,
+            send_buffer_times=send_buffer_times,
+            send_buffer_partition_id=self._send_buffer_partition_id,
+            reserve_reverse_ip_tag=self._reserve_reverse_ip_tag,
+            injection_partition_id=self._injection_partition_id)
+        machine_vertex.enable_recording(self._is_recording)
+        # Known issue with ReverseIPTagMulticastSourceMachineVertex
+        if sdram:
+            assert sdram == machine_vertex.sdram_required
+        return machine_vertex
 
     def _check_spike_density(self, spike_times):
         if len(spike_times):
@@ -328,3 +359,8 @@ class SpikeSourceArrayVertex(
             "parameters": parameters,
         }
         return context
+
+    @property
+    @overrides(PopulationApplicationVertex.n_colour_bits)
+    def n_colour_bits(self):
+        return self.__n_colour_bits

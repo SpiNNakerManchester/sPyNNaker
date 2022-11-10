@@ -137,6 +137,8 @@ typedef struct global_parameters {
     uint32_t n_spike_sources;
     //! Maximum expected spikes per tick (for recording)
     uint32_t max_spikes_per_tick;
+    //! Number of bits to use for colour
+    uint32_t n_colour_bits;
     //! The seed for the Poisson generation process
     rng_seed_t spike_source_seed;
 } global_parameters;
@@ -244,10 +246,14 @@ static uint16_t *input_this_timestep;
 //! The timesteps per second
 static UREAL ts_per_second;
 
-//! The time step colour
+//! Buffer for rate change packets
+static circular_buffer rate_change_buffer;
+
+//! The colour of the current time step
 static uint32_t colour;
 
-static circular_buffer rate_change_buffer;
+//! The mask to apply to the time to get the colour
+static uint32_t colour_mask;
 
 //! \brief Random number generation for the Poisson sources.
 //!        This is a local version for speed of operation.
@@ -493,6 +499,8 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
                 keys_size, ssp_params.n_spike_sources);
     }
     spin1_memcpy(keys, &(sdram_globals[1]), keys_size);
+
+    colour_mask = (1 << ssp_params.n_colour_bits) - 1;
 
     log_info("\tset rate mask = %08x",
             ssp_params.set_rate_neuron_id_mask);
@@ -959,6 +967,9 @@ static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
         return;
     }
 
+    // Set the colour for the time step
+    colour = time & colour_mask;
+
     // Do any rate changes
     while (circular_buffer_size(rate_change_buffer) >= 2) {
     	uint32_t id = 0;
@@ -1013,8 +1024,6 @@ static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
     if (recording_flags > 0) {
         record_spikes(time);
     }
-
-    colour = (colour + 1) & 0xF;
 }
 
 //! \brief Multicast callback used to set rate when injected in a live example

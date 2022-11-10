@@ -118,9 +118,10 @@ def _u3232_to_uint64(array):
 # 5. REAL slow_rate_per_tick_cutoff; 6. REAL fast_rate_per_tick_cutoff;
 # 7. unt32_t first_source_id; 8. uint32_t n_spike_sources;
 # 9. uint32_t max_spikes_per_timestep;
-# 10,11,12,13 mars_kiss64_seed_t (uint[4]) spike_source_seed;
-# 14. Rate changed flag
-PARAMS_BASE_WORDS = 14
+# 10. uint32_t n_colour_bits;
+# 11,12,13,14 mars_kiss64_seed_t (uint[4]) spike_source_seed;
+# 15. Rate changed flag
+PARAMS_BASE_WORDS = 15
 
 # uint32_t n_rates; uint32_t index
 PARAMS_WORDS_PER_NEURON = 2
@@ -454,7 +455,8 @@ class SpikeSourcePoissonMachineVertex(
             keys = [0] * self.vertex_slice.n_atoms
         else:
             spec.write_value(1)
-            keys = get_field_based_keys(key, self.vertex_slice)
+            keys = get_field_based_keys(
+                key, self.vertex_slice, self.app_vertex.n_colour_bits)
 
         # Write the incoming mask if there is one
         incoming_mask = 0
@@ -492,6 +494,9 @@ class SpikeSourcePoissonMachineVertex(
 
         # Write the maximum spikes per tick
         spec.write_value(data=self.max_spikes_per_ts())
+
+        # Write the number of colour bits
+        spec.write_value(data=self.app_vertex.n_colour_bits)
 
         # Write the random seed (4 words), generated randomly!
         spec.write_array(self._app_vertex.kiss_seed(self.vertex_slice))
@@ -551,4 +556,5 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id):
-        return self._vertex_slice.n_atoms * 16
+        n_colours = 2 ** self.app_vertex.n_colour_bits
+        return self._vertex_slice.n_atoms * n_colours

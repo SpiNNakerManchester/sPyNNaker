@@ -41,6 +41,9 @@ static spike_t last_spike = 0;
 //! \brief The last colour received
 static uint32_t last_colour = 0;
 
+//! \brief The last colour mask used
+static uint32_t last_colour_mask = 0;
+
 //! \brief The last neuron id for the key
 static uint32_t last_neuron_id = 0;
 
@@ -78,8 +81,8 @@ static inline void print_master_population_table(void) {
         log_info("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
         int count = entry.count;
         int start = entry.start;
-		log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
-				entry.core_mask, entry.mask_shift, entry.n_neurons, entry.n_words);
+		log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u, n_colour_bits: %u",
+				entry.core_mask, entry.mask_shift, entry.n_neurons, entry.n_words, entry.n_colour_bits);
         for (uint16_t j = start; j < (start + count); j++) {
             address_list_entry addr = address_list[j];
             if (addr.address == INVALID_ADDRESS) {
@@ -269,7 +272,7 @@ bool population_table_initialise(
 
 bool population_table_get_first_address(
         spike_t spike, synaptic_row_t *row_address,
-        size_t *n_bytes_to_transfer, uint32_t *colour) {
+        size_t *n_bytes_to_transfer, uint32_t *colour, uint32_t *colour_mask) {
 
     // check we don't have a complete miss
     uint32_t position;
@@ -284,12 +287,13 @@ bool population_table_get_first_address(
     next_item = entry.start;
     items_to_go = entry.count;
 	uint32_t local_neuron_id = get_local_neuron_id(entry, spike);
-	uint32_t last_colour = 0;
 	if (entry.n_colour_bits) {
-		uint32_t colour_mask = (1 << entry.n_colour_bits) - 1;
-	    last_colour = local_neuron_id & colour_mask;
+		last_colour_mask = (1 << entry.n_colour_bits) - 1;
+	    last_colour = local_neuron_id & last_colour_mask;
 	    last_neuron_id = (local_neuron_id >> entry.n_colour_bits) + get_core_sum(entry, spike);
 	} else {
+		last_colour = 0;
+		last_colour_mask = 0;
 		last_neuron_id = local_neuron_id + get_core_sum(entry, spike);
 	}
 
@@ -311,7 +315,8 @@ bool population_table_get_first_address(
     // to be passed in but using the address of an argument is odd!
     uint32_t local_spike_id;
     bool get_next = population_table_get_next_address(
-            &local_spike_id, row_address, n_bytes_to_transfer, colour);
+            &local_spike_id, row_address, n_bytes_to_transfer, colour,
+			colour_mask);
 
     // tracks surplus DMAs
     if (!get_next) {
@@ -322,7 +327,7 @@ bool population_table_get_first_address(
 
 bool population_table_get_next_address(
         spike_t *spike, synaptic_row_t *row_address,
-        size_t *n_bytes_to_transfer, uint32_t *colour) {
+        size_t *n_bytes_to_transfer, uint32_t *colour, uint32_t *colour_mask) {
     // If there are no more items in the list, return false
     if (items_to_go == 0) {
         return false;
@@ -337,6 +342,7 @@ bool population_table_get_next_address(
         			last_neuron_id, row_address, n_bytes_to_transfer);
             *spike = last_spike;
             *colour = last_colour;
+            *colour_mask = last_colour_mask;
             is_valid = true;
         }
 

@@ -322,3 +322,6 @@ class DelayExtensionMachineVertex(
 
         # write whether to throw away spikes
         spec.write_value(data=int(self._app_vertex.drop_late_spikes))
+
+        # Write the number of colour bits
+        spec.write_value(data=self.app_vertex.n_colour_bits)
