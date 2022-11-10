@@ -363,8 +363,6 @@ static inline index_t key_n(key_t k) {
 //! \brief Processes spikes queued by ::incoming_spike_callback()
 static inline void spike_process(void) {
 
-
-
     // While there are any incoming spikes
     spike_t s;
     uint32_t state = spin1_int_disable();

@@ -259,13 +259,15 @@ bool synaptogenesis_dynamics_rewire(
 
     uint32_t colour;
     uint32_t colour_mask;
-    if (!population_table_get_first_address(*spike, synaptic_row, n_bytes, &colour, &colour_mask)) {
+    if (!population_table_get_first_address(*spike, synaptic_row, n_bytes,
+    		&colour, &colour_mask)) {
         log_error("FAIL@key %d", *spike);
         rt_error(RTE_SWERR);
     }
     uint32_t index = 0;
     while (index < m_pop_index) {
-        if (!population_table_get_next_address(spike, synaptic_row, n_bytes, &colour, &colour_mask)) {
+        if (!population_table_get_next_address(spike, synaptic_row, n_bytes,
+        		&colour, &colour_mask)) {
             log_error("FAIL@key %d, index %d (failed at %d)",
                     *spike, m_pop_index, index);
             rt_error(RTE_SWERR);
