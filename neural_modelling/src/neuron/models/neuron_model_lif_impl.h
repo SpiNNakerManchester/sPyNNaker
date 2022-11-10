@@ -82,7 +82,10 @@ struct neuron_t {
     int32_t  T_refract;
 };
 
-static inline int32_t lif_ceil(REAL value) {
+//! \brief Performs a ceil operation on an accum
+//! \param[in] value The value to ceil
+//! \return The ceil of the value
+static inline int32_t lif_ceil_accum(REAL value) {
 	int32_t bits = bitsk(value);
 	int32_t integer = bits >> 15;
 	int32_t fraction = bits & 0x7FFF;
@@ -102,7 +105,7 @@ static inline void neuron_model_initialise(
 	state->I_offset = params->I_offset;
     state->refract_timer = params->refract_timer_init;
 	state->V_reset = params->V_reset;
-	state->T_refract = lif_ceil(kdivk(params->T_refract_ms, ts));
+	state->T_refract = lif_ceil_accum(kdivk(params->T_refract_ms, ts));
 }
 
 static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *params) {

@@ -42,7 +42,7 @@
 //!            of the core parameters data region in SDRAM
 //! \param[in] neuron_params_address: The absolute address in SDRAM for the
 //!            start of the neuron parameters data region in SDRAM
-//! \param[in] current_sources_address: The abosolute address in SDRAM for the
+//! \param[in] current_sources_address: The absolute address in SDRAM for the
 //!            start of the current sources data region in SDRAM
 //! \param[in] recording_address: the recording parameters in SDRAM
 //!            (contains which regions are active and how big they are)

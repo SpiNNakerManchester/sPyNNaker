@@ -69,7 +69,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 MAX_RING_BUFFER_BITS = 14
 
 # The maximum number of cores to consider acceptable for a single chip
-_MAX_CORES = 16
+_MAX_CORES = 15
 
 
 class SplitterAbstractPopulationVertexNeuronsSynapses(

@@ -152,11 +152,11 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
 		return false;
 	}
 
-    // Allocate DTCM for threshold type array and copy block of data
+    // Allocate DTCM for packet firing array and copy block of data
 	packet_firing_array =
 			spin1_malloc(n_neurons * sizeof(packet_firing_data_t));
 	if (packet_firing_array == NULL) {
-		log_error("Unable to allocate threshold type array - Out of DTCM");
+		log_error("Unable to allocate packet firing array - Out of DTCM");
 		return false;
 	}
 

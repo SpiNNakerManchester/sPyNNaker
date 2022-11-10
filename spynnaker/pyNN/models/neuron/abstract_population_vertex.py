@@ -526,7 +526,7 @@ class AbstractPopulationVertex(
                 return 0
 
         # If structs are generatable, we can guess that parameters are,
-        # and then assume each parameters is different for maximum SDRAM.
+        # and then assume each parameter is different for maximum SDRAM.
         n_structs = len(structs)
         n_params = sum(len(s.fields) for s in structs)
         return sum([

@@ -367,7 +367,6 @@ void set_spike_source_rate(uint32_t sub_id, unsigned long accum rate) {
         if (rate_per_tick >= ssp_params.fast_rate_per_tick_cutoff) {
             spike_source->sqrt_lambda = SQRT(rate_per_tick);
             spike_source->exp_minus_lambda = UFRACT_CONST(0);
-            // warning: sqrtk is untested...
         } else {
             spike_source->exp_minus_lambda = (UFRACT) EXP(-rate_per_tick);
             spike_source->sqrt_lambda = ZERO;
@@ -1020,7 +1019,8 @@ static void multicast_packet_callback(uint key, uint payload) {
             (id - ssp_params.first_source_id >= ssp_params.n_spike_sources)) {
         return;
     }
-    int32_t sub_id = id - ssp_params.first_source_id;
+    // The above condition prevents this from being negative
+    uint32_t sub_id = (uint32_t) id - ssp_params.first_source_id;
     circular_buffer_add(rate_change_buffer, sub_id);
     circular_buffer_add(rate_change_buffer, payload);
 }

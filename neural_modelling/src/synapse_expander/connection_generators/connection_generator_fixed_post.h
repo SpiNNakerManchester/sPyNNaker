@@ -25,8 +25,6 @@
 #include <log.h>
 #include <synapse_expander/rng.h>
 
-#define N_RETRIES 10
-
 //! The parameters that can be copied from SDRAM.
 struct fixed_post_params {
     //! Do we allow self connections?
