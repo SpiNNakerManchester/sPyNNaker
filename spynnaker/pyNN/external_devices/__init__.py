@@ -309,3 +309,15 @@ def SpikeInjector(
             database_notify_host, database_notify_port_num,
             database_ack_port_num)
     return ExternalDeviceSpikeInjector()
+
+
+def _set_simulator(simulator):
+    """
+    Should only be called by pyNN/__init__py setup method.
+
+    Any other uses is not supported.
+
+    :param spynnaker.pyNN.spinnaker.SpiNNaker simulator:
+    """
+    global __simulator
+    __simulator = simulator
