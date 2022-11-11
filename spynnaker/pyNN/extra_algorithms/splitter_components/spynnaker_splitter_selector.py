@@ -22,14 +22,14 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from .splitter_abstract_pop_vertex_fixed import (
     SplitterAbstractPopulationVertexFixed)
-from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
-from .splitter_poisson_delegate import SplitterPoissonDelegate
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
-    SpikeSourceArrayVertex)
-from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
-    SpikeSourcePoissonVertex)
+from spynnaker.pyNN.models.spike_source import (
+    SpikeSourceArrayVertex, SpikeSourcePoissonVertex)
+from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
+from .splitter_poisson_delegate import SplitterPoissonDelegate
+from .splitter_abstract_pop_vertex_neurons_synapses import (
+    SplitterAbstractPopulationVertexNeuronsSynapses)
 
 PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
 
@@ -67,7 +67,12 @@ def spynakker_vertex_selector(app_vertex):
     """
     if app_vertex.splitter is None:
         if isinstance(app_vertex, AbstractPopulationVertex):
-            app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
+            if app_vertex.combined_core_capable:
+                app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
+            else:
+                app_vertex.splitter = (
+                    SplitterAbstractPopulationVertexNeuronsSynapses(
+                        app_vertex.n_synapse_cores_required))
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             app_vertex.splitter = SplitterExternalDevice()
         elif isinstance(app_vertex, ApplicationFPGAVertex):

@@ -25,11 +25,26 @@
 
 #include <common/neuron-typedefs.h>
 
+// Forward declaration of the threshold params type
+struct threshold_type_params_t;
+typedef struct threshold_type_params_t threshold_type_params_t;
+
 // Forward declaration of the threshold pointer type
 struct threshold_type_t;
 typedef struct threshold_type_t threshold_type_t;
-//! Pointer to a threshold type
-typedef threshold_type_t* threshold_type_pointer_t;
+
+//! \brief initialise the state from the parameters
+//! \param[out] state: Pointer to the state to initialise
+//! \param[in] params: Pointer to the parameters passed in from host
+//! \param[in] n_steps_per_timestep: The number of steps to run each update
+static void threshold_type_initialise(threshold_type_t *state, threshold_type_params_t *params,
+		uint32_t n_steps_per_timestep);
+
+//! \brief save parameters and state back to SDRAM for reading by host and recovery
+//!        on restart
+//! \param[in] state: The current state
+//! \param[out] params: Pointer to structure into which parameter can be written
+static void threshold_type_save_state(threshold_type_t *state, threshold_type_params_t *params);
 
 //! \brief Determines if the value given is above the threshold value
 //! \param[in] value: The value to determine if it is above the threshold

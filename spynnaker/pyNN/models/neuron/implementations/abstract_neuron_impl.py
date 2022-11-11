@@ -37,12 +37,11 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         :rtype str
         """
 
-    @abstractmethod
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        """ Get the SDRAM memory usage required
+    @abstractproperty
+    def structs(self):
+        """ A list of structs used by the implementation
 
-        :param int n_neurons: The number of neurons to get the usage for
-        :rtype: int
+        :rtype: list(Struct)
         """
 
     @abstractmethod
@@ -127,37 +126,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :param ~spinn_utilities.ranged.RangeDictionary state_variables:
             A holder of the state variables
-        """
-
-    @abstractmethod
-    def get_data(self, parameters, state_variables, vertex_slice, atoms_shape):
-        """ Get the data *to be written to the machine* for this model
-
-        :param ~spinn_utilities.ranged.RangeDictionary parameters:
-            The holder of the parameters
-        :param ~spinn_utilities.ranged.RangeDictionary state_variables:
-            The holder of the state variables
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the vertex to generate parameters for
-        :param tuple(int) atoms_shape: The shape of the atoms in the vertex
-        :rtype: ~numpy.ndarray(~numpy.uint32)
-        """
-
-    @abstractmethod
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
-        """ Read the parameters and state variables of the model\
-            *from the given data* (read from the machine)
-
-        :param data: The data to be read
-        :type data: bytearray or bytes or memoryview
-        :param int offset: The offset where the data should be read from
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the vertex to read parameters for
-        :param ~spinn_utilities.ranged.RangeDictionary parameters:
-            The holder of the parameters to update
-        :param ~spinn_utilities.ranged.RangeDictionary state_variables:
-            The holder of the state variables to update
         """
 
     @abstractmethod

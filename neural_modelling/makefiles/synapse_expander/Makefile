@@ -13,13 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-APPS = delay_expander.mk synapse_expander.mk
+MODELS = synapse_expander neuron_expander
 
-all: $(APPS)
-	for f in $(APPS); do $(MAKE) -f $$f || exit $$?; done
+all:
+	for d in $(MODELS); do $(MAKE) -f $$d.mk || exit $$?; done
 
-%.aplx: %.mk
-	"$(MAKE)" -f $*
-
-clean: $(DIRS)
-	for f in $(APPS); do $(MAKE) -f $$f clean || exit $$?; done
+clean:
+	for d in $(MODELS); do $(MAKE) -f $$d.mk clean || exit $$?; done

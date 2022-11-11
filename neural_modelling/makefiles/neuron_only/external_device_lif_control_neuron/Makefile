@@ -15,8 +15,6 @@
 
 APP = external_device_lif_control_neuron
 
-OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
-INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_current.h
 NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_external_devices.h
 
 include ../neuron_build.mk

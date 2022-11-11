@@ -20,6 +20,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotRetinaDevice)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 class DelayedPayloadMultiCastCommand(MultiCastCommand):
@@ -43,7 +44,8 @@ class DelayedPayloadMultiCastCommand(MultiCastCommand):
 
 
 class PushBotSpiNNakerLinkRetinaDevice(
-        AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex):
+        AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex,
+        PopulationApplicationVertex):
     __slots__ = ["__new_key_command"]
 
     default_parameters = {'label': None, 'board_address': None}

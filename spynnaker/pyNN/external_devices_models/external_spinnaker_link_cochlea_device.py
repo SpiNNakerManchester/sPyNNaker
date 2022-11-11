@@ -12,11 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
-class ExternalCochleaDevice(ApplicationSpiNNakerLinkVertex):
+class ExternalCochleaDevice(
+        ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex):
     __slots__ = []
 
     def __init__(

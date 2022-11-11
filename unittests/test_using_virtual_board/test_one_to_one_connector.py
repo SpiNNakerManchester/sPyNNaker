@@ -69,33 +69,3 @@ class TestOneToOneConnector(BaseTestCase):
         sim.run(0)
         self.assertEqual(3, len(weights))
         sim.end()
-
-    def test_using_static_synapse_singles1(self):
-        sim.setup(timestep=1.0)
-        input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")
-        pop = sim.Population(2, sim.IF_curr_exp(), label="pop")
-        conn = sim.Projection(input, pop, sim.OneToOneConnector(),
-                              sim.StaticSynapse(weight=[0.7, 0.3],
-                                                delay=[3, 33]))
-        sim.run(1)
-        weights = conn.get(['weight', 'delay'], 'list')
-        sim.end()
-        target = [(0, 0, 0.7, 3), (1, 1, 0.3, 33)]
-        for i in range(2):
-            for j in range(2):
-                self.assertAlmostEqual(weights[i][j], target[i][j], places=3)
-
-    def test_using_static_synapse_singles2(self):
-        sim.setup(timestep=1.0)
-        input = sim.Population(2, sim.SpikeSourceArray([0]), label="input")
-        pop = sim.Population(2, sim.IF_curr_exp(), label="pop")
-        conn = sim.Projection(input, pop, sim.OneToOneConnector(),
-                              sim.StaticSynapse(weight=[0.7, 0.3],
-                                                delay=[31, 33]))
-        sim.run(1)
-        weights = conn.get(['weight', 'delay'], 'list')
-        sim.end()
-        target = [(0, 0, 0.7, 31), (1, 1, 0.3, 33)]
-        for i in range(2):
-            for j in range(2):
-                self.assertAlmostEqual(weights[i][j], target[i][j], places=3)

@@ -79,7 +79,15 @@ class _MasterPopEntryCType(ctypes.LittleEndianStructure):
         # Flag to indicate if an extra_info struct is present
         ("extra_info_flag", ctypes.c_uint32, 1),
         # The number of entries in ::address_list for this entry
-        ("count", ctypes.c_uint32, 16)
+        ("count", ctypes.c_uint32, 16),
+        # The mask to apply to the key once shifted get the core index
+        ("core_mask", ctypes.c_uint32, 16),
+        # The shift to apply to the key to get the core part (0-31)
+        ("mask_shift", ctypes.c_uint32, 16),
+        # The number of neurons per core (up to 2048)
+        ("n_neurons", ctypes.c_uint32, 16),
+        # The number of words required for n_neurons
+        ("n_words", ctypes.c_uint32, 16)
     ]
 
 
@@ -88,60 +96,31 @@ _MAX_ADDRESS_START = (1 << _n_bits(_MasterPopEntryCType.start)) - 1
 # Maximum count of address list entries for a single pop table entry
 _MAX_ADDRESS_COUNT = (1 << _n_bits(_MasterPopEntryCType.count)) - 1
 
-
-class _ExtraInfoCType(ctypes.LittleEndianStructure):
-    """ An Extra Info structure; matches the C struct
-    """
-    _fields_ = [
-        # The mask to apply to the key once shifted get the core index
-        ("core_mask", ctypes.c_uint32, 10),
-        # The number of words required for n_neurons
-        ("n_words", ctypes.c_uint32, 6),
-        # The shift to apply to the key to get the core part (0-31)
-        ("mask_shift", ctypes.c_uint32, 5),
-        # The number of neurons per core (up to 2048)
-        ("n_neurons", ctypes.c_uint32, 11)
-    ]
-
-
 # The maximum n_neurons value
-_MAX_N_NEURONS = (1 << _n_bits(_ExtraInfoCType.n_neurons)) - 1
+_MAX_N_NEURONS = (1 << _n_bits(_MasterPopEntryCType.n_neurons)) - 1
 # Maximum core mask (i.e. number of cores)
-_MAX_CORE_MASK = (1 << _n_bits(_ExtraInfoCType.core_mask)) - 1
+_MAX_CORE_MASK = (1 << _n_bits(_MasterPopEntryCType.core_mask)) - 1
 
 
-class _AddressAndRowLengthCType(ctypes.LittleEndianStructure):
+class _AddressListEntryCType(ctypes.LittleEndianStructure):
     """ An Address and Row Length structure; matches the C struct
     """
     _fields_ = [
         # the length of the row
         ("row_length", ctypes.c_uint32, 8),
         # the address
-        ("address", ctypes.c_uint32, 23),
-        # whether this is a direct/single address
-        ("is_single", ctypes.c_uint32, 1)
+        ("address", ctypes.c_uint32, 24)
     ]
 
 
 # An invalid address in the address and row length list
-_INVALID_ADDDRESS = (1 << _n_bits(_AddressAndRowLengthCType.address)) - 1
+_INVALID_ADDDRESS = (1 << _n_bits(_AddressListEntryCType.address)) - 1
 # Address is 23 bits, but maximum value means invalid
-_MAX_ADDRESS = (1 << _n_bits(_AddressAndRowLengthCType.address)) - 2
-
-
-class _AddressListEntryCType(ctypes.Union):
-    """ An Address List entry; one of two things
-    """
-    _fields_ = [
-        ("addr", _AddressAndRowLengthCType),
-        ("extra", _ExtraInfoCType)
-    ]
-
+_MAX_ADDRESS = (1 << _n_bits(_AddressListEntryCType.address)) - 2
 
 # Sizes of structs
 _MASTER_POP_ENTRY_SIZE_BYTES = ctypes.sizeof(_MasterPopEntryCType)
 _ADDRESS_LIST_ENTRY_SIZE_BYTES = ctypes.sizeof(_AddressListEntryCType)
-_EXTRA_INFO_ENTRY_SIZE_BYTES = ctypes.sizeof(_ExtraInfoCType)
 
 # Base size - 2 words for size of table and address list
 _BASE_SIZE_BYTES = 8
@@ -204,12 +183,11 @@ class _MasterPopEntry(object):
         self.__n_neurons = n_neurons
         self.__addresses_and_row_lengths = list()
 
-    def append(self, address, row_length, is_single):
+    def append(self, address, row_length):
         """ Add a synaptic matrix pointer to the entry
 
         :param int address: The address of the synaptic matrix
         :param int row_length: The length of each row in the matrix
-        :param bool is_single: True if the address is to the direct matrix
         :return: The index of the pointer within the entry
         :rtype: int
         """
@@ -219,7 +197,7 @@ class _MasterPopEntry(object):
                 "{} connections for the same source key (maximum {})".format(
                     index, _MAX_ADDRESS_COUNT))
         self.__addresses_and_row_lengths.append(
-            (address, row_length, is_single, True))
+            (address, row_length, True))
         return index
 
     def append_invalid(self):
@@ -230,7 +208,7 @@ class _MasterPopEntry(object):
         :rtype: int
         """
         index = len(self.__addresses_and_row_lengths)
-        self.__addresses_and_row_lengths.append((0, 0, False, False))
+        self.__addresses_and_row_lengths.append((0, 0, False))
         return index
 
     @property
@@ -304,25 +282,20 @@ class _MasterPopEntry(object):
         next_addr = start
         n_entries = count
 
-        # If there is a core mask, add a special entry for it
-        if self.__core_mask != 0:
-            entry.extra_info_flag = True
-            extra_info = address_list[next_addr].extra
-            extra_info.core_mask = self.__core_mask
-            extra_info.n_words = int(math.ceil(
-                self.__n_neurons / BIT_IN_A_WORD))
-            extra_info.n_neurons = self.__n_neurons
-            extra_info.mask_shift = self.__core_shift
-            next_addr += 1
-            n_entries += 1
+        # Add extra info
+        entry.extra_info_flag = True
+        entry.core_mask = self.__core_mask
+        entry.n_words = int(math.ceil(
+            self.__n_neurons / BIT_IN_A_WORD))
+        entry.n_neurons = self.__n_neurons
+        entry.mask_shift = self.__core_shift
 
-        for j, (address, row_length, is_single, is_valid) in enumerate(
+        for j, (address, row_length, is_valid) in enumerate(
                 self.__addresses_and_row_lengths):
-            address_entry = address_list[next_addr + j].addr
+            address_entry = address_list[next_addr + j]
             if not is_valid:
                 address_entry.address = _INVALID_ADDDRESS
             else:
-                address_entry.is_single = is_single
                 address_entry.row_length = row_length
                 address_entry.address = address
         return n_entries
@@ -358,22 +331,21 @@ class MasterPopTableAsBinarySearch(object):
             # pylint: disable=protected-access
             in_edge = proj._projection_edge
 
+            # Each projection with a delay will have an additional entry
+            if in_edge.n_delay_stages:
+                n_entries += 1
+
             # If we haven't seen this edge before, add it in
             if in_edge not in seen_edges:
                 seen_edges.add(in_edge)
-                vertex = in_edge.pre_vertex
-                n_cores = len(vertex.splitter.get_out_going_slices())
-
-                # If there are also delays, double it
+                # Each pre-vertex has a master pop entry
+                n_vertices += 1
                 if in_edge.n_delay_stages:
-                    n_cores *= _DELAY_SCALE
-
-                n_vertices += n_cores
+                    n_vertices += 1
 
         return (
             _BASE_SIZE_BYTES +
             (n_vertices * _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_vertices * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
             (n_entries * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
 
     @staticmethod
@@ -416,24 +388,6 @@ class MasterPopTableAsBinarySearch(object):
         self.__entries = dict()
         self.__n_addresses = 0
 
-    def add_machine_entry(
-            self, block_start_addr, row_length, key_and_mask, is_single=False):
-        """ Add an entry for a machine-edge to the population table.
-
-        :param int block_start_addr: where the synaptic matrix block starts
-        :param int row_length: how long in words each row is
-        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
-            the key and mask for this master pop entry
-        :param bool is_single:
-            Flag that states if the entry is a direct entry for a single row.
-        :return: The index of the entry, to be used to retrieve it
-        :rtype: int
-        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
-            If a bad address is used.
-        """
-        return self.__update_master_population_table(
-            block_start_addr, row_length, key_and_mask, 0, 0, 0, is_single)
-
     def add_application_entry(
             self, block_start_addr, row_length, key_and_mask, core_mask,
             core_shift, n_neurons):
@@ -448,8 +402,6 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param bool is_single:
-            Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
         :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
@@ -469,11 +421,11 @@ class MasterPopTableAsBinarySearch(object):
 
         return self.__update_master_population_table(
             block_start_addr, row_length, key_and_mask, core_mask, core_shift,
-            n_neurons, False)
+            n_neurons)
 
     def __update_master_population_table(
             self, block_start_addr, row_length, key_and_mask, core_mask,
-            core_shift, n_neurons, is_single):
+            core_shift, n_neurons):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param int block_start_addr: where the synaptic matrix block starts
@@ -485,47 +437,28 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param bool is_single:
-            Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
         :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
             If a bad address is used.
         """
         # if not single, scale the address
-        start_addr = block_start_addr
-        if not is_single:
-            if block_start_addr % _ADDRESS_SCALE != 0:
-                raise SynapticConfigurationException(
-                    "Address {} is not compatible with this table".format(
-                        block_start_addr))
-            start_addr = block_start_addr // _ADDRESS_SCALE
-            if start_addr > _MAX_ADDRESS:
-                raise SynapticConfigurationException(
-                    "Address {} is too big for this table".format(
-                        block_start_addr))
+        if block_start_addr % _ADDRESS_SCALE != 0:
+            raise SynapticConfigurationException(
+                "Address {} is not compatible with this table".format(
+                    block_start_addr))
+        start_addr = block_start_addr // _ADDRESS_SCALE
+        if start_addr > _MAX_ADDRESS:
+            raise SynapticConfigurationException(
+                "Address {} is too big for this table".format(
+                    block_start_addr))
         row_length = self.get_allowed_row_length(row_length)
 
         entry = self.__add_entry(
             key_and_mask, core_mask, core_shift, n_neurons)
-        index = entry.append(start_addr, row_length - 1, is_single)
+        index = entry.append(start_addr, row_length - 1)
         self.__n_addresses += 1
         return index
-
-    def add_invalid_machine_entry(self, key_and_mask):
-        """ Add an entry to the table from a machine vertex that doesn't point
-            to anywhere.  Used to keep indices in synchronisation between e.g.
-            normal and delay entries and between entries on different cores.
-
-        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
-            a key_and_mask object used as part of describing
-            an edge that will require being received to be stored in the
-            master pop table; the whole edge will become multiple calls to
-            this function
-        :return: The index of the added entry
-        :rtype: int
-        """
-        return self.__add_invalid_entry(key_and_mask, 0, 0, 0)
 
     def add_invalid_application_entry(
             self, key_and_mask, core_mask=0, core_shift=0, n_neurons=0):
@@ -596,9 +529,6 @@ class MasterPopTableAsBinarySearch(object):
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
                 n_neurons)
             self.__entries[key_and_mask.key] = entry
-            # Need to add an extra "address" for the extra_info if needed
-            if core_mask != 0:
-                self.__n_addresses += 1
             return entry
         entry = self.__entries[key_and_mask.key]
         if (key_and_mask.mask != entry.mask or
@@ -616,36 +546,17 @@ class MasterPopTableAsBinarySearch(object):
                     core_mask, core_shift, n_neurons))
         return entry
 
-    def finish_master_pop_table(self, spec, region, ref):
-        """ Complete the master pop table in the data specification.
+    def get_pop_table_data(self):
+        """ Get the master pop table data as a numpy array
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            the data specification to write the master pop entry to
-        :param int region:
-            the region to which the master pop table is being stored
-        :param ref:
-            the reference to use for the region, or None if not referenceable
+        :rtype: ~numpy.ndarray
         """
         # sort entries by key
         entries = sorted(
             self.__entries.values(),
             key=lambda a_entry: a_entry.routing_key)
         n_entries = len(entries)
-
-        # reserve space and switch
-        master_pop_table_sz = (
-            _BASE_SIZE_BYTES +
-            n_entries * _MASTER_POP_ENTRY_SIZE_BYTES +
-            self.__n_addresses * _ADDRESS_LIST_ENTRY_SIZE_BYTES)
-        spec.reserve_memory_region(
-            region=region, size=master_pop_table_sz, label='PopTable',
-            reference=ref)
-        spec.switch_write_focus(region=region)
-
-        # write no master pop entries and the address list size
-        spec.write_value(n_entries)
-        spec.write_value(self.__n_addresses)
-
+        data = [numpy.array([n_entries, self.__n_addresses], dtype="uint32")]
         # Generate the table and list as arrays
         pop_table = _make_array(_MasterPopEntryCType, n_entries)
         address_list = _make_array(_AddressListEntryCType, self.__n_addresses)
@@ -653,14 +564,10 @@ class MasterPopTableAsBinarySearch(object):
         for i, entry in enumerate(entries):
             start += entry.write_to_table(pop_table[i], address_list, start)
 
-        # Write the arrays
-        spec.write_array(_to_numpy(pop_table))
-        spec.write_array(_to_numpy(address_list))
-
-        self.__entries.clear()
-        del self.__entries
-        self.__entries = None
-        self.__n_addresses = 0
+        # Add the arrays
+        data.append(_to_numpy(pop_table))
+        data.append(_to_numpy(address_list))
+        return numpy.concatenate(data)
 
     @property
     def max_n_neurons_per_core(self):
@@ -687,25 +594,3 @@ class MasterPopTableAsBinarySearch(object):
         :rtype: int
         """
         return _MAX_ADDRESS_COUNT
-
-    def write_padding(self, spec, next_block_start_address):
-        """ Write padding to the data spec needed between blocks to align\
-            addresses correctly.
-
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The spec to write to
-        :param int next_block_start_address:
-            The address we are starting at
-        :return: The address we finish at after the padding
-        :rtype: int
-        """
-        next_allowed = self.get_next_allowed_address(next_block_start_address)
-        padding = next_allowed - next_block_start_address
-        if padding != 0:
-
-            # Pad out data file with the added alignment bytes:
-            spec.comment("\nWriting population table required padding\n")
-            spec.write_array(numpy.repeat(
-                numpy.array(_PADDING_BYTE, dtype="uint8"), padding).view(
-                    "uint32"))
-        return next_allowed

@@ -24,21 +24,21 @@
 
 //! DSG region identifiers
 typedef enum neuron_regions_e {
-    SYSTEM_REGION,                //!< simulation system; 0
-    NEURON_PARAMS_REGION,         //!< neuron parameters; 1
-    CURRENT_SOURCE_PARAMS_REGION, //!< current source parameters; 2
-    SYNAPSE_PARAMS_REGION,        //!< synapse parameters; 3
-    POPULATION_TABLE_REGION,      //!< master population table; 4
-    SYNAPTIC_MATRIX_REGION,       //!< synaptic matrix; 5
-    SYNAPSE_DYNAMICS_REGION,      //!< synapse dynamics; 6
-    STRUCTURAL_DYNAMICS_REGION,   //!< structural dynamics; 7
-    NEURON_RECORDING_REGION,      //!< recording; 8
-    PROVENANCE_DATA_REGION,       //!< provenance; 9
-    PROFILER_REGION,              //!< profiling; 10
-    CONNECTOR_BUILDER_REGION,     //!< connection building; 11
-    DIRECT_MATRIX_REGION,         //!< direct synaptic matrix; 12
-    BIT_FIELD_FILTER_REGION,      //!< bitfield filter; 13
-    BIT_FIELD_BUILDER,            //!< bitfield builder parameters; 14
-    BIT_FIELD_KEY_MAP,            //!< bitfield key map; 15
-    RECORDING_REGION              //!< general recording data; 16
+    SYSTEM_REGION,              //!< simulation system; 0
+    CORE_PARAMS_REGION,         //!< core parameters; 1
+    NEURON_PARAMS_REGION,       //!< neuron parameters; 2
+    CURRENT_SOURCE_PARAMS_REGION, //!< current source parameters; 3
+    SYNAPSE_PARAMS_REGION,      //!< synapse parameters; 4
+    POPULATION_TABLE_REGION,    //!< master population table; 5
+    SYNAPTIC_MATRIX_REGION,     //!< synaptic matrix; 6
+    SYNAPSE_DYNAMICS_REGION,    //!< synapse dynamics; 7
+    STRUCTURAL_DYNAMICS_REGION, //!< structural dynamics; 8
+    NEURON_RECORDING_REGION,    //!< recording; 9
+    PROVENANCE_DATA_REGION,     //!< provenance; 10
+    PROFILER_REGION,            //!< profiling; 11
+    CONNECTOR_BUILDER_REGION,   //!< connection building; 12
+    NEURON_BUILDER_REGION,      //!< neuron building; 13
+    BIT_FIELD_FILTER_REGION,    //!< bitfield filter; 14
+    RECORDING_REGION,           //!< general recording data; 15
+	INITIAL_VALUES_REGION       //!< initial neuron state; 16
 } regions_e;
