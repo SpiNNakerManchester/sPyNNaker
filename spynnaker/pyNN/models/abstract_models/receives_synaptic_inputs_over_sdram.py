@@ -35,20 +35,6 @@ class ReceivesSynapticInputsOverSDRAM(AbstractSupportsSDRAMEdges):
     N_BYTES_PER_INPUT = BYTES_PER_SHORT
 
     @abstractproperty
-    def n_target_neurons(self):
-        """ The number of neurons expecting to receive input
-
-        :rtype: int
-        """
-
-    @abstractproperty
-    def n_target_synapse_types(self):
-        """ The number of synapse types expecting to receive input
-
-        :rtype: int
-        """
-
-    @abstractproperty
     def weight_scales(self):
         """ A list of scale factors to be applied to weights that get passed
             over SDRAM, one for each synapse type.

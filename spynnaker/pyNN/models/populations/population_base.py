@@ -424,3 +424,10 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
+
+    @abstractproperty
+    def _recorder(self):
+        """ The recorder of the population
+
+        :rtype: ~Recorder
+        """

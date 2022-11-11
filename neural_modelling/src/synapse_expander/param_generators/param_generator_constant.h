@@ -38,15 +38,15 @@ struct param_generator_constant {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *param_generator_constant_initialize(address_t *region) {
+static void *param_generator_constant_initialize(void **region) {
     // Allocate space for the parameters
     struct param_generator_constant *params =
             spin1_malloc(sizeof(struct param_generator_constant));
 
     // Read parameters from SDRAM
-    struct param_generator_constant *params_sdram = (void *) *region;
-    *params = *params_sdram++;
-    *region = (void *) params_sdram;
+    struct param_generator_constant *params_sdram = *region;
+    *params = *params_sdram;
+    *region = &params_sdram[1];
     log_debug("Constant value %k", params->value);
     return params;
 }
@@ -62,19 +62,10 @@ static void param_generator_constant_free(void *generator) {
 /**
  * \brief How to generate values with the constant parameter generator
  * \param[in] generator: The generator to use to generate values
- * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
- * \param[in] indices: The \p n_indices post-neuron indices for each connection
- * \param[out] values: An array into which to place the values; will be
- *                     \p n_indices in size
+ * \return The value generated
  */
-static void param_generator_constant_generate(
-        void *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,
-        UNUSED uint16_t *indices, accum *values) {
+static accum param_generator_constant_generate(void *generator) {
     // Generate a constant for each index
     struct param_generator_constant *params = generator;
-    for (uint32_t i = 0; i < n_indices; i++) {
-        values[i] = params->value;
-    }
+    return params->value;
 }

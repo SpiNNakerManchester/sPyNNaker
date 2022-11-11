@@ -24,44 +24,52 @@
 #include "matrix_generator.h"
 #include "connection_generator.h"
 #include "param_generator.h"
+#include "rng.h"
 
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
+#include <key_atom_map.h>
 #include "common_mem.h"
+#include "bit_field_expander.h"
+
+#define INVALID_REGION_ID 0xFFFFFFFF
 
 //! The configuration of the connection builder
-struct connection_builder_config {
+typedef struct connection_builder_config {
     // the per-connector parameters
-    uint32_t offset;
-    uint32_t delayed_offset;
-    uint32_t max_row_n_words;
-    uint32_t max_delayed_row_n_words;
-    uint32_t max_row_n_synapses;
-    uint32_t max_delayed_row_n_synapses;
-    uint32_t pre_slice_start;
-    uint32_t pre_slice_count;
-    uint32_t max_stage;
-    uint32_t max_delay_per_stage;
-    accum timestep_per_delay;
+    uint32_t pre_lo;
+    uint32_t pre_hi;
+    uint32_t post_lo;
+    uint32_t post_hi;
     uint32_t synapse_type;
     // The types of the various components
     uint32_t matrix_type;
     uint32_t connector_type;
     uint32_t weight_type;
     uint32_t delay_type;
-};
+} connection_builder_config_t;
 
 //! The configuration of the synapse expander
-struct expander_config {
+__attribute__((aligned(4)))
+typedef struct expander_config {
     uint32_t synaptic_matrix_region;
+    uint32_t master_pop_region;
+    uint32_t bitfield_filter_region;
+    uint32_t structural_region;
     uint32_t n_in_edges;
     uint32_t post_slice_start;
     uint32_t post_slice_count;
+    uint32_t post_index;
     uint32_t n_synapse_types;
-    uint32_t n_synapse_type_bits;
-    uint32_t n_synapse_index_bits;
-};
+    accum timestep_per_delay;
+    rng_t population_rng;
+    rng_t core_rng;
+    unsigned long accum weight_scales[];
+} expander_config_t;
+
+rng_t *population_rng;
+rng_t *core_rng;
 
 /**
  * \brief Generate the synapses for a single connector
@@ -78,26 +86,23 @@ struct expander_config {
  *                           type
  * \return true on success, false on failure
  */
-static bool read_connection_builder_region(address_t *in_region,
-        address_t synaptic_matrix_region, uint32_t post_slice_start,
-        uint32_t post_slice_count, uint32_t n_synapse_type_bits,
-        uint32_t n_synapse_index_bits, unsigned long accum *weight_scales) {
-    address_t region = *in_region;
-    struct connection_builder_config config;
-    fast_memcpy(&config, region, sizeof(config));
-    region += sizeof(config) / sizeof(uint32_t);
+static bool read_connection_builder_region(void **region,
+        void *synaptic_matrix, uint32_t post_slice_start,
+        uint32_t post_slice_count, uint32_t post_index,
+        unsigned long accum *weight_scales, accum timestep_per_delay) {
+    connection_builder_config_t *sdram_config = *region;
+    connection_builder_config_t config = *sdram_config;
+    *region = &sdram_config[1];
 
     // Get the matrix, connector, weight and delay parameter generators
     matrix_generator_t matrix_generator =
-            matrix_generator_init(config.matrix_type, &region);
+            matrix_generator_init(config.matrix_type, region, synaptic_matrix);
     connection_generator_t connection_generator =
-            connection_generator_init(config.connector_type, &region);
+            connection_generator_init(config.connector_type, region);
     param_generator_t weight_generator =
-            param_generator_init(config.weight_type, &region);
+            param_generator_init(config.weight_type, region);
     param_generator_t delay_generator =
-            param_generator_init(config.delay_type, &region);
-
-    *in_region = region;
+            param_generator_init(config.delay_type, region);
 
     // If any components couldn't be created return false
     if (matrix_generator == NULL || connection_generator == NULL
@@ -105,47 +110,19 @@ static bool read_connection_builder_region(address_t *in_region,
         return false;
     }
 
-    log_debug("Synaptic matrix offset = %u, delayed offset = %u",
-            config.offset, config.delayed_offset);
-    log_debug("Max row synapses = %u, max delayed row synapses = %u",
-            config.max_row_n_synapses, config.max_delayed_row_n_synapses);
-
-    // Get the positions to which the data should be written in the matrix
-    address_t synaptic_matrix = NULL;
-    if (config.offset != 0xFFFFFFFF) {
-        synaptic_matrix = &synaptic_matrix_region[config.offset];
+    if (!connection_generator_generate(
+            connection_generator, config.pre_lo, config.pre_hi, config.post_lo,
+            config.post_hi, post_index, post_slice_start, post_slice_count,
+            weight_scales[config.synapse_type], timestep_per_delay,
+            weight_generator, delay_generator, matrix_generator)) {
+        return false;
     }
-    address_t delayed_synaptic_matrix = NULL;
-    if (config.delayed_offset != 0xFFFFFFFF) {
-        delayed_synaptic_matrix = &synaptic_matrix_region[config.delayed_offset];
-    }
-    log_debug("Generating matrix at 0x%08x, delayed at 0x%08x",
-            synaptic_matrix, delayed_synaptic_matrix);
-
-    // Do the generation
-    bool status = matrix_generator_generate(
-            matrix_generator, synaptic_matrix, delayed_synaptic_matrix,
-            config.max_row_n_words, config.max_delayed_row_n_words,
-            config.max_row_n_synapses, config.max_delayed_row_n_synapses,
-            n_synapse_type_bits, n_synapse_index_bits,
-            config.synapse_type, weight_scales,
-            post_slice_start, post_slice_count,
-            config.pre_slice_start, config.pre_slice_count,
-            connection_generator, delay_generator, weight_generator,
-            config.max_stage, config.max_delay_per_stage,
-            config.timestep_per_delay);
 
     // Free the neuron four!
     matrix_generator_free(matrix_generator);
     connection_generator_free(connection_generator);
     param_generator_free(weight_generator);
     param_generator_free(delay_generator);
-
-    // If failed, log error
-    if (!status) {
-        log_error("\tMatrix generation failed");
-        return false;
-    }
 
     // Return success!
     return true;
@@ -159,38 +136,68 @@ static bool read_connection_builder_region(address_t *in_region,
  *         error
  */
 static bool run_synapse_expander(data_specification_metadata_t *ds_regions,
-        address_t params_address) {
+        void *params_address) {
     // Read in the global parameters
-    struct expander_config config;
-    fast_memcpy(&config, params_address, sizeof(config));
-    params_address += sizeof(config) / sizeof(uint32_t);
+    expander_config_t *sdram_config = params_address;
+    uint32_t data_size = sizeof(expander_config_t)
+            + (sizeof(long accum) * sdram_config->n_synapse_types);
+    expander_config_t *config = spin1_malloc(data_size);
+    fast_memcpy(config, sdram_config, data_size);
     log_info("Generating %u edges for %u atoms starting at %u",
-            config.n_in_edges, config.post_slice_count, config.post_slice_start);
-
-    // Read in the weight scales, one per synapse type
-    unsigned long accum weight_scales[config.n_synapse_types];
-    fast_memcpy(weight_scales, params_address,
-            sizeof(unsigned long accum) * config.n_synapse_types);
-    params_address += 2 * config.n_synapse_types;
+            config->n_in_edges, config->post_slice_count, config->post_slice_start);
 
     // Get the synaptic matrix region
-    address_t synaptic_matrix_region = data_specification_get_region(
-            config.synaptic_matrix_region, ds_regions);
-    ds_regions->regions[config.synaptic_matrix_region].checksum = 0;
-    ds_regions->regions[config.synaptic_matrix_region].n_words = 0;
+    void *synaptic_matrix = data_specification_get_region(
+            config->synaptic_matrix_region, ds_regions);
+
+    // We are changing this region, so void the checksum
+    ds_regions->regions[config->synaptic_matrix_region].n_words = 0;
+    ds_regions->regions[config->synaptic_matrix_region].checksum = 0;
+
+    // Store the RNGs
+    population_rng = &(config->population_rng);
+    core_rng = &(config->core_rng);
+
+    log_info("Population RNG: %u %u %u %u", population_rng->seed[0],
+            population_rng->seed[1], population_rng->seed[2],
+            population_rng->seed[3]);
+
+    log_info("Core RNG: %u %u %u %u", core_rng->seed[0],
+            core_rng->seed[1], core_rng->seed[2], core_rng->seed[3]);
+
 
     // Go through each connector and generate
-    for (uint32_t edge = 0; edge < config.n_in_edges; edge++) {
+    void *address = &(sdram_config->weight_scales[config->n_synapse_types]);
+    for (uint32_t edge = 0; edge < config->n_in_edges; edge++) {
         if (!read_connection_builder_region(
-                &params_address, synaptic_matrix_region,
-                config.post_slice_start, config.post_slice_count,
-                config.n_synapse_type_bits,
-                config.n_synapse_index_bits, weight_scales)) {
+                &address, synaptic_matrix, config->post_slice_start,
+                config->post_slice_count, config->post_index,
+                config->weight_scales, config->timestep_per_delay)) {
             return false;
         }
     }
 
-    return true;
+    // Do bitfield generation on the whole matrix
+    uint32_t *n_atom_data_sdram = address;
+    void *master_pop = data_specification_get_region(
+            config->master_pop_region, ds_regions);
+    void *bitfield_filter = data_specification_get_region(
+            config->bitfield_filter_region, ds_regions);
+    void *structural_matrix = NULL;
+    if (config->structural_region != INVALID_REGION_ID) {
+        structural_matrix = data_specification_get_region(
+            config->structural_region, ds_regions);
+    }
+
+    // We are changing this region, so void the checksum
+    ds_regions->regions[config->bitfield_filter_region].n_words = 0;
+    ds_regions->regions[config->bitfield_filter_region].checksum = 0;
+    log_info("Region %u set to 0 at 0x%08x and 0x%08x",
+    		config->bitfield_filter_region,
+			&(ds_regions->regions[config->bitfield_filter_region].n_words),
+			&(ds_regions->regions[config->bitfield_filter_region].checksum));
+    return do_bitfield_generation(n_atom_data_sdram, master_pop,
+            synaptic_matrix, bitfield_filter, structural_matrix);
 }
 
 //! Entry point
@@ -208,7 +215,7 @@ void c_main(void) {
     // Get the addresses of the regions
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
-    address_t params_address = data_specification_get_region(user1, ds_regions);
+    void *params_address = data_specification_get_region(user1, ds_regions);
     log_info("\tReading SDRAM at 0x%08x", params_address);
 
     // Run the expander

@@ -105,6 +105,6 @@ if __name__ == '__main__':
     main entrance method
     """
     me = ManyBoards()
-    run = me.do_run(n_boards=10, n_neurons=2, simtime=300)
+    run = me.do_run()
     me.check_all_data()
     run.end()

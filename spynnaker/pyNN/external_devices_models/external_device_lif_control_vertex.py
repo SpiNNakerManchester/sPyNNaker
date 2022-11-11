@@ -44,7 +44,7 @@ class ExternalDeviceLifControlVertex(
             self, devices, create_edges, max_atoms_per_core, neuron_impl,
             pynn_model, translator=None, spikes_per_second=None, label=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-            drop_late_spikes=None, splitter=None):
+            drop_late_spikes=None, splitter=None, seed=None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
             The AbstractMulticastControllableDevice instances to be controlled
@@ -71,7 +71,7 @@ class ExternalDeviceLifControlVertex(
         super().__init__(
             len(devices), label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes, splitter)
+            neuron_impl, pynn_model, drop_late_spikes, splitter, seed)
 
         if not devices:
             raise ConfigurationException("No devices specified")
