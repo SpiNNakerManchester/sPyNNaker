@@ -12,7 +12,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.application.application_2d_fpga_vertex import Application2DFPGAVertex
-from spinn_front_end_common.abstract_models.abstract_send_me_multicast_commands_vertex import AbstractSendMeMulticastCommandsVertex
+from pacman.model.graphs.application import (
+    ApplicationFPGAVertex, FPGAConnection)
+from spinn_front_end_common.abstract_models import (
+    AbstractSendMeMulticastCommandsVertex)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from .spif_devices import SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK
 
-class SPIFOutputDevice(Application2DFPGAVertex, AbstractSendMeMulticastCommandsVertex):
+
+class SPIFOutputDevice(
+        ApplicationFPGAVertex, PopulationApplicationVertex,
+        AbstractSendMeMulticastCommandsVertex):
+    """ Output (only) to a SPIF device
+    """
+
+    def __init__(self, n_atoms, board_address=None, chip_coords=None,
+                 label=None):
+        super(SPIFOutputDevice, self).__init__(
+            n_atoms,
+            outgoing_fpga_connection=FPGAConnection(
+                SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address,
+                chip_coords),
+            label=label)

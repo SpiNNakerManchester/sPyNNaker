@@ -23,6 +23,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from .spif_devices import (
+    SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SPIF_INPUT_FPGA_LINKS,
     N_PIPES, N_FILTERS, SpiNNFPGARegister, SPIFRegister,
     set_field_mask, set_field_shift, set_field_limit,
     set_filter_mask, set_filter_value, set_mapper_key,
@@ -158,15 +159,16 @@ class SPIFRetinaDevice(
         :rtype: list(FPGAConnection)
         """
         # We use every other odd link
-        return [FPGAConnection(0, i, board_address, chip_coords)
-                for i in range(1, 16, 2)]
+        return [FPGAConnection(SPIF_FPGA_ID, i, board_address, chip_coords)
+                for i in SPIF_INPUT_FPGA_LINKS]
 
     def __outgoing_fpga(self, board_address, chip_coords):
-        """ Get the outgoing FPGA connection
+        """ Get the outgoing FPGA connection (for commands)
 
         :rtype: FGPA_Connection
         """
-        return FPGAConnection(0, 15, board_address, chip_coords)
+        return FPGAConnection(
+            SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address, chip_coords)
 
     def __fpga_indices(self, fpga_link_id):
         # We use every other odd link, so we can work out the "index" of the

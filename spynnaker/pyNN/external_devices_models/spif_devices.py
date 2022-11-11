@@ -38,6 +38,15 @@ N_FILTERS = 8
 #: but a logical separation per pipe is useful
 N_INPUTS = 8
 
+#: SPIF is always connected to FPGA 0
+SPIF_FPGA_ID = 0
+
+#: SPIF always outputs to FPGA link 15 on FPGA 0
+SPIF_OUTPUT_FPGA_LINK = 15
+
+#: SPIF always gets input from odd links on FPGA 0 (1, 3, 5, 7, 9, 11, 13, 15)
+SPIF_INPUT_FPGA_LINKS = range(1, 16, 2)
+
 
 class SPIFRegister(IntEnum):
     """ The register offsets on a SPIF device
