@@ -13,6 +13,5 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .spynnaker_ranged_dict import SpynnakerRangeDictionary
 from .spynnaker_ranged_list import SpynnakerRangedList
-__all__ = ["SpynnakerRangeDictionary", "SpynnakerRangedList"]
+__all__ = ["SpynnakerRangedList"]

@@ -45,8 +45,8 @@ from spinn_front_end_common.interface.provenance import (
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import NeuronRecorder
 from spynnaker.pyNN.models.abstract_models import (
-    PopulationApplicationVertex, AbstractAcceptsIncomingSynapses,
-    AbstractMaxSpikes, HasSynapses, ParameterHolder, SupportsStructure)
+    AbstractAcceptsIncomingSynapses, AbstractMaxSpikes, HasSynapses,
+    SupportsStructure)
 from spynnaker.pyNN.utilities.constants import (
     POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
@@ -58,6 +58,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.struct import StructRepeat
+from spynnaker.pyNN.models.common import (
+    ParameterHolder, PopulationApplicationVertex)
 from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
@@ -187,6 +189,9 @@ class AbstractPopulationVertex(
         :param splitter: splitter object
         :type splitter: None or
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+        :param seed:
+            The Population seed, used to ensure the same random generation
+            on each run.
         :param int n_colour_bits: The number of colour bits to use
         """
 
@@ -330,22 +335,26 @@ class AbstractPopulationVertex(
         self.__structure = structure
 
     @property
-    def single_core_capable(self):
-        """ Determine if the vertex can manage to operate on a single core,
-            or if a split synapse-core is more appropriate.
+    def combined_core_capable(self):
+        """ Determine if the vertex can manage to operate on a combined
+            neuron-synapse core, or if a split synapse-core is more
+            appropriate.
 
             Note that this is currently based only on the ITCM available, not
-            on the incoming synapses.
+            on the incoming synapses, but could be combined with
+            n_synapse_cores_required to determine if, and how-many, synapse
+            cores are needed.
 
         :rtype: bool
         """
         if self.__synapse_dynamics is None:
             return True
-        return self.__synapse_dynamics.is_single_core_capable
+        return self.__synapse_dynamics.is_combined_core_capable
 
     @property
     def n_synapse_cores_required(self):
-        """ Get the estimated number of synapse cores required.
+        """ Get the estimated number of synapse cores required, when using a
+            split synapse-neuron core model.
 
             Note this is currently hard-coded but could be updated to work
             this out based on the number of incoming synapses
@@ -432,7 +441,7 @@ class AbstractPopulationVertex(
     def parameters(self):
         """ The parameters of the neurons in the population
 
-        :rtype: SpyNNakerRangeDictionary
+        :rtype: RangeDictionary
         """
         return self.__parameters
 
@@ -440,7 +449,7 @@ class AbstractPopulationVertex(
     def state_variables(self):
         """ The state variables of the neuron in the population
 
-        :rtype: SpyNNakerRangeDicationary
+        :rtype: RangeDicationary
         """
         return self.__state_variables
 
@@ -448,7 +457,7 @@ class AbstractPopulationVertex(
     def initial_state_variables(self):
         """ The initial values of the state variables of the neurons
 
-        :rtype: SpyNNakerRangeDictionary
+        :rtype: RangeDictionary
         """
         return self.__initial_state_variables
 
@@ -533,7 +542,7 @@ class AbstractPopulationVertex(
                 return 0
 
         # If structs are generatable, we can guess that parameters are,
-        # and then assume each parameters is different for maximum SDRAM.
+        # and then assume each parameter is different for maximum SDRAM.
         n_structs = len(structs)
         n_params = sum(len(s.fields) for s in structs)
         return sum([

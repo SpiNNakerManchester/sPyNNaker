@@ -377,7 +377,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         if self._krn_weights is not None:
             return numpy.mean(self._krn_weights)
 
-        # I think this is overestimated, but not by much
         return super(KernelConnector, self).get_weight_mean(
             weights, synapse_info)
 
@@ -387,7 +386,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         if self._krn_weights is not None:
             return numpy.var(self._krn_weights)
 
-        # I think this is overestimated, but not by much
         return super(KernelConnector, self).get_weight_variance(
             weights, synapse_info)
 

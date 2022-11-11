@@ -37,11 +37,9 @@ def synapse_expander():
         Needs to be done after data has been loaded.
 
     """
-    synapse_bin = SpynnakerDataView.get_executable_path(SYNAPSE_EXPANDER_APLX)
 
     # Find the places where the synapse expander and delay receivers should run
-    expander_cores, expanded_pop_vertices, max_data, max_bf = _plan_expansion(
-        synapse_bin)
+    expander_cores, expanded_pop_vertices, max_data, max_bf = _plan_expansion()
 
     # Allow 1 seconds per ~1000 synapses, with minimum of 2 seconds
     timeout = max(2.0, max_data / 1000.0)
@@ -61,14 +59,14 @@ def synapse_expander():
     _fill_in_connection_data(expanded_pop_vertices)
 
 
-def _plan_expansion(synapse_expander_bin):
+def _plan_expansion():
     """ Plan the expansion of synapses and set up the regions using USER1
 
-    :param str synapse_expander_bin: The binary name of the synapse expander
     :return: The places to load the synapse expander and delay expander
         executables, and the target machine vertices to read synapses back from
     :rtype: (ExecutableTargets, list(MachineVertex, Placement))
     """
+    synapse_bin = SpynnakerDataView.get_executable_path(SYNAPSE_EXPANDER_APLX)
     expander_cores = ExecutableTargets()
     expanded_pop_vertices = list()
 
@@ -83,8 +81,7 @@ def _plan_expansion(synapse_expander_bin):
         if isinstance(vertex, AbstractSynapseExpandable):
             if vertex.gen_on_machine():
                 expander_cores.add_processor(
-                    synapse_expander_bin,
-                    placement.x, placement.y, placement.p,
+                    synapse_bin, placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
                 expanded_pop_vertices.append((vertex, placement))
                 # Write the region to USER1, as that is the best we can do

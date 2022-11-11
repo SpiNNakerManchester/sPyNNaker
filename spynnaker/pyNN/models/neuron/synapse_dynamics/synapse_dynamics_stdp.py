@@ -589,8 +589,8 @@ class SynapseDynamicsSTDP(
         return self.__delay
 
     @property
-    @overrides(AbstractPlasticSynapseDynamics.is_single_core_capable)
-    def is_single_core_capable(self):
+    @overrides(AbstractPlasticSynapseDynamics.is_combined_core_capable)
+    def is_combined_core_capable(self):
         return self.__neuromodulation is None
 
     @property

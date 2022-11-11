@@ -15,11 +15,12 @@
 
 from spinn_utilities.overrides import overrides
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.abstract_models import PopulationSpiNNakerLinkVertex
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 def get_y_from_fpga_retina(key, mode):
@@ -59,7 +60,8 @@ def get_spike_value_from_fpga_retina(key, mode):
 
 
 class ExternalFPGARetinaDevice(
-        PopulationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex):
+        ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
+        AbstractSendMeMulticastCommandsVertex):
     __slots__ = [
         "__fixed_key",
         "__fixed_mask"]
@@ -98,7 +100,7 @@ class ExternalFPGARetinaDevice(
 
         self.__fixed_mask = self._get_mask(mode)
 
-    @overrides(PopulationSpiNNakerLinkVertex.get_fixed_key_and_mask)
+    @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id):
         return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 

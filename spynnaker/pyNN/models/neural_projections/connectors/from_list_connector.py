@@ -426,9 +426,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @overrides(AbstractConnector.get_connected_vertices)
     def get_connected_vertices(self, s_info, source_vertex, target_vertex):
-        # This is similar to get_split_connections, but not because
-        # 1. We need to combine pre and post vertices and
-        # 2. We don't need to go as far as we only need the counts
 
         # Divide the targets into bins based on post slices
         post_slices = target_vertex.splitter.get_in_coming_slices()

@@ -19,8 +19,6 @@ from spinnaker_testbase import BaseTestCase
 
 class TestPopulation(BaseTestCase):
 
-    # NO unittest_setup() as sim.setup is called
-
     def test_model_fail_to_set_neuron_param_random_distribution(self):
         n_neurons = 5
         range_low = -70

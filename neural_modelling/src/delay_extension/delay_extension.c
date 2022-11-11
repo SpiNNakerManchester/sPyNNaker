@@ -59,8 +59,6 @@ struct delay_extension_provenance {
     uint32_t n_buffer_overflows;
     //! Number of times we had to back off because the comms hardware was busy
     uint32_t n_delays;
-    //! number of times the TDMA fell behind its slot
-    uint32_t times_tdma_fell_behind;
     //! number of packets lost due to count saturation of uint8
     uint32_t n_packets_lost_due_to_count_saturation;
     //! number of packets dropped due to invalid neuron value
@@ -276,7 +274,6 @@ static void store_provenance_data(address_t provenance_region) {
     prov->n_packets_sent = n_spikes_sent;
     prov->n_buffer_overflows = in_spikes_get_n_buffer_overflows();
     prov->n_delays = n_delays;
-    prov->times_tdma_fell_behind = 0;
     prov->n_packets_lost_due_to_count_saturation = saturation_count;
     prov->n_packets_dropped_due_to_invalid_neuron_value =
         n_packets_dropped_due_to_invalid_neuron_value;

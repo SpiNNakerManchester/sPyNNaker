@@ -56,7 +56,7 @@ struct neuron_provenance {
     //! The current time.
     uint32_t current_timer_tick;
     //! The number of times a TDMA slot was missed
-    uint32_t n_tdma_mises;
+    uint32_t n_tdma_misses;
     //! Earliest send time within any time step
     uint32_t earliest_send;
     //! Latest send time within any time step
@@ -90,7 +90,7 @@ extern uint32_t earliest_send_time;
 //! \param[out] prov: The data structure to store provenance data in
 static inline void store_neuron_provenance(struct neuron_provenance *prov) {
     prov->current_timer_tick = time;
-    prov->n_tdma_mises = 0;
+    prov->n_tdma_misses = 0;
     prov->earliest_send = earliest_send_time;
     prov->latest_send = latest_send_time;
 }

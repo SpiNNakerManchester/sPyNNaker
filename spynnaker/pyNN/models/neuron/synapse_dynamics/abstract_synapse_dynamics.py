@@ -89,8 +89,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
 
     @abstractproperty
-    def is_single_core_capable(self):
-        """ Determine if the synapse dynamics can run on a single core
+    def is_combined_core_capable(self):
+        """ Determine if the synapse dynamics can run on a core combined with
+            the neuron, or if a separate core is needed.
 
         :rtype: bool
         """

@@ -216,15 +216,26 @@ typedef unsigned long fract	UFRACT;
 
 extern uint64_t udiv64(uint64_t, uint64_t);
 
-//! \brief Divides two
+//! \brief Divides an accum by another accum
+//! \param[in] a The dividend
+//! \param[in] b The divisor
+//! \return a divided by b
 static inline REAL kdivk(REAL a, REAL b) {
 	return kbits((uint32_t) udiv64(((uint64_t) bitsk(a) << 15), (uint64_t) bitsk(b)));
 }
 
+//! \brief Divides an integer by an accum
+//! \param[in] a The dividend
+//! \param[in] b The divisor
+//! \return a divided by b
 static inline int32_t udivk(int32_t a, REAL b) {
     return __LI(udiv64(__U64(a) << 15, __U64(bitsk(b))));
 }
 
+//! \brief Divides an accum by an unsigned integer
+//! \param[in] a The dividend
+//! \param[in] b The divisor
+//! \return a divided by b
 static inline REAL kdivui(REAL a, uint32_t b) {
 	return kbits((uint32_t) __LI(udiv64(__U64(bitsk(a)), __U64(b))));
 }

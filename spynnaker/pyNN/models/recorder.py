@@ -24,7 +24,7 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.data_cache import DataCache
-from spynnaker.pyNN.models.abstract_models import RecordingType
+from spynnaker.pyNN.models.common import RecordingType
 
 # needed as dealing with quantities
 # pylint: disable=c-extension-no-member

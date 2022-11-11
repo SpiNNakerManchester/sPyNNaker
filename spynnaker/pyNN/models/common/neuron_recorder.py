@@ -24,7 +24,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import RecordingType
+from .population_application_vertex import RecordingType
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

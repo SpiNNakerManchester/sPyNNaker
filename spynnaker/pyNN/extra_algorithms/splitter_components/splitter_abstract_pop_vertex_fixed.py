@@ -294,11 +294,3 @@ class SplitterAbstractPopulationVertexFixed(
         if self.__slices is not None:
             return
         self.__slices = get_multidimensional_slices(self._governed_app_vertex)
-
-    @property
-    def n_synapse_vertices(self):
-        """ Return the number of synapse vertices per neuron vertex
-
-        :rtype: int
-        """
-        return 1

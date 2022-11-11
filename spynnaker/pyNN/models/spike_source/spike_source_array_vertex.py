@@ -24,10 +24,11 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models import (
-    PopulationApplicationVertex, RecordingType, ParameterHolder,
-    SupportsStructure)
+from spynnaker.pyNN.models.common import (
+    PopulationApplicationVertex, RecordingType)
+from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
+from spynnaker.pyNN.models.common import ParameterHolder
 from .spike_source_array_machine_vertex import SpikeSourceArrayMachineVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))

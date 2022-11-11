@@ -284,6 +284,6 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
                     SPIKE_PARTITION_ID)]
 
     @property
-    @overrides(SynapseDynamicsStatic.is_single_core_capable)
-    def is_single_core_capable(self):
+    @overrides(SynapseDynamicsStatic.is_combined_core_capable)
+    def is_combined_core_capable(self):
         return False

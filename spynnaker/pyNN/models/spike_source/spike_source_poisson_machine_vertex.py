@@ -106,7 +106,7 @@ def get_sdram_edge_params_bytes(vertex_slice):
 
 
 def _u3232_to_uint64(array):
-    """ Convert data to be written in U3232 to uint32 array
+    """ Convert data to be written in U3232 to uint64 array
     """
     return numpy.round(array * float(DataType.U3232.scale)).astype(
         DataType.U3232.numpy_typename)

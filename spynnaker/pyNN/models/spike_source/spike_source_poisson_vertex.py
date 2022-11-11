@@ -21,9 +21,9 @@ from pyNN.space import Grid2D, Grid3D
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary, RangedList
+from spinn_utilities.config_holder import get_config_int
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.resources import ConstantSDRAM
-from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.utilities.constants import (
@@ -31,13 +31,14 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import MultiSpikeRecorder
+from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.common import (
+    PopulationApplicationVertex, RecordingType)
+from spynnaker.pyNN.models.common import ParameterHolder
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes, get_expander_rates_bytes, get_params_bytes)
-from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
-from spynnaker.pyNN.models.abstract_models import SupportsStructure
-from spynnaker.pyNN.models.abstract_models import (
-    PopulationApplicationVertex, ParameterHolder, RecordingType)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
