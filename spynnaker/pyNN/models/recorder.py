@@ -258,51 +258,6 @@ class Recorder(object):
                 "The simulation is using a virtual machine and so has not "
                 "truly ran, hence the list will be empty")
             return self.__get_empty_data(variable)
-            data = numpy.zeros((0, 3))
-            indexes = []
-            sampling_interval = self.__vertex.get_neuron_sampling_interval(
-                variable)
-        else:
-            # assuming we got here, everything is ok, so we should go get the
-            # data
-            return self.__vertex.get_data(variable)
-
-        return (data, indexes, sampling_interval)
-
-    def get_spikes(self):
-        """ How to get spikes (of a population's neurons) from the recorder.
-
-        :return: the spikes (event times) from the underlying vertex
-        :rtype: ~numpy.ndarray
-        """
-
-        # check we're in a state where we can get spikes
-        if not isinstance(self.__vertex, AbstractSpikeRecordable):
-            raise ConfigurationException(
-                "This population has not got the capability to record spikes")
-        if not self.__vertex.is_recording_spikes():
-            raise ConfigurationException(
-                "This population has not been set to record spikes")
-
-        if not SpynnakerDataView.is_ran_last():
-            if SpynnakerDataView.is_ran_ever():
-                logger.warning(
-                    "The simulation has reset, therefore spikes cannot "
-                    "be retrieved, hence the list/ last segment will be empty")
-            else:
-                logger.warning(
-                    "The simulation has not yet run, therefore spikes cannot "
-                    "be retrieved, hence the list will be empty")
-            return numpy.zeros((0, 2))
-        if get_config_bool("Machine", "virtual_board"):
-            logger.warning(
-                "The simulation is using a virtual machine and so has not "
-                "truly ran, hence the spike list will be empty")
-            return numpy.zeros((0, 2))
-
-        # assuming we got here, everything is OK, so we should go get the
-        # spikes
-        return self.__vertex.get_spikes()
 
         return self.__vertex.get_recorded_data(variable)
 
@@ -666,19 +621,6 @@ class Recorder(object):
             name="Index {}".format(count), index=ids)
         block.channel_indexes.append(channel_index)
         return channel_index
-
-    def write_neo_metadata(self):
-        """
-        Write the metdatabase to the database so it can be used standalone
-        """
-        for variable in self.get_all_recording_variables():
-            if variable == SPIKES:
-                self.__vertex.write_spike_metadata()
-            elif variable == REWIRING:
-                self.__vertex.write_events_metadata(variable)
-            else:
-                self.__vertex.write_matrix_metadata(variable)
-
 
 def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
     """ Converts data between sPyNNaker format and Neo format

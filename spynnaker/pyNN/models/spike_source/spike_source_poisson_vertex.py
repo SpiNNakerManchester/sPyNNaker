@@ -36,6 +36,7 @@ from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import (
     PopulationApplicationVertex, RecordingType)
 from spynnaker.pyNN.models.common import ParameterHolder
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes, get_expander_rates_bytes, get_params_bytes)
@@ -395,12 +396,8 @@ class SpikeSourcePoissonVertex(
 
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self.__spike_recorder.get_spikes(
-            self.label,
-            SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            self)
+        with NeoBufferDatabase() as db:
+            return db.get_deta(self.app_vertex.label, name)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
@@ -530,14 +527,6 @@ class SpikeSourcePoissonVertex(
         """
         self.__kiss_seed[vertex_slice] = seed
 
-    @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self):
-        return self.__spike_recorder.get_spikes(
-            self.label,
-            SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            self)
-
-    @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self):
         buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
@@ -547,8 +536,8 @@ class SpikeSourcePoissonVertex(
                 placement.x, placement.y, placement.p,
                 SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 
-    @overrides(AbstractSpikeRecordable.write_spike_metadata)
-    def write_spike_metadata(self):
+    @overrides(PopulationApplicationVertex.write_recording_metadata)
+    def write_recording_metadata(self):
         self.__spike_recorder.write_spike_metadata(
             self, SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 

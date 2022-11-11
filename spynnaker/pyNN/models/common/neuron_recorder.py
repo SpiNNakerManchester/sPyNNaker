@@ -408,27 +408,6 @@ class NeuronRecorder(object):
         order = numpy.argsort(indexes)
         return pop_level_data[:, order]
 
-    def get_recorded_data(self, label, application_vertex, variable):
-        """ Get recorded data based on type
-
-        :param str label: vertex label
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
-        :rtype: ~numpy.ndarray
-        """
-        if not self.is_recording(variable):
-            raise KeyError(f"Variable {variable} was not recorded")
-        if variable in self.__bitfield_variables:
-            return self.get_spikes(label, application_vertex, variable)
-        if variable in self.__events_per_core_variables:
-            return self.get_events(label, application_vertex, variable)
-        if (variable in self.__sampling_rates or
-                variable in self.__per_timestep_variables):
-            return self.get_matrix_data(label, application_vertex, variable)
-        raise KeyError(f"This vertex cannot record {variable}")
-
     def get_recorded_data_type(self, variable):
         if variable in self.__bitfield_variables:
             return RecordingType.BIT_FIELD
@@ -438,34 +417,6 @@ class NeuronRecorder(object):
                 variable in self.__per_timestep_variables):
             return RecordingType.MATRIX
         raise KeyError(f"This vertex cannot record {variable}")
-
-    def get_matrix_data(self, label, application_vertex, variable):
-        """ Read a data mapped to time and neuron IDs from the SpiNNaker\
-            machine and converts to required data types with scaling if needed.
-
-        :param str label: vertex label
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
-        :rtype: ~numpy.ndarray
-        """
-        if variable in self.__bitfield_variables:
-            msg = ("Variable {} is not supported by get_matrix_data, use "
-                   "get_spikes(...)").format(variable)
-            raise ConfigurationException(msg)
-        if variable in self.__events_per_core_variables:
-            msg = ("Variable {} is not supported by get_matrix_data, use "
-                   "get_events(...)").format(variable)
-            raise ConfigurationException(msg)
-        if variable in self.__per_timestep_variables:
-            sampling_rate = 1
-            data_type = self.__per_timestep_datatypes[variable]
-        else:
-            sampling_rate = self.__sampling_rates[variable]
-            data_type = self.__data_types[variable]
-        return self.__read_data(
-            label, application_vertex, sampling_rate, data_type, variable)
 
     def __write_matrix_metadata(
             self, application_vertex,
@@ -494,15 +445,7 @@ class NeuronRecorder(object):
                 db.write_matrix_metadata(vertex, variable, region, neurons,
                                          data_type, sampling_rate)
 
-    def write_matrix_metadata(self, application_vertex, variable):
-        if variable in self.__bitfield_variables:
-            msg = ("Variable {} is not supported by get_matrix_data, use "
-                   "get_spikes(...)").format(variable)
-            raise ConfigurationException(msg)
-        if variable in self.__events_per_core_variables:
-            msg = ("Variable {} is not supported by get_matrix_data, use "
-                   "get_events(...)").format(variable)
-            raise ConfigurationException(msg)
+    def _write_matrix_metadata(self, application_vertex, variable):
         if variable in self.__per_timestep_variables:
             sampling_rate = 1
             data_type = self.__per_timestep_datatypes[variable]
@@ -512,19 +455,7 @@ class NeuronRecorder(object):
         self.__write_matrix_metadata(
             application_vertex, sampling_rate, data_type, variable)
 
-    def get_spikes(self, label, variable):
-        """ Read spikes mapped to time and neuron IDs from the SpiNNaker\
-            machine.
-
-        :param str label: vertex label
-        :param str variable:
-        :return:
-        :rtype: ~numpy.ndarray(tuple(int,int))
-        """
-        with NeoBufferDatabase() as db:
-            return db.get_deta(label, variable)
-
-    def write_spike_metadata(self, application_vertex):
+    def _write_spike_metadata(self, application_vertex):
         """
         Write the metadata to retreive spikes based on just the database
 
@@ -543,61 +474,7 @@ class NeuronRecorder(object):
                     application_vertex.atoms_shape)
                 db.write_spikes_metadata(vertex, self.SPIKES, region, neurons)
 
-    def write_events_metadata(self, application_vertex, variable):
-        """
-        Write the metadata to retrieve rewires data based on just the database
-
-        :param ApplicatioNVertex application_vertex:
-        :param str variable:
-        """
-        if variable == self.REWIRING:
-            return self.__write_rewires_metadata(application_vertex, variable)
-        else:
-            # Unspecified event variable
-            msg = (
-                "Variable {} is not supported. Supported event variables are: "
-                "{}".format(variable, self.get_event_recordable_variables()))
-            raise ConfigurationException(msg)
-
-    def get_events(self, label, application_vertex, variable):
-        """ Read events mapped to time and neuron IDs from the SpiNNaker\
-            machine.
-
-        :param str label: vertex label
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str variable:
-        :return:
-        :rtype: ~numpy.ndarray(tuple(int,int,int,int))
-        """
-        if variable == self.REWIRING:
-            return self._get_rewires(
-                label, application_vertex, variable)
-        else:
-            # Unspecified event variable
-            msg = (
-                "Variable {} is not supported. Supported event variables are: "
-                "{}".format(variable, self.get_event_recordable_variables()))
-            raise ConfigurationException(msg)
-
-    def _get_rewires(
-            self, label, application_vertex, variable):
-        """ Read rewires mapped to time and neuron IDs from the SpiNNaker\
-            machine.
-
-        :param str label: vertex label
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str variable:
-        :return:
-        :rtype: ~numpy.ndarray(tuple(int,int,int,int))
-        """
-        with NeoBufferDatabase() as db:
-            return db.get_deta(label, variable)
-
-    def __write_rewires_metadata(self, application_vertex, variable):
+    def __write_rewires_metadata(self, application_vertex):
         """
         Write the metadata to retrieve rewires data based on just the database
 
@@ -606,12 +483,30 @@ class NeuronRecorder(object):
         """
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
-                variable))
-        region = self.__region_ids[variable]
+                self.REWIRING))
+        region = self.__region_ids[self.REWIRING]
 
         for i, vertex in enumerate(vertices):
             with NeoBufferDatabase() as db:
-                db.write_rewires_metadata(vertex, variable, region)
+                db.write_rewires_metadata(vertex, self.REWIRING, region)
+
+    def write_recording_metadata(self, application_vertex):
+        """
+        Write the metdatabase to the database so it can be used standalone
+
+        :param application_vertex:
+        :return:
+        """
+        for variable in self.recording_variables:
+            if variable == self.SPIKES:
+                self._write_spike_metadata(application_vertex)
+            elif variable == self.REWIRING:
+                self.__write_rewires_metadata(application_vertex)
+            elif variable in self.__events_per_core_variables:
+                raise NotImplementedError(
+                    f"Unexpected Event variable: {variable}")
+            else:
+                self._write_matrix_metadata(application_vertex, variable)
 
     def get_recordable_variables(self):
         """

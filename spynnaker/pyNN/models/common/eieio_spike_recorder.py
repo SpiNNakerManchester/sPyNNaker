@@ -53,26 +53,6 @@ class EIEIOSpikeRecorder(object):
                            "SpikeSourceArray so being ignored")
         self.__record = new_state
 
-    def get_spikes(self, label, region,
-                   application_vertex, base_key_function):
-        """ Get the recorded spikes from the object
-
-        :param str label:
-        :param int region:
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param base_key_function:
-        :type base_key_function:
-            callable(~pacman.model.graphs.machine.MachineVertex,int)
-        :return: A numpy array of 2-element arrays of (neuron_id, time)
-            ordered by time, one element per event
-        :rtype: ~numpy.ndarray(tuple(int,int))
-        """
-        # pylint: disable=too-many-arguments
-        with NeoBufferDatabase() as db:
-            return db.get_deta(application_vertex.label, "spikes")
-
     def write_spike_metadata(
             self, region, application_vertex, base_key_function):
         """

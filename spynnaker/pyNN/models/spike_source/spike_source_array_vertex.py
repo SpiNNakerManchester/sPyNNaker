@@ -25,6 +25,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common import (
     PopulationApplicationVertex, RecordingType)
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.models.common import ParameterHolder
 from pyNN.space import Grid2D, Grid3D
@@ -270,25 +271,17 @@ class SpikeSourceArrayVertex(
 
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self.__spike_recorder.get_spikes(
-            self.label, 0, self,
-            lambda vertex:
-                vertex.virtual_key
-                if vertex.virtual_key is not None
-                else 0)
+        with NeoBufferDatabase() as db:
+            return db.get_deta(self.app_vertex.label, name)
 
-    @overrides(AbstractSpikeRecordable.write_spike_metadata)
-    def write_spike_metadata(self):
+    @overrides(PopulationApplicationVertex.write_recording_metadata)
+    def write_recording_metadata(self):
         self.__spike_recorder.write_spike_metadata(
             0, self, lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0)
 
-    @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self):
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
         if name != "spikes":

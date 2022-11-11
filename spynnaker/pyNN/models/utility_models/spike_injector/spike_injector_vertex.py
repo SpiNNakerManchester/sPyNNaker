@@ -20,6 +20,7 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.models.common import (
     PopulationApplicationVertex, RecordingType)
 
@@ -99,25 +100,16 @@ class SpikeInjectorVertex(
 
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self.__spike_recorder.get_spikes(
-            self.label, SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, self,
-            lambda vertex:
-                vertex.virtual_key
-                if vertex.virtual_key is not None
-                else 0)
+        with NeoBufferDatabase() as db:
+            return db.get_deta(self.app_vertex.label, name)
 
-    @overrides(AbstractSpikeRecordable.write_spike_metadata)
-    def write_spike_metadata(self):
+    def write_recording_metadata(self):
         self.__spike_recorder.write_spike_metadata(
             0, self, lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0)
 
-    @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self):
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
         if name != "spikes":

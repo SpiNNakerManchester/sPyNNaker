@@ -78,7 +78,8 @@ class MultiSpikeRecorder(object):
         :param ApplicatioNvertex application_vertex:
         :param int region: local region this vertex will write to
         """
-        with NeoBufferDatabase() as db:
-            vertices = application_vertex.machine_vertices
-            for vertex in vertices:
-                db.write_multi_spikes_metadata(vertex, "spikes", region)
+        if self.record:
+            with NeoBufferDatabase() as db:
+                vertices = application_vertex.machine_vertices
+                for vertex in vertices:
+                    db.write_multi_spikes_metadata(vertex, "spikes", region)
