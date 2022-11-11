@@ -40,9 +40,8 @@ from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
-    delay_support_adder, on_chip_bitfield_generator,
+    delay_support_adder, neuron_expander, synapse_expander,
     redundant_packet_count_report,
-    spynnaker_data_specification_writer,
     spynnaker_neuron_graph_network_specification_report)
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_machine_bit_field_router_compressor import (
@@ -52,7 +51,6 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_partitioner, spynnaker_splitter_selector)
-from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.utility_calls import (
     moved_in_v7_warning)
@@ -141,9 +139,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # extra post prerun algorithms
         for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
-        if self._data_writer.is_ran_ever():
-            for population in self._data_writer.iterate_populations():
-                population._reset_has_read_neuron_parameters_this_run()
 
         super(SpiNNaker, self).run(run_time, sync_time)
         # extra post run algorithms
@@ -378,12 +373,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         moved_in_v7_warning("register_binary_search_path is now a View method")
         SpynnakerDataView.register_binary_search_path(search_path)
 
-    @overrides(AbstractSpinnakerBase._execute_graph_data_specification_writer)
-    def _execute_graph_data_specification_writer(self):
-        with FecTimer("Spynnaker data specification writer", TimerWork.OTHER):
-            self._data_writer.set_dsg_targets(
-                spynnaker_data_specification_writer())
-
     def _execute_spynnaker_ordered_covering_compressor(self):
         with FecTimer("Spynnaker machine bitfield ordered covering compressor",
                       TimerWork.COMPRESSING) as timer:
@@ -422,12 +411,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 return
             synapse_expander()
 
-    def _execute_on_chip_bit_field_generator(self):
-        with FecTimer("Execute on chip bitfield generator",
-                      TimerWork.BITFIELD) as timer:
+    def _execute_neuron_expander(self):
+        with FecTimer("Neuron expander", TimerWork.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
                 return
-            on_chip_bitfield_generator()
+            neuron_expander()
 
     def _execute_finish_connection_holders(self):
         with FecTimer("Finish connection holders", TimerWork.OTHER):
@@ -435,8 +423,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @overrides(AbstractSpinnakerBase._do_extra_load_algorithms)
     def _do_extra_load_algorithms(self):
+        self._execute_neuron_expander()
         self._execute_synapse_expander()
-        self._execute_on_chip_bit_field_generator()
         self._execute_finish_connection_holders()
 
     def _report_write_network_graph(self):

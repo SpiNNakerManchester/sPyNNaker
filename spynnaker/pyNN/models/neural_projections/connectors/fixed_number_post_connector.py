@@ -19,8 +19,6 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
-from .abstract_connector_supports_views_on_machine import (
-    AbstractConnectorSupportsViewsOnMachine)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_generate_connector_on_host import (
@@ -30,8 +28,7 @@ N_GEN_PARAMS = 8
 
 
 class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
-                               AbstractGenerateConnectorOnHost,
-                               AbstractConnectorSupportsViewsOnMachine):
+                               AbstractGenerateConnectorOnHost):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
     """
@@ -41,8 +38,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         "__n_post",
         "__post_neurons",
         "__post_neurons_set",
-        "__with_replacement",
-        "__post_connector_seed"]
+        "__with_replacement"]
 
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False,
@@ -83,7 +79,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self.__with_replacement = with_replacement
         self.__post_neurons = None
         self.__post_neurons_set = False
-        self.__post_connector_seed = dict()
         self._rng = rng
 
     def set_projection_information(self, synapse_info):
@@ -245,12 +240,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         # Get lo and hi for the pre vertex
-        lo = pre_vertex_slice.lo_atom
-        hi = pre_vertex_slice.hi_atom
+        lo = 0
+        hi = synapse_info.n_pre_neurons - 1
 
         # Get number of connections
         n_connections = sum(
@@ -274,11 +268,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         block["source"] = pre_neurons_in_slice
         block["target"] = post_neurons_in_slice
         block["weight"] = self._generate_weights(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 
@@ -298,34 +292,15 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_id(self):
         return ConnectorIDs.FIXED_NUMBER_POST_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
-    def gen_connector_params(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
-        params = self._basic_connector_params(synapse_info)
-
-        # The same seed needs to be sent to each of the slices
-        key = (id(pre_vertex_slice), id(post_slices))
-        if key not in self.__post_connector_seed:
-            self.__post_connector_seed[
-                key] = utility_calls.create_mars_kiss_seeds(self._rng)
-
-        # Only deal with self-connections if the two populations are the same
-        self_connections = True
-        if ((not self.__allow_self_connections) and (
-                synapse_info.pre_population is synapse_info.post_population)):
-            self_connections = False
-        params.extend([
-            self_connections,
-            self.__with_replacement,
-            self.__n_post,
-            synapse_info.n_post_neurons])
-        params.extend(self.__post_connector_seed[key])
-        return numpy.array(params, dtype="uint32")
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
+    def gen_connector_params(self):
+        return numpy.array([
+            int(self.__allow_self_connections),
+            int(self.__with_replacement),
+            self.__n_post], dtype="uint32")
 
     @property
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)
+        return 3 * BYTES_PER_WORD

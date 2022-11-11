@@ -25,10 +25,13 @@ MODELS = synapses\
          synapses_structural_last_neuron_distance_weight\
          synapses_stdp_mad_pair_additive_structural_random_distance_weight\
          synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight\
+         synapses_stdp_mad_nearest_pair_additive_structural_random_distance_weight\
          synapses_stdp_izhikevich_neuromodulation_pair_additive
-         
+
 ifneq ($(SPYNNAKER_DEBUG), DEBUG)
-    MODELS += synapses_stdp_izhikevich_neuromodulation_pair_additive_structural_random_distance_weight\
+    MODELS += synapses_stdp_izhikevich_neuromodulation_pair_multiplicative\
+              synapses_stdp_izhikevich_neuromodulation_vogels_2011_additive\
+              synapses_stdp_izhikevich_neuromodulation_pair_additive_structural_random_distance_weight\
               synapses_stdp_izhikevich_neuromodulation_pair_additive_structural_last_neuron_distance_weight
 endif
 

@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.application import Application2DFPGAVertex
-from pacman.model.graphs.application import FPGAConnection
+from pacman.model.graphs.application import (
+    Application2DFPGAVertex, FPGAConnection)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
 from spinn_front_end_common.abstract_models import (
@@ -22,6 +22,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from enum import IntEnum
 
 _REPEATS = 2
@@ -106,10 +107,15 @@ def set_input_route(index, route):
 
 
 class _SpiNNFPGARegister(IntEnum):
+    # Peripheral
     P_KEY = 2
     P_MASK = 3
+
+    # SpiNNLink key
     LC_KEY = 12
     LC_MASK = 13
+
+    # SPIF key
     RC_KEY = 14
     RC_MASK = 15
     STOP = 16
@@ -122,8 +128,8 @@ class _SpiNNFPGARegister(IntEnum):
 
 
 class SPIFRetinaDevice(
-        Application2DFPGAVertex, AbstractSendMeMulticastCommandsVertex,
-        HasShapeKeyFields):
+        Application2DFPGAVertex, PopulationApplicationVertex,
+        AbstractSendMeMulticastCommandsVertex, HasShapeKeyFields):
     """ A retina device connected to SpiNNaker using a SPIF board.
     """
 

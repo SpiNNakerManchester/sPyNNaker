@@ -126,10 +126,10 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
                 synapse, i, synapse_row_sparse_weight(synapse));
         synapses_print_weight(synapse_row_sparse_weight(synapse),
                 ring_buffer_to_input_left_shifts[synapse_type]);
-        io_printf(IO_BUF, "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
+        io_printf(IO_BUF, "nA) d: %2u, %d, n = %3u)] - {%08x %08x}\n",
                 synapse_row_sparse_delay(synapse, synapse_type_index_bits,
                         synapse_delay_mask),
-                get_type_char(synapse_type),
+                synapse_type,
                 synapse_row_sparse_index(synapse, synapse_index_mask),
                 synapse_delay_mask, synapse_type_index_bits);
     }

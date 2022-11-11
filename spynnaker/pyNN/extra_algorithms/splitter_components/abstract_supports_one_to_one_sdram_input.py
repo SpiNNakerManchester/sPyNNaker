@@ -13,12 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 @add_metaclass(AbstractBase)
 class AbstractSupportsOneToOneSDRAMInput(object):
-    """ A marker interface for a splitter that supports one-to-one input using
+    """ An interface for a splitter that supports one-to-one input using
         SDRAM.  The splitter is assumed to handle the splitting on any inputs
         that are actually one-to-one, as it will have to create the vertices
     """
+
+    @abstractmethod
+    def handles_source_vertex(self, projection):
+        """ Determine if the source vertex of the given projection is to be
+            handled by the target splitter
+
+        :param Projection projection: The projection to check the source of
+        :rtype: bool
+        """

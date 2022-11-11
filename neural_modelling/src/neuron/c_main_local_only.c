@@ -45,11 +45,14 @@ enum regions {
     PROVENANCE_DATA_REGION,
     PROFILER_REGION,
     RECORDING_REGION,
+	CORE_PARAMS_REGION,
     NEURON_PARAMS_REGION,
     CURRENT_SOURCE_PARAMS_REGION,
     NEURON_RECORDING_REGION,
     LOCAL_ONLY_REGION,
     LOCAL_ONLY_PARAMS_REGION,
+	NEURON_BUILDER_REGION,
+	INITIAL_VALUES_REGION
 };
 
 //! From the regions, extract those that are common
@@ -69,9 +72,11 @@ const struct common_priorities COMMON_PRIORITIES = {
 
 //! From the regions, extract those that are neuron-specific
 const struct neuron_regions NEURON_REGIONS = {
+	.core_params = CORE_PARAMS_REGION,
     .neuron_params = NEURON_PARAMS_REGION,
     .current_source_params = CURRENT_SOURCE_PARAMS_REGION,
-    .neuron_recording = NEURON_RECORDING_REGION
+    .neuron_recording = NEURON_RECORDING_REGION,
+	.initial_values = INITIAL_VALUES_REGION
 };
 
 //! The current timer tick value.
@@ -123,7 +128,7 @@ void resume_callback(void) {
     recording_reset();
 
     // try resuming neuron
-    if (!neuron_resume()) {
+    if (!neuron_resume(time + 1)) {
         log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }

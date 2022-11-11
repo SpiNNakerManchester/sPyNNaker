@@ -22,8 +22,8 @@
 
 #include "neuron_model.h"
 
-//! The state variables of an Izhekevich model neuron
-typedef struct neuron_t {
+//! The state parameters of an Izhekevich model neuron
+struct neuron_params_t {
     // nominally 'fixed' parameters
     REAL A;
     REAL B;
@@ -37,16 +37,53 @@ typedef struct neuron_t {
     //! offset current [nA]
     REAL I_offset;
 
-    //! current timestep - simple correction for threshold
+    //! current timestep in ms
+    REAL time_step;
+
+    //! next value of this_h (saved)
+    REAL next_h;
+};
+
+//! The state variables of an Izhekevich model neuron
+struct neuron_t {
+    // nominally 'fixed' parameters
+    REAL A;
+    REAL B;
+    REAL C;
+    REAL D;
+
+    // Variable-state parameters
+    REAL V;
+    REAL U;
+
+    //! offset current [nA]
+    REAL I_offset;
+
+    //! current timestep
     REAL this_h;
-} neuron_t;
 
-//! Global neuron parameters for Izhekevich model neuron
-typedef struct global_neuron_params_t {
-    REAL machine_timestep_ms;
-} global_neuron_params_t;
+    //! timestep to reset to when not just spiked
+    REAL reset_h;
+};
 
-extern const global_neuron_params_t *global_params;
+static inline void neuron_model_initialise(neuron_t *state, neuron_params_t *params,
+		uint32_t n_steps_per_timestep) {
+	state->A = params->A;
+    state->B = params->B;
+	state->C = params->C;
+	state->D = params->D;
+	state->V = params->V;
+	state->U = params->U;
+	state->I_offset = params->I_offset;
+	state->this_h = params->next_h;
+	state->reset_h = kdivui(params->time_step, n_steps_per_timestep);
+}
+
+static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *params) {
+	params->next_h = state->this_h;
+	params->V = state->V;
+	params->U = state->U;
+}
 
 /*! \brief For linear membrane voltages, 1.5 is the correct value. However
  * with actual membrane voltage behaviour and tested over an wide range of
@@ -127,7 +164,7 @@ static inline void rk2_kernel_midpoint(
 //!     contains all the parameters for a specific neuron
 //! \return the value to be compared with a threshold value to determine if the
 //!     neuron has spiked
-static state_t neuron_model_state_update(
+static inline state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
         uint16_t num_inhibitory_inputs, const input_t *inh_input,
         input_t external_bias, REAL current_offset, neuron_t *restrict neuron) {
@@ -146,7 +183,7 @@ static state_t neuron_model_state_update(
 
     // the best AR update so far
     rk2_kernel_midpoint(neuron->this_h, neuron, input_this_timestep);
-    neuron->this_h = global_params->machine_timestep_ms;
+    neuron->this_h = neuron->reset_h;
 
     return neuron->V;
 }
@@ -154,7 +191,7 @@ static state_t neuron_model_state_update(
 //! \brief Indicates that the neuron has spiked
 //! \param[in, out] neuron pointer to a neuron parameter struct which contains
 //!     all the parameters for a specific neuron
-static void neuron_model_has_spiked(neuron_t *restrict neuron) {
+static inline void neuron_model_has_spiked(neuron_t *restrict neuron) {
     // reset membrane voltage
     neuron->V = neuron->C;
 
@@ -162,7 +199,7 @@ static void neuron_model_has_spiked(neuron_t *restrict neuron) {
     neuron->U += neuron->D;
 
     // simple threshold correction - next timestep (only) gets a bump
-    neuron->this_h = global_params->machine_timestep_ms * SIMPLE_TQ_OFFSET;
+    neuron->this_h = neuron->reset_h * SIMPLE_TQ_OFFSET;
 }
 
 //! \brief get the neuron membrane voltage for a given neuron parameter set
@@ -170,8 +207,24 @@ static void neuron_model_has_spiked(neuron_t *restrict neuron) {
 //!     all the parameters for a specific neuron
 //! \return the membrane voltage for a given neuron with the neuron
 //!     parameters specified in neuron
-static state_t neuron_model_get_membrane_voltage(const neuron_t *neuron) {
+static inline state_t neuron_model_get_membrane_voltage(const neuron_t *neuron) {
     return neuron->V;
+}
+
+static inline void neuron_model_print_state_variables(const neuron_t *neuron) {
+    log_debug("V = %11.4k ", neuron->V);
+    log_debug("U = %11.4k ", neuron->U);
+    log_debug("This h = %11.4k", neuron->this_h);
+}
+
+static inline void neuron_model_print_parameters(const neuron_t *neuron) {
+    log_debug("A = %11.4k ", neuron->A);
+    log_debug("B = %11.4k ", neuron->B);
+    log_debug("C = %11.4k ", neuron->C);
+    log_debug("D = %11.4k ", neuron->D);
+
+    log_debug("I = %11.4k \n", neuron->I_offset);
+    log_debug("Reset h = %11.4k", neuron->reset_h);
 }
 
 #endif   // _NEURON_MODEL_IZH_CURR_IMPL_H_
