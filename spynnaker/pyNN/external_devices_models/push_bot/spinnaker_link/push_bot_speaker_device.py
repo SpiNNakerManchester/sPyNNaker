@@ -13,13 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker.pyNN.models.abstract_models import PopulationSpiNNakerLinkVertex
+from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetSpeakerDevice)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 class PushBotSpiNNakerLinkSpeakerDevice(
-        PushBotEthernetSpeakerDevice, PopulationSpiNNakerLinkVertex):
+        PushBotEthernetSpeakerDevice, ApplicationSpiNNakerLinkVertex,
+        PopulationApplicationVertex):
     """ The speaker of a PushBot
     """
     __slots__ = []
@@ -62,6 +64,6 @@ class PushBotSpiNNakerLinkSpeakerDevice(
         super().__init__(
             speaker, protocol, start_active_time, start_total_period,
             start_frequency, start_melody)
-        PopulationSpiNNakerLinkVertex.__init__(
+        ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id, n_atoms=n_neurons,
             board_address=board_address, label=label)

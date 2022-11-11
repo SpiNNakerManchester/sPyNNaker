@@ -31,8 +31,8 @@ from spynnaker.pyNN.utilities.constants import SPIKES
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 from .population_view import PopulationView
-from spynnaker.pyNN.models.abstract_models import (
-    PopulationApplicationVertex, SupportsStructure)
+from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 logger = FormatAdapter(logging.getLogger(__file__))
 

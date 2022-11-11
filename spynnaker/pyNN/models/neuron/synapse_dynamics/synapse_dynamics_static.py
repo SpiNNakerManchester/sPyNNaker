@@ -234,6 +234,6 @@ class SynapseDynamicsStatic(
         return self.__pad_to_length
 
     @property
-    @overrides(AbstractStaticSynapseDynamics.is_single_core_capable)
-    def is_single_core_capable(self):
+    @overrides(AbstractStaticSynapseDynamics.is_combined_core_capable)
+    def is_combined_core_capable(self):
         return True

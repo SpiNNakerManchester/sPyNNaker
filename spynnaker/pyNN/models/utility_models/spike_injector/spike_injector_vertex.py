@@ -20,7 +20,7 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.models.abstract_models import (
+from spynnaker.pyNN.models.common import (
     PopulationApplicationVertex, RecordingType)
 
 logger = FormatAdapter(logging.getLogger(__name__))

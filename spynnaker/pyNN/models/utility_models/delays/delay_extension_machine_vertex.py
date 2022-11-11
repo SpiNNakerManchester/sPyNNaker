@@ -48,13 +48,12 @@ class DelayExtensionMachineVertex(
         N_PACKETS_SENT = 3
         N_BUFFER_OVERFLOWS = 4
         N_DELAYS = 5
-        N_TIMES_TDMA_FELL_BEHIND = 6
-        N_PACKETS_LOST_DUE_TO_COUNT_SATURATION = 7
-        N_PACKETS_WITH_INVALID_NEURON_IDS = 8
-        N_PACKETS_DROPPED_DUE_TO_INVALID_KEY = 9
-        N_LATE_SPIKES = 10
-        MAX_BACKGROUND_QUEUED = 11
-        N_BACKGROUND_OVERLOADS = 12
+        N_PACKETS_LOST_DUE_TO_COUNT_SATURATION = 6
+        N_PACKETS_WITH_INVALID_NEURON_IDS = 7
+        N_PACKETS_DROPPED_DUE_TO_INVALID_KEY = 8
+        N_LATE_SPIKES = 9
+        MAX_BACKGROUND_QUEUED = 10
+        N_BACKGROUND_OVERLOADS = 11
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
@@ -106,8 +105,8 @@ class DelayExtensionMachineVertex(
                parse_extra_provenance_items)
     def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
-         _n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
-         max_bg, n_bg_overloads) = provenance_data
+         n_sat, n_bad_neuron, n_bad_keys, n_late_spikes, max_bg,
+         n_bg_overloads) = provenance_data
 
         with ProvenanceWriter() as db:
             db.insert_core(

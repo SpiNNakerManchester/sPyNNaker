@@ -17,6 +17,7 @@ import logging
 from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import MultiRegionSDRAM
 from pacman.model.partitioner_splitters.abstract_splitters import (
@@ -39,7 +40,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spinn_utilities.ordered_set import OrderedSet
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \

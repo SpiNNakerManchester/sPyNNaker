@@ -67,7 +67,7 @@ def spynakker_vertex_selector(app_vertex):
     """
     if app_vertex.splitter is None:
         if isinstance(app_vertex, AbstractPopulationVertex):
-            if app_vertex.single_core_capable:
+            if app_vertex.combined_core_capable:
                 app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
             else:
                 app_vertex.splitter = (

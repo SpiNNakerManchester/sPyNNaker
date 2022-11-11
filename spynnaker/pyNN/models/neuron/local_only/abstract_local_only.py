@@ -52,6 +52,6 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
         return 2048
 
     @property
-    @overrides(AbstractSynapseDynamics.is_single_core_capable)
-    def is_single_core_capable(self):
+    @overrides(AbstractSynapseDynamics.is_combined_core_capable)
+    def is_combined_core_capable(self):
         return True

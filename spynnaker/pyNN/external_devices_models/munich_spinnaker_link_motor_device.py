@@ -21,7 +21,7 @@ from pacman.model.graphs.application.abstract import (
 from spinn_front_end_common.abstract_models import (
     AbstractVertexWithEdgeToDependentVertices)
 from spynnaker.pyNN.models.defaults import defaults
-from spynnaker.pyNN.models.abstract_models import PopulationApplicationVertex
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from .machine_munich_motor_device import MachineMunichMotorDevice
 
 

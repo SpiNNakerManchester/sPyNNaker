@@ -15,11 +15,12 @@
 
 from spinn_utilities.overrides import overrides
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.abstract_models import PopulationSpiNNakerLinkVertex
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 # robot with 7 7 1
 
@@ -37,7 +38,8 @@ def get_spike_value_from_robot_retina(key):
 
 
 class MunichRetinaDevice(
-        PopulationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex):
+        ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
+        AbstractSendMeMulticastCommandsVertex):
     """ An Omnibot silicon retina device.
     """
     __slots__ = [
@@ -111,7 +113,7 @@ class MunichRetinaDevice(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             label=label, board_address=board_address)
 
-    @overrides(PopulationSpiNNakerLinkVertex.get_fixed_key_and_mask)
+    @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id):
         return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 

@@ -98,32 +98,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self._rng = (self._rng or NumpyRNG())
         self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
-    def _check_parameter(self, values, name):
-        """ Check that the types of the values is supported.
-
-        :param values:
-        :type values: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
-        :param str name:
-        :param bool allow_lists:
-        """
-        if (not numpy.isscalar(values) and
-                not (isinstance(values, RandomDistribution))):
-            raise SpynnakerException("Parameter {} format unsupported".format(
-                name))
-
-    def _check_parameters(self, weights, delays):
-        """ Check the types of the weights and delays are supported
-
-        :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-        :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-        :param bool allow_lists:
-        """
-        self._check_parameter(weights, "weights")
-        self._check_parameter(delays, "delays")
-
     def _get_delay_minimum(self, delays, n_connections, synapse_info):
         """ Get the minimum delay given a float or RandomDistribution
 

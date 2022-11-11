@@ -292,6 +292,6 @@ class SynapseDynamicsStructuralSTDP(
                     SPIKE_PARTITION_ID)]
 
     @property
-    @overrides(SynapseDynamicsSTDP.is_single_core_capable)
-    def is_single_core_capable(self):
+    @overrides(SynapseDynamicsSTDP.is_combined_core_capable)
+    def is_combined_core_capable(self):
         return False

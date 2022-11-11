@@ -14,18 +14,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_front_end_common.utilities.system_control_logic import \
     run_system_application
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinn_front_end_common.utilities.helpful_functions import (
+    write_address_to_user1)
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractNeuronExpandable, NEURON_EXPANDER_APLX)
-from spinn_front_end_common.utilities.helpful_functions import (
-    write_address_to_user1)
-from spinn_utilities.config_holder import get_config_bool
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -36,10 +36,9 @@ def neuron_expander():
     .. note::
         Needs to be done after data has been loaded.
     """
-    neuron_bin = SpynnakerDataView.get_executable_path(NEURON_EXPANDER_APLX)
 
     # Find the places where the neuron expander should run
-    expander_cores, expanded_pop_vertices = _plan_expansion(neuron_bin)
+    expander_cores, expanded_pop_vertices = _plan_expansion()
 
     progress = ProgressBar(expander_cores.total_processors,
                            "Expanding Neuron Data")
@@ -55,17 +54,13 @@ def neuron_expander():
     _fill_in_initial_data(expanded_pop_vertices)
 
 
-def _plan_expansion(synapse_expander_bin):
-    """ Plan the expansion of synapses and set up the regions using USER1
+def _plan_expansion():
+    """ Plan the expansion of neurons and set up the regions using USER1
 
-    :param ~pacman.model.placements.Placements: The placements of the vertices
-    :param str synapse_expander_bin: The binary name of the synapse expander
-    :param ~spinnman.transceiver.Transceiver transceiver:
-        How to talk to the machine
-    :return: The places to load the synapse expander and delay expander
-        executables, and the target machine vertices to read synapses back from
     :rtype: (ExecutableTargets, list(MachineVertex, Placement))
     """
+    neuron_bin = SpynnakerDataView.get_executable_path(NEURON_EXPANDER_APLX)
+
     expander_cores = ExecutableTargets()
     expanded_pop_vertices = list()
 
@@ -80,8 +75,7 @@ def _plan_expansion(synapse_expander_bin):
             if vertex.gen_neurons_on_machine():
                 expanded_pop_vertices.append((vertex, placement))
                 expander_cores.add_processor(
-                    synapse_expander_bin,
-                    placement.x, placement.y, placement.p,
+                    neuron_bin, placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
                 # Write the region to USER1, as that is the best we can do
                 write_address_to_user1(

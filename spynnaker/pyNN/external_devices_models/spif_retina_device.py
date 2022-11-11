@@ -13,15 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.application import FPGAConnection
+from pacman.model.graphs.application import (
+    Application2DFPGAVertex, FPGAConnection)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.models.abstract_models import (
-    HasShapeKeyFields, Population2DFPGAVertex)
+from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from enum import IntEnum
 
 _REPEATS = 2
@@ -127,8 +128,8 @@ class _SpiNNFPGARegister(IntEnum):
 
 
 class SPIFRetinaDevice(
-        Population2DFPGAVertex, AbstractSendMeMulticastCommandsVertex,
-        HasShapeKeyFields):
+        Application2DFPGAVertex, PopulationApplicationVertex,
+        AbstractSendMeMulticastCommandsVertex, HasShapeKeyFields):
     """ A retina device connected to SpiNNaker using a SPIF board.
     """
 
@@ -274,14 +275,14 @@ class SPIFRetinaDevice(
         fpga_y_index = fpga_index // self.X_PER_ROW
         return fpga_x_index, fpga_y_index
 
-    @overrides(Population2DFPGAVertex.get_incoming_slice_for_link)
+    @overrides(Application2DFPGAVertex.get_incoming_slice_for_link)
     def get_incoming_slice_for_link(self, link, index):
         vertex_slice = super(
             SPIFRetinaDevice, self).get_incoming_slice_for_link(link, index)
         self.__index_by_slice[link.fpga_link_id, vertex_slice] = index
         return vertex_slice
 
-    @overrides(Population2DFPGAVertex.get_machine_fixed_key_and_mask)
+    @overrides(Application2DFPGAVertex.get_machine_fixed_key_and_mask)
     def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
         fpga_link_id = machine_vertex.fpga_link_id
         vertex_slice = machine_vertex.vertex_slice
@@ -297,7 +298,7 @@ class SPIFRetinaDevice(
         fpga_mask = key_and_mask.mask | self.__spif_mask
         return BaseKeyAndMask(fpga_key, fpga_mask)
 
-    @overrides(Population2DFPGAVertex.get_fixed_key_and_mask)
+    @overrides(Application2DFPGAVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id):
         n_key_bits = BITS_IN_KEY - self._key_shift
         key_mask = ((1 << n_key_bits) - 1) << self._key_shift
