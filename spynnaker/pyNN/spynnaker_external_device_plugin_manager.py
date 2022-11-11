@@ -123,9 +123,6 @@ class SpynnakerExternalDevicePluginManager(object):
         :param bool translate_keys:
             Whether the incoming keys from the cores should be translated
             to global keys rather than core-based keys
-        :param int received_key_right_shift:
-            The amount of right shift to apply to a received key before any
-            further processing (including translation)
         """
         # pylint: disable=too-many-arguments, too-many-locals, protected-access
         # get default params if none set
