@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from enum import IntEnum
 from spinn_front_end_common.utility_models import MultiCastCommand
+from spinn_utilities.overrides import overrides
 
 _REPEATS = 2
 _DELAY_BETWEEN_REPEATS = 1
@@ -233,6 +234,35 @@ def set_input_route(pipe, index, route):
     return SPIFRegister.IR_ROUTE_BASE.cmd(route, (pipe * N_INPUTS) + index)
 
 
+class _DelayedMultiCastCommand(MultiCastCommand):
+    """ A command where the getting of the payload is delayed
+    """
+    __slots__ = ["__get_payload"]
+
+    def __init__(self, key, get_payload, repeat, delay_between_repeats):
+        """
+
+        :param int key: The key to send
+        :param func()->int get_payload:
+            A function to call that returns a payload
+        :param int repeat: The number of times to repeat the command
+        :param int delay_between_repeats: The delay between the repeats
+        """
+        super().__init__(
+            key, repeat=repeat, delay_between_repeats=delay_between_repeats)
+        self.__get_payload = get_payload
+
+    @property
+    @overrides(MultiCastCommand.payload)
+    def payload(self):
+        return self.__get_payload()
+
+    @property
+    @overrides(MultiCastCommand.is_payload)
+    def is_payload(self):
+        return True
+
+
 class SpiNNFPGARegister(IntEnum):
     """ The register offsets on the SpiNNaker FPGAs for devices
     """
@@ -274,4 +304,16 @@ class SpiNNFPGARegister(IntEnum):
         """
         return MultiCastCommand(
             _LC_KEY + self.value, payload, time=None, repeat=_REPEATS,
+            delay_between_repeats=_DELAY_BETWEEN_REPEATS)
+
+    def delayed_command(self, get_payload):
+        """ Make a command to send to the FPGA to set a register value,
+            where the value itself is currently unknown
+
+        :param func()->int get_payload:
+            A function to call to get the payload later
+        :rtype: MultiCastCommand
+        """
+        return _DelayedMultiCastCommand(
+            _LC_KEY + self.value, get_payload, repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
