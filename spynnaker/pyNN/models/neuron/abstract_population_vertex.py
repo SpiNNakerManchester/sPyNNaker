@@ -26,17 +26,15 @@ from pyNN.space import Grid2D, Grid3D
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ranged import RangeDictionary
 from data_specification.enums.data_type import DataType
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (
-    AbstractCanReset, AbstractRewritesDataSpecification)
-from spinn_front_end_common.abstract_models.impl import (
-    TDMAAwareApplicationVertex)
+    AbstractCanReset)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profile_region_size)
 from spinn_front_end_common.interface.buffer_management\
@@ -45,16 +43,10 @@ from spinn_front_end_common.interface.buffer_management\
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable,
-    NeuronRecorder)
+from spynnaker.pyNN.models.common import NeuronRecorder
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
-    AbstractPopulationSettable, AbstractContainsUnits, AbstractMaxSpikes,
-    HasSynapses, SupportsStructure)
-from spynnaker.pyNN.exceptions import InvalidParameterType, SpynnakerException
-from spynnaker.pyNN.utilities.ranged import (
-    SpynnakerRangeDictionary)
+    AbstractAcceptsIncomingSynapses, AbstractMaxSpikes, HasSynapses,
+    SupportsStructure)
 from spynnaker.pyNN.utilities.constants import (
     POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
@@ -63,6 +55,16 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
+from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
+from spynnaker.pyNN.utilities.struct import StructRepeat
+from spynnaker.pyNN.models.common import (
+    ParameterHolder, PopulationApplicationVertex)
+from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
+from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
+
+from .population_machine_neurons import PopulationMachineNeurons
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
@@ -75,6 +77,11 @@ _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
 _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
 _NEURON_BASE_N_CPU_CYCLES = 10
 
+_NEURON_GENERATOR_BASE_SDRAM = 12 * BYTES_PER_WORD
+_NEURON_GENERATOR_PER_STRUCT = 4 * BYTES_PER_WORD
+_NEURON_GENERATOR_PER_PARAM = 2 * BYTES_PER_WORD
+_NEURON_GENERATOR_PER_ITEM = (2 * BYTES_PER_WORD) + MAX_PARAMS_BYTES
+
 # 1 for number of neurons
 # 1 for number of synapse types
 # 1 for number of neuron bits
@@ -83,6 +90,10 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 # 1 for drop late packets,
 # 1 for incoming spike buffer size
 _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
+
+_EXTRA_RECORDABLE_UNITS = {NeuronRecorder.SPIKES: "",
+                           NeuronRecorder.PACKETS: "",
+                           NeuronRecorder.REWIRING: ""}
 
 
 def _prod(iterable):
@@ -94,40 +105,42 @@ def _prod(iterable):
 
 
 class AbstractPopulationVertex(
-        TDMAAwareApplicationVertex, AbstractContainsUnits,
-        AbstractSpikeRecordable, AbstractNeuronRecordable,
-        AbstractEventRecordable,
-        AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractAcceptsIncomingSynapses,
+        PopulationApplicationVertex, AbstractAcceptsIncomingSynapses,
         AbstractCanReset, SupportsStructure):
     """ Underlying vertex model for Neural Populations.\
         Not actually abstract.
     """
 
     __slots__ = [
-        "__all_single_syn_sz",
         "__incoming_spike_buffer_size",
         "__n_atoms",
         "__n_profile_samples",
         "__neuron_impl",
         "__neuron_recorder",
         "__synapse_recorder",
-        "_parameters",  # See AbstractPyNNModel
+        "__parameters",
         "__pynn_model",
-        "_state_variables",  # See AbstractPyNNModel
+        "__state_variables",
         "__initial_state_variables",
-        "__has_run",
         "__updated_state_variables",
         "__ring_buffer_sigma",
         "__spikes_per_second",
         "__drop_late_spikes",
         "__incoming_projections",
+        "__incoming_poisson_projections",
         "__synapse_dynamics",
         "__max_row_info",
         "__self_projection",
         "__current_sources",
         "__current_source_id_list",
-        "__structure"]
+        "__structure",
+        "__rng",
+        "__pop_seed",
+        "__core_seeds",
+        "__connection_cache",
+        "__read_initial_values",
+        "__have_read_initial_values",
+        "__last_parameter_read_time"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -145,13 +158,13 @@ class AbstractPopulationVertex(
     _SYNAPSE_BASE_N_CPU_CYCLES = 10
 
     # 5 elements before the start of global parameters
-    # 1. has key, 2. n atoms, 3. n_atoms_peak 4. n_synapse_types
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 4 * BYTES_PER_WORD
+    # 1. has key, 2. key, 3. n atoms, 4. n_atoms_peak 5. n_synapse_types
+    CORE_PARAMS_BASE_SIZE = 5 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes, splitter):
+            neuron_impl, pynn_model, drop_late_spikes, splitter, seed):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -174,6 +187,9 @@ class AbstractPopulationVertex(
         :param splitter: splitter object
         :type splitter: None or
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+        :param seed:
+            The Population seed, used to ensure the same random generation
+            on each run.
         """
 
         # pylint: disable=too-many-arguments
@@ -187,10 +203,6 @@ class AbstractPopulationVertex(
         if incoming_spike_buffer_size is None:
             self.__incoming_spike_buffer_size = get_config_int(
                 "Simulation", "incoming_spike_buffer_size")
-
-        # Limit the DTCM used by one-to-one connections
-        self.__all_single_syn_sz = get_config_int(
-            "Simulation", "one_to_one_connection_dtcm_max_bytes")
 
         self.__ring_buffer_sigma = ring_buffer_sigma
         if self.__ring_buffer_sigma is None:
@@ -209,11 +221,11 @@ class AbstractPopulationVertex(
 
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
-        self._parameters = SpynnakerRangeDictionary(n_neurons)
-        self.__neuron_impl.add_parameters(self._parameters)
-        self.__initial_state_variables = SpynnakerRangeDictionary(n_neurons)
+        self.__parameters = RangeDictionary(n_neurons)
+        self.__neuron_impl.add_parameters(self.__parameters)
+        self.__initial_state_variables = RangeDictionary(n_neurons)
         self.__neuron_impl.add_state_variables(self.__initial_state_variables)
-        self._state_variables = self.__initial_state_variables.copy()
+        self.__state_variables = self.__initial_state_variables.copy()
 
         # Set up for recording
         neuron_recordable_variables = list(
@@ -230,9 +242,6 @@ class AbstractPopulationVertex(
             [NeuronRecorder.REWIRING],
             {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE})
 
-        # bool for if state has changed.
-        self.__has_run = False
-
         # Current sources for this vertex
         self.__current_sources = []
         self.__current_source_id_list = dict()
@@ -243,6 +252,7 @@ class AbstractPopulationVertex(
 
         # Set up for incoming
         self.__incoming_projections = defaultdict(list)
+        self.__incoming_poisson_projections = list()
         self.__max_row_info = dict()
         self.__self_projection = None
 
@@ -251,7 +261,19 @@ class AbstractPopulationVertex(
 
         self.__structure = None
 
-    @overrides(TDMAAwareApplicationVertex.get_max_atoms_per_core)
+        # An RNG for use in synaptic generation
+        self.__rng = numpy.random.RandomState(seed)
+        self.__pop_seed = create_mars_kiss_seeds(self.__rng)
+        self.__core_seeds = dict()
+
+        # Store connections read from machine until asked to clear
+        # Key is app_edge, synapse_info
+        self.__connection_cache = dict()
+        self.__read_initial_values = False
+        self.__have_read_initial_values = False
+        self.__last_parameter_read_time = None
+
+    @overrides(PopulationApplicationVertex.get_max_atoms_per_core)
     def get_max_atoms_per_core(self):
         max_atoms = super().get_max_atoms_per_core()
 
@@ -259,7 +281,8 @@ class AbstractPopulationVertex(
         return min(
             max_atoms, self.__synapse_dynamics.absolute_max_atoms_per_core)
 
-    @overrides(TDMAAwareApplicationVertex.get_max_atoms_per_dimension_per_core)
+    @overrides(
+        PopulationApplicationVertex.get_max_atoms_per_dimension_per_core)
     def get_max_atoms_per_dimension_per_core(self):
         max_atoms = self.get_max_atoms_per_core()
 
@@ -288,7 +311,8 @@ class AbstractPopulationVertex(
                 f" {len(self.atoms_shape)} dimensions)")
         return max_per_dim
 
-    @overrides(TDMAAwareApplicationVertex.set_max_atoms_per_dimension_per_core)
+    @overrides(PopulationApplicationVertex.
+               set_max_atoms_per_dimension_per_core)
     def set_max_atoms_per_dimension_per_core(self, new_value):
         max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
         if numpy.prod(new_value) > max_atoms:
@@ -302,6 +326,35 @@ class AbstractPopulationVertex(
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure):
         self.__structure = structure
+
+    @property
+    def combined_core_capable(self):
+        """ Determine if the vertex can manage to operate on a combined
+            neuron-synapse core, or if a split synapse-core is more
+            appropriate.
+
+            Note that this is currently based only on the ITCM available, not
+            on the incoming synapses, but could be combined with
+            n_synapse_cores_required to determine if, and how-many, synapse
+            cores are needed.
+
+        :rtype: bool
+        """
+        if self.__synapse_dynamics is None:
+            return True
+        return self.__synapse_dynamics.is_combined_core_capable
+
+    @property
+    def n_synapse_cores_required(self):
+        """ Get the estimated number of synapse cores required, when using a
+            split synapse-neuron core model.
+
+            Note this is currently hard-coded but could be updated to work
+            this out based on the number of incoming synapses
+
+        :rtype: int
+        """
+        return 1
 
     @property
     def synapse_dynamics(self):
@@ -338,6 +391,8 @@ class AbstractPopulationVertex(
         self.__incoming_projections[pre_vertex].append(projection)
         if pre_vertex == self:
             self.__self_projection = projection
+        if isinstance(pre_vertex, SpikeSourcePoissonVertex):
+            self.__incoming_poisson_projections.append(projection)
 
     @property
     def self_projection(self):
@@ -348,20 +403,16 @@ class AbstractPopulationVertex(
         return self.__self_projection
 
     @property
-    @overrides(TDMAAwareApplicationVertex.n_atoms)
+    @overrides(PopulationApplicationVertex.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
 
     @property
-    @overrides(TDMAAwareApplicationVertex.atoms_shape)
+    @overrides(PopulationApplicationVertex.atoms_shape)
     def atoms_shape(self):
         if isinstance(self.__structure, (Grid2D, Grid3D)):
             return self.__structure.calculate_size(self.__n_atoms)
         return super(AbstractPopulationVertex, self).atoms_shape
-
-    @overrides(TDMAAwareApplicationVertex.get_n_cores)
-    def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices())
 
     @property
     def size(self):
@@ -370,23 +421,6 @@ class AbstractPopulationVertex(
         :rtype: int
         """
         return self.__n_atoms
-
-    @property
-    def all_single_syn_size(self):
-        """ The maximum amount of DTCM to use for single synapses
-
-        :rtype: int
-        """
-        return self.__all_single_syn_sz
-
-    @property
-    def direct_matrix_size(self):
-        """ The size of the direct matrix region in bytes
-
-        :rtype: int
-        """
-        # An additional word is used for the size of the region
-        return self.__all_single_syn_sz + BYTES_PER_WORD
 
     @property
     def incoming_spike_buffer_size(self):
@@ -400,17 +434,25 @@ class AbstractPopulationVertex(
     def parameters(self):
         """ The parameters of the neurons in the population
 
-        :rtype: SpyNNakerRangeDictionary
+        :rtype: RangeDictionary
         """
-        return self._parameters
+        return self.__parameters
 
     @property
     def state_variables(self):
         """ The state variables of the neuron in the population
 
-        :rtype: SpyNNakerRangeDicationary
+        :rtype: RangeDicationary
         """
-        return self._state_variables
+        return self.__state_variables
+
+    @property
+    def initial_state_variables(self):
+        """ The initial values of the state variables of the neurons
+
+        :rtype: RangeDictionary
+        """
+        return self.__initial_state_variables
 
     @property
     def neuron_impl(self):
@@ -452,41 +494,56 @@ class AbstractPopulationVertex(
         """
         return self.__drop_late_spikes
 
-    def set_has_run(self):
-        """ Set the flag has run so initialize only affects state variables
-
-        :rtype: None
-        """
-        self.__has_run = True
-
-    def get_neuron_params_position(self, n_atoms):
-        """ Get the position of the neuron parameters themselves within the
-            neuron parameters region
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            the slice of atoms.
-        :rtype: int
-        """
+    def get_sdram_usage_for_core_neuron_params(self, n_atoms):
         return (
-            # Parameters global for the neurons
-            self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            # The ring buffer shifts
+            self.CORE_PARAMS_BASE_SIZE +
             (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
-            # TDMA parameters
-            self.tdma_sdram_size_in_bytes +
             # The keys per neuron
             n_atoms * BYTES_PER_WORD)
 
     def get_sdram_usage_for_neuron_params(self, n_atoms):
         """ Calculate the SDRAM usage for just the neuron parameters region.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            the slice of atoms.
+        :param int n_atoms: The number of atoms per core
         :return: The SDRAM required for the neuron region
         """
-        return (
-            self.get_neuron_params_position(n_atoms) +
-            self.__neuron_impl.get_sdram_usage_in_bytes(n_atoms))
+        return sum(s.get_size_in_whole_words(n_atoms)
+                   if s.repeat_type == StructRepeat.PER_NEURON
+                   else s.get_size_in_whole_words()
+                   for s in self.__neuron_impl.structs) * BYTES_PER_WORD
+
+    def get_sdram_usage_for_neuron_generation(self, n_atoms):
+        """ Calculate the SDRAM usage for the neuron generation region.
+
+        :param int n_atoms: The number of atoms per core
+        :return: The SDRAM required for the neuron generator region
+        """
+        return (self.__get_sdram_usage_for_neuron_struct_generation(n_atoms) +
+                self.__neuron_recorder.get_generator_sdram_usage_in_bytes(
+                    n_atoms))
+
+    def __get_sdram_usage_for_neuron_struct_generation(self, n_atoms):
+        """ Calculate the SDRAM usage for the neuron struct generation region.
+
+        :param int n_atoms: The number of atoms per core
+        :return: The SDRAM required for the neuron generator region
+        """
+        # Uses nothing if not generatable
+        structs = self.__neuron_impl.structs
+        for struct in structs:
+            if not struct.is_generatable:
+                return 0
+
+        # If structs are generatable, we can guess that parameters are,
+        # and then assume each parameter is different for maximum SDRAM.
+        n_structs = len(structs)
+        n_params = sum(len(s.fields) for s in structs)
+        return sum([
+            _NEURON_GENERATOR_BASE_SDRAM,
+            _NEURON_GENERATOR_PER_STRUCT * n_structs,
+            _NEURON_GENERATOR_PER_PARAM * n_params,
+            _NEURON_GENERATOR_PER_ITEM * n_params * n_atoms
+        ])
 
     def get_sdram_usage_for_current_source_params(self, n_atoms):
         """ Calculate the SDRAM usage for the current source parameters region.
@@ -516,217 +573,224 @@ class AbstractPopulationVertex(
 
         return sdram_usage
 
-    @overrides(AbstractSpikeRecordable.is_recording_spikes)
-    def is_recording_spikes(self):
-        return self.__neuron_recorder.is_recording(NeuronRecorder.SPIKES)
+    def __read_parameters_now(self):
+        # If we already read the parameters at this time, don't do it again
+        current_time = SpynnakerDataView().get_current_run_time_ms()
+        if self.__last_parameter_read_time == current_time:
+            return
 
-    @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(
-            self, new_state=True, sampling_interval=None, indexes=None):
-        self.set_recording(
-            NeuronRecorder.SPIKES, new_state, sampling_interval, indexes)
+        self.__last_parameter_read_time = current_time
+        for m_vertex in self.machine_vertices:
+            if isinstance(m_vertex, PopulationMachineNeurons):
+                placement = SpynnakerDataView.get_placement_of_vertex(m_vertex)
+                m_vertex.read_parameters_from_machine(placement)
 
-    @overrides(AbstractEventRecordable.is_recording_events)
-    def is_recording_events(self, variable):
-        return self.__synapse_recorder.is_recording(variable)
+    def __read_initial_parameters_now(self):
+        # If we already read the initial parameters, don't do it again
+        if self.__have_read_initial_values:
+            return
 
-    @overrides(AbstractEventRecordable.set_recording_events)
-    def set_recording_events(
-            self, variable, new_state=True, sampling_interval=None,
-            indexes=None):
-        self.set_recording(
-            variable, new_state, sampling_interval, indexes)
+        for m_vertex in self.machine_vertices:
+            if isinstance(m_vertex, PopulationMachineNeurons):
+                placement = SpynnakerDataView.get_placement_of_vertex(m_vertex)
+                m_vertex.read_initial_parameters_from_machine(placement)
 
-    @overrides(AbstractSpikeRecordable.write_spike_metadata)
-    def write_spike_metadata(self):
-        return self.__neuron_recorder.write_spike_metadata(self)
+    def __read_parameter(self, name, selector=None):
+        return self.__parameters[name].get_values(selector)
 
-    @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self):
-        return self.__neuron_recorder.get_spikes(
-            self.label, NeuronRecorder.SPIKES)
+    @overrides(PopulationApplicationVertex.get_parameter_values)
+    def get_parameter_values(self, names, selector=None):
+        self._check_parameters(names, set(self.__parameters.keys()))
+        # If we haven't yet run, or have just reset, note to read the values
+        # when they are ready
+        if not SpynnakerDataView.is_ran_last():
+            self.__read_initial_values = True
+        elif SpynnakerDataView.has_transceiver():
+            self.__read_parameters_now()
+        return ParameterHolder(names, self.__read_parameter, selector)
 
-    @overrides(AbstractEventRecordable.get_events)
-    def get_events(self, variable):
-        return self.__synapse_recorder.get_events(
-            self.label, self, variable)
+    @overrides(PopulationApplicationVertex.set_parameter_values)
+    def set_parameter_values(self, name, value, selector=None):
+        # If we have run, and not reset, we need to read the values back
+        # so that we don't overwrite the state.  Note that a reset will
+        # then make this a waste, but we can't see the future...
+        if SpynnakerDataView.is_ran_last():
+            self.__read_parameters_now()
+            self.__tell_neuron_vertices_to_regenerate()
+        self.__parameters[name].set_value_by_selector(selector, value)
 
-    @overrides(AbstractEventRecordable.write_events_metadata)
-    def write_events_metadata(self, variable):
-        return self.__synapse_recorder.write_events_metadata(self, variable)
+    @overrides(PopulationApplicationVertex.get_parameters)
+    def get_parameters(self):
+        return self.__pynn_model.default_parameters.keys()
 
-    @overrides(AbstractNeuronRecordable.get_recordable_variables)
+    def __read_initial_state_variable(self, name, selector=None):
+        return self.__initial_state_variables[name].get_values(selector)
+
+    @overrides(PopulationApplicationVertex.get_initial_state_values)
+    def get_initial_state_values(self, names, selector=None):
+        self._check_variables(names, set(self.__state_variables.keys()))
+        # If we haven't yet run, or have just reset, note to read the values
+        # when they are ready
+        if not SpynnakerDataView.is_ran_last():
+            self.__read_initial_values = True
+        else:
+            self.__read_initial_parameters_now()
+        return ParameterHolder(
+            names, self.__read_initial_state_variable, selector)
+
+    @overrides(PopulationApplicationVertex.set_initial_state_values)
+    def set_initial_state_values(self, name, value, selector=None):
+        self._check_variables([name], set(self.__state_variables.keys()))
+        if not SpynnakerDataView.is_ran_last():
+            self.__state_variables[name].set_value_by_selector(
+                selector, value)
+        self.__initial_state_variables[name].set_value_by_selector(
+            selector, value)
+
+    def __read_current_state_variable(self, name, selector=None):
+        return self.__state_variables[name].get_values(selector)
+
+    @overrides(PopulationApplicationVertex.get_current_state_values)
+    def get_current_state_values(self, names, selector=None):
+        self._check_variables(names, set(self.__state_variables.keys()))
+        # If we haven't yet run, or have just reset, note to read the values
+        # when they are ready
+        if not SpynnakerDataView.is_ran_last():
+            self.__read_initial_values = True
+        else:
+            self.__read_parameters_now()
+        return ParameterHolder(
+            names, self.__read_current_state_variable, selector)
+
+    @overrides(PopulationApplicationVertex.set_current_state_values)
+    def set_current_state_values(self, name, value, selector=None):
+        self._check_variables([name], set(self.__state_variables.keys()))
+        # If we have run, and not reset, we need to read the values back
+        # so that we don't overwrite all the state.  Note that a reset will
+        # then make this a waste, but we can't see the future...
+        if SpynnakerDataView.is_ran_last():
+            self.__read_parameters_now()
+            self.__tell_neuron_vertices_to_regenerate()
+        self.__state_variables[name].set_value_by_selector(
+            selector, value)
+
+    @overrides(PopulationApplicationVertex.get_state_variables)
+    def get_state_variables(self):
+        return self.__pynn_model.default_initial_values.keys()
+
+    @overrides(PopulationApplicationVertex.get_units)
+    def get_units(self, name):
+        if name in _EXTRA_RECORDABLE_UNITS:
+            return _EXTRA_RECORDABLE_UNITS[name]
+        if self.__neuron_impl.is_recordable(name):
+            return self.__neuron_impl.get_recordable_units(name)
+        if (name not in self.__parameters and
+                name not in self.__state_variables):
+            raise KeyError(f"No such parameter {name}")
+        return self.__neuron_impl.get_units(name)
+
+    @property
+    @overrides(PopulationApplicationVertex.conductance_based)
+    def conductance_based(self):
+        return self.__neuron_impl.is_conductance_based
+
+    @overrides(PopulationApplicationVertex.get_recordable_variables)
     def get_recordable_variables(self):
         variables = list()
         variables.extend(self.__neuron_recorder.get_recordable_variables())
         variables.extend(self.__synapse_recorder.get_recordable_variables())
         return variables
 
-    def __raise_var_not_supported(self, variable):
-        """ Helper to indicate that recording a variable is not supported
+    @overrides(PopulationApplicationVertex.can_record)
+    def can_record(self, name):
+        return (self.__neuron_recorder.is_recordable(name) or
+                self.__synapse_recorder.is_recordable(name))
 
-        :param str variable: The variable to report as unsupported
-        """
-        msg = ("Variable {} is not supported. Supported variables are"
-               "{}".format(variable, self.get_recordable_variables()))
-        raise ConfigurationException(msg)
-
-    @overrides(AbstractNeuronRecordable.is_recording)
-    def is_recording(self, variable):
-        if self.__neuron_recorder.is_recordable(variable):
-            return self.__neuron_recorder.is_recording(variable)
-        if self.__synapse_recorder.is_recordable(variable):
-            return self.__synapse_recorder.is_recording(variable)
-        self.__raise_var_not_supported(variable)
-
-    @overrides(AbstractNeuronRecordable.set_recording)
-    def set_recording(self, variable, new_state=True, sampling_interval=None,
-                      indexes=None):
-        if self.__neuron_recorder.is_recordable(variable):
+    @overrides(PopulationApplicationVertex.set_recording)
+    def set_recording(self, name, sampling_interval=None, indices=None):
+        if self.__neuron_recorder.is_recordable(name):
             self.__neuron_recorder.set_recording(
-                variable, new_state, sampling_interval, indexes)
-        elif self.__synapse_recorder.is_recordable(variable):
+                name, True, sampling_interval, indices)
+        elif self.__synapse_recorder.is_recordable(name):
             self.__synapse_recorder.set_recording(
-                variable, new_state, sampling_interval, indexes)
+                name, True, sampling_interval, indices)
         else:
-            self.__raise_var_not_supported(variable)
-        if self.is_recording(variable):
-            SpynnakerDataView.set_requires_mapping()
+            raise KeyError(f"It is not possible to record {name}")
+        SpynnakerDataView.set_requires_mapping()
 
-    @overrides(AbstractNeuronRecordable.get_data)
-    def get_data(self, variable):
-        # pylint: disable=too-many-arguments
-        if self.__neuron_recorder.is_recordable(variable):
-            return self.__neuron_recorder.get_matrix_data(
-                self.label, self, variable)
-        elif self.__synapse_recorder.is_recordable(variable):
-            return self.__synapse_recorder.get_matrix_data(
-                self.label, self, variable)
-        self.__raise_var_not_supported(variable)
-
-    @overrides(AbstractNeuronRecordable.write_matrix_metadata)
-    def write_matrix_metadata(self, variable):
-        # pylint: disable=too-many-arguments
-        if self.__neuron_recorder.is_recordable(variable):
-            self.__neuron_recorder.write_matrix_metadata(self, variable)
-        elif self.__synapse_recorder.is_recordable(variable):
-            self.__synapse_recorder.write_matrix_metadata(self, variable)
+    @overrides(PopulationApplicationVertex.set_not_recording)
+    def set_not_recording(self, name, indices=None):
+        if self.__neuron_recorder.is_recordable(name):
+            self.__neuron_recorder.set_recording(name, False, indexes=indices)
+        elif self.__synapse_recorder.is_recordable(name):
+            self.__synapse_recorder.set_recording(name, False, indexes=indices)
         else:
-            self.__raise_var_not_supported(variable)
+            raise KeyError(f"It is not possible to record {name}")
 
-    @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
-    def get_neuron_sampling_interval(self, variable):
-        if self.__neuron_recorder.is_recordable(variable):
-            return self.__neuron_recorder.get_neuron_sampling_interval(
-                variable)
-        elif self.__synapse_recorder.is_recordable(variable):
-            return self.__synapse_recorder.get_neuron_sampling_interval(
-                variable)
-        self.__raise_var_not_supported(variable)
+    @overrides(PopulationApplicationVertex.get_recording_variables)
+    def get_recording_variables(self):
+        recording = list()
+        recording.extend(self.__neuron_recorder.recording_variables)
+        recording.extend(self.__synapse_recorder.recording_variables)
+        return recording
 
-    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
-    def get_spikes_sampling_interval(self):
-        return self.__neuron_recorder.get_neuron_sampling_interval("spikes")
+    @overrides(PopulationApplicationVertex.is_recording_variable)
+    def is_recording_variable(self, name):
+        return (
+            self.__neuron_recorder.is_recording(name) or
+            self.__synapse_recorder.is_recording(name))
 
-    @overrides(AbstractEventRecordable.get_events_sampling_interval)
-    def get_events_sampling_interval(self, variable):
-        return self.__neuron_recorder.get_neuron_sampling_interval(variable)
+    @overrides(PopulationApplicationVertex.get_recorded_data)
+    def get_recorded_data(self, name):
+        if self.__neuron_recorder.is_recording(name):
+            return self.__neuron_recorder.get_recorded_data(
+                self.label, self, name)
+        if self.__synapse_recorder.is_recording(name):
+            return self.__synapse_recorder.get_recorded_data(
+                self.label, self, name)
+        if (not self.__neuron_recorder.is_recordable(name) and
+                not self.__synapse_recorder.is_recordable(name)):
+            raise KeyError(f"{name} is not a supported variable")
+        raise KeyError(f"{name} has not been set to record")
 
-    @overrides(AbstractPopulationInitializable.initialize)
-    def initialize(self, variable, value, selector=None):
-        if variable not in self._state_variables:
-            raise KeyError(
-                "Vertex does not support initialisation of"
-                " parameter {}".format(variable))
-        if self.__has_run:
-            self._state_variables[variable].set_value_by_selector(
-                selector, value)
-            logger.warning(
-                "initializing {} after run and before reset only changes the "
-                "current state and will be lost after reset".format(variable))
+    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
+    def get_recording_sampling_interval(self, name):
+        if self.__neuron_recorder.is_recordable(name):
+            return self.__neuron_recorder.get_sampling_interval(name)
+        if self.__synapse_recorder.is_recordable(name):
+            return self.__synapse_recorder.get_sampling_interval(name)
+        raise KeyError(f"It is not possible to record {name}")
+
+    @overrides(PopulationApplicationVertex.get_recording_indices)
+    def get_recording_indices(self, name):
+        if self.__neuron_recorder.is_recordable(name):
+            return self.__neuron_recorder.get_recorded_indices(self, name)
+        if self.__synapse_recorder.is_recordable(name):
+            return self.__synapse_recorder.get_recorded_indices(self, name)
+        raise KeyError(f"It is not possible to record {name}")
+
+    @overrides(PopulationApplicationVertex.get_recording_type)
+    def get_recording_type(self, name):
+        if self.__neuron_recorder.is_recordable(name):
+            return self.__neuron_recorder.get_recorded_data_type(name)
+        if self.__synapse_recorder.is_recordable(name):
+            return self.__synapse_recorder.get_recorded_data_type(name)
+        raise KeyError(f"It is not possible to record {name}")
+
+    @overrides(PopulationApplicationVertex.clear_recording_data)
+    def clear_recording_data(self, name):
+        if self.__neuron_recorder.is_recordable(name):
+            region = self.__neuron_recorder.get_region(name)
+        elif self.__synapse_recorder.is_recordable(name):
+            region = self.__synapse_recorder.get_region(name)
         else:
-            # set the inital values
-            self.__initial_state_variables[variable].set_value_by_selector(
-                selector, value)
-            # Update the sate variables in case asked for
-            self._state_variables.copy_into(self.__initial_state_variables)
-        for vertex in self.machine_vertices:
-            if isinstance(vertex, AbstractRewritesDataSpecification):
-                vertex.set_reload_required(True)
-
-    @property
-    def initialize_parameters(self):
-        """ The names of parameters that have default initial values.
-
-        :rtype: iterable(str)
-        """
-        return self.__pynn_model.default_initial_values.keys()
-
-    def _get_parameter(self, variable):
-        """ Get a neuron parameter value
-
-        :param str variable: The variable to get the value of
-        """
-        if variable.endswith("_init"):
-            # method called with "V_init"
-            key = variable[:-5]
-            if variable in self._state_variables:
-                # variable is v and parameter is v_init
-                return variable
-            elif key in self._state_variables:
-                # Oops neuron defines v and not v_init
-                return key
-        else:
-            # method called with "v"
-            if variable + "_init" in self._state_variables:
-                # variable is v and parameter is v_init
-                return variable + "_init"
-            if variable in self._state_variables:
-                # Oops neuron defines v and not v_init
-                return variable
-
-        # parameter not found for this variable
-        raise KeyError("No variable {} found in {}".format(
-            variable, self.__neuron_impl.model_name))
-
-    @overrides(AbstractPopulationInitializable.get_initial_value)
-    def get_initial_value(self, variable, selector=None):
-        parameter = self._get_parameter(variable)
-
-        ranged_list = self._state_variables[parameter]
-        if selector is None:
-            return ranged_list
-        return ranged_list.get_values(selector)
-
-    @property
-    def conductance_based(self):
-        """
-        :rtype: bool
-        """
-        return self.__neuron_impl.is_conductance_based
-
-    @overrides(AbstractPopulationSettable.get_value)
-    def get_value(self, key):
-        """ Get a property of the overall model.
-        """
-        if key not in self._parameters:
-            raise InvalidParameterType(
-                "Population {} does not have parameter {}".format(
-                    self.__neuron_impl.model_name, key))
-        return self._parameters[key]
-
-    @overrides(AbstractPopulationSettable.set_value)
-    def set_value(self, key, value):
-        """ Set a property of the overall model.
-        """
-        if key not in self._parameters:
-            raise InvalidParameterType(
-                "Population {} does not have parameter {}".format(
-                    self.__neuron_impl.model_name, key))
-        self._parameters.set_value(key, value)
-        for vertex in self.machine_vertices:
-            if isinstance(vertex, AbstractRewritesDataSpecification):
-                vertex.set_reload_required(True)
+            raise KeyError(f"It is not possible to record {name}")
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
+        for machine_vertex in self.machine_vertices:
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
+            buffer_manager.clear_recorded_data(
+                placement.x, placement.y, placement.p, region)
 
     @property
     def weight_scale(self):
@@ -762,56 +826,7 @@ class AbstractPopulationVertex(
     def clear_connection_cache(self):
         """ Flush the cache of connection information; needed for a second run
         """
-        for post_vertex in self.machine_vertices:
-            if isinstance(post_vertex, HasSynapses):
-                post_vertex.clear_connection_cache()
-
-    @overrides(AbstractNeuronRecordable.clear_recording)
-    def clear_recording(self, variable):
-        if variable == NeuronRecorder.SPIKES:
-            index = len(self.__neuron_impl.get_recordable_variables())
-        elif variable == NeuronRecorder.REWIRING:
-            index = len(self.__neuron_impl.get_recordable_variables()) + 1
-        else:
-            index = (
-                self.__neuron_impl.get_recordable_variable_index(variable))
-        self._clear_recording_region(index)
-
-    @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self):
-        self._clear_recording_region(
-            len(self.__neuron_impl.get_recordable_variables()))
-
-    @overrides(AbstractEventRecordable.clear_event_recording)
-    def clear_event_recording(self):
-        self._clear_recording_region(
-            len(self.__neuron_impl.get_recordable_variables()) + 1)
-
-    def _clear_recording_region(self, recording_region_id):
-        """ Clear a recorded data region from the buffer manager.
-
-        :param recording_region_id: the recorded region ID for clearing
-        :rtype: None
-        """
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
-        for machine_vertex in self.machine_vertices:
-            placement = SpynnakerDataView.get_placement_of_vertex(
-                machine_vertex)
-            buffer_manager.clear_recorded_data(
-                placement.x, placement.y, placement.p, recording_region_id)
-
-    @overrides(AbstractContainsUnits.get_units)
-    def get_units(self, variable):
-        if variable == NeuronRecorder.SPIKES:
-            return NeuronRecorder.SPIKES
-        if variable == NeuronRecorder.PACKETS:
-            return "count"
-        if self.__neuron_impl.is_recordable(variable):
-            return self.__neuron_impl.get_recordable_units(variable)
-        if variable not in self._parameters:
-            raise Exception("Population {} does not have parameter {}".format(
-                self.__neuron_impl.model_name, variable))
-        return self.__neuron_impl.get_units(variable)
+        self.__connection_cache.clear()
 
     def describe(self):
         """ Get a human-readable description of the cell or synapse type.
@@ -825,9 +840,8 @@ class AbstractPopulationVertex(
 
         :rtype: dict(str, ...)
         """
-        parameters = dict()
-        for parameter_name in self.__pynn_model.default_parameters:
-            parameters[parameter_name] = self.get_value(parameter_name)
+        parameters = dict(self.get_parameter_values(
+            self.__pynn_model.default_parameters.keys()))
 
         context = {
             "name": self.__neuron_impl.model_name,
@@ -844,12 +858,10 @@ class AbstractPopulationVertex(
         """
         return self.__neuron_impl.get_synapse_id_by_target(target)
 
-    def inject(self, current_source, neuron_list):
-        """ Inject method from population to set up current source
-
-        """
+    @overrides(PopulationApplicationVertex.inject)
+    def inject(self, current_source, selector=None):
         self.__current_sources.append(current_source)
-        self.__current_source_id_list[current_source] = neuron_list
+        self.__current_source_id_list[current_source] = selector
         # set the associated vertex (for multi-run case)
         current_source.set_app_vertex(self)
         # set to reload for multi-run case
@@ -878,19 +890,17 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
-        # Mark that reset has been done, and reload state variables
-        self.__has_run = False
-        self._state_variables.copy_into(self.__initial_state_variables)
-        for vertex in self.machine_vertices:
-            if isinstance(vertex, AbstractRewritesDataSpecification):
-                vertex.set_reload_required(True)
+        # Reset state variables
+        self.__state_variables.copy_into(self.__initial_state_variables)
 
-        # If synapses change during the run,
+        # If synapses change during the run also regenerate these to get
+        # back to the initial state
         if self.__synapse_dynamics.changes_during_run:
             SpynnakerDataView.set_requires_data_generation()
-            for vertex in self.machine_vertices:
-                if isinstance(vertex, AbstractRewritesDataSpecification):
-                    vertex.set_reload_required(True)
+        else:
+            # We only get neuron vertices to regenerate not redoing data
+            # generation
+            self.__tell_neuron_vertices_to_regenerate()
 
     @staticmethod
     def _ring_buffer_expected_upper_bound(
@@ -1029,6 +1039,10 @@ class AbstractPopulationVertex(
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, app_edge, synapse_info):
+        # If we already have connections cached, return them
+        if (app_edge, synapse_info) in self.__connection_cache:
+            return self.__connection_cache[app_edge, synapse_info]
+
         # Start with something in the list so that concatenate works
         connections = [numpy.zeros(
                 0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
@@ -1042,7 +1056,9 @@ class AbstractPopulationVertex(
                     post_vertex)
                 connections.extend(post_vertex.get_connections_from_machine(
                     placement, app_edge, synapse_info))
-        return numpy.concatenate(connections)
+        all_connections = numpy.concatenate(connections)
+        self.__connection_cache[app_edge, synapse_info] = all_connections
+        return all_connections
 
     def get_synapse_params_size(self):
         """ Get the size of the synapse parameters in bytes
@@ -1093,6 +1109,8 @@ class AbstractPopulationVertex(
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
             The projections to consider in the calculations
         """
+        if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
+            return 0
         addr = 2 * BYTES_PER_WORD
         for proj in self.incoming_projections:
             addr = self.__add_matrix_size(addr, proj, n_post_atoms)
@@ -1154,7 +1172,9 @@ class AbstractPopulationVertex(
 
         :rtype: int
         """
-        size = 0
+        size = SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
+        size += (self.__neuron_impl.get_n_synapse_types() *
+                 DataType.U3232.size)
         for proj in self.incoming_projections:
             # pylint: disable=protected-access
             synapse_info = proj._synapse_information
@@ -1167,12 +1187,7 @@ class AbstractPopulationVertex(
                                       vertex.n_atoms))
                 n_sub_edges = int(math.ceil(vertex.n_atoms / max_atoms))
             size += self.__generator_info_size(synapse_info) * n_sub_edges
-
-        # If anything generates data, also add some base information
-        if size:
-            size += SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
-            size += (self.__neuron_impl.get_n_synapse_types() *
-                     DataType.U3232.size)
+        size += get_sdram_for_keys(self.incoming_projections)
         return size
 
     @staticmethod
@@ -1305,10 +1320,12 @@ class AbstractPopulationVertex(
         :param NeuronRegions neuron_regions: Region IDs
         :rtype: int
         """
+        params_cost = self.get_sdram_usage_for_neuron_params(n_atoms)
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
-            neuron_regions.neuron_params,
-            self.get_sdram_usage_for_neuron_params(n_atoms))
+            neuron_regions.core_params,
+            self.get_sdram_usage_for_core_neuron_params(n_atoms))
+        sdram.add_cost(neuron_regions.neuron_params, params_cost)
         sdram.add_cost(
             neuron_regions.current_source_params,
             self.get_sdram_usage_for_current_source_params(n_atoms))
@@ -1316,6 +1333,10 @@ class AbstractPopulationVertex(
             neuron_regions.neuron_recording,
             self.__neuron_recorder.get_metadata_sdram_usage_in_bytes(
                 n_atoms))
+        sdram.add_cost(
+            neuron_regions.neuron_builder,
+            self.get_sdram_usage_for_neuron_generation(n_atoms))
+        sdram.add_cost(neuron_regions.initial_values, params_cost)
         return sdram
 
     @property
@@ -1333,6 +1354,64 @@ class AbstractPopulationVertex(
             the given source
         """
         return self.__incoming_projections[source_vertex]
+
+    @property
+    def incoming_poisson_projections(self):
+        """ The projections that target this population vertex which
+            originate from a Poisson source
+
+        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)
+        """
+        return self.__incoming_poisson_projections
+
+    @property
+    def pop_seed(self):
+        """ The seed to use for the population overall
+
+        :return: A list of 4 integers
+        :rtype: list(int)
+        """
+        return self.__pop_seed
+
+    def core_seed(self, vertex_slice):
+        """ The seed to use for a core
+
+        :param Slice vertex_slice: The machine vertex that the seed is for
+
+        :return: A list of 4 integers
+        :rtype: list(int)
+        """
+        if vertex_slice not in self.__core_seeds:
+            self.__core_seeds[vertex_slice] = create_mars_kiss_seeds(
+                self.__rng)
+        return self.__core_seeds[vertex_slice]
+
+    def copy_initial_state_variables(self, vertex_slice):
+        """ Copies the state variables into the initial state variables
+
+        :param Slice vertex_slice: The slice to copy now
+        """
+        for key in self.__state_variables.keys():
+            value = self.__state_variables[key][vertex_slice.as_slice]
+            self.__initial_state_variables[key].set_value_by_slice(
+                vertex_slice.lo_atom, vertex_slice.hi_atom + 1, value)
+        # This is called during reading of initial values, so we don't
+        # need to do it again
+        self.__read_initial_values = False
+        self.__have_read_initial_values = True
+
+    @property
+    def read_initial_values(self):
+        """ Determine if initial values need to be stored
+
+        :rtype: bool
+        """
+        return self.__read_initial_values
+
+    def __tell_neuron_vertices_to_regenerate(self):
+        for vertex in self.machine_vertices:
+            if isinstance(vertex, PopulationMachineNeurons):
+                vertex.set_do_neuron_regeneration()
 
 
 class _Stats(object):

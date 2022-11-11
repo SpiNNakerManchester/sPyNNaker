@@ -42,11 +42,26 @@
 
 #include <common/neuron-typedefs.h>
 
+// Forward declaration of the input type parameters
+struct input_type_params_t;
+typedef struct input_type_params_t input_type_params_t;
+
 // Forward declaration of the input type structure
 struct input_type_t;
 typedef struct input_type_t input_type_t;
-//! Declaration of the input type pointer
-typedef input_type_t *input_type_pointer_t;
+
+//! \brief initialise the structure from the parameters
+//! \param[out] state: Pointer to the state to set up
+//! \param[in] params: Pointer to the parameters passed in from host
+//! \param[in] n_steps_per_timestep: The number of steps to perform each update
+static void input_type_initialise(input_type_t *state, input_type_params_t *params,
+		uint32_t n_steps_per_timestep);
+
+//! \brief save parameters and state back to SDRAM for reading by host and recovery
+//!        on restart
+//! \param[in] state: The current state
+//! \param[out] params: Pointer to structure into which parameter can be written
+static void input_type_save_state(input_type_t *state, input_type_params_t *params);
 
 //! \brief Gets the actual input value. This allows any scaling to take place
 //! \param[in,out] value: The array of the receptor-based values of the input

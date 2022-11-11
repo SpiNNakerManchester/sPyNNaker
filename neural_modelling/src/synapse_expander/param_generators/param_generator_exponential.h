@@ -39,7 +39,6 @@ typedef struct param_generator_exponential_params {
  */
 struct param_generator_exponential {
     param_generator_exponential_params params;
-    rng_t rng;
 };
 
 /**
@@ -48,19 +47,17 @@ struct param_generator_exponential {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *param_generator_exponential_initialize(address_t *region) {
+static void *param_generator_exponential_initialize(void **region) {
     // Allocate memory for the data
     struct param_generator_exponential *params =
             spin1_malloc(sizeof(struct param_generator_exponential));
 
     // Copy the parameters in
-    param_generator_exponential_params *params_sdram = (void *) *region;
-    params->params = *params_sdram++;
-    *region = (void *) params_sdram;
+    param_generator_exponential_params *params_sdram = *region;
+    params->params = *params_sdram;
+    *region = &params_sdram[1];
     log_debug("exponential beta = %k", params->params.beta);
 
-    // Initialise the RNG for this generator
-    params->rng = rng_init(region);
     return params;
 }
 
@@ -69,28 +66,16 @@ static void *param_generator_exponential_initialize(address_t *region) {
  * \param[in] generator: The generator to free
  */
 static void param_generator_exponential_free(void *generator) {
-    struct param_generator_exponential *params = generator;
-    rng_free(params->rng);
     sark_free(generator);
 }
 
 /**
  * \brief How to generate values with the exponential RNG parameter generator
  * \param[in] generator: The generator to use to generate values
- * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
- * \param[in] indices: The \p n_indices post-neuron indices for each connection
- * \param[out] values: An array into which to place the values; will be
- *                     \p n_indices in size
+ * \return The value generated
  */
-static void param_generator_exponential_generate(
-        void *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,
-        UNUSED uint16_t *indices, accum *values) {
-    // For each index, generate an exponentially distributed value
+static accum param_generator_exponential_generate(void *generator) {
+    // generate an exponentially distributed value
     struct param_generator_exponential *params = generator;
-    for (uint32_t i = 0; i < n_indices; i++) {
-        accum value = rng_exponential(params->rng);
-        values[i] = value * params->params.beta;
-    }
+    return rng_exponential(core_rng) * params->params.beta;
 }

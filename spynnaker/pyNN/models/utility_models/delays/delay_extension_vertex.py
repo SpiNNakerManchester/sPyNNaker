@@ -13,36 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict
-import math
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_bool
-from spinn_front_end_common.utilities.constants import (
-    BITS_PER_WORD, BYTES_PER_WORD)
-from spinn_front_end_common.abstract_models.impl import (
-    TDMAAwareApplicationVertex)
+from pacman.model.graphs.application import ApplicationVertex
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from spynnaker.pyNN.utilities.constants import (
     POP_TABLE_MAX_ROW_LENGTH)
-from .delay_block import DelayBlock
-from .delay_generator_data import DelayGeneratorData
 
 _DELAY_PARAM_HEADER_WORDS = 8
 
 
 class DelayExtensionVertex(
-        TDMAAwareApplicationVertex, AbstractHasDelayStages):
+        ApplicationVertex, AbstractHasDelayStages):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
     __slots__ = [
         # The parition this Delay is supporting
         "__partition",
-        "__delay_blocks",
         "__delay_per_stage",
         "__n_delay_stages",
-        "__delay_generator_data",
         "__drop_late_spikes",
         "__outgoing_edges"]
 
@@ -73,10 +65,6 @@ class DelayExtensionVertex(
         self.__partition = partition
         self.__n_delay_stages = n_delay_stages
         self.__delay_per_stage = delay_per_stage
-        self.__delay_generator_data = defaultdict(list)
-
-        # Dictionary of vertex_slice -> delay block for data specification
-        self.__delay_blocks = dict()
 
         self.__drop_late_spikes = get_config_bool(
             "Simulation", "drop_late_spikes")
@@ -126,87 +114,10 @@ class DelayExtensionVertex(
         """
         return self.__partition.pre_vertex
 
-    def add_delays(self, vertex_slice, source_ids, stages):
-        """ Add delayed connections for a given vertex slice
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param list(int) source_ids:
-        :param list(int) stages:
+    def delay_params_size(self):
+        """ The size of the delay parameters
         """
-        if vertex_slice not in self.__delay_blocks:
-            self.__delay_blocks[vertex_slice] = DelayBlock(
-                self.__n_delay_stages, vertex_slice)
-        for (source_id, stage) in zip(source_ids, stages):
-            self.__delay_blocks[vertex_slice].add_delay(source_id, stage)
-
-    def delay_blocks_for(self, vertex_slice):
-        if vertex_slice in self.__delay_blocks:
-            return self.__delay_blocks[vertex_slice]
-        else:
-            return DelayBlock(
-                self.__n_delay_stages, vertex_slice)
-
-    def add_generator_data(
-            self, max_row_n_synapses, max_delayed_row_n_synapses, pre_slices,
-            post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_information, max_stage, max_delay_per_stage):
-        """ Add delays for a connection to be generated
-
-        :param int max_row_n_synapses:
-            The maximum number of synapses in a row
-        :param int max_delayed_row_n_synapses:
-            The maximum number of synapses in a delay row
-        :param list(~pacman.model.graphs.common.Slice) pre_slices:
-            The list of slices of the pre application vertex
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-            The list of slices of the post application vertex
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-            The slice of the pre applcation vertex currently being
-            considered
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post application vertex currently being
-            considered
-        :param ~spynnaker.pyNN.models.neural_projections.SynapseInformation \
-                synapse_information:
-            The synapse information of the connection
-        :param synapse_information:
-        :type synapse_information:
-            ~spynnaker.pyNN.models.neural_projections.SynapseInformation
-        :param int max_stage:
-            The maximum delay stage
-        """
-        self.__delay_generator_data[pre_vertex_slice].append(
-            DelayGeneratorData(
-                max_row_n_synapses, max_delayed_row_n_synapses,
-                pre_slices, post_slices,
-                pre_vertex_slice, post_vertex_slice,
-                synapse_information, max_stage, max_delay_per_stage))
-
-    def gen_on_machine(self, vertex_slice):
-        """ Determine if the given slice needs to be generated on the machine
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: bool
-        """
-        return vertex_slice in self.__delay_generator_data
-
-    def delay_generator_data(self, vertex_slice):
-        return self.__delay_generator_data.get(vertex_slice, None)
-
-    def delay_params_size(self, vertex_slice):
-        """ The size of the delay parameters for a given vertex slice
-
-        :param Slice slice: The slice to get the size of the parameters for
-        """
-        n_words_per_stage = int(
-            math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
-        return BYTES_PER_WORD * (
-            _DELAY_PARAM_HEADER_WORDS +
-            (self.__n_delay_stages * n_words_per_stage))
-
-    @overrides(TDMAAwareApplicationVertex.get_n_cores)
-    def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices())
+        return BYTES_PER_WORD * _DELAY_PARAM_HEADER_WORDS
 
     @property
     def partition(self):

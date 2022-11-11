@@ -33,10 +33,8 @@ typedef enum region_identifiers {
     DELAY_PARAMS = 1,
     //! Provenance recording region
     PROVENANCE_REGION = 2,
-    //! On-chip delay matrix expansion region
-    EXPANDER_REGION = 3,
     //! tdma data
-    TDMA_REGION = 4,
+    TDMA_REGION = 3,
 } region_identifiers;
 
 //! \brief Delay configuration, as read from SDRAM where it was placed by DSG
@@ -50,7 +48,6 @@ struct delay_parameters {
     uint32_t n_delay_stages;      //!< Number of delay stages
     uint32_t n_delay_in_a_stage;  //!< Number of delays in a given stage
     uint32_t clear_packets;       //!< Clear packets each timestep?
-    uint32_t delay_blocks[];      //!< Descriptions of delays to apply
 };
 
 //! \brief Encode a delay as a 16-bit integer

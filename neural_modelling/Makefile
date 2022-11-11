@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 BUILDS = synapse_expander \
-         bit_field_expander \
          spike_source/poisson \
          delay_extension \
          robot_motor_control \
