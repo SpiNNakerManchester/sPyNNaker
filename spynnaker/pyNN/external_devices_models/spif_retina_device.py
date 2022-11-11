@@ -19,106 +19,13 @@ from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
-from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
-from enum import IntEnum
-
-_REPEATS = 2
-_DELAY_BETWEEN_REPEATS = 1
-
-#: Base key to send packets to SpiNNaker FPGA (add register offset)
-_LC_KEY = 0xFFFFFE00
-
-#: Base key to send packets to SPIF (add register offset)
-_RC_KEY = 0xFFFFFF00
-
-#: The number of pipes
-_N_PIPES = 2
-
-#: The number of fields supported for each pipe
-_N_FIELDS = 4
-
-#: The number of filters supported for each pipe
-_N_FILTERS = 8
-
-
-class _SPIFRegister(IntEnum):
-    REPLY_KEY = 2
-    IR_KEY_BASE = 16
-    IR_MASK_BASE = 32
-    IR_ROUTE_BASE = 48
-    OUT_PERIPH_PKT_CNT = 64
-    CONFIG_PKT_CNT = 65
-    DROPPED_PKT_CNT = 66
-    IN_PERIPH_PKT_CNT = 67
-    MP_KEY_BASE = 80
-    MP_FLD_MASK_BASE = 96
-    MP_FLD_SHIFT_BASE = 112
-    MP_FLD_LIMIT_BASE = 128
-    FL_VALUE_BASE = 144
-    FL_MASK_BASE = 176
-
-    def cmd(self, payload=None, index=0):
-        return MultiCastCommand(
-            _RC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
-            delay_between_repeats=_DELAY_BETWEEN_REPEATS)
-
-
-def set_mapper_key(pipe, key):
-    return _SPIFRegister.MP_KEY_BASE.cmd(key, pipe)
-
-
-def set_field_mask(pipe, index, mask):
-    return _SPIFRegister.MP_FLD_MASK_BASE.cmd(mask, (pipe * _N_FIELDS) + index)
-
-
-def set_field_shift(pipe, index, shift):
-    return _SPIFRegister.MP_FLD_SHIFT_BASE.cmd(
-        shift, (pipe * _N_FIELDS) + index)
-
-
-def set_field_limit(pipe, index, limit):
-    return _SPIFRegister.MP_FLD_LIMIT_BASE.cmd(
-        limit, (pipe * _N_FIELDS) + index)
-
-
-def set_filter_value(pipe, index, value):
-    return _SPIFRegister.FL_VALUE_BASE.cmd(
-        value, (pipe * _N_FILTERS) + index)
-
-
-def set_filter_mask(pipe, index, mask):
-    return _SPIFRegister.FL_MASK_BASE.cmd(
-        mask, (pipe * _N_FILTERS) + index)
-
-
-def set_input_key(index, key):
-    return _SPIFRegister.IR_KEY_BASE.cmd(key, index)
-
-
-def set_input_mask(index, mask):
-    return _SPIFRegister.IR_MASK_BASE.cmd(mask, index)
-
-
-def set_input_route(index, route):
-    return _SPIFRegister.IR_ROUTE_BASE.cmd(route, index)
-
-
-class _SpiNNFPGARegister(IntEnum):
-    P_KEY = 2
-    P_MASK = 3
-    LC_KEY = 12
-    LC_MASK = 13
-    RC_KEY = 14
-    RC_MASK = 15
-    STOP = 16
-    START = 17
-
-    def cmd(self, payload=None):
-        return MultiCastCommand(
-            _LC_KEY + self.value, payload, time=None, repeat=_REPEATS,
-            delay_between_repeats=_DELAY_BETWEEN_REPEATS)
+from .spif_devices import (
+    N_PIPES, N_FILTERS, SpiNNFPGARegister, SPIFRegister,
+    set_field_mask, set_field_shift, set_field_limit,
+    set_filter_mask, set_filter_value, set_mapper_key,
+    set_input_key, set_input_mask, set_input_route)
 
 
 class SPIFRetinaDevice(
@@ -191,9 +98,9 @@ class SPIFRetinaDevice(
             raise ConfigurationException(
                 "The sub-squares must be >=4 x >= 2"
                 f" ({sub_width} x {sub_height} specified)")
-        if pipe >= _N_PIPES:
+        if pipe >= N_PIPES:
             raise ConfigurationException(
-                f"Pipe {pipe} is bigger than maximum allowed {_N_PIPES}")
+                f"Pipe {pipe} is bigger than maximum allowed {N_PIPES}")
 
         # Call the super
         super().__init__(
@@ -302,13 +209,13 @@ class SPIFRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
         # Make sure everything has stopped
-        commands = [_SpiNNFPGARegister.STOP.cmd()]
+        commands = [SpiNNFPGARegister.STOP.cmd()]
 
         # Clear the counters
-        commands.append(_SPIFRegister.OUT_PERIPH_PKT_CNT.cmd(0))
-        commands.append(_SPIFRegister.CONFIG_PKT_CNT.cmd(0))
-        commands.append(_SPIFRegister.DROPPED_PKT_CNT.cmd(0))
-        commands.append(_SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0))
+        commands.append(SPIFRegister.OUT_PERIPH_PKT_CNT.cmd(0))
+        commands.append(SPIFRegister.CONFIG_PKT_CNT.cmd(0))
+        commands.append(SPIFRegister.DROPPED_PKT_CNT.cmd(0))
+        commands.append(SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0))
 
         # Configure the creation of packets from fields to keys using the
         # "standard" input to SPIF (X | P | Y) and convert to (Y | X)
@@ -332,10 +239,10 @@ class SPIFRetinaDevice(
 
         # Don't filter
         commands.extend([
-            set_filter_mask(self.__pipe, i, 0) for i in range(_N_FILTERS)
+            set_filter_mask(self.__pipe, i, 0) for i in range(N_FILTERS)
         ])
         commands.extend([
-            set_filter_value(self.__pipe, i, 1) for i in range(_N_FILTERS)
+            set_filter_value(self.__pipe, i, 1) for i in range(N_FILTERS)
         ])
 
         # Configure the output routing key
@@ -344,21 +251,23 @@ class SPIFRetinaDevice(
 
         # Configure the links to send packets to the 8 FPGAs using the
         # lower bits
-        commands.extend(set_input_key(i + (self.__pipe * 8),
-                                      self.__spif_key(15 - (i * 2)))
-                        for i in range(8))
-        commands.extend(set_input_mask(i + (self.__pipe * 8), self.__spif_mask)
-                        for i in range(8))
-        commands.extend(set_input_route(i + (self.__pipe * 8), i)
-                        for i in range(8))
+        commands.extend(
+            set_input_key(self.__pipe, i, self.__spif_key(15 - (i * 2)))
+            for i in range(8))
+        commands.extend(
+            set_input_mask(self.__pipe, i, self.__spif_mask)
+            for i in range(8))
+        commands.extend(
+            set_input_route(self.__pipe, i, i)
+            for i in range(8))
 
         # Send the start signal
-        commands.append(_SpiNNFPGARegister.START.cmd())
+        commands.append(SpiNNFPGARegister.START.cmd())
 
         return commands
 
-    def __spif_key(self, index):
-        x, y = self.__fpga_indices(index)
+    def __spif_key(self, fpga_link_id):
+        x, y = self.__fpga_indices(fpga_link_id)
         return ((self.__base_key << self._key_shift) +
                 (x << self._source_x_shift) +
                 (y << self._source_y_shift))
@@ -367,7 +276,7 @@ class SPIFRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         # Send the stop signal
-        return [_SpiNNFPGARegister.STOP.cmd()]
+        return [SpiNNFPGARegister.STOP.cmd()]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
