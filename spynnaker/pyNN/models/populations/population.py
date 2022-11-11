@@ -795,6 +795,7 @@ class Population(PopulationBase):
                     additional_parameters, population_parameters)
             self.__vertex = model.create_vertex(
                 size, label, **population_parameters)
+            assert isinstance(self.__vertex, PopulationApplicationVertex)
 
         # Use a provided application vertex directly
         elif isinstance(model, PopulationApplicationVertex):

@@ -143,5 +143,5 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         :param int n_neurons: The number of neurons in the population
         :param str label: The label to give to the vertex
         :return: An application vertex for the population
-        :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        :rtype: ~spynnaker.pyNN.models.common.PopulationApplicationVertex
         """
