@@ -12,12 +12,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, FPGAConnection)
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from .spif_devices import SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from .spif_devices import (
+    SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SpiNNFPGARegister)
 
 
 class SPIFOutputDevice(
@@ -25,6 +28,8 @@ class SPIFOutputDevice(
         AbstractSendMeMulticastCommandsVertex):
     """ Output (only) to a SPIF device
     """
+
+    __slots__ = ["__incoming_partition"]
 
     def __init__(self, n_atoms, board_address=None, chip_coords=None,
                  label=None):
@@ -34,3 +39,46 @@ class SPIFOutputDevice(
                 SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address,
                 chip_coords),
             label=label)
+        self.__incoming_partition = None
+
+    @overrides(ApplicationFPGAVertex.add_incoming_edge)
+    def add_incoming_edge(self, edge, partition):
+        if self.__incoming_partition is not None:
+            raise ValueError(
+                "Only one outgoing connection is supported per spif device")
+        self.__incoming_partition = partition
+
+    def _get_set_key_payload(self):
+        """ Get the payload for the command to set the router key
+        """
+        r_infos = SpynnakerDataView.get_routing_infos()
+        return r_infos.get_first_key_from_pre_vertex(
+            self.__incoming_partition.pre_vertex,
+            self.__incoming_partition.identifier)
+
+    def _get_set_mask_payload(self):
+        """ Get the payload for the command to set the router mask
+        """
+        r_infos = SpynnakerDataView.get_routing_infos()
+        return r_infos.get_routing_info_from_pre_vertex(
+            self.__incoming_partition.pre_vertex,
+            self.__incoming_partition.identifier).mask
+
+    @property
+    def start_resume_commands(self):
+        # The commands here are delayed, as at the time of providing them,
+        # we don't know the key or mask of the incoming link...
+        return [
+            SpiNNFPGARegister.P_KEY.delayed_command(
+                self._get_set_key_payload),
+            SpiNNFPGARegister.P_MASK.delayed_command(
+                self._get_set_mask_payload)
+        ]
+
+    @property
+    def pause_stop_commands(self):
+        return []
+
+    @property
+    def timed_commands(self):
+        return []
