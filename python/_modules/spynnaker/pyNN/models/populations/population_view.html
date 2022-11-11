@@ -62,9 +62,9 @@
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">NumpyRNG</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.ranged.abstract_sized</span> <span class="kn">import</span> <span class="n">AbstractSized</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">.idmixin</span> <span class="kn">import</span> <span class="n">IDMixin</span>
 <span class="kn">from</span> <span class="nn">.population_base</span> <span class="kn">import</span> <span class="n">PopulationBase</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
@@ -89,13 +89,17 @@
         <span class="s2">&quot;__label&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__mask&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__parent&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__population&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__population&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__vertex&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__recorder&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param parent: the population or view to make the view from</span>
 <span class="sd">        :type parent: ~spynnaker.pyNN.models.populations.Population or</span>
 <span class="sd">            ~spynnaker.pyNN.models.populations.PopulationView</span>
+<span class="sd">        :param PopulationApplicationVertex vertex: The actual underlying vertex</span>
+<span class="sd">        :param Recorder recorder: The recorder of the Population</span>
 <span class="sd">        :param selector: a slice or numpy mask array.</span>
 <span class="sd">            The mask array should either be a boolean array (ideally) of the</span>
 <span class="sd">            same size as the parent,</span>
@@ -127,6 +131,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__annotations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
+        <span class="c1"># Get these two objects to make access easier</span>
+        <span class="c1"># pylint: disable=protected-access</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_vertex</span>
+        <span class="c1"># pylint: disable=protected-access</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_recorder</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The total number of neurons in the Population View.</span>
@@ -149,16 +159,28 @@
 
 <span class="sd">        :rtype: AbstractPyNNModel</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">celltype</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parent</span><span class="o">.</span><span class="n">celltype</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; A dict containing the initial values of the state variables.</span>
 
-<span class="sd">        :rtype: dict(str, ...)</span>
+<span class="sd">        :rtype: InitialValuesHolder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_get_initial_values</span><span class="p">(</span><span class="n">selector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_initial_state_values</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_state_variables</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; A dict containing the initial values of the state variables.</span>
+
+<span class="sd">        :rtype: InitialValuesHolder</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warn_once</span><span class="p">(</span>
+            <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;current_values is non-standard PyNN and therefore &quot;</span>
+            <span class="s2">&quot;will not be portable to other simulators.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_current_state_values</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_state_variables</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -190,11 +212,6 @@
     <span class="k">def</span> <span class="nf">_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_vertex</span>
-
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return either a single cell (ID object) from the Population,\</span>
 <span class="sd">            if index is an integer, or a subset of the cells\</span>
@@ -210,7 +227,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">IDMixin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">PopulationView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">+</span><span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">PopulationView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Iterator over cell IDs (on the local node).</span>
@@ -218,7 +235,7 @@
 <span class="sd">        :rtype: iterable(~.IDMixin)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">IDMixin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">IDMixin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the total number of cells in the population (all nodes).</span>
@@ -233,14 +250,14 @@
 <span class="sd">        :rtype: iterable(~.IDMixin)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">IDMixin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span></div>
+            <span class="k">yield</span> <span class="n">IDMixin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationView.can_record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.can_record">[docs]</a>    <span class="k">def</span> <span class="nf">can_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine whether variable can be recorded from this population.</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">can_record</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">can_record</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">conductance_based</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -249,17 +266,15 @@
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">conductance_based</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">conductance_based</span>
 
 <div class="viewcode-block" id="PopulationView.inject"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.inject">[docs]</a>    <span class="k">def</span> <span class="nf">inject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_source</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Injects the specified current_source into this PopulationView.</span>
 
-<span class="sd">        :param ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource\</span>
+<span class="sd">        :param ~pyNN.standardmodels.electrodes.StandardCurrentSource\</span>
 <span class="sd">            current_source: the CurrentSource to be injected</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">current_source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span>
-        <span class="n">current_source</span><span class="o">.</span><span class="n">set_population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="p">)</span>
-        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">current_source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationView.describe"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s1">&#39;populationview_default.txt&#39;</span><span class="p">,</span>
                  <span class="n">engine</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>
@@ -293,7 +308,7 @@
 <span class="sd">        :return: The units of the variable</span>
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">find_units</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationView.get"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter_names</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">simplify</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the values of the given parameters for every local cell in\</span>
@@ -310,7 +325,7 @@
 <span class="sd">        :type parameter_names: str or list(str)</span>
 <span class="sd">        :param bool gather:</span>
 <span class="sd">        :param bool simplify:</span>
-<span class="sd">        :rtype: iterable(float)</span>
+<span class="sd">        :rtype: ParameterHolder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">gather</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;SpiNNaker only supports gather=True. We will run &quot;</span>
@@ -318,9 +333,8 @@
         <span class="k">if</span> <span class="n">simplify</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The simplify value is ignored if not set to true&quot;</span><span class="p">)</span>
 
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_get_by_selector</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">parameter_names</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_parameter_values</span><span class="p">(</span>
+            <span class="n">parameter_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationView.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -358,8 +372,15 @@
                 <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;Annotations parameter is not standard PyNN so may &quot;</span>
                 <span class="s2">&quot;not be supported by all platforms.&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">get_data_by_indexes</span><span class="p">(</span>
-            <span class="n">variables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="n">clear</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">extract_neo_block</span><span class="p">(</span>
+            <span class="n">variables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationView.spinnaker_get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.spinnaker_get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">spinnaker_get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Pulic accessor for getting spikes as a numpy array, instead of\</span>
+<span class="sd">            the neo based object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">spikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;spikes&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">spikes</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">spikes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="PopulationView.spinnaker_get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.spinnaker_get_data">[docs]</a>    <span class="k">def</span> <span class="nf">spinnaker_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">as_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Public accessor for getting data as a numpy array, instead of\</span>
@@ -395,11 +416,10 @@
                 <span class="s2">&quot;as if gather was set to True.&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;get_spike_counts is inefficient as it just counts the &quot;</span>
                     <span class="s2">&quot;results of get_datas(&#39;spikes&#39;)&quot;</span><span class="p">)</span>
-        <span class="n">neo_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;spikes&quot;</span><span class="p">)</span>
-        <span class="n">spiketrains</span> <span class="o">=</span> <span class="n">neo_data</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">neo_data</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">spiketrains</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="n">idx</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">spiketrains</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)}</span></div>
+        <span class="n">spikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;spikes&quot;</span><span class="p">)</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">spikes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+                                <span class="n">minlength</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">}</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">grandparent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -456,8 +476,36 @@
 <span class="sd">            p.initialize(v=rand_distr, gsyn_exc=0.0)</span>
 <span class="sd">            p.initialize(v=lambda i: -65 + i / 10.0)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">initial_values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span>  <span class="c1"># pylint: disable=protected-access</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_initial_state_values</span><span class="p">(</span>
+                <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationView.set_state"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.set_state">[docs]</a>    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">initial_values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set current values of state variables, e.g. the membrane\</span>
+<span class="sd">            potential.  Values passed to ``initialize()`` may be:</span>
+
+<span class="sd">        * single numeric values (all neurons set to the same value), or</span>
+<span class="sd">        * :py:class:`~pyNN.random.RandomDistribution` objects, or</span>
+<span class="sd">        * lists / arrays of numbers of the same size as the population</span>
+<span class="sd">          mapping functions, where a mapping function accepts a single</span>
+<span class="sd">          argument (the cell index) and returns a single number.</span>
+
+<span class="sd">        Values should be expressed in the standard PyNN units (i.e.</span>
+<span class="sd">        millivolts, nanoamps, milliseconds, microsiemens, nanofarads,</span>
+<span class="sd">        events per second).</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            p.set_state(v=-70.0)</span>
+<span class="sd">            p.set_state(v=rand_distr, gsyn_exc=0.0)</span>
+<span class="sd">            p.set_state(v=lambda i: -65 + i / 10.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warn_once</span><span class="p">(</span>
+            <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;set_state is non-standard PyNN and therefore &quot;</span>
+            <span class="s2">&quot;will not be portable to other simulators.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">initial_values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_current_state_values</span><span class="p">(</span>
                 <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationView.record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span>  <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -478,7 +526,7 @@
 <span class="sd">            should be a value in milliseconds, and an integer multiple of the</span>
 <span class="sd">            simulation timestep.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_record</span><span class="p">(</span>  <span class="c1"># pylint: disable=protected-access</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">record</span><span class="p">(</span>
             <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationView.sample"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -521,8 +569,8 @@
 <span class="sd">            p.set(cm=rand_distr, tau_m=lambda i: 10 + i / 10.0)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">set_by_selector</span><span class="p">(</span>
-                <span class="n">selector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_parameter_values</span><span class="p">(</span>
+                <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationView.write_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.write_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                    <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -557,14 +605,24 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">gather</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;SpiNNaker only supports gather=True. We will run &quot;</span>
                            <span class="s2">&quot;as if gather was set to True.&quot;</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">get_data_by_indexes</span><span class="p">(</span>
-            <span class="n">variables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="n">clear</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">extract_neo_block</span><span class="p">(</span>
+            <span class="n">variables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">io</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">get_io</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
 
         <span class="c1"># write the neo block to the file</span>
         <span class="n">io</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationBase</span><span class="o">.</span><span class="n">_vertex</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationBase</span><span class="o">.</span><span class="n">_recorder</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_recorder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span>
 </pre></div>
 
             <div class="clearer"></div>

@@ -197,7 +197,9 @@
     <span class="n">max_delay_supported</span> <span class="o">=</span> <span class="n">get_maximum_delay_supported_in_ms</span><span class="p">(</span>
         <span class="n">in_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">())</span>
     <span class="n">max_delay</span> <span class="o">=</span> <span class="n">max_delay_supported</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_delay_stages</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">pad_to_length</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">pad_to_length</span>
+    <span class="n">pad_to_length</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractSDRAMSynapseDynamics</span><span class="p">):</span>
+        <span class="n">pad_to_length</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">pad_to_length</span>
 
     <span class="c1"># delay point where delay extensions start</span>
     <span class="n">min_delay_for_delay_extension</span> <span class="o">=</span> <span class="p">(</span>
@@ -289,8 +291,8 @@
 
 <div class="viewcode-block" id="get_synapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.get_synapses">[docs]</a><span class="k">def</span> <span class="nf">get_synapses</span><span class="p">(</span>
         <span class="n">connections</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
-        <span class="n">weight_scales</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-        <span class="n">max_row_info</span><span class="p">,</span> <span class="n">gen_undelayed</span><span class="p">,</span> <span class="n">gen_delayed</span><span class="p">):</span>
+        <span class="n">weight_scales</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span>
+        <span class="n">gen_undelayed</span><span class="p">,</span> <span class="n">gen_delayed</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Get the synapses as an array of words for non-delayed synapses and\</span>
 <span class="sd">        an array of words for delayed synapses. This is used to prepare\</span>
 <span class="sd">        information for *deployment to SpiNNaker*.</span>
@@ -307,8 +309,6 @@
 <span class="sd">        The scaling of the weights for each synapse type</span>
 <span class="sd">    :param ~pacman.model.graphs.appplication.ApplicationEdge app_edge:</span>
 <span class="sd">        The incoming machine edge that the synapses are on</span>
-<span class="sd">    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        The slice of the pre-vertex to get the synapses for</span>
 <span class="sd">    :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        The slice of the post-vertex to get the synapses for</span>
 <span class="sd">    :param MaxRowInfo max_row_info:</span>
@@ -317,20 +317,17 @@
 <span class="sd">        Whether to generate undelayed data</span>
 <span class="sd">    :param bool gen_delayed:</span>
 <span class="sd">        Whether to generate delayed data</span>
+<span class="sd">    :param int max_atoms_per_core:</span>
+<span class="sd">        The maximum number of atoms on a core</span>
 <span class="sd">    :return:</span>
-<span class="sd">        (``row_data``, ``delayed_row_data``, ``delayed_source_ids``,</span>
-<span class="sd">        ``stages``) where:</span>
+<span class="sd">        (``row_data``, ``delayed_row_data``) where:</span>
 
 <span class="sd">        * ``row_data`` is the undelayed connectivity data arranged into a</span>
 <span class="sd">            row per source, each row the same length</span>
 <span class="sd">        * ``delayed_row_data`` is the delayed connectivity data arranged</span>
 <span class="sd">            into a row per source per delay stage, each row the same length</span>
-<span class="sd">        * ``delayed_source_ids`` is the machine-vertex-local source neuron</span>
-<span class="sd">            id of each connection of the delayed vertices</span>
-<span class="sd">        * ``stages`` is the delay stage of each delayed connection</span>
 <span class="sd">    :rtype:</span>
-<span class="sd">        tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,</span>
-<span class="sd">        ~numpy.ndarray)</span>
+<span class="sd">        tuple(~numpy.ndarray, ~numpy.ndarray)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
     <span class="c1"># Get delays in timesteps</span>
@@ -362,53 +359,51 @@
     <span class="n">row_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">gen_undelayed</span> <span class="ow">and</span> <span class="n">max_row_info</span><span class="o">.</span><span class="n">undelayed_max_n_synapses</span><span class="p">:</span>
         <span class="c1"># Get which row each connection will go into</span>
-        <span class="n">undelayed_row_indices</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">undelayed_connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
+        <span class="n">undelayed_row_indices</span> <span class="o">=</span> <span class="n">undelayed_connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
         <span class="n">row_data</span> <span class="o">=</span> <span class="n">_get_row_data</span><span class="p">(</span>
             <span class="n">undelayed_connections</span><span class="p">,</span> <span class="n">undelayed_row_indices</span><span class="p">,</span>
-            <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
+            <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
             <span class="n">max_row_info</span><span class="o">.</span><span class="n">undelayed_max_n_synapses</span><span class="p">,</span>
-            <span class="n">max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span><span class="p">)</span>
+            <span class="n">max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
 
         <span class="k">del</span> <span class="n">undelayed_row_indices</span>
     <span class="k">del</span> <span class="n">undelayed_connections</span>
 
     <span class="c1"># Get the data for the delayed connections</span>
     <span class="n">delayed_row_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
-    <span class="n">stages</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
-    <span class="n">delayed_source_ids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">gen_delayed</span> <span class="ow">and</span> <span class="n">max_row_info</span><span class="o">.</span><span class="n">delayed_max_n_synapses</span><span class="p">:</span>
         <span class="c1"># Get the delay stages and which row each delayed connection will</span>
         <span class="c1"># go into</span>
         <span class="n">stages</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">numpy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span>
             <span class="n">delayed_connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span> <span class="o">/</span> <span class="n">max_delay</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
             <span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
-        <span class="n">delayed_row_indices</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="p">(</span><span class="n">delayed_connections</span><span class="p">[</span>
-                     <span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="o">+</span>
-                <span class="p">((</span><span class="n">stages</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
+        <span class="n">delayed_cores</span> <span class="o">=</span> <span class="n">delayed_connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">//</span> <span class="n">max_atoms_per_core</span>
+        <span class="n">local_sources</span> <span class="o">=</span> <span class="n">delayed_connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span>
+            <span class="n">delayed_cores</span> <span class="o">*</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
+        <span class="n">delay_atoms_per_core</span> <span class="o">=</span> <span class="n">max_atoms_per_core</span> <span class="o">*</span> <span class="n">n_delay_stages</span>
+        <span class="n">delayed_pre_cores</span> <span class="o">=</span> <span class="n">delayed_cores</span> <span class="o">*</span> <span class="n">delay_atoms_per_core</span>
+        <span class="n">local_index</span> <span class="o">=</span> <span class="p">((</span><span class="n">stages</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">max_atoms_per_core</span><span class="p">)</span> <span class="o">+</span> <span class="n">local_sources</span>
+        <span class="n">delayed_row_indices</span> <span class="o">=</span> <span class="n">delayed_pre_cores</span> <span class="o">+</span> <span class="n">local_index</span>
         <span class="n">delayed_connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">max_delay</span> <span class="o">*</span> <span class="n">stages</span>
-        <span class="n">delayed_source_ids</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">delayed_connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
 
         <span class="c1"># Get the data</span>
         <span class="n">delayed_row_data</span> <span class="o">=</span> <span class="n">_get_row_data</span><span class="p">(</span>
             <span class="n">delayed_connections</span><span class="p">,</span> <span class="n">delayed_row_indices</span><span class="p">,</span>
-            <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
             <span class="n">max_row_info</span><span class="o">.</span><span class="n">delayed_max_n_synapses</span><span class="p">,</span>
-            <span class="n">max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span><span class="p">)</span>
+            <span class="n">max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
         <span class="k">del</span> <span class="n">delayed_row_indices</span>
     <span class="k">del</span> <span class="n">delayed_connections</span>
 
-    <span class="k">return</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed_row_data</span><span class="p">,</span> <span class="n">delayed_source_ids</span><span class="p">,</span> <span class="n">stages</span></div>
+    <span class="k">return</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed_row_data</span></div>
 
 
 <span class="k">def</span> <span class="nf">_get_row_data</span><span class="p">(</span>
         <span class="n">connections</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
         <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">max_row_n_synapses</span><span class="p">,</span>
-        <span class="n">max_row_n_words</span><span class="p">):</span>
+        <span class="n">max_row_n_words</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param ~numpy.ndarray connections:</span>
 <span class="sd">        The connections to convert; the dtype is</span>
@@ -424,6 +419,7 @@
 <span class="sd">        The synapse dynamics of the synapses</span>
 <span class="sd">    :param int max_row_n_synapses: The maximum number of synapses in a row</span>
 <span class="sd">    :param int max_row_n_words: The maximum number of words in a row</span>
+<span class="sd">    :param int max_atoms_per_core: The maximum number of atoms per core</span>
 <span class="sd">    :rtype: tuple(int, ~numpy.ndarray)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
@@ -435,7 +431,7 @@
         <span class="c1"># Get the static data</span>
         <span class="n">ff_data</span><span class="p">,</span> <span class="n">ff_size</span> <span class="o">=</span> <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">get_static_synaptic_data</span><span class="p">(</span>
             <span class="n">connections</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_row_n_synapses</span><span class="p">)</span>
+            <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_row_n_synapses</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
 
         <span class="c1"># Blank the plastic data</span>
         <span class="n">fp_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)]</span>
@@ -452,7 +448,7 @@
         <span class="n">fp_data</span><span class="p">,</span> <span class="n">pp_data</span><span class="p">,</span> <span class="n">fp_size</span><span class="p">,</span> <span class="n">pp_size</span> <span class="o">=</span> \
             <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">get_plastic_synaptic_data</span><span class="p">(</span>
                 <span class="n">connections</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-                <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_row_n_synapses</span><span class="p">)</span>
+                <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_row_n_synapses</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
 
     <span class="c1"># Add some padding</span>
     <span class="n">row_lengths</span> <span class="o">=</span> <span class="p">[</span>
@@ -473,16 +469,15 @@
 
 
 <div class="viewcode-block" id="convert_to_connections"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.convert_to_connections">[docs]</a><span class="k">def</span> <span class="nf">convert_to_connections</span><span class="p">(</span>
-        <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+        <span class="n">synapse_info</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span>
         <span class="n">max_row_length</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
-        <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
+        <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Read the synapses for a given projection synapse information\</span>
 <span class="sd">        object out of the given data and convert to connection data</span>
 
 <span class="sd">    :param SynapseInformation synapse_info:</span>
 <span class="sd">        The synapse information of the synapses</span>
-<span class="sd">    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        The slice of the source neurons of the synapses in the data</span>
+<span class="sd">    :param int n_pre_atoms: The number of atoms in the pre-vertex</span>
 <span class="sd">    :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        The slice of the target neurons of the synapses in the data</span>
 <span class="sd">    :param int max_row_length:</span>
@@ -493,9 +488,12 @@
 <span class="sd">        The weight scaling of each synapse type</span>
 <span class="sd">    :param bytearray data:</span>
 <span class="sd">        The raw data containing the synapses</span>
-<span class="sd">    :param bool delayed: True if the data should be considered delayed</span>
+<span class="sd">    :param bool delayed:</span>
+<span class="sd">        True if the data should be considered delayed</span>
 <span class="sd">    :param int post_vertex_max_delay_ticks:</span>
-<span class="sd">            max delayed ticks supported from post vertex</span>
+<span class="sd">        The maximum delayed ticks supported from post vertex</span>
+<span class="sd">    :param int max_atoms_per_core:</span>
+<span class="sd">        The maximum number of atoms on a core</span>
 <span class="sd">    :return: The connections read from the data; the dtype is</span>
 <span class="sd">        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">    :rtype: ~numpy.ndarray</span>
@@ -513,13 +511,13 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dynamics</span><span class="p">,</span> <span class="n">AbstractStaticSynapseDynamics</span><span class="p">):</span>
         <span class="c1"># Read static data</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="n">_read_static_data</span><span class="p">(</span>
-            <span class="n">dynamics</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
-            <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">)</span>
+            <span class="n">dynamics</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
+            <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Read plastic data</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="n">_read_plastic_data</span><span class="p">(</span>
-            <span class="n">dynamics</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
-            <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">)</span>
+            <span class="n">dynamics</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
+            <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
 
     <span class="c1"># There might still be no connections if the row was all padding</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">connections</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
@@ -536,8 +534,8 @@
 
 <div class="viewcode-block" id="read_all_synapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.read_all_synapses">[docs]</a><span class="k">def</span> <span class="nf">read_all_synapses</span><span class="p">(</span>
         <span class="n">data</span><span class="p">,</span> <span class="n">delayed_data</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
-        <span class="n">weight_scales</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-        <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">):</span>
+        <span class="n">weight_scales</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span>
+        <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Read the synapses for a given projection synapse information\</span>
 <span class="sd">        object out of the given delayed and undelayed data.</span>
 
@@ -551,14 +549,15 @@
 <span class="sd">        The total number of synapse types available</span>
 <span class="sd">    :param list(float) weight_scales:</span>
 <span class="sd">        A weight scale for each synapse type</span>
-<span class="sd">    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        The slice of the pre-vertex to read the synapses for</span>
+<span class="sd">    :param int n_pre_atoms: The number of atoms in the pre-vertex</span>
 <span class="sd">    :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        The slice of the post-vertex to read the synapses for</span>
 <span class="sd">    :param int post_vertex_max_delay_ticks:</span>
 <span class="sd">            max delayed ticks supported from post vertex</span>
 <span class="sd">    :param MaxRowInfo max_row_info:</span>
 <span class="sd">        The maximum information for each of the rows</span>
+<span class="sd">    :param int max_atoms_per_core:</span>
+<span class="sd">        The maximum number of atoms on a core</span>
 <span class="sd">    :return: The connections read from the data; the dtype is</span>
 <span class="sd">        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">    :rtype: ~numpy.ndarray</span>
@@ -567,13 +566,13 @@
     <span class="n">max_row_length</span> <span class="o">=</span> <span class="n">max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span>
     <span class="n">delayed_max_row_length</span> <span class="o">=</span> <span class="n">max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span>
     <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_to_connections</span><span class="p">(</span>
-        <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">max_row_length</span><span class="p">,</span>
+        <span class="n">synapse_info</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span> <span class="n">max_row_length</span><span class="p">,</span>
         <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">post_vertex_max_delay_ticks</span><span class="p">))</span>
+        <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">))</span>
     <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_to_connections</span><span class="p">(</span>
-        <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+        <span class="n">synapse_info</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span>
         <span class="n">delayed_max_row_length</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">delayed_data</span><span class="p">,</span>
-        <span class="kc">True</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">))</span>
+        <span class="kc">True</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">))</span>
 
     <span class="c1"># Join the connections into a single list and return it</span>
     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span></div>
@@ -600,14 +599,14 @@
 
 
 <span class="k">def</span> <span class="nf">_read_static_data</span><span class="p">(</span>
-        <span class="n">dynamics</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-        <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
+        <span class="n">dynamics</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span>
+        <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span>
+        <span class="n">max_atoms_per_core</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Read static data from row data</span>
 
 <span class="sd">    :param AbstractStaticSynapseDynamics dynamics:</span>
 <span class="sd">        The synapse dynamics that generated the data</span>
-<span class="sd">    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        The slice of neurons that are the sources of the synapses</span>
+<span class="sd">    :param int n_pre_atoms: The number of atoms on the pre-vertex</span>
 <span class="sd">    :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        The slice of neurons that are the targets of the synapses</span>
 <span class="sd">    :param int n_synapse_types:</span>
@@ -616,6 +615,7 @@
 <span class="sd">        The raw row data to read</span>
 <span class="sd">    :param bool delayed: True if data should be considered delayed</span>
 <span class="sd">    :param int post_vertex_max_delay_ticks: post vertex delay maximum</span>
+<span class="sd">    :param int max_atoms_per_core: The maximum number of atoms on a core</span>
 <span class="sd">    :return: the connections read with dtype</span>
 <span class="sd">        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">    :rtype: list(~numpy.ndarray)</span>
@@ -625,14 +625,13 @@
             <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSDRAMSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)</span>
     <span class="n">ff_size</span><span class="p">,</span> <span class="n">ff_data</span> <span class="o">=</span> <span class="n">_parse_static_data</span><span class="p">(</span><span class="n">row_data</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">)</span>
     <span class="n">connections</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">read_static_synaptic_data</span><span class="p">(</span>
-        <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">ff_size</span><span class="p">,</span> <span class="n">ff_data</span><span class="p">)</span>
+        <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">ff_size</span><span class="p">,</span> <span class="n">ff_data</span><span class="p">,</span>
+        <span class="n">max_atoms_per_core</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">delayed</span><span class="p">:</span>
         <span class="n">n_synapses</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">get_n_synapses_in_rows</span><span class="p">(</span><span class="n">ff_size</span><span class="p">)</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="n">__convert_delayed_data</span><span class="p">(</span>
-            <span class="n">n_synapses</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span>
+            <span class="n">n_synapses</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span>
             <span class="n">post_vertex_max_delay_ticks</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
     <span class="k">return</span> <span class="n">connections</span>
 
 
@@ -665,14 +664,14 @@
 
 
 <span class="k">def</span> <span class="nf">_read_plastic_data</span><span class="p">(</span>
-        <span class="n">dynamics</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-        <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
+        <span class="n">dynamics</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span>
+        <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span>
+        <span class="n">max_atoms_per_core</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Read plastic data from raw data</span>
 
 <span class="sd">    :param AbstractStaticSynapseDynamics dynamics:</span>
 <span class="sd">        The synapse dynamics that generated the data</span>
-<span class="sd">    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        The slice of neurons that are the sources of the synapses</span>
+<span class="sd">    :param int n_pre_atoms: The number of atoms in the pre-vertex</span>
 <span class="sd">    :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        The slice of neurons that are the targets of the synapses</span>
 <span class="sd">    :param int n_synapse_types:</span>
@@ -681,6 +680,7 @@
 <span class="sd">        The raw row data to read</span>
 <span class="sd">    :param bool delayed: True if data should be considered delayed</span>
 <span class="sd">    :param int post_vertex_max_delay_ticks: post vertex delay maximum</span>
+<span class="sd">    :param int max_atoms_per_core: The maximum number of atoms on a core</span>
 <span class="sd">    :return: the connections read with dtype</span>
 <span class="sd">        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">    :rtype: list(~numpy.ndarray)</span>
@@ -692,15 +692,13 @@
         <span class="n">row_data</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">)</span>
     <span class="n">connections</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">read_plastic_synaptic_data</span><span class="p">(</span>
         <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">pp_size</span><span class="p">,</span> <span class="n">pp_data</span><span class="p">,</span>
-        <span class="n">fp_size</span><span class="p">,</span> <span class="n">fp_data</span><span class="p">)</span>
+        <span class="n">fp_size</span><span class="p">,</span> <span class="n">fp_data</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">delayed</span><span class="p">:</span>
         <span class="n">n_synapses</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">get_n_synapses_in_rows</span><span class="p">(</span><span class="n">pp_size</span><span class="p">,</span> <span class="n">fp_size</span><span class="p">)</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="n">__convert_delayed_data</span><span class="p">(</span>
-            <span class="n">n_synapses</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span>
+            <span class="n">n_synapses</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span>
             <span class="n">post_vertex_max_delay_ticks</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
     <span class="k">return</span> <span class="n">connections</span>
 
 
@@ -722,14 +720,13 @@
 
 
 <span class="k">def</span> <span class="nf">__convert_delayed_data</span><span class="p">(</span>
-            <span class="n">n_synapses</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">delayed_connections</span><span class="p">,</span>
+            <span class="n">n_synapses</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span> <span class="n">delayed_connections</span><span class="p">,</span>
             <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Take the delayed_connections and convert the source ids and delay\</span>
 <span class="sd">        values back to global values</span>
 
 <span class="sd">    :param ~numpy.ndarray n_synapses: The number of synapses in each row</span>
-<span class="sd">    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        The slice of atoms in the pre-vertex</span>
+<span class="sd">    :param int n_pre_atoms: number of atoms in the pre-vertex</span>
 <span class="sd">    :param ~numpy.ndarray delayed_connections:</span>
 <span class="sd">        The connections to convert of dtype</span>
 <span class="sd">        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
@@ -741,7 +738,7 @@
     <span class="c1"># from the first delay stage, then all from the second stage and so on</span>
     <span class="n">synapse_ids</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">n_synapses</span><span class="p">))</span>
     <span class="n">row_stage</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-        <span class="n">i</span> <span class="o">//</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
+        <span class="n">i</span> <span class="o">//</span> <span class="n">n_pre_atoms</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">synapse_ids</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
     <span class="c1"># Work out the delay for each stage</span>
     <span class="n">row_min_delay</span> <span class="o">=</span> <span class="p">(</span><span class="n">row_stage</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">post_vertex_max_delay_ticks</span>
@@ -753,12 +750,11 @@
     <span class="c1"># this converts the row id back to a source neuron id</span>
     <span class="n">connection_source_extra</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
         <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
-            <span class="n">row_stage</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">(</span><span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">),</span>
+            <span class="n">row_stage</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">(</span><span class="n">n_pre_atoms</span><span class="p">),</span>
             <span class="n">n_synapses</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">synapse_ids</span><span class="p">])</span>
     <span class="c1"># Do the conversions</span>
     <span class="n">delayed_connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">connection_source_extra</span>
-    <span class="n">delayed_connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
     <span class="n">delayed_connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">connection_min_delay</span>
     <span class="k">return</span> <span class="n">delayed_connections</span>
 </pre></div>

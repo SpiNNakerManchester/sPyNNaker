@@ -62,6 +62,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractVertexWithEdgeToDependentVertices</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.defaults</span> <span class="kn">import</span> <span class="n">defaults</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">PopulationApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">.machine_munich_motor_device</span> <span class="kn">import</span> <span class="n">MachineMunichMotorDevice</span>
 
 
@@ -77,7 +78,8 @@
 <span class="nd">@defaults</span>
 <span class="k">class</span> <span class="nc">MunichMotorDevice</span><span class="p">(</span>
         <span class="n">AbstractOneAppOneMachineVertex</span><span class="p">,</span>
-        <span class="n">AbstractVertexWithEdgeToDependentVertices</span><span class="p">):</span>
+        <span class="n">AbstractVertexWithEdgeToDependentVertices</span><span class="p">,</span>
+        <span class="n">PopulationApplicationVertex</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An Omnibot motor control device. This has a real vertex and an \</span>
 <span class="sd">        external device vertex.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

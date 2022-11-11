@@ -62,7 +62,10 @@
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.max_support_delay"><code class="docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay.max_support_delay()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput"><code class="docutils literal notranslate"><span class="pre">AbstractSupportsOneToOneSDRAMInput</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput"><code class="docutils literal notranslate"><span class="pre">AbstractSupportsOneToOneSDRAMInput</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput.handles_source_vertex"><code class="docutils literal notranslate"><span class="pre">AbstractSupportsOneToOneSDRAMInput.handles_source_vertex()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.INVALID_POP_ERROR_MESSAGE"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.INVALID_POP_ERROR_MESSAGE</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.create_machine_vertex()</span></code></a></li>
@@ -90,6 +93,7 @@
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_vertices()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_same_chip_groups"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_same_chip_groups()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_source_specific_in_coming_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_source_specific_in_coming_vertices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.handles_source_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.handles_source_vertex()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.machine_vertices_for_recording"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.machine_vertices_for_recording()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay()</span></code></a></li>
@@ -201,9 +205,13 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.on_chip_bitfield_generator">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.</span></span><span class="sig-name descname"><span class="pre">on_chip_bitfield_generator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.on_chip_bitfield_generator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads and runs the bit field generator on chip.</p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.neuron_expander">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.</span></span><span class="sig-name descname"><span class="pre">neuron_expander</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.neuron_expander" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the neuron expander.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Needs to be done after data has been loaded.</p>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -212,24 +220,6 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.</span></span><span class="sig-name descname"><span class="pre">spynnaker_data_specification_writer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executes data specification generation for sPyNNaker</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>DSG targets (map of placement tuple and filename)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<em>DataSpecificationTargets</em>,
-<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>,<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>,<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>), <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>))</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ConfigurationException</strong> – If the DSG asks to use more SDRAM than is available.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -293,9 +283,8 @@
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.delay_support_adder"><code class="docutils literal notranslate"><span class="pre">delay_support_adder()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.finish_connection_holders"><code class="docutils literal notranslate"><span class="pre">finish_connection_holders()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.on_chip_bitfield_generator"><code class="docutils literal notranslate"><span class="pre">on_chip_bitfield_generator()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.neuron_expander"><code class="docutils literal notranslate"><span class="pre">neuron_expander()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.redundant_packet_count_report"><code class="docutils literal notranslate"><span class="pre">redundant_packet_count_report()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer"><code class="docutils literal notranslate"><span class="pre">spynnaker_data_specification_writer()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bitField_pair_router_compressor"><code class="docutils literal notranslate"><span class="pre">spynnaker_machine_bitField_pair_router_compressor()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_machine_bitfield_ordered_covering_compressor"><code class="docutils literal notranslate"><span class="pre">spynnaker_machine_bitfield_ordered_covering_compressor()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.spynnaker_neuron_graph_network_specification_report"><code class="docutils literal notranslate"><span class="pre">spynnaker_neuron_graph_network_specification_report()</span></code></a></li>

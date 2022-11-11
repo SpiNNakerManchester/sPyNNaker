@@ -100,9 +100,26 @@ raised saying a different splitter is required.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">AbstractSupportsOneToOneSDRAMInput</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>A marker interface for a splitter that supports one-to-one input using
+<p>An interface for a splitter that supports one-to-one input using
 SDRAM.  The splitter is assumed to handle the splitting on any inputs
 that are actually one-to-one, as it will have to create the vertices</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput.handles_source_vertex">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">handles_source_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/abstract_supports_one_to_one_sdram_input.html#AbstractSupportsOneToOneSDRAMInput.handles_source_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput.handles_source_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Determine if the source vertex of the given projection is to be</dt><dd><p>handled by the target splitter</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><em>Projection</em></a>) – The projection to check the source of</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -123,7 +140,7 @@ slices</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex">
-<span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sdram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sdram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_buffer_shifts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_scales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_matrices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neuron_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -200,9 +217,9 @@ for external edges.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms">
-<span class="sig-name descname"><span class="pre">get_sdram_used_by_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the resources of a slice of atoms
-:param int n_atoms
+<span class="sig-name descname"><span class="pre">get_sdram_used_by_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_syn_block_sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_sz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the resources of a slice of atoms</p>
+<p>:param int n_atoms
 :rtype: ~pacman.model.resources.MultiRegionSDRAM</p>
 </dd></dl>
 
@@ -460,8 +477,25 @@ machine or application vertices that should hit the target)</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.handles_source_vertex">
+<span class="sig-name descname"><span class="pre">handles_source_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.handles_source_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.handles_source_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Determine if the source vertex of the given projection is to be</dt><dd><p>handled by the target splitter</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><em>Projection</em></a>) – The projection to check the source of</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_direct_poisson_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_direct_poisson_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if a given Poisson source can be created by this splitter</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -667,17 +701,11 @@ for external edges.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_sdram_used_by_atoms">
-<span class="sig-name descname"><span class="pre">get_sdram_used_by_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_delay_vertex_slice.html#SplitterDelayVertexSlice.get_sdram_used_by_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_sdram_used_by_atoms" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_sdram_used_by_atoms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_delay_vertex_slice.html#SplitterDelayVertexSlice.get_sdram_used_by_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_sdram_used_by_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the sdram used by the delay extension</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>graph</strong> (<em>ApplicationGraph</em>) – app graph</p></li>
-<li><p><strong>vertex_slice</strong> (<em>Slice</em>) – The slice to get the size of</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>ConstantSDRAM</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ConstantSDRAM</p>
 </dd>
 </dl>
 </dd></dl>
@@ -923,7 +951,10 @@ machine vertices on the same chip.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.max_support_delay"><code class="docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay.max_support_delay()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput"><code class="docutils literal notranslate"><span class="pre">AbstractSupportsOneToOneSDRAMInput</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput"><code class="docutils literal notranslate"><span class="pre">AbstractSupportsOneToOneSDRAMInput</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput.handles_source_vertex"><code class="docutils literal notranslate"><span class="pre">AbstractSupportsOneToOneSDRAMInput.handles_source_vertex()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.INVALID_POP_ERROR_MESSAGE"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.INVALID_POP_ERROR_MESSAGE</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.create_machine_vertex()</span></code></a></li>
@@ -951,6 +982,7 @@ machine vertices on the same chip.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_vertices()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_same_chip_groups"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_same_chip_groups()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_source_specific_in_coming_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.get_source_specific_in_coming_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.handles_source_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.handles_source_vertex()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.machine_vertices_for_recording"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.machine_vertices_for_recording()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay()</span></code></a></li>

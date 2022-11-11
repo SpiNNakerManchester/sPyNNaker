@@ -68,7 +68,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">neuron_model.h File Reference</div>  </div>
@@ -78,21 +77,18 @@ $(function() {
 <p>The API for neuron models themselves.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="neuron-typedefs_8h_source.html">common/neuron-typedefs.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
 </div>
 <p><a href="neuron__model_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:af6a73a4c591000fae3ac1f7e879b9a36"><td class="memItemLeft" align="right" valign="top"><a id="af6a73a4c591000fae3ac1f7e879b9a36"></a>
-typedef <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model_8h.html#af6a73a4c591000fae3ac1f7e879b9a36">global_neuron_params_pointer_t</a></td></tr>
-<tr class="memdesc:af6a73a4c591000fae3ac1f7e879b9a36"><td class="mdescLeft">&#160;</td><td class="mdescRight">pointer to global neuron parameters <br /></td></tr>
-<tr class="separator:af6a73a4c591000fae3ac1f7e879b9a36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a2c709e18b3833cf07131b394b0a9b929"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model_8h.html#a2c709e18b3833cf07131b394b0a9b929">neuron_model_set_global_neuron_params</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>)</td></tr>
-<tr class="memdesc:a2c709e18b3833cf07131b394b0a9b929"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the global neuron parameters  <a href="neuron__model_8h.html#a2c709e18b3833cf07131b394b0a9b929">More...</a><br /></td></tr>
-<tr class="separator:a2c709e18b3833cf07131b394b0a9b929"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5fc11951300c8a7321586ffb24b4107"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model_8h.html#ac5fc11951300c8a7321586ffb24b4107">neuron_model_initialise</a> (<a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *state, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__params__t">neuron_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>, uint32_t <a class="el" href="neuron__impl__standard_8h.html#adc2145aaa2f8435401d2c077d42c7b91">n_steps_per_timestep</a>)</td></tr>
+<tr class="memdesc:ac5fc11951300c8a7321586ffb24b4107"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialise the structure from the parameters  <a href="neuron__model_8h.html#ac5fc11951300c8a7321586ffb24b4107">More...</a><br /></td></tr>
+<tr class="separator:ac5fc11951300c8a7321586ffb24b4107"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add9582f47143d4a943af8bbd50082d4a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model_8h.html#add9582f47143d4a943af8bbd50082d4a">neuron_model_save_state</a> (<a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *state, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__params__t">neuron_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>)</td></tr>
+<tr class="memdesc:add9582f47143d4a943af8bbd50082d4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">save parameters and state back to SDRAM for reading by host and recovery on restart  <a href="neuron__model_8h.html#add9582f47143d4a943af8bbd50082d4a">More...</a><br /></td></tr>
+<tr class="separator:add9582f47143d4a943af8bbd50082d4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6809c07eadc54841c5970164ca52dc3b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model_8h.html#a6809c07eadc54841c5970164ca52dc3b">neuron_model_state_update</a> (uint16_t num_excitatory_inputs, const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *exc_input, uint16_t num_inhibitory_inputs, const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *inh_input, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> external_bias, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> current_offset, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *restrict neuron)</td></tr>
 <tr class="memdesc:a6809c07eadc54841c5970164ca52dc3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">primary function called in timer loop after synaptic updates  <a href="neuron__model_8h.html#a6809c07eadc54841c5970164ca52dc3b">More...</a><br /></td></tr>
 <tr class="separator:a6809c07eadc54841c5970164ca52dc3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -102,43 +98,112 @@ Functions</h2></td></tr>
 <tr class="memitem:a36ed2fe89ac12da019a6bcee8b6672c9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model_8h.html#a36ed2fe89ac12da019a6bcee8b6672c9">neuron_model_get_membrane_voltage</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
 <tr class="memdesc:a36ed2fe89ac12da019a6bcee8b6672c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the neuron membrane voltage for a given neuron parameter set  <a href="neuron__model_8h.html#a36ed2fe89ac12da019a6bcee8b6672c9">More...</a><br /></td></tr>
 <tr class="separator:a36ed2fe89ac12da019a6bcee8b6672c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a039b8ee28cccb786e7c67c985e88e3d6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model_8h.html#a039b8ee28cccb786e7c67c985e88e3d6">neuron_model_print_state_variables</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
-<tr class="memdesc:a039b8ee28cccb786e7c67c985e88e3d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">printout of state variables i.e. those values that might change  <a href="neuron__model_8h.html#a039b8ee28cccb786e7c67c985e88e3d6">More...</a><br /></td></tr>
-<tr class="separator:a039b8ee28cccb786e7c67c985e88e3d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a645937167c46b7556757b05250f9864d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model_8h.html#a645937167c46b7556757b05250f9864d">neuron_model_print_parameters</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
-<tr class="memdesc:a645937167c46b7556757b05250f9864d"><td class="mdescLeft">&#160;</td><td class="mdescRight">printout of parameters i.e. those values that don't change  <a href="neuron__model_8h.html#a645937167c46b7556757b05250f9864d">More...</a><br /></td></tr>
-<tr class="separator:a645937167c46b7556757b05250f9864d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34e146df45faa9cdf07da003881f0181"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model_8h.html#a34e146df45faa9cdf07da003881f0181">neuron_model_print_state_variables</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
+<tr class="memdesc:a34e146df45faa9cdf07da003881f0181"><td class="mdescLeft">&#160;</td><td class="mdescRight">printout of state variables i.e. those values that might change  <a href="neuron__model_8h.html#a34e146df45faa9cdf07da003881f0181">More...</a><br /></td></tr>
+<tr class="separator:a34e146df45faa9cdf07da003881f0181"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae984b1ab35b6ea027f5d622074c21212"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model_8h.html#ae984b1ab35b6ea027f5d622074c21212">neuron_model_print_parameters</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
+<tr class="memdesc:ae984b1ab35b6ea027f5d622074c21212"><td class="mdescLeft">&#160;</td><td class="mdescRight">printout of parameters i.e. those values that don't change  <a href="neuron__model_8h.html#ae984b1ab35b6ea027f5d622074c21212">More...</a><br /></td></tr>
+<tr class="separator:ae984b1ab35b6ea027f5d622074c21212"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The API for neuron models themselves. </p>
 
 <p class="definition">Definition in file <a class="el" href="neuron__model_8h_source.html">neuron_model.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a2c709e18b3833cf07131b394b0a9b929"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c709e18b3833cf07131b394b0a9b929">&#9670;&nbsp;</a></span>neuron_model_set_global_neuron_params()</h2>
+<a id="ac5fc11951300c8a7321586ffb24b4107"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5fc11951300c8a7321586ffb24b4107">&#9670;&nbsp;</a></span>neuron_model_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void neuron_model_set_global_neuron_params </td>
+          <td class="memname">static void neuron_model_initialise </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *&#160;</td>
-          <td class="paramname"><em>params</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__params__t">neuron_params_t</a> *&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_steps_per_timestep</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>set the global neuron parameters </p>
+<p>initialise the structure from the parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">params</td><td>The parameters to set </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">state</td><td>Pointer to the state to be filled in </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">params</td><td>Pointer to the parameters passed in from host </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_steps_per_timestep</td><td>Number of time steps to be done each full update </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00027">27</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
+</div>
+</div>
+<a id="add9582f47143d4a943af8bbd50082d4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add9582f47143d4a943af8bbd50082d4a">&#9670;&nbsp;</a></span>neuron_model_save_state()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void neuron_model_save_state </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__params__t">neuron_params_t</a> *&#160;</td>
+          <td class="paramname"><em>params</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>save parameters and state back to SDRAM for reading by host and recovery on restart </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The current state </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">params</td><td>Pointer to structure into which parameter can be written </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -291,20 +356,28 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a039b8ee28cccb786e7c67c985e88e3d6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a039b8ee28cccb786e7c67c985e88e3d6">&#9670;&nbsp;</a></span>neuron_model_print_state_variables()</h2>
+<a id="a34e146df45faa9cdf07da003881f0181"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34e146df45faa9cdf07da003881f0181">&#9670;&nbsp;</a></span>neuron_model_print_state_variables()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void neuron_model_print_state_variables </td>
+          <td class="memname">static void neuron_model_print_state_variables </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
           <td class="paramname"><em>neuron</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>printout of state variables i.e. those values that might change </p>
@@ -315,24 +388,30 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00032">32</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
-
 </div>
 </div>
-<a id="a645937167c46b7556757b05250f9864d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a645937167c46b7556757b05250f9864d">&#9670;&nbsp;</a></span>neuron_model_print_parameters()</h2>
+<a id="ae984b1ab35b6ea027f5d622074c21212"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae984b1ab35b6ea027f5d622074c21212">&#9670;&nbsp;</a></span>neuron_model_print_parameters()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void neuron_model_print_parameters </td>
+          <td class="memname">static void neuron_model_print_parameters </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
           <td class="paramname"><em>neuron</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>printout of parameters i.e. those values that don't change </p>
@@ -343,14 +422,12 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00037">37</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
-
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

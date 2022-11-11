@@ -65,19 +65,10 @@
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnHost.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnHost.create_synaptic_block">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create a synaptic block from the data.</span>
 
-<span class="sd">        :param weights:</span>
-<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float</span>
-<span class="sd">            or list(int) or list(float)</span>
-<span class="sd">        :param delays:</span>
-<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float</span>
-<span class="sd">            or list(int) or list(float)</span>
-<span class="sd">        :param list(~pacman.model.graphs.common.Slice) pre_slices:</span>
 <span class="sd">        :param list(~pacman.model.graphs.common.Slice) post_slices:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        :param AbstractSynapseType synapse_type:</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>

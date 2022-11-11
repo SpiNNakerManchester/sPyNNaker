@@ -69,7 +69,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">input_type.h File Reference</div>  </div>
@@ -91,15 +90,14 @@ Macros</h2></td></tr>
 <tr class="memdesc:a6dd746ed60f4dc54e7e604f239843aa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of inhibitory receptors.  <a href="input__type_8h.html#a6dd746ed60f4dc54e7e604f239843aa6">More...</a><br /></td></tr>
 <tr class="separator:a6dd746ed60f4dc54e7e604f239843aa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:af2eac2241adec660b95b59ab8cc519ff"><td class="memItemLeft" align="right" valign="top"><a id="af2eac2241adec660b95b59ab8cc519ff"></a>
-typedef <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input__type_8h.html#af2eac2241adec660b95b59ab8cc519ff">input_type_pointer_t</a></td></tr>
-<tr class="memdesc:af2eac2241adec660b95b59ab8cc519ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declaration of the input type pointer. <br /></td></tr>
-<tr class="separator:af2eac2241adec660b95b59ab8cc519ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a26f363df8042bd869bd06d36744bfbee"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input__type_8h.html#a26f363df8042bd869bd06d36744bfbee">input_type_initialise</a> (<a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *state, <a class="el" href="input__type__none_8h.html#structinput__type__params__t">input_type_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>, uint32_t <a class="el" href="neuron__impl__standard_8h.html#adc2145aaa2f8435401d2c077d42c7b91">n_steps_per_timestep</a>)</td></tr>
+<tr class="memdesc:a26f363df8042bd869bd06d36744bfbee"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialise the structure from the parameters  <a href="input__type_8h.html#a26f363df8042bd869bd06d36744bfbee">More...</a><br /></td></tr>
+<tr class="separator:a26f363df8042bd869bd06d36744bfbee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae174cb0d7c7d94f22ee29379c80b73b8"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input__type_8h.html#ae174cb0d7c7d94f22ee29379c80b73b8">input_type_save_state</a> (<a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *state, <a class="el" href="input__type__none_8h.html#structinput__type__params__t">input_type_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>)</td></tr>
+<tr class="memdesc:ae174cb0d7c7d94f22ee29379c80b73b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">save parameters and state back to SDRAM for reading by host and recovery on restart  <a href="input__type_8h.html#ae174cb0d7c7d94f22ee29379c80b73b8">More...</a><br /></td></tr>
+<tr class="separator:ae174cb0d7c7d94f22ee29379c80b73b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81523b64ae8f05a21338702d0551e9e6"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input__type_8h.html#a81523b64ae8f05a21338702d0551e9e6">input_type_get_input_value</a> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *restrict value, <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *input_type, uint16_t num_receptors)</td></tr>
 <tr class="memdesc:a81523b64ae8f05a21338702d0551e9e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the actual input value. This allows any scaling to take place.  <a href="input__type_8h.html#a81523b64ae8f05a21338702d0551e9e6">More...</a><br /></td></tr>
 <tr class="separator:a81523b64ae8f05a21338702d0551e9e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,6 +152,103 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a26f363df8042bd869bd06d36744bfbee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26f363df8042bd869bd06d36744bfbee">&#9670;&nbsp;</a></span>input_type_initialise()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void input_type_initialise </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="input__type__none_8h.html#structinput__type__params__t">input_type_params_t</a> *&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_steps_per_timestep</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>initialise the structure from the parameters </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">state</td><td>Pointer to the state to set up </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">params</td><td>Pointer to the parameters passed in from host </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_steps_per_timestep</td><td>The number of steps to perform each update </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae174cb0d7c7d94f22ee29379c80b73b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae174cb0d7c7d94f22ee29379c80b73b8">&#9670;&nbsp;</a></span>input_type_save_state()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void input_type_save_state </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="input__type__none_8h.html#structinput__type__params__t">input_type_params_t</a> *&#160;</td>
+          <td class="paramname"><em>params</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>save parameters and state back to SDRAM for reading by host and recovery on restart </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The current state </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">params</td><td>Pointer to structure into which parameter can be written </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a81523b64ae8f05a21338702d0551e9e6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a81523b64ae8f05a21338702d0551e9e6">&#9670;&nbsp;</a></span>input_type_get_input_value()</h2>
 
@@ -314,7 +409,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

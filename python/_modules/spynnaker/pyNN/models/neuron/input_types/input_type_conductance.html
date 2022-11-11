@@ -57,14 +57,10 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">.abstract_input_type</span> <span class="kn">import</span> <span class="n">AbstractInputType</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
 
 <span class="n">E_REV_E</span> <span class="o">=</span> <span class="s2">&quot;e_rev_E&quot;</span>
 <span class="n">E_REV_I</span> <span class="o">=</span> <span class="s2">&quot;e_rev_I&quot;</span>
-
-<span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">E_REV_E</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span>
-    <span class="n">E_REV_I</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span>
-<span class="p">}</span>
 
 
 <span class="k">class</span> <span class="nc">InputTypeConductance</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="p">):</span>
@@ -87,9 +83,10 @@
 <span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># e_rev_E</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># e_rev_I</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Struct</span><span class="p">([(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">E_REV_E</span><span class="p">),</span>
+                     <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">E_REV_I</span><span class="p">)])],</span>
+            <span class="p">{</span><span class="n">E_REV_E</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span> <span class="n">E_REV_I</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__e_rev_E</span> <span class="o">=</span> <span class="n">e_rev_E</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__e_rev_I</span> <span class="o">=</span> <span class="n">e_rev_I</span>
 
@@ -100,24 +97,6 @@
 
 <div class="viewcode-block" id="InputTypeConductance.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.add_state_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="InputTypeConductance.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="InputTypeConductance.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.has_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
-
-<div class="viewcode-block" id="InputTypeConductance.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-
-        <span class="c1"># Add the rest of the data</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">parameters</span><span class="p">[</span><span class="n">E_REV_E</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">E_REV_I</span><span class="p">]]</span></div>
-
-<div class="viewcode-block" id="InputTypeConductance.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="InputTypeConductance.get_global_weight_scale"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_global_weight_scale">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">get_global_weight_scale</span><span class="p">)</span>

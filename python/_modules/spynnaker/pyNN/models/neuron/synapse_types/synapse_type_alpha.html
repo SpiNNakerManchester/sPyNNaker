@@ -54,10 +54,11 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">.abstract_synapse_type</span> <span class="kn">import</span> <span class="n">AbstractSynapseType</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 
 <span class="n">EXC_RESPONSE</span> <span class="o">=</span> <span class="s2">&quot;exc_response&quot;</span>
 <span class="n">EXC_EXP_RESPONSE</span> <span class="o">=</span> <span class="s2">&quot;exc_exp_response&quot;</span>
@@ -67,17 +68,7 @@
 <span class="n">TAU_SYN_I</span> <span class="o">=</span> <span class="s2">&quot;tau_syn_I&quot;</span>
 <span class="n">Q_EXC</span> <span class="o">=</span> <span class="s2">&quot;q_exc&quot;</span>
 <span class="n">Q_INH</span> <span class="o">=</span> <span class="s2">&quot;q_inh&quot;</span>
-
-<span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">EXC_RESPONSE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">EXC_EXP_RESPONSE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">TAU_SYN_E</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">,</span>
-    <span class="n">Q_EXC</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">INH_RESPONSE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">INH_EXP_RESPONSE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">TAU_SYN_I</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">,</span>
-    <span class="n">Q_INH</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
-<span class="p">}</span>
+<span class="n">TIMESTEP_MS</span> <span class="o">=</span> <span class="s2">&quot;timestep_ms&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">SynapseTypeAlpha</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="p">):</span>
@@ -119,17 +110,19 @@
 <span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># exc_response</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># exc_exp_response</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># 1 / tau_syn_E^2</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">,</span>    <span class="c1"># e^(-ts / tau_syn_E)</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># excitatory q</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># inh_response</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># inh_exp_response</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># 1 / tau_syn_I^2</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">,</span>    <span class="c1"># e^(-ts / tau_syn_I)</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># inhibitory q</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Struct</span><span class="p">([</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">EXC_RESPONSE</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">EXC_EXP_RESPONSE</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">Q_EXC</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">TAU_SYN_E</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">INH_RESPONSE</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">INH_EXP_RESPONSE</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">Q_INH</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">TAU_SYN_I</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">TIMESTEP_MS</span><span class="p">)])],</span>
+            <span class="p">{</span><span class="n">EXC_RESPONSE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">EXC_EXP_RESPONSE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">TAU_SYN_E</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">,</span>
+             <span class="n">INH_RESPONSE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">INH_EXP_RESPONSE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">TAU_SYN_I</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">})</span>
 
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__exc_response</span> <span class="o">=</span> <span class="n">exc_response</span>
@@ -151,49 +144,9 @@
         <span class="n">state_variables</span><span class="p">[</span><span class="n">Q_EXC</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">state_variables</span><span class="p">[</span><span class="n">INH_RESPONSE</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__inh_response</span>
         <span class="n">state_variables</span><span class="p">[</span><span class="n">INH_EXP_RESPONSE</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__inh_exp_response</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">Q_INH</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div>
-
-<div class="viewcode-block" id="SynapseTypeAlpha.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="SynapseTypeAlpha.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.has_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
-
-<div class="viewcode-block" id="SynapseTypeAlpha.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int ts: machine time step</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">init</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>  <span class="c1"># noqa: E731</span>
-        <span class="n">decay</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span><span class="p">)</span>  <span class="c1"># noqa: E731</span>
-
-        <span class="c1"># Add the rest of the data</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">state_variables</span><span class="p">[</span><span class="n">EXC_RESPONSE</span><span class="p">],</span>
-                <span class="n">state_variables</span><span class="p">[</span><span class="n">EXC_EXP_RESPONSE</span><span class="p">],</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_E</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="n">init</span><span class="p">),</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_E</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="n">decay</span><span class="p">),</span>
-                <span class="n">state_variables</span><span class="p">[</span><span class="n">Q_EXC</span><span class="p">],</span>
-                <span class="n">state_variables</span><span class="p">[</span><span class="n">INH_RESPONSE</span><span class="p">],</span>
-                <span class="n">state_variables</span><span class="p">[</span><span class="n">INH_EXP_RESPONSE</span><span class="p">],</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_I</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="n">init</span><span class="p">),</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_I</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="n">decay</span><span class="p">),</span>
-                <span class="n">state_variables</span><span class="p">[</span><span class="n">Q_INH</span><span class="p">]]</span></div>
-
-<div class="viewcode-block" id="SynapseTypeAlpha.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-
-        <span class="c1"># Read the data</span>
-        <span class="p">(</span><span class="n">exc_resp</span><span class="p">,</span> <span class="n">exc_exp_resp</span><span class="p">,</span> <span class="n">_dt_over_tau_E_sq</span><span class="p">,</span> <span class="n">_exp_tau_E</span><span class="p">,</span> <span class="n">q_exc</span><span class="p">,</span>
-         <span class="n">inh_resp</span><span class="p">,</span> <span class="n">inh_exp_resp</span><span class="p">,</span> <span class="n">_dt_over_tau_I_sq</span><span class="p">,</span> <span class="n">_exp_tau_I</span><span class="p">,</span> <span class="n">q_inh</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
-
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">EXC_RESPONSE</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc_resp</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">EXC_EXP_RESPONSE</span><span class="p">]</span> <span class="o">=</span> <span class="n">exc_exp_resp</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">Q_EXC</span><span class="p">]</span> <span class="o">=</span> <span class="n">q_exc</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">INH_RESPONSE</span><span class="p">]</span> <span class="o">=</span> <span class="n">inh_resp</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">INH_EXP_RESPONSE</span><span class="p">]</span> <span class="o">=</span> <span class="n">inh_exp_resp</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">Q_INH</span><span class="p">]</span> <span class="o">=</span> <span class="n">q_inh</span></div>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">Q_INH</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">TIMESTEP_MS</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="SynapseTypeAlpha.get_n_synapse_types"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.get_n_synapse_types">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_synapse_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -57,14 +57,10 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">.abstract_synapse_type</span> <span class="kn">import</span> <span class="n">AbstractSynapseType</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
 
 <span class="n">ISYN_EXC</span> <span class="o">=</span> <span class="s2">&quot;isyn_exc&quot;</span>
 <span class="n">ISYN_INH</span> <span class="o">=</span> <span class="s2">&quot;isyn_inh&quot;</span>
-
-<span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">ISYN_EXC</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">ISYN_EXC</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
-<span class="p">}</span>
 
 
 <span class="k">class</span> <span class="nc">SynapseTypeDelta</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="p">):</span>
@@ -85,9 +81,11 @@
 <span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># isyn_exc</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># isyn_inh</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Struct</span><span class="p">([</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">ISYN_EXC</span><span class="p">),</span>  <span class="c1"># isyn_exc</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">ISYN_INH</span><span class="p">)])],</span>  <span class="c1"># isyn_inh</span>
+            <span class="p">{</span><span class="n">ISYN_EXC</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ISYN_EXC</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_exc</span> <span class="o">=</span> <span class="n">isyn_exc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_inh</span> <span class="o">=</span> <span class="n">isyn_inh</span>
 
@@ -99,27 +97,6 @@
     <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
         <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_EXC</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_exc</span>
         <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_INH</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isyn_inh</span></div>
-
-<div class="viewcode-block" id="SynapseTypeDelta.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="SynapseTypeDelta.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.has_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
-
-<div class="viewcode-block" id="SynapseTypeDelta.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="c1"># Add the rest of the data</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_EXC</span><span class="p">],</span> <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_INH</span><span class="p">]]</span></div>
-
-<div class="viewcode-block" id="SynapseTypeDelta.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="c1"># Read the data</span>
-        <span class="p">(</span><span class="n">isyn_exc</span><span class="p">,</span> <span class="n">isyn_inh</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
-
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_EXC</span><span class="p">]</span> <span class="o">=</span> <span class="n">isyn_exc</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_INH</span><span class="p">]</span> <span class="o">=</span> <span class="n">isyn_inh</span></div>
 
 <div class="viewcode-block" id="SynapseTypeDelta.get_n_synapse_types"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.get_n_synapse_types">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_synapse_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

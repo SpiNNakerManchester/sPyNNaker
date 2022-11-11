@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['additional_5finput_5fpointer_5ft_4800',['additional_input_pointer_t',['../additional__input_8h.html#a2c12126afb370d66fb361daac93067cb',1,'additional_input.h']]]
+  ['card_4816',['Card',['../maths-util_8h.html#a63fe77b0ec710597cb0b69eee8d90aaf',1,'maths-util.h']]],
+  ['control_5ft_4817',['control_t',['../synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2',1,'synapse_row.h']]]
 ];

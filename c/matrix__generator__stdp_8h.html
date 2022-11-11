@@ -95,24 +95,37 @@ Data Structures</h2></td></tr>
 <tr class="memitem:structrow__fixed__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#structrow__fixed__t">row_fixed_t</a></td></tr>
 <tr class="memdesc:structrow__fixed__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The layout of the fixed synapse region of the row; the fixed-fixed region is empty.  <a href="matrix__generator__stdp_8h.html#structrow__fixed__t">More...</a><br /></td></tr>
 <tr class="separator:structrow__fixed__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:structmatrix__generator__stdp"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#structmatrix__generator__stdp">matrix_generator_stdp</a></td></tr>
-<tr class="memdesc:structmatrix__generator__stdp"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data for the generator.  <a href="matrix__generator__stdp_8h.html#structmatrix__generator__stdp">More...</a><br /></td></tr>
-<tr class="separator:structmatrix__generator__stdp"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structmatrix__generator__stdp__data__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#structmatrix__generator__stdp__data__t">matrix_generator_stdp_data_t</a></td></tr>
+<tr class="memdesc:structmatrix__generator__stdp__data__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data for the generator.  <a href="matrix__generator__stdp_8h.html#structmatrix__generator__stdp__data__t">More...</a><br /></td></tr>
+<tr class="separator:structmatrix__generator__stdp__data__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:unionmatrix__generator__stdp__data__t_8____unnamed25____"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#unionmatrix__generator__stdp__data__t_8____unnamed25____">matrix_generator_stdp_data_t.__unnamed25__</a></td></tr>
+<tr class="separator:unionmatrix__generator__stdp__data__t_8____unnamed25____"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:unionmatrix__generator__stdp__data__t_8____unnamed27____"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#unionmatrix__generator__stdp__data__t_8____unnamed27____">matrix_generator_stdp_data_t.__unnamed27__</a></td></tr>
+<tr class="separator:unionmatrix__generator__stdp__data__t_8____unnamed27____"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a0ddb143edd7818571ecf6ccb2d22abb9"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#a0ddb143edd7818571ecf6ccb2d22abb9">matrix_generator_stdp_initialize</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:a0ddb143edd7818571ecf6ccb2d22abb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the STDP synaptic matrix generator.  <a href="matrix__generator__stdp_8h.html#a0ddb143edd7818571ecf6ccb2d22abb9">More...</a><br /></td></tr>
-<tr class="separator:a0ddb143edd7818571ecf6ccb2d22abb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0ccbf6127b7bd9ba00efc3ba17373e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#aa0ccbf6127b7bd9ba00efc3ba17373e9">matrix_generator_stdp_free</a> (void *generator)</td></tr>
-<tr class="memdesc:aa0ccbf6127b7bd9ba00efc3ba17373e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free any data for the STDP synaptic matrix generator.  <a href="matrix__generator__stdp_8h.html#aa0ccbf6127b7bd9ba00efc3ba17373e9">More...</a><br /></td></tr>
-<tr class="separator:aa0ccbf6127b7bd9ba00efc3ba17373e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a5ed9ae80176b92497373cd16a53989"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#a3a5ed9ae80176b92497373cd16a53989">plastic_half_words</a> (uint32_t n_half_words_per_pp_header, uint32_t n_half_words_per_pp_synapse, uint32_t max_row_n_synapses)</td></tr>
+<tr class="memdesc:a3a5ed9ae80176b92497373cd16a53989"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum number of plastic half-words in a row.  <a href="matrix__generator__stdp_8h.html#a3a5ed9ae80176b92497373cd16a53989">More...</a><br /></td></tr>
+<tr class="separator:a3a5ed9ae80176b92497373cd16a53989"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fd79284f87d27ffb21c99534d6b8156"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="matrix__generator__stdp_8h.html#structrow__fixed__t">row_fixed_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#a7fd79284f87d27ffb21c99534d6b8156">get_stdp_fixed_row</a> (<a class="el" href="matrix__generator__stdp_8h.html#structrow__plastic__t">row_plastic_t</a> *plastic_row, uint32_t n_half_words_per_pp_header, uint32_t n_half_words_per_pp_synapse, uint32_t max_row_n_synapses)</td></tr>
+<tr class="memdesc:a7fd79284f87d27ffb21c99534d6b8156"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the fixed part of a row that comes after the plastic part. Note that this assumes the max row size in number of synapses.  <a href="matrix__generator__stdp_8h.html#a7fd79284f87d27ffb21c99534d6b8156">More...</a><br /></td></tr>
+<tr class="separator:a7fd79284f87d27ffb21c99534d6b8156"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a730440b766c56973dcde444c94792da1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#a730440b766c56973dcde444c94792da1">setup_stdp_rows</a> (uint32_t *matrix, uint32_t n_rows, uint32_t n_half_words_per_pp_header, uint32_t n_half_words_per_pp_synapse, uint32_t max_row_n_synapses, uint32_t max_row_n_words)</td></tr>
+<tr class="memdesc:a730440b766c56973dcde444c94792da1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the rows so that they are ready for writing to.  <a href="matrix__generator__stdp_8h.html#a730440b766c56973dcde444c94792da1">More...</a><br /></td></tr>
+<tr class="separator:a730440b766c56973dcde444c94792da1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad136b625e3f52e67d888a50058e43a16"><td class="memItemLeft" align="right" valign="top">static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#ad136b625e3f52e67d888a50058e43a16">build_fixed_plastic_half_word</a> (uint16_t delay, uint32_t type, uint32_t post_index, uint32_t <a class="el" href="synapses_8h.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a>, uint32_t <a class="el" href="synapses_8h.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, uint32_t delay_bits)</td></tr>
 <tr class="memdesc:ad136b625e3f52e67d888a50058e43a16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a fixed-plastic half-word from its components.  <a href="matrix__generator__stdp_8h.html#ad136b625e3f52e67d888a50058e43a16">More...</a><br /></td></tr>
 <tr class="separator:ad136b625e3f52e67d888a50058e43a16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e08d07102afbb52373e761318380e97"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#a7e08d07102afbb52373e761318380e97">matrix_generator_stdp_write_row</a> (void *generator, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t <a class="el" href="synapses_8h.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a>, uint32_t <a class="el" href="synapses_8h.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_per_stage)</td></tr>
-<tr class="memdesc:a7e08d07102afbb52373e761318380e97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a row of a STDP synaptic matrix.  <a href="matrix__generator__stdp_8h.html#a7e08d07102afbb52373e761318380e97">More...</a><br /></td></tr>
-<tr class="separator:a7e08d07102afbb52373e761318380e97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06a33655a1c01edaf72f5d4403608823"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#a06a33655a1c01edaf72f5d4403608823">matrix_generator_stdp_initialize</a> (void **<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>, void *synaptic_matrix)</td></tr>
+<tr class="memdesc:a06a33655a1c01edaf72f5d4403608823"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the STDP synaptic matrix generator.  <a href="matrix__generator__stdp_8h.html#a06a33655a1c01edaf72f5d4403608823">More...</a><br /></td></tr>
+<tr class="separator:a06a33655a1c01edaf72f5d4403608823"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0ccbf6127b7bd9ba00efc3ba17373e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#aa0ccbf6127b7bd9ba00efc3ba17373e9">matrix_generator_stdp_free</a> (void *generator)</td></tr>
+<tr class="memdesc:aa0ccbf6127b7bd9ba00efc3ba17373e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free any data for the STDP synaptic matrix generator.  <a href="matrix__generator__stdp_8h.html#aa0ccbf6127b7bd9ba00efc3ba17373e9">More...</a><br /></td></tr>
+<tr class="separator:aa0ccbf6127b7bd9ba00efc3ba17373e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7dc79c13959aa923b5193e825048565"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__stdp_8h.html#aa7dc79c13959aa923b5193e825048565">matrix_generator_stdp_write_synapse</a> (void *generator, uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay, unsigned long accum weight_scale)</td></tr>
+<tr class="memdesc:aa7dc79c13959aa923b5193e825048565"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to write a synapse to a matrix.  <a href="matrix__generator__stdp_8h.html#aa7dc79c13959aa923b5193e825048565">More...</a><br /></td></tr>
+<tr class="separator:aa7dc79c13959aa923b5193e825048565"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>STDP synaptic matrix implementation. </p>
@@ -189,14 +202,14 @@ the fixed-plastic data within the fixed region </td></tr>
 
 </div>
 </div>
-<a name="structmatrix__generator__stdp" id="structmatrix__generator__stdp"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structmatrix__generator__stdp">&#9670;&nbsp;</a></span>matrix_generator_stdp</h2>
+<a name="structmatrix__generator__stdp__data__t" id="structmatrix__generator__stdp__data__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structmatrix__generator__stdp__data__t">&#9670;&nbsp;</a></span>matrix_generator_stdp_data_t</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct matrix_generator_stdp</td>
+          <td class="memname">struct matrix_generator_stdp_data_t</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -206,19 +219,103 @@ the fixed-plastic data within the fixed region </td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a id="aa5737732096b5f67fca029d1f2aed44c"></a>uint32_t</td>
+<a id="ac1d2993daff6c111f05aa774659703e5"></a>union <a class="el" href="matrix__generator__stdp_8h.html#unionmatrix__generator__stdp__data__t_8____unnamed25____">matrix_generator_stdp_data_t</a></td>
+<td class="fieldname">
+__unnamed__</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="ac85b5f824fecfc192e9198df6a0f590e"></a>union <a class="el" href="matrix__generator__stdp_8h.html#unionmatrix__generator__stdp__data__t_8____unnamed27____">matrix_generator_stdp_data_t</a></td>
+<td class="fieldname">
+__unnamed__</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a5373ffe70ce452ba9bb3f76d506b7ed1"></a>uint32_t</td>
+<td class="fieldname">
+max_row_n_synapses</td>
+<td class="fielddoc">
+The maximum number of synapses on a row. </td></tr>
+<tr><td class="fieldtype">
+<a id="ad1e8ca16398cc8fc3414ef587d7b6739"></a>uint32_t</td>
+<td class="fieldname">
+max_delayed_row_n_synapses</td>
+<td class="fielddoc">
+The maximum number of synapses on a delayed row. </td></tr>
+<tr><td class="fieldtype">
+<a id="abd7ab500589a86984b976070bc626b29"></a>uint32_t</td>
+<td class="fieldname">
+max_row_n_words</td>
+<td class="fielddoc">
+The maximum number of words on a row. </td></tr>
+<tr><td class="fieldtype">
+<a id="a4f6423f80ded8e29e357b6b5cb9a6e7d"></a>uint32_t</td>
+<td class="fieldname">
+max_delayed_row_n_words</td>
+<td class="fielddoc">
+The maximum number of words on a delayed row. </td></tr>
+<tr><td class="fieldtype">
+<a id="a1397a13cdf7986fe0dc619643b7f2e35"></a>uint32_t</td>
+<td class="fieldname">
+synapse_type</td>
+<td class="fielddoc">
+The matrix synapse type. </td></tr>
+<tr><td class="fieldtype">
+<a id="ae24d1dfe8862caee856ac234da3f8c51"></a>uint32_t</td>
+<td class="fieldname">
+synapse_type_bits</td>
+<td class="fielddoc">
+The number of bits needed to represent the synapse type. </td></tr>
+<tr><td class="fieldtype">
+<a id="aef196080cb2260eaca3cc93a38385a50"></a>uint32_t</td>
+<td class="fieldname">
+synapse_index_bits</td>
+<td class="fielddoc">
+The number of bits needed to represent the synapse neuron id. </td></tr>
+<tr><td class="fieldtype">
+<a id="a14527414e8f4cc7e50b568075162f6cc"></a>uint32_t</td>
+<td class="fieldname">
+max_stage</td>
+<td class="fielddoc">
+The maximum delay stage, including 0 for no delay stage. </td></tr>
+<tr><td class="fieldtype">
+<a id="ace136fe2521eb720c36274494ca3d6bb"></a>uint32_t</td>
+<td class="fieldname">
+max_delay_per_stage</td>
+<td class="fielddoc">
+The maximum delay per delay stage in time steps. </td></tr>
+<tr><td class="fieldtype">
+<a id="a6ccfcbaddf0bbe569448ea56534b49cb"></a>uint32_t</td>
+<td class="fieldname">
+delay_bits</td>
+<td class="fielddoc">
+The number of bits needed to represent the maximum delay per stage. </td></tr>
+<tr><td class="fieldtype">
+<a id="a473d65f4a7583a8f9166549b15a2ba07"></a>uint32_t</td>
+<td class="fieldname">
+n_pre_neurons</td>
+<td class="fielddoc">
+The number of pre-synaptic neurons. </td></tr>
+<tr><td class="fieldtype">
+<a id="abe6c585e4aa85cb2bbe7a201a3618ee1"></a>uint32_t</td>
+<td class="fieldname">
+n_pre_neurons_per_core</td>
+<td class="fielddoc">
+The number of pre-synaptic neurons per core. </td></tr>
+<tr><td class="fieldtype">
+<a id="aaf18d9fbe16ef43e0a03a2a6bf6eec8c"></a>uint32_t</td>
 <td class="fieldname">
 n_half_words_per_pp_row_header</td>
 <td class="fielddoc">
 The number of half-words in a plastic-plastic row header. </td></tr>
 <tr><td class="fieldtype">
-<a id="ab29da34a8c2311993638cb6a258d1b4a"></a>uint32_t</td>
+<a id="a9f0a9c8b5ab09642db74da57a9404f87"></a>uint32_t</td>
 <td class="fieldname">
 n_half_words_per_pp_synapse</td>
 <td class="fielddoc">
 The number of half-words in each plastic-plastic synapse. </td></tr>
 <tr><td class="fieldtype">
-<a id="ac7ef0134f0184dc3c7819ab29f022bbb"></a>uint32_t</td>
+<a id="ac39c09c2359f42c6423c6abb3269bf4c"></a>uint32_t</td>
 <td class="fieldname">
 weight_half_word</td>
 <td class="fielddoc">
@@ -227,61 +324,258 @@ The index of the half-word that will contain the weight. </td></tr>
 
 </div>
 </div>
+<a name="unionmatrix__generator__stdp__data__t_8____unnamed25____" id="unionmatrix__generator__stdp__data__t_8____unnamed25____"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#unionmatrix__generator__stdp__data__t_8____unnamed25____">&#9670;&nbsp;</a></span>matrix_generator_stdp_data_t.__unnamed25__</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">union matrix_generator_stdp_data_t.__unnamed25__</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock">
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00047">47</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="af6b400c26840513b7ee58df3bf0ac2be"></a>uint32_t *</td>
+<td class="fieldname">
+synaptic_matrix</td>
+<td class="fielddoc">
+The address of the synaptic matrix (once initialised) </td></tr>
+<tr><td class="fieldtype">
+<a id="adcfd35c31907352e33cd6f35ef1fb389"></a>uint32_t</td>
+<td class="fieldname">
+synaptic_matrix_offset</td>
+<td class="fielddoc">
+The offset of the synaptic matrix (as read from SDRAM) </td></tr>
+</table>
+
+</div>
+</div>
+<a name="unionmatrix__generator__stdp__data__t_8____unnamed27____" id="unionmatrix__generator__stdp__data__t_8____unnamed27____"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#unionmatrix__generator__stdp__data__t_8____unnamed27____">&#9670;&nbsp;</a></span>matrix_generator_stdp_data_t.__unnamed27__</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">union matrix_generator_stdp_data_t.__unnamed27__</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock">
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00053">53</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="afe6ef05d5c6b9526753307f711cd2917"></a>uint32_t *</td>
+<td class="fieldname">
+delayed_synaptic_matrix</td>
+<td class="fielddoc">
+The address of the delayed synaptic matrix (once initialised) </td></tr>
+<tr><td class="fieldtype">
+<a id="a1bdd384087e001d00dfc05da0ecfa5c2"></a>uint32_t</td>
+<td class="fieldname">
+delayed_matrix_offset</td>
+<td class="fielddoc">
+The offset of the delayed synaptic matrix (as read from SDRAM) </td></tr>
+</table>
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a0ddb143edd7818571ecf6ccb2d22abb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0ddb143edd7818571ecf6ccb2d22abb9">&#9670;&nbsp;</a></span>matrix_generator_stdp_initialize()</h2>
+<a id="a3a5ed9ae80176b92497373cd16a53989"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a5ed9ae80176b92497373cd16a53989">&#9670;&nbsp;</a></span>plastic_half_words()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void* matrix_generator_stdp_initialize </td>
+          <td class="memname">static uint32_t plastic_half_words </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
-          <td class="paramname"><em>region</em></td><td>)</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_half_words_per_pp_header</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_half_words_per_pp_synapse</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_row_n_synapses</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Initialise the STDP synaptic matrix generator. </p>
+<p>Get the maximum number of plastic half-words in a row. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>Region to read parameters from. Should be updated to position just after parameters after calling. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_half_words_per_pp_header</td><td>the number of half-words at the start of each row </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_half_words_per_pp_synapse</td><td>the number of half-words used by each synapse </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_row_n_synapses</td><td>the maximum number of synapses in a row </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of plastic half-words in a maximum length row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00061">61</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00100">100</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
-<a id="aa0ccbf6127b7bd9ba00efc3ba17373e9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0ccbf6127b7bd9ba00efc3ba17373e9">&#9670;&nbsp;</a></span>matrix_generator_stdp_free()</h2>
+<a id="a7fd79284f87d27ffb21c99534d6b8156"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fd79284f87d27ffb21c99534d6b8156">&#9670;&nbsp;</a></span>get_stdp_fixed_row()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void matrix_generator_stdp_free </td>
+          <td class="memname">static <a class="el" href="matrix__generator__stdp_8h.html#structrow__fixed__t">row_fixed_t</a>* get_stdp_fixed_row </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>generator</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="matrix__generator__stdp_8h.html#structrow__plastic__t">row_plastic_t</a> *&#160;</td>
+          <td class="paramname"><em>plastic_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_half_words_per_pp_header</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_half_words_per_pp_synapse</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_row_n_synapses</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Free any data for the STDP synaptic matrix generator. </p>
+<p>Get the fixed part of a row that comes after the plastic part. Note that this assumes the max row size in number of synapses. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">plastic_row</td><td>A pointer to the row to find the fixed part of </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_half_words_per_pp_header</td><td>the (even) number of header words at the start of the plastic data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_half_words_per_pp_synapse</td><td>the number of half-words in each synapse, not necessarily even </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_row_n_synapses</td><td>the maximum number of synapses in the row </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the fixed part of the row assuming all synapses used </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00121">121</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+
+</div>
+</div>
+<a id="a730440b766c56973dcde444c94792da1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a730440b766c56973dcde444c94792da1">&#9670;&nbsp;</a></span>setup_stdp_rows()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void setup_stdp_rows </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_rows</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_half_words_per_pp_header</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_half_words_per_pp_synapse</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_row_n_synapses</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_row_n_words</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set up the rows so that they are ready for writing to. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix</td><td>The base address of the matrix to set up </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_rows</td><td>The number of rows in the matrix </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_half_words_per_pp_header</td><td>The number of half-words at the start of each row </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_half_words_per_pp_synapse</td><td>The number of half-words used by each synapse </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_row_n_synapses</td><td>The maximum number of synapses in a row </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_row_n_words</td><td>The maximum number of words used by a row </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00077">77</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00140">140</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
@@ -357,111 +651,27 @@ The index of the half-word that will contain the weight. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A half-word fixed-plastic synapse </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00091">91</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00173">173</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
-<a id="a7e08d07102afbb52373e761318380e97"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7e08d07102afbb52373e761318380e97">&#9670;&nbsp;</a></span>matrix_generator_stdp_write_row()</h2>
+<a id="a06a33655a1c01edaf72f5d4403608823"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06a33655a1c01edaf72f5d4403608823">&#9670;&nbsp;</a></span>matrix_generator_stdp_initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void matrix_generator_stdp_write_row </td>
+          <td class="memname">void* matrix_generator_stdp_initialize </td>
           <td>(</td>
+          <td class="paramtype">void **&#160;</td>
+          <td class="paramname"><em>region</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>generator</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
-          <td class="paramname"><em>synaptic_matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
-          <td class="paramname"><em>delayed_synaptic_matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n_pre_neurons</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>max_row_n_words</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>max_delayed_row_n_words</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>synapse_type_bits</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>synapse_index_bits</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>synapse_type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n_synapses</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>delays</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>weights</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>max_stage</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>max_delay_per_stage</em>&#160;</td>
+          <td class="paramname"><em>synaptic_matrix</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -471,37 +681,127 @@ The index of the half-word that will contain the weight. </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Generate a row of a STDP synaptic matrix. </p>
+<p>Initialise the STDP synaptic matrix generator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The data for the matrix generator, returned by the initialise function </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">synaptic_matrix</td><td>The address of the synaptic matrix to write to </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">delayed_synaptic_matrix</td><td>The address of the synaptic matrix to write delayed connections to </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_pre_neurons</td><td>The number of pre neurons to generate for </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the first pre neuron </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">max_row_n_words</td><td>The maximum number of words in a normal row </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">max_delayed_row_n_words</td><td>The maximum number of words in a delayed row </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_bits</td><td>The number of bits used for the synapse type </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_bits</td><td>The number of bits used for the neuron id </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type</td><td>The synapse type of each connection </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_synapses</td><td>The number of synapses </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>Pointer to table of indices </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">delays</td><td>Pointer to table of delays </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">weights</td><td>Pointer to table of weights </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">max_stage</td><td>The maximum delay stage to support </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">max_delay_per_stage</td><td>the max delay per delay stage </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>Region to read parameters from. Should be updated to position just after parameters after calling. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synaptic_matrix</td><td>The base address of the synaptic matrix </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00197">197</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+
+</div>
+</div>
+<a id="aa0ccbf6127b7bd9ba00efc3ba17373e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0ccbf6127b7bd9ba00efc3ba17373e9">&#9670;&nbsp;</a></span>matrix_generator_stdp_free()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void matrix_generator_stdp_free </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Free any data for the STDP synaptic matrix generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00130">130</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00237">237</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
+
+</div>
+</div>
+<a id="aa7dc79c13959aa923b5193e825048565"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7dc79c13959aa923b5193e825048565">&#9670;&nbsp;</a></span>matrix_generator_stdp_write_synapse()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool matrix_generator_stdp_write_synapse </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pre_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>post_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">accum&#160;</td>
+          <td class="paramname"><em>weight</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>delay</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned long accum&#160;</td>
+          <td class="paramname"><em>weight_scale</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>How to write a synapse to a matrix. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pre_index</td><td>The index of the pre-neuron relative to the start of the matrix </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">post_index</td><td>The index of the post-neuron on this core </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">weight</td><td>The weight of the synapse in raw form </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delay</td><td>The delay of the synapse in time steps </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">weight_scale</td><td>The scale to apply to the weight if needed </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="matrix__generator__stdp_8h_source.html#l00251">251</a> of file <a class="el" href="matrix__generator__stdp_8h_source.html">matrix_generator_stdp.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

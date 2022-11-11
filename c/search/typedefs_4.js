@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['generate_5fconnection_5ffunc_4807',['generate_connection_func',['../generator__types_8h.html#a074270ea0663c44b9bcc392c1fcb935e',1,'generator_types.h']]],
-  ['generate_5fparam_5ffunc_4808',['generate_param_func',['../generator__types_8h.html#a776082247e99447649d185bdd6b8f777',1,'generator_types.h']]],
-  ['generate_5frow_5ffunc_4809',['generate_row_func',['../generator__types_8h.html#a8d1b332d6f35a47155fc48aabebeaf80',1,'generator_types.h']]],
-  ['generator_5fhash_5ft_4810',['generator_hash_t',['../generator__types_8h.html#a55f8d20fc9350939e3fa6a85d8aed90c',1,'generator_types.h']]],
-  ['global_5fneuron_5fparams_5fpointer_5ft_4811',['global_neuron_params_pointer_t',['../neuron__model_8h.html#af6a73a4c591000fae3ac1f7e879b9a36',1,'neuron_model.h']]]
+  ['initialize_5fconnector_5ffunc_4825',['initialize_connector_func',['../generator__types_8h.html#aa2bb0f66f4f24dc4e04b844f1b8c8453',1,'generator_types.h']]],
+  ['initialize_5fmatrix_5ffunc_4826',['initialize_matrix_func',['../generator__types_8h.html#a5cbf8d694bdaf766029ecedfa941d5a5',1,'generator_types.h']]],
+  ['initialize_5fparam_5ffunc_4827',['initialize_param_func',['../generator__types_8h.html#a0a50a2e28c5d94827d681367fb6930f8',1,'generator_types.h']]],
+  ['input_5ft_4828',['input_t',['../neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591',1,'neuron-typedefs.h']]]
 ];

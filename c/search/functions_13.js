@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['vcpu_3549',['vcpu',['../bit__field__expander_8c.html#a3f6a8a68b4b17ff5dfc9625fcbca0ba5',1,'bit_field_expander.c']]]
+  ['zero_5fspike_5fcounters_3578',['zero_spike_counters',['../delay__extension_8c.html#a5cc35d1e25ce49ad5799713dabd2abb9',1,'delay_extension.c']]]
 ];

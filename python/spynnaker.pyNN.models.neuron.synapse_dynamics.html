@@ -70,9 +70,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.gen_matrix_params">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gen_matrix_params</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.gen_matrix_params" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gen_matrix_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delayed_matrix_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_row_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pre_atoms_per_core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_post_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_generate_on_machine.html#AbstractGenerateOnMachine.gen_matrix_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.gen_matrix_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Any parameters required by the matrix generator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -83,7 +83,7 @@
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.gen_matrix_params_size_in_bytes">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gen_matrix_params_size_in_bytes</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.gen_matrix_params_size_in_bytes" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gen_matrix_params_size_in_bytes</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.gen_matrix_params_size_in_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The size of the parameters of the matrix generator in bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -163,7 +163,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_plastic_synaptic_data">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_row_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_synapses</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_plastic_synapse_dynamics.html#AbstractPlasticSynapseDynamics.get_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_row_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_plastic_synapse_dynamics.html#AbstractPlasticSynapseDynamics.get_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the fixed-plastic data, and plastic-plastic data for each row,            and lengths for the fixed_plastic and plastic-plastic parts of            each row.</p>
 <p>Data is returned as an array made up of an array of 32-bit words for        each row, for each of the fixed-plastic and plastic-plastic data        regions.  The row into which connection should go is given by        <cite>connection_row_indices</cite>, and the total number of rows is given by        <cite>n_rows</cite>.</p>
 <p>Lengths are returned as an array made up of an integer for each row,        for each of the fixed-plastic and plastic-plastic regions.</p>
@@ -176,6 +176,7 @@
 <li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the post vertex to get the connections for</p></li>
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of synapse types</p></li>
 <li><p><strong>max_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of synapses to generate</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of atoms on a core</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -190,7 +191,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.read_plastic_synaptic_data">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_plastic_synapse_dynamics.html#AbstractPlasticSynapseDynamics.read_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.read_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_plastic_synapse_dynamics.html#AbstractPlasticSynapseDynamics.read_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.read_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the connections indicated in the connection indices from the            data in <cite>pp_data</cite> and <cite>fp_data</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -201,6 +202,7 @@
 <li><p><strong>pp_data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – 2D</p></li>
 <li><p><strong>fp_size</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – 1D</p></li>
 <li><p><strong>fp_data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – 2D</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -404,7 +406,7 @@ weight scale</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.get_static_synaptic_data">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_static_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_row_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_synapses</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_static_synapse_dynamics.html#AbstractStaticSynapseDynamics.get_static_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.get_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_static_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_row_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_static_synapse_dynamics.html#AbstractStaticSynapseDynamics.get_static_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.get_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the fixed-fixed data for each row, and lengths for the            fixed-fixed parts of each row.</p>
 <p>Data is returned as an array made up of an array of 32-bit words for        each row for the fixed-fixed region. The row into which connection        should go is given by <cite>connection_row_indices</cite>, and the total number        of rows is given by <cite>n_rows</cite>.</p>
 <p>Lengths are returned as an array made up of an integer for each row,        for the fixed-fixed region.</p>
@@ -417,6 +419,7 @@ weight scale</p></li>
 <li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the post vertex to generate for</p></li>
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of synapse types</p></li>
 <li><p><strong>max_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of synapses to generate</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of atoms on a core</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -430,7 +433,7 @@ weight scale</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.read_static_synaptic_data">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_static_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_static_synapse_dynamics.html#AbstractStaticSynapseDynamics.read_static_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.read_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_static_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_static_synapse_dynamics.html#AbstractStaticSynapseDynamics.read_static_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.read_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the connections from the words of data in <cite>ff_data</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -439,6 +442,7 @@ weight scale</p></li>
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>ff_size</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – </p></li>
 <li><p><strong>ff_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em>)</em>) – </p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -713,6 +717,20 @@ synapse dynamics object</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_value">
+<span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics.html#AbstractSynapseDynamics.get_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the name of the property</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_vertex_executable_suffix">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_vertex_executable_suffix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics.html#AbstractSynapseDynamics.get_vertex_executable_suffix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the executable suffix for a vertex for this dynamics</p>
@@ -765,6 +783,20 @@ synapse dynamics object</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.is_combined_core_capable">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_combined_core_capable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.is_combined_core_capable" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Determine if the synapse dynamics can run on a core combined with</dt><dd><p>the neuron, or if a separate core is needed.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.merge">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_dynamics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics.html#AbstractSynapseDynamics.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.merge" title="Permalink to this definition">¶</a></dt>
@@ -775,6 +807,20 @@ synapse dynamics object</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics">AbstractSynapseDynamics</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.set_value">
+<span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics.html#AbstractSynapseDynamics.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the name of the parameter to change</p></li>
+<li><p><strong>value</strong> (<em>Any</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – the new value of the parameter to assign</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -925,7 +971,7 @@ synapse dynamics object</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.set_connections">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics_structural.html#AbstractSynapseDynamicsStructural.set_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.set_connections" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/abstract_synapse_dynamics_structural.html#AbstractSynapseDynamicsStructural.set_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.set_connections" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set connections for structural plasticity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -934,8 +980,6 @@ synapse dynamics object</p>
 <li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 <li><p><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) – </p></li>
 <li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p></li>
-<li><p><strong>pre_index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>pre_slice</strong> (<em>Slice</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -986,7 +1030,7 @@ synapse dynamics object</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.</span></span><span class="sig-name descname"><span class="pre">SynapseDynamicsNeuromodulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPlasticSynapseDynamics</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPlasticSynapseDynamics</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine</span></code></a></p>
 <p>Synapses that target a neuromodulation receptor</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.changes_during_run">
@@ -1016,9 +1060,9 @@ synapse dynamics object</p>
 </dl>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.gen_matrix_params">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gen_matrix_params</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.gen_matrix_params" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">gen_matrix_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delayed_matrix_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_row_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pre_atoms_per_core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_post_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_neuromodulation.html#SynapseDynamicsNeuromodulation.gen_matrix_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.gen_matrix_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Any parameters required by the matrix generator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -1132,7 +1176,7 @@ synapse dynamics object</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_plastic_synaptic_data">
-<span class="sig-name descname"><span class="pre">get_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_row_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_synapses</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_neuromodulation.html#SynapseDynamicsNeuromodulation.get_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_row_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_neuromodulation.html#SynapseDynamicsNeuromodulation.get_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the fixed-plastic data, and plastic-plastic data for each row,            and lengths for the fixed_plastic and plastic-plastic parts of            each row.</p>
 <p>Data is returned as an array made up of an array of 32-bit words for        each row, for each of the fixed-plastic and plastic-plastic data        regions.  The row into which connection should go is given by        <cite>connection_row_indices</cite>, and the total number of rows is given by        <cite>n_rows</cite>.</p>
 <p>Lengths are returned as an array made up of an integer for each row,        for each of the fixed-plastic and plastic-plastic regions.</p>
@@ -1145,6 +1189,7 @@ synapse dynamics object</p>
 <li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the post vertex to get the connections for</p></li>
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of synapse types</p></li>
 <li><p><strong>max_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of synapses to generate</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of atoms on a core</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1175,12 +1220,40 @@ synapse dynamics object</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_value">
+<span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_neuromodulation.html#SynapseDynamicsNeuromodulation.get_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the name of the property</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_vertex_executable_suffix">
 <span class="sig-name descname"><span class="pre">get_vertex_executable_suffix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_neuromodulation.html#SynapseDynamicsNeuromodulation.get_vertex_executable_suffix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the executable suffix for a vertex for this dynamics</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.is_combined_core_capable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_combined_core_capable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.is_combined_core_capable" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Determine if the synapse dynamics can run on a core combined with</dt><dd><p>the neuron, or if a separate core is needed.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1226,7 +1299,7 @@ synapse dynamics object</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.read_plastic_synaptic_data">
-<span class="sig-name descname"><span class="pre">read_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_neuromodulation.html#SynapseDynamicsNeuromodulation.read_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.read_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">read_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_neuromodulation.html#SynapseDynamicsNeuromodulation.read_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.read_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the connections indicated in the connection indices from the            data in <cite>pp_data</cite> and <cite>fp_data</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1237,6 +1310,7 @@ synapse dynamics object</p>
 <li><p><strong>pp_data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – 2D</p></li>
 <li><p><strong>fp_size</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – 1D</p></li>
 <li><p><strong>fp_data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – 2D</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1244,6 +1318,20 @@ synapse dynamics object</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.set_value">
+<span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_neuromodulation.html#SynapseDynamicsNeuromodulation.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the name of the parameter to change</p></li>
+<li><p><strong>value</strong> (<em>Any</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – the new value of the parameter to assign</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1296,7 +1384,7 @@ weight scale</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.</span></span><span class="sig-name descname"><span class="pre">SynapseDynamicsSTDP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timing_dependence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_dependence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage_dependence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dendritic_delay_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_to_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backprop_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPlasticSynapseDynamics</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="spynnaker.pyNN.models.abstract_models.AbstractSettable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSettable</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPlasticSynapseDynamics</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine</span></code></a></p>
 <p>The dynamics of a synapse that changes over time using a         Spike Timing Dependent Plasticity (STDP) rule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1362,9 +1450,9 @@ weight scale</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.gen_matrix_params">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gen_matrix_params</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.gen_matrix_params" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">gen_matrix_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delayed_matrix_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_row_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pre_atoms_per_core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_post_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.gen_matrix_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.gen_matrix_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Any parameters required by the matrix generator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -1476,7 +1564,7 @@ weight scale</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_plastic_synaptic_data">
-<span class="sig-name descname"><span class="pre">get_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_row_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_synapses</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.get_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_row_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.get_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the fixed-plastic data, and plastic-plastic data for each row,            and lengths for the fixed_plastic and plastic-plastic parts of            each row.</p>
 <p>Data is returned as an array made up of an array of 32-bit words for        each row, for each of the fixed-plastic and plastic-plastic data        regions.  The row into which connection should go is given by        <cite>connection_row_indices</cite>, and the total number of rows is given by        <cite>n_rows</cite>.</p>
 <p>Lengths are returned as an array made up of an integer for each row,        for each of the fixed-plastic and plastic-plastic regions.</p>
@@ -1489,6 +1577,7 @@ weight scale</p></li>
 <li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the post vertex to get the connections for</p></li>
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of synapse types</p></li>
 <li><p><strong>max_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of synapses to generate</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of atoms on a core</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1567,6 +1656,20 @@ weight scale</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.is_combined_core_capable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_combined_core_capable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.is_combined_core_capable" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Determine if the synapse dynamics can run on a core combined with</dt><dd><p>the neuron, or if a separate core is needed.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.is_same_as">
 <span class="sig-name descname"><span class="pre">is_same_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_dynamics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.is_same_as"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.is_same_as" title="Permalink to this definition">¶</a></dt>
@@ -1618,7 +1721,7 @@ weight scale</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.read_plastic_synaptic_data">
-<span class="sig-name descname"><span class="pre">read_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.read_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.read_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">read_plastic_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.read_plastic_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.read_plastic_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the connections indicated in the connection indices from the            data in <cite>pp_data</cite> and <cite>fp_data</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1629,6 +1732,7 @@ weight scale</p></li>
 <li><p><strong>pp_data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – 2D</p></li>
 <li><p><strong>fp_size</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – 1D</p></li>
 <li><p><strong>fp_data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – 2D</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1702,7 +1806,7 @@ weight scale</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.</span></span><span class="sig-name descname"><span class="pre">SynapseDynamicsStatic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_to_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractStaticSynapseDynamics</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="spynnaker.pyNN.models.abstract_models.AbstractSettable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSettable</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractStaticSynapseDynamics</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine</span></code></a></p>
 <p>The dynamics of a synapse that does not change over time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1734,6 +1838,28 @@ weight scale</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.gen_matrix_id">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gen_matrix_id</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.gen_matrix_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>The ID of the on-machine matrix generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.gen_matrix_params">
+<span class="sig-name descname"><span class="pre">gen_matrix_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delayed_matrix_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_row_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pre_atoms_per_core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_post_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.gen_matrix_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.gen_matrix_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Any parameters required by the matrix generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>(uint32)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.gen_matrix_params_size_in_bytes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gen_matrix_params_size_in_bytes</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.gen_matrix_params_size_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the parameters of the matrix generator in bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -1827,7 +1953,7 @@ weight scale</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_static_synaptic_data">
-<span class="sig-name descname"><span class="pre">get_static_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_row_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_synapses</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.get_static_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_static_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_row_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.get_static_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the fixed-fixed data for each row, and lengths for the            fixed-fixed parts of each row.</p>
 <p>Data is returned as an array made up of an array of 32-bit words for        each row for the fixed-fixed region. The row into which connection        should go is given by <cite>connection_row_indices</cite>, and the total number        of rows is given by <cite>n_rows</cite>.</p>
 <p>Lengths are returned as an array made up of an integer for each row,        for the fixed-fixed region.</p>
@@ -1840,6 +1966,7 @@ weight scale</p></li>
 <li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the post vertex to generate for</p></li>
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of synapse types</p></li>
 <li><p><strong>max_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of synapses to generate</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of atoms on a core</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1852,26 +1979,26 @@ weight scale</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_value">
-<span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.get_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a property</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the name of the property</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Any or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_vertex_executable_suffix">
 <span class="sig-name descname"><span class="pre">get_vertex_executable_suffix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.get_vertex_executable_suffix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the executable suffix for a vertex for this dynamics</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.is_combined_core_capable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_combined_core_capable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.is_combined_core_capable" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Determine if the synapse dynamics can run on a core combined with</dt><dd><p>the neuron, or if a separate core is needed.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1912,7 +2039,7 @@ weight scale</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.read_static_synaptic_data">
-<span class="sig-name descname"><span class="pre">read_static_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.read_static_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.read_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">read_static_synaptic_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ff_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.read_static_synaptic_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.read_static_synaptic_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the connections from the words of data in <cite>ff_data</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1921,20 +2048,7 @@ weight scale</p></li>
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>ff_size</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – </p></li>
 <li><p><strong>ff_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em>)</em>) – </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.set_value">
-<span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.set_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set a property</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the name of the parameter to change</p></li>
-<li><p><strong>value</strong> (<em>Any</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – the new value of the parameter to assign</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -2369,6 +2483,20 @@ It should be different every time called with None.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.is_combined_core_capable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_combined_core_capable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.is_combined_core_capable" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Determine if the synapse dynamics can run on a core combined with</dt><dd><p>the neuron, or if a separate core is needed.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.is_same_as">
 <span class="sig-name descname"><span class="pre">is_same_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_dynamics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_stdp.html#SynapseDynamicsStructuralSTDP.is_same_as"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.is_same_as" title="Permalink to this definition">¶</a></dt>
@@ -2427,7 +2555,7 @@ It should be different every time called with None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.set_connections">
-<span class="sig-name descname"><span class="pre">set_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_stdp.html#SynapseDynamicsStructuralSTDP.set_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.set_connections" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_stdp.html#SynapseDynamicsStructuralSTDP.set_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.set_connections" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set connections for structural plasticity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2436,8 +2564,6 @@ It should be different every time called with None.</p>
 <li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 <li><p><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) – </p></li>
 <li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p></li>
-<li><p><strong>pre_index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>pre_slice</strong> (<em>Slice</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -2739,6 +2865,20 @@ It should be different every time called with None.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.is_combined_core_capable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_combined_core_capable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.is_combined_core_capable" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Determine if the synapse dynamics can run on a core combined with</dt><dd><p>the neuron, or if a separate core is needed.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.is_same_as">
 <span class="sig-name descname"><span class="pre">is_same_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_dynamics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_static.html#SynapseDynamicsStructuralStatic.is_same_as"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.is_same_as" title="Permalink to this definition">¶</a></dt>
@@ -2797,7 +2937,7 @@ It should be different every time called with None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.set_connections">
-<span class="sig-name descname"><span class="pre">set_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_static.html#SynapseDynamicsStructuralStatic.set_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.set_connections" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_structural_static.html#SynapseDynamicsStructuralStatic.set_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.set_connections" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set connections for structural plasticity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2806,8 +2946,6 @@ It should be different every time called with None.</p>
 <li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 <li><p><strong>app_edge</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a>) – </p></li>
 <li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p></li>
-<li><p><strong>pre_index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>pre_slice</strong> (<em>Slice</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -2904,7 +3042,7 @@ It should be different every time called with None.</p>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.synapse_dynamics">Module contents</a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine"><code class="docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.gen_matrix_id"><code class="docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine.gen_matrix_id</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.gen_matrix_params"><code class="docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine.gen_matrix_params</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.gen_matrix_params"><code class="docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine.gen_matrix_params()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.gen_matrix_params_size_in_bytes"><code class="docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine.gen_matrix_params_size_in_bytes</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.generate_on_machine"><code class="docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine.generate_on_machine()</span></code></a></li>
 </ul>
@@ -2960,11 +3098,14 @@ It should be different every time called with None.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_delay_variance"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.get_delay_variance()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_provenance_data"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.get_provenance_data()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_value"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.get_value()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.get_vertex_executable_suffix()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_weight_maximum"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.get_weight_maximum()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_weight_mean"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.get_weight_mean()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_weight_variance"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.get_weight_variance()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.is_combined_core_capable"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.is_combined_core_capable</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.merge"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.merge()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.set_value"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.set_value()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.weight"><code class="docutils literal notranslate"><span class="pre">AbstractSynapseDynamics.weight</span></code></a></li>
 </ul>
 </li>
@@ -2993,7 +3134,7 @@ It should be different every time called with None.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.changes_during_run"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.changes_during_run</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.delay"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.delay</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.gen_matrix_id"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.gen_matrix_id</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.gen_matrix_params"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.gen_matrix_params</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.gen_matrix_params"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.gen_matrix_params()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.gen_matrix_params_size_in_bytes"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.gen_matrix_params_size_in_bytes</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_max_synapses"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.get_max_synapses()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_n_fixed_plastic_words_per_row"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.get_n_fixed_plastic_words_per_row()</span></code></a></li>
@@ -3004,12 +3145,15 @@ It should be different every time called with None.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_plastic_synaptic_data"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.get_plastic_synaptic_data()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_synapse_id_by_target"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.get_synapse_id_by_target()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_value"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.get_value()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.get_vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.get_vertex_executable_suffix()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.is_combined_core_capable"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.is_combined_core_capable</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.is_neuromodulation_same_as"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.is_neuromodulation_same_as()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.is_same_as"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.is_same_as()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.merge"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.merge()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.pad_to_length"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.pad_to_length</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.read_plastic_synaptic_data"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.read_plastic_synaptic_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.set_value"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.set_value()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.tau_c"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.tau_c</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.tau_d"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.tau_d</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsNeuromodulation.w_max"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsNeuromodulation.w_max</span></code></a></li>
@@ -3024,7 +3168,7 @@ It should be different every time called with None.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.delay"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.delay</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.dendritic_delay_fraction"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.dendritic_delay_fraction</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.gen_matrix_id"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.gen_matrix_id</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.gen_matrix_params"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.gen_matrix_params</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.gen_matrix_params"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.gen_matrix_params()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.gen_matrix_params_size_in_bytes"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.gen_matrix_params_size_in_bytes</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_max_synapses"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.get_max_synapses()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_n_fixed_plastic_words_per_row"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.get_n_fixed_plastic_words_per_row()</span></code></a></li>
@@ -3039,6 +3183,7 @@ It should be different every time called with None.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_weight_maximum"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.get_weight_maximum()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_weight_mean"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.get_weight_mean()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_weight_variance"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.get_weight_variance()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.is_combined_core_capable"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.is_combined_core_capable</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.is_same_as"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.is_same_as()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.merge"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.merge()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.merge_neuromodulation"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsSTDP.merge_neuromodulation()</span></code></a></li>
@@ -3056,6 +3201,8 @@ It should be different every time called with None.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.changes_during_run"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.changes_during_run</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.delay"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.delay</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.gen_matrix_id"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.gen_matrix_id</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.gen_matrix_params"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.gen_matrix_params()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.gen_matrix_params_size_in_bytes"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.gen_matrix_params_size_in_bytes</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_max_synapses"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.get_max_synapses()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_n_static_words_per_row"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.get_n_static_words_per_row()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_n_synapses_in_rows"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.get_n_synapses_in_rows()</span></code></a></li>
@@ -3063,13 +3210,12 @@ It should be different every time called with None.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_parameter_names"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.get_parameter_names()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_parameters_sdram_usage_in_bytes"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.get_parameters_sdram_usage_in_bytes()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_static_synaptic_data"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.get_static_synaptic_data()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_value"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.get_value()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_vertex_executable_suffix"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.get_vertex_executable_suffix()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.is_combined_core_capable"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.is_combined_core_capable</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.is_same_as"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.is_same_as()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.merge"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.merge()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.pad_to_length"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.pad_to_length</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.read_static_synaptic_data"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.read_static_synaptic_data()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.set_value"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.set_value()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.weight"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.weight</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.write_parameters"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStatic.write_parameters()</span></code></a></li>
 </ul>
@@ -3105,6 +3251,7 @@ It should be different every time called with None.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.get_weight_mean"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralSTDP.get_weight_mean()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.initial_delay"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralSTDP.initial_delay</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.initial_weight"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralSTDP.initial_weight</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.is_combined_core_capable"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralSTDP.is_combined_core_capable</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.is_same_as"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralSTDP.is_same_as()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.merge"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralSTDP.merge()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.partner_selection"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralSTDP.partner_selection</span></code></a></li>
@@ -3134,6 +3281,7 @@ It should be different every time called with None.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.get_weight_variance"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralStatic.get_weight_variance()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.initial_delay"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralStatic.initial_delay</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.initial_weight"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralStatic.initial_weight</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.is_combined_core_capable"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralStatic.is_combined_core_capable</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.is_same_as"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralStatic.is_same_as()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.merge"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralStatic.merge()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.partner_selection"><code class="docutils literal notranslate"><span class="pre">SynapseDynamicsStructuralStatic.partner_selection</span></code></a></li>

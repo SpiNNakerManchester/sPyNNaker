@@ -68,7 +68,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">threshold_type.h File Reference</div>  </div>
@@ -81,15 +80,14 @@ $(function() {
 </div>
 <p><a href="threshold__type_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a52fff0cbae0aee9e6dc7ad0e209511dd"><td class="memItemLeft" align="right" valign="top"><a id="a52fff0cbae0aee9e6dc7ad0e209511dd"></a>
-typedef <a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threshold__type_8h.html#a52fff0cbae0aee9e6dc7ad0e209511dd">threshold_type_pointer_t</a></td></tr>
-<tr class="memdesc:a52fff0cbae0aee9e6dc7ad0e209511dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to a threshold type. <br /></td></tr>
-<tr class="separator:a52fff0cbae0aee9e6dc7ad0e209511dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a0ccf2c0ff1feb59d7843d6102a4bdfdb"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threshold__type_8h.html#a0ccf2c0ff1feb59d7843d6102a4bdfdb">threshold_type_initialise</a> (<a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *state, <a class="el" href="threshold__type__static_8h.html#structthreshold__type__params__t">threshold_type_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>, uint32_t <a class="el" href="neuron__impl__standard_8h.html#adc2145aaa2f8435401d2c077d42c7b91">n_steps_per_timestep</a>)</td></tr>
+<tr class="memdesc:a0ccf2c0ff1feb59d7843d6102a4bdfdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialise the state from the parameters  <a href="threshold__type_8h.html#a0ccf2c0ff1feb59d7843d6102a4bdfdb">More...</a><br /></td></tr>
+<tr class="separator:a0ccf2c0ff1feb59d7843d6102a4bdfdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a230a810f6d449075f7fc416195d4967f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threshold__type_8h.html#a230a810f6d449075f7fc416195d4967f">threshold_type_save_state</a> (<a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *state, <a class="el" href="threshold__type__static_8h.html#structthreshold__type__params__t">threshold_type_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>)</td></tr>
+<tr class="memdesc:a230a810f6d449075f7fc416195d4967f"><td class="mdescLeft">&#160;</td><td class="mdescRight">save parameters and state back to SDRAM for reading by host and recovery on restart  <a href="threshold__type_8h.html#a230a810f6d449075f7fc416195d4967f">More...</a><br /></td></tr>
+<tr class="separator:a230a810f6d449075f7fc416195d4967f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78e80ccc57135aa9f338b0e82001fb89"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threshold__type_8h.html#a78e80ccc57135aa9f338b0e82001fb89">threshold_type_is_above_threshold</a> (<a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> value, <a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *threshold_type)</td></tr>
 <tr class="memdesc:a78e80ccc57135aa9f338b0e82001fb89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if the value given is above the threshold value.  <a href="threshold__type_8h.html#a78e80ccc57135aa9f338b0e82001fb89">More...</a><br /></td></tr>
 <tr class="separator:a78e80ccc57135aa9f338b0e82001fb89"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -99,6 +97,103 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="threshold__type_8h_source.html">threshold_type.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a0ccf2c0ff1feb59d7843d6102a4bdfdb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ccf2c0ff1feb59d7843d6102a4bdfdb">&#9670;&nbsp;</a></span>threshold_type_initialise()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void threshold_type_initialise </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="threshold__type__static_8h.html#structthreshold__type__params__t">threshold_type_params_t</a> *&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_steps_per_timestep</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>initialise the state from the parameters </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">state</td><td>Pointer to the state to initialise </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">params</td><td>Pointer to the parameters passed in from host </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_steps_per_timestep</td><td>The number of steps to run each update </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a230a810f6d449075f7fc416195d4967f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a230a810f6d449075f7fc416195d4967f">&#9670;&nbsp;</a></span>threshold_type_save_state()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void threshold_type_save_state </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="threshold__type__static_8h.html#structthreshold__type__params__t">threshold_type_params_t</a> *&#160;</td>
+          <td class="paramname"><em>params</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>save parameters and state back to SDRAM for reading by host and recovery on restart </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The current state </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">params</td><td>Pointer to structure into which parameter can be written </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a78e80ccc57135aa9f338b0e82001fb89"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a78e80ccc57135aa9f338b0e82001fb89">&#9670;&nbsp;</a></span>threshold_type_is_above_threshold()</h2>
 
@@ -148,7 +243,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -68,7 +68,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">rng.c File Reference</div>  </div>
@@ -78,101 +77,31 @@ $(function() {
 <p>An implementation of random number generation.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="rng_8h_source.html">rng.h</a>&quot;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/random_8h.html">random.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/normal_8h.html">normal.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="common__mem_8h_source.html">common_mem.h</a>&quot;</code><br />
 </div>
 <p><a href="rng_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Data Structures</h2></td></tr>
-<tr class="memitem:structrng"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rng_8c.html#structrng">rng_t</a></td></tr>
-<tr class="memdesc:structrng"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Random number generator parameters.  <a href="rng_8c.html#structrng">More...</a><br /></td></tr>
-<tr class="separator:structrng"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac2b523470897c3c3e4168e8d82579d18"><td class="memItemLeft" align="right" valign="top">rng_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rng_8c.html#ac2b523470897c3c3e4168e8d82579d18">rng_init</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:ac2b523470897c3c3e4168e8d82579d18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the random number generator.  <a href="rng_8c.html#ac2b523470897c3c3e4168e8d82579d18">More...</a><br /></td></tr>
-<tr class="separator:ac2b523470897c3c3e4168e8d82579d18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3c7d931977e162864cb4615442d96b7"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rng_8c.html#aa3c7d931977e162864cb4615442d96b7">rng_generator</a> (rng_t <a class="el" href="rng_8c.html#structrng">rng</a>)</td></tr>
-<tr class="memdesc:aa3c7d931977e162864cb4615442d96b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a uniformly-distributed random number.  <a href="rng_8c.html#aa3c7d931977e162864cb4615442d96b7">More...</a><br /></td></tr>
-<tr class="separator:aa3c7d931977e162864cb4615442d96b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12e0ea48f3cf6181063f30ece7b30c2d"><td class="memItemLeft" align="right" valign="top">accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rng_8c.html#a12e0ea48f3cf6181063f30ece7b30c2d">rng_exponential</a> (rng_t <a class="el" href="rng_8c.html#structrng">rng</a>)</td></tr>
-<tr class="memdesc:a12e0ea48f3cf6181063f30ece7b30c2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate an exponentially-distributed random number.  <a href="rng_8c.html#a12e0ea48f3cf6181063f30ece7b30c2d">More...</a><br /></td></tr>
-<tr class="separator:a12e0ea48f3cf6181063f30ece7b30c2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7afddf66f0bcc73ecd2637231a654f01"><td class="memItemLeft" align="right" valign="top">accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rng_8c.html#a7afddf66f0bcc73ecd2637231a654f01">rng_normal</a> (rng_t <a class="el" href="rng_8c.html#structrng">rng</a>)</td></tr>
-<tr class="memdesc:a7afddf66f0bcc73ecd2637231a654f01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate an normally-distributed random number.  <a href="rng_8c.html#a7afddf66f0bcc73ecd2637231a654f01">More...</a><br /></td></tr>
-<tr class="separator:a7afddf66f0bcc73ecd2637231a654f01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a469702c3bba13b63ccfba049840500d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rng_8c.html#a469702c3bba13b63ccfba049840500d8">rng_free</a> (rng_t <a class="el" href="rng_8c.html#structrng">rng</a>)</td></tr>
-<tr class="memdesc:a469702c3bba13b63ccfba049840500d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finish with a random number generator.  <a href="rng_8c.html#a469702c3bba13b63ccfba049840500d8">More...</a><br /></td></tr>
-<tr class="separator:a469702c3bba13b63ccfba049840500d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad3647089384bbdbd3a58476639d7b47"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rng_8c.html#aad3647089384bbdbd3a58476639d7b47">rng_generator</a> (<a class="el" href="rng_8h.html#structrng__t">rng_t</a> *<a class="el" href="spike__source__poisson_8c.html#a62b426a3cc403e96d3f3c71761cf797d">rng</a>)</td></tr>
+<tr class="memdesc:aad3647089384bbdbd3a58476639d7b47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a uniformly-distributed random number.  <a href="rng_8c.html#aad3647089384bbdbd3a58476639d7b47">More...</a><br /></td></tr>
+<tr class="separator:aad3647089384bbdbd3a58476639d7b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26876180ba17fcab970dcf37b27f7e8e"><td class="memItemLeft" align="right" valign="top">accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rng_8c.html#a26876180ba17fcab970dcf37b27f7e8e">rng_exponential</a> (<a class="el" href="rng_8h.html#structrng__t">rng_t</a> *<a class="el" href="spike__source__poisson_8c.html#a62b426a3cc403e96d3f3c71761cf797d">rng</a>)</td></tr>
+<tr class="memdesc:a26876180ba17fcab970dcf37b27f7e8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate an exponentially-distributed random number.  <a href="rng_8c.html#a26876180ba17fcab970dcf37b27f7e8e">More...</a><br /></td></tr>
+<tr class="separator:a26876180ba17fcab970dcf37b27f7e8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5677399580a8c95d1359086be8b7d5c3"><td class="memItemLeft" align="right" valign="top">accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rng_8c.html#a5677399580a8c95d1359086be8b7d5c3">rng_normal</a> (<a class="el" href="rng_8h.html#structrng__t">rng_t</a> *<a class="el" href="spike__source__poisson_8c.html#a62b426a3cc403e96d3f3c71761cf797d">rng</a>)</td></tr>
+<tr class="memdesc:a5677399580a8c95d1359086be8b7d5c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate an normally-distributed random number.  <a href="rng_8c.html#a5677399580a8c95d1359086be8b7d5c3">More...</a><br /></td></tr>
+<tr class="separator:a5677399580a8c95d1359086be8b7d5c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of random number generation. </p>
 
 <p class="definition">Definition in file <a class="el" href="rng_8c_source.html">rng.c</a>.</p>
-</div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
-<a name="structrng" id="structrng"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structrng">&#9670;&nbsp;</a></span>rng</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct rng</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<div class="textblock"><p>The Random number generator parameters. </p>
-<p>Random number generator "object". </p>
-
-<p class="definition">Definition at line <a class="el" href="rng_8c_source.html#l00031">31</a> of file <a class="el" href="rng_8c_source.html">rng.c</a>.</p>
-</div><table class="fieldtable">
-<tr><th colspan="3">Data Fields</th></tr>
-<tr><td class="fieldtype">
-<a id="ad6f575bc1ac33e14794487999fb84877"></a><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a></td>
-<td class="fieldname">
-seed</td>
-<td class="fielddoc">
-</td></tr>
-</table>
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="ac2b523470897c3c3e4168e8d82579d18"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2b523470897c3c3e4168e8d82579d18">&#9670;&nbsp;</a></span>rng_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">rng_t rng_init </td>
-          <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
-          <td class="paramname"><em>region</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialise the random number generator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>An initialised random number generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="rng_8c_source.html#l00035">35</a> of file <a class="el" href="rng_8c_source.html">rng.c</a>.</p>
-
-</div>
-</div>
-<a id="aa3c7d931977e162864cb4615442d96b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3c7d931977e162864cb4615442d96b7">&#9670;&nbsp;</a></span>rng_generator()</h2>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="aad3647089384bbdbd3a58476639d7b47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad3647089384bbdbd3a58476639d7b47">&#9670;&nbsp;</a></span>rng_generator()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -180,7 +109,7 @@ seed</td>
         <tr>
           <td class="memname">uint32_t rng_generator </td>
           <td>(</td>
-          <td class="paramtype">rng_t&#160;</td>
+          <td class="paramtype"><a class="el" href="rng_8h.html#structrng__t">rng_t</a> *&#160;</td>
           <td class="paramname"><em>rng</em></td><td>)</td>
           <td></td>
         </tr>
@@ -196,12 +125,12 @@ seed</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number generated between 0 and 0xFFFFFFFF </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rng_8c_source.html#l00042">42</a> of file <a class="el" href="rng_8c_source.html">rng.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rng_8c_source.html#l00027">27</a> of file <a class="el" href="rng_8c_source.html">rng.c</a>.</p>
 
 </div>
 </div>
-<a id="a12e0ea48f3cf6181063f30ece7b30c2d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12e0ea48f3cf6181063f30ece7b30c2d">&#9670;&nbsp;</a></span>rng_exponential()</h2>
+<a id="a26876180ba17fcab970dcf37b27f7e8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26876180ba17fcab970dcf37b27f7e8e">&#9670;&nbsp;</a></span>rng_exponential()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -209,7 +138,7 @@ seed</td>
         <tr>
           <td class="memname">accum rng_exponential </td>
           <td>(</td>
-          <td class="paramtype">rng_t&#160;</td>
+          <td class="paramtype"><a class="el" href="rng_8h.html#structrng__t">rng_t</a> *&#160;</td>
           <td class="paramname"><em>rng</em></td><td>)</td>
           <td></td>
         </tr>
@@ -225,12 +154,12 @@ seed</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rng_8c_source.html#l00046">46</a> of file <a class="el" href="rng_8c_source.html">rng.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rng_8c_source.html#l00031">31</a> of file <a class="el" href="rng_8c_source.html">rng.c</a>.</p>
 
 </div>
 </div>
-<a id="a7afddf66f0bcc73ecd2637231a654f01"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7afddf66f0bcc73ecd2637231a654f01">&#9670;&nbsp;</a></span>rng_normal()</h2>
+<a id="a5677399580a8c95d1359086be8b7d5c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5677399580a8c95d1359086be8b7d5c3">&#9670;&nbsp;</a></span>rng_normal()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -238,7 +167,7 @@ seed</td>
         <tr>
           <td class="memname">accum rng_normal </td>
           <td>(</td>
-          <td class="paramtype">rng_t&#160;</td>
+          <td class="paramtype"><a class="el" href="rng_8h.html#structrng__t">rng_t</a> *&#160;</td>
           <td class="paramname"><em>rng</em></td><td>)</td>
           <td></td>
         </tr>
@@ -254,42 +183,14 @@ seed</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rng_8c_source.html#l00050">50</a> of file <a class="el" href="rng_8c_source.html">rng.c</a>.</p>
-
-</div>
-</div>
-<a id="a469702c3bba13b63ccfba049840500d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a469702c3bba13b63ccfba049840500d8">&#9670;&nbsp;</a></span>rng_free()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void rng_free </td>
-          <td>(</td>
-          <td class="paramtype">rng_t&#160;</td>
-          <td class="paramname"><em>rng</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Finish with a random number generator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">rng</td><td>The generator to free </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="rng_8c_source.html#l00055">55</a> of file <a class="el" href="rng_8c_source.html">rng.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rng_8c_source.html#l00035">35</a> of file <a class="el" href="rng_8c_source.html">rng.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

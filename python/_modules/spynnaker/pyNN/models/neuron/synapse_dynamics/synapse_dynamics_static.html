@@ -58,19 +58,17 @@
 <span class="kn">from</span> <span class="nn">pyNN.standardmodels.synapses</span> <span class="kn">import</span> <span class="n">StaticSynapse</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractSettable</span>
 <span class="kn">from</span> <span class="nn">.abstract_static_synapse_dynamics</span> <span class="kn">import</span> <span class="n">AbstractStaticSynapseDynamics</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateOnMachine</span><span class="p">,</span> <span class="n">MatrixGeneratorID</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.synapse_dynamics_neuromodulation</span> <span class="kn">import</span> <span class="n">SynapseDynamicsNeuromodulation</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span><span class="p">,</span>\
-    <span class="n">SynapticConfigurationException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_n_bits</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 
 
 <span class="k">class</span> <span class="nc">SynapseDynamicsStatic</span><span class="p">(</span>
-        <span class="n">AbstractStaticSynapseDynamics</span><span class="p">,</span> <span class="n">AbstractSettable</span><span class="p">,</span>
+        <span class="n">AbstractStaticSynapseDynamics</span><span class="p">,</span>
         <span class="n">AbstractGenerateOnMachine</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The dynamics of a synapse that does not change over time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -139,9 +137,10 @@
 <div class="viewcode-block" id="SynapseDynamicsStatic.get_static_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_static_synaptic_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStaticSynapseDynamics</span><span class="o">.</span><span class="n">get_static_synaptic_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_static_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span>
-            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">):</span>
+            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">,</span>
+            <span class="n">max_atoms_per_core</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">n_neuron_id_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+        <span class="n">n_neuron_id_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">max_atoms_per_core</span><span class="p">)</span>
         <span class="n">neuron_id_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n_neuron_id_bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">n_synapse_type_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)</span>
 
@@ -197,10 +196,11 @@
 
 <div class="viewcode-block" id="SynapseDynamicsStatic.read_static_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.read_static_synaptic_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStaticSynapseDynamics</span><span class="o">.</span><span class="n">read_static_synaptic_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">read_static_synaptic_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">ff_size</span><span class="p">,</span> <span class="n">ff_data</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">ff_size</span><span class="p">,</span> <span class="n">ff_data</span><span class="p">,</span>
+            <span class="n">max_atoms_per_core</span><span class="p">):</span>
 
         <span class="n">n_synapse_type_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)</span>
-        <span class="n">n_neuron_id_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+        <span class="n">n_neuron_id_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">max_atoms_per_core</span><span class="p">)</span>
         <span class="n">neuron_id_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n_neuron_id_bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">ff_data</span><span class="p">)</span>
@@ -215,21 +215,6 @@
 
         <span class="k">return</span> <span class="n">connections</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsStatic.get_value"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_value">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSettable</span><span class="o">.</span><span class="n">get_value</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="n">InvalidParameterType</span><span class="p">(</span>
-            <span class="s2">&quot;Type </span><span class="si">{}</span><span class="s2"> does not have parameter </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">key</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="SynapseDynamicsStatic.set_value"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.set_value">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSettable</span><span class="o">.</span><span class="n">set_value</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
-        <span class="k">raise</span> <span class="n">InvalidParameterType</span><span class="p">(</span>
-            <span class="s2">&quot;Type </span><span class="si">{}</span><span class="s2"> does not have parameter </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">key</span><span class="p">))</span></div>
-
 <div class="viewcode-block" id="SynapseDynamicsStatic.get_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.get_parameter_names">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStaticSynapseDynamics</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="s1">&#39;delay&#39;</span><span class="p">]</span></div>
@@ -242,6 +227,32 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateOnMachine</span><span class="o">.</span><span class="n">gen_matrix_id</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">gen_matrix_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">MatrixGeneratorID</span><span class="o">.</span><span class="n">STATIC_MATRIX</span><span class="o">.</span><span class="n">value</span>
+
+<div class="viewcode-block" id="SynapseDynamicsStatic.gen_matrix_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.gen_matrix_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateOnMachine</span><span class="o">.</span><span class="n">gen_matrix_params</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">gen_matrix_params</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">synaptic_matrix_offset</span><span class="p">,</span> <span class="n">delayed_matrix_offset</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
+            <span class="n">synapse_info</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span> <span class="n">max_pre_atoms_per_core</span><span class="p">,</span>
+            <span class="n">max_post_atoms_per_core</span><span class="p">):</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span>
+        <span class="n">n_synapse_type_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">())</span>
+        <span class="n">n_synapse_index_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">max_post_atoms_per_core</span><span class="p">)</span>
+        <span class="n">max_delay</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()</span>
+        <span class="n">max_delay_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">max_delay</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="n">synaptic_matrix_offset</span><span class="p">,</span> <span class="n">delayed_matrix_offset</span><span class="p">,</span>
+            <span class="n">max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span><span class="p">,</span> <span class="n">max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span><span class="p">,</span>
+            <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">,</span> <span class="n">n_synapse_type_bits</span><span class="p">,</span>
+            <span class="n">n_synapse_index_bits</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">max_delay</span><span class="p">,</span> <span class="n">max_delay_bits</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span>
+            <span class="n">max_pre_atoms_per_core</span><span class="p">],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateOnMachine</span><span class="o">.</span>
+               <span class="n">gen_matrix_params_size_in_bytes</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">gen_matrix_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">12</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStaticSynapseDynamics</span><span class="o">.</span><span class="n">changes_during_run</span><span class="p">)</span>
@@ -262,6 +273,11 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStaticSynapseDynamics</span><span class="o">.</span><span class="n">pad_to_length</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">pad_to_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pad_to_length</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStaticSynapseDynamics</span><span class="o">.</span><span class="n">is_combined_core_capable</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_combined_core_capable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
 </pre></div>
 
             <div class="clearer"></div>

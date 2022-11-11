@@ -57,13 +57,15 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.input_types" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.AbstractInputType">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.input_types.</span></span><span class="sig-name descname"><span class="pre">AbstractInputType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.input_types.</span></span><span class="sig-name descname"><span class="pre">AbstractInputType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent" title="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractStandardNeuronComponent</span></code></a></p>
 <p>Represents a possible input type for a neuron model (e.g., current).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a><em>)</em>) – A list of data types in the component structure, in the order that
-they appear</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct" title="spynnaker.pyNN.utilities.struct.Struct"><em>Struct</em></a><em>)</em>) – The structs of the component</p></li>
+<li><p><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – The units to use for each parameter</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py method">
@@ -147,69 +149,6 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal pot
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_units">
-<span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_conductance.html#InputTypeConductance.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_values">
-<span class="sig-name descname"><span class="pre">get_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_conductance.html#InputTypeConductance.get_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
-<li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The time to be advanced in one call to the update of this component</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list with the same length as self.struct.field_types</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)"><em>RangedList</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.has_variable">
-<span class="sig-name descname"><span class="pre">has_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_conductance.html#InputTypeConductance.has_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.update_values">
-<span class="sig-name descname"><span class="pre">update_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_conductance.html#InputTypeConductance.update_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
@@ -249,195 +188,6 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal pot
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_units">
-<span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current.html#InputTypeCurrent.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_values">
-<span class="sig-name descname"><span class="pre">get_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current.html#InputTypeCurrent.get_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
-<li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The time to be advanced in one call to the update of this component</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list with the same length as self.struct.field_types</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)"><em>RangedList</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.has_variable">
-<span class="sig-name descname"><span class="pre">has_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current.html#InputTypeCurrent.has_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.update_values">
-<span class="sig-name descname"><span class="pre">update_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current.html#InputTypeCurrent.update_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.input_types.</span></span><span class="sig-name descname"><span class="pre">InputTypeCurrentSEMD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiplicator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inh_input_previous</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractInputType</span></code></a></p>
-<p>The current sEMD input type.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>multiplicator</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.10)"><em>RandomDistribution</em></a><em>
-or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
-<li><p><strong>inh_input_previous</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.10)"><em>RandomDistribution</em></a><em>
-or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.add_parameters">
-<span class="sig-name descname"><span class="pre">add_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current_semd.html#InputTypeCurrentSEMD.add_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.add_state_variables">
-<span class="sig-name descname"><span class="pre">add_state_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current_semd.html#InputTypeCurrentSEMD.add_state_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_global_weight_scale">
-<span class="sig-name descname"><span class="pre">get_global_weight_scale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current_semd.html#InputTypeCurrentSEMD.get_global_weight_scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_global_weight_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the global weight scaling value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The global weight scaling value</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_units">
-<span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current_semd.html#InputTypeCurrentSEMD.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_values">
-<span class="sig-name descname"><span class="pre">get_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current_semd.html#InputTypeCurrentSEMD.get_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
-<li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The time to be advanced in one call to the update of this component</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list with the same length as self.struct.field_types</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)"><em>RangedList</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.has_variable">
-<span class="sig-name descname"><span class="pre">has_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current_semd.html#InputTypeCurrentSEMD.has_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.inh_input_previous">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inh_input_previous</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.inh_input_previous" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.multiplicator">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multiplicator</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.multiplicator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.update_values">
-<span class="sig-name descname"><span class="pre">update_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current_semd.html#InputTypeCurrentSEMD.update_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -485,69 +235,6 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_units">
-<span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_delta.html#InputTypeDelta.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_values">
-<span class="sig-name descname"><span class="pre">get_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_delta.html#InputTypeDelta.get_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
-<li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The time to be advanced in one call to the update of this component</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list with the same length as self.struct.field_types</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)"><em>RangedList</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.has_variable">
-<span class="sig-name descname"><span class="pre">has_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_delta.html#InputTypeDelta.has_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.update_values">
-<span class="sig-name descname"><span class="pre">update_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_delta.html#InputTypeDelta.update_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -575,42 +262,18 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.e_rev_E"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.e_rev_E</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.e_rev_I"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.e_rev_I</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.get_global_weight_scale()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_units"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.get_units()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.get_values"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.get_values()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.has_variable"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.has_variable()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.update_values"><code class="docutils literal notranslate"><span class="pre">InputTypeConductance.update_values()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.add_parameters"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.add_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.add_state_variables"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.add_state_variables()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.get_global_weight_scale()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_units"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.get_units()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_values"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.get_values()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.has_variable"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.has_variable()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.update_values"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrent.update_values()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD</span></code></a><ul>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.add_parameters"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.add_parameters()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.add_state_variables"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.add_state_variables()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.get_global_weight_scale()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_units"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.get_units()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_values"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.get_values()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.has_variable"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.has_variable()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.inh_input_previous"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.inh_input_previous</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.multiplicator"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.multiplicator</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.update_values"><code class="docutils literal notranslate"><span class="pre">InputTypeCurrentSEMD.update_values()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.add_parameters"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.add_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.add_state_variables"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.add_state_variables()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_global_weight_scale"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.get_global_weight_scale()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_units"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.get_units()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_values"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.get_values()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.has_variable"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.has_variable()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.update_values"><code class="docutils literal notranslate"><span class="pre">InputTypeDelta.update_values()</span></code></a></li>
 </ul>
 </li>
 </ul>

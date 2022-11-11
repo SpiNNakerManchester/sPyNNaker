@@ -81,6 +81,7 @@ $(function() {
 <p>This file contains the main functions for a Poisson spike generator.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="maths-util_8h_source.html">common/maths-util.h</a>&gt;</code><br />
+<code>#include &lt;common/send_mc.h&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/recording_8h.html">recording.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
@@ -90,7 +91,6 @@ $(function() {
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html">bit_field.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/stdfix-full-iso_8h.html">stdfix-full-iso.h</a>&gt;</code><br />
 <code>#include &lt;limits.h&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8h.html">tdma_processing.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/circular__buffer_8h.html">circular_buffer.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="spike__source_2poisson_2profile__tags_8h_source.html">profile_tags.h</a>&quot;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8h.html">profiler.h</a>&gt;</code><br />
@@ -118,12 +118,19 @@ Data Structures</h2></td></tr>
 <tr class="memitem:structsource__info"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a></td></tr>
 <tr class="memdesc:structsource__info"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collection of rates to apply over time to a particular spike source.  <a href="spike__source__poisson_8c.html#structsource__info">More...</a><br /></td></tr>
 <tr class="separator:structsource__info"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structsource__expand__details"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#structsource__expand__details">source_expand_details</a></td></tr>
+<tr class="separator:structsource__expand__details"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structsource__expand__region"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#structsource__expand__region">source_expand_region</a></td></tr>
+<tr class="separator:structsource__expand__region"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structsdram__config"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#structsdram__config">sdram_config</a></td></tr>
 <tr class="memdesc:structsdram__config"><td class="mdescLeft">&#160;</td><td class="mdescRight">A region of SDRAM used to transfer synapses.  <a href="spike__source__poisson_8c.html#structsdram__config">More...</a><br /></td></tr>
 <tr class="separator:structsdram__config"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a52c73ec81e8b14467ce36dd9892bc3df"><td class="memItemLeft" align="right" valign="top"><a id="a52c73ec81e8b14467ce36dd9892bc3df"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>END_OF_TIME</b>&#160;&#160;&#160;0xFFFFFFFF</td></tr>
+<tr class="separator:a52c73ec81e8b14467ce36dd9892bc3df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9460522d5774f317649cd352ea6112b0"><td class="memItemLeft" align="right" valign="top"><a id="a9460522d5774f317649cd352ea6112b0"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a9460522d5774f317649cd352ea6112b0">NUMBER_OF_REGIONS_TO_RECORD</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memdesc:a9460522d5774f317649cd352ea6112b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of recording regions. <br /></td></tr>
@@ -147,8 +154,8 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a43f0d58cfc0317ea06139b20c9242d1e">PROVENANCE_REGION</a>
 , <a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a161a63f4ef09daf69f48a49cc4a8ef5b">PROFILER_REGION</a>
-, <a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a3ec559988321d901a9631875c4782ba6">TDMA_REGION</a>
 , <a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a83adee9297ce4e0afe12a39cc55f4562">SDRAM_PARAMS_REGION</a>
+, <a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a719368d00e2ee9a5b0e27a360ea05be4">EXPANDER_REGION</a>
 <br />
  }</td></tr>
 <tr class="memdesc:a1b9edddb3735d131c67e9e824f07c402"><td class="mdescLeft">&#160;</td><td class="mdescRight">spike source array region IDs in human readable form  <a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">More...</a><br /></td></tr>
@@ -198,19 +205,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a45470e19eabdcc8098607930b8aac481"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a45470e19eabdcc8098607930b8aac481">n_steps_until_next</a> (void)</td></tr>
 <tr class="memdesc:a45470e19eabdcc8098607930b8aac481"><td class="mdescLeft">&#160;</td><td class="mdescRight">How many time steps until the next spike for a slow Poisson source.  <a href="spike__source__poisson_8c.html#a45470e19eabdcc8098607930b8aac481">More...</a><br /></td></tr>
 <tr class="separator:a45470e19eabdcc8098607930b8aac481"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a6f18428eca2d03be2d82834e642876"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a6a6f18428eca2d03be2d82834e642876">store_provenance_data</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> provenance_region)</td></tr>
-<tr class="memdesc:a6a6f18428eca2d03be2d82834e642876"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the provenance data.  <a href="spike__source__poisson_8c.html#a6a6f18428eca2d03be2d82834e642876">More...</a><br /></td></tr>
-<tr class="separator:a6a6f18428eca2d03be2d82834e642876"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a271dd89ae6f3a25d49a7e2d4cb768a37"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a271dd89ae6f3a25d49a7e2d4cb768a37">get_source_data</a> (uint32_t id)</td></tr>
-<tr class="memdesc:a271dd89ae6f3a25d49a7e2d4cb768a37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the source data for a particular spike source.  <a href="spike__source__poisson_8c.html#a271dd89ae6f3a25d49a7e2d4cb768a37">More...</a><br /></td></tr>
-<tr class="separator:a271dd89ae6f3a25d49a7e2d4cb768a37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af538c1942ccd68490d03067fae37805b"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#af538c1942ccd68490d03067fae37805b">out_spikes_bitfield</a> (uint32_t n)</td></tr>
-<tr class="memdesc:af538c1942ccd68490d03067fae37805b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set specific spikes for recording.  <a href="spike__source__poisson_8c.html#af538c1942ccd68490d03067fae37805b">More...</a><br /></td></tr>
-<tr class="separator:af538c1942ccd68490d03067fae37805b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6965b6994e494500e00730df56c449b5"><td class="memItemLeft" align="right" valign="top"><a id="a6965b6994e494500e00730df56c449b5"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a6965b6994e494500e00730df56c449b5">reset_spikes</a> (void)</td></tr>
-<tr class="memdesc:a6965b6994e494500e00730df56c449b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the spike buffer by clearing the bit field. <br /></td></tr>
-<tr class="separator:a6965b6994e494500e00730df56c449b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2602e67f1b5a03f8e9440743171ef81"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#aa2602e67f1b5a03f8e9440743171ef81">slow_spike_source_get_time_to_spike</a> (uint32_t mean_inter_spike_interval_in_ticks)</td></tr>
 <tr class="memdesc:aa2602e67f1b5a03f8e9440743171ef81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine the time in timer ticks multiplied by ISI_SCALE_FACTOR until the next spike is to occur given the mean inter-spike interval.  <a href="spike__source__poisson_8c.html#aa2602e67f1b5a03f8e9440743171ef81">More...</a><br /></td></tr>
 <tr class="separator:aa2602e67f1b5a03f8e9440743171ef81"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,6 +214,25 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:a44e2906c713931da0ee4f911361afc5f"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a44e2906c713931da0ee4f911361afc5f">faster_spike_source_get_num_spikes</a> (<a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> sqrt_lambda)</td></tr>
 <tr class="memdesc:a44e2906c713931da0ee4f911361afc5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine how many spikes to transmit this timer tick, for a faster source (where &lambda; is large enough that a Gaussian can be used instead of a Poisson)  <a href="spike__source__poisson_8c.html#a44e2906c713931da0ee4f911361afc5f">More...</a><br /></td></tr>
 <tr class="separator:a44e2906c713931da0ee4f911361afc5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bf6651c51e0a26f22f653842a1dcba8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a8bf6651c51e0a26f22f653842a1dcba8">set_spike_source_rate</a> (uint32_t sub_id, unsigned long accum rate)</td></tr>
+<tr class="memdesc:a8bf6651c51e0a26f22f653842a1dcba8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the spike source rate as required.  <a href="spike__source__poisson_8c.html#a8bf6651c51e0a26f22f653842a1dcba8">More...</a><br /></td></tr>
+<tr class="separator:a8bf6651c51e0a26f22f653842a1dcba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a6f18428eca2d03be2d82834e642876"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a6a6f18428eca2d03be2d82834e642876">store_provenance_data</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> provenance_region)</td></tr>
+<tr class="memdesc:a6a6f18428eca2d03be2d82834e642876"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the provenance data.  <a href="spike__source__poisson_8c.html#a6a6f18428eca2d03be2d82834e642876">More...</a><br /></td></tr>
+<tr class="separator:a6a6f18428eca2d03be2d82834e642876"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c307f77a5a996c1a276b9ea46051517"><td class="memItemLeft" align="right" valign="top"><a id="a4c307f77a5a996c1a276b9ea46051517"></a>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>ms_to_ticks</b> (unsigned long accum ms)</td></tr>
+<tr class="separator:a4c307f77a5a996c1a276b9ea46051517"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f02e9fcf2a2838cfdbb83f1d7876099"><td class="memItemLeft" align="right" valign="top"><a id="a9f02e9fcf2a2838cfdbb83f1d7876099"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>set_spike_source_details</b> (uint32_t id, bool rate_changed)</td></tr>
+<tr class="separator:a9f02e9fcf2a2838cfdbb83f1d7876099"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af538c1942ccd68490d03067fae37805b"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#af538c1942ccd68490d03067fae37805b">out_spikes_bitfield</a> (uint32_t n)</td></tr>
+<tr class="memdesc:af538c1942ccd68490d03067fae37805b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set specific spikes for recording.  <a href="spike__source__poisson_8c.html#af538c1942ccd68490d03067fae37805b">More...</a><br /></td></tr>
+<tr class="separator:af538c1942ccd68490d03067fae37805b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6965b6994e494500e00730df56c449b5"><td class="memItemLeft" align="right" valign="top"><a id="a6965b6994e494500e00730df56c449b5"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a6965b6994e494500e00730df56c449b5">reset_spikes</a> (void)</td></tr>
+<tr class="memdesc:a6965b6994e494500e00730df56c449b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the spike buffer by clearing the bit field. <br /></td></tr>
+<tr class="separator:a6965b6994e494500e00730df56c449b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01cb7fc152ba6cfcdef074e29129fd50"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a01cb7fc152ba6cfcdef074e29129fd50">print_spike_source</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> s)</td></tr>
 <tr class="memdesc:a01cb7fc152ba6cfcdef074e29129fd50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a spike source.  <a href="spike__source__poisson_8c.html#a01cb7fc152ba6cfcdef074e29129fd50">More...</a><br /></td></tr>
 <tr class="separator:a01cb7fc152ba6cfcdef074e29129fd50"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,9 +246,12 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:a5d93135c80cbb663f602737e639626ce"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a5d93135c80cbb663f602737e639626ce">read_next_rates</a> (uint32_t id)</td></tr>
 <tr class="memdesc:a5d93135c80cbb663f602737e639626ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next chunk of rates read.  <a href="spike__source__poisson_8c.html#a5d93135c80cbb663f602737e639626ce">More...</a><br /></td></tr>
 <tr class="separator:a5d93135c80cbb663f602737e639626ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4847de2b9a2d080b0e03eabccb7308d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#af4847de2b9a2d080b0e03eabccb7308d">read_rates</a> (<a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> *sdram_sources)</td></tr>
-<tr class="memdesc:af4847de2b9a2d080b0e03eabccb7308d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the rates of the Poisson.  <a href="spike__source__poisson_8c.html#af4847de2b9a2d080b0e03eabccb7308d">More...</a><br /></td></tr>
-<tr class="separator:af4847de2b9a2d080b0e03eabccb7308d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a535ce144ca7eade51b6277f40d09136f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a535ce144ca7eade51b6277f40d09136f">read_rates</a> (<a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> *sdram_sources, bool rate_changed, uint32_t next_time)</td></tr>
+<tr class="memdesc:a535ce144ca7eade51b6277f40d09136f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the rates of the Poisson.  <a href="spike__source__poisson_8c.html#a535ce144ca7eade51b6277f40d09136f">More...</a><br /></td></tr>
+<tr class="separator:a535ce144ca7eade51b6277f40d09136f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a097f1bb8fcf7b8d05018da01f6ef00a6"><td class="memItemLeft" align="right" valign="top"><a id="a097f1bb8fcf7b8d05018da01f6ef00a6"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>expand_rates</b> (<a class="el" href="spike__source__poisson_8c.html#structsource__expand__region">source_expand_region</a> *items, <a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> *sdram_sources)</td></tr>
+<tr class="separator:a097f1bb8fcf7b8d05018da01f6ef00a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25d26d2a2c3ec75e4013c7a5e42bc5a7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a25d26d2a2c3ec75e4013c7a5e42bc5a7">initialise_recording</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification_metadata_t</a> *ds_regions)</td></tr>
 <tr class="memdesc:a25d26d2a2c3ec75e4013c7a5e42bc5a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the recording parts of the model.  <a href="spike__source__poisson_8c.html#a25d26d2a2c3ec75e4013c7a5e42bc5a7">More...</a><br /></td></tr>
 <tr class="separator:a25d26d2a2c3ec75e4013c7a5e42bc5a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -249,24 +265,18 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#afb40f588131f69f1d033283921f1a811">resume_callback</a> (void)</td></tr>
 <tr class="memdesc:afb40f588131f69f1d033283921f1a811"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run any functions needed at resume time. <br /></td></tr>
 <tr class="separator:afb40f588131f69f1d033283921f1a811"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3f5360b39be7e95723ff26506d24fbe"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#ad3f5360b39be7e95723ff26506d24fbe">store_poisson_parameters</a> (void)</td></tr>
-<tr class="memdesc:ad3f5360b39be7e95723ff26506d24fbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store the Poisson parameters back into SDRAM for reading by the host when needed.  <a href="spike__source__poisson_8c.html#ad3f5360b39be7e95723ff26506d24fbe">More...</a><br /></td></tr>
-<tr class="separator:ad3f5360b39be7e95723ff26506d24fbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a285c14edf54c74a6fe624e2968964a12"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a285c14edf54c74a6fe624e2968964a12">mark_spike</a> (uint32_t neuron_id, uint32_t <a class="el" href="last__neuron__selection__impl_8h.html#a3517ef59d8e5a261be447e890013b160">n_spikes</a>)</td></tr>
 <tr class="memdesc:a285c14edf54c74a6fe624e2968964a12"><td class="mdescLeft">&#160;</td><td class="mdescRight">records spikes as needed  <a href="spike__source__poisson_8c.html#a285c14edf54c74a6fe624e2968964a12">More...</a><br /></td></tr>
 <tr class="separator:a285c14edf54c74a6fe624e2968964a12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6383f32ff6d54333f83d681ff919d4d0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a6383f32ff6d54333f83d681ff919d4d0">record_spikes</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
 <tr class="memdesc:a6383f32ff6d54333f83d681ff919d4d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">writing spikes to SDRAM  <a href="spike__source__poisson_8c.html#a6383f32ff6d54333f83d681ff919d4d0">More...</a><br /></td></tr>
 <tr class="separator:a6383f32ff6d54333f83d681ff919d4d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c0f1543e08e9c0d5ea8ac638f65fdac"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a8c0f1543e08e9c0d5ea8ac638f65fdac">process_fast_source</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> s_id, <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *<a class="el" href="spike__source__poisson_8c.html#a8fc9649bde3c5a1307c82861ad881004">source</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count)</td></tr>
-<tr class="memdesc:a8c0f1543e08e9c0d5ea8ac638f65fdac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle a fast spike source.  <a href="spike__source__poisson_8c.html#a8c0f1543e08e9c0d5ea8ac638f65fdac">More...</a><br /></td></tr>
-<tr class="separator:a8c0f1543e08e9c0d5ea8ac638f65fdac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6b1e1c0aee533b40075573aca35b72f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#ae6b1e1c0aee533b40075573aca35b72f">process_slow_source</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> s_id, <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *<a class="el" href="spike__source__poisson_8c.html#a8fc9649bde3c5a1307c82861ad881004">source</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count)</td></tr>
-<tr class="memdesc:ae6b1e1c0aee533b40075573aca35b72f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle a slow spike source.  <a href="spike__source__poisson_8c.html#ae6b1e1c0aee533b40075573aca35b72f">More...</a><br /></td></tr>
-<tr class="separator:ae6b1e1c0aee533b40075573aca35b72f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12c72782cb450237076bc0622fc90125"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a12c72782cb450237076bc0622fc90125">set_spike_source_rate</a> (uint32_t id, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> rate)</td></tr>
-<tr class="memdesc:a12c72782cb450237076bc0622fc90125"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the spike source rate as required.  <a href="spike__source__poisson_8c.html#a12c72782cb450237076bc0622fc90125">More...</a><br /></td></tr>
-<tr class="separator:a12c72782cb450237076bc0622fc90125"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad84270695d282c5f3ed37d17b3a68d8e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#ad84270695d282c5f3ed37d17b3a68d8e">process_fast_source</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> s_id, <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *<a class="el" href="spike__source__poisson_8c.html#a8fc9649bde3c5a1307c82861ad881004">source</a>)</td></tr>
+<tr class="memdesc:ad84270695d282c5f3ed37d17b3a68d8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle a fast spike source.  <a href="spike__source__poisson_8c.html#ad84270695d282c5f3ed37d17b3a68d8e">More...</a><br /></td></tr>
+<tr class="separator:ad84270695d282c5f3ed37d17b3a68d8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0133a2417f76bb17221381ed2a1e8be3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a0133a2417f76bb17221381ed2a1e8be3">process_slow_source</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> s_id, <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *<a class="el" href="spike__source__poisson_8c.html#a8fc9649bde3c5a1307c82861ad881004">source</a>)</td></tr>
+<tr class="memdesc:a0133a2417f76bb17221381ed2a1e8be3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle a slow spike source.  <a href="spike__source__poisson_8c.html#a0133a2417f76bb17221381ed2a1e8be3">More...</a><br /></td></tr>
+<tr class="separator:a0133a2417f76bb17221381ed2a1e8be3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3ba3db2e11b1db9fd9d1986558eee30"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#ab3ba3db2e11b1db9fd9d1986558eee30">timer_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused)</td></tr>
 <tr class="memdesc:ab3ba3db2e11b1db9fd9d1986558eee30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timer interrupt callback.  <a href="spike__source__poisson_8c.html#ab3ba3db2e11b1db9fd9d1986558eee30">More...</a><br /></td></tr>
 <tr class="separator:ab3ba3db2e11b1db9fd9d1986558eee30"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -280,14 +290,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spik
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a3474215ce02c1bf76bceafe71ef89c7b"><td class="memItemLeft" align="right" valign="top"><a id="a3474215ce02c1bf76bceafe71ef89c7b"></a>
-static <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters">global_parameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a3474215ce02c1bf76bceafe71ef89c7b">ssp_params</a></td></tr>
-<tr class="memdesc:a3474215ce02c1bf76bceafe71ef89c7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters" title="Parameters of the SpikeSourcePoisson.">global_parameters</a> for the sub-population. <br /></td></tr>
-<tr class="separator:a3474215ce02c1bf76bceafe71ef89c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00ba8dd1cc55e4637c11af4c8e582ff3"><td class="memItemLeft" align="right" valign="top"><a id="a00ba8dd1cc55e4637c11af4c8e582ff3"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>source_details</b></td></tr>
+<tr class="separator:a00ba8dd1cc55e4637c11af4c8e582ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a803a94ccf2c3fa0146b8c2316fdb850a"><td class="memItemLeft" align="right" valign="top"><a id="a803a94ccf2c3fa0146b8c2316fdb850a"></a>
 static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a803a94ccf2c3fa0146b8c2316fdb850a">keys</a></td></tr>
 <tr class="memdesc:a803a94ccf2c3fa0146b8c2316fdb850a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The keys to send spikes with. <br /></td></tr>
 <tr class="separator:a803a94ccf2c3fa0146b8c2316fdb850a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3474215ce02c1bf76bceafe71ef89c7b"><td class="memItemLeft" align="right" valign="top"><a id="a3474215ce02c1bf76bceafe71ef89c7b"></a>
+static <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters">global_parameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a3474215ce02c1bf76bceafe71ef89c7b">ssp_params</a></td></tr>
+<tr class="memdesc:a3474215ce02c1bf76bceafe71ef89c7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters" title="Parameters of the SpikeSourcePoisson.">global_parameters</a> for the sub-population. <br /></td></tr>
+<tr class="separator:a3474215ce02c1bf76bceafe71ef89c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47b4faf584a02b7d913efcb91134d196"><td class="memItemLeft" align="right" valign="top"><a id="a47b4faf584a02b7d913efcb91134d196"></a>
 static <a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a47b4faf584a02b7d913efcb91134d196">source_data</a></td></tr>
 <tr class="memdesc:a47b4faf584a02b7d913efcb91134d196"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of pointers to sequences of rate data. <br /></td></tr>
@@ -338,6 +351,10 @@ static struct <a class="el" href="spike__source__poisson_8c.html#structsdram__co
 static uint16_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a148ad514a3ea3af1eae2a8a354f242c2">input_this_timestep</a></td></tr>
 <tr class="memdesc:a148ad514a3ea3af1eae2a8a354f242c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The inputs to be sent at the end of this timestep. <br /></td></tr>
 <tr class="separator:a148ad514a3ea3af1eae2a8a354f242c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d336819c22c6a3bcda7ba321da3741b"><td class="memItemLeft" align="right" valign="top"><a id="a3d336819c22c6a3bcda7ba321da3741b"></a>
+static <a class="el" href="maths-util_8h.html#a2e4c6b7f842497114d81356c763536c4">UREAL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a3d336819c22c6a3bcda7ba321da3741b">ts_per_second</a></td></tr>
+<tr class="memdesc:a3d336819c22c6a3bcda7ba321da3741b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The timesteps per second. <br /></td></tr>
+<tr class="separator:a3d336819c22c6a3bcda7ba321da3741b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1725d9f0f0d4af892f22a0181e4fdeac"><td class="memItemLeft" align="right" valign="top"><a id="a1725d9f0f0d4af892f22a0181e4fdeac"></a>
 static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/circular__buffer_8h.html#a549d5bcaed4164249aee6a6828a51e6f">circular_buffer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rate_change_buffer</b></td></tr>
 <tr class="separator:a1725d9f0f0d4af892f22a0181e4fdeac"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -360,7 +377,7 @@ static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/
 </div><div class="memdoc">
 <div class="textblock"><p>data structure for Poisson sources </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00050">50</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00051">51</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -428,7 +445,7 @@ Planned time to spike, in ticks. </td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>data structure for recording spikes </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00071">71</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00072">72</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -466,7 +483,7 @@ Spike recording buffers; sort of a bit_field_t[]. </td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>An RNG seed of 4 words. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00112">112</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00113">113</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -510,7 +527,7 @@ c</td>
 </div><div class="memdoc">
 <div class="textblock"><p>Parameters of the SpikeSourcePoisson. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00120">120</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00121">121</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -532,11 +549,11 @@ seconds_per_tick</td>
 <td class="fielddoc">
 The time between ticks in seconds for setting the rate. </td></tr>
 <tr><td class="fieldtype">
-<a id="a6725343f8032eb0ad9d37408b92dace8"></a>uint32_t</td>
+<a id="a7c28ee6e0f3f9ee952400112f7ea2c82"></a><a class="el" href="maths-util_8h.html#a2e4c6b7f842497114d81356c763536c4">UREAL</a></td>
 <td class="fieldname">
-ticks_per_second</td>
+ticks_per_ms</td>
 <td class="fielddoc">
-The number of ticks per second for setting the rate. </td></tr>
+The number of ticks per millisecond for setting the start and duration. </td></tr>
 <tr><td class="fieldtype">
 <a id="a8fc7a576f718c19bb241c4c6301fd416"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
@@ -590,7 +607,7 @@ The seed for the Poisson generation process. </td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>Structure of the provenance data. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00144">144</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00145">145</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -616,7 +633,7 @@ number of times the tdma fell behind its slot </td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>Collection of rates to apply over time to a particular spike source. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00157">157</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00161">161</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -632,11 +649,79 @@ index</td>
 <td class="fielddoc">
 Where in the array of rate descriptors we are. </td></tr>
 <tr><td class="fieldtype">
-<a id="a489d13f6c68c512fda05e069a5383947"></a><a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a></td>
+<a id="a56c2077f5085d9d86a1a5a39d62a9029"></a>source_details</td>
 <td class="fieldname">
-poissons[]</td>
+details[]</td>
 <td class="fielddoc">
-Array of rate descriptors. </td></tr>
+Array of rates. </td></tr>
+</table>
+
+</div>
+</div>
+<a name="structsource__expand__details" id="structsource__expand__details"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structsource__expand__details">&#9670;&nbsp;</a></span>source_expand_details</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct source_expand_details</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock">
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00170">170</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a0b22dacb098532eb13061823df198d9b"></a>uint32_t</td>
+<td class="fieldname">
+count</td>
+<td class="fielddoc">
+The number of items to expand. </td></tr>
+<tr><td class="fieldtype">
+<a id="aa148724471d5c6680c4a1ad0a7182ced"></a><a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a></td>
+<td class="fieldname">
+info</td>
+<td class="fielddoc">
+The details for the given number of items. </td></tr>
+</table>
+
+</div>
+</div>
+<a name="structsource__expand__region" id="structsource__expand__region"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structsource__expand__region">&#9670;&nbsp;</a></span>source_expand_region</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct source_expand_region</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock">
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00177">177</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a536780c6b007db0857d07656546a8fb2"></a>uint32_t</td>
+<td class="fieldname">
+rate_changed</td>
+<td class="fielddoc">
+Determine if any rates have been changed. </td></tr>
+<tr><td class="fieldtype">
+<a id="a1671c2c801472af0d0a1620811b3de92"></a>uint32_t</td>
+<td class="fieldname">
+n_items</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a02e47372e7664a4d64089b6e89a80a52"></a><a class="el" href="spike__source__poisson_8c.html#structsource__expand__details">source_expand_details</a></td>
+<td class="fieldname">
+items[]</td>
+<td class="fielddoc">
+</td></tr>
 </table>
 
 </div>
@@ -654,7 +739,7 @@ Array of rate descriptors. </td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>A region of SDRAM used to transfer synapses. </p>
 
-<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00085">85</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00088">88</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -672,29 +757,11 @@ size_in_bytes</td>
 The size of the input data to be transferred per core. <p>The size of the input data to be transferred. </p>
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a6a591c0cd469068deef9515db3a5435d"></a>uint32_t</td>
-<td class="fieldname">
-n_neurons</td>
-<td class="fielddoc">
-The number of neurons. </td></tr>
-<tr><td class="fieldtype">
-<a id="a5aeda4c778a8f079554189f957410c9c"></a>uint32_t</td>
-<td class="fieldname">
-n_synapse_types</td>
-<td class="fielddoc">
-The number of synapse types. </td></tr>
-<tr><td class="fieldtype">
 <a id="ac71da842b9ee9030342176197e40ba3b"></a>uint32_t</td>
 <td class="fieldname">
 n_synapse_cores</td>
 <td class="fielddoc">
 The number of synapse cores feeding into here. </td></tr>
-<tr><td class="fieldtype">
-<a id="ac5dd25085ff51b0365a1a81144c5883d"></a>uint32_t</td>
-<td class="fieldname">
-synapse_index_bits</td>
-<td class="fielddoc">
-The number of bits needed for the neurons. </td></tr>
 <tr><td class="fieldtype">
 <a id="a86b526324ed1f6013de23834e46a28b6"></a>uint32_t *</td>
 <td class="fieldname">
@@ -751,13 +818,13 @@ The weight to send for each active Poisson source. </td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a1b9edddb3735d131c67e9e824f07c402a161a63f4ef09daf69f48a49cc4a8ef5b"></a>PROFILER_REGION&#160;</td><td class="fielddoc"><p>profiling region </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a1b9edddb3735d131c67e9e824f07c402a3ec559988321d901a9631875c4782ba6"></a>TDMA_REGION&#160;</td><td class="fielddoc"><p>tdma processing region </p>
-</td></tr>
 <tr><td class="fieldname"><a id="a1b9edddb3735d131c67e9e824f07c402a83adee9297ce4e0afe12a39cc55f4562"></a>SDRAM_PARAMS_REGION&#160;</td><td class="fielddoc"><p>SDRAM transfer parameters region. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a1b9edddb3735d131c67e9e824f07c402a719368d00e2ee9a5b0e27a360ea05be4"></a>EXPANDER_REGION&#160;</td><td class="fielddoc"><p>Expanding of parameters. </p>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00081">81</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00082">82</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -785,7 +852,7 @@ The weight to send for each active Poisson source. </td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00100">100</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00101">101</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -800,7 +867,7 @@ The weight to send for each active Poisson source. </td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static uint32_t <a class="el" href="rng_8c.html#structrng">rng</a> </td>
+          <td class="memname">static uint32_t rng </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -817,7 +884,7 @@ The weight to send for each active Poisson source. </td></tr>
 <p>Random number generation for the Poisson sources. This is a local version for speed of operation. </p>
 <dl class="section return"><dt>Returns</dt><dd>A random number </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00224">224</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00252">252</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -854,7 +921,7 @@ The weight to send for each active Poisson source. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>How many spikes to generate </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00240">240</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00268">268</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -885,117 +952,7 @@ The weight to send for each active Poisson source. </td></tr>
 <p>How many time steps until the next spike for a slow Poisson source. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of time steps until the next spike </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00255">255</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
-
-</div>
-</div>
-<a id="a6a6f18428eca2d03be2d82834e642876"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6a6f18428eca2d03be2d82834e642876">&#9670;&nbsp;</a></span>store_provenance_data()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void store_provenance_data </td>
-          <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
-          <td class="paramname"><em>provenance_region</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Writes the provenance data. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">provenance_region</td><td>Where to write the provenance </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00280">280</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
-
-</div>
-</div>
-<a id="a271dd89ae6f3a25d49a7e2d4cb768a37"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a271dd89ae6f3a25d49a7e2d4cb768a37">&#9670;&nbsp;</a></span>get_source_data()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a>* get_source_data </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>id</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get the source data for a particular spike source. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The spike source ID </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Its current rate descriptor, in SDRAM </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00292">292</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
-
-</div>
-</div>
-<a id="af538c1942ccd68490d03067fae37805b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af538c1942ccd68490d03067fae37805b">&#9670;&nbsp;</a></span>out_spikes_bitfield()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a> out_spikes_bitfield </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set specific spikes for recording. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the spike array index </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>bit field at the location n </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00299">299</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00283">283</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1032,7 +989,7 @@ The weight to send for each active Poisson source. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>"time" in timer ticks * ISI_SCALE_FACTOR until the next spike occurs </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00316">316</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00310">310</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1069,7 +1026,7 @@ The weight to send for each active Poisson source. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the number of spikes to transmit this timer tick </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00332">332</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00326">326</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1106,7 +1063,119 @@ The weight to send for each active Poisson source. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of spikes to transmit this timer tick </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00348">348</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00342">342</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+
+</div>
+</div>
+<a id="a8bf6651c51e0a26f22f653842a1dcba8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8bf6651c51e0a26f22f653842a1dcba8">&#9670;&nbsp;</a></span>set_spike_source_rate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void set_spike_source_rate </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>sub_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned long accum&#160;</td>
+          <td class="paramname"><em>rate</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the spike source rate as required. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>the ID of the source to be updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">rate</td><td>the rate in Hz, to be multiplied to get per-tick values </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00355">355</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+
+</div>
+</div>
+<a id="a6a6f18428eca2d03be2d82834e642876"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a6f18428eca2d03be2d82834e642876">&#9670;&nbsp;</a></span>store_provenance_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void store_provenance_data </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramname"><em>provenance_region</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Writes the provenance data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">provenance_region</td><td>Where to write the provenance </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00394">394</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+
+</div>
+</div>
+<a id="af538c1942ccd68490d03067fae37805b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af538c1942ccd68490d03067fae37805b">&#9670;&nbsp;</a></span>out_spikes_bitfield()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a> out_spikes_bitfield </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set specific spikes for recording. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the spike array index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>bit field at the location n </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00439">439</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1142,7 +1211,7 @@ The weight to send for each active Poisson source. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00360">360</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00455">455</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1179,7 +1248,7 @@ The weight to send for each active Poisson source. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the parameters were read successfully. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00384">384</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00480">480</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1215,12 +1284,12 @@ The weight to send for each active Poisson source. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00423">423</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00521">521</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
-<a id="af4847de2b9a2d080b0e03eabccb7308d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af4847de2b9a2d080b0e03eabccb7308d">&#9670;&nbsp;</a></span>read_rates()</h2>
+<a id="a535ce144ca7eade51b6277f40d09136f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a535ce144ca7eade51b6277f40d09136f">&#9670;&nbsp;</a></span>read_rates()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1232,8 +1301,24 @@ The weight to send for each active Poisson source. </td></tr>
           <td class="memname">static bool read_rates </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> *&#160;</td>
-          <td class="paramname"><em>sdram_sources</em></td><td>)</td>
+          <td class="paramname"><em>sdram_sources</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>rate_changed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>next_time</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -1247,12 +1332,14 @@ The weight to send for each active Poisson source. </td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sdram_sources</td><td>the configuration in SDRAM </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">rate_changed</td><td>whether any rates have actually changed </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">next_time</td><td>the time which will be the next timestep to run </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the rates were read successfully. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00437">437</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00533">533</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1289,7 +1376,7 @@ The weight to send for each active Poisson source. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether recording initialisation is successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00483">483</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00630">630</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1325,7 +1412,7 @@ The weight to send for each active Poisson source. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00496">496</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00643">643</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1356,38 +1443,7 @@ The weight to send for each active Poisson source. </td></tr>
 <p>Initialise the model by reading in the regions and checking recording data. </p>
 <dl class="section return"><dt>Returns</dt><dd>Whether it successfully read all the regions and set up all its internal data structures. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00525">525</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
-
-</div>
-</div>
-<a id="ad3f5360b39be7e95723ff26506d24fbe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3f5360b39be7e95723ff26506d24fbe">&#9670;&nbsp;</a></span>store_poisson_parameters()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool store_poisson_parameters </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Store the Poisson parameters back into SDRAM for reading by the host when needed. </p>
-<dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00665">665</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00672">672</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1434,7 +1490,7 @@ The weight to send for each active Poisson source. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00688">688</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00812">812</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1470,12 +1526,12 @@ The weight to send for each active Poisson source. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00704">704</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00828">828</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
-<a id="a8c0f1543e08e9c0d5ea8ac638f65fdac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c0f1543e08e9c0d5ea8ac638f65fdac">&#9670;&nbsp;</a></span>process_fast_source()</h2>
+<a id="ad84270695d282c5f3ed37d17b3a68d8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad84270695d282c5f3ed37d17b3a68d8e">&#9670;&nbsp;</a></span>process_fast_source()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1493,13 +1549,7 @@ The weight to send for each active Poisson source. </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *&#160;</td>
-          <td class="paramname"><em>source</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
-          <td class="paramname"><em>timer_count</em>&#160;</td>
+          <td class="paramname"><em>source</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1517,19 +1567,18 @@ The weight to send for each active Poisson source. </td></tr>
 <p>Handle a fast spike source. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">s_id</td><td>Source ID </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">source</td><td>Source descriptor </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">timer_count</td><td>Time to send spike at </td></tr>
+    <tr><td class="paramname">s_id</td><td>Source ID </td></tr>
+    <tr><td class="paramname">source</td><td>Source descriptor </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00716">716</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00839">839</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
-<a id="ae6b1e1c0aee533b40075573aca35b72f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae6b1e1c0aee533b40075573aca35b72f">&#9670;&nbsp;</a></span>process_slow_source()</h2>
+<a id="a0133a2417f76bb17221381ed2a1e8be3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0133a2417f76bb17221381ed2a1e8be3">&#9670;&nbsp;</a></span>process_slow_source()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1547,13 +1596,7 @@ The weight to send for each active Poisson source. </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *&#160;</td>
-          <td class="paramname"><em>source</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
-          <td class="paramname"><em>timer_count</em>&#160;</td>
+          <td class="paramname"><em>source</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1571,53 +1614,13 @@ The weight to send for each active Poisson source. </td></tr>
 <p>Handle a slow spike source. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">s_id</td><td>Source ID </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">source</td><td>Source descriptor </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">timer_count</td><td>Time to send spike at </td></tr>
+    <tr><td class="paramname">s_id</td><td>Source ID </td></tr>
+    <tr><td class="paramname">source</td><td>Source descriptor </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00766">766</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
-
-</div>
-</div>
-<a id="a12c72782cb450237076bc0622fc90125"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12c72782cb450237076bc0622fc90125">&#9670;&nbsp;</a></span>set_spike_source_rate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void set_spike_source_rate </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
-          <td class="paramname"><em>rate</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the spike source rate as required. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>the ID of the source to be updated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">rate</td><td>the rate in Hz, to be multiplied to get per-tick values </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00808">808</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00886">886</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1664,7 +1667,7 @@ The weight to send for each active Poisson source. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00840">840</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00928">928</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1711,7 +1714,7 @@ The weight to send for each active Poisson source. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00926">926</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l01016">1016</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
@@ -1737,14 +1740,14 @@ The weight to send for each active Poisson source. </td></tr>
 </div><div class="memdoc">
 <p>the time interval parameter TODO this variable could be removed and use the timer tick callback timer value. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00190">190</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__source__poisson_8c_source.html#l00215">215</a> of file <a class="el" href="spike__source__poisson_8c_source.html">spike_source_poisson.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

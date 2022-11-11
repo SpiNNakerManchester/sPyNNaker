@@ -77,7 +77,8 @@
 <div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_plastic_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_plastic_synaptic_data">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_plastic_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span>
-            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">):</span>
+            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">,</span>
+            <span class="n">max_atoms_per_core</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the fixed-plastic data, and plastic-plastic data for each row,\</span>
 <span class="sd">            and lengths for the fixed_plastic and plastic-plastic parts of\</span>
 <span class="sd">            each row.</span>
@@ -99,6 +100,7 @@
 <span class="sd">            The slice of the post vertex to get the connections for</span>
 <span class="sd">        :param int n_synapse_types: The number of synapse types</span>
 <span class="sd">        :param int max_n_synapses: The maximum number of synapses to generate</span>
+<span class="sd">        :param int max_atoms_per_core: The maximum number of atoms on a core</span>
 <span class="sd">        :return: (fp_data, pp_data, fp_size, pp_size)</span>
 <span class="sd">        :rtype:</span>
 <span class="sd">            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,</span>
@@ -131,7 +133,7 @@
 <div class="viewcode-block" id="AbstractPlasticSynapseDynamics.read_plastic_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.read_plastic_synaptic_data">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">read_plastic_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">pp_size</span><span class="p">,</span> <span class="n">pp_data</span><span class="p">,</span>
-            <span class="n">fp_size</span><span class="p">,</span> <span class="n">fp_data</span><span class="p">):</span>
+            <span class="n">fp_size</span><span class="p">,</span> <span class="n">fp_data</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read the connections indicated in the connection indices from the\</span>
 <span class="sd">            data in `pp_data` and `fp_data`.</span>
 
@@ -141,6 +143,7 @@
 <span class="sd">        :param ~numpy.ndarray pp_data: 2D</span>
 <span class="sd">        :param ~numpy.ndarray fp_size: 1D</span>
 <span class="sd">        :param ~numpy.ndarray fp_data: 2D</span>
+<span class="sd">        :param int max_atoms_per_core:</span>
 <span class="sd">        :return:</span>
 <span class="sd">            array with columns ``source``, ``target``, ``weight``, ``delay``</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>

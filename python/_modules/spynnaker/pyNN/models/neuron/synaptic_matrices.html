@@ -54,11 +54,9 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
-<span class="kn">from</span> <span class="nn">spinn_utilities.ordered_set</span> <span class="kn">import</span> <span class="n">OrderedSet</span>
 <span class="kn">from</span> <span class="nn">pacman.model.routing_info</span> <span class="kn">import</span> <span class="n">BaseKeyAndMask</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
 
@@ -66,21 +64,41 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.master_pop_table</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MasterPopTableAsBinarySearch</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_n_bits</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
-<span class="kn">from</span> <span class="nn">.key_space_tracker</span> <span class="kn">import</span> <span class="n">KeySpaceTracker</span>
 <span class="kn">from</span> <span class="nn">.synaptic_matrix_app</span> <span class="kn">import</span> <span class="n">SynapticMatrixApp</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.bit_field_utilities</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_sdram_for_bit_field_region</span><span class="p">,</span> <span class="n">get_bitfield_key_map_data</span><span class="p">,</span>
+    <span class="n">write_bitfield_init_data</span><span class="p">)</span>
 
 <span class="c1"># 1 for synaptic matrix region</span>
+<span class="c1"># 1 for master pop region</span>
+<span class="c1"># 1 for bitfield filter region</span>
+<span class="c1"># 1 for structural region</span>
 <span class="c1"># 1 for n_edges</span>
-<span class="c1"># 2 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms</span>
+<span class="c1"># 1 for post_vertex_slice.lo_atom</span>
+<span class="c1"># 1 for post_vertex_slice.n_atoms</span>
+<span class="c1"># 1 for post index</span>
 <span class="c1"># 1 for n_synapse_types</span>
-<span class="c1"># 1 for n_synapse_type_bits</span>
-<span class="c1"># 1 for n_synapse_index_bits</span>
+<span class="c1"># 1 for timestep per delay</span>
+<span class="c1"># 1 for padding</span>
+<span class="c1"># 4 for Population RNG seed</span>
+<span class="c1"># 4 for core RNG seed</span>
 <span class="n">SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+    <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
 <span class="n">DIRECT_MATRIX_HEADER_COST_BYTES</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
+<span class="c1"># Value to use when there is no region</span>
+<span class="n">INVALID_REGION_ID</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
+
+<span class="c1"># Identifiers for synapse regions</span>
+<span class="n">SYNAPSE_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;synapse_params&quot;</span><span class="p">,</span> <span class="s2">&quot;pop_table&quot;</span><span class="p">,</span> <span class="s2">&quot;synaptic_matrix&quot;</span><span class="p">,</span> <span class="s2">&quot;synapse_dynamics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;structural_dynamics&quot;</span><span class="p">,</span> <span class="s2">&quot;bitfield_filter&quot;</span><span class="p">,</span> <span class="s2">&quot;connection_builder&quot;</span><span class="p">]</span>
+<span class="n">SynapseRegions</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s2">&quot;SynapseRegions&quot;</span><span class="p">,</span> <span class="n">SYNAPSE_FIELDS</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="SynapticMatrices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices">[docs]</a><span class="k">class</span> <span class="nc">SynapticMatrices</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -88,22 +106,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="c1"># The slice of the post-vertex that these matrices are for</span>
-        <span class="s2">&quot;__post_vertex_slice&quot;</span><span class="p">,</span>
         <span class="c1"># The number of synapse types received</span>
         <span class="s2">&quot;__n_synapse_types&quot;</span><span class="p">,</span>
-        <span class="c1"># The maximum summed size of the &quot;direct&quot; or &quot;single&quot; matrices</span>
-        <span class="s2">&quot;__all_single_syn_sz&quot;</span><span class="p">,</span>
-        <span class="c1"># The ID of the synaptic matrix region</span>
-        <span class="s2">&quot;__synaptic_matrix_region&quot;</span><span class="p">,</span>
-        <span class="c1"># The ID of the &quot;direct&quot; or &quot;single&quot; matrix region</span>
-        <span class="s2">&quot;__direct_matrix_region&quot;</span><span class="p">,</span>
-        <span class="c1"># The ID of the master population table region</span>
-        <span class="s2">&quot;__poptable_region&quot;</span><span class="p">,</span>
-        <span class="c1"># The ID of the connection builder region</span>
-        <span class="s2">&quot;__connection_builder_region&quot;</span><span class="p">,</span>
-        <span class="c1"># The master population table data structure</span>
-        <span class="s2">&quot;__poptable&quot;</span><span class="p">,</span>
+        <span class="c1"># The region identifiers</span>
+        <span class="s2">&quot;__regions&quot;</span><span class="p">,</span>
         <span class="c1"># The sub-matrices for each incoming edge</span>
         <span class="s2">&quot;__matrices&quot;</span><span class="p">,</span>
         <span class="c1"># The address within the synaptic matrix region after the last matrix</span>
@@ -114,69 +120,46 @@
         <span class="s2">&quot;__on_chip_generated_block_addr&quot;</span><span class="p">,</span>
         <span class="c1"># Determine if any of the matrices can be generated on the machine</span>
         <span class="s2">&quot;__gen_on_machine&quot;</span><span class="p">,</span>
-        <span class="c1"># Reference to give the synaptic matrix</span>
-        <span class="s2">&quot;__synaptic_matrix_ref&quot;</span><span class="p">,</span>
-        <span class="c1"># Reference to give the direct matrix</span>
-        <span class="s2">&quot;__direct_matrix_ref&quot;</span><span class="p">,</span>
-        <span class="c1"># Reference to give the master population table</span>
-        <span class="s2">&quot;__poptable_ref&quot;</span><span class="p">,</span>
-        <span class="c1"># Reference to give the connection builder</span>
-        <span class="s2">&quot;__connection_builder_ref&quot;</span><span class="p">,</span>
+        <span class="c1"># Number of bits to use for neuron IDs</span>
+        <span class="s2">&quot;__max_atoms_per_core&quot;</span><span class="p">,</span>
+        <span class="c1"># The stored master population table data</span>
+        <span class="s2">&quot;__master_pop_data&quot;</span><span class="p">,</span>
+        <span class="c1"># The stored generated data</span>
+        <span class="s2">&quot;__generated_data&quot;</span><span class="p">,</span>
+        <span class="c1"># The size needed for generated data</span>
+        <span class="s2">&quot;__generated_data_size&quot;</span><span class="p">,</span>
+        <span class="c1"># The matrices that need to be generated on host</span>
+        <span class="s2">&quot;__on_host_matrices&quot;</span><span class="p">,</span>
+        <span class="c1"># The matrices that have been generated on machine</span>
+        <span class="s2">&quot;__on_machine_matrices&quot;</span><span class="p">,</span>
+        <span class="c1"># The application vertex</span>
+        <span class="s2">&quot;__app_vertex&quot;</span><span class="p">,</span>
+        <span class="c1"># The weight scales</span>
+        <span class="s2">&quot;__weight_scales&quot;</span><span class="p">,</span>
+        <span class="c1"># The size of all synaptic blocks added together</span>
+        <span class="s2">&quot;__all_syn_block_sz&quot;</span><span class="p">,</span>
+        <span class="c1"># Whether data generation has already happened</span>
+        <span class="s2">&quot;__data_generated&quot;</span><span class="p">,</span>
+        <span class="c1"># The size of the bit field data to be allocated</span>
+        <span class="s2">&quot;__bit_field_size&quot;</span><span class="p">,</span>
+        <span class="c1"># The bit field key map generated</span>
+        <span class="s2">&quot;__bit_field_key_map&quot;</span><span class="p">,</span>
         <span class="c1"># The maximum generated data, for calculating timeouts</span>
         <span class="s2">&quot;__max_gen_data&quot;</span>
     <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">all_single_syn_sz</span><span class="p">,</span>
-            <span class="n">synaptic_matrix_region</span><span class="p">,</span> <span class="n">direct_matrix_region</span><span class="p">,</span> <span class="n">poptable_region</span><span class="p">,</span>
-            <span class="n">connection_builder_region</span><span class="p">,</span> <span class="n">synaptic_matrix_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">direct_matrix_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">poptable_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">connection_builder_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">regions</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
+            <span class="n">all_syn_block_sz</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
-<span class="sd">            The slice of the post vertex that these matrices are for</span>
-<span class="sd">        :param int n_synapse_types: The number of synapse types available</span>
-<span class="sd">        :param int all_single_syn_sz:</span>
-<span class="sd">            The space available for &quot;direct&quot; or &quot;single&quot; synapses</span>
-<span class="sd">        :param int synaptic_matrix_region:</span>
-<span class="sd">            The region where synaptic matrices are stored</span>
-<span class="sd">        :param int direct_matrix_region:</span>
-<span class="sd">            The region where &quot;direct&quot; or &quot;single&quot; synapses are stored</span>
-<span class="sd">        :param int poptable_region:</span>
-<span class="sd">            The region where the population table is stored</span>
-<span class="sd">        :param int connection_builder_region:</span>
-<span class="sd">            The region where the synapse generator information is stored</span>
-<span class="sd">        :param synaptic_matrix_ref:</span>
-<span class="sd">            The reference to the synaptic matrix region, or None if not</span>
-<span class="sd">            referenceable</span>
-<span class="sd">        :type synaptic_matrix_ref: int or None</span>
-<span class="sd">        :param direct_matrix_ref:</span>
-<span class="sd">            The reference to the direct matrix region, or None if not</span>
-<span class="sd">            referenceable</span>
-<span class="sd">        :type direct_matrix_ref: int or None</span>
-<span class="sd">        :param poptable_ref:</span>
-<span class="sd">            The reference to the pop table region, or None if not</span>
-<span class="sd">            referenceable</span>
-<span class="sd">        :type poptable_ref: int or None</span>
-<span class="sd">        :param connection_builder_ref:</span>
-<span class="sd">            The reference to the connection builder region, or None if not</span>
-<span class="sd">            referenceable</span>
-<span class="sd">        :type connection_builder_ref: int or None</span>
+<span class="sd">        :param SynapseRegions regions: The synapse regions to use</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span> <span class="o">=</span> <span class="n">post_vertex_slice</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span> <span class="o">=</span> <span class="n">n_synapse_types</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__all_single_syn_sz</span> <span class="o">=</span> <span class="n">all_single_syn_sz</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrix_region</span> <span class="o">=</span> <span class="n">synaptic_matrix_region</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__direct_matrix_region</span> <span class="o">=</span> <span class="n">direct_matrix_region</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__poptable_region</span> <span class="o">=</span> <span class="n">poptable_region</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__connection_builder_region</span> <span class="o">=</span> <span class="n">connection_builder_region</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrix_ref</span> <span class="o">=</span> <span class="n">synaptic_matrix_ref</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__direct_matrix_ref</span> <span class="o">=</span> <span class="n">direct_matrix_ref</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__poptable_ref</span> <span class="o">=</span> <span class="n">poptable_ref</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__connection_builder_ref</span> <span class="o">=</span> <span class="n">connection_builder_ref</span>
-
-        <span class="c1"># Set up the master population table</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span> <span class="o">=</span> <span class="n">MasterPopTableAsBinarySearch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span> <span class="o">=</span> <span class="n">app_vertex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__regions</span> <span class="o">=</span> <span class="n">regions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span> <span class="o">=</span> <span class="n">app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_atoms_per_core</span> <span class="o">=</span> <span class="n">max_atoms_per_core</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span> <span class="o">=</span> <span class="n">weight_scales</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span> <span class="o">=</span> <span class="n">all_syn_block_sz</span>
 
         <span class="c1"># Map of (app_edge, synapse_info) to SynapticMatrixApp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -187,7 +170,15 @@
 
         <span class="c1"># Determine whether to generate on machine</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__gen_on_machine</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data_generated</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_gen_data</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__on_host_matrices</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__on_machine_matrices</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__generated_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__generated_data_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__master_pop_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__bit_field_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__bit_field_key_map</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_gen_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -196,6 +187,14 @@
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_gen_data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bit_field_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The size of the bit field data</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bit_field_size</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">host_generated_block_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -219,136 +218,132 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__on_chip_generated_block_addr</span> <span class="o">-</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__host_generated_block_addr</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__app_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get or create an application synaptic matrix object</span>
+<div class="viewcode-block" id="SynapticMatrices.generate_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.generate_data">[docs]</a>    <span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># If the data has already been generated, stop</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_generated</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data_generated</span> <span class="o">=</span> <span class="kc">True</span>
 
-<span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
-<span class="sd">            The application edge to get the object for</span>
-<span class="sd">        :param SynapseInformation synapse_info:</span>
-<span class="sd">            The synapse information to get the object for</span>
-<span class="sd">        :rtype: SynapticMatrixApp</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="c1"># If there are no synapses, there is nothing to do!</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
 
-        <span class="n">matrix</span> <span class="o">=</span> <span class="n">SynapticMatrixApp</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_single_syn_sz</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrix_region</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__direct_matrix_region</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span>
-        <span class="k">return</span> <span class="n">matrix</span>
+        <span class="c1"># Track writes inside the synaptic matrix region:</span>
+        <span class="n">block_addr</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Set up the master population table</span>
+        <span class="n">poptable</span> <span class="o">=</span> <span class="n">MasterPopTableAsBinarySearch</span><span class="p">()</span>
+        <span class="n">poptable</span><span class="o">.</span><span class="n">initialise_table</span><span class="p">()</span>
+
+        <span class="c1"># Set up other lists</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__on_host_matrices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__on_machine_matrices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">generated_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="c1"># Keep on-machine generated blocks together at the end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__generated_data_size</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES</span> <span class="o">+</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span> <span class="o">*</span> <span class="n">DataType</span><span class="o">.</span><span class="n">U3232</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+
+        <span class="c1"># For each incoming machine vertex, reserve pop table space</span>
+        <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=protected-access</span>
+            <span class="n">app_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
+            <span class="n">synapse_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
+            <span class="n">app_key_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_and_mask</span><span class="p">(</span><span class="n">app_edge</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">app_key_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">d_app_key_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_and_mask</span><span class="p">(</span><span class="n">app_edge</span><span class="p">)</span>
+            <span class="n">app_matrix</span> <span class="o">=</span> <span class="n">SynapticMatrixApp</span><span class="p">(</span>
+                <span class="n">synapse_info</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">synaptic_matrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_atoms_per_core</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span><span class="p">,</span> <span class="n">app_key_info</span><span class="p">,</span> <span class="n">d_app_key_info</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="p">[</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">]</span> <span class="o">=</span> <span class="n">app_matrix</span>
+
+            <span class="c1"># If we can generate on machine, store until end</span>
+            <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">may_generate_on_machine</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__on_machine_matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">app_matrix</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">block_addr</span> <span class="o">=</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">reserve_matrices</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="n">poptable</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__on_host_matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">app_matrix</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__host_generated_block_addr</span> <span class="o">=</span> <span class="n">block_addr</span>
+
+        <span class="c1"># Now add the blocks on machine to keep these all together</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_gen_data</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">app_matrix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_machine_matrices</span><span class="p">:</span>
+            <span class="n">block_addr</span> <span class="o">=</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">reserve_matrices</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="n">poptable</span><span class="p">)</span>
+            <span class="n">gen_data</span> <span class="o">=</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">get_generator_data</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__generated_data_size</span> <span class="o">+=</span> <span class="n">gen_data</span><span class="o">.</span><span class="n">size</span>
+            <span class="n">generated_data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">gen_data</span><span class="o">.</span><span class="n">gen_data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__max_gen_data</span> <span class="o">+=</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">gen_size</span>
+        <span class="k">if</span> <span class="n">generated_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_on_machine</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__generated_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">generated_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_on_machine</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__generated_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__on_chip_generated_block_addr</span> <span class="o">=</span> <span class="n">block_addr</span>
+
+        <span class="c1"># Store the master pop table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__master_pop_data</span> <span class="o">=</span> <span class="n">poptable</span><span class="o">.</span><span class="n">get_pop_table_data</span><span class="p">()</span>
+
+        <span class="c1"># Store bit field data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__bit_field_size</span> <span class="o">=</span> <span class="n">get_sdram_for_bit_field_region</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__bit_field_key_map</span> <span class="o">=</span> <span class="n">get_bitfield_key_map_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__generated_data_size</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__bit_field_key_map</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__write_pop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">poptable_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">master_pop_table_sz</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__master_pop_data</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">pop_table</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">master_pop_table_sz</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;PopTable&#39;</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="n">poptable_ref</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">pop_table</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__master_pop_data</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SynapticMatrices.write_synaptic_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.write_synaptic_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_synaptic_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">references</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write the synaptic data for all incoming projections</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The spec to write to</span>
-<span class="sd">        :param list(~spynnaker8.models.Projection) incoming_projection:</span>
-<span class="sd">            The projections to generate data for</span>
-<span class="sd">        :param int all_syn_block_sz:</span>
-<span class="sd">            The size in bytes of the space reserved for synapses</span>
-<span class="sd">        :param list(float) weight_scales: The weight scale of each synapse</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
+<span class="sd">            The slice of the post-vertex the matrix is for</span>
+<span class="sd">        :param SynapseRegions references:</span>
+<span class="sd">            Regions which are referenced; each region which is not referenced</span>
+<span class="sd">            can be None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># If there are no synapses, there is nothing to do!</span>
-        <span class="k">if</span> <span class="n">all_syn_block_sz</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span>
 
         <span class="c1"># Reserve the region</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span>
             <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing Synaptic Matrix and Master Population Table:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__write_pop_table</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">references</span><span class="o">.</span><span class="n">pop_table</span><span class="p">)</span>
+
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrix_region</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SynBlocks&#39;</span><span class="p">,</span>
-            <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrix_ref</span><span class="p">)</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">synaptic_matrix</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SynBlocks&#39;</span><span class="p">,</span>
+            <span class="n">reference</span><span class="o">=</span><span class="n">references</span><span class="o">.</span><span class="n">synaptic_matrix</span><span class="p">)</span>
 
-        <span class="c1"># Track writes inside the synaptic matrix region:</span>
-        <span class="n">block_addr</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">initialise_table</span><span class="p">()</span>
-
-        <span class="c1"># Convert the data for convenience</span>
-        <span class="n">incoming_by_app_edge</span><span class="p">,</span> <span class="n">delayed_by_app_edge</span><span class="p">,</span> <span class="n">key_space_tracker</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_by_app_edge</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">)</span>
-
-        <span class="c1"># Set up for single synapses</span>
-        <span class="c1"># The list is seeded with an empty array so we can just concatenate</span>
-        <span class="c1"># later (as numpy doesn&#39;t let you concatenate nothing)</span>
-        <span class="n">single_synapses</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)]</span>
-        <span class="n">single_addr</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="c1"># Lets write some synapses</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrix_region</span><span class="p">)</span>
-
-        <span class="c1"># Store a list of synapse info to be generated on the machine</span>
-        <span class="n">generate_on_machine</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-
-        <span class="c1"># For each incoming machine vertex, create a synaptic list</span>
-        <span class="k">for</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">m_vertices</span> <span class="ow">in</span> <span class="n">incoming_by_app_edge</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">delayed_m_vertices</span> <span class="o">=</span> <span class="n">delayed_by_app_edge</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="p">[])</span>
-
-            <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing matrix for edge:</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">app_edge</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
-            <span class="n">app_key_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_and_mask</span><span class="p">(</span>
-                <span class="n">m_vertices</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">)</span>
-            <span class="n">d_app_key_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_and_mask</span><span class="p">(</span>
-                <span class="n">delayed_m_vertices</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">)</span>
-
-            <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">:</span>
-                <span class="n">app_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_matrix</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
-                <span class="n">delay_pre_vertex</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">if</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">delay_pre_vertex</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
-                <span class="n">app_matrix</span><span class="o">.</span><span class="n">set_info</span><span class="p">(</span>
-                    <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">app_key_info</span><span class="p">,</span> <span class="n">d_app_key_info</span><span class="p">,</span>
-                    <span class="n">weight_scales</span><span class="p">,</span> <span class="n">m_vertices</span><span class="p">,</span> <span class="n">delay_pre_vertex</span><span class="p">)</span>
-
-                <span class="c1"># If we can generate the connector on the machine, do so</span>
-                <span class="k">if</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">can_generate_on_machine</span><span class="p">(</span><span class="n">single_addr</span><span class="p">):</span>
-                    <span class="n">generate_on_machine</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">app_matrix</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">block_addr</span><span class="p">,</span> <span class="n">single_addr</span> <span class="o">=</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">write_matrix</span><span class="p">(</span>
-                        <span class="n">spec</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">single_addr</span><span class="p">,</span> <span class="n">single_synapses</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__host_generated_block_addr</span> <span class="o">=</span> <span class="n">block_addr</span>
-
-        <span class="c1"># Skip blocks that will be written on the machine, but add them</span>
-        <span class="c1"># to the master population table</span>
-        <span class="n">generator_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__max_gen_data</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">app_matrix</span> <span class="ow">in</span> <span class="n">generate_on_machine</span><span class="p">:</span>
-            <span class="n">block_addr</span> <span class="o">=</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">write_on_chip_matrix_data</span><span class="p">(</span>
-                <span class="n">generator_data</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__max_gen_data</span> <span class="o">+=</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">gen_size</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_on_machine</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__on_chip_generated_block_addr</span> <span class="o">=</span> <span class="n">block_addr</span>
-
-        <span class="c1"># Finish the master population table</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">finish_master_pop_table</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable_region</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable_ref</span><span class="p">)</span>
-
-        <span class="c1"># Write the size and data of single synapses to the direct region</span>
-        <span class="n">single_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">single_synapses</span><span class="p">)</span>
-        <span class="n">single_data_words</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">single_data</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__direct_matrix_region</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="p">(</span>
-                <span class="n">single_data_words</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span> <span class="o">+</span>
-                <span class="n">DIRECT_MATRIX_HEADER_COST_BYTES</span><span class="p">),</span>
-            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;DirectMatrix&#39;</span><span class="p">,</span>
-            <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__direct_matrix_ref</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__direct_matrix_region</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">single_data_words</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">single_data_words</span><span class="p">:</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">single_data</span><span class="p">)</span>
+        <span class="c1"># Write data for each matrix</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">synaptic_matrix</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_host_matrices</span><span class="p">:</span>
+            <span class="n">matrix</span><span class="o">.</span><span class="n">write_matrix</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__write_synapse_expander_data_spec</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">generator_data</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">)</span></div>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">references</span><span class="o">.</span><span class="n">connection_builder</span><span class="p">)</span>
+
+        <span class="n">write_bitfield_init_data</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">bitfield_filter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bit_field_size</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">.</span><span class="n">bitfield_filter</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__write_synapse_expander_data_spec</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">generator_data</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">connection_builder_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write the data spec for the synapse expander</span>
 
 <span class="sd">        :param ~.DataSpecificationGenerator spec:</span>
@@ -357,36 +352,40 @@
 <span class="sd">        :param weight_scales: scaling of weights on each synapse</span>
 <span class="sd">        :type weight_scales: list(int or float)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">generator_data</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connection_builder_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generated_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">connection_builder_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># If there is a reference, we still need a region to create</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-                    <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__connection_builder_region</span><span class="p">,</span>
+                    <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">connection_builder</span><span class="p">,</span>
                     <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;ConnectorBuilderRegion&quot;</span><span class="p">,</span>
-                    <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__connection_builder_ref</span><span class="p">)</span>
+                    <span class="n">reference</span><span class="o">=</span><span class="n">connection_builder_ref</span><span class="p">)</span>
             <span class="k">return</span>
 
-        <span class="n">n_bytes</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES</span> <span class="o">+</span>
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span> <span class="o">*</span> <span class="n">DataType</span><span class="o">.</span><span class="n">U3232</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">generator_data</span><span class="p">:</span>
-            <span class="n">n_bytes</span> <span class="o">+=</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span>
-
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__connection_builder_region</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="n">n_bytes</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;ConnectorBuilderRegion&quot;</span><span class="p">,</span>
-            <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__connection_builder_ref</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__connection_builder_region</span><span class="p">)</span>
-
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrix_region</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">generator_data</span><span class="p">))</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">connection_builder</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__generated_data_size</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;ConnectorBuilderRegion&quot;</span><span class="p">,</span>
+            <span class="n">reference</span><span class="o">=</span><span class="n">connection_builder_ref</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">connection_builder</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">synaptic_matrix</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">pop_table</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">bitfield_filter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
+                      <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regions</span><span class="o">.</span><span class="n">structural_dynamics</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">INVALID_REGION_ID</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__on_machine_matrices</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># TODO: The index if needed</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">get_n_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">))</span>
-        <span class="n">n_neuron_id_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">n_neuron_id_bits</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weight_scales</span><span class="p">:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">encode_as_int</span><span class="p">(</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_ms</span><span class="p">()))</span>
+        <span class="c1"># Per-Population RNG</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">pop_seed</span><span class="p">)</span>
+        <span class="c1"># Per-Core RNG</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">core_seed</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">:</span>
             <span class="c1"># if the weights are high enough and the population size large</span>
             <span class="c1"># enough, then weight_scales &lt; 1 will result in a zero scale</span>
             <span class="c1"># if converted to an int, so we use U3232 here instead (as there</span>
@@ -394,276 +393,68 @@
             <span class="n">dtype</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">U3232</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">dtype</span><span class="o">.</span><span class="n">max</span><span class="p">),</span> <span class="n">data_type</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
-        <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">generator_data</span><span class="p">:</span>
-            <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">gen_data</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__generated_data</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__bit_field_key_map</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__incoming_by_app_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Convert a list of incoming projections to a dict of</span>
-<span class="sd">            application edge -&gt; list of pre vertices, and a key tracker</span>
-
-<span class="sd">        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
-<span class="sd">            The incoming projections</span>
-<span class="sd">        :rtype: tuple(dict, KeySpaceTracker)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">incoming_by_app_edge</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">OrderedSet</span><span class="p">)</span>
-        <span class="n">delayed_by_app_edge</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">OrderedSet</span><span class="p">)</span>
-        <span class="n">key_space_tracker</span> <span class="o">=</span> <span class="n">KeySpaceTracker</span><span class="p">()</span>
-        <span class="n">pre_vertices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-
-        <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
-            <span class="c1"># pylint: disable=protected-access</span>
-            <span class="n">app_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
-
-            <span class="c1"># Skip if already done</span>
-            <span class="k">if</span> <span class="n">app_edge</span> <span class="ow">in</span> <span class="n">incoming_by_app_edge</span><span class="p">:</span>
-                <span class="k">continue</span>
-
-            <span class="c1"># Add all incoming machine vertices</span>
-            <span class="n">out_verts</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">(</span>
-                <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="n">out_verts</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="n">pre_vertices</span><span class="p">:</span>
-                    <span class="k">continue</span>
-
-                <span class="n">pre_vertices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)</span>
-                <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
-                <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
-                    <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-                <span class="n">key_space_tracker</span><span class="o">.</span><span class="n">allocate_keys</span><span class="p">(</span><span class="n">rinfo</span><span class="p">)</span>
-
-                <span class="n">incoming_by_app_edge</span><span class="p">[</span><span class="n">app_edge</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)</span>
-
-            <span class="c1"># Add all incoming delayed vertices</span>
-            <span class="n">delay_edge</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span>
-            <span class="k">if</span> <span class="n">delay_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">verts</span> <span class="o">=</span> <span class="n">delay_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">(</span>
-                    <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="n">verts</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="n">pre_vertices</span><span class="p">:</span>
-                        <span class="k">continue</span>
-
-                    <span class="n">pre_vertices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)</span>
-                    <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
-                    <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
-                        <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-                    <span class="n">key_space_tracker</span><span class="o">.</span><span class="n">allocate_keys</span><span class="p">(</span><span class="n">rinfo</span><span class="p">)</span>
-                    <span class="n">delayed_by_app_edge</span><span class="p">[</span><span class="n">app_edge</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">incoming_by_app_edge</span><span class="p">,</span> <span class="n">delayed_by_app_edge</span><span class="p">,</span> <span class="n">key_space_tracker</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__check_keys_adjacent</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">mask_size</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Check that a given list of keys and slices have no gaps between</span>
-<span class="sd">            them</span>
-
-<span class="sd">        :param list(tuple(int, Slice)) keys: A list of keys and slices to check</span>
-<span class="sd">        :param mask_size: The number of 0s in the mask</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">key_increment</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">mask_size</span><span class="p">)</span>
-        <span class="n">last_key</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">last_slice</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">v_slice</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
-            <span class="c1"># If the first round, we can skip the checks and just store</span>
-            <span class="k">if</span> <span class="n">last_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="c1"># Fail if next key is not adjacent to last key</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">last_key</span> <span class="o">+</span> <span class="n">key_increment</span><span class="p">)</span> <span class="o">!=</span> <span class="n">key</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="kc">False</span>
-
-                <span class="c1"># Fail if this is not the last key and the number of atoms</span>
-                <span class="c1"># don&#39;t match the other keys (last is OK to be different)</span>
-                <span class="k">elif</span> <span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="ow">and</span>
-                        <span class="n">last_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">!=</span> <span class="n">v_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="kc">False</span>
-
-                <span class="c1"># Fail if the atoms are not adjacent</span>
-                <span class="k">elif</span> <span class="p">(</span><span class="n">last_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">v_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="kc">False</span>
-
-            <span class="c1"># Store for the next round</span>
-            <span class="n">last_key</span> <span class="o">=</span> <span class="n">key</span>
-            <span class="n">last_slice</span> <span class="o">=</span> <span class="n">v_slice</span>
-
-        <span class="c1"># Pass if nothing failed</span>
-        <span class="k">return</span> <span class="kc">True</span>
-
-    <span class="k">def</span> <span class="nf">__get_app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">n_stages</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a key and mask for an incoming application vertex as a whole,\</span>
-<span class="sd">            or say it isn&#39;t possible (return None)</span>
+    <span class="k">def</span> <span class="nf">__get_app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r_info</span><span class="p">,</span> <span class="n">n_stages</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a key and mask for an incoming application vertex as a whole</span>
 
 <span class="sd">        :param list(tuple(int, Slice)) keys:</span>
 <span class="sd">            The key and slice of each relevant machine vertex in the incoming</span>
 <span class="sd">            application vertex</span>
 <span class="sd">        :param int mask: The mask that covers all keys</span>
 <span class="sd">        :param n_stages: The number of delay stages</span>
-<span class="sd">        :param key_space_tracker:</span>
-<span class="sd">            A key space tracker that has been filled in with all keys this</span>
-<span class="sd">            vertex will receive</span>
 <span class="sd">        :rtype: None or _AppKeyInfo</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Can be merged only if keys are adjacent outside the mask</span>
-        <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">mask_size</span> <span class="o">=</span> <span class="n">KeySpaceTracker</span><span class="o">.</span><span class="n">count_trailing_0s</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_keys_adjacent</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">mask_size</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">None</span>
+        <span class="c1"># Find the bit that is just for the core</span>
+        <span class="n">mask_size</span> <span class="o">=</span> <span class="n">r_info</span><span class="o">.</span><span class="n">n_bits_atoms</span>
+        <span class="n">core_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">machine_mask</span> <span class="o">-</span> <span class="n">r_info</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">mask_size</span>
+        <span class="n">pre</span> <span class="o">=</span> <span class="n">r_info</span><span class="o">.</span><span class="n">vertex</span>
+        <span class="n">n_atoms</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">pre</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
 
-        <span class="c1"># Get the key as the first key and the mask as the mask that covers</span>
-        <span class="c1"># enough keys</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">n_extra_mask_bits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">))))</span>
-        <span class="n">core_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">n_extra_mask_bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="n">new_mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span><span class="n">core_mask</span> <span class="o">&lt;&lt;</span> <span class="n">mask_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_AppKeyInfo</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">r_info</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span>
+                           <span class="n">mask_size</span><span class="p">,</span> <span class="n">n_atoms</span> <span class="o">*</span> <span class="n">n_stages</span><span class="p">)</span>
 
-        <span class="c1"># Final check because adjacent keys don&#39;t mean they all fit under a</span>
-        <span class="c1"># single mask</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="n">new_mask</span> <span class="o">!=</span> <span class="n">key</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">def</span> <span class="nf">__app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a key and mask for an incoming application vertex as a whole</span>
 
-        <span class="c1"># Check that the key doesn&#39;t cover other keys that it shouldn&#39;t</span>
-        <span class="n">next_key</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">mask_size</span><span class="p">)</span>
-        <span class="n">max_key</span> <span class="o">=</span> <span class="n">key</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">mask_size</span> <span class="o">+</span> <span class="n">n_extra_mask_bits</span><span class="p">))</span>
-        <span class="n">n_unused</span> <span class="o">=</span> <span class="n">max_key</span> <span class="o">-</span> <span class="p">(</span><span class="n">next_key</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">n_unused</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">key_space_tracker</span><span class="o">.</span><span class="n">is_allocated</span><span class="p">(</span><span class="n">next_key</span><span class="p">,</span> <span class="n">n_unused</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="k">return</span> <span class="n">_AppKeyInfo</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">new_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">mask_size</span><span class="p">,</span>
-                           <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">n_stages</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__check_key_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">slices</span><span class="p">,</span> <span class="n">delay_stages</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Check if a list of slices cover all n_atoms without any gaps</span>
-
-<span class="sd">        :param int n_atoms: The total number of atoms expected</span>
-<span class="sd">        :param list(Slice) slices: The list of slices to check</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">slices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">slices</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-        <span class="n">slice_atoms</span> <span class="o">=</span> <span class="n">slices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">-</span> <span class="n">slices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">slice_atoms</span> <span class="o">!=</span> <span class="n">n_atoms</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="c1"># Check that all slices are also there in between, and that all are</span>
-        <span class="c1"># the same size (except the last one)</span>
-        <span class="n">next_high</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">n_atoms_per_core</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">last_slice</span> <span class="o">=</span> <span class="n">slices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">slices</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">!=</span> <span class="n">next_high</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">n_atoms_per_core</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">s</span> <span class="o">!=</span> <span class="n">last_slice</span> <span class="ow">and</span>
-                    <span class="n">n_atoms_per_core</span> <span class="o">!=</span> <span class="n">s</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">):</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="n">next_high</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">n_atoms_per_core</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">n_atoms_per_core</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">n_atoms</span>
-
-        <span class="c1"># If the number of atoms per core is too big, this can&#39;t be done</span>
-        <span class="k">if</span> <span class="p">((</span><span class="n">n_atoms_per_core</span> <span class="o">*</span> <span class="n">delay_stages</span><span class="p">)</span> <span class="o">&gt;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">max_n_neurons_per_core</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span>
-
-    <span class="k">def</span> <span class="nf">__app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m_vertices</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a key and mask for an incoming application vertex as a whole,\</span>
-<span class="sd">            or say it isn&#39;t possible (return None)</span>
-
-<span class="sd">        :param list(MachineVertex) m_vertices:</span>
-<span class="sd">            The relevant incoming machine vertices</span>
 <span class="sd">        :param PopulationApplicationEdge app_edge:</span>
 <span class="sd">            The application edge to get the key and mask of</span>
-<span class="sd">        :param KeySpaceTracker key_space_tracker:</span>
-<span class="sd">            A tracker pre-filled with the keys of all incoming edges</span>
+<span class="sd">        :param RoutingInfo routing_info: The routing information of all edges</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># If there are too many pre-cores, give up now</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_vertices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">max_core_mask</span><span class="p">:</span>
+        <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
+        <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
+            <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="c1"># Work out if the keys allow the machine vertices to be merged</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-
-        <span class="c1"># Can be merged only if all the masks are the same</span>
-        <span class="n">pre_slices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">m_vertices</span><span class="p">:</span>
-            <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
-            <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
-                <span class="n">m_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-            <span class="n">pre_slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
-            <span class="c1"># No routing info at all? Must have been filtered, so doesn&#39;t work</span>
-            <span class="k">if</span> <span class="n">rinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="c1"># Mask is not the same as the last mask?  Doesn&#39;t work</span>
-            <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">mask</span> <span class="o">!=</span> <span class="n">mask</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">mask</span>
-            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_key_slices</span><span class="p">(</span>
-                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_app_key_and_mask</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__delay_app_key_and_mask</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">m_vertices</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a key and mask for a whole incoming delayed application\</span>
-<span class="sd">            vertex, or say it isn&#39;t possible (return None)</span>
-
-<span class="sd">        :param list(MachineVertex) m_vertices:</span>
-<span class="sd">            The relevant incoming machine vertices from delays</span>
-<span class="sd">        :param PopulationApplicationEdge app_edge:</span>
-<span class="sd">            The application edge to get the key and mask of</span>
-<span class="sd">        :param KeySpaceTracker key_space_tracker:</span>
-<span class="sd">            A tracker pre-filled with the keys of all incoming edges</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># If there are no delay vertices, stop</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">m_vertices</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="c1"># If there are too many pre-cores, give up now</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_vertices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">max_core_mask</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="c1"># Work out if the keys allow the machine vertices to be</span>
-        <span class="c1"># merged</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-
-        <span class="c1"># Can be merged only if all the masks are the same</span>
-        <span class="n">pre_slices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">m_vertices</span><span class="p">:</span>
-            <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
-            <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
-                <span class="n">m_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-            <span class="n">pre_slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
-            <span class="c1"># No routing info at all? Must have been filtered, so doesn&#39;t work</span>
-            <span class="k">if</span> <span class="n">rinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="c1"># Mask is not the same as the last mask?  Doesn&#39;t work</span>
-            <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">mask</span> <span class="o">!=</span> <span class="n">mask</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">mask</span>
-            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_key_slices</span><span class="p">(</span>
-                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span>
-                <span class="n">app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_app_key_and_mask</span><span class="p">(</span>
-            <span class="n">keys</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">)</span>
+            <span class="n">r_info</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">())</span>
 
-<div class="viewcode-block" id="SynapticMatrices.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.get_connections_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__delay_app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a key and mask for a whole incoming delayed application\</span>
+<span class="sd">            vertex, or return None if no delay edge exists</span>
+
+<span class="sd">        :param PopulationApplicationEdge app_edge:</span>
+<span class="sd">            The application edge to get the key and mask of</span>
+<span class="sd">        :param RoutingInfo routing_info: The routing information of all edges</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">delay_edge</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span>
+        <span class="k">if</span> <span class="n">delay_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
+        <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
+            <span class="n">delay_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+
+        <span class="c1"># We use the app_edge pre-vertex max atoms here as the delay vertex</span>
+        <span class="c1"># is split according to this</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_app_key_and_mask</span><span class="p">(</span>
+            <span class="n">r_info</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">,</span>
+            <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">())</span>
+
+<div class="viewcode-block" id="SynapticMatrices.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.get_connections_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the synaptic connections from the machine</span>
 
-<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
-<span class="sd">            Used to read the data from the machine</span>
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            Where the vertices are on the machine</span>
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
@@ -671,10 +462,10 @@
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">            The synapse information of the projection</span>
 <span class="sd">        :return: A list of arrays of connections, each with dtype</span>
-<span class="sd">            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
+<span class="sd">            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_matrix</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="p">[</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">matrix</span><span class="o">.</span><span class="n">get_connections</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SynapticMatrices.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
@@ -684,14 +475,8 @@
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            where the data is to be read from</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_machine_matrices</span><span class="p">:</span>
             <span class="n">matrix</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="SynapticMatrices.clear_connection_cache"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.clear_connection_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_connection_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Clear any values read from the machine</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">matrix</span><span class="o">.</span><span class="n">clear_connection_cache</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -701,18 +486,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gen_on_machine</span>
 
-<div class="viewcode-block" id="SynapticMatrices.get_index"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.get_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">m_vertex</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapticMatrices.get_index"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.get_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the index of an incoming projection in the population table</span>
 
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">            The application edge of the projection</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">            The synapse information of the projection</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex m_vertex:</span>
-<span class="sd">            The source machine vertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_matrix</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">matrix</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="n">m_vertex</span><span class="p">)</span></div></div>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="p">[</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">matrix</span><span class="o">.</span><span class="n">get_index</span><span class="p">()</span></div></div>
 
 
 <span class="k">class</span> <span class="nc">_AppKeyInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>

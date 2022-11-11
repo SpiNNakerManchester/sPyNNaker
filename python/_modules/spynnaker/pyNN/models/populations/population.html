@@ -60,25 +60,20 @@
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">from</span> <span class="nn">pyNN</span> <span class="kn">import</span> <span class="n">descriptions</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">NumpyRNG</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">InvalidParameterType</span><span class="p">,</span> <span class="n">SpynnakerException</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractContainsUnits</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span>
-    <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">,</span>
-    <span class="n">SupportsStructure</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_pynn_model</span> <span class="kn">import</span> <span class="n">AbstractPyNNModel</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.recorder</span> <span class="kn">import</span> <span class="n">Recorder</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKES</span>
 <span class="kn">from</span> <span class="nn">.idmixin</span> <span class="kn">import</span> <span class="n">IDMixin</span>
 <span class="kn">from</span> <span class="nn">.population_base</span> <span class="kn">import</span> <span class="n">PopulationBase</span>
 <span class="kn">from</span> <span class="nn">.population_view</span> <span class="kn">import</span> <span class="n">PopulationView</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">SupportsStructure</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">PopulationApplicationVertex</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
 
@@ -98,20 +93,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;_all_ids&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_annotations&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_celltype&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__annotations&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__celltype&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__first_id&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__has_read_neuron_parameters_this_run&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__last_id&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_positions&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_recorder&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_size&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__positions&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__recorder&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__size&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__structure&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__vertex&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__vertex_contains_units&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__vertex_population_initializable&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__vertex_population_settable&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__vertex&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">cellclass</span><span class="p">,</span> <span class="n">cellparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -139,13 +129,13 @@
         <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__roundsize</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__create_vertex</span><span class="p">(</span>
             <span class="n">model</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">additional_parameters</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span> <span class="o">=</span> <span class="n">Recorder</span><span class="p">(</span><span class="n">population</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span> <span class="o">=</span> <span class="n">Recorder</span><span class="p">(</span><span class="n">population</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">)</span>
 
         <span class="c1"># Internal structure now supported 23 November 2014 ADR</span>
         <span class="c1"># structure should be a valid Space.py structure type.</span>
         <span class="c1"># generation of positions is deferred until needed.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span> <span class="o">=</span> <span class="n">structure</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__positions</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_structure</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
 
@@ -155,26 +145,22 @@
         <span class="c1"># initialise common stuff</span>
         <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">n_atoms</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_annotations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-
-        <span class="c1"># parameter</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__has_read_neuron_parameters_this_run</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__annotations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
         <span class="c1"># things for pynn demands</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__first_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__last_id</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">add_population</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_all_ids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__first_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__last_id</span><span class="p">)</span>
 
         <span class="c1"># set up initial values if given</span>
         <span class="k">if</span> <span class="n">initial_values</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">initial_values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_initial_state_values</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Iterate over local cells</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__size</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">IDMixin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_id</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_or_slice</span><span class="p">):</span>
@@ -189,7 +175,7 @@
 
 <span class="sd">        :rtype: iterable(IDMixin)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__size</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">IDMixin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_id</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
@@ -198,7 +184,7 @@
 
 <span class="sd">        :rtype: dict(str, ...)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annotations</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__annotations</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">celltype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -207,7 +193,7 @@
 <span class="sd">        :return: The celltype this property has been set to</span>
 <span class="sd">        :rtype: AbstractPyNNModel</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_celltype</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__celltype</span>
 
 <div class="viewcode-block" id="Population.can_record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.can_record">[docs]</a>    <span class="k">def</span> <span class="nf">can_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine whether `variable` can be recorded from this population.</span>
@@ -215,8 +201,7 @@
 <span class="sd">        :param str variable: The variable to answer the question about</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">get_all_possible_recordable_variables</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">can_record</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.record">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationBase</span><span class="o">.</span><span class="n">record</span><span class="p">,</span> <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -234,32 +219,8 @@
 <span class="sd">        :param int sampling_interval: a value in milliseconds, and an integer</span>
 <span class="sd">            multiple of the simulation timestep.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">record</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">record</span><span class="p">(</span>
             <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">_record</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Record the specified variable or variables for all cells in the\</span>
-<span class="sd">            Population or view.</span>
-
-<span class="sd">        :param variables: either a single variable name or a list of variable</span>
-<span class="sd">            names. For a given celltype class, ``celltype.recordable`` contains</span>
-<span class="sd">            a list of variables that can be recorded for that celltype.</span>
-<span class="sd">            Can also be ``None`` to reset the list of variables.</span>
-<span class="sd">        :type variables: str or list(str) or None</span>
-<span class="sd">        :param to_file: a file to automatically record to (optional).</span>
-<span class="sd">            :py:meth:`write_data` will be automatically called when</span>
-<span class="sd">            `sim.end()` is called.</span>
-<span class="sd">        :type to_file: ~neo.io or ~neo.rawio or str</span>
-<span class="sd">        :param int sampling_interval: a value in milliseconds, and an integer</span>
-<span class="sd">            multiple of the simulation timestep.</span>
-<span class="sd">        :param indexes: The indexes of neurons to record from.</span>
-<span class="sd">            This is non-standard PyNN and equivalent to creating a view with</span>
-<span class="sd">            these indexes and asking the View to record.</span>
-<span class="sd">        :type indexes: None or list(int)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">record</span><span class="p">(</span>
-            <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Population.sample"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Randomly sample `n` cells from the Population, and return a\</span>
@@ -315,7 +276,7 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">io</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">get_io</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">extract_neo_block</span><span class="p">(</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">extract_neo_block</span><span class="p">(</span>
             <span class="n">variables</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">clear</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span>
         <span class="c1"># write the neo block to the file</span>
         <span class="n">io</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
@@ -335,7 +296,7 @@
 <span class="sd">        :type engine: str or ~pyNN.descriptions.TemplateEngine or None</span>
 <span class="sd">        :rtype: str or dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">vertex_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+        <span class="n">vertex_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 
         <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
@@ -346,22 +307,22 @@
             <span class="s2">&quot;first_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_id</span><span class="p">,</span>
             <span class="s2">&quot;last_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_id</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_annotations</span><span class="p">)</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__annotations</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
                 <span class="s2">&quot;local_first_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">first_id</span><span class="p">,</span>
                 <span class="s2">&quot;cell_parameters&quot;</span><span class="p">:</span> <span class="p">{}})</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_structure</span><span class="p">:</span>
-            <span class="n">context</span><span class="p">[</span><span class="s2">&quot;structure&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_structure</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span><span class="p">:</span>
+            <span class="n">context</span><span class="p">[</span><span class="s2">&quot;structure&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">descriptions</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Do final steps at the end of the simulation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">write_to_files_indicators</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">write_to_files_indicators</span><span class="p">[</span><span class="n">variable</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">write_to_files_indicators</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">write_to_files_indicators</span><span class="p">[</span><span class="n">variable</span><span class="p">]:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span>
-                    <span class="n">io</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">write_to_files_indicators</span><span class="p">[</span><span class="n">variable</span><span class="p">],</span>
+                    <span class="n">io</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">write_to_files_indicators</span><span class="p">[</span><span class="n">variable</span><span class="p">],</span>
                     <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="n">variable</span><span class="p">])</span>
 
 <div class="viewcode-block" id="Population.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.get_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationBase</span><span class="o">.</span><span class="n">get_data</span><span class="p">,</span> <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -400,32 +361,8 @@
                 <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;annotations parameter is not standard PyNN so may &quot;</span>
                         <span class="s2">&quot;not be supported by all platforms.&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">extract_neo_block</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">extract_neo_block</span><span class="p">(</span>
             <span class="n">variables</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">clear</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Population.get_data_by_indexes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.get_data_by_indexes">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_by_indexes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return a Neo `Block` containing the data\</span>
-<span class="sd">            (spikes, state variables) recorded from the Assembly.</span>
-
-<span class="sd">        :param variables: either a single variable name or a list of variable</span>
-<span class="sd">            names. Variables must have been previously recorded, otherwise an</span>
-<span class="sd">            Exception will be raised.</span>
-<span class="sd">        :type variables: str or list(str)</span>
-<span class="sd">        :param list(int) indexes: List of neuron indexes to include in the</span>
-<span class="sd">            data. Clearly only neurons recording will actually have any data.</span>
-<span class="sd">            If None will be taken as all recording as in :meth:`get_data`</span>
-<span class="sd">        :param bool clear: Whether recorded data will be deleted.</span>
-<span class="sd">        :param annotations: annotations to put on the neo block</span>
-<span class="sd">        :type annotations: dict(str, ...)</span>
-<span class="sd">        :rtype: ~neo.core.Block</span>
-<span class="sd">        :raises \</span>
-<span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
-<span class="sd">            If the variable or variables have not been previously set to</span>
-<span class="sd">            record.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">extract_neo_block</span><span class="p">(</span>
-            <span class="n">variables</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.spinnaker_get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.spinnaker_get_data">[docs]</a>    <span class="k">def</span> <span class="nf">spinnaker_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">as_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Public accessor for getting data as a numpy array, instead of\</span>
@@ -450,11 +387,11 @@
         <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">SPIKES</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">as_matrix</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ignoring as matrix for </span><span class="si">{</span><span class="n">SPIKES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">spikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">()</span>
+            <span class="n">spikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;spikes&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">view_indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">spikes</span>
             <span class="k">return</span> <span class="n">spikes</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">spikes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">view_indexes</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">get_recorded_pynn7</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">get_recorded_pynn7</span><span class="p">(</span>
             <span class="n">variable</span><span class="p">,</span> <span class="n">as_matrix</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.get_spike_counts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.get_spike_counts">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationBase</span><span class="o">.</span><span class="n">get_spike_counts</span><span class="p">,</span> <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -463,7 +400,7 @@
 
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">spikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">()</span>
+        <span class="n">spikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;spikes&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_spike_counts</span><span class="p">(</span><span class="n">spikes</span><span class="p">,</span> <span class="n">gather</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_spike_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -494,28 +431,32 @@
 <span class="sd">        :return: The units of the variable</span>
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_variable_unit</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.set"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set parameters of this population.</span>
+        <span class="sd">&quot;&quot;&quot; Set one or more parameters for every cell in the population.</span>
 
-<span class="sd">        :param parameters: The parameters to set.</span>
+<span class="sd">        ``parameter`` can be a dict, in which case ``value`` should not be</span>
+<span class="sd">        supplied, or a string giving the parameter name, in which case</span>
+<span class="sd">        ``value`` is the parameter value. ``value`` can be a numeric value, or</span>
+<span class="sd">        list of such (e.g. for setting spike times)::</span>
+
+<span class="sd">            p._set(&quot;tau_m&quot;, 20.0).</span>
+<span class="sd">            p._set({&#39;tau_m&#39;:20, &#39;v_rest&#39;:-65})</span>
+
+<span class="sd">        :param parameters:</span>
+<span class="sd">            the parameter to set or dictionary of parameters to set</span>
+<span class="sd">        :type parameters:</span>
+<span class="sd">            str or dict(str, int or float or list(int) or list(float))</span>
+<span class="sd">        :param value: the value of the parameter to set.</span>
+<span class="sd">        :type value: int or float or list(int) or list(float)</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">InvalidParameterType</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Population.tset"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.tset">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationBase</span><span class="o">.</span><span class="n">tset</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">tset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="s2">&quot;This function is deprecated; call pop.set(...) instead&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">InvalidParameterType</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_parameter_values</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.initialize"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set initial values of state variables, e.g. the membrane\</span>
@@ -537,90 +478,88 @@
 <span class="sd">            p.initialize(v=rand_distr, gsyn_exc=0.0)</span>
 <span class="sd">            p.initialize(v=lambda i: -65 + i / 10.0)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
+            <span class="n">warn_once</span><span class="p">(</span>
+                <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;Calling initialize without reset will have no effect.&quot;</span>
+                <span class="s2">&quot; If you want to set the current value of a state variable&quot;</span>
+                <span class="s2">&quot; consider calling the non-PyNN function set_state instead.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_initial_state_values</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: dict</span>
+        <span class="sd">&quot;&quot;&quot; Get the initial values of the state variables.  Note that these</span>
+<span class="sd">            values will be the same as the values set with the last call to</span>
+<span class="sd">            initialize rather than the actual initial values if this call has</span>
+<span class="sd">            been made.</span>
+
+<span class="sd">        :rtype: InitialValuesHolder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_initializable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                <span class="s2">&quot;Population does not support the initialisation&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">initial_values</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_initial_state_values</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_state_variables</span><span class="p">())</span>
 
-<div class="viewcode-block" id="Population.get_initial_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.get_initial_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_initial_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        .. deprecated:: 6.0</span>
-<span class="sd">            Use :py:meth:`initial_values` instead.</span>
+<div class="viewcode-block" id="Population.set_state"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.set_state">[docs]</a>    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set current values of state variables, e.g. the membrane\</span>
+<span class="sd">            potential.  Values passed to ``set_state()`` may be:</span>
+
+<span class="sd">        * single numeric values (all neurons set to the same value), or</span>
+<span class="sd">        * :py:class:`~pyNN.random.RandomDistribution` objects, or</span>
+<span class="sd">        * lists / arrays of numbers of the same size as the population</span>
+<span class="sd">          mapping functions, where a mapping function accepts a single</span>
+<span class="sd">          argument (the cell index) and returns a single number.</span>
+
+<span class="sd">        Values should be expressed in the standard PyNN units (i.e.</span>
+<span class="sd">        millivolts, nanoamps, milliseconds, microsiemens, nanofarads,</span>
+<span class="sd">        event per second).</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">            p.set_state(v=-70.0)</span>
+<span class="sd">            p.set_state(v=rand_distr, gsyn_exc=0.0)</span>
+<span class="sd">            p.set_state(v=lambda i: -65 + i / 10.0)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">REMOVED_V6</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="s2">&quot;get_initial_value&quot;</span><span class="p">,</span> <span class="s2">&quot;initial_values&quot;</span><span class="p">))</span></div>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
+        <span class="n">warn_once</span><span class="p">(</span>
+            <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;set_state is non-standard PyNN and therefore &quot;</span>
+            <span class="s2">&quot;will not be portable to other simulators.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_current_state_values</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_initial_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">selector</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; See :py:meth:`~.AbstractPopulationInitializable.get_initial_value`</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the current values of the state variables.</span>
 
-<span class="sd">        :param str variable: variable name with or without ``_init`` suffix</span>
-<span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
-<span class="sd">            for all. See:</span>
-<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
-<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
-<span class="sd">        :return: A list, or an object which acts like a list</span>
-<span class="sd">        :rtype: iterable</span>
+<span class="sd">        :rtype: InitialValuesHolder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_initializable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                <span class="s2">&quot;Population does not support the initialisation of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">variable</span><span class="p">))</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">get_initial_value</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Population.set_initial_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.set_initial_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_initial_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        .. deprecated:: 6.0</span>
-<span class="sd">            Use :py:meth:`initialize` instead.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">REMOVED_V6</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="s2">&quot;set_initial_value&quot;</span><span class="p">,</span> <span class="s2">&quot;initialize&quot;</span><span class="p">))</span></div>
-
-    <span class="k">def</span> <span class="nf">_get_initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; See :py:meth:`~.AbstractPopulationInitializable.get_initial_values`</span>
-
-<span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
-<span class="sd">            for all. See:</span>
-<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
-<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
-<span class="sd">        :return: dictionary from variable name to initial value(s)</span>
-<span class="sd">        :rtype: dict(str,int or float or list(int) or list(float))</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_initializable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Population does not support the initialisation&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">get_initial_values</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
+        <span class="n">warn_once</span><span class="p">(</span>
+            <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;current_values is non-standard PyNN and therefore &quot;</span>
+            <span class="s2">&quot;will not be portable to other simulators.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_current_state_values</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_state_variables</span><span class="p">())</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the position array for structured populations.</span>
 
-<span class="sd">        :return: a 2D array, one row per cell.</span>
-<span class="sd">            Each row is three long, for X,Y,Z</span>
+<span class="sd">        :return: a 3xN array</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_structure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__positions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;attempted to retrieve positions &quot;</span>
                                  <span class="s2">&quot;for an unstructured population&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_structure</span><span class="o">.</span><span class="n">generate_positions</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># change of order in pyNN 0.8</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span><span class="o">.</span><span class="n">generate_positions</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__positions</span><span class="o">.</span><span class="n">T</span>
 
     <span class="nd">@positions</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Sets all the positions in the population.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="n">positions</span>
-
-        <span class="c1"># state that something has changed in the population,</span>
-        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__positions</span> <span class="o">=</span> <span class="n">positions</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">all_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -628,7 +567,7 @@
 <span class="sd">        :rtype: list(~spynnaker.pyNN.models.populations.IDMixin)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cells</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__size</span><span class="p">):</span>
             <span class="n">cells</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">IDMixin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_id</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">cells</span>
 
@@ -658,21 +597,18 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__last_id</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: ~pyNN.space.BaseStructure or None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span>
-
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span>
 
-    <span class="k">def</span> <span class="nf">_reset_has_read_neuron_parameters_this_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__has_read_neuron_parameters_this_run</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_recorder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: Recorder</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">conductance_based</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -680,9 +616,7 @@
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="s2">&quot;conductance_based&quot;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">conductance_based</span>
-        <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">conductance_based</span>
 
 <div class="viewcode-block" id="Population.get"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter_names</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">simplify</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the values of a parameter for every local cell in the\</span>
@@ -696,7 +630,7 @@
 <span class="sd">        :return: A single list of values (or possibly a single value) if</span>
 <span class="sd">            paramter_names is a string, or a dict of these if parameter names</span>
 <span class="sd">            is a list.</span>
-<span class="sd">        :rtype: str or list(str) or dict(str,str) or dict(str,list(str))</span>
+<span class="sd">        :rtype: ParameterHolder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">gather</span><span class="p">:</span>
             <span class="n">warn_once</span><span class="p">(</span>
@@ -705,42 +639,8 @@
         <span class="k">if</span> <span class="n">simplify</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">warn_once</span><span class="p">(</span>
                 <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;The simplify value is ignored if not set to true&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_settable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Population does not support setting&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameter_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">parameter_names</span><span class="p">)</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">parameter_name</span> <span class="ow">in</span> <span class="n">parameter_names</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="n">parameter_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">parameter_name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">results</span></div>
 
-    <span class="c1"># NON-PYNN API CALL</span>
-    <span class="k">def</span> <span class="nf">_get_by_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">parameter_names</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the values of a parameter for the selected cell in the\</span>
-<span class="sd">            population.</span>
-
-<span class="sd">        :param selector: a description of the subrange to accept.</span>
-<span class="sd">            Or None for all. See:</span>
-<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
-<span class="sd">        :type selector: slice or int or iterable(bool) or iterable(int)</span>
-<span class="sd">        :param parameter_names: Name of parameter. This is either a</span>
-<span class="sd">            single string or a list of strings</span>
-<span class="sd">        :type parameter_names: str or iterable(str)</span>
-<span class="sd">        :return: A single list of values (or possibly a single value) if</span>
-<span class="sd">            paramter_names is a string or a dict of these if parameter names</span>
-<span class="sd">            is a list.</span>
-<span class="sd">        :rtype: str or list(str) or dict(str,str) or dict(str,list(str))</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_settable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Population does not support setting&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameter_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_value_by_selector</span><span class="p">(</span>
-                <span class="n">selector</span><span class="p">,</span> <span class="n">parameter_names</span><span class="p">)</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">parameter_name</span> <span class="ow">in</span> <span class="n">parameter_names</span><span class="p">:</span>
-            <span class="n">results</span><span class="p">[</span><span class="n">parameter_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_value_by_selector</span><span class="p">(</span>
-                <span class="n">selector</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">results</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_parameter_values</span><span class="p">(</span><span class="n">parameter_names</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.id_to_index"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.id_to_index">[docs]</a>    <span class="k">def</span> <span class="nf">id_to_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>  <span class="c1"># @ReservedAssignment</span>
         <span class="sd">&quot;&quot;&quot; Given the ID(s) of cell(s) in the Population, return its (their)\</span>
@@ -794,26 +694,6 @@
         <span class="c1"># TODO: Need __getitem__</span>
         <span class="n">_we_dont_do_this_now</span><span class="p">(</span><span class="n">cell_id</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set the initial value of one of the state variables of the neurons\</span>
-<span class="sd">            in this population.</span>
-
-<span class="sd">        :param str variable:</span>
-<span class="sd">        :param value:</span>
-<span class="sd">        :type value: float or int or list(float) or list(int)</span>
-<span class="sd">        :param selector: a description of the subrange to accept.</span>
-<span class="sd">            Or None for all. See:</span>
-<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
-<span class="sd">        :type selector: slice or int or iterable(bool) or iterable(int)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_initializable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                <span class="s2">&quot;Population does not support the initialisation of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">variable</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_read_parameters_before_set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
-
 <div class="viewcode-block" id="Population.inject"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.inject">[docs]</a>    <span class="k">def</span> <span class="nf">inject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_source</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Connect a current source to all cells in the Population.</span>
 
@@ -821,15 +701,12 @@
 <span class="sd">        http://neuralensemble.org/docs/PyNN/reference/populations.html</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Pass this into the vertex</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">current_source</span><span class="p">,</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">)])</span>
-        <span class="n">current_source</span><span class="o">.</span><span class="n">set_population</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="c1"># Must remap if called between runs (with reset)</span>
-        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">current_source</span><span class="p">,</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__size</span><span class="p">)])</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the total number of cells in the population.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__size</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -837,7 +714,7 @@
 
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">label</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">label</span>
 
     <span class="nd">@label</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
@@ -852,117 +729,7 @@
 <span class="sd">        http://neuralensemble.org/docs/PyNN/reference/populations.html</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Doesn&#39;t make much sense on SpiNNaker</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
-
-    <span class="k">def</span> <span class="nf">_set_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Checks for various set methods.</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_settable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Population does not have property </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">parameter</span><span class="p">))</span>
-
-        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;A value (not None) must be specified&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s2">&quot;Parameter must either be the name of a single parameter to&quot;</span>
-                <span class="s2">&quot; set, or a dict of parameter: value items to set&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_read_parameters_before_set</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set one or more parameters for every cell in the population.</span>
-
-<span class="sd">        ``parameter`` can be a dict, in which case ``value`` should not be</span>
-<span class="sd">        supplied, or a string giving the parameter name, in which case</span>
-<span class="sd">        ``value`` is the parameter value. ``value`` can be a numeric value, or</span>
-<span class="sd">        list of such (e.g. for setting spike times)::</span>
-
-<span class="sd">            p._set(&quot;tau_m&quot;, 20.0).</span>
-<span class="sd">            p._set({&#39;tau_m&#39;:20, &#39;v_rest&#39;:-65})</span>
-
-<span class="sd">        :param parameter:</span>
-<span class="sd">            the parameter to set or dictionary of parameters to set</span>
-<span class="sd">        :type parameter:</span>
-<span class="sd">            str or dict(str, int or float or list(int) or list(float))</span>
-<span class="sd">        :param value: the value of the parameter to set.</span>
-<span class="sd">        :type value: int or float or list(int) or list(float)</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_check</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-
-        <span class="c1"># set new parameters</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;A value (not None) must be specified&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-            <span class="k">return</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parameter</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-
-    <span class="c1"># NON-PYNN API CALL</span>
-<div class="viewcode-block" id="Population.set_by_selector"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.set_by_selector">[docs]</a>    <span class="k">def</span> <span class="nf">set_by_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set one or more parameters for selected cell in the population.</span>
-
-<span class="sd">        param can be a dict, in which case value should not be supplied, or a</span>
-<span class="sd">        string giving the parameter name, in which case value is the parameter</span>
-<span class="sd">        value. value can be a numeric value, or list of such</span>
-<span class="sd">        (e.g. for setting spike times)::</span>
-
-<span class="sd">            p.set_by_selector(1, &quot;tau_m&quot;, 20.0).</span>
-<span class="sd">            p.set_by_selector(1, {&#39;tau_m&#39;:20, &#39;v_rest&#39;:-65})</span>
-
-<span class="sd">        :param selector:</span>
-<span class="sd">            See :py:meth:`RangedList.set_value_by_selector` as this is just a</span>
-<span class="sd">            pass through method</span>
-<span class="sd">        :param parameter:</span>
-<span class="sd">            the parameter to set or dictionary of parameters to set</span>
-<span class="sd">        :type parameter:</span>
-<span class="sd">            str or dict(str, int or float or list(int) or list(float))</span>
-<span class="sd">        :param value: the value of the parameter to set.</span>
-<span class="sd">        :type value: int or float or list(int) or list(float)</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_check</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-
-        <span class="c1"># set new parameters</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parameter</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">_read_parameters_before_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Reads parameters from the machine before :py:meth:`set` completes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># If the tools have run before, and not reset, and the read</span>
-        <span class="c1"># hasn&#39;t already been done, read back the data</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">()</span>
-                <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__has_read_neuron_parameters_this_run</span>
-                <span class="ow">and</span> <span class="ow">not</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">)):</span>
-            <span class="c1"># go through each machine vertex and read the neuron parameters</span>
-            <span class="c1"># it contains</span>
-            <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">):</span>
-                    <span class="c1"># tell the core to rewrite neuron params back to the</span>
-                    <span class="c1"># SDRAM space.</span>
-                    <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
-                        <span class="n">vertex</span><span class="p">)</span>
-                    <span class="n">vertex</span><span class="o">.</span><span class="n">read_parameters_from_machine</span><span class="p">(</span>
-                        <span class="n">placement</span><span class="p">,</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__has_read_neuron_parameters_this_run</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__size</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1014,22 +781,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">n_atoms</span>
 
-    <span class="k">def</span> <span class="nf">_get_variable_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Helper method for getting units from a parameter used by the vertex</span>
-
-<span class="sd">        :param str parameter_name: the parameter name to find the units for</span>
-<span class="sd">        :return: the units in string form</span>
-<span class="sd">        :rtype: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_contains_units</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">parameter_name</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-            <span class="s2">&quot;This population does not support describing its units&quot;</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">_cache_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Store data for later extraction</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">cache_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">cache_data</span><span class="p">()</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__create_model</span><span class="p">(</span><span class="n">cellclass</span><span class="p">,</span> <span class="n">cellparams</span><span class="p">):</span>
@@ -1067,7 +822,7 @@
 <span class="sd">        :type additional_parameters: dict(str, ...)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_celltype</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__celltype</span> <span class="o">=</span> <span class="n">model</span>
         <span class="c1"># Use a provided model to create a vertex</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">AbstractPyNNModel</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
@@ -1083,7 +838,7 @@
                 <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">population_parameters</span><span class="p">)</span>
 
         <span class="c1"># Use a provided application vertex directly</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ApplicationVertex</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PopulationApplicationVertex</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">additional_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                     <span class="s2">&quot;Cannot accept additional parameters </span><span class="si">{}</span><span class="s2"> when the cell is&quot;</span>
@@ -1100,16 +855,8 @@
         <span class="c1"># Fail on anything else</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;Model must be either an AbstractPyNNModel or an&quot;</span>
-                <span class="s2">&quot; ApplicationVertex&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Introspect properties of the vertex</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_settable</span> <span class="o">=</span> \
-            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_initializable</span> <span class="o">=</span> \
-            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractPopulationInitializable</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_contains_units</span> <span class="o">=</span> \
-            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractContainsUnits</span><span class="p">)</span>
+                <span class="s2">&quot;Model must be either an AbstractPyNNModel or a&quot;</span>
+                <span class="s2">&quot; PopulationApplicationVertex&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Population.create"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.create">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">cellclass</span><span class="p">,</span> <span class="n">cellparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>

@@ -318,7 +318,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ArbitraryFPGADevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">ArbitraryFPGADevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chip_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ArbitraryFPGADevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationFPGAVertex</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationFPGAVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -336,7 +336,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ExternalCochleaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">ExternalCochleaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalCochleaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -359,7 +359,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model_name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the model.</p></li>
 <li><p><strong>binary</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the implementation executable.</p></li>
-<li><p><strong>neuron_model</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel" title="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel"><em>AbstractNeuronModel</em></a>) – The model of the neuron soma</p></li>
+<li><p><strong>neuron_model</strong> (<em>AbstractNeuronModel</em>) – The model of the neuron soma</p></li>
 <li><p><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><em>AbstractInputType</em></a>) – The model of synaptic input types</p></li>
 <li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) – The model of the synapses’ dynamics</p></li>
 <li><p><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><em>AbstractThresholdType</em></a>) – The model of the firing threshold</p></li>
@@ -369,7 +369,7 @@
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl.create_vertex">
-<span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes_per_second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_buffer_sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_spike_buffer_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps_per_timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_late_spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control.html#ExternalDeviceLifControl.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl.create_vertex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes_per_second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_buffer_sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_spike_buffer_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps_per_timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_late_spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control.html#ExternalDeviceLifControl.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl.create_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vertex for a population of the model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -392,7 +392,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">ExternalFPGARetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retina_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -735,7 +735,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.MunichMotorDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">MunichMotorDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4096</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">23</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">continue_if_not_different</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractOneAppOneMachineVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractVertexWithEdgeToDependentVertices</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractOneAppOneMachineVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractVertexWithEdgeToDependentVertices</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code></p>
 <p>An Omnibot motor control device. This has a real vertex and an         external device vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -792,7 +792,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.MunichRetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">MunichRetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retina_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MunichRetinaDevice'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
 <p>An Omnibot silicon retina device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -892,7 +892,7 @@ conditions.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.SPIFRetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">SPIFRetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_x_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_y_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chip_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Application2DFPGAVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">HasShapeKeyFields</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Application2DFPGAVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">HasShapeKeyFields</span></code></p>
 <p>A retina device connected to SpiNNaker using a SPIF board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1051,7 +1051,7 @@ in the order of the fields</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">ThresholdTypeMulticastDeviceControl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">ThresholdTypeMulticastDeviceControl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">devices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractThresholdType</span></code></p>
 <p>A threshold type that can send multicast keys with the value of        membrane voltage as the payload</p>
 <dl class="field-list simple">
@@ -1077,69 +1077,6 @@ in the order of the fields</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_units">
-<span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/threshold_type_multicast_device_control.html#ThresholdTypeMulticastDeviceControl.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_values">
-<span class="sig-name descname"><span class="pre">get_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/threshold_type_multicast_device_control.html#ThresholdTypeMulticastDeviceControl.get_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of variables being retrieved</p></li>
-<li><p><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The time to be advanced in one call to the update of this component</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list with the same length as self.struct.field_types</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)"><em>RangedList</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.has_variable">
-<span class="sig-name descname"><span class="pre">has_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/threshold_type_multicast_device_control.html#ThresholdTypeMulticastDeviceControl.has_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.update_values">
-<span class="sig-name descname"><span class="pre">update_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/threshold_type_multicast_device_control.html#ThresholdTypeMulticastDeviceControl.update_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>)</em>) – The values read from the machine, one for each struct element</p></li>
-<li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters to update</p></li>
-<li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables to update</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1267,10 +1204,6 @@ in the order of the fields</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.add_parameters"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.add_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.add_state_variables"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.add_state_variables()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_units"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.get_units()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_values"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.get_values()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.has_variable"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.has_variable()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.update_values"><code class="docutils literal notranslate"><span class="pre">ThresholdTypeMulticastDeviceControl.update_values()</span></code></a></li>
 </ul>
 </li>
 </ul>

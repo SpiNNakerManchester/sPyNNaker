@@ -74,7 +74,7 @@ $(function() {
 , <a class="el" href="delay__extension_8c.html#aa6f8cf72b9fbed71a4cd0989050ef04d">delay_extension_provenance</a>
 </li>
 <li>n_bitfield_vars
-: <a class="el" href="neuron__recording_8c.html#aceb45219931c687ba2595c66b9561e18">neuron_recording_header_t</a>
+: <a class="el" href="neuron__recording_8h.html#aceb45219931c687ba2595c66b9561e18">neuron_recording_header_t</a>
 </li>
 <li>n_buffer_overflows
 : <a class="el" href="delay__extension_8c.html#a14402f68e6fb5f758c453cd1ef86f954">delay_extension_provenance</a>
@@ -104,17 +104,14 @@ $(function() {
 <li>n_filtered_by_bitfield
 : <a class="el" href="structsynapse__provenance.html#a5ecd8b0730953e302c74d60403925a33">synapse_provenance</a>
 </li>
-<li>n_fixed
-: <a class="el" href="direct__synapses_8c.html#a98e324626937fff9c6246c5fe23aa1a6">single_synaptic_row_t</a>
-</li>
 <li>n_ghost_pop_table_searches
 : <a class="el" href="structsynapse__provenance.html#a870bc6cb94b842c5fdb3cc3e83259525">synapse_provenance</a>
 </li>
 <li>n_half_words_per_pp_row_header
-: <a class="el" href="matrix__generator__stdp_8h.html#aa5737732096b5f67fca029d1f2aed44c">matrix_generator_stdp</a>
+: <a class="el" href="matrix__generator__stdp_8h.html#aaf18d9fbe16ef43e0a03a2a6bf6eec8c">matrix_generator_stdp_data_t</a>
 </li>
 <li>n_half_words_per_pp_synapse
-: <a class="el" href="matrix__generator__stdp_8h.html#ab29da34a8c2311993638cb6a258d1b4a">matrix_generator_stdp</a>
+: <a class="el" href="matrix__generator__stdp_8h.html#a9f0a9c8b5ab09642db74da57a9404f87">matrix_generator_stdp_data_t</a>
 </li>
 <li>n_input_buffer_overflows
 : <a class="el" href="robot__motor__control_8c.html#adaf680d39b72069f2abf3665d1e2138e">robot_motor_control_provenance</a>
@@ -125,8 +122,7 @@ $(function() {
 : <a class="el" href="structsynapse__provenance.html#a66ba96fb391b707d23174767cf8c27c5">synapse_provenance</a>
 </li>
 <li>n_neurons
-: <a class="el" href="population__table__binary__search__impl_8c.html#aa4dfc64a68bcb1cf34110d310f67530c">extra_info</a>
-, <a class="el" href="spike__source__poisson_8c.html#a6a591c0cd469068deef9515db3a5435d">sdram_config</a>
+: <a class="el" href="population__table_8h.html#a2196632025af2e0113f8cfd4479463f1">master_population_table_entry</a>
 </li>
 <li>n_packets_added
 : <a class="el" href="delay__extension_8c.html#acbaa257f6e6e932abf4010eba0deae93">delay_extension_provenance</a>
@@ -153,23 +149,19 @@ $(function() {
 <li>n_packets_sent
 : <a class="el" href="delay__extension_8c.html#a859939d1c299e24a68bb25e7af803895">delay_extension_provenance</a>
 </li>
-<li>n_plastic
-: <a class="el" href="direct__synapses_8c.html#a1b6fa98c7e08a0ef08fc5211be5ae829">single_synaptic_row_t</a>
-</li>
-<li>n_plastic_controls
-: <a class="el" href="direct__synapses_8c.html#a3f71526e9df46b5cef9c3b485e15dd6c">single_synaptic_row_t</a>
-</li>
 <li>n_plastic_synaptic_weight_saturations
 : <a class="el" href="structsynapse__provenance.html#a01fa00d445c9550b160386bedbd0ff68">synapse_provenance</a>
 </li>
 <li>n_post
 : <a class="el" href="connection__generator__fixed__post_8h.html#af4c0ed8a643a617c21ce2a377fd1952c">fixed_post_params</a>
 </li>
-<li>n_post_neurons
-: <a class="el" href="connection__generator__fixed__post_8h.html#a19ed05dac833a17b29f0c53d918bd1d2">fixed_post_params</a>
+<li>n_pre_neurons
+: <a class="el" href="matrix__generator__stdp_8h.html#a473d65f4a7583a8f9166549b15a2ba07">matrix_generator_stdp_data_t</a>
+, <a class="el" href="matrix__generator__static_8h.html#a9b3800fcbb5cf9d5670d6735d5e06c89">matrix_genetator_static_data_t</a>
 </li>
-<li>n_pre_neurons_done
-: <a class="el" href="connection__generator__fixed__pre_8h.html#a39a9876a13a2fe1e6700d4fa144de305">fixed_pre_globals_t</a>
+<li>n_pre_neurons_per_core
+: <a class="el" href="matrix__generator__stdp_8h.html#abe6c585e4aa85cb2bbe7a201a3618ee1">matrix_generator_stdp_data_t</a>
+, <a class="el" href="matrix__generator__static_8h.html#a1a17ebd5b4ccb7795574a8b227fd03e4">matrix_genetator_static_data_t</a>
 </li>
 <li>n_pre_synaptic_events
 : <a class="el" href="structsynapse__provenance.html#a8b7c4febfb5b48ff724746939fd5e8b3">synapse_provenance</a>
@@ -178,7 +170,7 @@ $(function() {
 : <a class="el" href="spike__source__poisson_8c.html#a62435794d07ae2d9589f23e7e318cf65">source_info</a>
 </li>
 <li>n_recorded_vars
-: <a class="el" href="neuron__recording_8c.html#abedd25f4658e60246836b650b8432a7b">neuron_recording_header_t</a>
+: <a class="el" href="neuron__recording_8h.html#abedd25f4658e60246836b650b8432a7b">neuron_recording_header_t</a>
 </li>
 <li>n_rewires
 : <a class="el" href="spike__processing__fast_8h.html#a5d9089dc46eecff324a8477701bcc289">spike_processing_fast_provenance</a>
@@ -203,20 +195,17 @@ $(function() {
 <li>n_synapse_cores
 : <a class="el" href="spike__source__poisson_8c.html#ac71da842b9ee9030342176197e40ba3b">sdram_config</a>
 </li>
-<li>n_synapse_types
-: <a class="el" href="spike__source__poisson_8c.html#a5aeda4c778a8f079554189f957410c9c">sdram_config</a>
-</li>
 <li>n_synaptic_weight_saturations
 : <a class="el" href="structsynapse__provenance.html#a6fe3542191d7d2ced6bb0ad19b2b7fde">synapse_provenance</a>
 </li>
-<li>n_tdma_mises
-: <a class="el" href="structneuron__provenance.html#a9567e9ef2fd91cdd106404ec2e2ed282">neuron_provenance</a>
+<li>n_tdma_misses
+: <a class="el" href="structneuron__provenance.html#ae102e3055f07cead0ad5a1b4adf08578">neuron_provenance</a>
 </li>
 <li>n_transfer_timer_overruns
 : <a class="el" href="spike__processing__fast_8h.html#a8c8f48422aa08e54559b1fb06c080d07">spike_processing_fast_provenance</a>
 </li>
 <li>n_words
-: <a class="el" href="population__table__binary__search__impl_8c.html#a30fce9306ac45fadef4dd737d177d467">extra_info</a>
+: <a class="el" href="population__table_8h.html#ab9d13dcb500adc5e34abdff7de94ba2a">master_population_table_entry</a>
 </li>
 <li>neg_machine_time_step_ms_div_10
 : <a class="el" href="threshold__type__static_8h.html#ad4d04f4117f32c07cd86ee51cdc9eb74">threshold_type_t</a>
@@ -226,6 +215,9 @@ $(function() {
 </li>
 <li>neuron_recording
 : <a class="el" href="structneuron__regions.html#a5eb67797af3ac013b128589af3237784">neuron_regions</a>
+</li>
+<li>next_h
+: <a class="el" href="neuron__model__lif__impl_8h.html#a44341613a6482efe24379ae9a3c758d3">neuron_params_t</a>
 </li>
 <li>next_ticks
 : <a class="el" href="spike__source__poisson_8c.html#aa9931cbd5389b3c46b8c0a4de4d0aa77">spike_source_t</a>
@@ -249,7 +241,7 @@ $(function() {
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

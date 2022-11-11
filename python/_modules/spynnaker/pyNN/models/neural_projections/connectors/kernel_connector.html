@@ -61,7 +61,7 @@
 <span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span> <span class="n">ConnectorIDs</span><span class="p">,</span> <span class="n">PARAM_TYPE_KERNEL</span><span class="p">)</span>
+    <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span> <span class="n">ConnectorIDs</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_host</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
@@ -275,7 +275,7 @@
             <span class="s2">&quot;as specified by the shape kernel values.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__compute_statistics</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_neurons</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Compute the relevant information required for the connections.</span>
 
 <span class="sd">        :param weights:</span>
@@ -284,7 +284,6 @@
 <span class="sd">        :param delays:</span>
 <span class="sd">        :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray</span>
 <span class="sd">            or ConvolutionKernel</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If __compute_statistics is called more than once, there&#39;s</span>
@@ -305,8 +304,7 @@
         <span class="n">post_lo</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
 
         <span class="c1"># Loop over pre-vertices</span>
-        <span class="k">for</span> <span class="n">pre_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
-                <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">pre_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_pre_neurons</span><span class="p">):</span>
             <span class="n">pre_r</span><span class="p">,</span> <span class="n">pre_c</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">pre_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_w</span><span class="p">)</span>
             <span class="n">coords</span><span class="p">[</span><span class="n">pre_idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -356,13 +354,13 @@
 
 <div class="viewcode-block" id="KernelConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="c1"># Use the kernel delays if user has supplied them</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="p">)</span>
+
         <span class="c1"># I think this is overestimated, but not by much</span>
         <span class="n">n_conns</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pre_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span><span class="p">)</span>
-        <span class="c1"># Use the kernel delays if user has supplied them</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_maximum</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
 
         <span class="c1"># if not then use the values that came in</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_maximum</span><span class="p">(</span>
@@ -370,17 +368,25 @@
 
 <div class="viewcode-block" id="KernelConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="c1"># Use the kernel delays if user has supplied them</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="p">)</span>
+
         <span class="c1"># I think this is overestimated, but not by much</span>
         <span class="n">n_conns</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pre_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span><span class="p">)</span>
-        <span class="c1"># Use the kernel delays if user has supplied them</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_minimum</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
 
         <span class="c1"># if not then use the values that came in</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_minimum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KernelConnector.get_delay_variance"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.get_delay_variance">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_variance</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_delay_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KernelConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_delay_variance</span><span class="p">(</span>
+            <span class="n">delays</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KernelConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
@@ -396,16 +402,33 @@
 
 <div class="viewcode-block" id="KernelConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="c1"># Use the kernel weights if user has supplied them</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span><span class="p">)</span>
+
         <span class="c1"># I think this is overestimated, but not by much</span>
         <span class="n">n_conns</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pre_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span><span class="p">)</span>
-        <span class="c1"># Use the kernel weights if user has supplied them</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_maximum</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
-
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_maximum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KernelConnector.get_weight_mean"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.get_weight_mean">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_mean</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_weight_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="c1"># Use the kernel weights if user has supplied them</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KernelConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_weight_mean</span><span class="p">(</span>
+            <span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KernelConnector.get_weight_variance"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.get_weight_variance">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_variance</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_weight_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="c1"># Use the kernel weights if user has supplied them</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KernelConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_weight_variance</span><span class="p">(</span>
+            <span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;KernelConnector(shape_kernel[</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">])&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -413,12 +436,11 @@
 
 <div class="viewcode-block" id="KernelConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnHost</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="p">(</span><span class="n">n_connections</span><span class="p">,</span> <span class="n">all_post</span><span class="p">,</span> <span class="n">all_pre_in_range</span><span class="p">,</span> <span class="n">all_pre_in_range_delays</span><span class="p">,</span>
          <span class="n">all_pre_in_range_weights</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__compute_statistics</span><span class="p">(</span>
-            <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span>
-            <span class="n">post_vertex_slice</span><span class="p">)</span>
+            <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">)</span>
 
         <span class="n">syn_dtypes</span> <span class="o">=</span> <span class="n">AbstractConnector</span><span class="o">.</span><span class="n">NUMPY_SYNAPSES_DTYPE</span>
 
@@ -436,11 +458,13 @@
         <span class="k">return</span> <span class="n">block</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_kernel_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: list(int)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_id</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">gen_connector_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ConnectorIDs</span><span class="o">.</span><span class="n">KERNEL_CONNECTOR</span><span class="o">.</span><span class="n">value</span>
+
+<div class="viewcode-block" id="KernelConnector.gen_connector_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.gen_connector_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_params</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
             <span class="n">shape2word</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_common_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_common_h</span><span class="p">),</span>
             <span class="n">shape2word</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pre_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_h</span><span class="p">),</span>
             <span class="n">shape2word</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_h</span><span class="p">),</span>
@@ -448,69 +472,20 @@
             <span class="n">shape2word</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_start_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_start_h</span><span class="p">),</span>
             <span class="n">shape2word</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pre_step_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_step_h</span><span class="p">),</span>
             <span class="n">shape2word</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_step_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_step_h</span><span class="p">),</span>
-            <span class="n">shape2word</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span><span class="p">)]</span>
-
-<div class="viewcode-block" id="KernelConnector.gen_delays_id"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.gen_delays_id">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_delays_id</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">gen_delays_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">PARAM_TYPE_KERNEL</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_delays_id</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="KernelConnector.gen_delay_params_size_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.gen_delay_params_size_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span>
-        <span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_delay_params_size_in_bytes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">gen_delay_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">N_KERNEL_PARAMS</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">*</span> \
-                <span class="n">BYTES_PER_WORD</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_delay_params_size_in_bytes</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="KernelConnector.gen_delay_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.gen_delay_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_delay_params</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">gen_delay_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">properties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_properties</span>
-            <span class="n">properties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">properties</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">encode_as_numpy_int_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_delay_params</span><span class="p">(</span>
-            <span class="n">delays</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="KernelConnector.gen_weights_id"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.gen_weights_id">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_weights_id</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">gen_weights_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+            <span class="n">shape2word</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span><span class="p">),</span>
+            <span class="n">shape2word</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">),</span>
+                       <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
+        <span class="n">extra_data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">PARAM_TYPE_KERNEL</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_weights_id</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
+            <span class="n">extra_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">encode_as_numpy_int_array</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">extra_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">encode_as_numpy_int_array</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_krn_delays</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
 
-<div class="viewcode-block" id="KernelConnector.gen_weight_params_size_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.gen_weight_params_size_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span>
-        <span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_weight_params_size_in_bytes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">gen_weight_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">N_KERNEL_PARAMS</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">*</span> \
-                <span class="n">BYTES_PER_WORD</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_weight_params_size_in_bytes</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="KernelConnector.gen_weights_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.gen_weights_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_weights_params</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">gen_weights_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">properties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_properties</span>
-            <span class="n">properties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">properties</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">encode_as_numpy_int_array</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">gen_weights_params</span><span class="p">(</span>
-            <span class="n">weights</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">)</span></div>
-
-    <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_id</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">gen_connector_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">ConnectorIDs</span><span class="o">.</span><span class="n">KERNEL_CONNECTOR</span><span class="o">.</span><span class="n">value</span>
-
-<div class="viewcode-block" id="KernelConnector.gen_connector_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.gen_connector_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_params</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kernel_properties</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">extra_data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">extra_data</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">data</span></div>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span>

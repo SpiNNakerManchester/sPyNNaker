@@ -78,28 +78,30 @@ $(function() {
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html">common-typedefs.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="param__generator_8h_source.html">param_generator.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="matrix__generator_8h_source.html">matrix_generator.h</a>&quot;</code><br />
 </div>
 <p><a href="connection__generator_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aaef4756b6809d564b87d98007f5e27a1"><td class="memItemLeft" align="right" valign="top">connection_generator_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator_8h.html#aaef4756b6809d564b87d98007f5e27a1">connection_generator_init</a> (uint32_t hash, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:aaef4756b6809d564b87d98007f5e27a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a specific connection generator.  <a href="connection__generator_8h.html#aaef4756b6809d564b87d98007f5e27a1">More...</a><br /></td></tr>
-<tr class="separator:aaef4756b6809d564b87d98007f5e27a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48471e82d8fe492b0f961147c69477ad"><td class="memItemLeft" align="right" valign="top">connection_generator_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator_8h.html#a48471e82d8fe492b0f961147c69477ad">connection_generator_init</a> (uint32_t hash, void **<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:a48471e82d8fe492b0f961147c69477ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a specific connection generator.  <a href="connection__generator_8h.html#a48471e82d8fe492b0f961147c69477ad">More...</a><br /></td></tr>
+<tr class="separator:a48471e82d8fe492b0f961147c69477ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9b132e35b3d39240d34e7f225193910"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator_8h.html#ab9b132e35b3d39240d34e7f225193910">connection_generator_free</a> (connection_generator_t generator)</td></tr>
 <tr class="memdesc:ab9b132e35b3d39240d34e7f225193910"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finish with a connection generator.  <a href="connection__generator_8h.html#ab9b132e35b3d39240d34e7f225193910">More...</a><br /></td></tr>
 <tr class="separator:ab9b132e35b3d39240d34e7f225193910"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82fb9cd00aa5c51cdcbf97879763f28e"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator_8h.html#a82fb9cd00aa5c51cdcbf97879763f28e">connection_generator_generate</a> (connection_generator_t generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</td></tr>
-<tr class="memdesc:a82fb9cd00aa5c51cdcbf97879763f28e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with a connection generator.  <a href="connection__generator_8h.html#a82fb9cd00aa5c51cdcbf97879763f28e">More...</a><br /></td></tr>
-<tr class="separator:a82fb9cd00aa5c51cdcbf97879763f28e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae17e4a6bdf077f36b078033db1c7fbe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator_8h.html#aae17e4a6bdf077f36b078033db1c7fbe">connection_generator_generate</a> (connection_generator_t generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t <a class="el" href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a>)</td></tr>
+<tr class="memdesc:aae17e4a6bdf077f36b078033db1c7fbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with a connection generator.  <a href="connection__generator_8h.html#aae17e4a6bdf077f36b078033db1c7fbe">More...</a><br /></td></tr>
+<tr class="separator:aae17e4a6bdf077f36b078033db1c7fbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Connection Generator interface. </p>
 
 <p class="definition">Definition in file <a class="el" href="connection__generator_8h_source.html">connection_generator.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="aaef4756b6809d564b87d98007f5e27a1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaef4756b6809d564b87d98007f5e27a1">&#9670;&nbsp;</a></span>connection_generator_init()</h2>
+<a id="a48471e82d8fe492b0f961147c69477ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48471e82d8fe492b0f961147c69477ad">&#9670;&nbsp;</a></span>connection_generator_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -113,7 +115,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramtype">void **&#160;</td>
           <td class="paramname"><em>region</em>&#160;</td>
         </tr>
         <tr>
@@ -162,18 +164,18 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00142">142</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator_8c_source.html#l00144">144</a> of file <a class="el" href="connection__generator_8c_source.html">connection_generator.c</a>.</p>
 
 </div>
 </div>
-<a id="a82fb9cd00aa5c51cdcbf97879763f28e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82fb9cd00aa5c51cdcbf97879763f28e">&#9670;&nbsp;</a></span>connection_generator_generate()</h2>
+<a id="aae17e4a6bdf077f36b078033db1c7fbe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae17e4a6bdf077f36b078033db1c7fbe">&#9670;&nbsp;</a></span>connection_generator_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint32_t connection_generator_generate </td>
+          <td class="memname">bool connection_generator_generate </td>
           <td>(</td>
           <td class="paramtype">connection_generator_t&#160;</td>
           <td class="paramname"><em>generator</em>, </td>
@@ -182,19 +184,31 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_slice_start</em>, </td>
+          <td class="paramname"><em>pre_lo</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_slice_count</em>, </td>
+          <td class="paramname"><em>pre_hi</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
+          <td class="paramname"><em>post_lo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>post_hi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>post_index</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -211,14 +225,32 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>max_row_length</em>, </td>
+          <td class="paramtype">unsigned long accum&#160;</td>
+          <td class="paramname"><em>weight_scale</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>&#160;</td>
+          <td class="paramtype">accum&#160;</td>
+          <td class="paramname"><em>timestep_per_delay</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">param_generator_t&#160;</td>
+          <td class="paramname"><em>weight_generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">param_generator_t&#160;</td>
+          <td class="paramname"><em>delay_generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">matrix_generator_t&#160;</td>
+          <td class="paramname"><em>matrix_generator</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -251,7 +283,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

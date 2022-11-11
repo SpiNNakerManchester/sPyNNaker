@@ -50,49 +50,9 @@
 <section id="module-spynnaker.pyNN.utilities.ranged">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.utilities.ranged" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.ranged.</span></span><span class="sig-name descname"><span class="pre">SpynnakerRangeDictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RangeDictionary</span></code></p>
-<p>The Object is set up initially where every ID in the range will share
-the same value for each key. All keys must be of type str. The
-default Values can be anything including None.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Fixed number of IDs / Length of lists</p></li>
-<li><p><strong>defaults</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Default dictionary where all keys must be str</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary.list_factory">
-<span class="sig-name descname"><span class="pre">list_factory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/ranged/spynnaker_ranged_dict.html#SpynnakerRangeDictionary.list_factory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary.list_factory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines which class or subclass of RangedList to use</p>
-<p>Main purpose is for subclasses to use a subclass or RangedList
-All parameters are pass through ones to the List constructor</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Fixed length of the list</p></li>
-<li><p><strong>value</strong> – value to given to all elements in the list</p></li>
-<li><p><strong>key</strong> – The dict key this list covers.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>AbstractList in this case a RangedList</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList" title="spynnaker.pyNN.utilities.ranged.SpynnakerRangedList">SpynnakerRangedList</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.ranged.SpynnakerRangedList">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.ranged.</span></span><span class="sig-name descname"><span class="pre">SpynnakerRangedList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_list_as_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RangedList</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangedList</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -155,10 +115,6 @@ case <a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.Spynna
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.utilities.ranged package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.ranged">Module contents</a><ul>
-<li><a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangeDictionary</span></code></a><ul>
-<li><a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary.list_factory"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangeDictionary.list_factory()</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangedList</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.as_list"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangedList.as_list()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.is_list"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangedList.is_list()</span></code></a></li>

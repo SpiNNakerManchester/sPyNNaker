@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.models.common.population_application_vertex &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.common.population_application_vertex</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.common.population_application_vertex</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2020-2021 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.helpful_functions</span> <span class="kn">import</span> <span class="n">is_singleton</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
+
+
+<span class="k">class</span> <span class="nc">RecordingType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; The type of data being recorded</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">BIT_FIELD</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">MATRIX</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">EVENT</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<span class="k">class</span> <span class="nc">PopulationApplicationVertex</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A vertex that can be used in a Population.</span>
+
+<span class="sd">        Provides some default functions that can be overridden if the vertex</span>
+<span class="sd">        supports these.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># No data required here; makes it easy to mix in!</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_as_list</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Normalise the input to a list</span>
+
+<span class="sd">        :param names: The item or items to normalise</span>
+<span class="sd">        :type names: str or list</span>
+<span class="sd">        :rtype: list(str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_singleton</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">names</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">names</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_names</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">allowed</span><span class="p">,</span> <span class="n">type_of_thing</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check the list of names are allowed or not</span>
+
+<span class="sd">        :param names: The names to check</span>
+<span class="sd">        :type names: str or list</span>
+<span class="sd">        :param set(str) allowed: The set of allowed names</span>
+<span class="sd">        :param str type_of_thing: The &quot;type of thing&quot; to report in any error</span>
+<span class="sd">        :raises KeyError: If one of the names is not allowed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">_as_list</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not a recognized </span><span class="si">{</span><span class="n">type_of_thing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_parameters</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">allowed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check that parameters are allowed</span>
+
+<span class="sd">        :param names: The names to check</span>
+<span class="sd">        :type names: str or list</span>
+<span class="sd">        :param set(str) allowed: The set of allowed names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">_check_names</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">allowed</span><span class="p">,</span> <span class="s2">&quot;parameter&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_variables</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">allowed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check that state variables are allowed</span>
+
+<span class="sd">        :param names: The names to check</span>
+<span class="sd">        :type names: str or list</span>
+<span class="sd">        :param set(str) allowed: The set of allowed names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">_check_names</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">allowed</span><span class="p">,</span> <span class="s2">&quot;variable&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_parameter_values"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_parameter_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the values of a parameter or parameters for the whole</span>
+<span class="sd">            Population or a subset if the selector is used</span>
+
+<span class="sd">        :param names: The name or names of the parameter to get</span>
+<span class="sd">        :type names: str or list</span>
+<span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
+<span class="sd">            for all. See:</span>
+<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
+<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
+<span class="sd">        :rtype: ParameterHolder</span>
+<span class="sd">        :raise KeyError: if the parameter is not something that can be read</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="s2">&quot;This Population does not support the reading of parameters&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.set_parameter_values"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_parameter_values">[docs]</a>    <span class="k">def</span> <span class="nf">set_parameter_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the values of a parameter for the whole Population or a subset</span>
+<span class="sd">            if the selector is used</span>
+
+<span class="sd">        :param str name: The name of the parameter to set</span>
+<span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
+<span class="sd">            for all. See:</span>
+<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
+<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
+<span class="sd">        :raise KeyError: if the parameter is not something that can be changed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="s2">&quot;This Population does not support the setting of parameters&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_parameters"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the names of all the parameters that can be obtained</span>
+
+<span class="sd">        :rtype: list(str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_initial_state_values"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_initial_state_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_initial_state_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the initial values of a state variable for the whole Population</span>
+<span class="sd">            or a subset if the selector is used</span>
+
+<span class="sd">        :param names: The name or names of the variable to get</span>
+<span class="sd">        :type name: str or list</span>
+<span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
+<span class="sd">            for all. See:</span>
+<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
+<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
+<span class="sd">        :rtype: ParameterHolder</span>
+<span class="sd">        :raise KeyError: if the variable is not something that can be read</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="s2">&quot;This Population does not support the reading of state&quot;</span>
+            <span class="s2">&quot; variables&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.set_initial_state_values"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_initial_state_values">[docs]</a>    <span class="k">def</span> <span class="nf">set_initial_state_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the initial values of a state variable for the whole Population</span>
+<span class="sd">            or a subset if the selector is used</span>
+
+<span class="sd">        :param str name: The name of the variable to set</span>
+<span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
+<span class="sd">            for all. See:</span>
+<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
+<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
+<span class="sd">        :raise KeyError: if the variable is not something that can be changed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="s2">&quot;This Population does not support the initialization of state&quot;</span>
+            <span class="s2">&quot; variables&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_current_state_values"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_current_state_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_current_state_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the current values of a state variable for the whole Population</span>
+<span class="sd">            or a subset if the selector is used</span>
+
+<span class="sd">        :param names: The name or names of the variable to get</span>
+<span class="sd">        :type name: str or list</span>
+<span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
+<span class="sd">            for all. See:</span>
+<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
+<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
+<span class="sd">        :rtype: ParameterHolder</span>
+<span class="sd">        :raise KeyError: if the variable is not something that can be read</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="s2">&quot;This Population does not support the reading of state&quot;</span>
+            <span class="s2">&quot; variables&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.set_current_state_values"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_current_state_values">[docs]</a>    <span class="k">def</span> <span class="nf">set_current_state_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the current values of a state variable for the whole Population</span>
+<span class="sd">            or a subset if the selector is used</span>
+
+<span class="sd">        :param str name: The name of the variable to set</span>
+<span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
+<span class="sd">            for all. See:</span>
+<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
+<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
+<span class="sd">        :raise KeyError: if the variable is not something that can be changed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="s2">&quot;This Population does not support the setting of state&quot;</span>
+            <span class="s2">&quot; variables&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_state_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_state_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a list of supported state variables</span>
+
+<span class="sd">        :rtype: list(str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_units"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the units of the given parameter or state variable</span>
+
+<span class="sd">        :param str name: the name of the parameter to get the units of</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        :raise KeyError:</span>
+<span class="sd">            if the name isn&#39;t recognised or the units cannot be identified</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The units for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> cannot be found&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">conductance_based</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Determine whether the vertex models post-synaptic inputs as</span>
+<span class="sd">            currents or conductance.</span>
+
+<span class="sd">            By default this returns False; override if the model accepts</span>
+<span class="sd">            conductance based input.</span>
+
+<span class="sd">        :rtype: bool.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_recordable_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recordable_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a list of the names and types of things that can be recorded</span>
+
+<span class="sd">        :rtype: list(str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.can_record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.can_record">[docs]</a>    <span class="k">def</span> <span class="nf">can_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Determine if the given variable can be recorded.</span>
+
+<span class="sd">        :param str name: The name of the variable to test</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.set_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_recording">[docs]</a>    <span class="k">def</span> <span class="nf">set_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set a variable recording</span>
+
+<span class="sd">        :param str name: The name of the variable to set the status of</span>
+<span class="sd">        :param sampling_interval:</span>
+<span class="sd">            How often the variable should be recorded or None for every</span>
+<span class="sd">            time step, in milliseconds</span>
+<span class="sd">        :type sampling_interval: float or None</span>
+<span class="sd">        :param indices: The list of neuron indices to record or None for all</span>
+<span class="sd">        :type indices: list(int) or None</span>
+<span class="sd">        :raises KeyError: if the variable cannot be recorded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.set_not_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_not_recording">[docs]</a>    <span class="k">def</span> <span class="nf">set_not_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set a variable not recording</span>
+
+<span class="sd">        :param str name: The name of the variable to not record</span>
+<span class="sd">        :param indices:</span>
+<span class="sd">            The list of neuron indices to not record or None for all</span>
+<span class="sd">        :type indices: list(int) or None</span>
+<span class="sd">        :raises KeyError: if the variable cannot be stopped from recording</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="s2">&quot;This Population does not support the stopping of recording&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_recording_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a list of variables that are currently being recorded</span>
+
+<span class="sd">        :rtype: list(str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.is_recording_variable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.is_recording_variable">[docs]</a>    <span class="k">def</span> <span class="nf">is_recording_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Indicate whether the given variable is being recorded</span>
+
+<span class="sd">        :param str name: The name of the variable to check the status of</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        :raises KeyError: if the variable is not supported</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_recorded_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recorded_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the data recorded for a given variable</span>
+
+<span class="sd">        :param str name: The name of the variable recorded</span>
+<span class="sd">        :rtype: ndarray</span>
+<span class="sd">        :raises KeyError: if the variable isn&#39;t being recorded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_recording_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_sampling_interval">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the sampling interval of the recording for the given variable</span>
+
+<span class="sd">        :rtype: float</span>
+<span class="sd">        :raises KeyError: If the variable isn&#39;t being recorded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_recording_indices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the indices of the given variable that are being recorded</span>
+
+<span class="sd">        :rtype: list(int)</span>
+<span class="sd">        :raises KeyError: If the variable isn&#39;t being recorded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_recording_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the type of recording of the variable</span>
+
+<span class="sd">        :param str name: The name of the variable to get the type of</span>
+<span class="sd">        :rtype: RecordingType</span>
+<span class="sd">        :raise KeyError: If the variable isn&#39;t recordable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.clear_recording_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.clear_recording_data">[docs]</a>    <span class="k">def</span> <span class="nf">clear_recording_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Clear the data for the given recording</span>
+
+<span class="sd">        :param str name: The name of the variable to clear the data from</span>
+<span class="sd">        :raise KeyError: If the variable isn&#39;t recordable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.inject"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.inject">[docs]</a>    <span class="k">def</span> <span class="nf">inject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_source</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Inject a current source into this population</span>
+
+<span class="sd">        :param ~pyNN.standardmodels.electrodes.StandardCurrentSource\</span>
+<span class="sd">            current_source: the Current Source to be injected</span>
+<span class="sd">        :param selector: a description of the subrange to accept, or ``None``</span>
+<span class="sd">            for all. See:</span>
+<span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
+<span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
+<span class="sd">        :raise ConfigurationException:</span>
+<span class="sd">            if the population doesn&#39;t support injection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+            <span class="s2">&quot;This Population doesn&#39;t support injection&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.common.population_application_vertex</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>

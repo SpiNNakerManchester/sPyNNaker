@@ -55,7 +55,7 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractGeneratesDataSpecification</span><span class="p">)</span>
+    <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.population_machine_common</span> <span class="kn">import</span> <span class="n">PopulationMachineCommon</span>
 <span class="kn">from</span> <span class="nn">.population_machine_synapses</span> <span class="kn">import</span> <span class="n">PopulationMachineSynapses</span>
 <span class="kn">from</span> <span class="nn">.population_synapses_machine_vertex_common</span> <span class="kn">import</span> <span class="p">(</span>
@@ -65,7 +65,8 @@
 <span class="k">class</span> <span class="nc">PopulationSynapsesMachineVertexLead</span><span class="p">(</span>
         <span class="n">PopulationSynapsesMachineVertexCommon</span><span class="p">,</span>
         <span class="n">PopulationMachineSynapses</span><span class="p">,</span>
-        <span class="n">AbstractGeneratesDataSpecification</span><span class="p">):</span>
+        <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span>
+        <span class="n">AbstractRewritesDataSpecification</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A synaptic machine vertex that leads other Synaptic machine vertices,</span>
 <span class="sd">        writing shared areas.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -74,14 +75,16 @@
         <span class="s2">&quot;__synaptic_matrices&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__ring_buffer_shifts&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__weight_scales&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__all_syn_block_sz&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__structural_sz&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__synapse_references&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__synapse_references&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__max_atoms_per_core&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__regenerate_data&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span>
-            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ring_buffer_shifts</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span>
-            <span class="n">structural_sz</span><span class="p">,</span> <span class="n">synapse_references</span><span class="p">):</span>
+            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ring_buffer_shifts</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
+            <span class="n">structural_sz</span><span class="p">,</span> <span class="n">synapse_references</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span>
+            <span class="n">synaptic_matrices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.resources.AbstractSDRAM sdram:</span>
 <span class="sd">            The sdram used by the vertex</span>
@@ -95,12 +98,13 @@
             <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span> <span class="o">=</span> <span class="n">ring_buffer_shifts</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span> <span class="o">=</span> <span class="n">weight_scales</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span> <span class="o">=</span> <span class="n">all_syn_block_sz</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__structural_sz</span> <span class="o">=</span> <span class="n">structural_sz</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_references</span> <span class="o">=</span> <span class="n">synapse_references</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_atoms_per_core</span> <span class="o">=</span> <span class="n">max_atoms_per_core</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__regenerate_data</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># Need to do this last so that the values above can be used</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_synaptic_matrices</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrices</span> <span class="o">=</span> <span class="n">synaptic_matrices</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationMachineSynapses</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="p">)</span>
@@ -116,6 +120,11 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationMachineSynapses</span><span class="o">.</span><span class="n">_synapse_references</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_synapse_references</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_references</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationMachineSynapses</span><span class="o">.</span><span class="n">_max_atoms_per_core</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_max_atoms_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_atoms_per_core</span>
 
 <div class="viewcode-block" id="PopulationSynapsesMachineVertexLead.get_recorded_region_ids"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexLead.get_recorded_region_ids">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationMachineCommon</span><span class="o">.</span><span class="n">get_recorded_region_ids</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_recorded_region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -136,8 +145,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_synapse_data_spec</span><span class="p">(</span>
             <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__structural_sz</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structural_sz</span><span class="p">)</span>
 
         <span class="c1"># Write information about SDRAM</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_sdram_edge_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
@@ -152,6 +160,24 @@
     <span class="k">def</span> <span class="nf">_parse_synapse_provenance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">PopulationMachineSynapses</span><span class="o">.</span><span class="n">_parse_synapse_provenance</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PopulationSynapsesMachineVertexLead.regenerate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexLead.regenerate_data_specification">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">regenerate_data_specification</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">regenerate_data_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+        <span class="c1"># We don&#39;t need to do anything here because the originally written</span>
+        <span class="c1"># data can be used again</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="PopulationSynapsesMachineVertexLead.reload_required"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexLead.reload_required">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">reload_required</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">reload_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__regenerate_data</span></div>
+
+<div class="viewcode-block" id="PopulationSynapsesMachineVertexLead.set_reload_required"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexLead.set_reload_required">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_reload_required</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__regenerate_data</span> <span class="o">=</span> <span class="n">new_value</span></div>
+
+<div class="viewcode-block" id="PopulationSynapsesMachineVertexLead.set_do_synapse_regeneration"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexLead.set_do_synapse_regeneration">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationMachineSynapses</span><span class="o">.</span><span class="n">set_do_synapse_regeneration</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_do_synapse_regeneration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__regenerate_data</span> <span class="o">=</span> <span class="kc">True</span></div>
 </pre></div>
 
             <div class="clearer"></div>

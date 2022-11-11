@@ -64,23 +64,13 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.ordered_set</span> <span class="kn">import</span> <span class="n">OrderedSet</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">,</span> <span class="n">AbstractEventRecordable</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SPIKES</span><span class="p">,</span> <span class="n">MEMBRANE_POTENTIAL</span><span class="p">,</span> <span class="n">GSYN_EXCIT</span><span class="p">,</span> <span class="n">GSYN_INHIB</span><span class="p">,</span> <span class="n">REWIRING</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.data_cache</span> <span class="kn">import</span> <span class="n">DataCache</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">RecordingType</span>
 
 <span class="c1"># needed as dealing with quantities</span>
 <span class="c1"># pylint: disable=c-extension-no-member</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
-<span class="n">_DEFAULT_UNITS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">SPIKES</span><span class="p">:</span> <span class="s2">&quot;spikes&quot;</span><span class="p">,</span>
-    <span class="n">MEMBRANE_POTENTIAL</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span>
-    <span class="n">GSYN_EXCIT</span><span class="p">:</span> <span class="s2">&quot;uS&quot;</span><span class="p">,</span>
-    <span class="n">GSYN_INHIB</span><span class="p">:</span> <span class="s2">&quot;uS&quot;</span><span class="p">,</span>
-    <span class="n">REWIRING</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="Recorder"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder">[docs]</a><span class="k">class</span> <span class="nc">Recorder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -88,9 +78,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;_data_cache&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__data_cache&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__population&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_recording_start_time&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__recording_start_time&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__vertex&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__write_to_files_indicators&quot;</span><span class="p">]</span>
 
@@ -110,9 +100,9 @@
             <span class="s1">&#39;gsyn_exc&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s1">&#39;gsyn_inh&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span> <span class="o">=</span> \
+        <span class="bp">self</span><span class="o">.</span><span class="n">__recording_start_time</span> <span class="o">=</span> \
             <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_current_run_time_ms</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_data_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">write_to_files_indicators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -123,8 +113,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_to_files_indicators</span>
 
-<div class="viewcode-block" id="Recorder.record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
+<div class="viewcode-block" id="Recorder.record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Same as record but without non-standard PyNN warning</span>
 
 <span class="sd">        This method is non-standard PyNN and is intended only to be called by</span>
@@ -171,7 +160,7 @@
                     <span class="s1">&#39;therefore may not be portable to other simulators.&#39;</span><span class="p">)</span>
 
                 <span class="c1"># iterate though all possible recordings for this vertex</span>
-                <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_possible_recordable_variables</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">():</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">turn_on_record</span><span class="p">(</span>
                         <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -201,21 +190,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
-        <span class="c1"># tell vertex its recording</span>
-        <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;This population does not support the &quot;</span>
-                                <span class="s2">&quot;recording of spikes!&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_recording_spikes</span><span class="p">(</span>
-                <span class="n">sampling_interval</span><span class="o">=</span><span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Illegal call with all&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;This population does not support the &quot;</span>
-                                <span class="s2">&quot;recording of </span><span class="si">{}</span><span class="s2">!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_recording</span><span class="p">(</span>
-                <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">)</span>
 
         <span class="c1"># update file writer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__write_to_files_indicators</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_file</span>
@@ -231,7 +205,10 @@
                 <span class="n">warn_once</span><span class="p">(</span>
                     <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;You are trying to record the inhibitory &quot;</span>
                     <span class="s2">&quot;conductance from a model which does not use conductance &quot;</span>
-                    <span class="s2">&quot;input. You will receive current measurements instead.&quot;</span><span class="p">)</span></div>
+                    <span class="s2">&quot;input. You will receive current measurements instead.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Tell the vertex to record</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.get_recorded_pynn7"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_recorded_pynn7">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_pynn7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">as_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get recorded data in PyNN 0.7 format. Must not be spikes.</span>
@@ -245,11 +222,15 @@
 <span class="sd">        :type view_indexes: list(int) or None</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SPIKES</span><span class="p">,</span> <span class="n">REWIRING</span><span class="p">]:</span>
+        <span class="c1"># Only matrix variables are currently supported through this function</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_type</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span> <span class="o">!=</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">MATRIX</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recorded_matrix</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+        <span class="n">sampling_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_sampling_interval</span><span class="p">(</span>
+            <span class="n">variable</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_indices</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">view_indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">:</span>
                 <span class="n">warn_once</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SELECTIVE_RECORDED_MSG</span><span class="p">)</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="n">ids</span>
         <span class="k">elif</span> <span class="n">view_indexes</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
@@ -275,29 +256,30 @@
                 <span class="n">numpy</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">),</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">column_length</span><span class="p">)))</span></div>
 
-<div class="viewcode-block" id="Recorder.get_recorded_matrix"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_recorded_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Perform safety checks and get the recorded data from the vertex\</span>
-<span class="sd">            in matrix format.</span>
+    <span class="k">def</span> <span class="nf">__get_empty_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get an empty array for the given recording type</span>
 
-<span class="sd">        :param str variable:</span>
-<span class="sd">            The variable name to read. Supported variable names are:</span>
-<span class="sd">            ``gsyn_exc``, ``gsyn_inh``, ``v``</span>
-<span class="sd">        :return: data, indexes, sampling_interval</span>
-<span class="sd">        :rtype: tuple(~numpy.ndarray, list(int), float)</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
+<span class="sd">        :param str variable: the variable to get the array for</span>
+<span class="sd">        :rtype: ~numpy.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">is_recording_variable</span><span class="p">(</span><span class="n">variable</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> is not being recorded&quot;</span><span class="p">)</span>
+        <span class="n">var_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_type</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">var_type</span> <span class="o">==</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">MATRIX</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">var_type</span> <span class="o">==</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">BIT_FIELD</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">var_type</span> <span class="o">==</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">EVENT</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown type </span><span class="si">{</span><span class="n">var_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Recorder.get_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the data for the given variable with safety checks</span>
+
+<span class="sd">        :param str variable: the variable to get the data for</span>
+<span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
-        <span class="c1"># check that we&#39;re in a state to get voltages</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;This population has not got the capability to record </span><span class="si">{}</span><span class="s2">&quot;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">is_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;This population has not been set to record </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">variable</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_ever</span><span class="p">():</span>
@@ -309,93 +291,15 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;The simulation has not yet run, therefore </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;cannot be retrieved, hence the list will be empty&quot;</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-            <span class="n">indexes</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">sampling_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_neuron_sampling_interval</span><span class="p">(</span>
-                <span class="n">variable</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_empty_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;The simulation is using a virtual machine and so has not &quot;</span>
                 <span class="s2">&quot;truly ran, hence the list will be empty&quot;</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-            <span class="n">indexes</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">sampling_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_neuron_sampling_interval</span><span class="p">(</span>
-                <span class="n">variable</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># assuming we got here, everything is ok, so we should go get the</span>
-            <span class="c1"># data</span>
-            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-            <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> <span class="n">results</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_empty_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Recorder.get_spikes"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; How to get spikes (of a population&#39;s neurons) from the recorder.</span>
-
-<span class="sd">        :return: the spikes (event times) from the underlying vertex</span>
-<span class="sd">        :rtype: ~numpy.ndarray</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># check we&#39;re in a state where we can get spikes</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;This population has not got the capability to record spikes&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">is_recording_spikes</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;This population has not been set to record spikes&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_ever</span><span class="p">():</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;The simulation has reset, therefore spikes cannot &quot;</span>
-                    <span class="s2">&quot;be retrieved, hence the list/ last segment will be empty&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;The simulation has not yet run, therefore spikes cannot &quot;</span>
-                    <span class="s2">&quot;be retrieved, hence the list will be empty&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;The simulation is using a virtual machine and so has not &quot;</span>
-                <span class="s2">&quot;truly ran, hence the spike list will be empty&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-
-        <span class="c1"># assuming we got here, everything is OK, so we should go get the</span>
-        <span class="c1"># spikes</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="Recorder.get_events"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; How to get rewiring events (of a post-population) from recorder</span>
-
-<span class="sd">        :return: the rewires (event times, values) from the underlying vertex</span>
-<span class="sd">        :rtype: ~numpy.ndarray</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># check we&#39;re in a state where we can get rewires</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractEventRecordable</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;This population has not got the capability to record rewires&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">is_recording</span><span class="p">(</span><span class="n">REWIRING</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;This population has not been set to record rewires&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_ever</span><span class="p">():</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;The simulation has been reset, therefore rewires cannot &quot;</span>
-                    <span class="s2">&quot;be retrieved, hence the list/last segment will be empty&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;The simulation has not yet run, therefore rewires &quot;</span>
-                    <span class="s2">&quot;cannot be retrieved, hence the list will be empty&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;The simulation is using a virtual machine and so has not &quot;</span>
-                <span class="s2">&quot;truly ran, hence the rewires list will be empty&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recorded_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.turn_off_all_recording"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.turn_off_all_recording">[docs]</a>    <span class="k">def</span> <span class="nf">turn_off_all_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Turns off recording, is used by a pop saying ``.record()``</span>
@@ -403,17 +307,8 @@
 <span class="sd">        :param indexes:</span>
 <span class="sd">        :type indexes: list or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># check for standard record which includes spikes</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">):</span>
-            <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_recording</span><span class="p">(</span>
-                    <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">)</span>
-
-        <span class="c1"># check for spikes</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_recording_spikes</span><span class="p">(</span>
-                <span class="n">new_state</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">)</span></div>
+        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_not_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.extract_neo_block"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.extract_neo_block">[docs]</a>    <span class="k">def</span> <span class="nf">extract_neo_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extracts block from the vertices and puts them into a Neo block</span>
@@ -429,7 +324,7 @@
         <span class="n">block</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">Block</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">previous</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_append_previous_segment</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__append_previous_segment</span><span class="p">(</span>
                 <span class="n">block</span><span class="p">,</span> <span class="n">previous</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span>
 
         <span class="c1"># add to the segments the new block</span>
@@ -445,33 +340,10 @@
             <span class="n">block</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="o">**</span><span class="n">annotations</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">block</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get units with some safety code if the population has trouble</span>
-
-<span class="sd">        :param str variable: name of the variable</span>
-<span class="sd">        :return: type of the data</span>
-<span class="sd">        :rtype: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">find_units</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Population: </span><span class="si">{}</span><span class="s2"> Does not support units for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
-                           <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">_DEFAULT_UNITS</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">_DEFAULT_UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
-            <span class="k">raise</span> <span class="n">e</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">__spike_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: float</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">()</span>
-
 <div class="viewcode-block" id="Recorder.cache_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.cache_data">[docs]</a>    <span class="k">def</span> <span class="nf">cache_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Store data for later extraction</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_recording_variables</span><span class="p">()</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_variables</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">variables</span><span class="p">:</span>
             <span class="n">segment_number</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Caching data for segment </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">segment_number</span><span class="p">)</span>
@@ -480,39 +352,22 @@
                 <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
                 <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">describe</span><span class="p">(),</span>
                 <span class="n">segment_number</span><span class="o">=</span><span class="n">segment_number</span><span class="p">,</span>
-                <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span><span class="p">,</span>
+                <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__recording_start_time</span><span class="p">,</span>
                 <span class="n">t</span><span class="o">=</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_current_run_time_ms</span><span class="p">())</span>
 
             <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">SPIKES</span><span class="p">:</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">()</span>
-                    <span class="n">sampling_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_sampling_interval</span>
-                    <span class="n">indexes</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">REWIRING</span><span class="p">:</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-                    <span class="n">sampling_interval</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="n">indexes</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> \
-                        <span class="bp">self</span><span class="o">.</span><span class="n">get_recorded_matrix</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+                <span class="n">samp_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_sampling_interval</span><span class="p">(</span>
+                    <span class="n">variable</span><span class="p">)</span>
+                <span class="n">indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_indices</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
                 <span class="n">data_cache</span><span class="o">.</span><span class="n">save_data</span><span class="p">(</span>
                     <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">,</span>
                     <span class="n">n_neurons</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-                    <span class="n">units</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_units</span><span class="p">(</span><span class="n">variable</span><span class="p">),</span>
-                    <span class="n">sampling_interval</span><span class="o">=</span><span class="n">sampling_interval</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_data_cache</span><span class="p">[</span><span class="n">segment_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_cache</span></div>
+                    <span class="n">units</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">variable</span><span class="p">),</span>
+                    <span class="n">sampling_interval</span><span class="o">=</span><span class="n">samp_interval</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">[</span><span class="n">segment_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_cache</span></div>
 
-    <span class="k">def</span> <span class="nf">_filter_recorded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_ids</span><span class="p">):</span>
-        <span class="c1"># TODO: unused?</span>
-        <span class="n">record_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">neuron_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">filter_ids</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">filter_ids</span><span class="p">[</span><span class="n">neuron_id</span><span class="p">]:</span>
-                <span class="c1"># add population first ID to ensure all atoms have a unique</span>
-                <span class="c1"># identifier (PyNN enforcement)</span>
-                <span class="n">record_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neuron_id</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">first_id</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">record_ids</span>
-
-    <span class="k">def</span> <span class="nf">_clean_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__clean_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Sorts out variables for processing usage</span>
 
 <span class="sd">        :param variables: list of variables names, or &#39;all&#39;, or single.</span>
@@ -531,7 +386,7 @@
         <span class="k">if</span> <span class="s1">&#39;all&#39;</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
             <span class="n">variables</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
             <span class="n">variables</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
-            <span class="n">variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_all_recording_variables</span><span class="p">())</span>
+            <span class="n">variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_variables</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">variables</span>
 
     <span class="k">def</span> <span class="nf">__append_current_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">):</span>
@@ -542,47 +397,44 @@
             <span class="n">rec_datetime</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
 
         <span class="c1"># sort out variables for using</span>
-        <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_variables</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clean_variables</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">SPIKES</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__read_in_spikes</span><span class="p">(</span>
-                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span>
-                    <span class="n">spikes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(),</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+            <span class="n">s_intrval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_sampling_interval</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+            <span class="n">var_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_type</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">var_type</span> <span class="o">==</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">BIT_FIELD</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_neo_spiketrains</span><span class="p">(</span>
+                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span> <span class="n">spikes</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
                     <span class="n">t</span><span class="o">=</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_current_run_time_ms</span><span class="p">(),</span>
                     <span class="n">n_neurons</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-                    <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span><span class="p">,</span>
-                    <span class="n">sampling_interval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__spike_sampling_interval</span><span class="p">,</span>
-                    <span class="n">indexes</span><span class="o">=</span><span class="n">view_indexes</span><span class="p">,</span>
+                    <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__recording_start_time</span><span class="p">,</span>
+                    <span class="n">sampling_interval</span><span class="o">=</span><span class="n">s_intrval</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">view_indexes</span><span class="p">,</span>
                     <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">REWIRING</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__read_in_event</span><span class="p">(</span>
-                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span>
-                    <span class="n">event_array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">variable</span><span class="p">),</span>
+            <span class="k">elif</span> <span class="n">var_type</span> <span class="o">==</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">EVENT</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_neo_events</span><span class="p">(</span>
+                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span> <span class="n">event_array</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span>
+                    <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__recording_start_time</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">var_type</span> <span class="o">==</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">MATRIX</span><span class="p">:</span>
+                <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_indices</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_neo_analog_signals</span><span class="p">(</span>
+                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span> <span class="n">signal_array</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">data_indexes</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="n">view_indexes</span><span class="p">,</span>
                     <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span>
-                    <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span><span class="p">)</span>
+                    <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__recording_start_time</span><span class="p">,</span>
+                    <span class="n">sampling_interval</span><span class="o">=</span><span class="n">s_intrval</span><span class="p">,</span>
+                    <span class="n">units</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">variable</span><span class="p">),</span>
+                    <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> \
-                    <span class="bp">self</span><span class="o">.</span><span class="n">get_recorded_matrix</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__read_in_signal</span><span class="p">(</span>
-                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span>
-                    <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
-                    <span class="n">signal_array</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-                    <span class="n">data_indexes</span><span class="o">=</span><span class="n">data_indexes</span><span class="p">,</span>
-                    <span class="n">view_indexes</span><span class="o">=</span><span class="n">view_indexes</span><span class="p">,</span>
-                    <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span>
-                    <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span><span class="p">,</span>
-                    <span class="n">sampling_interval</span><span class="o">=</span><span class="n">sampling_interval</span><span class="p">,</span>
-                    <span class="n">units</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_units</span><span class="p">(</span><span class="n">variable</span><span class="p">),</span>
-                    <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown recording type </span><span class="si">{</span><span class="n">var_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">clear</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_clear_recording</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__clear_recording</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_append_previous_segment</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">__append_previous_segment</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">segment_number</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">segment_number</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_cache</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">segment_number</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No Data available for Segment </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">segment_number</span><span class="p">)</span>
             <span class="n">segment</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span>
                 <span class="n">name</span><span class="o">=</span><span class="s2">&quot;segment</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">segment_number</span><span class="p">),</span>
@@ -591,10 +443,10 @@
             <span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
             <span class="k">return</span>
 
-        <span class="n">data_cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_cache</span><span class="p">[</span><span class="n">segment_number</span><span class="p">]</span>
+        <span class="n">data_cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">[</span><span class="n">segment_number</span><span class="p">]</span>
 
         <span class="c1"># sort out variables</span>
-        <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_variables</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clean_variables</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
 
         <span class="c1"># build segment for the previous data to be gathered in</span>
         <span class="n">segment</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span>
@@ -608,65 +460,30 @@
                                <span class="n">segment_number</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="n">variable_cache</span> <span class="o">=</span> <span class="n">data_cache</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">SPIKES</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__read_in_spikes</span><span class="p">(</span>
-                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span>
-                    <span class="n">spikes</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-                    <span class="n">t</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">t</span><span class="p">,</span>
-                    <span class="n">n_neurons</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">n_neurons</span><span class="p">,</span>
+            <span class="n">var_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_type</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">var_type</span> <span class="o">==</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">BIT_FIELD</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_neo_spiketrains</span><span class="p">(</span>
+                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span> <span class="n">spikes</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">t</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">n_neurons</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">n_neurons</span><span class="p">,</span>
                     <span class="n">recording_start_time</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">recording_start_time</span><span class="p">,</span>
                     <span class="n">sampling_interval</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">sampling_interval</span><span class="p">,</span>
-                    <span class="n">indexes</span><span class="o">=</span><span class="n">view_indexes</span><span class="p">,</span>
-                    <span class="n">label</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">REWIRING</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__read_in_event</span><span class="p">(</span>
-                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span>
-                    <span class="n">event_array</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">indexes</span><span class="o">=</span><span class="n">view_indexes</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">var_type</span> <span class="o">==</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">EVENT</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_neo_events</span><span class="p">(</span>
+                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span> <span class="n">event_array</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
                     <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span>
                     <span class="n">recording_start_time</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">recording_start_time</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__read_in_signal</span><span class="p">(</span>
-                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span>
-                    <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
+            <span class="k">elif</span> <span class="n">var_type</span> <span class="o">==</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">MATRIX</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__add_neo_analog_signals</span><span class="p">(</span>
+                    <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
                     <span class="n">signal_array</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
                     <span class="n">data_indexes</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">indexes</span><span class="p">,</span>
-                    <span class="n">view_indexes</span><span class="o">=</span><span class="n">view_indexes</span><span class="p">,</span>
-                    <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span>
+                    <span class="n">view_indexes</span><span class="o">=</span><span class="n">view_indexes</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span>
                     <span class="n">recording_start_time</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">recording_start_time</span><span class="p">,</span>
                     <span class="n">sampling_interval</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">sampling_interval</span><span class="p">,</span>
-                    <span class="n">units</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
-                    <span class="n">label</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+                    <span class="n">units</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
 
         <span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Recorder.get_all_possible_recordable_variables"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_all_possible_recordable_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_possible_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; All variables that could be recorded.</span>
-
-<span class="sd">        :rtype: set(str)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">variables</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">):</span>
-            <span class="n">variables</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">SPIKES</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">):</span>
-            <span class="n">variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">())</span>
-        <span class="k">return</span> <span class="n">variables</span></div>
-
-<div class="viewcode-block" id="Recorder.get_all_recording_variables"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_all_recording_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_recording_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; All variables that have been set to record.</span>
-
-<span class="sd">        :rtype: set(str)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">possibles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_possible_recordable_variables</span><span class="p">()</span>
-        <span class="n">variables</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">possible</span> <span class="ow">in</span> <span class="n">possibles</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">possible</span> <span class="o">==</span> <span class="n">SPIKES</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">)</span> \
-                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">is_recording_spikes</span><span class="p">():</span>
-                    <span class="n">variables</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">possible</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">)</span> \
-                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">is_recording</span><span class="p">(</span><span class="n">possible</span><span class="p">):</span>
-                <span class="n">variables</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">possible</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">variables</span></div>
 
     <span class="k">def</span> <span class="nf">__metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
@@ -683,21 +500,14 @@
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;mpi_processes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># meaningless on Spinnaker</span>
         <span class="k">return</span> <span class="n">metadata</span>
 
-    <span class="k">def</span> <span class="nf">_clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">SPIKES</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">clear_spike_recording</span><span class="p">()</span>
-            <span class="k">elif</span> <span class="n">variable</span> <span class="ow">in</span> <span class="p">[</span><span class="n">MEMBRANE_POTENTIAL</span><span class="p">,</span> <span class="n">GSYN_EXCIT</span><span class="p">,</span> <span class="n">GSYN_INHIB</span><span class="p">]:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">clear_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">InvalidParameterType</span><span class="p">(</span>
-                    <span class="s2">&quot;The variable </span><span class="si">{}</span><span class="s2"> is not a recordable value&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">variable</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">clear_recording_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__read_in_spikes</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">__add_neo_spiketrains</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">recording_start_time</span><span class="p">,</span>
             <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Converts the data into SpikeTrains and saves them to the segment.</span>
+        <span class="sd">&quot;&quot;&quot; Adds data that is spike-train-like to a neo segment.</span>
 
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add spikes to</span>
 <span class="sd">        :param ~numpy.ndarray spikes: Spike data in raw sPyNNaker format</span>
@@ -709,9 +519,6 @@
 <span class="sd">        :param str label: recording elements label</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="c1"># Safety check in case spikes are an empty list</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">spikes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
         <span class="c1"># Put the times for each neuron into the right place</span>
         <span class="n">times</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)]</span>
@@ -732,7 +539,6 @@
                 <span class="n">source_population</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
                 <span class="n">source_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">index_to_id</span><span class="p">(</span><span class="n">index</span><span class="p">),</span>
                 <span class="n">source_index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
-            <span class="c1"># get times per atom</span>
             <span class="n">segment</span><span class="o">.</span><span class="n">spiketrains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spiketrain</span><span class="p">)</span>
 
     <span class="n">_SELECTIVE_RECORDED_MSG</span> <span class="o">=</span> <span class="p">(</span>
@@ -740,11 +546,10 @@
         <span class="s2">&quot;active will result in only the requested neurons being returned &quot;</span>
         <span class="s2">&quot;in numerical order and without repeats.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__read_in_signal</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">__add_neo_analog_signals</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">signal_array</span><span class="p">,</span> <span class="n">data_indexes</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span>
             <span class="n">variable</span><span class="p">,</span> <span class="n">recording_start_time</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Reads in a data item that&#39;s not spikes (likely v, gsyn e, gsyn i)\</span>
-<span class="sd">            and saves this data to the segment.</span>
+        <span class="sd">&quot;&quot;&quot; Adds a data item that is an analog signal to a neo segment</span>
 
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
 <span class="sd">        :param ~neo.core.Block block: neo block</span>
@@ -769,7 +574,7 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
                 <span class="n">warn_once</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SELECTIVE_RECORDED_MSG</span><span class="p">)</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">view_indexes</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">list</span><span class="p">(</span><span class="n">view_indexes</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">):</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># keep just the view indexes in the data</span>
@@ -793,10 +598,9 @@
         <span class="n">segment</span><span class="o">.</span><span class="n">analogsignals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_array</span><span class="p">)</span>
         <span class="n">channel_index</span><span class="o">.</span><span class="n">analogsignals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_array</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__read_in_event</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">__add_neo_events</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">event_array</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">recording_start_time</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Reads in a data item that is an event (i.e. rewiring form/elim)\</span>
-<span class="sd">            and saves this data to the segment.</span>
+        <span class="sd">&quot;&quot;&quot; Adds data that is events to a neo segment.</span>
 
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
 <span class="sd">        :param ~numpy.ndarray signal_array: the raw &quot;event&quot; data</span>
@@ -857,20 +661,6 @@
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Index </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">ids</span><span class="p">)</span>
         <span class="n">block</span><span class="o">.</span><span class="n">channel_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">channel_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">channel_index</span></div>
-
-
-<span class="k">def</span> <span class="nf">_convert_extracted_data_into_neo_expected_format</span><span class="p">(</span><span class="n">signal_array</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts data between sPyNNaker format and Neo format</span>
-
-<span class="sd">    :param ~numpy.ndarray signal_array: Draw data in sPyNNaker format</span>
-<span class="sd">    :param list(int) indexes:</span>
-<span class="sd">    :rtype: ~numpy.ndarray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">processed_data</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">signal_array</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">][</span><span class="n">signal_array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">index</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
-    <span class="n">processed_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">processed_data</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="k">return</span> <span class="n">processed_data</span>
 </pre></div>
 
             <div class="clearer"></div>

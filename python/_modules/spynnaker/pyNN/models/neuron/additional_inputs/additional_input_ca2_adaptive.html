@@ -54,20 +54,16 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">.abstract_additional_input</span> <span class="kn">import</span> <span class="n">AbstractAdditionalInput</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 
 <span class="n">I_ALPHA</span> <span class="o">=</span> <span class="s2">&quot;i_alpha&quot;</span>
 <span class="n">I_CA2</span> <span class="o">=</span> <span class="s2">&quot;i_ca2&quot;</span>
 <span class="n">TAU_CA2</span> <span class="o">=</span> <span class="s2">&quot;tau_ca2&quot;</span>
-
-<span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">I_ALPHA</span><span class="p">:</span> <span class="s2">&quot;nA&quot;</span><span class="p">,</span>
-    <span class="n">I_CA2</span><span class="p">:</span> <span class="s2">&quot;nA&quot;</span><span class="p">,</span>
-    <span class="n">TAU_CA2</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span>
-<span class="p">}</span>
+<span class="n">TIME_STEP</span> <span class="o">=</span> <span class="s2">&quot;time_step&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">AdditionalInputCa2Adaptive</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="p">):</span>
@@ -76,7 +72,7 @@
         <span class="s2">&quot;__i_ca2&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__i_alpha&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">tau_ca2</span><span class="p">,</span> <span class="n">i_ca2</span><span class="p">,</span> <span class="n">i_alpha</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_ca2</span><span class="p">,</span> <span class="n">i_ca2</span><span class="p">,</span> <span class="n">i_alpha</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`</span>
 <span class="sd">        :type tau_ca2: float, iterable(float),</span>
@@ -88,10 +84,13 @@
 <span class="sd">        :type i_alpha: float, iterable(float),</span>
 <span class="sd">            ~pyNN.random.RandomDistribution or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># e^(-ts / tau_ca2)</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># i_ca_2</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># i_alpha</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Struct</span><span class="p">([</span>
+                 <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">TAU_CA2</span><span class="p">),</span>
+                 <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">I_CA2</span><span class="p">),</span>
+                 <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">I_ALPHA</span><span class="p">),</span>
+                 <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">TIME_STEP</span><span class="p">)])],</span>
+            <span class="p">{</span><span class="n">I_ALPHA</span><span class="p">:</span> <span class="s2">&quot;nA&quot;</span><span class="p">,</span> <span class="n">I_CA2</span><span class="p">:</span> <span class="s2">&quot;nA&quot;</span><span class="p">,</span> <span class="n">TAU_CA2</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tau_ca2</span> <span class="o">=</span> <span class="n">tau_ca2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__i_ca2</span> <span class="o">=</span> <span class="n">i_ca2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__i_alpha</span> <span class="o">=</span> <span class="n">i_alpha</span>
@@ -99,37 +98,12 @@
 <div class="viewcode-block" id="AdditionalInputCa2Adaptive.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.add_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_CA2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_ca2</span>
-        <span class="n">parameters</span><span class="p">[</span><span class="n">I_ALPHA</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_alpha</span></div>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">I_ALPHA</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_alpha</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">TIME_STEP</span><span class="p">]</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AdditionalInputCa2Adaptive.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.add_state_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
         <span class="n">state_variables</span><span class="p">[</span><span class="n">I_CA2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_ca2</span></div>
-
-<div class="viewcode-block" id="AdditionalInputCa2Adaptive.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="AdditionalInputCa2Adaptive.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.has_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
-
-<div class="viewcode-block" id="AdditionalInputCa2Adaptive.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int ts: machine time step</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Add the rest of the data</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">parameters</span><span class="p">[</span><span class="n">TAU_CA2</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
-                    <span class="n">operation</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="o">-</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1000.0</span> <span class="o">*</span> <span class="n">x</span><span class="p">))),</span>
-                <span class="n">state_variables</span><span class="p">[</span><span class="n">I_CA2</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">I_ALPHA</span><span class="p">]]</span></div>
-
-<div class="viewcode-block" id="AdditionalInputCa2Adaptive.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="c1"># Read the data</span>
-        <span class="p">(</span><span class="n">_exp_tau_ca2</span><span class="p">,</span> <span class="n">i_ca2</span><span class="p">,</span> <span class="n">_i_alpha</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
-
-        <span class="c1"># Copy the changed data only</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">I_CA2</span><span class="p">]</span> <span class="o">=</span> <span class="n">i_ca2</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_ca2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

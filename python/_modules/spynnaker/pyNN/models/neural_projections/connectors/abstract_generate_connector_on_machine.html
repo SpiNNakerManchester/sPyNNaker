@@ -54,34 +54,19 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">available_distributions</span><span class="p">,</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">abstractproperty</span><span class="p">,</span> <span class="n">AbstractBase</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractConnector</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common.param_generator_data</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">param_generator_params</span><span class="p">,</span> <span class="n">param_generator_params_size_in_bytes</span><span class="p">,</span>
+    <span class="n">param_generator_id</span><span class="p">,</span> <span class="n">is_param_generatable</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_host</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">)</span>
-
-<span class="c1"># Hash of the constant parameter generator</span>
-<span class="n">PARAM_TYPE_CONSTANT_ID</span> <span class="o">=</span> <span class="mi">0</span>
-
-<span class="c1"># Hashes of the parameter generators supported by the synapse expander</span>
-<span class="n">PARAM_TYPE_BY_NAME</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;uniform&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s2">&quot;uniform_int&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s2">&quot;normal&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="s2">&quot;normal_clipped&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-    <span class="s2">&quot;normal_clipped_to_boundary&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-    <span class="s2">&quot;exponential&quot;</span><span class="p">:</span> <span class="mi">5</span>
-<span class="p">}</span>
-
-<span class="n">PARAM_TYPE_KERNEL</span> <span class="o">=</span> <span class="mi">6</span>
 
 
 <span class="c1"># Hashes of the connection generators supported by the synapse expander</span>
@@ -101,8 +86,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__delay_seed&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__weight_seed&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__connector_seed&quot;</span>
     <span class="p">]</span>
 
@@ -113,8 +96,6 @@
 <span class="sd">        :param bool verbose:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__delay_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__weight_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__connector_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.validate_connection"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.validate_connection">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">validate_connection</span><span class="p">)</span>
@@ -128,30 +109,6 @@
                     <span class="s2">&quot; generated on the machine, but the connector cannot&quot;</span>
                     <span class="s2">&quot; be generated on host!&quot;</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_generate_lists_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Checks if the connector should generate lists on machine rather\</span>
-<span class="sd">            than trying to generate the connectivity data on host, based on\</span>
-<span class="sd">            the types of the weights and/or delays</span>
-
-<span class="sd">        :param values:</span>
-<span class="sd">        :type values: int or ~pyNN.random.NumpyRNG</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Strings (i.e. for distance-dependent weights/delays) not supported</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="c1"># Scalars are fine on the machine</span>
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">True</span>
-
-        <span class="c1"># Only certain types of random distributions are supported for\</span>
-        <span class="c1"># generation on the machine</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">PARAM_TYPE_BY_NAME</span>
-
-        <span class="k">return</span> <span class="kc">False</span>
-
     <span class="k">def</span> <span class="nf">_get_connector_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the seed of the connector for a given pre-post pairing</span>
 
@@ -164,87 +121,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__connector_seed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">create_mars_kiss_seeds</span><span class="p">(</span>
                 <span class="n">rng</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connector_seed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_generate_param_seed</span><span class="p">(</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">seeds</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the seed of a parameter generator for a given pre-post pairing</span>
-
-<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
-<span class="sd">        :param values:</span>
-<span class="sd">        :type values: int or ~pyNN.random.NumpyRNG</span>
-<span class="sd">        :param dict(list(int)) seeds:</span>
-<span class="sd">        :rtype: list(int)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">pre_vertex_slice</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">values</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seeds</span><span class="p">:</span>
-            <span class="n">seeds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">create_mars_kiss_seeds</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">seeds</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_param_generator_params</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the parameter generator parameters as a numpy array</span>
-
-<span class="sd">        :param values:</span>
-<span class="sd">        :type values: int or ~pyNN.random.NumpyRNG</span>
-<span class="sd">        :param list(int) seed:</span>
-<span class="sd">        :rtype: ~numpy.ndarray</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">encode_as_int</span><span class="p">(</span><span class="n">values</span><span class="p">)],</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
-            <span class="n">parameters</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">values</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="n">available_distributions</span><span class="p">[</span><span class="n">values</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
-            <span class="n">parameters</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">max</span> <span class="k">if</span> <span class="n">param</span> <span class="o">==</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
-                <span class="k">else</span> <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">min</span> <span class="k">if</span> <span class="n">param</span> <span class="o">==</span> <span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">inf</span> <span class="k">else</span> <span class="n">param</span>
-                <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span> <span class="k">if</span> <span class="n">param</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">encode_as_int</span><span class="p">(</span><span class="n">param</span><span class="p">)</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
-
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected value </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">))</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_param_generator_params_size_in_bytes</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the size of the parameter generator parameters in bytes</span>
-
-<span class="sd">        :param values:</span>
-<span class="sd">        :type values: int or ~pyNN.random.NumpyRNG</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">BYTES_PER_WORD</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
-            <span class="n">parameters</span> <span class="o">=</span> <span class="n">available_distributions</span><span class="p">[</span><span class="n">values</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-            <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected value </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">))</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_param_generator_id</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the id of the parameter generator</span>
-
-<span class="sd">        :param values:</span>
-<span class="sd">        :type values: int or ~pyNN.random.NumpyRNG</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">PARAM_TYPE_CONSTANT_ID</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">PARAM_TYPE_BY_NAME</span><span class="p">[</span><span class="n">values</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected value </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">))</span>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.generate_on_machine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.generate_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">generate_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine if this instance can generate on the machine.</span>
@@ -260,8 +136,8 @@
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_generate_lists_on_machine</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="ow">and</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_generate_lists_on_machine</span><span class="p">(</span><span class="n">delays</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">is_param_generatable</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">is_param_generatable</span><span class="p">(</span><span class="n">delays</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_weights_id"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_weights_id">[docs]</a>    <span class="k">def</span> <span class="nf">gen_weights_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the id of the weight generator on the machine</span>
@@ -271,57 +147,43 @@
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_generator_id</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">param_generator_id</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_weights_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_weights_params">[docs]</a>    <span class="k">def</span> <span class="nf">gen_weights_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_weights_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_weights_params">[docs]</a>    <span class="k">def</span> <span class="nf">gen_weights_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the parameters of the weight generator on the machine</span>
 
 <span class="sd">        :param weights:</span>
-<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
-<span class="sd">            float or list(int) or list(float)</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
+<span class="sd">        :type weights: ~pyNN.random.NumpyRNG or int or float</span>
 <span class="sd">        :rtype: ~numpy.ndarray(~numpy.uint32)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_param_seed</span><span class="p">(</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__weight_seed</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_generator_params</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">param_generator_params</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">gen_weight_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The size of the weight parameters in bytes</span>
 
 <span class="sd">        :param weights:</span>
-<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
-<span class="sd">            float or list(int) or list(float)</span>
+<span class="sd">        :type weights: ~pyNN.random.NumpyRNG or int or float</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_generator_params_size_in_bytes</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">param_generator_params_size_in_bytes</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_delays_id"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_delays_id">[docs]</a>    <span class="k">def</span> <span class="nf">gen_delays_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the id of the delay generator on the machine</span>
 
 <span class="sd">        :param delays:</span>
-<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
-<span class="sd">            float or list(int) or list(float)</span>
+<span class="sd">        :type delays: ~pyNN.random.NumpyRNG or int or float</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_generator_id</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">param_generator_id</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_delay_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_delay_params">[docs]</a>    <span class="k">def</span> <span class="nf">gen_delay_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_delay_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_delay_params">[docs]</a>    <span class="k">def</span> <span class="nf">gen_delay_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the parameters of the delay generator on the machine</span>
 
 <span class="sd">        :param delays:</span>
-<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
-<span class="sd">            float or list(int) or list(float)</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
+<span class="sd">        :type delays: ~pyNN.random.NumpyRNG or int or float</span>
 <span class="sd">        :rtype: ~numpy.ndarray(~numpy.uint32)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_param_seed</span><span class="p">(</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delay_seed</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_generator_params</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">param_generator_params</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_delay_params_size_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_delay_params_size_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">gen_delay_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The size of the delay parameters in bytes</span>
@@ -331,7 +193,7 @@
 <span class="sd">            float or list(int) or list(float)</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_generator_params_size_in_bytes</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">param_generator_params_size_in_bytes</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">gen_connector_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -340,17 +202,9 @@
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_connector_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_connector_params">[docs]</a>    <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_connector_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_connector_params">[docs]</a>    <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the parameters of the on machine generation.</span>
 
-<span class="sd">        :param list(~pacman.model.graphs.common.Slice) pre_slices:</span>
-<span class="sd">        :param list(~pacman.model.graphs.common.Slice) post_slices:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
-<span class="sd">        :param AbstractSynapseType synapse_type:</span>
-<span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">        :rtype: ~numpy.ndarray(uint32)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=unused-argument</span>
@@ -363,20 +217,6 @@
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">0</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_get_view_lo_hi</span><span class="p">(</span><span class="n">view</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the range of neuron IDs covered by a view.</span>
-
-<span class="sd">        :param ~spynnaker.pyNN.models.populations.PopulationView view:</span>
-<span class="sd">        :rtype: tuple(int,int)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Evil forward reference to subpackage implementation of type!</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="n">indexes</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">_indexes</span>
-        <span class="n">view_lo</span> <span class="o">=</span> <span class="n">indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">view_hi</span> <span class="o">=</span> <span class="n">indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">view_lo</span><span class="p">,</span> <span class="n">view_hi</span>
 </pre></div>
 
             <div class="clearer"></div>

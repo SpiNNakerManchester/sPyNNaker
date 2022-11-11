@@ -97,7 +97,7 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a9675fd66449aa60f08c39561c803ccf9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing__fast_8h.html#a9675fd66449aa60f08c39561c803ccf9">spike_processing_fast_initialise</a> (uint32_t <a class="el" href="bit__field__expander_8c.html#af9b6824a750777e79471f086307d51b9">row_max_n_words</a>, uint32_t <a class="el" href="spike__source__poisson_8c.html#afdae215608627a97110d1cd913398563">spike_buffer_size</a>, bool discard_late_packets, uint32_t pkts_per_ts_rec_region, uint32_t multicast_priority, struct <a class="el" href="spike__source__poisson_8c.html#structsdram__config">sdram_config</a> sdram_inputs_param, struct <a class="el" href="spike__processing__fast_8h.html#structkey__config">key_config</a> key_config_param, weight_t *ring_buffers_param)</td></tr>
+<tr class="memitem:a9675fd66449aa60f08c39561c803ccf9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing__fast_8h.html#a9675fd66449aa60f08c39561c803ccf9">spike_processing_fast_initialise</a> (uint32_t row_max_n_words, uint32_t <a class="el" href="spike__source__poisson_8c.html#afdae215608627a97110d1cd913398563">spike_buffer_size</a>, bool discard_late_packets, uint32_t pkts_per_ts_rec_region, uint32_t multicast_priority, struct <a class="el" href="spike__source__poisson_8c.html#structsdram__config">sdram_config</a> sdram_inputs_param, struct <a class="el" href="spike__processing__fast_8h.html#structkey__config">key_config</a> key_config_param, weight_t *ring_buffers_param)</td></tr>
 <tr class="memdesc:a9675fd66449aa60f08c39561c803ccf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up spike processing.  <a href="spike__processing__fast_8h.html#a9675fd66449aa60f08c39561c803ccf9">More...</a><br /></td></tr>
 <tr class="separator:a9675fd66449aa60f08c39561c803ccf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3feb6ea173c87c2b68c1606b751dbc47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing__fast_8h.html#a3feb6ea173c87c2b68c1606b751dbc47">spike_processing_fast_time_step_loop</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t n_rewires)</td></tr>
@@ -125,7 +125,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>A region of SDRAM used to transfer synapses. </p>
 
-<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00085">85</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00088">88</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -143,29 +143,11 @@ size_in_bytes</td>
 The size of the input data to be transferred per core. <p>The size of the input data to be transferred. </p>
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a6a591c0cd469068deef9515db3a5435d"></a>uint32_t</td>
-<td class="fieldname">
-n_neurons</td>
-<td class="fielddoc">
-The number of neurons. </td></tr>
-<tr><td class="fieldtype">
-<a id="a5aeda4c778a8f079554189f957410c9c"></a>uint32_t</td>
-<td class="fieldname">
-n_synapse_types</td>
-<td class="fielddoc">
-The number of synapse types. </td></tr>
-<tr><td class="fieldtype">
 <a id="ac71da842b9ee9030342176197e40ba3b"></a>uint32_t</td>
 <td class="fieldname">
 n_synapse_cores</td>
 <td class="fielddoc">
 The number of synapse cores feeding into here. </td></tr>
-<tr><td class="fieldtype">
-<a id="ac5dd25085ff51b0365a1a81144c5883d"></a>uint32_t</td>
-<td class="fieldname">
-synapse_index_bits</td>
-<td class="fielddoc">
-The number of bits needed for the neurons. </td></tr>
 <tr><td class="fieldtype">
 <a id="a86b526324ed1f6013de23834e46a28b6"></a>uint32_t *</td>
 <td class="fieldname">
@@ -321,6 +303,24 @@ The number of times a time step was skipped entirely. </td></tr>
 max_transfer_timer_overrun</td>
 <td class="fielddoc">
 The maximum additional time taken to transfer. </td></tr>
+<tr><td class="fieldtype">
+<a id="ada0587dfdf0b6c93fd84124e948e0880"></a>uint32_t</td>
+<td class="fieldname">
+earliest_receive</td>
+<td class="fielddoc">
+The earliest received time of a spike. </td></tr>
+<tr><td class="fieldtype">
+<a id="af092c1094a787efc5ecb2b5d78875b90"></a>uint32_t</td>
+<td class="fieldname">
+latest_receive</td>
+<td class="fielddoc">
+The latest received time of a spike. </td></tr>
+<tr><td class="fieldtype">
+<a id="a16b051ee2aa9d8627aa7067590241554"></a>uint32_t</td>
+<td class="fieldname">
+max_spikes_overflow</td>
+<td class="fielddoc">
+The most spikes left at the end of any time step. </td></tr>
 </table>
 
 </div>
@@ -404,7 +404,7 @@ The maximum additional time taken to transfer. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the setup was successful or not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing__fast_8c_source.html#l00566">566</a> of file <a class="el" href="spike__processing__fast_8c_source.html">spike_processing_fast.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing__fast_8c_source.html#l00595">595</a> of file <a class="el" href="spike__processing__fast_8c_source.html">spike_processing_fast.c</a>.</p>
 
 </div>
 </div>
@@ -443,7 +443,7 @@ The maximum additional time taken to transfer. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing__fast_8c_source.html#l00479">479</a> of file <a class="el" href="spike__processing__fast_8c_source.html">spike_processing_fast.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing__fast_8c_source.html#l00496">496</a> of file <a class="el" href="spike__processing__fast_8c_source.html">spike_processing_fast.c</a>.</p>
 
 </div>
 </div>
@@ -471,14 +471,14 @@ The maximum additional time taken to transfer. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing__fast_8c_source.html#l00610">610</a> of file <a class="el" href="spike__processing__fast_8c_source.html">spike_processing_fast.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing__fast_8c_source.html#l00639">639</a> of file <a class="el" href="spike__processing__fast_8c_source.html">spike_processing_fast.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -1,16 +1,19 @@
 var searchData=
 [
-  ['generate_5fbit_5ffield_3206',['generate_bit_field',['../bit__field__expander_8c.html#a05cd52c8292c3bab8005816a1b7d5645',1,'bit_field_expander.c']]],
-  ['get_5faddress_3207',['get_address',['../population__table__binary__search__impl_8c.html#aa48b23a2a333284836c0054f7113ca95',1,'population_table_binary_search_impl.c']]],
-  ['get_5fbitfield_5fsum_3208',['get_bitfield_sum',['../population__table__binary__search__impl_8c.html#a4dab389e388857fd430ade234d606239',1,'population_table_binary_search_impl.c']]],
-  ['get_5fcore_5findex_3209',['get_core_index',['../population__table__binary__search__impl_8c.html#abbbbe3092321f99b294c4143a2438c5e',1,'population_table_binary_search_impl.c']]],
-  ['get_5fcore_5fsum_3210',['get_core_sum',['../population__table__binary__search__impl_8c.html#a5d4827066ef5e80065b7008054bd7686',1,'population_table_binary_search_impl.c']]],
-  ['get_5fdelay_3211',['get_delay',['../matrix__generator__common_8h.html#a70d02afe8081b6ed99856fe4594e88e8',1,'matrix_generator_common.h']]],
-  ['get_5fdirect_5faddress_3212',['get_direct_address',['../population__table__binary__search__impl_8c.html#a0f6729803ce65a621db8be58bfa1d972',1,'population_table_binary_search_impl.c']]],
-  ['get_5flocal_5fneuron_5fid_3213',['get_local_neuron_id',['../population__table__binary__search__impl_8c.html#a0e1b8eb97598151a700431dc6226d089',1,'population_table_binary_search_impl.c']]],
-  ['get_5fneuron_5fid_3214',['get_neuron_id',['../population__table__binary__search__impl_8c.html#ab08d6807fc8fd46ed5f70a8bd14a5a93',1,'population_table_binary_search_impl.c']]],
-  ['get_5foffset_3215',['get_offset',['../population__table__binary__search__impl_8c.html#a30c2c744e7524091a4a2b64d231fdf4f',1,'population_table_binary_search_impl.c']]],
-  ['get_5frow_5flength_3216',['get_row_length',['../population__table__binary__search__impl_8c.html#a90850a3d006b876ba62076c80a401be1',1,'population_table_binary_search_impl.c']]],
-  ['get_5fsource_5fdata_3217',['get_source_data',['../spike__source__poisson_8c.html#a271dd89ae6f3a25d49a7e2d4cb768a37',1,'spike_source_poisson.c']]],
-  ['get_5ftype_5fchar_3218',['get_type_char',['../synapses_8c.html#a5af3d86ffc14ed6815aeeec7dbe9412a',1,'synapses.c']]]
+  ['generate_5fbit_5ffield_3219',['generate_bit_field',['../bit__field__expander_8h.html#ac4477b4a6faf287e216d3a2ba19f91ca',1,'bit_field_expander.h']]],
+  ['get_5faddress_3220',['get_address',['../population__table_8h.html#a2916b1e1b3368cce2257f3a2d2babd11',1,'population_table.h']]],
+  ['get_5fcore_5findex_3221',['get_core_index',['../population__table_8h.html#aa2d4dd26fcbfb2f760cc5ec9c021e475',1,'population_table.h']]],
+  ['get_5fcore_5fsum_3222',['get_core_sum',['../population__table_8h.html#ac6d62fa8b2be8dfcb6c5ff7c9ff9d7aa',1,'population_table.h']]],
+  ['get_5fdelay_3223',['get_delay',['../matrix__generator__common_8h.html#a70d02afe8081b6ed99856fe4594e88e8',1,'matrix_generator_common.h']]],
+  ['get_5fdelay_5frow_3224',['get_delay_row',['../matrix__generator__common_8h.html#adbffbf3c44823b700f697d2bb4df627b',1,'matrix_generator_common.h']]],
+  ['get_5flocal_5fneuron_5fid_3225',['get_local_neuron_id',['../population__table_8h.html#a48c705b7db3ec689ae14c6173df1de60',1,'population_table.h']]],
+  ['get_5fneuron_5fid_3226',['get_neuron_id',['../population__table_8h.html#ab08d6807fc8fd46ed5f70a8bd14a5a93',1,'population_table.h']]],
+  ['get_5fnm_5ffixed_5frow_3227',['get_nm_fixed_row',['../matrix__generator__neuromodulation_8h.html#a67543bac5ac231c0f3ac6897b4eebab4',1,'matrix_generator_neuromodulation.h']]],
+  ['get_5fnm_5frow_3228',['get_nm_row',['../matrix__generator__neuromodulation_8h.html#adb49a447e52dc2d7f8bd96b5003ad5b7',1,'matrix_generator_neuromodulation.h']]],
+  ['get_5foffset_3229',['get_offset',['../population__table_8h.html#a071de88b0691d4747c55dbea8cc58f86',1,'population_table.h']]],
+  ['get_5frow_3230',['get_row',['../matrix__generator__common_8h.html#a59540be417d878df2430b21bad1eb91c',1,'matrix_generator_common.h']]],
+  ['get_5frow_5faddr_5fand_5fsize_3231',['get_row_addr_and_size',['../population__table_8h.html#a1bd7c13d57e46e337171e57af8f345fe',1,'population_table.h']]],
+  ['get_5frow_5flength_3232',['get_row_length',['../population__table_8h.html#a44d4641d18cf8073f34f171a7e9a0f54',1,'population_table.h']]],
+  ['get_5fstdp_5ffixed_5frow_3233',['get_stdp_fixed_row',['../matrix__generator__stdp_8h.html#a7fd79284f87d27ffb21c99534d6b8156',1,'matrix_generator_stdp.h']]],
+  ['get_5ftype_5fchar_3234',['get_type_char',['../synapses_8c.html#a5af3d86ffc14ed6815aeeec7dbe9412a',1,'synapses.c']]]
 ];

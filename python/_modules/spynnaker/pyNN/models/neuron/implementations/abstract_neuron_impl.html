@@ -78,13 +78,12 @@
 <span class="sd">        :rtype str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AbstractNeuronImpl.get_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the SDRAM memory usage required</span>
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">structs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; A list of structs used by the implementation</span>
 
-<span class="sd">        :param int n_neurons: The number of neurons to get the usage for</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        :rtype: list(Struct)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractNeuronImpl.get_global_weight_scale"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_global_weight_scale">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_global_weight_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -168,37 +167,6 @@
 
 <span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary state_variables:</span>
 <span class="sd">            A holder of the state variables</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-<div class="viewcode-block" id="AbstractNeuronImpl.get_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_data">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the data *to be written to the machine* for this model</span>
-
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary parameters:</span>
-<span class="sd">            The holder of the parameters</span>
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary state_variables:</span>
-<span class="sd">            The holder of the state variables</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">            The slice of the vertex to generate parameters for</span>
-<span class="sd">        :param tuple(int) atoms_shape: The shape of the atoms in the vertex</span>
-<span class="sd">        :rtype: ~numpy.ndarray(~numpy.uint32)</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-<div class="viewcode-block" id="AbstractNeuronImpl.read_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.read_data">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Read the parameters and state variables of the model\</span>
-<span class="sd">            *from the given data* (read from the machine)</span>
-
-<span class="sd">        :param data: The data to be read</span>
-<span class="sd">        :type data: bytearray or bytes or memoryview</span>
-<span class="sd">        :param int offset: The offset where the data should be read from</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">            The slice of the vertex to read parameters for</span>
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary parameters:</span>
-<span class="sd">            The holder of the parameters to update</span>
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary state_variables:</span>
-<span class="sd">            The holder of the state variables to update</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractNeuronImpl.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_units">[docs]</a>    <span class="nd">@abstractmethod</span>

@@ -57,16 +57,13 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">.abstract_threshold_type</span> <span class="kn">import</span> <span class="n">AbstractThresholdType</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 
 <span class="n">DU_TH</span> <span class="o">=</span> <span class="s2">&quot;du_th&quot;</span>
 <span class="n">TAU_TH</span> <span class="o">=</span> <span class="s2">&quot;tau_th&quot;</span>
 <span class="n">V_THRESH</span> <span class="o">=</span> <span class="s2">&quot;v_thresh&quot;</span>
-
-<span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">DU_TH</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span>
-    <span class="n">TAU_TH</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">,</span>
-    <span class="n">V_THRESH</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span>
-<span class="p">}</span>
+<span class="n">TIMESTEP</span> <span class="o">=</span> <span class="s2">&quot;timestep&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">ThresholdTypeMaassStochastic</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="p">):</span>
@@ -95,11 +92,13 @@
 <span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
 <span class="sd">            or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># 1 / du_th</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># 1 / tau_th</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># v_thresh</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># ts / 10</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Struct</span><span class="p">([</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">DU_TH</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">TAU_TH</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">V_THRESH</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">TIMESTEP</span><span class="p">)])],</span>
+            <span class="p">{</span><span class="n">DU_TH</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span> <span class="n">TAU_TH</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">,</span> <span class="n">V_THRESH</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__du_th</span> <span class="o">=</span> <span class="n">du_th</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tau_th</span> <span class="o">=</span> <span class="n">tau_th</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__v_thresh</span> <span class="o">=</span> <span class="n">v_thresh</span>
@@ -108,29 +107,11 @@
     <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">parameters</span><span class="p">[</span><span class="n">DU_TH</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__du_th</span>
         <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_TH</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_th</span>
-        <span class="n">parameters</span><span class="p">[</span><span class="n">V_THRESH</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_thresh</span></div>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">V_THRESH</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_thresh</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">TIMESTEP</span><span class="p">]</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ThresholdTypeMaassStochastic.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.add_state_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="ThresholdTypeMaassStochastic.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="ThresholdTypeMaassStochastic.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.has_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
-
-<div class="viewcode-block" id="ThresholdTypeMaassStochastic.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="c1"># Add the rest of the data</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">parameters</span><span class="p">[</span><span class="n">DU_TH</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">x</span><span class="p">),</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_TH</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">x</span><span class="p">),</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">V_THRESH</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="o">-</span><span class="mf">10000.0</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="ThresholdTypeMaassStochastic.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
     <span class="nd">@property</span>

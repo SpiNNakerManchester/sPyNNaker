@@ -83,12 +83,21 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
+<tr class="memitem:structthreshold__type__params__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threshold__type__static_8h.html#structthreshold__type__params__t">threshold_type_params_t</a></td></tr>
+<tr class="memdesc:structthreshold__type__params__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stochastic threshold parameters.  <a href="threshold__type__static_8h.html#structthreshold__type__params__t">More...</a><br /></td></tr>
+<tr class="separator:structthreshold__type__params__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structthreshold__type__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a></td></tr>
 <tr class="memdesc:structthreshold__type__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stochastic threshold configuration.  <a href="threshold__type__static_8h.html#structthreshold__type__t">More...</a><br /></td></tr>
 <tr class="separator:structthreshold__type__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a0ccf2c0ff1feb59d7843d6102a4bdfdb"><td class="memItemLeft" align="right" valign="top"><a id="a0ccf2c0ff1feb59d7843d6102a4bdfdb"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>threshold_type_initialise</b> (<a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *state, <a class="el" href="threshold__type__static_8h.html#structthreshold__type__params__t">threshold_type_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>, uint32_t <a class="el" href="neuron__impl__standard_8h.html#adc2145aaa2f8435401d2c077d42c7b91">n_steps_per_timestep</a>)</td></tr>
+<tr class="separator:a0ccf2c0ff1feb59d7843d6102a4bdfdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a230a810f6d449075f7fc416195d4967f"><td class="memItemLeft" align="right" valign="top"><a id="a230a810f6d449075f7fc416195d4967f"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>threshold_type_save_state</b> (<a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *state, <a class="el" href="threshold__type__static_8h.html#structthreshold__type__params__t">threshold_type_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>)</td></tr>
+<tr class="separator:a230a810f6d449075f7fc416195d4967f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78e80ccc57135aa9f338b0e82001fb89"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threshold__type__static_8h.html#a78e80ccc57135aa9f338b0e82001fb89">threshold_type_is_above_threshold</a> (<a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> value, <a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *threshold_type)</td></tr>
 <tr class="memdesc:a78e80ccc57135aa9f338b0e82001fb89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if the value given is above the threshold value.  <a href="threshold__type__static_8h.html#a78e80ccc57135aa9f338b0e82001fb89">More...</a><br /></td></tr>
 <tr class="separator:a78e80ccc57135aa9f338b0e82001fb89"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -98,6 +107,56 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="threshold__type__static_8h_source.html">threshold_type_static.h</a>.</p>
 </div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
+<a name="structthreshold__type__params__t" id="structthreshold__type__params__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structthreshold__type__params__t">&#9670;&nbsp;</a></span>threshold_type_params_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct threshold_type_params_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>Stochastic threshold parameters. </p>
+
+<p class="definition">Definition at line <a class="el" href="threshold__type__maass__stochastic_8h_source.html#l00031">31</a> of file <a class="el" href="threshold__type__maass__stochastic_8h_source.html">threshold_type_maass_stochastic.h</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a39a4a0cad4335ec0a6228e491c51b715"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+du_th</td>
+<td class="fielddoc">
+sensitivity of soft threshold to membrane voltage [mV<sup>-1</sup>] </td></tr>
+<tr><td class="fieldtype">
+<a id="a8765ecbcef96af7f1564c611b7f3ae70"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+tau_th</td>
+<td class="fielddoc">
+time constant for soft threshold [ms<sup>-1</sup>] </td></tr>
+<tr><td class="fieldtype">
+<a id="a2a2c98c037d25d3e16f5fbed1f25885a"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+v_thresh</td>
+<td class="fielddoc">
+soft threshold value [mV] </td></tr>
+<tr><td class="fieldtype">
+<a id="a6618b1cdebadeb52e86c0ea33d94ea8b"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+time_step_ms</td>
+<td class="fielddoc">
+time step scaling factor </td></tr>
+<tr><td class="fieldtype">
+<a id="a6e1abe871ed27b99be9a050662871898"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+threshold_value</td>
+<td class="fielddoc">
+The value of the static threshold. </td></tr>
+</table>
+
+</div>
+</div>
 <a name="structthreshold__type__t" id="structthreshold__type__t"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#structthreshold__type__t">&#9670;&nbsp;</a></span>threshold_type_t</h2>
 
@@ -112,7 +171,7 @@ Functions</h2></td></tr>
 <div class="textblock"><p>Stochastic threshold configuration. </p>
 <p>Static threshold configuration. </p>
 
-<p class="definition">Definition at line <a class="el" href="threshold__type__maass__stochastic_8h_source.html#l00031">31</a> of file <a class="el" href="threshold__type__maass__stochastic_8h_source.html">threshold_type_maass_stochastic.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="threshold__type__maass__stochastic_8h_source.html#l00043">43</a> of file <a class="el" href="threshold__type__maass__stochastic_8h_source.html">threshold_type_maass_stochastic.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -196,14 +255,14 @@ The value of the static threshold. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the neuron should fire </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="threshold__type__static_8h_source.html#l00035">35</a> of file <a class="el" href="threshold__type__static_8h_source.html">threshold_type_static.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="threshold__type__static_8h_source.html#l00049">49</a> of file <a class="el" href="threshold__type__static_8h_source.html">threshold_type_static.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -135,6 +135,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topo
 <tr class="memitem:a5cdd3772a85bf8d042932b9ec4e57125"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#a5cdd3772a85bf8d042932b9ec4e57125">synaptogenesis_dynamics_rewire</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *synaptic_row, uint32_t *n_bytes)</td></tr>
 <tr class="memdesc:a5cdd3772a85bf8d042932b9ec4e57125"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trigger the process of synaptic rewiring.  <a href="topographic__map__impl_8c.html#a5cdd3772a85bf8d042932b9ec4e57125">More...</a><br /></td></tr>
 <tr class="separator:a5cdd3772a85bf8d042932b9ec4e57125"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67a28cf101eaae356ff05dda2e96a8ff"><td class="memItemLeft" align="right" valign="top"><a id="a67a28cf101eaae356ff05dda2e96a8ff"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>do_formation</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> restrict row, <a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict current_state)</td></tr>
+<tr class="separator:a67a28cf101eaae356ff05dda2e96a8ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1038fc3912a348ccc5b2f3331181a98"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#aa1038fc3912a348ccc5b2f3331181a98">row_restructure</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> restrict row, <a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict current_state)</td></tr>
 <tr class="memdesc:aa1038fc3912a348ccc5b2f3331181a98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the actual restructuring of a row.  <a href="topographic__map__impl_8c.html#aa1038fc3912a348ccc5b2f3331181a98">More...</a><br /></td></tr>
 <tr class="separator:aa1038fc3912a348ccc5b2f3331181a98"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -332,7 +335,7 @@ value</td>
 </div><div class="memdoc">
 
 <p>Trigger the process of synaptic rewiring. </p>
-<p>Usually called on a timer registered in <a class="el" href="bit__field__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point.">c_main()</a> </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Usually called on a timer registered in <a class="el" href="delay__extension_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point.">c_main()</a> </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the current timestep </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">spike</td><td>variable to hold the spike </td></tr>
@@ -398,7 +401,7 @@ value</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the row was changed and needs to be written back </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00298">298</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00319">319</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -438,7 +441,7 @@ value</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the row was changed and needs to be written back </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00391">391</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00378">378</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -477,7 +480,7 @@ value</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00398">398</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00385">385</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -500,7 +503,7 @@ value</td>
 <p>Number of updates to do of synaptogenesis this time step. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of updates to do this time step </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00402">402</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00389">389</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -562,7 +565,7 @@ value</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

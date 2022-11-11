@@ -69,7 +69,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">maths-util.h File Reference</div>  </div>
 </div><!--header-->
@@ -174,6 +175,21 @@ typedef long fract&#160;</td><td class="memItemRight" valign="bottom"><a class="
 typedef unsigned long fract&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="maths-util_8h.html#a8cf409d4308be505fbdb5683525213ba">UFRACT</a></td></tr>
 <tr class="memdesc:a8cf409d4308be505fbdb5683525213ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used for "unsigned fractional" numbers. <br /></td></tr>
 <tr class="separator:a8cf409d4308be505fbdb5683525213ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a4706b7e32b19a119b97dff713c091636"><td class="memItemLeft" align="right" valign="top"><a id="a4706b7e32b19a119b97dff713c091636"></a>
+uint64_t&#160;</td><td class="memItemRight" valign="bottom"><b>udiv64</b> (uint64_t, uint64_t)</td></tr>
+<tr class="separator:a4706b7e32b19a119b97dff713c091636"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93c5e8722291b50b8a17e64cf8d5edb9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="maths-util_8h.html#a93c5e8722291b50b8a17e64cf8d5edb9">kdivk</a> (<a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> a, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> b)</td></tr>
+<tr class="memdesc:a93c5e8722291b50b8a17e64cf8d5edb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Divides an accum by another accum.  <a href="maths-util_8h.html#a93c5e8722291b50b8a17e64cf8d5edb9">More...</a><br /></td></tr>
+<tr class="separator:a93c5e8722291b50b8a17e64cf8d5edb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fa3dde0c1762bfdb7e5f0c72dd5ac44"><td class="memItemLeft" align="right" valign="top">static int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="maths-util_8h.html#a8fa3dde0c1762bfdb7e5f0c72dd5ac44">udivk</a> (int32_t a, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> b)</td></tr>
+<tr class="memdesc:a8fa3dde0c1762bfdb7e5f0c72dd5ac44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Divides an integer by an accum.  <a href="maths-util_8h.html#a8fa3dde0c1762bfdb7e5f0c72dd5ac44">More...</a><br /></td></tr>
+<tr class="separator:a8fa3dde0c1762bfdb7e5f0c72dd5ac44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6e6f665bddb5253982e560b4b2969c5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="maths-util_8h.html#ab6e6f665bddb5253982e560b4b2969c5">kdivui</a> (<a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> a, uint32_t b)</td></tr>
+<tr class="memdesc:ab6e6f665bddb5253982e560b4b2969c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Divides an accum by an unsigned integer.  <a href="maths-util_8h.html#ab6e6f665bddb5253982e560b4b2969c5">More...</a><br /></td></tr>
+<tr class="separator:ab6e6f665bddb5253982e560b4b2969c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="maths-util_8h.html" title="maths-util.h - first created 7/10/2013 version 0.1">maths-util.h</a> - first created 7/10/2013 version 0.1 </p>
@@ -650,10 +666,155 @@ typedef unsigned long fract&#160;</td><td class="memItemRight" valign="bottom"><
 
 </div>
 </div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a93c5e8722291b50b8a17e64cf8d5edb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93c5e8722291b50b8a17e64cf8d5edb9">&#9670;&nbsp;</a></span>kdivk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> kdivk </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Divides an accum by another accum. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>The dividend </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The divisor </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a divided by b </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="maths-util_8h_source.html#l00223">223</a> of file <a class="el" href="maths-util_8h_source.html">maths-util.h</a>.</p>
+
+</div>
+</div>
+<a id="a8fa3dde0c1762bfdb7e5f0c72dd5ac44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fa3dde0c1762bfdb7e5f0c72dd5ac44">&#9670;&nbsp;</a></span>udivk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static int32_t udivk </td>
+          <td>(</td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Divides an integer by an accum. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>The dividend </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The divisor </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a divided by b </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="maths-util_8h_source.html#l00231">231</a> of file <a class="el" href="maths-util_8h_source.html">maths-util.h</a>.</p>
+
+</div>
+</div>
+<a id="ab6e6f665bddb5253982e560b4b2969c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6e6f665bddb5253982e560b4b2969c5">&#9670;&nbsp;</a></span>kdivui()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> kdivui </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Divides an accum by an unsigned integer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>The dividend </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The divisor </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a divided by b </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="maths-util_8h_source.html#l00239">239</a> of file <a class="el" href="maths-util_8h_source.html">maths-util.h</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

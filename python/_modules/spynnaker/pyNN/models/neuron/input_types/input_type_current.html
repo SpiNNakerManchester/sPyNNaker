@@ -56,6 +56,7 @@
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">.abstract_input_type</span> <span class="kn">import</span> <span class="n">AbstractInputType</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
 
 
 <span class="k">class</span> <span class="nc">InputTypeCurrent</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="p">):</span>
@@ -66,7 +67,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([])</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span><span class="n">Struct</span><span class="p">([])],</span> <span class="nb">dict</span><span class="p">())</span>
 
 <div class="viewcode-block" id="InputTypeCurrent.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.add_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
@@ -75,22 +76,6 @@
 <div class="viewcode-block" id="InputTypeCurrent.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.add_state_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
         <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="InputTypeCurrent.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[]</span></div>
-
-<div class="viewcode-block" id="InputTypeCurrent.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="InputTypeCurrent.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="InputTypeCurrent.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.has_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="InputTypeCurrent.get_global_weight_scale"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.get_global_weight_scale">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">get_global_weight_scale</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_global_weight_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

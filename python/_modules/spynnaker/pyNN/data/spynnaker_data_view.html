@@ -252,7 +252,7 @@
         <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.populations.population</span> <span class="kn">import</span> <span class="n">Population</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">Population</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The population must be a Projection&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The population must be a Population&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">population</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_populations</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;This method should only be called from the Population init&quot;</span><span class="p">)</span>

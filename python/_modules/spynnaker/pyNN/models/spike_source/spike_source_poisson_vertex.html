@@ -61,30 +61,25 @@
 <span class="kn">from</span> <span class="nn">pyNN.space</span> <span class="kn">import</span> <span class="n">Grid2D</span><span class="p">,</span> <span class="n">Grid3D</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.ranged</span> <span class="kn">import</span> <span class="n">RangeDictionary</span><span class="p">,</span> <span class="n">RangedList</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_int</span>
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">LegacyPartitionerAPI</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="n">ConstantSDRAM</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_int</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">recording_utilities</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+    <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="n">profile_utils</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">MultiSpikeRecorder</span><span class="p">,</span> <span class="n">SimplePopulationSettable</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.spike_source_poisson_machine_vertex</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SpikeSourcePoissonMachineVertex</span><span class="p">,</span> <span class="n">_flatten</span><span class="p">,</span> <span class="n">get_rates_bytes</span><span class="p">,</span>
-    <span class="n">get_sdram_edge_params_bytes</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">MultiSpikeRecorder</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">create_mars_kiss_seeds</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">SupportsStructure</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict</span> \
-    <span class="kn">import</span> <span class="nn">SpynnakerRangeDictionary</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list</span> \
-    <span class="kn">import</span> <span class="nn">SpynnakerRangedList</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PopulationApplicationVertex</span><span class="p">,</span> <span class="n">RecordingType</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">ParameterHolder</span>
+<span class="kn">from</span> <span class="nn">.spike_source_poisson_machine_vertex</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SpikeSourcePoissonMachineVertex</span><span class="p">,</span> <span class="n">_flatten</span><span class="p">,</span> <span class="n">get_rates_bytes</span><span class="p">,</span>
+    <span class="n">get_sdram_edge_params_bytes</span><span class="p">,</span> <span class="n">get_expander_rates_bytes</span><span class="p">,</span> <span class="n">get_params_bytes</span><span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
@@ -103,34 +98,34 @@
 <span class="c1"># The microseconds per timestep will be divided by this to get the max offset</span>
 <span class="n">_MAX_OFFSET_DENOMINATOR</span> <span class="o">=</span> <span class="mi">10</span>
 
+<span class="c1"># Indicates a duration that never ends</span>
+<span class="n">DURATION_FOREVER</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
+
 
 <span class="k">class</span> <span class="nc">SpikeSourcePoissonVertex</span><span class="p">(</span>
-        <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">,</span>
-        <span class="n">SimplePopulationSettable</span><span class="p">,</span> <span class="n">LegacyPartitionerAPI</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
+        <span class="n">PopulationApplicationVertex</span><span class="p">,</span>
+        <span class="n">LegacyPartitionerAPI</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A Poisson Spike source object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__duration&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__last_rate_read_time&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__model&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__model_name&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_atoms&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__rate&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__rng&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__seed&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__spike_recorder&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__start&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__time_to_spike&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__kiss_seed&quot;</span><span class="p">,</span>  <span class="c1"># dict indexed by vertex slice</span>
-        <span class="s2">&quot;__n_subvertices&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__max_rate&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__rate_change&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__max_n_rates&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_profile_samples&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__data&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__is_variable_rate&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__outgoing_projections&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__incoming_control_edge&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__structure&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__structure&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__allowed_parameters&quot;</span><span class="p">]</span>
 
     <span class="n">SPIKE_RECORDING_REGION_ID</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -160,7 +155,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_subvertices</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span> <span class="o">=</span> <span class="n">MultiSpikeRecorder</span><span class="p">()</span>
 
@@ -211,10 +205,10 @@
             <span class="n">durations</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
-                <span class="n">durations</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_rate</span><span class="p">])</span>
+                <span class="n">durations</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">DURATION_FOREVER</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">_rate</span><span class="p">])</span>
                              <span class="k">for</span> <span class="n">_rate</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">durations</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_rate</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">])</span>
+                <span class="n">durations</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">DURATION_FOREVER</span> <span class="k">for</span> <span class="n">_rate</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">])</span>
 
         <span class="c1"># Check that there is either one list for all neurons,</span>
         <span class="c1"># or one per neuron</span>
@@ -258,28 +252,17 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">duration_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rate_set</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Each rate must have its own duration&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
-            <span class="n">time_to_spike</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rates</span><span class="p">[</span><span class="n">i</span><span class="p">]))])</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rates</span><span class="p">))]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">time_to_spike</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rates</span><span class="p">))])</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span> <span class="o">=</span> <span class="n">SpynnakerRangeDictionary</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SpynnakerRangedList</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span> <span class="o">=</span> <span class="n">RangeDictionary</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">RangedList</span><span class="p">(</span>
             <span class="n">n_neurons</span><span class="p">,</span> <span class="n">rates</span><span class="p">,</span>
             <span class="n">use_list_as_value</span><span class="o">=</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;__len__&quot;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;starts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SpynnakerRangedList</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;starts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">RangedList</span><span class="p">(</span>
             <span class="n">n_neurons</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span>
             <span class="n">use_list_as_value</span><span class="o">=</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">starts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;__len__&quot;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;durations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SpynnakerRangedList</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;durations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">RangedList</span><span class="p">(</span>
             <span class="n">n_neurons</span><span class="p">,</span> <span class="n">durations</span><span class="p">,</span>
             <span class="n">use_list_as_value</span><span class="o">=</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">durations</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;__len__&quot;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;time_to_spike&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SpynnakerRangedList</span><span class="p">(</span>
-            <span class="n">n_neurons</span><span class="p">,</span> <span class="n">time_to_spike</span><span class="p">,</span>
-            <span class="n">use_list_as_value</span><span class="o">=</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">time_to_spike</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;__len__&quot;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__rng</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__rate_change</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span> <span class="o">=</span> <span class="n">get_config_int</span><span class="p">(</span>
             <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;n_profile_samples&quot;</span><span class="p">)</span>
@@ -293,6 +276,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">all_rates</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">max_rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_n_rates</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">])</span>
 
         <span class="c1"># Keep track of how many outgoing projections exist</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_projections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -300,9 +284,24 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span> <span class="o">=</span> <span class="kc">None</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_variable_rate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__allowed_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rates&quot;</span><span class="p">,</span> <span class="s2">&quot;durations&quot;</span><span class="p">,</span> <span class="s2">&quot;starts&quot;</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__allowed_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="s2">&quot;duration&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__last_rate_read_time</span> <span class="o">=</span> <span class="kc">None</span>
+
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.set_structure"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_structure">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SupportsStructure</span><span class="o">.</span><span class="n">set_structure</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span> <span class="o">=</span> <span class="n">structure</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the rates</span>
+
+<span class="sd">        :rtype: RangedList</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.add_outgoing_projection"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.add_outgoing_projection">[docs]</a>    <span class="k">def</span> <span class="nf">add_outgoing_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an outgoing projection from this vertex</span>
@@ -324,118 +323,155 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_variable_rate</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Get variable rate poisson rates with .rates&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_flatten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]))</span>
-
-    <span class="nd">@rate</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_variable_rate</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot set rate of a variable rate poisson&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__rate_change</span> <span class="o">=</span> <span class="n">rate</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="nb">list</span><span class="p">(</span><span class="n">_flatten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">])))</span>
-        <span class="c1"># Normalise parameter</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
-            <span class="c1"># Single rate per neuron for whole simulation</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_value</span><span class="p">([</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">])</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rate</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Single rate for all neurons for whole simulation</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">rate</span><span class="p">]),</span> <span class="n">use_list_as_value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">all_rates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_flatten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]))</span>
-        <span class="n">new_max</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_rates</span><span class="p">):</span>
-            <span class="n">new_max</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">all_rates</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span> <span class="o">=</span> <span class="n">new_max</span>
-        <span class="c1"># Setting record forces reset so OK to go over if not recording</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span> <span class="ow">and</span> <span class="n">new_max</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Increasing spike rate while recording requires a &#39;</span>
-                        <span class="s1">&#39;&quot;reset unless additional_parameters &quot;max_rate&quot; is &#39;</span>
-                        <span class="s1">&#39;set&#39;</span><span class="p">)</span>
-            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span> <span class="o">=</span> <span class="n">new_max</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;starts&quot;</span><span class="p">]</span>
-
-    <span class="nd">@start</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_variable_rate</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot set start of a variable rate poisson&quot;</span><span class="p">)</span>
-        <span class="c1"># Normalise parameter</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
-            <span class="c1"># Single start per neuron for whole simulation</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;starts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_value</span><span class="p">([</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s</span><span class="p">])</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">start</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Single start for all neurons for whole simulation</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;starts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">start</span><span class="p">]),</span> <span class="n">use_list_as_value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;durations&quot;</span><span class="p">]</span>
-
-    <span class="nd">@duration</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_variable_rate</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot set duration of a variable rate poisson&quot;</span><span class="p">)</span>
-        <span class="c1"># Normalise parameter</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
-            <span class="c1"># Single duration per neuron for whole simulation</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;durations&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">d</span><span class="p">])</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">duration</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Single duration for all neurons for whole simulation</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;durations&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">duration</span><span class="p">]),</span> <span class="n">use_list_as_value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">rates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]</span>
-
-    <span class="nd">@rates</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_rates</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_variable_rate</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot set rates of a variable rate poisson&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Set the rate of a Poisson source using rate&quot;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">starts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;starts&quot;</span><span class="p">]</span>
-
-    <span class="nd">@starts</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">starts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_starts</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_variable_rate</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot set starts of a variable rate poisson&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Set the start of a Poisson source using start&quot;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">durations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;durations&quot;</span><span class="p">]</span>
-
-    <span class="nd">@durations</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">durations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_durations</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_variable_rate</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot set durations of a variable rate poisson&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Set the duration of a Poisson source using duration&quot;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">time_to_spike</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;time_to_spike&quot;</span><span class="p">]</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">rate_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rate_change</span>
+    <span class="k">def</span> <span class="nf">__read_parameters_now</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># If we already read the parameters at this time, don&#39;t do it again</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_run_time_ms</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__last_rate_read_time</span> <span class="o">==</span> <span class="n">current_time</span><span class="p">:</span>
+            <span class="k">return</span>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.set_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_value">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SimplePopulationSettable</span><span class="o">.</span><span class="n">set_value</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__last_rate_read_time</span> <span class="o">=</span> <span class="n">current_time</span>
+        <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">m_vertex</span><span class="p">)</span>
+            <span class="n">m_vertex</span><span class="o">.</span><span class="n">read_parameters_from_machine</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__read_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">selector</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">()</span> <span class="ow">and</span>
+                <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">has_transceiver</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__read_parameters_now</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__full_name</span><span class="p">(</span><span class="n">name</span><span class="p">)]</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__full_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_variable_rate</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">name</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">s&quot;</span>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_parameter_values"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_parameter_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_parameter_values</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_parameter_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_parameters</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowed_parameters</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ParameterHolder</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_parameter</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.set_parameter_values"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_parameter_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">set_parameter_values</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_parameter_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_parameters</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowed_parameters</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_variable_rate</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot set the </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> of a variable rate Poisson&quot;</span><span class="p">)</span>
+
+        <span class="c1"># If we have just run, we need to read parameters to avoid overwrite</span>
+        <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="p">()</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__read_parameters_now</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
+            <span class="n">m_vertex</span><span class="o">.</span><span class="n">set_rate_changed</span><span class="p">()</span>
+
+        <span class="c1"># Must be parameter without the s</span>
+        <span class="n">fixed_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">s&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
+            <span class="c1"># Single start per neuron for whole simulation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="n">fixed_name</span><span class="p">]</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span>
+                <span class="n">selector</span><span class="p">,</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s</span><span class="p">])</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">value</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Single start for all neurons for whole simulation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="n">fixed_name</span><span class="p">]</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span>
+                <span class="n">selector</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">value</span><span class="p">]),</span> <span class="n">use_list_as_value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_parameters"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_parameters</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allowed_parameters</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_units"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;rates&quot;</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;rates&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Hz&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;duration&quot;</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;durations&quot;</span> <span class="ow">or</span>
+                <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;starts&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;ms&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Units for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> unknown&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recordable_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recordable_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;spikes&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.can_record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.can_record">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">can_record</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">can_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;spikes&quot;</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.set_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">set_recording</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sampling_interval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Sampling interval currently not supported for &quot;</span>
+                           <span class="s2">&quot;SpikeSourcePoisson so being ignored&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Indices currently not supported for &quot;</span>
+                           <span class="s2">&quot;SpikeSourcePoisson so being ignored&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span><span class="p">:</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recording_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_recording_variables</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_recording_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;spikes&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.is_recording_variable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.is_recording_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">is_recording_variable</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_recording_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.set_not_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_not_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">set_not_recording</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_not_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Indices currently not supported for &quot;</span>
+                           <span class="s2">&quot;SpikeSourceArray so being ignored&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recorded_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recorded_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_recorded_data</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_recorded_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">SpikeSourcePoissonVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recording_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_recording_sampling_interval</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_recording_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_us</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_indices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recording_indices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_recording_indices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_recording_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recording_type">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_recording_type</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_recording_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">BIT_FIELD</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.clear_recording_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.clear_recording_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">clear_recording_data</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">clear_recording_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">buffer_manager</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_buffer_manager</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">):</span>
-                <span class="n">machine_vertex</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+            <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
+                <span class="n">machine_vertex</span><span class="p">)</span>
+            <span class="n">buffer_manager</span><span class="o">.</span><span class="n">clear_recorded_data</span><span class="p">(</span>
+                <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                <span class="n">SpikeSourcePoissonVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.max_spikes_per_ts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.max_spikes_per_ts">[docs]</a>    <span class="k">def</span> <span class="nf">max_spikes_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ts_per_second</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_s</span><span class="p">()</span>
@@ -465,15 +501,16 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=arguments-differ</span>
-        <span class="n">rates_sz</span> <span class="o">=</span> <span class="n">get_rates_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">])</span>
-        <span class="n">params_sz</span> <span class="o">=</span> <span class="n">SpikeSourcePoissonMachineVertex</span><span class="o">.</span><span class="n">PARAMS_BASE_WORDS</span> <span class="o">+</span> <span class="p">(</span>
-            <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+        <span class="n">poisson_params_sz</span> <span class="o">=</span> <span class="n">get_params_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+        <span class="n">poisson_rates_sz</span> <span class="o">=</span> <span class="n">get_rates_bytes</span><span class="p">(</span>
+            <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_n_rates</span><span class="p">)</span>
+        <span class="n">poisson_expander_sz</span> <span class="o">=</span> <span class="n">get_expander_rates_bytes</span><span class="p">(</span>
+            <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_n_rates</span><span class="p">)</span>
         <span class="n">sdram_sz</span> <span class="o">=</span> <span class="n">get_sdram_edge_params_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">other</span> <span class="o">=</span> <span class="n">ConstantSDRAM</span><span class="p">(</span>
             <span class="n">SYSTEM_BYTES_REQUIREMENT</span> <span class="o">+</span>
             <span class="n">SpikeSourcePoissonMachineVertex</span><span class="o">.</span><span class="n">get_provenance_data_size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
-            <span class="n">rates_sz</span> <span class="o">+</span> <span class="n">params_sz</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span> <span class="o">+</span>
+            <span class="n">poisson_params_sz</span> <span class="o">+</span> <span class="n">poisson_rates_sz</span> <span class="o">+</span> <span class="n">poisson_expander_sz</span> <span class="o">+</span>
             <span class="n">recording_utilities</span><span class="o">.</span><span class="n">get_recording_header_size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span>
             <span class="n">recording_utilities</span><span class="o">.</span><span class="n">get_recording_data_constant_size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span>
             <span class="n">profile_utils</span><span class="o">.</span><span class="n">get_profile_region_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span><span class="p">)</span> <span class="o">+</span>
@@ -487,7 +524,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span>
 
     <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">)</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">atoms_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__structure</span><span class="p">,</span> <span class="p">(</span><span class="n">Grid2D</span><span class="p">,</span> <span class="n">Grid3D</span><span class="p">)):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span><span class="o">.</span><span class="n">calculate_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span><span class="p">)</span>
@@ -497,15 +534,17 @@
     <span class="k">def</span> <span class="nf">create_machine_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_subvertices</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_subvertices</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">SpikeSourcePoissonMachineVertex</span><span class="p">(</span>
             <span class="n">sdram</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span><span class="p">,</span>
-            <span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span></div>
+            <span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_n_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_n_rates</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -516,27 +555,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__rng</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.is_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.is_recording_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">is_recording_spikes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">is_recording_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span></div>
-
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.set_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_recording_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">set_recording_spikes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_recording_spikes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">new_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">sampling_interval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Sampling interval currently not supported for &quot;</span>
-                           <span class="s2">&quot;SpikeSourcePoisson so being ignored&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;indexes not supported for &quot;</span>
-                           <span class="s2">&quot;SpikeSourcePoisson so being ignored&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">new_state</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span><span class="p">:</span>
-            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">new_state</span></div>
-
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_spikes_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_spikes_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_spikes_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_us</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.kiss_seed"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.kiss_seed">[docs]</a>    <span class="k">def</span> <span class="nf">kiss_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">vertex_slice</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span><span class="p">:</span>
@@ -553,23 +571,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="n">SpikeSourcePoissonVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">,</span>
-            <span class="bp">self</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.clear_spike_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.clear_spike_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">clear_spike_recording</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">clear_spike_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">buffer_manager</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_buffer_manager</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
-            <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
-                <span class="n">machine_vertex</span><span class="p">)</span>
-            <span class="n">buffer_manager</span><span class="o">.</span><span class="n">clear_recorded_data</span><span class="p">(</span>
-                <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
-                <span class="n">SpikeSourcePoissonVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">)</span></div>
-
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.describe"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return a human-readable description of the cell or synapse type.</span>
 
@@ -583,9 +584,7 @@
 <span class="sd">        :rtype: dict(str, ...)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">parameters</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">parameter_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model</span><span class="o">.</span><span class="n">default_parameters</span><span class="p">:</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="n">parameter_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">parameter_name</span><span class="p">)</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameter_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__model</span><span class="o">.</span><span class="n">default_parameters</span><span class="p">)</span>
 
         <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model_name</span><span class="p">,</span>
@@ -595,10 +594,6 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">context</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_n_cores"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_n_cores">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="n">get_n_cores</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_n_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span></div>
-
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.set_live_poisson_control_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_live_poisson_control_edge">[docs]</a>    <span class="k">def</span> <span class="nf">set_live_poisson_control_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_control_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The Poisson can only be controlled by one source&quot;</span><span class="p">)</span>
@@ -607,6 +602,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">incoming_control_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_control_edge</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span>
 </pre></div>
 
             <div class="clearer"></div>

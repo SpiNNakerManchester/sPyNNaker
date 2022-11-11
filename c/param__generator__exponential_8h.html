@@ -97,15 +97,15 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a518b5f87123dff22dbf32caeebf3bd62"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__exponential_8h.html#a518b5f87123dff22dbf32caeebf3bd62">param_generator_exponential_initialize</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:a518b5f87123dff22dbf32caeebf3bd62"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to initialise the exponential RNG parameter generator.  <a href="param__generator__exponential_8h.html#a518b5f87123dff22dbf32caeebf3bd62">More...</a><br /></td></tr>
-<tr class="separator:a518b5f87123dff22dbf32caeebf3bd62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91fcc830218bf9d51c08110a9ba370c0"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__exponential_8h.html#a91fcc830218bf9d51c08110a9ba370c0">param_generator_exponential_initialize</a> (void **<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:a91fcc830218bf9d51c08110a9ba370c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to initialise the exponential RNG parameter generator.  <a href="param__generator__exponential_8h.html#a91fcc830218bf9d51c08110a9ba370c0">More...</a><br /></td></tr>
+<tr class="separator:a91fcc830218bf9d51c08110a9ba370c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e6bcf3faf8c177cd11b9aa85f8332ab"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__exponential_8h.html#a5e6bcf3faf8c177cd11b9aa85f8332ab">param_generator_exponential_free</a> (void *generator)</td></tr>
 <tr class="memdesc:a5e6bcf3faf8c177cd11b9aa85f8332ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to free any data for the exponential RNG parameter generator.  <a href="param__generator__exponential_8h.html#a5e6bcf3faf8c177cd11b9aa85f8332ab">More...</a><br /></td></tr>
 <tr class="separator:a5e6bcf3faf8c177cd11b9aa85f8332ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35c790b036e9fe9d1fa56d6f73481253"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__exponential_8h.html#a35c790b036e9fe9d1fa56d6f73481253">param_generator_exponential_generate</a> (void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</td></tr>
-<tr class="memdesc:a35c790b036e9fe9d1fa56d6f73481253"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate values with the exponential RNG parameter generator.  <a href="param__generator__exponential_8h.html#a35c790b036e9fe9d1fa56d6f73481253">More...</a><br /></td></tr>
-<tr class="separator:a35c790b036e9fe9d1fa56d6f73481253"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b7052da706984ea9afd03182b04db9e"><td class="memItemLeft" align="right" valign="top">static accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__exponential_8h.html#a0b7052da706984ea9afd03182b04db9e">param_generator_exponential_generate</a> (void *generator)</td></tr>
+<tr class="memdesc:a0b7052da706984ea9afd03182b04db9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate values with the exponential RNG parameter generator.  <a href="param__generator__exponential_8h.html#a0b7052da706984ea9afd03182b04db9e">More...</a><br /></td></tr>
+<tr class="separator:a0b7052da706984ea9afd03182b04db9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Exponentially distributed random parameter generator implementation. </p>
@@ -160,19 +160,13 @@ beta</td>
 params</td>
 <td class="fielddoc">
 </td></tr>
-<tr><td class="fieldtype">
-<a id="a85dc6fd57a2f5b96e715b578b4efdd4b"></a>rng_t</td>
-<td class="fieldname">
-rng</td>
-<td class="fielddoc">
-</td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a518b5f87123dff22dbf32caeebf3bd62"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a518b5f87123dff22dbf32caeebf3bd62">&#9670;&nbsp;</a></span>param_generator_exponential_initialize()</h2>
+<a id="a91fcc830218bf9d51c08110a9ba370c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91fcc830218bf9d51c08110a9ba370c0">&#9670;&nbsp;</a></span>param_generator_exponential_initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -183,7 +177,7 @@ rng</td>
         <tr>
           <td class="memname">static void* param_generator_exponential_initialize </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramtype">void **&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
           <td></td>
         </tr>
@@ -204,7 +198,7 @@ rng</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator__exponential_8h_source.html#l00051">51</a> of file <a class="el" href="param__generator__exponential_8h_source.html">param_generator_exponential.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator__exponential_8h_source.html#l00050">50</a> of file <a class="el" href="param__generator__exponential_8h_source.html">param_generator_exponential.h</a>.</p>
 
 </div>
 </div>
@@ -240,12 +234,12 @@ rng</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator__exponential_8h_source.html#l00071">71</a> of file <a class="el" href="param__generator__exponential_8h_source.html">param_generator_exponential.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator__exponential_8h_source.html#l00068">68</a> of file <a class="el" href="param__generator__exponential_8h_source.html">param_generator_exponential.h</a>.</p>
 
 </div>
 </div>
-<a id="a35c790b036e9fe9d1fa56d6f73481253"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a35c790b036e9fe9d1fa56d6f73481253">&#9670;&nbsp;</a></span>param_generator_exponential_generate()</h2>
+<a id="a0b7052da706984ea9afd03182b04db9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b7052da706984ea9afd03182b04db9e">&#9670;&nbsp;</a></span>param_generator_exponential_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -254,39 +248,11 @@ rng</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void param_generator_exponential_generate </td>
+          <td class="memname">static accum param_generator_exponential_generate </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>generator</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n_indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">accum *&#160;</td>
-          <td class="paramname"><em>values</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -300,22 +266,19 @@ rng</td>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to use to generate values </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_indices</td><td>The number of values to generate </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the neuron in the pre-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>The <code>n_indices</code> post-neuron indices for each connection </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">values</td><td>An array into which to place the values; will be <code>n_indices</code> in size </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>The value generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator__exponential_8h_source.html#l00087">87</a> of file <a class="el" href="param__generator__exponential_8h_source.html">param_generator_exponential.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator__exponential_8h_source.html#l00077">77</a> of file <a class="el" href="param__generator__exponential_8h_source.html">param_generator_exponential.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

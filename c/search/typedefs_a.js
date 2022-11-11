@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['threshold_5ftype_5fpointer_5ft_4825',['threshold_type_pointer_t',['../threshold__type_8h.html#a52fff0cbae0aee9e6dc7ad0e209511dd',1,'threshold_type.h']]]
+  ['write_5fsynapse_5ffunc_4841',['write_synapse_func',['../generator__types_8h.html#a2ddfc8a6851657caf368b43e958e7cdf',1,'generator_types.h']]]
 ];

@@ -77,7 +77,8 @@
 <div class="viewcode-block" id="AbstractStaticSynapseDynamics.get_static_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.get_static_synaptic_data">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_static_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span>
-            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">):</span>
+            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">,</span>
+            <span class="n">max_atoms_per_core</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the fixed-fixed data for each row, and lengths for the\</span>
 <span class="sd">            fixed-fixed parts of each row.</span>
 
@@ -97,6 +98,7 @@
 <span class="sd">            The slice of the post vertex to generate for</span>
 <span class="sd">        :param int n_synapse_types: The number of synapse types</span>
 <span class="sd">        :param int max_n_synapses: The maximum number of synapses to generate</span>
+<span class="sd">        :param int max_atoms_per_core: The maximum number of atoms on a core</span>
 <span class="sd">        :return: (ff_data, ff_size)</span>
 <span class="sd">        :rtype: tuple(list(~numpy.ndarray), ~numpy.ndarray)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
@@ -120,13 +122,15 @@
 
 <div class="viewcode-block" id="AbstractStaticSynapseDynamics.read_static_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.read_static_synaptic_data">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">read_static_synaptic_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">ff_size</span><span class="p">,</span> <span class="n">ff_data</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">ff_size</span><span class="p">,</span> <span class="n">ff_data</span><span class="p">,</span>
+            <span class="n">max_atoms_per_core</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read the connections from the words of data in `ff_data`.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        :param int n_synapse_types:</span>
 <span class="sd">        :param ~numpy.ndarray ff_size:</span>
 <span class="sd">        :param list(~numpy.ndarray) ff_data:</span>
+<span class="sd">        :param int max_atoms_per_core:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 </pre></div>
 

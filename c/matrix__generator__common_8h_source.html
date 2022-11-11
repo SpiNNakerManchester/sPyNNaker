@@ -93,44 +93,91 @@ $(function() {
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="matrix__generator__common_8h.html">   33</a></span>&#160;<span class="keyword">struct </span><a class="code" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a> {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    uint16_t delay;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    uint16_t stage;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;};</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">static</span> <span class="keyword">struct </span><a class="code" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a> <a class="code" href="matrix__generator__common_8h.html#a70d02afe8081b6ed99856fe4594e88e8">get_delay</a>(</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        uint16_t <a class="code" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>, uint32_t max_stage,</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        uint32_t max_delay_per_stage) {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    uint16_t delay = <a class="code" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="comment">// Ensure delay is at least 1</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">if</span> (delay &lt; 1) {</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;Delay of %u is too small&quot;</span>, delay);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        delay = 1;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    }</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="comment">// Ensure that the delay is less than the maximum</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    uint16_t stage = (delay - 1) / max_delay_per_stage;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">if</span> (stage &gt;= max_stage) {</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;Delay of %u is too big&quot;</span>, delay);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        stage = max_stage - 1;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        delay = (stage * max_delay_per_stage);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    }</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="comment">// Get the remainder of the delay</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    delay = ((delay - 1) % max_delay_per_stage) + 1;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordflow">return</span> (<span class="keyword">struct</span> <a class="code" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>) {.delay = delay, .stage = stage};</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// __MATRIX_GENERATOR_COMMON_H__</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="matrix__generator__common_8h.html#a04acf43728100eca08ffab028792301a">   31</a></span>&#160;<span class="preprocessor">#define N_HEADER_WORDS 3</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="matrix__generator__common_8h.html">   36</a></span>&#160;<span class="keyword">struct </span><a class="code" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a> {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    uint16_t delay;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    uint16_t stage;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;};</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keyword">static</span> <span class="keyword">struct </span><a class="code" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a> <a class="code" href="matrix__generator__common_8h.html#a70d02afe8081b6ed99856fe4594e88e8">get_delay</a>(</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        uint16_t <a class="code" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>, uint32_t max_stage,</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        uint32_t max_delay_per_stage) {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    uint16_t delay = <a class="code" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="comment">// Ensure delay is at least 1</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordflow">if</span> (delay &lt; 1) {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;Delay of %u is too small&quot;</span>, delay);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        delay = 1;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="comment">// Ensure that the delay is less than the maximum</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    uint16_t stage = (delay - 1) / max_delay_per_stage;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">if</span> (stage &gt;= max_stage) {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;Delay of %u is too big&quot;</span>, delay);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        stage = max_stage - 1;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        delay = (stage * max_delay_per_stage);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="comment">// Get the remainder of the delay</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    delay = ((delay - 1) % max_delay_per_stage) + 1;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">return</span> (<span class="keyword">struct</span> <a class="code" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>) {.delay = delay, .stage = stage};</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="matrix__generator__common_8h.html#a59540be417d878df2430b21bad1eb91c">   81</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> *<a class="code" href="matrix__generator__common_8h.html#a59540be417d878df2430b21bad1eb91c">get_row</a>(uint32_t *synaptic_matrix, uint32_t max_row_n_words,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        uint32_t pre_index) {</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    uint32_t idx = pre_index * (max_row_n_words + <a class="code" href="matrix__generator__common_8h.html#a04acf43728100eca08ffab028792301a">N_HEADER_WORDS</a>);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">return</span> &amp;synaptic_matrix[idx];</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;}</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="matrix__generator__common_8h.html#adbffbf3c44823b700f697d2bb4df627b">  100</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> *<a class="code" href="matrix__generator__common_8h.html#adbffbf3c44823b700f697d2bb4df627b">get_delay_row</a>(uint32_t *delayed_synaptic_matrix,</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        uint32_t max_delayed_row_n_words, uint32_t pre_index, uint32_t delay_stage,</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        uint32_t n_pre_neurons_per_core, uint32_t max_delay_stage, uint32_t n_pre_neurons) {</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="comment">// Work out which core the pre-index is on</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    uint32_t core = 0;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    uint32_t remaining_pre_neurons = n_pre_neurons;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordflow">while</span> (((core + 1) * n_pre_neurons_per_core) &lt; pre_index) {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        core++;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        remaining_pre_neurons -= n_pre_neurons_per_core;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    }</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="comment">// Get the core-local pre-index</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    uint32_t local_pre_index = pre_index - (core * n_pre_neurons_per_core);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="comment">// Find the number of neurons on *this* core, which might be the last core</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="comment">// (and therefore have less of them)</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    uint32_t n_neurons_on_core = n_pre_neurons_per_core;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">if</span> (remaining_pre_neurons &lt; n_pre_neurons_per_core) {</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        n_neurons_on_core = remaining_pre_neurons;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="comment">// Work out the *delay* neurons per pre-delay-core</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    uint32_t n_delay_neurons_per_core = n_pre_neurons_per_core * (max_delay_stage - 1);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="comment">// With these we can now work out the number of rows associated with all the</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="comment">// previous cores, and the delay row index for this core</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    uint32_t delay_core_index = core * n_delay_neurons_per_core;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    uint32_t delay_local_index = ((delay_stage - 1) * n_neurons_on_core) + local_pre_index;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="comment">// That then finally gives us the delay pre-row</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    uint32_t pre_row = delay_core_index + delay_local_index;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    uint32_t idx = pre_row * (max_delayed_row_n_words + <a class="code" href="matrix__generator__common_8h.html#a04acf43728100eca08ffab028792301a">N_HEADER_WORDS</a>);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordflow">return</span> &amp;delayed_synaptic_matrix[idx];</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;}</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// __MATRIX_GENERATOR_COMMON_H__</span></div>
 <div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
 <div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
-<div class="ttc" id="amatrix__generator__common_8h_html_a70d02afe8081b6ed99856fe4594e88e8"><div class="ttname"><a href="matrix__generator__common_8h.html#a70d02afe8081b6ed99856fe4594e88e8">get_delay</a></div><div class="ttdeci">static struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage, uint32_t max_delay_per_stage)</div><div class="ttdoc">Get a converted delay value and stage.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__common_8h_source.html#l00001">matrix_generator_common.h:45</a></div></div>
-<div class="ttc" id="amatrix__generator__common_8h_html_structdelay__value"><div class="ttname"><a href="matrix__generator__common_8h.html#structdelay__value">delay_value</a></div><div class="ttdoc">A converted final delay value and delay stage.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__common_8h_source.html#l00033">matrix_generator_common.h:33</a></div></div>
+<div class="ttc" id="amatrix__generator__common_8h_html_a04acf43728100eca08ffab028792301a"><div class="ttname"><a href="matrix__generator__common_8h.html#a04acf43728100eca08ffab028792301a">N_HEADER_WORDS</a></div><div class="ttdeci">#define N_HEADER_WORDS</div><div class="ttdoc">The number of header words per row.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__common_8h_source.html#l00031">matrix_generator_common.h:31</a></div></div>
+<div class="ttc" id="amatrix__generator__common_8h_html_a59540be417d878df2430b21bad1eb91c"><div class="ttname"><a href="matrix__generator__common_8h.html#a59540be417d878df2430b21bad1eb91c">get_row</a></div><div class="ttdeci">static void * get_row(uint32_t *synaptic_matrix, uint32_t max_row_n_words, uint32_t pre_index)</div><div class="ttdoc">Get a synaptic row for a given neuron.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__common_8h_source.html#l00081">matrix_generator_common.h:81</a></div></div>
+<div class="ttc" id="amatrix__generator__common_8h_html_a70d02afe8081b6ed99856fe4594e88e8"><div class="ttname"><a href="matrix__generator__common_8h.html#a70d02afe8081b6ed99856fe4594e88e8">get_delay</a></div><div class="ttdeci">static struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage, uint32_t max_delay_per_stage)</div><div class="ttdoc">Get a converted delay value and stage.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__common_8h_source.html#l00001">matrix_generator_common.h:48</a></div></div>
+<div class="ttc" id="amatrix__generator__common_8h_html_adbffbf3c44823b700f697d2bb4df627b"><div class="ttname"><a href="matrix__generator__common_8h.html#adbffbf3c44823b700f697d2bb4df627b">get_delay_row</a></div><div class="ttdeci">static void * get_delay_row(uint32_t *delayed_synaptic_matrix, uint32_t max_delayed_row_n_words, uint32_t pre_index, uint32_t delay_stage, uint32_t n_pre_neurons_per_core, uint32_t max_delay_stage, uint32_t n_pre_neurons)</div><div class="ttdoc">Get a delayed synaptic row for a given neuron and delay stage.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__common_8h_source.html#l00100">matrix_generator_common.h:100</a></div></div>
+<div class="ttc" id="amatrix__generator__common_8h_html_structdelay__value"><div class="ttname"><a href="matrix__generator__common_8h.html#structdelay__value">delay_value</a></div><div class="ttdoc">A converted final delay value and delay stage.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__common_8h_source.html#l00036">matrix_generator_common.h:36</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -88,7 +88,7 @@ $(function() {
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/simulation_8h.html">simulation.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8h.html">tdma_processing.h</a>&gt;</code><br />
+<code>#include &lt;common/send_mc.h&gt;</code><br />
 </div>
 <p><a href="delay__extension_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -214,10 +214,6 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <tr class="memitem:a054f3ef43206b776850559a847dc8276"><td class="memItemLeft" align="right" valign="top">static uint8_t **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8c.html#a054f3ef43206b776850559a847dc8276">spike_counters</a> = <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></td></tr>
 <tr class="memdesc:a054f3ef43206b776850559a847dc8276"><td class="mdescLeft">&#160;</td><td class="mdescRight">The spike counters, as a 2D array.  <a href="delay__extension_8c.html#a054f3ef43206b776850559a847dc8276">More...</a><br /></td></tr>
 <tr class="separator:a054f3ef43206b776850559a847dc8276"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7cc70efc4d7a8de402bb8c1d180abce"><td class="memItemLeft" align="right" valign="top"><a id="ab7cc70efc4d7a8de402bb8c1d180abce"></a>
-static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8c.html#ab7cc70efc4d7a8de402bb8c1d180abce">neuron_delay_stage_config</a> = <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></td></tr>
-<tr class="memdesc:ab7cc70efc4d7a8de402bb8c1d180abce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of bitfields describing which neurons to deliver spikes to, from which bucket. <br /></td></tr>
-<tr class="separator:ab7cc70efc4d7a8de402bb8c1d180abce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9e975dfdcc2204fa4b4366446786a6c"><td class="memItemLeft" align="right" valign="top"><a id="ac9e975dfdcc2204fa4b4366446786a6c"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8c.html#ac9e975dfdcc2204fa4b4366446786a6c">num_delay_stages</a> = 0</td></tr>
 <tr class="memdesc:ac9e975dfdcc2204fa4b4366446786a6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of delay stages. <br /></td></tr>
@@ -236,7 +232,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <tr class="separator:a72085e13d5dfdbd948a0773dd1e13096"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa9a8a4f3032a26fe66584aab4a7d201"><td class="memItemLeft" align="right" valign="top"><a id="afa9a8a4f3032a26fe66584aab4a7d201"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8c.html#afa9a8a4f3032a26fe66584aab4a7d201">neuron_bit_field_words</a> = 0</td></tr>
-<tr class="memdesc:afa9a8a4f3032a26fe66584aab4a7d201"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of each bitfield in <a class="el" href="delay__extension_8c.html#ab7cc70efc4d7a8de402bb8c1d180abce" title="Array of bitfields describing which neurons to deliver spikes to, from which bucket.">neuron_delay_stage_config</a>. <br /></td></tr>
+<tr class="memdesc:afa9a8a4f3032a26fe66584aab4a7d201"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of each bitfield in ::neuron_delay_stage_config. <br /></td></tr>
 <tr class="separator:afa9a8a4f3032a26fe66584aab4a7d201"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a587eec262ef2a410251b4b507b6da974"><td class="memItemLeft" align="right" valign="top"><a id="a587eec262ef2a410251b4b507b6da974"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8c.html#a587eec262ef2a410251b4b507b6da974">n_in_spikes</a> = 0</td></tr>
@@ -352,12 +348,6 @@ Number of circular buffer overflows (spikes internally dropped) </td></tr>
 n_delays</td>
 <td class="fielddoc">
 Number of times we had to back off because the comms hardware was busy. </td></tr>
-<tr><td class="fieldtype">
-<a id="a91449b33fd2d1a77fac263c2de918e29"></a>uint32_t</td>
-<td class="fieldname">
-times_tdma_fell_behind</td>
-<td class="fielddoc">
-number of times the TDMA fell behind its slot </td></tr>
 <tr><td class="fieldtype">
 <a id="aac3499d38dafe99c13b7f0f373dae57d"></a>uint32_t</td>
 <td class="fieldname">
@@ -476,7 +466,7 @@ Background queue overloads. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00176">176</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00171">171</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -513,7 +503,7 @@ Background queue overloads. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The minimum power of two that is no smaller than the argument </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00186">186</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00181">181</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -550,7 +540,7 @@ Background queue overloads. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00200">200</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00195">195</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -586,7 +576,7 @@ Background queue overloads. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00299">299</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00254">254</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -617,7 +607,7 @@ Background queue overloads. </td></tr>
 <p>Read the application configuration. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if initialisation succeeded. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00324">324</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00278">278</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -665,7 +655,7 @@ Background queue overloads. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00374">374</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00322">322</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -702,7 +692,7 @@ Background queue overloads. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the neuron ID </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00396">396</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00344">344</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -749,7 +739,7 @@ Background queue overloads. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00451">451</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00399">399</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -796,7 +786,7 @@ Background queue overloads. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00459">459</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00407">407</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -843,7 +833,7 @@ Background queue overloads. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00533">533</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00467">467</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -870,17 +860,17 @@ Background queue overloads. </td></tr>
 
 <p>The spike counters, as a 2D array. </p>
 <div class="fragment"><div class="line"><a class="code" href="delay__extension_8c.html#a054f3ef43206b776850559a847dc8276">spike_counters</a>[time_slot][neuron_id]</div>
-<div class="ttc" id="adelay__extension_8c_html_a054f3ef43206b776850559a847dc8276"><div class="ttname"><a href="delay__extension_8c.html#a054f3ef43206b776850559a847dc8276">spike_counters</a></div><div class="ttdeci">static uint8_t ** spike_counters</div><div class="ttdoc">The spike counters, as a 2D array.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00114">delay_extension.c:114</a></div></div>
+<div class="ttc" id="adelay__extension_8c_html_a054f3ef43206b776850559a847dc8276"><div class="ttname"><a href="delay__extension_8c.html#a054f3ef43206b776850559a847dc8276">spike_counters</a></div><div class="ttdeci">static uint8_t ** spike_counters</div><div class="ttdoc">The spike counters, as a 2D array.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00112">delay_extension.c:112</a></div></div>
 </div><!-- fragment --><p> Time slots are the time of reception of the spike, masked by <a class="el" href="delay__extension_8c.html#a72085e13d5dfdbd948a0773dd1e13096" title="Mask for converting time into the current delay slot.">num_delay_slots_mask</a>, and neuron IDs are extracted from the spike key by masking with <a class="el" href="delay__extension_8c.html#a13afd57fbc79bb49bb800adaa4c0b9c6" title="Mask for key (that matches incoming_key/incoming_mask) to extract the neuron ID from it.">incoming_neuron_mask</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00114">114</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00112">112</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

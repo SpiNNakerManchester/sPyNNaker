@@ -138,7 +138,7 @@
     <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
             <span class="n">ring_buffer_sigma</span><span class="p">,</span> <span class="n">incoming_spike_buffer_size</span><span class="p">,</span>
-            <span class="n">n_steps_per_timestep</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
+            <span class="n">n_steps_per_timestep</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">n_neurons</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_devices</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;Number of neurons does not match number of devices in </span><span class="si">{}</span><span class="s2">&quot;</span>
@@ -148,7 +148,7 @@
         <span class="k">return</span> <span class="n">ExternalDeviceLifControlVertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_devices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_edges</span><span class="p">,</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_translator</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">ring_buffer_sigma</span><span class="p">,</span>
-            <span class="n">incoming_spike_buffer_size</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span></div>
+            <span class="n">incoming_spike_buffer_size</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

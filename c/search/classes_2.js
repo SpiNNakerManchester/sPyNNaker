@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['bit_5fset_5ft_2548',['bit_set_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/bit__set_8h.html',1,'']]],
-  ['bitfield_5finfo_5ft_2549',['bitfield_info_t',['../neuron__recording_8h.html#structbitfield__info__t',1,'']]],
-  ['bitfield_5fproc_5ft_2550',['bitfield_proc_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/compressor__sorter__structs_8h.html',1,'']]],
-  ['bitfield_5fvalues_5ft_2551',['bitfield_values_t',['../neuron__recording_8h.html#structbitfield__values__t',1,'']]],
-  ['block_5ft_2552',['block_t',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
-  ['builder_5fregion_5fstruct_2553',['builder_region_struct',['../bit__field__expander_8c.html#structbuilder__region__struct',1,'']]]
+  ['bit_5fset_5ft_2555',['bit_set_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/bit__set_8h.html',1,'']]],
+  ['bitfield_5finfo_5ft_2556',['bitfield_info_t',['../neuron__recording_8h.html#structbitfield__info__t',1,'']]],
+  ['bitfield_5fproc_5ft_2557',['bitfield_proc_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/compressor__sorter__structs_8h.html',1,'']]],
+  ['bitfield_5frecording_5ft_2558',['bitfield_recording_t',['../neuron__expander_8c.html#structbitfield__recording__t',1,'']]],
+  ['bitfield_5fvalues_5ft_2559',['bitfield_values_t',['../neuron__recording_8h.html#structbitfield__values__t',1,'']]],
+  ['block_5ft_2560',['block_t',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]]
 ];

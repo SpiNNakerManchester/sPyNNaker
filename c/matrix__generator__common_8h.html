@@ -69,6 +69,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
+<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">matrix_generator_common.h File Reference</div>  </div>
@@ -87,11 +88,24 @@ Data Structures</h2></td></tr>
 <tr class="memdesc:structdelay__value"><td class="mdescLeft">&#160;</td><td class="mdescRight">A converted final delay value and delay stage.  <a href="matrix__generator__common_8h.html#structdelay__value">More...</a><br /></td></tr>
 <tr class="separator:structdelay__value"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a04acf43728100eca08ffab028792301a"><td class="memItemLeft" align="right" valign="top"><a id="a04acf43728100eca08ffab028792301a"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__common_8h.html#a04acf43728100eca08ffab028792301a">N_HEADER_WORDS</a>&#160;&#160;&#160;3</td></tr>
+<tr class="memdesc:a04acf43728100eca08ffab028792301a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of header words per row. <br /></td></tr>
+<tr class="separator:a04acf43728100eca08ffab028792301a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a70d02afe8081b6ed99856fe4594e88e8"><td class="memItemLeft" align="right" valign="top">static struct <a class="el" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__common_8h.html#a70d02afe8081b6ed99856fe4594e88e8">get_delay</a> (uint16_t <a class="el" href="matrix__generator__common_8h.html#structdelay__value">delay_value</a>, uint32_t max_stage, uint32_t max_delay_per_stage)</td></tr>
 <tr class="memdesc:a70d02afe8081b6ed99856fe4594e88e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a converted delay value and stage.  <a href="matrix__generator__common_8h.html#a70d02afe8081b6ed99856fe4594e88e8">More...</a><br /></td></tr>
 <tr class="separator:a70d02afe8081b6ed99856fe4594e88e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59540be417d878df2430b21bad1eb91c"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__common_8h.html#a59540be417d878df2430b21bad1eb91c">get_row</a> (uint32_t *synaptic_matrix, uint32_t max_row_n_words, uint32_t pre_index)</td></tr>
+<tr class="memdesc:a59540be417d878df2430b21bad1eb91c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a synaptic row for a given neuron.  <a href="matrix__generator__common_8h.html#a59540be417d878df2430b21bad1eb91c">More...</a><br /></td></tr>
+<tr class="separator:a59540be417d878df2430b21bad1eb91c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbffbf3c44823b700f697d2bb4df627b"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__common_8h.html#adbffbf3c44823b700f697d2bb4df627b">get_delay_row</a> (uint32_t *delayed_synaptic_matrix, uint32_t max_delayed_row_n_words, uint32_t pre_index, uint32_t delay_stage, uint32_t n_pre_neurons_per_core, uint32_t max_delay_stage, uint32_t n_pre_neurons)</td></tr>
+<tr class="memdesc:adbffbf3c44823b700f697d2bb4df627b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a delayed synaptic row for a given neuron and delay stage.  <a href="matrix__generator__common_8h.html#adbffbf3c44823b700f697d2bb4df627b">More...</a><br /></td></tr>
+<tr class="separator:adbffbf3c44823b700f697d2bb4df627b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Common functions for matrix generation. </p>
@@ -111,7 +125,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>A converted final delay value and delay stage. </p>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__common_8h_source.html#l00033">33</a> of file <a class="el" href="matrix__generator__common_8h_source.html">matrix_generator_common.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__common_8h_source.html#l00036">36</a> of file <a class="el" href="matrix__generator__common_8h_source.html">matrix_generator_common.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -186,10 +200,148 @@ stage</td>
 
 </div>
 </div>
+<a id="a59540be417d878df2430b21bad1eb91c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59540be417d878df2430b21bad1eb91c">&#9670;&nbsp;</a></span>get_row()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void* get_row </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>synaptic_matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_row_n_words</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pre_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a synaptic row for a given neuron. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">synaptic_matrix</td><td>the address of the synaptic matrix </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_row_n_words</td><td>the maximum number of words (excluding headers) in each row of the table </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pre_index</td><td>the index of the pre-neuron relative to the start of the matrix </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the row of the matrix to write to </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="matrix__generator__common_8h_source.html#l00081">81</a> of file <a class="el" href="matrix__generator__common_8h_source.html">matrix_generator_common.h</a>.</p>
+
+</div>
+</div>
+<a id="adbffbf3c44823b700f697d2bb4df627b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbffbf3c44823b700f697d2bb4df627b">&#9670;&nbsp;</a></span>get_delay_row()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void* get_delay_row </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>delayed_synaptic_matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_delayed_row_n_words</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pre_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>delay_stage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_pre_neurons_per_core</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_delay_stage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_pre_neurons</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a delayed synaptic row for a given neuron and delay stage. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">delayed</td><td>synaptic_matrix the address of the delayed synaptic matrix </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_delayed_row_n_words</td><td>the maximum number of words (excluding headers) in each delayed row of the table </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pre_index</td><td>the index of the pre-neuron relative to the start of the matrix </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delay_stage</td><td>the delay stage, where 0 means the undelayed stage </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_pre_neurons_per_core</td><td>The number of neurons per core in the pre-population </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_delay_stage</td><td>The maximum delay stage </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_pre_neurons</td><td>The number of neurons in the pre-population </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the row of the delayed matrix to write to </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="matrix__generator__common_8h_source.html#l00100">100</a> of file <a class="el" href="matrix__generator__common_8h_source.html">matrix_generator_common.h</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

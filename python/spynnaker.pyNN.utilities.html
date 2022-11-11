@@ -182,10 +182,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html">spynnaker.pyNN.utilities.ranged package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#module-spynnaker.pyNN.utilities.ranged">Module contents</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangeDictionary</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangeDictionary.list_factory"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangeDictionary.list_factory()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangedList</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.as_list"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangedList.as_list()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.is_list"><code class="docutils literal notranslate"><span class="pre">SpynnakerRangedList.is_list()</span></code></a></li>
@@ -204,43 +200,29 @@
 <section id="module-spynnaker.pyNN.utilities.bit_field_utilities">
 <span id="spynnaker-pynn-utilities-bit-field-utilities-module"></span><h2>spynnaker.pyNN.utilities.bit_field_utilities module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.bit_field_utilities" title="Permalink to this heading">¶</a></h2>
 <dl class="py data">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.ELEMENTS_USED_IN_BIT_FIELD_HEADER">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">ELEMENTS_USED_IN_BIT_FIELD_HEADER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.ELEMENTS_USED_IN_BIT_FIELD_HEADER" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.FILTER_HEADER_WORDS">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">FILTER_HEADER_WORDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.FILTER_HEADER_WORDS" title="Permalink to this definition">¶</a></dt>
 <dd><p>n_filters, pointer for array</p>
 </dd></dl>
 
-<dl class="py data">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.N_KEYS_DATA_SET_IN_WORDS">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">N_KEYS_DATA_SET_IN_WORDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.N_KEYS_DATA_SET_IN_WORDS" title="Permalink to this definition">¶</a></dt>
-<dd><p>n key to n neurons maps size in words</p>
-</dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.N_REGIONS_ADDRESSES">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">N_REGIONS_ADDRESSES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.N_REGIONS_ADDRESSES" title="Permalink to this definition">¶</a></dt>
-<dd><p>the regions addresses needed (
-pop table, synaptic matrix, direct matrix, bit_field, bit field builder,
-bit_field_key, structural region)</p>
-</dd></dl>
-
 <dl class="py function">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">exact_sdram_for_bit_field_builder_region</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#exact_sdram_for_bit_field_builder_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the SDRAM requirement for the builder region</p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.get_bitfield_key_map_data">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_bitfield_key_map_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_bitfield_key_map_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_bitfield_key_map_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get data for the key map region</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the SDRAM requirement for the builder region</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>incoming_projections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>Projection</em><em>)</em>) – The projections to generate bitfields for</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_estimated_sdram_for_bit_field_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_bit_field_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>estimates the SDRAM for the bit field region</p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.get_sdram_for_bit_field_region">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_sdram_for_bit_field_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_sdram_for_bit_field_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_sdram_for_bit_field_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>the SDRAM for the bit field filter region</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>incoming_projections</strong> (<em>iterable</em><em>(</em><em>Projection</em><em>)</em>) – The projections that target the vertex in question</p>
@@ -255,9 +237,9 @@ bit_field_key, structural region)</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_estimated_sdram_for_key_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_key_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>gets an estimate of the bitfield builder region</p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.get_sdram_for_keys">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_sdram_for_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_sdram_for_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_sdram_for_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets the space needed for keys</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>incoming_projections</strong> (<em>iterable</em><em>(</em><em>Projection</em><em>)</em>) – The projections that target the vertex in question</p>
@@ -272,42 +254,16 @@ bit_field_key, structural region)</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">reserve_bit_field_regions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_filter_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_filter_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#reserve_bit_field_regions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>reserves the regions for the bitfields</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – dsg spec writer</p></li>
-<li><p><strong>incoming_projections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>Projection</em><em>)</em>) – The projections to generate bitfields for</p></li>
-<li><p><strong>bit_field_builder_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – region id for the builder region</p></li>
-<li><p><strong>bit_filter_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – region id for the bitfield region</p></li>
-<li><p><strong>bit_field_key_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – region id for the key map</p></li>
-<li><p><strong>bit_field_builder_region_ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – Reference to give the region, or None if not referencable</p></li>
-<li><p><strong>bit_filter_region_ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – Reference to give the region, or None if not referencable</p></li>
-<li><p><strong>bit_field_key_region_ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – Reference to give the region, or None if not referencable</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">write_bitfield_init_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">master_pop_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_map_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_dynamics_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_structural_dynamics_region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#write_bitfield_init_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">write_bitfield_init_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bit_field_bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#write_bitfield_init_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>writes the init data needed for the bitfield generator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – data spec writer</p></li>
-<li><p><strong>incoming_projections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>Projection</em><em>)</em>) – The projections to generate bitfields for</p></li>
-<li><p><strong>bit_field_builder_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the bitfield builder</p></li>
-<li><p><strong>master_pop_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the master pop table</p></li>
-<li><p><strong>synaptic_matrix_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the synaptic matrix</p></li>
-<li><p><strong>direct_matrix_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the direct matrix</p></li>
-<li><p><strong>bit_field_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the bit-fields</p></li>
-<li><p><strong>bit_field_key_map_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the key map</p></li>
-<li><p><strong>structural_dynamics_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the structural</p></li>
-<li><p><strong>has_structural_dynamics_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – whether the core has a structural_dynamics region</p></li>
+<li><p><strong>bit_field_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the bit-field filters</p></li>
+<li><p><strong>n_bit_field_bytes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the size of the region</p></li>
+<li><p><strong>bit_field_region_ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The reference to the region</p></li>
 </ul>
 </dd>
 </dl>
@@ -979,37 +935,69 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <span id="spynnaker-pynn-utilities-struct-module"></span><h2>spynnaker.pyNN.utilities.struct module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.struct" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.struct.</span></span><span class="sig-name descname"><span class="pre">Struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_types</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.struct.</span></span><span class="sig-name descname"><span class="pre">Struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeat_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">StructRepeat.PER_NEURON</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Represents a C code structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>field_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a><em>)</em>) – The types of the fields, ordered as they appear in the struct.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fields</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The types and names of the fields, ordered as they appear in the
+struct.</p></li>
+<li><p><strong>repeat_type</strong> (<a class="reference internal" href="#spynnaker.pyNN.utilities.struct.StructRepeat" title="spynnaker.pyNN.utilities.struct.StructRepeat"><em>StructRepeat</em></a>) – How the structure repeats</p></li>
+<li><p><strong>default_values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><em>str-&gt;int</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><em>None</em>) – Dict of field name -&gt; value to use when values doesn’t contain the
+field</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.field_types">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">field_types</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.field_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>The types of the fields, ordered as they appear in the struct.</p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.fields">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fields</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.fields" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>The types and names of the fields, ordered as they appear in the</dt><dd><p>struct.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a>, <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.get_data">
-<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.get_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a numpy array of uint32 of data for the given values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or
-</em><a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)"><em>RangedList</em></a><em>)</em>) – A list of values with length the same size as the number of fields
-returned by field_types</p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the vertex to get values for</p></li>
-<li><p><strong>atoms_shape</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The shape of the atoms in the vertex</p></li>
+<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><em>str-&gt;one</em><em> of </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>AbstractList</em><em>)</em>) – The values to fill in the data with</p></li>
+<li><p><strong>vertex_slice</strong> (<em>Slice</em><em> or </em><em>None</em>) – The vertex slice to get the data for, or None if the struct is
+global.</p></li>
+<li><p><strong>atoms_shape</strong> – The shape of the atoms in the whole application vertex.
+When vertex_slice is not None, atoms_shape must not be not None.
+When vertex_slice is None, atoms_shape is ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>(dtype=”uint32”)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.get_generator_data">
+<span class="sig-name descname"><span class="pre">get_generator_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.get_generator_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.get_generator_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a numpy array of uint32 of data to generate the given values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>values</strong> (<em>~dict-like</em>) – The values to fill in the data with</p></li>
+<li><p><strong>vertex_slice</strong> (<em>Slice</em><em> or </em><em>None</em>) – The vertex slice or None for a struct with repeat_type global, or
+where a single value repeats for every neuron.  If this is not the
+case and vertex_slice is None, an error will be raised!</p></li>
+<li><p><strong>atoms_shape</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The shape of the atoms in the whole application vertex.
+When vertex_slice is not None, atoms_shape must not be not None.
+When vertex_slice is None, atoms_shape is ignored.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1033,6 +1021,17 @@ returned by field_types</p></li>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.is_generatable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_generatable</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.is_generatable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the data inside could be generated on machine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.numpy_dtype">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">numpy_dtype</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.numpy_dtype" title="Permalink to this definition">¶</a></dt>
 <dd><p>The numpy data type of the struct</p>
@@ -1045,23 +1044,50 @@ returned by field_types</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.read_data">
-<span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.read_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a bytearray of data and convert to struct values</p>
+<span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.read_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a bytearray of data and write to values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytearray" title="(in Python v3.8)"><em>bytearray</em></a>) – The data to be read</p></li>
-<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of the byte at the start of the valid data</p></li>
-<li><p><strong>array_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of struct elements to read</p></li>
+<li><p><strong>values</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The values to update with the read data</p></li>
+<li><p><strong>data_offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of the byte at the start of the valid data.</p></li>
+<li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The first index into values to write to.</p></li>
+<li><p><strong>array_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The number of struct copies to read, or None if this is a
+non-repeating struct.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a list of lists of data values, one list for each struct element</p>
-</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.repeat_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">repeat_type</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.repeat_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>How the structure repeats</p>
+<dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>)</p>
+<dd class="field-odd"><p><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.StructRepeat" title="spynnaker.pyNN.utilities.struct.StructRepeat">StructRepeat</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.StructRepeat">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.struct.</span></span><span class="sig-name descname"><span class="pre">StructRepeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#StructRepeat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.StructRepeat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>How a struct repeats, or not, in memory</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.StructRepeat.GLOBAL">
+<span class="sig-name descname"><span class="pre">GLOBAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.StructRepeat.GLOBAL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates a single global struct</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.StructRepeat.PER_NEURON">
+<span class="sig-name descname"><span class="pre">PER_NEURON</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.StructRepeat.PER_NEURON" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates a struct that repeats per neuron</p>
 </dd></dl>
 
 </dd></dl>
@@ -1428,13 +1454,10 @@ regardless of whether they were recording or not.</p></li>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.bit_field_utilities">spynnaker.pyNN.utilities.bit_field_utilities module</a><ul>
-<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.ELEMENTS_USED_IN_BIT_FIELD_HEADER"><code class="docutils literal notranslate"><span class="pre">ELEMENTS_USED_IN_BIT_FIELD_HEADER</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.N_KEYS_DATA_SET_IN_WORDS"><code class="docutils literal notranslate"><span class="pre">N_KEYS_DATA_SET_IN_WORDS</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.N_REGIONS_ADDRESSES"><code class="docutils literal notranslate"><span class="pre">N_REGIONS_ADDRESSES</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region"><code class="docutils literal notranslate"><span class="pre">exact_sdram_for_bit_field_builder_region()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region"><code class="docutils literal notranslate"><span class="pre">get_estimated_sdram_for_bit_field_region()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region"><code class="docutils literal notranslate"><span class="pre">get_estimated_sdram_for_key_region()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions"><code class="docutils literal notranslate"><span class="pre">reserve_bit_field_regions()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.FILTER_HEADER_WORDS"><code class="docutils literal notranslate"><span class="pre">FILTER_HEADER_WORDS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_bitfield_key_map_data"><code class="docutils literal notranslate"><span class="pre">get_bitfield_key_map_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_sdram_for_bit_field_region"><code class="docutils literal notranslate"><span class="pre">get_sdram_for_bit_field_region()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_sdram_for_keys"><code class="docutils literal notranslate"><span class="pre">get_sdram_for_keys()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data"><code class="docutils literal notranslate"><span class="pre">write_bitfield_init_data()</span></code></a></li>
 </ul>
 </li>
@@ -1521,11 +1544,19 @@ regardless of whether they were recording or not.</p></li>
 </li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.struct">spynnaker.pyNN.utilities.struct module</a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct"><code class="docutils literal notranslate"><span class="pre">Struct</span></code></a><ul>
-<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.field_types"><code class="docutils literal notranslate"><span class="pre">Struct.field_types</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.fields"><code class="docutils literal notranslate"><span class="pre">Struct.fields</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.get_data"><code class="docutils literal notranslate"><span class="pre">Struct.get_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.get_generator_data"><code class="docutils literal notranslate"><span class="pre">Struct.get_generator_data()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.get_size_in_whole_words"><code class="docutils literal notranslate"><span class="pre">Struct.get_size_in_whole_words()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.is_generatable"><code class="docutils literal notranslate"><span class="pre">Struct.is_generatable</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.numpy_dtype"><code class="docutils literal notranslate"><span class="pre">Struct.numpy_dtype</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.read_data"><code class="docutils literal notranslate"><span class="pre">Struct.read_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.Struct.repeat_type"><code class="docutils literal notranslate"><span class="pre">Struct.repeat_type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.StructRepeat"><code class="docutils literal notranslate"><span class="pre">StructRepeat</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.StructRepeat.GLOBAL"><code class="docutils literal notranslate"><span class="pre">StructRepeat.GLOBAL</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.utilities.struct.StructRepeat.PER_NEURON"><code class="docutils literal notranslate"><span class="pre">StructRepeat.PER_NEURON</span></code></a></li>
 </ul>
 </li>
 </ul>

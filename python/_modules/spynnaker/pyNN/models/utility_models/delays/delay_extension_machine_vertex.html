@@ -56,8 +56,7 @@
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">SIMULATION_N_BYTES</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">SIMULATION_N_BYTES</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
@@ -66,14 +65,7 @@
     <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
-
-<span class="c1">#  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms</span>
-<span class="c1">#  6. n_delay_stages, 7. the number of delay supported by each delay stage</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
-
-<span class="n">_EXPANDER_BASE_PARAMS_SIZE</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-
-<span class="n">DELAY_EXPANDER_APLX</span> <span class="o">=</span> <span class="s2">&quot;delay_expander.aplx&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">DelayExtensionMachineVertex</span><span class="p">(</span>
@@ -88,8 +80,7 @@
         <span class="n">SYSTEM</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">DELAY_PARAMS</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">PROVENANCE_REGION</span> <span class="o">=</span> <span class="mi">2</span>
-        <span class="n">EXPANDER_REGION</span> <span class="o">=</span> <span class="mi">3</span>
-        <span class="n">TDMA_REGION</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">TDMA_REGION</span> <span class="o">=</span> <span class="mi">3</span>
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES">[docs]</a>    <span class="k">class</span> <span class="nc">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
         <span class="n">N_PACKETS_RECEIVED</span> <span class="o">=</span> <span class="mi">0</span>
@@ -98,13 +89,12 @@
         <span class="n">N_PACKETS_SENT</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">N_BUFFER_OVERFLOWS</span> <span class="o">=</span> <span class="mi">4</span>
         <span class="n">N_DELAYS</span> <span class="o">=</span> <span class="mi">5</span>
-        <span class="n">N_TIMES_TDMA_FELL_BEHIND</span> <span class="o">=</span> <span class="mi">6</span>
-        <span class="n">N_PACKETS_LOST_DUE_TO_COUNT_SATURATION</span> <span class="o">=</span> <span class="mi">7</span>
-        <span class="n">N_PACKETS_WITH_INVALID_NEURON_IDS</span> <span class="o">=</span> <span class="mi">8</span>
-        <span class="n">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span> <span class="o">=</span> <span class="mi">9</span>
-        <span class="n">N_LATE_SPIKES</span> <span class="o">=</span> <span class="mi">10</span>
-        <span class="n">MAX_BACKGROUND_QUEUED</span> <span class="o">=</span> <span class="mi">11</span>
-        <span class="n">N_BACKGROUND_OVERLOADS</span> <span class="o">=</span> <span class="mi">12</span></div>
+        <span class="n">N_PACKETS_LOST_DUE_TO_COUNT_SATURATION</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="n">N_PACKETS_WITH_INVALID_NEURON_IDS</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="n">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="n">N_LATE_SPIKES</span> <span class="o">=</span> <span class="mi">9</span>
+        <span class="n">MAX_BACKGROUND_QUEUED</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">N_BACKGROUND_OVERLOADS</span> <span class="o">=</span> <span class="mi">11</span></div>
 
     <span class="n">N_EXTRA_PROVENANCE_DATA_ENTRIES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span>
 
@@ -156,11 +146,9 @@
                <span class="n">parse_extra_provenance_items</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">parse_extra_provenance_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
         <span class="p">(</span><span class="n">n_received</span><span class="p">,</span> <span class="n">n_processed</span><span class="p">,</span> <span class="n">n_added</span><span class="p">,</span> <span class="n">n_sent</span><span class="p">,</span> <span class="n">n_overflows</span><span class="p">,</span> <span class="n">n_delays</span><span class="p">,</span>
-         <span class="n">n_tdma_behind</span><span class="p">,</span> <span class="n">n_sat</span><span class="p">,</span> <span class="n">n_bad_neuron</span><span class="p">,</span> <span class="n">n_bad_keys</span><span class="p">,</span> <span class="n">n_late_spikes</span><span class="p">,</span>
-         <span class="n">max_bg</span><span class="p">,</span> <span class="n">n_bg_overloads</span><span class="p">)</span> <span class="o">=</span> <span class="n">provenance_data</span>
+         <span class="n">n_sat</span><span class="p">,</span> <span class="n">n_bad_neuron</span><span class="p">,</span> <span class="n">n_bad_keys</span><span class="p">,</span> <span class="n">n_late_spikes</span><span class="p">,</span> <span class="n">max_bg</span><span class="p">,</span>
+         <span class="n">n_bg_overloads</span><span class="p">)</span> <span class="o">=</span> <span class="n">provenance_data</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_tdma_provenance_item</span><span class="p">(</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">n_tdma_behind</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">ProvenanceWriter</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
             <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
                 <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COUNT_SATURATION_NAME</span><span class="p">,</span> <span class="n">n_sat</span><span class="p">)</span>
@@ -262,7 +250,8 @@
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.get_n_keys_for_partition"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_n_keys_for_partition">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_keys_for_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span></div>
+        <span class="n">n_keys</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">(</span><span class="n">partition_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n_keys</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span></div>
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.get_binary_file_name"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_binary_file_name">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_binary_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -284,8 +273,7 @@
 
         <span class="c1"># ###################################################################</span>
         <span class="c1"># Reserve SDRAM space for memory areas:</span>
-        <span class="n">delay_params_sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_params_size</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="p">)</span>
+        <span class="n">delay_params_sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_params_size</span><span class="p">()</span>
 
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
             <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
@@ -294,10 +282,6 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
             <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">DELAY_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="n">delay_params_sz</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;delay_params&#39;</span><span class="p">)</span>
-
-        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">TDMA_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;tdma data&quot;</span><span class="p">)</span>
 
         <span class="c1"># reserve region for provenance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
@@ -322,29 +306,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">write_delay_parameters</span><span class="p">(</span>
             <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">incoming_key</span><span class="p">,</span> <span class="n">incoming_mask</span><span class="p">)</span>
-
-        <span class="n">generator_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_generator_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">generator_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">expander_size</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">generator_data</span><span class="p">)</span>
-            <span class="n">expander_size</span> <span class="o">+=</span> <span class="n">_EXPANDER_BASE_PARAMS_SIZE</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-                <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">EXPANDER_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">size</span><span class="o">=</span><span class="n">expander_size</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;delay_expander&#39;</span><span class="p">)</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">EXPANDER_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">generator_data</span><span class="p">))</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">generator_data</span><span class="p">:</span>
-                <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">gen_data</span><span class="p">)</span>
-
-        <span class="c1"># add tdma data</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">TDMA_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">generate_tdma_data_specification_data</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 
         <span class="c1"># End-of-Spec:</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
@@ -400,19 +361,7 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_per_stage</span><span class="p">)</span>
 
         <span class="c1"># write whether to throw away spikes</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span><span class="p">))</span>
-
-        <span class="c1"># Write the actual delay blocks (create a new one if it doesn&#39;t exist)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">array_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_blocks_for</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="p">)</span><span class="o">.</span><span class="n">delay_block</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="DelayExtensionMachineVertex.gen_on_machine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.gen_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determine if the given slice needs to be generated on the machine</span>
-
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span></div>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span><span class="p">))</span></div>
 </pre></div>
 
             <div class="clearer"></div>

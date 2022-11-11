@@ -22,14 +22,6 @@ Subpackages
 Submodules
 ----------
 
-spynnaker.pyNN.models.neuron.key\_space\_tracker module
--------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.key_space_tracker
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 spynnaker.pyNN.models.neuron.master\_pop\_table module
 ------------------------------------------------------
 
@@ -50,14 +42,6 @@ spynnaker.pyNN.models.neuron.synaptic\_matrices module
 ------------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.models.neuron.synaptic_matrices
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-spynnaker.pyNN.models.neuron.synaptic\_matrix module
-----------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.synaptic_matrix
    :members:
    :undoc-members:
    :show-inheritance:

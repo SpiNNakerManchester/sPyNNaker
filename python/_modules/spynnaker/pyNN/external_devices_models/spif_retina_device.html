@@ -54,8 +54,8 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">Application2DFPGAVertex</span>
-<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">FPGAConnection</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Application2DFPGAVertex</span><span class="p">,</span> <span class="n">FPGAConnection</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.routing_info</span> <span class="kn">import</span> <span class="n">BaseKeyAndMask</span>
 <span class="kn">from</span> <span class="nn">pacman.utilities.constants</span> <span class="kn">import</span> <span class="n">BITS_IN_KEY</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
@@ -63,6 +63,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">MultiCastCommand</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">HasShapeKeyFields</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">PopulationApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
 
 <span class="n">_REPEATS</span> <span class="o">=</span> <span class="mi">2</span>
@@ -147,10 +148,15 @@
 
 
 <span class="k">class</span> <span class="nc">_SpiNNFPGARegister</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="c1"># Peripheral</span>
     <span class="n">P_KEY</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">P_MASK</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># SpiNNLink key</span>
     <span class="n">LC_KEY</span> <span class="o">=</span> <span class="mi">12</span>
     <span class="n">LC_MASK</span> <span class="o">=</span> <span class="mi">13</span>
+
+    <span class="c1"># SPIF key</span>
     <span class="n">RC_KEY</span> <span class="o">=</span> <span class="mi">14</span>
     <span class="n">RC_MASK</span> <span class="o">=</span> <span class="mi">15</span>
     <span class="n">STOP</span> <span class="o">=</span> <span class="mi">16</span>
@@ -163,8 +169,8 @@
 
 
 <span class="k">class</span> <span class="nc">SPIFRetinaDevice</span><span class="p">(</span>
-        <span class="n">Application2DFPGAVertex</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">,</span>
-        <span class="n">HasShapeKeyFields</span><span class="p">):</span>
+        <span class="n">Application2DFPGAVertex</span><span class="p">,</span> <span class="n">PopulationApplicationVertex</span><span class="p">,</span>
+        <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">,</span> <span class="n">HasShapeKeyFields</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A retina device connected to SpiNNaker using a SPIF board.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

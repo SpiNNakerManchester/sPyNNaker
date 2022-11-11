@@ -1,233 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <tagfile doxygen_version="1.9.1">
   <compound kind="file">
-    <name>bit_field_expander.c</name>
-    <path>/github/workspace/neural_modelling/src/bit_field_expander/</path>
-    <filename>bit__field__expander_8c.html</filename>
-    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
-    <includes id="direct__synapses_8h" name="direct_synapses.h" local="no" imported="no">neuron/direct_synapses.h</includes>
-    <includes id="population__table_8h" name="population_table.h" local="no" imported="no">neuron/population_table/population_table.h</includes>
-    <includes id="sp__structs_8h" name="sp_structs.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
-    <class kind="struct">builder_region_struct</class>
-    <member kind="define">
-      <type>#define</type>
-      <name>BYTE_TO_WORD_CONVERSION</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>ac9b2b86329da8040e6c2257d65b0a251</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>N_NEURONS</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a06f93843e9bcfa4f58d70e41333ce0af</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>N_SYNAPSE_TYPES</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>aed4ffe162776a6c89746019dda4d592f</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static vcpu_t *</type>
-      <name>vcpu</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a3f6a8a68b4b17ff5dfc9625fcbca0ba5</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>fail_shut_down</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>acbb8b3b888337366c49aa83e72172383</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>success_shut_down</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a1218cee1aa99ae955d38901097ba2eea</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>read_in_addresses</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a4a87539383a9998fa1063e982f63e0a3</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>initialise</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a08e046aae605f0fc1ba5dc96b1d2f09a</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>process_synaptic_row</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a138926c3ded07524f2b617eb4ba8b96b</anchor>
-      <arglist>(synaptic_row_t row)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>do_sdram_read_and_test</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a5eadce86b92d6e5f04e21e7532745ade</anchor>
-      <arglist>(synaptic_row_t row, uint32_t n_bytes_to_transfer)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>sort_by_key</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>af9ca4dbc2f71c68e5140742c020f8380</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>determine_redundancy</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a73a98b51cca3f71b0eee0817f2d6eab8</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>generate_bit_field</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a05cd52c8292c3bab8005816a1b7d5645</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>c_main</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>aa14f4f1d4c84183b7bf7108bf930a23c</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="variable">
-      <type>int</type>
-      <name>FAILED_REGION_ID</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a9132a44b6d09c3f7ffd226f8e16f11a9</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>address_t</type>
-      <name>master_pop_base_address</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>ae5b6bc86a4a4b0a6873f106ef9082005</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>address_t</type>
-      <name>synaptic_matrix_base_address</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>aa848568a69120df24c0430e5ee983c5c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>filter_region_t *</type>
-      <name>bit_field_base_address</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a445fa555a051ef68edc27fc90a89ec65</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>address_t</type>
-      <name>direct_matrix_region_base_address</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>aa1da3d4b23e323da04f859a8d9eb6c69</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>address_t</type>
-      <name>structural_matrix_region_base_address</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a37444ff66ef05a9fff67975a7b9a3427</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>address_t</type>
-      <name>direct_synapses_address</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a7e8f73474622d82215423413dec84223</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>row_max_n_words</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>af9b6824a750777e79471f086307d51b9</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>key_atom_data_t *</type>
-      <name>keys_to_max_atoms</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>ace2af7f42ceddbe32acd8a8e32c9aa4e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_keys_to_max_atom_map</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a10c000a085edd682afcaf53023749648</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_vertex_regions</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>aecf3dda26a0c94057f7ff47a66de4e68</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>bit_field_t *</type>
-      <name>fake_bit_fields</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>abab455406701d8b67a962835f9175899</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>synaptic_row_t</type>
-      <name>row_data</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a7a0a788410818524ea425e5287922f92</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>bool</type>
-      <name>can_run</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a08d5046cd90ed4bcb3d31721e5fa3452</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>rewiring_data_t</type>
-      <name>rewiring_data</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a14052fb746b24752fc5a96accf39d8b8</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static post_to_pre_entry *</type>
-      <name>post_to_pre_table</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>ab4adc13b137ccdbaff9d8883400182eb</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>pre_pop_info_table_t</type>
-      <name>pre_info</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a25e63ee99aecac3677f299c1cccec889</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="file">
     <name>in_spikes.h</name>
     <path>/github/workspace/neural_modelling/src/common/</path>
     <filename>in__spikes_8h.html</filename>
@@ -509,6 +282,27 @@
       <anchorfile>maths-util_8h.html</anchorfile>
       <anchor>a8cf409d4308be505fbdb5683525213ba</anchor>
       <arglist></arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static REAL</type>
+      <name>kdivk</name>
+      <anchorfile>maths-util_8h.html</anchorfile>
+      <anchor>a93c5e8722291b50b8a17e64cf8d5edb9</anchor>
+      <arglist>(REAL a, REAL b)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static int32_t</type>
+      <name>udivk</name>
+      <anchorfile>maths-util_8h.html</anchorfile>
+      <anchor>a8fa3dde0c1762bfdb7e5f0c72dd5ac44</anchor>
+      <arglist>(int32_t a, REAL b)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static REAL</type>
+      <name>kdivui</name>
+      <anchorfile>maths-util_8h.html</anchorfile>
+      <anchor>ab6e6f665bddb5253982e560b4b2969c5</anchor>
+      <arglist>(REAL a, uint32_t b)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -1633,13 +1427,6 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static bit_field_t *</type>
-      <name>neuron_delay_stage_config</name>
-      <anchorfile>delay__extension_8c.html</anchorfile>
-      <anchor>ab7cc70efc4d7a8de402bb8c1d180abce</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
       <type>static uint32_t</type>
       <name>num_delay_stages</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
@@ -1825,12 +1612,6 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>EXPANDER_REGION</name>
-      <anchorfile>delay__extension_8h.html</anchorfile>
-      <anchor>a6e4d67a0bd74db4da98539f8d2e5ab32a719368d00e2ee9a5b0e27a360ea05be4</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
       <name>TDMA_REGION</name>
       <anchorfile>delay__extension_8h.html</anchorfile>
       <anchor>a6e4d67a0bd74db4da98539f8d2e5ab32a3ec559988321d901a9631875c4782ba6</anchor>
@@ -1842,12 +1623,19 @@
     <path>/github/workspace/neural_modelling/src/neuron/additional_inputs/</path>
     <filename>additional__input_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <member kind="typedef">
-      <type>additional_input_t *</type>
-      <name>additional_input_pointer_t</name>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>additional_input_initialise</name>
       <anchorfile>additional__input_8h.html</anchorfile>
-      <anchor>a2c12126afb370d66fb361daac93067cb</anchor>
-      <arglist></arglist>
+      <anchor>aadbad417439bccd417fa263908cf5f23</anchor>
+      <arglist>(additional_input_t *state, additional_input_params_t *params, uint32_t n_steps_per_timestep)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>additional_input_save_state</name>
+      <anchorfile>additional__input_8h.html</anchorfile>
+      <anchor>abb4f4a48858a047e98636c6c4c91c97b</anchor>
+      <arglist>(additional_input_t *state, additional_input_params_t *params)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t</type>
@@ -1869,20 +1657,21 @@
     <path>/github/workspace/neural_modelling/src/neuron/additional_inputs/</path>
     <filename>additional__input__ca2__adaptive__impl_8h.html</filename>
     <includes id="additional__input_8h" name="additional_input.h" local="yes" imported="no">additional_input.h</includes>
+    <class kind="struct">additional_input_params_t</class>
     <class kind="struct">additional_input_t</class>
     <member kind="function" static="yes">
       <type>static input_t</type>
       <name>additional_input_get_input_value_as_current</name>
       <anchorfile>additional__input__ca2__adaptive__impl_8h.html</anchorfile>
-      <anchor>a136eddebea2acf483d5e28be84070452</anchor>
-      <arglist>(struct additional_input_t *additional_input, state_t membrane_voltage)</arglist>
+      <anchor>a9e4d2b22f1906900e72db9131cf3822b</anchor>
+      <arglist>(additional_input_t *additional_input, state_t membrane_voltage)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>additional_input_has_spiked</name>
       <anchorfile>additional__input__ca2__adaptive__impl_8h.html</anchorfile>
-      <anchor>ac6a9ad3289ee8e787955dfbd7b2a726d</anchor>
-      <arglist>(struct additional_input_t *additional_input)</arglist>
+      <anchor>ab82803acdc9d245f4d1275928dea72e8</anchor>
+      <arglist>(additional_input_t *additional_input)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -1890,20 +1679,21 @@
     <path>/github/workspace/neural_modelling/src/neuron/additional_inputs/</path>
     <filename>additional__input__none__impl_8h.html</filename>
     <includes id="additional__input_8h" name="additional_input.h" local="yes" imported="no">additional_input.h</includes>
+    <class kind="struct">additional_input_params_t</class>
     <class kind="struct">additional_input_t</class>
     <member kind="function" static="yes">
       <type>static input_t</type>
       <name>additional_input_get_input_value_as_current</name>
       <anchorfile>additional__input__none__impl_8h.html</anchorfile>
-      <anchor>a136eddebea2acf483d5e28be84070452</anchor>
-      <arglist>(struct additional_input_t *additional_input, state_t membrane_voltage)</arglist>
+      <anchor>a9e4d2b22f1906900e72db9131cf3822b</anchor>
+      <arglist>(additional_input_t *additional_input, state_t membrane_voltage)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>additional_input_has_spiked</name>
       <anchorfile>additional__input__none__impl_8h.html</anchorfile>
-      <anchor>ac6a9ad3289ee8e787955dfbd7b2a726d</anchor>
-      <arglist>(struct additional_input_t *additional_input)</arglist>
+      <anchor>ab82803acdc9d245f4d1275928dea72e8</anchor>
+      <arglist>(additional_input_t *additional_input)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -2546,54 +2336,6 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>direct_synapses.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
-    <filename>direct__synapses_8c.html</filename>
-    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <class kind="struct">single_synaptic_row_t</class>
-    <class kind="struct">direct_matrix_data_t</class>
-    <member kind="function">
-      <type>bool</type>
-      <name>direct_synapses_initialise</name>
-      <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a4f96698f7745cad8c8009298fb03da9b</anchor>
-      <arglist>(void *direct_matrix_address, address_t *direct_synapses_address)</arglist>
-    </member>
-    <member kind="function">
-      <type>synaptic_row_t</type>
-      <name>direct_synapses_get_direct_synapse</name>
-      <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a4e044c9a28f8428d353c90dbc0249482</anchor>
-      <arglist>(void *row_address)</arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static single_synaptic_row_t</type>
-      <name>single_fixed_synapse</name>
-      <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a5dd766c9e442321941ea5ccef7d32710</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="file">
-    <name>direct_synapses.h</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
-    <filename>direct__synapses_8h.html</filename>
-    <member kind="function">
-      <type>bool</type>
-      <name>direct_synapses_initialise</name>
-      <anchorfile>direct__synapses_8h.html</anchorfile>
-      <anchor>a4f96698f7745cad8c8009298fb03da9b</anchor>
-      <arglist>(void *direct_matrix_address, address_t *direct_synapses_address)</arglist>
-    </member>
-    <member kind="function">
-      <type>synaptic_row_t</type>
-      <name>direct_synapses_get_direct_synapse</name>
-      <anchorfile>direct__synapses_8h.html</anchorfile>
-      <anchor>a4e044c9a28f8428d353c90dbc0249482</anchor>
-      <arglist>(void *row_address)</arglist>
-    </member>
-  </compound>
-  <compound kind="file">
     <name>neuron_impl.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/implementations/</path>
     <filename>neuron__impl_8h.html</filename>
@@ -2616,8 +2358,8 @@
       <type>static void</type>
       <name>neuron_impl_load_neuron_parameters</name>
       <anchorfile>neuron__impl_8h.html</anchorfile>
-      <anchor>a72b0028625c6e3cad1e4176bdba1b44e</anchor>
-      <arglist>(address_t address, uint32_t next, uint32_t n_neurons)</arglist>
+      <anchor>a6096589e60619a6e460d1f3b2438b72d</anchor>
+      <arglist>(address_t address, uint32_t next, uint32_t n_neurons, address_t save_initial_state)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -2661,10 +2403,8 @@
     <filename>neuron__impl__external__devices_8h.html</filename>
     <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" imported="no">neuron_impl.h</includes>
     <includes id="neuron__model__lif__impl_8h" name="neuron_model_lif_impl.h" local="no" imported="no">neuron/models/neuron_model_lif_impl.h</includes>
-    <includes id="additional__input_8h" name="additional_input.h" local="no" imported="no">neuron/additional_inputs/additional_input.h</includes>
     <includes id="synapse__types__exponential__impl_8h" name="synapse_types_exponential_impl.h" local="no" imported="no">neuron/synapse_types/synapse_types_exponential_impl.h</includes>
     <includes id="input__type__current_8h" name="input_type_current.h" local="no" imported="no">neuron/input_types/input_type_current.h</includes>
-    <includes id="additional__input__none__impl_8h" name="additional_input_none_impl.h" local="no" imported="no">neuron/additional_inputs/additional_input_none_impl.h</includes>
     <includes id="current__source__impl_8h" name="current_source_impl.h" local="no" imported="no">neuron/current_sources/current_source_impl.h</includes>
     <includes id="current__source_8h" name="current_source.h" local="no" imported="no">neuron/current_sources/current_source.h</includes>
     <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" imported="no">neuron/neuron_recording.h</includes>
@@ -2821,13 +2561,6 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
-      <name>neuron_impl_load_neuron_parameters</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a72b0028625c6e3cad1e4176bdba1b44e</anchor>
-      <arglist>(address_t address, uint32_t next, uint32_t n_neurons)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
       <name>neuron_impl_do_timestep_update</name>
       <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
       <anchor>a5c11520af8e2915ec00d5dc1edcd8b36</anchor>
@@ -2869,20 +2602,6 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static input_type_t *</type>
-      <name>input_type_array</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a31058212f43265088fe71863d4ea0907</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static additional_input_t *</type>
-      <name>additional_input_array</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a9a9983ef2e0e8377f0fc818e32eec11d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
       <type>static packet_firing_data_t *</type>
       <name>packet_firing_array</name>
       <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
@@ -2890,17 +2609,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static global_neuron_params_t *</type>
-      <name>global_parameters</name>
+      <type>static synapse_types_t *</type>
+      <name>synapse_types_array</name>
       <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a3080a592212f89a8d8dde67f13a58949</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static synapse_param_t *</type>
-      <name>neuron_synapse_shaping_params</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>ae0383b1a8ff4169668ce6e5130cfbeaf</anchor>
+      <anchor>aed1e3706b58fb9163d3009b05e9b41ef</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -3034,8 +2746,8 @@
       <type>static void</type>
       <name>neuron_impl_load_neuron_parameters</name>
       <anchorfile>neuron__impl__standard_8h.html</anchorfile>
-      <anchor>a72b0028625c6e3cad1e4176bdba1b44e</anchor>
-      <arglist>(address_t address, uint32_t next, uint32_t n_neurons)</arglist>
+      <anchor>a6096589e60619a6e460d1f3b2438b72d</anchor>
+      <arglist>(address_t address, uint32_t next, uint32_t n_neurons, address_t save_initial_state)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -3101,17 +2813,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static global_neuron_params_t *</type>
-      <name>global_parameters</name>
+      <type>static synapse_types_t *</type>
+      <name>synapse_types_array</name>
       <anchorfile>neuron__impl__standard_8h.html</anchorfile>
-      <anchor>a3080a592212f89a8d8dde67f13a58949</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static synapse_param_t *</type>
-      <name>neuron_synapse_shaping_params</name>
-      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
-      <anchor>ae0383b1a8ff4169668ce6e5130cfbeaf</anchor>
+      <anchor>aed1e3706b58fb9163d3009b05e9b41ef</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -3141,12 +2846,19 @@
       <anchor>a6dd746ed60f4dc54e7e604f239843aa6</anchor>
       <arglist></arglist>
     </member>
-    <member kind="typedef">
-      <type>input_type_t *</type>
-      <name>input_type_pointer_t</name>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>input_type_initialise</name>
       <anchorfile>input__type_8h.html</anchorfile>
-      <anchor>af2eac2241adec660b95b59ab8cc519ff</anchor>
-      <arglist></arglist>
+      <anchor>a26f363df8042bd869bd06d36744bfbee</anchor>
+      <arglist>(input_type_t *state, input_type_params_t *params, uint32_t n_steps_per_timestep)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>input_type_save_state</name>
+      <anchorfile>input__type_8h.html</anchorfile>
+      <anchor>ae174cb0d7c7d94f22ee29379c80b73b8</anchor>
+      <arglist>(input_type_t *state, input_type_params_t *params)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
@@ -3175,6 +2887,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
     <filename>input__type__conductance_8h.html</filename>
     <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
+    <class kind="struct">input_type_params_t</class>
     <class kind="struct">input_type_t</class>
     <member kind="function" static="yes">
       <type>static input_t *</type>
@@ -3203,6 +2916,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
     <filename>input__type__current_8h.html</filename>
     <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
+    <class kind="struct">input_type_params_t</class>
     <class kind="struct">input_type_t</class>
     <member kind="function" static="yes">
       <type>static input_t *</type>
@@ -3224,13 +2938,6 @@
       <anchorfile>input__type__current_8h.html</anchorfile>
       <anchor>a07605d2b04f6d102c116229dd0ccc91c</anchor>
       <arglist>(input_t *restrict inh_input, const input_type_t *input_type, state_t membrane_voltage)</arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static const REAL</type>
-      <name>INPUT_SCALE_FACTOR</name>
-      <anchorfile>input__type__current_8h.html</anchorfile>
-      <anchor>a80a0eacdb1171eb336d3ff00ee1fa50a</anchor>
-      <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -3238,6 +2945,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
     <filename>input__type__delta_8h.html</filename>
     <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
+    <class kind="struct">input_type_params_t</class>
     <class kind="struct">input_type_t</class>
     <member kind="function" static="yes">
       <type>static input_t *</type>
@@ -3260,19 +2968,13 @@
       <anchor>a07605d2b04f6d102c116229dd0ccc91c</anchor>
       <arglist>(input_t *restrict inh_input, const input_type_t *input_type, state_t membrane_voltage)</arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static const REAL</type>
-      <name>INPUT_SCALE_FACTOR</name>
-      <anchorfile>input__type__delta_8h.html</anchorfile>
-      <anchor>a80a0eacdb1171eb336d3ff00ee1fa50a</anchor>
-      <arglist></arglist>
-    </member>
   </compound>
   <compound kind="file">
     <name>input_type_none.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/input_types/</path>
     <filename>input__type__none_8h.html</filename>
     <includes id="input__type_8h" name="input_type.h" local="yes" imported="no">input_type.h</includes>
+    <class kind="struct">input_type_params_t</class>
     <class kind="struct">input_type_t</class>
     <member kind="define">
       <type>#define</type>
@@ -3504,19 +3206,19 @@
     <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <member kind="typedef">
-      <type>global_neuron_params_t *</type>
-      <name>global_neuron_params_pointer_t</name>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>neuron_model_initialise</name>
       <anchorfile>neuron__model_8h.html</anchorfile>
-      <anchor>af6a73a4c591000fae3ac1f7e879b9a36</anchor>
-      <arglist></arglist>
+      <anchor>ac5fc11951300c8a7321586ffb24b4107</anchor>
+      <arglist>(neuron_t *state, neuron_params_t *params, uint32_t n_steps_per_timestep)</arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_model_set_global_neuron_params</name>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>neuron_model_save_state</name>
       <anchorfile>neuron__model_8h.html</anchorfile>
-      <anchor>a2c709e18b3833cf07131b394b0a9b929</anchor>
-      <arglist>(const global_neuron_params_t *params)</arglist>
+      <anchor>add9582f47143d4a943af8bbd50082d4a</anchor>
+      <arglist>(neuron_t *state, neuron_params_t *params)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static state_t</type>
@@ -3539,53 +3241,19 @@
       <anchor>a36ed2fe89ac12da019a6bcee8b6672c9</anchor>
       <arglist>(const neuron_t *neuron)</arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
+    <member kind="function" static="yes">
+      <type>static void</type>
       <name>neuron_model_print_state_variables</name>
       <anchorfile>neuron__model_8h.html</anchorfile>
-      <anchor>a039b8ee28cccb786e7c67c985e88e3d6</anchor>
+      <anchor>a34e146df45faa9cdf07da003881f0181</anchor>
       <arglist>(const neuron_t *neuron)</arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
+    <member kind="function" static="yes">
+      <type>static void</type>
       <name>neuron_model_print_parameters</name>
       <anchorfile>neuron__model_8h.html</anchorfile>
-      <anchor>a645937167c46b7556757b05250f9864d</anchor>
+      <anchor>ae984b1ab35b6ea027f5d622074c21212</anchor>
       <arglist>(const neuron_t *neuron)</arglist>
-    </member>
-  </compound>
-  <compound kind="file">
-    <name>neuron_model_izh_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/models/</path>
-    <filename>neuron__model__izh__impl_8c.html</filename>
-    <includes id="neuron__model__izh__impl_8h" name="neuron_model_izh_impl.h" local="yes" imported="no">neuron_model_izh_impl.h</includes>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_model_set_global_neuron_params</name>
-      <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
-      <anchor>a2c709e18b3833cf07131b394b0a9b929</anchor>
-      <arglist>(const global_neuron_params_t *params)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_model_print_state_variables</name>
-      <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
-      <anchor>a039b8ee28cccb786e7c67c985e88e3d6</anchor>
-      <arglist>(const neuron_t *neuron)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_model_print_parameters</name>
-      <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
-      <anchor>a645937167c46b7556757b05250f9864d</anchor>
-      <arglist>(const neuron_t *neuron)</arglist>
-    </member>
-    <member kind="variable">
-      <type>const global_neuron_params_t *</type>
-      <name>global_params</name>
-      <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
-      <anchor>a60d02bd3fd0eb5694bf3d08679d4565d</anchor>
-      <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -3593,8 +3261,8 @@
     <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model__izh__impl_8h.html</filename>
     <includes id="neuron__model_8h" name="neuron_model.h" local="yes" imported="no">neuron_model.h</includes>
+    <class kind="struct">neuron_params_t</class>
     <class kind="struct">neuron_t</class>
-    <class kind="struct">global_neuron_params_t</class>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>rk2_kernel_midpoint</name>
@@ -3623,13 +3291,6 @@
       <anchor>a36ed2fe89ac12da019a6bcee8b6672c9</anchor>
       <arglist>(const neuron_t *neuron)</arglist>
     </member>
-    <member kind="variable">
-      <type>const global_neuron_params_t *</type>
-      <name>global_params</name>
-      <anchorfile>neuron__model__izh__impl_8h.html</anchorfile>
-      <anchor>a60d02bd3fd0eb5694bf3d08679d4565d</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="variable" static="yes">
       <type>static const REAL</type>
       <name>SIMPLE_TQ_OFFSET</name>
@@ -3646,39 +3307,19 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>neuron_model_lif_impl.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/models/</path>
-    <filename>neuron__model__lif__impl_8c.html</filename>
-    <includes id="neuron__model__lif__impl_8h" name="neuron_model_lif_impl.h" local="yes" imported="no">neuron_model_lif_impl.h</includes>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_model_set_global_neuron_params</name>
-      <anchorfile>neuron__model__lif__impl_8c.html</anchorfile>
-      <anchor>a2c709e18b3833cf07131b394b0a9b929</anchor>
-      <arglist>(const global_neuron_params_t *params)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_model_print_state_variables</name>
-      <anchorfile>neuron__model__lif__impl_8c.html</anchorfile>
-      <anchor>a039b8ee28cccb786e7c67c985e88e3d6</anchor>
-      <arglist>(const neuron_t *neuron)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_model_print_parameters</name>
-      <anchorfile>neuron__model__lif__impl_8c.html</anchorfile>
-      <anchor>a645937167c46b7556757b05250f9864d</anchor>
-      <arglist>(const neuron_t *neuron)</arglist>
-    </member>
-  </compound>
-  <compound kind="file">
     <name>neuron_model_lif_impl.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model__lif__impl_8h.html</filename>
     <includes id="neuron__model_8h" name="neuron_model.h" local="yes" imported="no">neuron_model.h</includes>
+    <class kind="struct">neuron_params_t</class>
     <class kind="struct">neuron_t</class>
-    <class kind="struct">global_neuron_params_t</class>
+    <member kind="function" static="yes">
+      <type>static int32_t</type>
+      <name>lif_ceil_accum</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a9657bc9566431a1077df6f73dae27baf</anchor>
+      <arglist>(REAL value)</arglist>
+    </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>lif_neuron_closed_form</name>
@@ -3717,27 +3358,27 @@
     <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" imported="no">implementations/neuron_impl.h</includes>
     <includes id="current__source_8h" name="current_source.h" local="yes" imported="no">current_sources/current_source.h</includes>
     <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" imported="no">plasticity/synapse_dynamics.h</includes>
-    <class kind="struct">neuron_parameters</class>
+    <class kind="struct">neuron_core_parameters</class>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>neuron_load_neuron_parameters</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>a9f74a3915bdd91fc758c4682c54568a5</anchor>
-      <arglist>(void)</arglist>
+      <anchor>aff90525477e8305d9754a5876cbdfb18</anchor>
+      <arglist>(uint32_t time)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>neuron_resume</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>aab8eb2155951459c0acf8b990dd29e69</anchor>
-      <arglist>(void)</arglist>
+      <anchor>a82283d81b442ae011e830b3c3ab7882b</anchor>
+      <arglist>(uint32_t time)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>neuron_initialise</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>ace6f63d291f13e8e89dc1c8b8d433743</anchor>
-      <arglist>(address_t address, address_t cs_address, address_t recording_address, uint32_t *n_rec_regions_used)</arglist>
+      <anchor>a0e3fd26136f3e14f31f40f95bf4e9e54</anchor>
+      <arglist>(void *core_params_address, void *neuron_params_address, void *current_sources_address, void *recording_address, void *initial_values_address, uint32_t *n_rec_regions_used)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3838,17 +3479,24 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static address_t</type>
-      <name>saved_params_address</name>
+      <type>static void *</type>
+      <name>saved_neuron_params_address</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>a0a022907f7d958b27b03e3e079108327</anchor>
+      <anchor>af0054ecd50a9d83ec3b87837779e061a</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static address_t</type>
+      <type>static void *</type>
       <name>current_source_address</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>aa269b2afc1811a0714dcaf06deb457c1</anchor>
+      <anchor>a3ed312627afac83b5285c86756231886</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static void *</type>
+      <name>saved_initial_values_address</name>
+      <anchorfile>neuron_8c.html</anchorfile>
+      <anchor>ac29f7d6b5e1d2e4b5afcf4c724b51d13</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -3862,8 +3510,8 @@
       <type>bool</type>
       <name>neuron_initialise</name>
       <anchorfile>neuron_8h.html</anchorfile>
-      <anchor>ace6f63d291f13e8e89dc1c8b8d433743</anchor>
-      <arglist>(address_t address, address_t cs_address, address_t recording_address, uint32_t *n_rec_regions_used)</arglist>
+      <anchor>a0e3fd26136f3e14f31f40f95bf4e9e54</anchor>
+      <arglist>(void *core_params_address, void *neuron_params_address, void *current_sources_address, void *recording_address, void *initial_values_address, uint32_t *n_rec_regions_used)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3876,8 +3524,8 @@
       <type>bool</type>
       <name>neuron_resume</name>
       <anchorfile>neuron_8h.html</anchorfile>
-      <anchor>aab8eb2155951459c0acf8b990dd29e69</anchor>
-      <arglist>(void)</arglist>
+      <anchor>a82283d81b442ae011e830b3c3ab7882b</anchor>
+      <arglist>(uint32_t time)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3916,132 +3564,6 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>neuron_recording.c</name>
-    <path>/github/workspace/neural_modelling/src/neuron/</path>
-    <filename>neuron__recording_8c.html</filename>
-    <includes id="neuron__recording_8h" name="neuron_recording.h" local="yes" imported="no">neuron_recording.h</includes>
-    <class kind="struct">neuron_recording_header_t</class>
-    <member kind="define">
-      <type>#define</type>
-      <name>FLOOR_TO_2</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a403b173ad583ec922758a7edc380fa3c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>CEIL_TO_2</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>aa2d4795fc5236852254c8bebccde5764</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>reset_record_counter</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a48e4d4f21167fadbe5b44ec1707677fe</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>bitfield_data_size</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>acf22d4e046f8216c065e3c77a5274f84</anchor>
-      <arglist>(uint32_t n_neurons)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>neuron_recording_read_in_elements</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>ab1ce319a9907ceeca7fa4a77029bef5c</anchor>
-      <arglist>(void *recording_address, uint32_t n_neurons)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>neuron_recording_reset</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a6ec6bcccf5cf769f8ea0c853ab0577e9</anchor>
-      <arglist>(uint32_t n_neurons)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>allocate_word_dtcm</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a8b7a478d22db76495934d689b0a32482</anchor>
-      <arglist>(uint32_t n_neurons)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>allocate_bitfield_dtcm</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>af48d91cdeaac5c1b26bf495746757f81</anchor>
-      <arglist>(uint32_t n_neurons)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>neuron_recording_initialise</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>acf13eda07e993e65ef639d2b70d4531b</anchor>
-      <arglist>(void *recording_address, uint32_t n_neurons, uint32_t *n_rec_regions_used)</arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t **</type>
-      <name>neuron_recording_indexes</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a7d71204655340d9946d301dd396b3cfe</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t **</type>
-      <name>bitfield_recording_indexes</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a8e8050b4ec719ade7df406f544d1eb30</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>recording_info_t *</type>
-      <name>recording_info</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a96a8e9a2f37a358a5264aadc6bb37263</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>bitfield_info_t *</type>
-      <name>bitfield_info</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a2960fd20508bd11722265c5a5e2bebec</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint8_t **</type>
-      <name>recording_values</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>ac1ffd13a57545991775c1691ca0be09c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t **</type>
-      <name>bitfield_values</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>ab63f6c062cd231b9b383cdf19a09dd0d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>volatile uint32_t</type>
-      <name>n_recordings_outstanding</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a629e0fd3d865713eb4c4ec5c0f0c5352</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static void *</type>
-      <name>reset_address</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>ac4b03f54804a47d2b1d7f9086d42292a</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="file">
     <name>neuron_recording.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>neuron__recording_8h.html</filename>
@@ -4050,6 +3572,21 @@
     <class kind="struct">bitfield_values_t</class>
     <class kind="struct">recording_info_t</class>
     <class kind="struct">bitfield_info_t</class>
+    <class kind="struct">neuron_recording_header_t</class>
+    <member kind="define">
+      <type>#define</type>
+      <name>FLOOR_TO_2</name>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
+      <anchor>a403b173ad583ec922758a7edc380fa3c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>CEIL_TO_2</name>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
+      <anchor>aa2d4795fc5236852254c8bebccde5764</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>neuron_recording_record_value</name>
@@ -4106,11 +3643,46 @@
       <anchor>a7827a3c6f8c4ba62e3d8b15af7ae3ac0</anchor>
       <arglist>(void)</arglist>
     </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>reset_record_counter</name>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
+      <anchor>a48e4d4f21167fadbe5b44ec1707677fe</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>bitfield_data_size</name>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
+      <anchor>acf22d4e046f8216c065e3c77a5274f84</anchor>
+      <arglist>(uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>neuron_recording_read_in_elements</name>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
+      <anchor>ab1ce319a9907ceeca7fa4a77029bef5c</anchor>
+      <arglist>(void *recording_address, uint32_t n_neurons)</arglist>
+    </member>
     <member kind="function">
       <type>bool</type>
       <name>neuron_recording_reset</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>a6ec6bcccf5cf769f8ea0c853ab0577e9</anchor>
+      <arglist>(uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>allocate_word_dtcm</name>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
+      <anchor>a8b7a478d22db76495934d689b0a32482</anchor>
+      <arglist>(uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>allocate_bitfield_dtcm</name>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
+      <anchor>af48d91cdeaac5c1b26bf495746757f81</anchor>
       <arglist>(uint32_t n_neurons)</arglist>
     </member>
     <member kind="function">
@@ -4120,46 +3692,60 @@
       <anchor>acf13eda07e993e65ef639d2b70d4531b</anchor>
       <arglist>(void *recording_address, uint32_t n_neurons, uint32_t *n_rec_regions_used)</arglist>
     </member>
-    <member kind="variable">
-      <type>uint16_t **</type>
+    <member kind="variable" static="yes">
+      <type>static uint16_t **</type>
       <name>neuron_recording_indexes</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>a7d71204655340d9946d301dd396b3cfe</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>uint16_t **</type>
+    <member kind="variable" static="yes">
+      <type>static uint16_t **</type>
       <name>bitfield_recording_indexes</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>a8e8050b4ec719ade7df406f544d1eb30</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>recording_info_t *</type>
+    <member kind="variable" static="yes">
+      <type>static recording_info_t *</type>
       <name>recording_info</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>a96a8e9a2f37a358a5264aadc6bb37263</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>bitfield_info_t *</type>
+    <member kind="variable" static="yes">
+      <type>static bitfield_info_t *</type>
       <name>bitfield_info</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>a2960fd20508bd11722265c5a5e2bebec</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>uint8_t **</type>
+    <member kind="variable" static="yes">
+      <type>static uint8_t **</type>
       <name>recording_values</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>ac1ffd13a57545991775c1691ca0be09c</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>uint32_t **</type>
+    <member kind="variable" static="yes">
+      <type>static uint32_t **</type>
       <name>bitfield_values</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>ab63f6c062cd231b9b383cdf19a09dd0d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static volatile uint32_t</type>
+      <name>n_recordings_outstanding</name>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
+      <anchor>a629e0fd3d865713eb4c4ec5c0f0c5352</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static void *</type>
+      <name>reset_address</name>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
+      <anchor>ac4b03f54804a47d2b1d7f9086d42292a</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -4905,12 +4491,12 @@
     <name>random_util.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/plasticity/stdp/timing_dependence/</path>
     <filename>random__util_8h.html</filename>
-    <member kind="function" static="yes">
-      <type>static int32_t</type>
-      <name>mars_kiss_fixed_point</name>
+    <member kind="variable" static="yes">
+      <type>static mars_kiss64_seed_t</type>
+      <name>seed</name>
       <anchorfile>random__util_8h.html</anchorfile>
-      <anchor>a888c74ee81620d84c956eed32713f074</anchor>
-      <arglist>(void)</arglist>
+      <anchor>a242fd815ccc9f4b3ad34154405da64c6</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -6060,40 +5646,51 @@
     <path>/github/workspace/neural_modelling/src/neuron/population_table/</path>
     <filename>population__table_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <member kind="function">
-      <type>bool</type>
-      <name>population_table_initialise</name>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
+    <class kind="struct">master_population_table_entry</class>
+    <class kind="struct">address_list_entry</class>
+    <class kind="struct">pop_table_config_t</class>
+    <member kind="define">
+      <type>#define</type>
+      <name>BITS_PER_WORD</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a5f92af4dd47e65504cbbbcb265083196</anchor>
-      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *row_max_n_words)</arglist>
+      <anchor>af859a98f57110e5243e8f0541319e43b</anchor>
+      <arglist></arglist>
     </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>population_table_load_bitfields</name>
+    <member kind="define">
+      <type>#define</type>
+      <name>TOP_BIT_IN_WORD</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a4e78f94389fe12981acf2cea7e8bfe91</anchor>
-      <arglist>(filter_region_t *filter_region)</arglist>
+      <anchor>a76abab9c83287abfbdde2324b659b836</anchor>
+      <arglist></arglist>
     </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>population_table_get_first_address</name>
+    <member kind="define">
+      <type>#define</type>
+      <name>NOT_IN_MASTER_POP_TABLE_FLAG</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a511a4004e5621e6ec83228d4e4f94672</anchor>
-      <arglist>(spike_t spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a5f369817d958cb4c367752b5558957b1</anchor>
+      <arglist></arglist>
     </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>population_table_is_next</name>
+    <member kind="define">
+      <type>#define</type>
+      <name>N_ADDRESS_BITS</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a6af50f83e29bc2f5340724898921df93</anchor>
-      <arglist>(void)</arglist>
+      <anchor>a2233d5046582aeea3564c6ec3e72c553</anchor>
+      <arglist></arglist>
     </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>population_table_get_next_address</name>
+    <member kind="define">
+      <type>#define</type>
+      <name>INDIRECT_ADDRESS_SHIFT</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a06008941811a064b8c67dcf3a5846cde</anchor>
-      <arglist>(spike_t *spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a36896ff3554f8b8ee7fe1599ec6c26f5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>INVALID_ADDRESS</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>ac0e87c1d66cacc61454b23cdc12ff764</anchor>
+      <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
@@ -6130,6 +5727,104 @@
       <anchor>aebd5b17aab1bbe44fa564e8786f84d94</anchor>
       <arglist></arglist>
     </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_offset</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a071de88b0691d4747c55dbea8cc58f86</anchor>
+      <arglist>(address_list_entry entry)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_address</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a2916b1e1b3368cce2257f3a2d2babd11</anchor>
+      <arglist>(address_list_entry entry, uint32_t addr)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_row_length</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a44d4641d18cf8073f34f171a7e9a0f54</anchor>
+      <arglist>(address_list_entry entry)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_core_index</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>aa2d4dd26fcbfb2f760cc5ec9c021e475</anchor>
+      <arglist>(master_population_table_entry entry, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_core_sum</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>ac6d62fa8b2be8dfcb6c5ff7c9ff9d7aa</anchor>
+      <arglist>(master_population_table_entry entry, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_neuron_id</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>ab08d6807fc8fd46ed5f70a8bd14a5a93</anchor>
+      <arglist>(master_population_table_entry entry, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>get_local_neuron_id</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a48c705b7db3ec689ae14c6173df1de60</anchor>
+      <arglist>(master_population_table_entry entry, spike_t spike)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>get_row_addr_and_size</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a1bd7c13d57e46e337171e57af8f345fe</anchor>
+      <arglist>(address_list_entry item, uint32_t synaptic_rows_base_address, uint32_t neuron_id, synaptic_row_t *row_address, uint32_t *n_bytes_to_transfer)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>population_table_setup</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a0b783bdc820853519d04fe41adb0b7de</anchor>
+      <arglist>(address_t table_address, uint32_t *row_max_n_words, uint32_t *master_pop_table_length, master_population_table_entry **master_pop_table, address_list_entry **address_list)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>population_table_initialise</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>ac894fca012fcf12a7730d360f65e535b</anchor>
+      <arglist>(address_t table_address, address_t synapse_rows_address, uint32_t *row_max_n_words)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>population_table_load_bitfields</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a4e78f94389fe12981acf2cea7e8bfe91</anchor>
+      <arglist>(filter_region_t *filter_region)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>population_table_get_first_address</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a511a4004e5621e6ec83228d4e4f94672</anchor>
+      <arglist>(spike_t spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>population_table_is_next</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a6af50f83e29bc2f5340724898921df93</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>population_table_get_next_address</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a06008941811a064b8c67dcf3a5846cde</anchor>
+      <arglist>(spike_t *spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>population_table_binary_search_impl.c</name>
@@ -6137,116 +5832,6 @@
     <filename>population__table__binary__search__impl_8c.html</filename>
     <includes id="population__table_8h" name="population_table.h" local="yes" imported="no">population_table.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
-    <class kind="struct">master_population_table_entry</class>
-    <class kind="struct">extra_info</class>
-    <class kind="struct">address_and_row_length</class>
-    <class kind="union">address_list_entry</class>
-    <class kind="struct">pop_table_config_t</class>
-    <member kind="define">
-      <type>#define</type>
-      <name>BITS_PER_WORD</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>af859a98f57110e5243e8f0541319e43b</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>TOP_BIT_IN_WORD</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a76abab9c83287abfbdde2324b659b836</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>NOT_IN_MASTER_POP_TABLE_FLAG</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a5f369817d958cb4c367752b5558957b1</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>N_ADDRESS_BITS</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a2233d5046582aeea3564c6ec3e72c553</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>INDIRECT_ADDRESS_SHIFT</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a36896ff3554f8b8ee7fe1599ec6c26f5</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>INVALID_ADDRESS</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ac0e87c1d66cacc61454b23cdc12ff764</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_direct_address</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a0f6729803ce65a621db8be58bfa1d972</anchor>
-      <arglist>(address_and_row_length entry)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_offset</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a30c2c744e7524091a4a2b64d231fdf4f</anchor>
-      <arglist>(address_and_row_length entry)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_address</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>aa48b23a2a333284836c0054f7113ca95</anchor>
-      <arglist>(address_and_row_length entry)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_row_length</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a90850a3d006b876ba62076c80a401be1</anchor>
-      <arglist>(address_and_row_length entry)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_core_index</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>abbbbe3092321f99b294c4143a2438c5e</anchor>
-      <arglist>(extra_info extra, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_core_sum</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a5d4827066ef5e80065b7008054bd7686</anchor>
-      <arglist>(extra_info extra, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_bitfield_sum</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a4dab389e388857fd430ade234d606239</anchor>
-      <arglist>(extra_info extra, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_neuron_id</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ab08d6807fc8fd46ed5f70a8bd14a5a93</anchor>
-      <arglist>(master_population_table_entry entry, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_local_neuron_id</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a0e1b8eb97598151a700431dc6226d089</anchor>
-      <arglist>(master_population_table_entry entry, extra_info extra, spike_t spike)</arglist>
-    </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>print_master_population_table</name>
@@ -6255,18 +5840,11 @@
       <arglist>(void)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>matches</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a84c16f8e8fdf9909791cbca87e983dde</anchor>
-      <arglist>(uint32_t mp_i, uint32_t key)</arglist>
-    </member>
-    <member kind="function" static="yes">
       <type>static void</type>
       <name>print_bitfields</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ab9711943341e2f63e48945e4dfee5099</anchor>
-      <arglist>(uint32_t mp_i, uint32_t start, uint32_t end, filter_info_t *filters)</arglist>
+      <anchor>a1f7ee4914c85908186b0301d9deaba4c</anchor>
+      <arglist>(uint32_t mp_i, filter_info_t *filters)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -6284,10 +5862,17 @@
     </member>
     <member kind="function">
       <type>bool</type>
+      <name>population_table_setup</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a0b783bdc820853519d04fe41adb0b7de</anchor>
+      <arglist>(address_t table_address, uint32_t *row_max_n_words, uint32_t *master_pop_table_length, master_population_table_entry **master_pop_table, address_list_entry **address_list)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
       <name>population_table_initialise</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a5f92af4dd47e65504cbbbcb265083196</anchor>
-      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *row_max_n_words)</arglist>
+      <anchor>ac894fca012fcf12a7730d360f65e535b</anchor>
+      <arglist>(address_t table_address, address_t synapse_rows_address, uint32_t *row_max_n_words)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -6329,13 +5914,6 @@
       <name>synaptic_rows_base_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>a3808a62ff90d026b89ca198c9a503295</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>direct_rows_base_address</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a53f683b47d1883d1fe9dc988c1b6a101</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -6401,110 +5979,12 @@
       <anchor>a442bf46f572f3fc97a52421b7e1a0f87</anchor>
       <arglist></arglist>
     </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_direct_address</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a0f6729803ce65a621db8be58bfa1d972</anchor>
-      <arglist>(address_and_row_length entry)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_offset</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a30c2c744e7524091a4a2b64d231fdf4f</anchor>
-      <arglist>(address_and_row_length entry)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_address</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>aa48b23a2a333284836c0054f7113ca95</anchor>
-      <arglist>(address_and_row_length entry)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_row_length</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a90850a3d006b876ba62076c80a401be1</anchor>
-      <arglist>(address_and_row_length entry)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_core_index</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>abbbbe3092321f99b294c4143a2438c5e</anchor>
-      <arglist>(extra_info extra, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_core_sum</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a5d4827066ef5e80065b7008054bd7686</anchor>
-      <arglist>(extra_info extra, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_bitfield_sum</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a4dab389e388857fd430ade234d606239</anchor>
-      <arglist>(extra_info extra, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_neuron_id</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ab08d6807fc8fd46ed5f70a8bd14a5a93</anchor>
-      <arglist>(master_population_table_entry entry, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>get_local_neuron_id</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a0e1b8eb97598151a700431dc6226d089</anchor>
-      <arglist>(master_population_table_entry entry, extra_info extra, spike_t spike)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>print_master_population_table</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a3c2c10dcc54c9ec95a730e4c1324a2c5</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>matches</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a84c16f8e8fdf9909791cbca87e983dde</anchor>
-      <arglist>(uint32_t mp_i, uint32_t key)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>print_bitfields</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ab9711943341e2f63e48945e4dfee5099</anchor>
-      <arglist>(uint32_t mp_i, uint32_t start, uint32_t end, filter_info_t *filters)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>population_table_load_bitfields</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a4e78f94389fe12981acf2cea7e8bfe91</anchor>
-      <arglist>(filter_region_t *filter_region)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>population_table_position_in_the_master_pop_array</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ab4759e505b101d5eb919685e2bfb55b0</anchor>
-      <arglist>(spike_t spike, uint32_t *position)</arglist>
-    </member>
     <member kind="function">
       <type>bool</type>
       <name>population_table_initialise</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a5f92af4dd47e65504cbbbcb265083196</anchor>
-      <arglist>(address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *row_max_n_words)</arglist>
+      <anchor>ac894fca012fcf12a7730d360f65e535b</anchor>
+      <arglist>(address_t table_address, address_t synapse_rows_address, uint32_t *row_max_n_words)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -6593,6 +6073,12 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
+      <name>CORE_PARAMS_REGION</name>
+      <anchorfile>regions_8h.html</anchorfile>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a0d3388e5865664c61df9083946894849</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
       <name>NEURON_PARAMS_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
       <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8</anchor>
@@ -6659,9 +6145,9 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>DIRECT_MATRIX_REGION</name>
+      <name>NEURON_BUILDER_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
-      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a84d4ee5aba19d8207b0707272b24d31f</anchor>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6adfa066c343d11dbd1ec0909bad0d0319</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -6671,21 +6157,15 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>BIT_FIELD_BUILDER</name>
-      <anchorfile>regions_8h.html</anchorfile>
-      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a9fe4b33a648c41ceae6630767bb6dd2d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>BIT_FIELD_KEY_MAP</name>
-      <anchorfile>regions_8h.html</anchorfile>
-      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6ad5b5a1863e094414c5fd530f7b0c42ff</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
       <name>RECORDING_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
       <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a1fcdb0acbaceba25c8b18313a1efbcbd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>INITIAL_VALUES_REGION</name>
+      <anchorfile>regions_8h.html</anchorfile>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a1b7dad0611f796bf47478691cacd5ddd</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -6697,7 +6177,6 @@
     <includes id="population__table_8h" name="population_table.h" local="yes" imported="no">population_table/population_table.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="yes" imported="no">synapse_row.h</includes>
     <includes id="synapses_8h" name="synapses.h" local="yes" imported="no">synapses.h</includes>
-    <includes id="direct__synapses_8h" name="direct_synapses.h" local="yes" imported="no">direct_synapses.h</includes>
     <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" imported="no">structural_plasticity/synaptogenesis_dynamics.h</includes>
     <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
     <class kind="struct">dma_buffer</class>
@@ -7721,45 +7200,81 @@
     <docanchor file="synapse__row_8h.html" title="Fixed and Fixed-Plastic Regions">fixed</docanchor>
   </compound>
   <compound kind="file">
+    <name>exp_synapse_utils.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
+    <filename>exp__synapse__utils_8h.html</filename>
+    <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
+    <class kind="struct">exp_params_t</class>
+    <class kind="struct">exp_state_t</class>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>decay_and_init</name>
+      <anchorfile>exp__synapse__utils_8h.html</anchorfile>
+      <anchor>a520234c2d6b83476eb4ccd9b9d0090c6</anchor>
+      <arglist>(exp_state_t *state, exp_params_t *params, REAL time_step_ms, uint32_t n_steps_per_timestep)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>exp_shaping</name>
+      <anchorfile>exp__synapse__utils_8h.html</anchorfile>
+      <anchor>ac13fc21295ccbd585a152053e552ed18</anchor>
+      <arglist>(exp_state_t *exp_param)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>add_input_exp</name>
+      <anchorfile>exp__synapse__utils_8h.html</anchorfile>
+      <anchor>ad493be4d8ecd9a7a893225cbcf29f533</anchor>
+      <arglist>(exp_state_t *parameter, input_t input)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
     <name>synapse_types.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
     <filename>synapse__types_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
-    <member kind="typedef">
-      <type>synapse_param_t *</type>
-      <name>synapse_param_pointer_t</name>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>synapse_types_initialise</name>
       <anchorfile>synapse__types_8h.html</anchorfile>
-      <anchor>a45cfd57493ca66ddc880bd013f1022fe</anchor>
-      <arglist></arglist>
+      <anchor>a30620978a602b7a044f6aaa5880e9341</anchor>
+      <arglist>(synapse_types_t *state, synapse_types_params_t *params, uint32_t n_steps_per_time_step)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>synapse_types_save_state</name>
+      <anchorfile>synapse__types_8h.html</anchorfile>
+      <anchor>a04321df403d140de964e5c5a152fe436</anchor>
+      <arglist>(synapse_types_t *state, synapse_types_params_t *params)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_shape_input</name>
       <anchorfile>synapse__types_8h.html</anchorfile>
-      <anchor>a9252e28ec9676ec472c3128ff88c368d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>adbe3014909741294cc935642b318df74</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_add_neuron_input</name>
       <anchorfile>synapse__types_8h.html</anchorfile>
-      <anchor>aebfa05875ff9afaae47150029297e087</anchor>
-      <arglist>(index_t synapse_type_index, synapse_param_t *parameters, input_t input)</arglist>
+      <anchor>a60079a7d7261fb6e7154977cad9341dc</anchor>
+      <arglist>(index_t synapse_type_index, synapse_types_t *parameters, input_t input)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types_8h.html</anchorfile>
-      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
-      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ab345936fa750094ee2248158b958fc06</anchor>
+      <arglist>(input_t *excitatory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types_8h.html</anchorfile>
-      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
-      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ae4c225f8ba56ac8fae7c48210f46530b</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -7772,15 +7287,15 @@
       <type>static void</type>
       <name>synapse_types_print_parameters</name>
       <anchorfile>synapse__types_8h.html</anchorfile>
-      <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ac952ce9bf740864faedaf4a2c146ca7c</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_print_input</name>
       <anchorfile>synapse__types_8h.html</anchorfile>
-      <anchor>a4d26d3dff1703c07eca4dbf846a0946d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a7b7cb2cf40fadcfa990bc69cc8986640</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -7790,7 +7305,9 @@
     <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
     <class kind="struct">alpha_params_t</class>
-    <class kind="struct">synapse_param_t</class>
+    <class kind="struct">synapse_types_params_t</class>
+    <class kind="struct">alpha_state_t</class>
+    <class kind="struct">synapse_types_t</class>
     <member kind="define">
       <type>#define</type>
       <name>SYNAPSE_TYPE_BITS</name>
@@ -7842,43 +7359,43 @@
       <type>static void</type>
       <name>alpha_shaping</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a595d73638412233a14d1ac8462421c85</anchor>
-      <arglist>(alpha_params_t *a_params)</arglist>
+      <anchor>a687a789180879b2c8fe40c120cda5bb1</anchor>
+      <arglist>(alpha_state_t *a_params)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_shape_input</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a9252e28ec9676ec472c3128ff88c368d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>adbe3014909741294cc935642b318df74</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>add_input_alpha</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a6f1daf43aec061c87d2cfe8cf23ca667</anchor>
-      <arglist>(alpha_params_t *a_params, input_t input)</arglist>
+      <anchor>ad6ed5acc2d19cea1f300ca637d82716a</anchor>
+      <arglist>(alpha_state_t *a_params, input_t input)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_add_neuron_input</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>aebfa05875ff9afaae47150029297e087</anchor>
-      <arglist>(index_t synapse_type_index, synapse_param_t *parameters, input_t input)</arglist>
+      <anchor>a60079a7d7261fb6e7154977cad9341dc</anchor>
+      <arglist>(index_t synapse_type_index, synapse_types_t *parameters, input_t input)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
-      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ab345936fa750094ee2248158b958fc06</anchor>
+      <arglist>(input_t *excitatory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
-      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ae4c225f8ba56ac8fae7c48210f46530b</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -7891,15 +7408,15 @@
       <type>static void</type>
       <name>synapse_types_print_input</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a4d26d3dff1703c07eca4dbf846a0946d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a7b7cb2cf40fadcfa990bc69cc8986640</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_print_parameters</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ac952ce9bf740864faedaf4a2c146ca7c</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -7908,8 +7425,8 @@
     <filename>synapse__types__delta__impl_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
-    <class kind="struct">delta_params_t</class>
-    <class kind="struct">synapse_param_t</class>
+    <class kind="struct">synapse_types_params_t</class>
+    <class kind="struct">synapse_types_t</class>
     <member kind="define">
       <type>#define</type>
       <name>SYNAPSE_TYPE_BITS</name>
@@ -7959,45 +7476,31 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
-      <name>delta_shaping</name>
-      <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>aefa7a5c5b0733fa2e07811fc7f4bf646</anchor>
-      <arglist>(delta_params_t *delta_param)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
       <name>synapse_types_shape_input</name>
       <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>a9252e28ec9676ec472c3128ff88c368d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>add_input_delta</name>
-      <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>a4ad32bf38141af059e3de4e3d29fcb52</anchor>
-      <arglist>(delta_params_t *delta_param, input_t input)</arglist>
+      <anchor>adbe3014909741294cc935642b318df74</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_add_neuron_input</name>
       <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>aebfa05875ff9afaae47150029297e087</anchor>
-      <arglist>(index_t synapse_type_index, synapse_param_t *parameters, input_t input)</arglist>
+      <anchor>a60079a7d7261fb6e7154977cad9341dc</anchor>
+      <arglist>(index_t synapse_type_index, synapse_types_t *parameters, input_t input)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
-      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ab345936fa750094ee2248158b958fc06</anchor>
+      <arglist>(input_t *excitatory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
-      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ae4c225f8ba56ac8fae7c48210f46530b</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -8010,25 +7513,25 @@
       <type>static void</type>
       <name>synapse_types_print_input</name>
       <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>a4d26d3dff1703c07eca4dbf846a0946d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a7b7cb2cf40fadcfa990bc69cc8986640</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_print_parameters</name>
       <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ac952ce9bf740864faedaf4a2c146ca7c</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>synapse_types_dual_excitatory_exponential_impl.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
     <filename>synapse__types__dual__excitatory__exponential__impl_8h.html</filename>
-    <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
-    <class kind="struct">exp_params_t</class>
-    <class kind="struct">synapse_param_t</class>
+    <includes id="exp__synapse__utils_8h" name="exp_synapse_utils.h" local="yes" imported="no">exp_synapse_utils.h</includes>
+    <class kind="struct">synapse_types_params_t</class>
+    <class kind="struct">synapse_types_t</class>
     <member kind="define">
       <type>#define</type>
       <name>SYNAPSE_TYPE_BITS</name>
@@ -8084,45 +7587,31 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
-      <name>exp_shaping</name>
-      <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>a95a70b829aa4c8502819828a2f7e28f0</anchor>
-      <arglist>(exp_params_t *exp_param)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
       <name>synapse_types_shape_input</name>
       <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>a9252e28ec9676ec472c3128ff88c368d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>add_input_exp</name>
-      <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>a6f6553c51eb2199989cc1e7ca9f16b71</anchor>
-      <arglist>(exp_params_t *exp_param, input_t input)</arglist>
+      <anchor>adbe3014909741294cc935642b318df74</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_add_neuron_input</name>
       <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>aebfa05875ff9afaae47150029297e087</anchor>
-      <arglist>(index_t synapse_type_index, synapse_param_t *parameters, input_t input)</arglist>
+      <anchor>a60079a7d7261fb6e7154977cad9341dc</anchor>
+      <arglist>(index_t synapse_type_index, synapse_types_t *parameters, input_t input)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
-      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ab345936fa750094ee2248158b958fc06</anchor>
+      <arglist>(input_t *excitatory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
-      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ae4c225f8ba56ac8fae7c48210f46530b</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -8135,25 +7624,25 @@
       <type>static void</type>
       <name>synapse_types_print_input</name>
       <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>a4d26d3dff1703c07eca4dbf846a0946d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a7b7cb2cf40fadcfa990bc69cc8986640</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_print_parameters</name>
       <anchorfile>synapse__types__dual__excitatory__exponential__impl_8h.html</anchorfile>
-      <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ac952ce9bf740864faedaf4a2c146ca7c</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>synapse_types_exponential_impl.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
     <filename>synapse__types__exponential__impl_8h.html</filename>
-    <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
-    <class kind="struct">exp_params_t</class>
-    <class kind="struct">synapse_param_t</class>
+    <includes id="exp__synapse__utils_8h" name="exp_synapse_utils.h" local="yes" imported="no">exp_synapse_utils.h</includes>
+    <class kind="struct">synapse_types_params_t</class>
+    <class kind="struct">synapse_types_t</class>
     <member kind="define">
       <type>#define</type>
       <name>SYNAPSE_TYPE_BITS</name>
@@ -8203,45 +7692,31 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
-      <name>exp_shaping</name>
-      <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>a95a70b829aa4c8502819828a2f7e28f0</anchor>
-      <arglist>(exp_params_t *exp_param)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
       <name>synapse_types_shape_input</name>
       <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>a9252e28ec9676ec472c3128ff88c368d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>add_input_exp</name>
-      <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>a6f6553c51eb2199989cc1e7ca9f16b71</anchor>
-      <arglist>(exp_params_t *exp_param, input_t input)</arglist>
+      <anchor>adbe3014909741294cc935642b318df74</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_add_neuron_input</name>
       <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>aebfa05875ff9afaae47150029297e087</anchor>
-      <arglist>(index_t synapse_type_index, synapse_param_t *parameters, input_t input)</arglist>
+      <anchor>a60079a7d7261fb6e7154977cad9341dc</anchor>
+      <arglist>(index_t synapse_type_index, synapse_types_t *parameters, input_t input)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
-      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ab345936fa750094ee2248158b958fc06</anchor>
+      <arglist>(input_t *excitatory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
-      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ae4c225f8ba56ac8fae7c48210f46530b</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -8254,25 +7729,25 @@
       <type>static void</type>
       <name>synapse_types_print_input</name>
       <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>a4d26d3dff1703c07eca4dbf846a0946d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a7b7cb2cf40fadcfa990bc69cc8986640</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_print_parameters</name>
       <anchorfile>synapse__types__exponential__impl_8h.html</anchorfile>
-      <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ac952ce9bf740864faedaf4a2c146ca7c</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>synapse_types_semd_impl.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/synapse_types/</path>
     <filename>synapse__types__semd__impl_8h.html</filename>
-    <includes id="decay_8h" name="decay.h" local="no" imported="no">neuron/decay.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="yes" imported="no">synapse_types.h</includes>
-    <class kind="struct">exp_params_t</class>
-    <class kind="struct">synapse_param_t</class>
+    <includes id="exp__synapse__utils_8h" name="exp_synapse_utils.h" local="yes" imported="no">exp_synapse_utils.h</includes>
+    <class kind="struct">synapse_types_params_t</class>
+    <class kind="struct">synapse_types_t</class>
     <member kind="define">
       <type>#define</type>
       <name>SYNAPSE_TYPE_BITS</name>
@@ -8328,45 +7803,31 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
-      <name>exp_shaping</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a95a70b829aa4c8502819828a2f7e28f0</anchor>
-      <arglist>(exp_params_t *exp_param)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
       <name>synapse_types_shape_input</name>
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a9252e28ec9676ec472c3128ff88c368d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>add_input_exp</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a49fd1a10ec209bdebb87d116fcd8d1a9</anchor>
-      <arglist>(exp_params_t *parameter, input_t input)</arglist>
+      <anchor>adbe3014909741294cc935642b318df74</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_add_neuron_input</name>
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>acf288f16ad00e587ffe9057de91c5b4e</anchor>
-      <arglist>(index_t synapse_type_index, synapse_param_t *parameter, input_t input)</arglist>
+      <anchor>a7b40e391b3478e22e6d301eb93e4628f</anchor>
+      <arglist>(index_t synapse_type_index, synapse_types_t *parameter, input_t input)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_excitatory_input</name>
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a445fbc87ae924aa89de5d72e6841cad6</anchor>
-      <arglist>(input_t *excitatory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ab345936fa750094ee2248158b958fc06</anchor>
+      <arglist>(input_t *excitatory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static input_t *</type>
       <name>synapse_types_get_inhibitory_input</name>
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>ae4d30d854f0664fe4cef10f4ecc00831</anchor>
-      <arglist>(input_t *inhibitory_response, synapse_param_t *parameters)</arglist>
+      <anchor>ae4c225f8ba56ac8fae7c48210f46530b</anchor>
+      <arglist>(input_t *inhibitory_response, synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static const char *</type>
@@ -8379,15 +7840,15 @@
       <type>static void</type>
       <name>synapse_types_print_input</name>
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a4d26d3dff1703c07eca4dbf846a0946d</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>a7b7cb2cf40fadcfa990bc69cc8986640</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapse_types_print_parameters</name>
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a8c173175ef5d71b07f3bc7d511cc11c7</anchor>
-      <arglist>(synapse_param_t *parameters)</arglist>
+      <anchor>ac952ce9bf740864faedaf4a2c146ca7c</anchor>
+      <arglist>(synapse_types_t *parameters)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -8699,12 +8160,19 @@
     <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
     <filename>threshold__type_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <member kind="typedef">
-      <type>threshold_type_t *</type>
-      <name>threshold_type_pointer_t</name>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>threshold_type_initialise</name>
       <anchorfile>threshold__type_8h.html</anchorfile>
-      <anchor>a52fff0cbae0aee9e6dc7ad0e209511dd</anchor>
-      <arglist></arglist>
+      <anchor>a0ccf2c0ff1feb59d7843d6102a4bdfdb</anchor>
+      <arglist>(threshold_type_t *state, threshold_type_params_t *params, uint32_t n_steps_per_timestep)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>threshold_type_save_state</name>
+      <anchorfile>threshold__type_8h.html</anchorfile>
+      <anchor>a230a810f6d449075f7fc416195d4967f</anchor>
+      <arglist>(threshold_type_t *state, threshold_type_params_t *params)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -8719,6 +8187,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
     <filename>threshold__type__maass__stochastic_8h.html</filename>
     <includes id="threshold__type_8h" name="threshold_type.h" local="yes" imported="no">threshold_type.h</includes>
+    <class kind="struct">threshold_type_params_t</class>
     <class kind="struct">threshold_type_t</class>
     <member kind="define">
       <type>#define</type>
@@ -8740,6 +8209,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
     <filename>threshold__type__none_8h.html</filename>
     <includes id="threshold__type_8h" name="threshold_type.h" local="yes" imported="no">threshold_type.h</includes>
+    <class kind="struct">threshold_type_params_t</class>
     <class kind="struct">threshold_type_t</class>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -8754,6 +8224,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/threshold_types/</path>
     <filename>threshold__type__static_8h.html</filename>
     <includes id="threshold__type_8h" name="threshold_type.h" local="yes" imported="no">threshold_type.h</includes>
+    <class kind="struct">threshold_type_params_t</class>
     <class kind="struct">threshold_type_t</class>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -9051,6 +8522,8 @@
     <class kind="struct">global_parameters</class>
     <class kind="struct">poisson_extension_provenance</class>
     <class kind="struct">source_info</class>
+    <class kind="struct">source_expand_details</class>
+    <class kind="struct">source_expand_region</class>
     <class kind="struct">sdram_config</class>
     <member kind="define">
       <type>#define</type>
@@ -9117,15 +8590,15 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>TDMA_REGION</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a1b9edddb3735d131c67e9e824f07c402a3ec559988321d901a9631875c4782ba6</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
       <name>SDRAM_PARAMS_REGION</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>a1b9edddb3735d131c67e9e824f07c402a83adee9297ce4e0afe12a39cc55f4562</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>EXPANDER_REGION</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a1b9edddb3735d131c67e9e824f07c402a719368d00e2ee9a5b0e27a360ea05be4</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumeration">
@@ -9181,34 +8654,6 @@
       <arglist>(void)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void</type>
-      <name>store_provenance_data</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a6a6f18428eca2d03be2d82834e642876</anchor>
-      <arglist>(address_t provenance_region)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static spike_source_t *</type>
-      <name>get_source_data</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a271dd89ae6f3a25d49a7e2d4cb768a37</anchor>
-      <arglist>(uint32_t id)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bit_field_t</type>
-      <name>out_spikes_bitfield</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>af538c1942ccd68490d03067fae37805b</anchor>
-      <arglist>(uint32_t n)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>reset_spikes</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a6965b6994e494500e00730df56c449b5</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
       <type>static uint32_t</type>
       <name>slow_spike_source_get_time_to_spike</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
@@ -9228,6 +8673,34 @@
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>a44e2906c713931da0ee4f911361afc5f</anchor>
       <arglist>(REAL sqrt_lambda)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>set_spike_source_rate</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a8bf6651c51e0a26f22f653842a1dcba8</anchor>
+      <arglist>(uint32_t sub_id, unsigned long accum rate)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>store_provenance_data</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a6a6f18428eca2d03be2d82834e642876</anchor>
+      <arglist>(address_t provenance_region)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bit_field_t</type>
+      <name>out_spikes_bitfield</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>af538c1942ccd68490d03067fae37805b</anchor>
+      <arglist>(uint32_t n)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>reset_spikes</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a6965b6994e494500e00730df56c449b5</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9261,8 +8734,8 @@
       <type>static bool</type>
       <name>read_rates</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>af4847de2b9a2d080b0e03eabccb7308d</anchor>
-      <arglist>(source_info *sdram_sources)</arglist>
+      <anchor>a535ce144ca7eade51b6277f40d09136f</anchor>
+      <arglist>(source_info *sdram_sources, bool rate_changed, uint32_t next_time)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -9293,13 +8766,6 @@
       <arglist>(void)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>store_poisson_parameters</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>ad3f5360b39be7e95723ff26506d24fbe</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
       <type>static void</type>
       <name>mark_spike</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
@@ -9317,22 +8783,15 @@
       <type>static void</type>
       <name>process_fast_source</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a8c0f1543e08e9c0d5ea8ac638f65fdac</anchor>
-      <arglist>(index_t s_id, spike_source_t *source, uint timer_count)</arglist>
+      <anchor>ad84270695d282c5f3ed37d17b3a68d8e</anchor>
+      <arglist>(index_t s_id, spike_source_t *source)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>process_slow_source</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>ae6b1e1c0aee533b40075573aca35b72f</anchor>
-      <arglist>(index_t s_id, spike_source_t *source, uint timer_count)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>set_spike_source_rate</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a12c72782cb450237076bc0622fc90125</anchor>
-      <arglist>(uint32_t id, REAL rate)</arglist>
+      <anchor>a0133a2417f76bb17221381ed2a1e8be3</anchor>
+      <arglist>(index_t s_id, spike_source_t *source)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9356,17 +8815,17 @@
       <arglist>(void)</arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static global_parameters</type>
-      <name>ssp_params</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a3474215ce02c1bf76bceafe71ef89c7b</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
       <type>static uint32_t *</type>
       <name>keys</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>a803a94ccf2c3fa0146b8c2316fdb850a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static global_parameters</type>
+      <name>ssp_params</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a3474215ce02c1bf76bceafe71ef89c7b</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -9459,6 +8918,49 @@
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>a148ad514a3ea3af1eae2a8a354f242c2</anchor>
       <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static UREAL</type>
+      <name>ts_per_second</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a3d336819c22c6a3bcda7ba321da3741b</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>bit_field_expander.h</name>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <filename>bit__field__expander_8h.html</filename>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="no" imported="no">neuron/synapse_row.h</includes>
+    <includes id="population__table_8h" name="population_table.h" local="no" imported="no">neuron/population_table/population_table.h</includes>
+    <includes id="sp__structs_8h" name="sp_structs.h" local="no" imported="no">neuron/structural_plasticity/synaptogenesis/sp_structs.h</includes>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>do_sdram_read_and_test</name>
+      <anchorfile>bit__field__expander_8h.html</anchorfile>
+      <anchor>aae677d854d4a3416d03ae6268e268215</anchor>
+      <arglist>(synaptic_row_t row_data, synaptic_row_t row, uint32_t n_bytes_to_transfer)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>determine_redundancy</name>
+      <anchorfile>bit__field__expander_8h.html</anchorfile>
+      <anchor>a15cfb9de720808f7005d7d93f426c162</anchor>
+      <arglist>(filter_region_t *bitfield_filters)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>generate_bit_field</name>
+      <anchorfile>bit__field__expander_8h.html</anchorfile>
+      <anchor>ac4477b4a6faf287e216d3a2ba19f91ca</anchor>
+      <arglist>(filter_region_t *bitfield_filters, uint32_t *n_atom_data, void *synaptic_matrix, void *structural_matrix, pre_pop_info_table_t *pre_info, synaptic_row_t row_data)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>do_bitfield_generation</name>
+      <anchorfile>bit__field__expander_8h.html</anchorfile>
+      <anchor>a9fb8dd78e38e33e88fa72cc981744d2a</anchor>
+      <arglist>(uint32_t *n_atom_data_sdram, void *master_pop, void *synaptic_matrix, void *bitfield_filters, void *structural_matrix)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9593,15 +9095,15 @@
       <type>connection_generator_t</type>
       <name>connection_generator_init</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>a1a3c815932172e25183bbd6c237d0974</anchor>
-      <arglist>(uint32_t hash, address_t *in_region)</arglist>
+      <anchor>aa5d2850a976b1db33c19af00ad9fcc67</anchor>
+      <arglist>(uint32_t hash, void **in_region)</arglist>
     </member>
     <member kind="function">
-      <type>uint32_t</type>
+      <type>bool</type>
       <name>connection_generator_generate</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>a82fb9cd00aa5c51cdcbf97879763f28e</anchor>
-      <arglist>(connection_generator_t generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</arglist>
+      <anchor>aae17e4a6bdf077f36b078033db1c7fbe</anchor>
+      <arglist>(connection_generator_t generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -9622,12 +9124,14 @@
     <name>connection_generator.h</name>
     <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>connection__generator_8h.html</filename>
+    <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
+    <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" imported="no">matrix_generator.h</includes>
     <member kind="function">
       <type>connection_generator_t</type>
       <name>connection_generator_init</name>
       <anchorfile>connection__generator_8h.html</anchorfile>
-      <anchor>aaef4756b6809d564b87d98007f5e27a1</anchor>
-      <arglist>(uint32_t hash, address_t *region)</arglist>
+      <anchor>a48471e82d8fe492b0f961147c69477ad</anchor>
+      <arglist>(uint32_t hash, void **region)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -9637,11 +9141,11 @@
       <arglist>(connection_generator_t generator)</arglist>
     </member>
     <member kind="function">
-      <type>uint32_t</type>
+      <type>bool</type>
       <name>connection_generator_generate</name>
       <anchorfile>connection__generator_8h.html</anchorfile>
-      <anchor>a82fb9cd00aa5c51cdcbf97879763f28e</anchor>
-      <arglist>(connection_generator_t generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</arglist>
+      <anchor>aae17e4a6bdf077f36b078033db1c7fbe</anchor>
+      <arglist>(connection_generator_t generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9654,8 +9158,8 @@
       <type>static void *</type>
       <name>connection_generator_all_to_all_initialise</name>
       <anchorfile>connection__generator__all__to__all_8h.html</anchorfile>
-      <anchor>a8d9ed83bb1525d9746415cc0006b4766</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>ac150b0e8c557463d42d6e39a06ef0109</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9665,11 +9169,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static uint32_t</type>
+      <type>static bool</type>
       <name>connection_generator_all_to_all_generate</name>
       <anchorfile>connection__generator__all__to__all_8h.html</anchorfile>
-      <anchor>af4d7356915b9d9c671b2acaadde00d12</anchor>
-      <arglist>(void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</arglist>
+      <anchor>af13222b82326b2caa582ee2b216252de</anchor>
+      <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9683,8 +9187,8 @@
       <type>static void *</type>
       <name>connection_generator_fixed_post_initialise</name>
       <anchorfile>connection__generator__fixed__post_8h.html</anchorfile>
-      <anchor>af300d7d4f64b41abc443edefe98a8958</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>ab972e5eab0e6d68f74814835f11a3e90</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9697,15 +9201,15 @@
       <type>static uint32_t</type>
       <name>post_random_in_range</name>
       <anchorfile>connection__generator__fixed__post_8h.html</anchorfile>
-      <anchor>ae08cfcb6c50855844e811f8bec2eacbf</anchor>
-      <arglist>(struct fixed_post *obj, uint32_t range)</arglist>
+      <anchor>a379e0e6995c258b9d2944d38f5bc3f6e</anchor>
+      <arglist>(rng_t *rng, uint32_t range)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static uint32_t</type>
+      <type>static bool</type>
       <name>connection_generator_fixed_post_generate</name>
       <anchorfile>connection__generator__fixed__post_8h.html</anchorfile>
-      <anchor>ab2e91f8df6e9d90fbd9028a6ff1c0964</anchor>
-      <arglist>(void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</arglist>
+      <anchor>a7d6fda536e854ee9bab7178fd773b5a9</anchor>
+      <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9715,20 +9219,19 @@
     <includes id="rng_8h" name="rng.h" local="no" imported="no">synapse_expander/rng.h</includes>
     <class kind="struct">fixed_pre_params</class>
     <class kind="struct">fixed_pre</class>
-    <class kind="struct">fixed_pre_globals_t</class>
     <member kind="function" static="yes">
       <type>static uint32_t</type>
       <name>pre_random_in_range</name>
       <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
-      <anchor>a54a7a66e8fd8c26ab3c07eba79adec9b</anchor>
-      <arglist>(struct fixed_pre *obj, uint32_t range)</arglist>
+      <anchor>aa37d4d25b55098b93af4cf67d51a6911</anchor>
+      <arglist>(rng_t *rng, uint32_t range)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void *</type>
       <name>connection_generator_fixed_pre_initialise</name>
       <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
-      <anchor>abe6fe758cca3bdf0ec27a3aef98d535a</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a2a24dde6dfff07d8fc2698d7e6d34674</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -9738,18 +9241,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function">
-      <type>uint32_t</type>
+      <type>bool</type>
       <name>connection_generator_fixed_pre_generate</name>
       <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
-      <anchor>a935e1c46d26b5ce26a6abaefc0fc004c</anchor>
-      <arglist>(void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static struct fixed_pre_globals_t</type>
-      <name>fixed_pre_globals</name>
-      <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
-      <anchor>a41013d6c3210c085c7880db23bbcb53e</anchor>
-      <arglist></arglist>
+      <anchor>a7451194e2c09026732c5d82654c8120c</anchor>
+      <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9764,8 +9260,8 @@
       <type>static void *</type>
       <name>connection_generator_fixed_prob_initialise</name>
       <anchorfile>connection__generator__fixed__prob_8h.html</anchorfile>
-      <anchor>a6436406b7bd4c57206d0491c42e62f2e</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a00bb7467e04e5ec9d4386b74ed43beba</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9775,11 +9271,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static uint32_t</type>
+      <type>static bool</type>
       <name>connection_generator_fixed_prob_generate</name>
       <anchorfile>connection__generator__fixed__prob_8h.html</anchorfile>
-      <anchor>a7b905731d8c7fa5fafc3dfed1992b4f5</anchor>
-      <arglist>(void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</arglist>
+      <anchor>ac8b2f5a508831466425f0f0967a30604</anchor>
+      <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9794,8 +9290,8 @@
       <type>static void *</type>
       <name>connection_generator_fixed_total_initialise</name>
       <anchorfile>connection__generator__fixed__total_8h.html</anchorfile>
-      <anchor>a97f78806add1b87f56c6c852906a7cdd</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a60c12da86242faaf32bdaa43a164fa04</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9805,25 +9301,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>binomial</name>
-      <anchorfile>connection__generator__fixed__total_8h.html</anchorfile>
-      <anchor>a1f0a769498290639dfc184f29e18de1c</anchor>
-      <arglist>(uint32_t n, uint32_t N, uint32_t K, rng_t rng)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>hypergeom</name>
-      <anchorfile>connection__generator__fixed__total_8h.html</anchorfile>
-      <anchor>a081ce5ff6a9e874943fc38e9815afa34</anchor>
-      <arglist>(uint32_t n, uint32_t N, uint32_t K, rng_t rng)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
+      <type>static bool</type>
       <name>connection_generator_fixed_total_generate</name>
       <anchorfile>connection__generator__fixed__total_8h.html</anchorfile>
-      <anchor>a1c9a7660e7c8a2f2b89d837ff908e1f0</anchor>
-      <arglist>(void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</arglist>
+      <anchor>a5326514456754b8f06dfff55a3d4ee7a</anchor>
+      <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9838,8 +9320,8 @@
       <type>static void *</type>
       <name>connection_generator_kernel_initialise</name>
       <anchorfile>connection__generator__kernel_8h.html</anchorfile>
-      <anchor>ab16e17812b60db23d3d20cbfe6658bf6</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>aa8f0e149c087998c5d16ca12598785ca</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9849,11 +9331,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static uint32_t</type>
+      <type>static bool</type>
       <name>connection_generator_kernel_generate</name>
       <anchorfile>connection__generator__kernel_8h.html</anchorfile>
-      <anchor>a12d662122a5300d729a5266a3736becf</anchor>
-      <arglist>(void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</arglist>
+      <anchor>a9d2040bb7df48fbe84c9ce51256964a3</anchor>
+      <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -9861,13 +9343,12 @@
     <path>/github/workspace/neural_modelling/src/synapse_expander/connection_generators/</path>
     <filename>connection__generator__one__to__one_8h.html</filename>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
-    <class kind="struct">one_to_one</class>
     <member kind="function" static="yes">
       <type>static void *</type>
       <name>connection_generator_one_to_one_initialise</name>
       <anchorfile>connection__generator__one__to__one_8h.html</anchorfile>
-      <anchor>aacacd3d03b90bd854ba61a48097b0e97</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a65db4882285a7d23efb818a6716f2ef3</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9877,49 +9358,19 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static uint32_t</type>
+      <type>static bool</type>
       <name>connection_generator_one_to_one_generate</name>
       <anchorfile>connection__generator__one__to__one_8h.html</anchorfile>
-      <anchor>afa595e91deb02bd7ae09d16c0cd3d1de</anchor>
-      <arglist>(void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</arglist>
-    </member>
-  </compound>
-  <compound kind="file">
-    <name>delay_expander.c</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
-    <filename>delay__expander_8c.html</filename>
-    <includes id="connection__generator_8h" name="connection_generator.h" local="yes" imported="no">connection_generator.h</includes>
-    <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
-    <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" imported="no">matrix_generators/matrix_generator_common.h</includes>
-    <includes id="common__mem_8h" name="common_mem.h" local="yes" imported="no">common_mem.h</includes>
-    <includes id="delay__extension_8h" name="delay_extension.h" local="no" imported="no">delay_extension/delay_extension.h</includes>
-    <class kind="struct">delay_builder_config</class>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>read_delay_builder_region</name>
-      <anchorfile>delay__expander_8c.html</anchorfile>
-      <anchor>ae335350371ddbd7a0c4da33ab032fcd5</anchor>
-      <arglist>(address_t *in_region, bit_field_t *neuron_delay_stage_config, uint32_t pre_slice_start, uint32_t pre_slice_count)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>run_delay_expander</name>
-      <anchorfile>delay__expander_8c.html</anchorfile>
-      <anchor>ab8e8cac1b4ebc8d1fd0d665b9639988e</anchor>
-      <arglist>(void *delay_params_address, address_t params_address)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>c_main</name>
-      <anchorfile>delay__expander_8c.html</anchorfile>
-      <anchor>aa14f4f1d4c84183b7bf7108bf930a23c</anchor>
-      <arglist>(void)</arglist>
+      <anchor>a0995920e464679529f2a804431341768</anchor>
+      <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>generator_types.h</name>
     <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>generator__types_8h.html</filename>
+    <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
+    <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" imported="no">matrix_generator.h</includes>
     <member kind="typedef">
       <type>uint32_t</type>
       <name>generator_hash_t</name>
@@ -9929,10 +9380,24 @@
     </member>
     <member kind="typedef">
       <type>void *()</type>
-      <name>initialize_func</name>
+      <name>initialize_param_func</name>
       <anchorfile>generator__types_8h.html</anchorfile>
-      <anchor>a2eba3e6d9fed26ac5064e720ceed0f91</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a0a50a2e28c5d94827d681367fb6930f8</anchor>
+      <arglist>(void **region)</arglist>
+    </member>
+    <member kind="typedef">
+      <type>void *()</type>
+      <name>initialize_connector_func</name>
+      <anchorfile>generator__types_8h.html</anchorfile>
+      <anchor>aa2bb0f66f4f24dc4e04b844f1b8c8453</anchor>
+      <arglist>(void **region)</arglist>
+    </member>
+    <member kind="typedef">
+      <type>void *()</type>
+      <name>initialize_matrix_func</name>
+      <anchorfile>generator__types_8h.html</anchorfile>
+      <anchor>a5cbf8d694bdaf766029ecedfa941d5a5</anchor>
+      <arglist>(void **region, void *synaptic_matrix)</arglist>
     </member>
     <member kind="typedef">
       <type>void()</type>
@@ -9942,25 +9407,39 @@
       <arglist>(void *data)</arglist>
     </member>
     <member kind="typedef">
-      <type>uint32_t()</type>
-      <name>generate_connection_func</name>
-      <anchorfile>generator__types_8h.html</anchorfile>
-      <anchor>a074270ea0663c44b9bcc392c1fcb935e</anchor>
-      <arglist>(void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</arglist>
-    </member>
-    <member kind="typedef">
-      <type>void()</type>
+      <type>accum()</type>
       <name>generate_param_func</name>
       <anchorfile>generator__types_8h.html</anchorfile>
-      <anchor>a776082247e99447649d185bdd6b8f777</anchor>
-      <arglist>(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</arglist>
+      <anchor>aeb13a16410f550a8620d9db733b00114</anchor>
+      <arglist>(void *generator)</arglist>
     </member>
     <member kind="typedef">
-      <type>void()</type>
-      <name>generate_row_func</name>
+      <type>bool()</type>
+      <name>write_synapse_func</name>
       <anchorfile>generator__types_8h.html</anchorfile>
-      <anchor>a8d1b332d6f35a47155fc48aabebeaf80</anchor>
-      <arglist>(void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_in_a_stage)</arglist>
+      <anchor>a2ddfc8a6851657caf368b43e958e7cdf</anchor>
+      <arglist>(void *generator, uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay, unsigned long accum weight_scale)</arglist>
+    </member>
+    <member kind="typedef">
+      <type>bool()</type>
+      <name>generate_connection_func</name>
+      <anchorfile>generator__types_8h.html</anchorfile>
+      <anchor>ae7498b5ac57ed8c5279e034819ae4c3f</anchor>
+      <arglist>(void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t matrix_generator)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint16_t</type>
+      <name>rescale_delay</name>
+      <anchorfile>generator__types_8h.html</anchorfile>
+      <anchor>abe727a061d0165e4205bb2764711e760</anchor>
+      <arglist>(accum delay, accum timestep_per_delay)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint16_t</type>
+      <name>rescale_weight</name>
+      <anchorfile>generator__types_8h.html</anchorfile>
+      <anchor>a5ee0662d7b826e8ba7abfa68bbe6a327</anchor>
+      <arglist>(accum weight, unsigned long accum weight_scale)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10003,8 +9482,8 @@
       <type>matrix_generator_t</type>
       <name>matrix_generator_init</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>a9539b11486e767ca5114db0390a505a1</anchor>
-      <arglist>(uint32_t hash, address_t *in_region)</arglist>
+      <anchor>a1251737c3f53736fac48f2f91f1b082e</anchor>
+      <arglist>(uint32_t hash, void **in_region, void *synaptic_matrix)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -10013,33 +9492,12 @@
       <anchor>aafbab40316b9861d41999287c65d1dbe</anchor>
       <arglist>(matrix_generator_t generator)</arglist>
     </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>matrix_generator_write_row</name>
-      <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>a94ef2f50254210f92e2d2ea5d85c486d</anchor>
-      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_per_stage)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint16_t</type>
-      <name>rescale_delay</name>
-      <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>abe727a061d0165e4205bb2764711e760</anchor>
-      <arglist>(accum delay, accum timestep_per_delay)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint16_t</type>
-      <name>rescale_weight</name>
-      <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>a5ee0662d7b826e8ba7abfa68bbe6a327</anchor>
-      <arglist>(accum weight, unsigned long accum weight_scale)</arglist>
-    </member>
     <member kind="function">
       <type>bool</type>
-      <name>matrix_generator_generate</name>
+      <name>matrix_generator_write_synapse</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>a0830f8d698bd7251d62c094a41d9d160</anchor>
-      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, unsigned long accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, uint32_t max_delay_in_a_stage, accum timestep_per_delay)</arglist>
+      <anchor>a7d0ab0ac823dba9d0d1bfaa5304d4fda</anchor>
+      <arglist>(matrix_generator_t generator, uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay, unsigned long accum weight_scale)</arglist>
     </member>
     <member kind="variable" static="yes">
       <type>static const struct matrix_generator_info</type>
@@ -10053,14 +9511,12 @@
     <name>matrix_generator.h</name>
     <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>matrix__generator_8h.html</filename>
-    <includes id="connection__generator_8h" name="connection_generator.h" local="yes" imported="no">connection_generator.h</includes>
-    <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
     <member kind="function">
       <type>matrix_generator_t</type>
       <name>matrix_generator_init</name>
       <anchorfile>matrix__generator_8h.html</anchorfile>
-      <anchor>a2ad0747490f9e777226c0508f7c670af</anchor>
-      <arglist>(uint32_t hash, address_t *region)</arglist>
+      <anchor>a8fbcc0eb851d4f4ba5952ba9e3459e93</anchor>
+      <arglist>(uint32_t hash, void **region, void *synaptic_matrix)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -10071,10 +9527,10 @@
     </member>
     <member kind="function">
       <type>bool</type>
-      <name>matrix_generator_generate</name>
+      <name>matrix_generator_write_synapse</name>
       <anchorfile>matrix__generator_8h.html</anchorfile>
-      <anchor>a3a75ff58588bafc87d46b933290ba3e1</anchor>
-      <arglist>(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, unsigned long accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, uint32_t max_delay_per_stage, accum timestep_per_delay)</arglist>
+      <anchor>a7d0ab0ac823dba9d0d1bfaa5304d4fda</anchor>
+      <arglist>(matrix_generator_t generator, uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay, unsigned long accum weight_scale)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10082,12 +9538,33 @@
     <path>/github/workspace/neural_modelling/src/synapse_expander/matrix_generators/</path>
     <filename>matrix__generator__common_8h.html</filename>
     <class kind="struct">delay_value</class>
+    <member kind="define">
+      <type>#define</type>
+      <name>N_HEADER_WORDS</name>
+      <anchorfile>matrix__generator__common_8h.html</anchorfile>
+      <anchor>a04acf43728100eca08ffab028792301a</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="function" static="yes">
       <type>static struct delay_value</type>
       <name>get_delay</name>
       <anchorfile>matrix__generator__common_8h.html</anchorfile>
       <anchor>a70d02afe8081b6ed99856fe4594e88e8</anchor>
       <arglist>(uint16_t delay_value, uint32_t max_stage, uint32_t max_delay_per_stage)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void *</type>
+      <name>get_row</name>
+      <anchorfile>matrix__generator__common_8h.html</anchorfile>
+      <anchor>a59540be417d878df2430b21bad1eb91c</anchor>
+      <arglist>(uint32_t *synaptic_matrix, uint32_t max_row_n_words, uint32_t pre_index)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void *</type>
+      <name>get_delay_row</name>
+      <anchorfile>matrix__generator__common_8h.html</anchorfile>
+      <anchor>adbffbf3c44823b700f697d2bb4df627b</anchor>
+      <arglist>(uint32_t *delayed_synaptic_matrix, uint32_t max_delayed_row_n_words, uint32_t pre_index, uint32_t delay_stage, uint32_t n_pre_neurons_per_core, uint32_t max_delay_stage, uint32_t n_pre_neurons)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10100,12 +9577,34 @@
     <class kind="struct">matrix_generator_neuromodulation</class>
     <class kind="struct">row_nm_plastic_t</class>
     <class kind="struct">row_nm_fixed_t</class>
+    <class kind="union">matrix_generator_neuromodulation.__unnamed19__</class>
+    <member kind="function" static="yes">
+      <type>static row_nm_plastic_t *</type>
+      <name>get_nm_row</name>
+      <anchorfile>matrix__generator__neuromodulation_8h.html</anchorfile>
+      <anchor>adb49a447e52dc2d7f8bd96b5003ad5b7</anchor>
+      <arglist>(uint32_t *synaptic_matrix, uint32_t max_row_n_words, uint32_t pre_index)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static row_nm_fixed_t *</type>
+      <name>get_nm_fixed_row</name>
+      <anchorfile>matrix__generator__neuromodulation_8h.html</anchorfile>
+      <anchor>a67543bac5ac231c0f3ac6897b4eebab4</anchor>
+      <arglist>(row_nm_plastic_t *plastic_row)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>setup_nm_rows</name>
+      <anchorfile>matrix__generator__neuromodulation_8h.html</anchorfile>
+      <anchor>aac7b4d7aaf8b502f118972ae9bdb0bef</anchor>
+      <arglist>(uint32_t *matrix, uint32_t n_rows, uint32_t max_row_n_words, uint32_t is_reward, uint32_t synapse_type)</arglist>
+    </member>
     <member kind="function">
       <type>void *</type>
       <name>matrix_generator_neuromodulation_initialize</name>
       <anchorfile>matrix__generator__neuromodulation_8h.html</anchorfile>
-      <anchor>ae7544b10515464b4d4cb92537bd08eb6</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>af0f41945cb7bccb10b7013198aeb35fc</anchor>
+      <arglist>(void **region, void *synaptic_matrix)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -10123,6 +9622,9 @@
     <includes id="matrix__generator__common_8h" name="matrix_generator_common.h" local="yes" imported="no">matrix_generator_common.h</includes>
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">static_row_t</class>
+    <class kind="struct">matrix_genetator_static_data_t</class>
+    <class kind="union">matrix_genetator_static_data_t.__unnamed21__</class>
+    <class kind="union">matrix_genetator_static_data_t.__unnamed23__</class>
     <member kind="define">
       <type>#define</type>
       <name>SYNAPSE_WEIGHT_SHIFT</name>
@@ -10138,18 +9640,11 @@
       <arglist></arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void *</type>
-      <name>matrix_generator_static_initialize</name>
-      <anchorfile>matrix__generator__static_8h.html</anchorfile>
-      <anchor>a34e736f14eb0b8aa28b50e8b1d053acf</anchor>
-      <arglist>(address_t *region)</arglist>
-    </member>
-    <member kind="function" static="yes">
       <type>static void</type>
-      <name>matrix_generator_static_free</name>
+      <name>setup_rows</name>
       <anchorfile>matrix__generator__static_8h.html</anchorfile>
-      <anchor>a21c6ce388b821caaa1268c3d6abb9ef1</anchor>
-      <arglist>(void *generator)</arglist>
+      <anchor>ad8a76e9758256ce53a6f257964452086</anchor>
+      <arglist>(uint32_t *matrix, uint32_t n_rows, uint32_t max_row_n_words)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static uint32_t</type>
@@ -10159,11 +9654,25 @@
       <arglist>(uint16_t weight, uint16_t delay, uint32_t type, uint16_t post_index, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t delay_bits)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void</type>
-      <name>matrix_generator_static_write_row</name>
+      <type>static void *</type>
+      <name>matrix_generator_static_initialize</name>
       <anchorfile>matrix__generator__static_8h.html</anchorfile>
-      <anchor>a03d500a7b238275b5b5a32fd32ff6f80</anchor>
-      <arglist>(void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_per_stage)</arglist>
+      <anchor>ad86e9c4ee5ed8c51f49ef84a9715a065</anchor>
+      <arglist>(void **region, void *synaptic_matrix)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>matrix_generator_static_free</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a21c6ce388b821caaa1268c3d6abb9ef1</anchor>
+      <arglist>(void *generator)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>matrix_generator_static_write_synapse</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a158569634b57155a6c5b62e4cb782979</anchor>
+      <arglist>(void *generator, uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay, unsigned long accum weight_scale)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10175,20 +9684,29 @@
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">row_plastic_t</class>
     <class kind="struct">row_fixed_t</class>
-    <class kind="struct">matrix_generator_stdp</class>
-    <member kind="function">
-      <type>void *</type>
-      <name>matrix_generator_stdp_initialize</name>
+    <class kind="struct">matrix_generator_stdp_data_t</class>
+    <class kind="union">matrix_generator_stdp_data_t.__unnamed25__</class>
+    <class kind="union">matrix_generator_stdp_data_t.__unnamed27__</class>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>plastic_half_words</name>
       <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>a0ddb143edd7818571ecf6ccb2d22abb9</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a3a5ed9ae80176b92497373cd16a53989</anchor>
+      <arglist>(uint32_t n_half_words_per_pp_header, uint32_t n_half_words_per_pp_synapse, uint32_t max_row_n_synapses)</arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
-      <name>matrix_generator_stdp_free</name>
+    <member kind="function" static="yes">
+      <type>static row_fixed_t *</type>
+      <name>get_stdp_fixed_row</name>
       <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>aa0ccbf6127b7bd9ba00efc3ba17373e9</anchor>
-      <arglist>(void *generator)</arglist>
+      <anchor>a7fd79284f87d27ffb21c99534d6b8156</anchor>
+      <arglist>(row_plastic_t *plastic_row, uint32_t n_half_words_per_pp_header, uint32_t n_half_words_per_pp_synapse, uint32_t max_row_n_synapses)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>setup_stdp_rows</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a730440b766c56973dcde444c94792da1</anchor>
+      <arglist>(uint32_t *matrix, uint32_t n_rows, uint32_t n_half_words_per_pp_header, uint32_t n_half_words_per_pp_synapse, uint32_t max_row_n_synapses, uint32_t max_row_n_words)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static uint16_t</type>
@@ -10198,11 +9716,92 @@
       <arglist>(uint16_t delay, uint32_t type, uint32_t post_index, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t delay_bits)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
-      <name>matrix_generator_stdp_write_row</name>
+      <type>void *</type>
+      <name>matrix_generator_stdp_initialize</name>
       <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>a7e08d07102afbb52373e761318380e97</anchor>
-      <arglist>(void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_per_stage)</arglist>
+      <anchor>a06a33655a1c01edaf72f5d4403608823</anchor>
+      <arglist>(void **region, void *synaptic_matrix)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>matrix_generator_stdp_free</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>aa0ccbf6127b7bd9ba00efc3ba17373e9</anchor>
+      <arglist>(void *generator)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>matrix_generator_stdp_write_synapse</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>aa7dc79c13959aa923b5193e825048565</anchor>
+      <arglist>(void *generator, uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay, unsigned long accum weight_scale)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>neuron_expander.c</name>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <filename>neuron__expander_8c.html</filename>
+    <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
+    <includes id="rng_8h" name="rng.h" local="yes" imported="no">rng.h</includes>
+    <includes id="type__writers_8h" name="type_writers.h" local="yes" imported="no">type_writers.h</includes>
+    <includes id="common__mem_8h" name="common_mem.h" local="yes" imported="no">common_mem.h</includes>
+    <class kind="struct">neuron_param_item_t</class>
+    <class kind="struct">neuron_param_t</class>
+    <class kind="struct">neuron_params_struct_t</class>
+    <class kind="struct">sdram_variable_recording_data_t</class>
+    <class kind="struct">sdram_bitfield_recording_data_t</class>
+    <class kind="struct">recording_index_t</class>
+    <class kind="struct">variable_recording_t</class>
+    <class kind="struct">bitfield_recording_t</class>
+    <class kind="struct">recording_params_t</class>
+    <member kind="define">
+      <type>#define</type>
+      <name>FLOOR_TO_2</name>
+      <anchorfile>neuron__expander_8c.html</anchorfile>
+      <anchor>a403b173ad583ec922758a7edc380fa3c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>CEIL_TO_2</name>
+      <anchorfile>neuron__expander_8c.html</anchorfile>
+      <anchor>aa2d4795fc5236852254c8bebccde5764</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>read_struct_builder_region</name>
+      <anchorfile>neuron__expander_8c.html</anchorfile>
+      <anchor>aef4672e3d943cabed294c6a5faa1c674</anchor>
+      <arglist>(void **region, void **neuron_params_region, uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>run_neuron_expander</name>
+      <anchorfile>neuron__expander_8c.html</anchorfile>
+      <anchor>a7aed94e2eb1e4c346934267636aa6008</anchor>
+      <arglist>(data_specification_metadata_t *ds_regions, void *params_address)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>c_main</name>
+      <anchorfile>neuron__expander_8c.html</anchorfile>
+      <anchor>aa14f4f1d4c84183b7bf7108bf930a23c</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="variable">
+      <type>rng_t *</type>
+      <name>population_rng</name>
+      <anchorfile>neuron__expander_8c.html</anchorfile>
+      <anchor>aa5d23a2beb618420408ca4853051f042</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>rng_t *</type>
+      <name>core_rng</name>
+      <anchorfile>neuron__expander_8c.html</anchorfile>
+      <anchor>a5ca5c820c3873b51d8ca1ad0d35eb075</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10217,70 +9816,63 @@
     <includes id="param__generator__normal__clipped_8h" name="param_generator_normal_clipped.h" local="yes" imported="no">param_generators/param_generator_normal_clipped.h</includes>
     <includes id="param__generator__normal__clipped__to__boundary_8h" name="param_generator_normal_clipped_to_boundary.h" local="yes" imported="no">param_generators/param_generator_normal_clipped_to_boundary.h</includes>
     <includes id="param__generator__exponential_8h" name="param_generator_exponential.h" local="yes" imported="no">param_generators/param_generator_exponential.h</includes>
-    <includes id="param__generator__kernel_8h" name="param_generator_kernel.h" local="yes" imported="no">param_generators/param_generator_kernel.h</includes>
     <class kind="struct">param_generator_info</class>
     <class kind="struct">param_generator</class>
     <member kind="enumvalue">
       <name>CONSTANT</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a6b7b47dd702d9e331586d485013fd1eaa83972670b57415508523b5641bb46116</anchor>
+      <anchor>a5d76b81b0ad4c19007a781d4edb8181fa83972670b57415508523b5641bb46116</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>UNIFORM</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a6b7b47dd702d9e331586d485013fd1eaa8f44784d154005a214e0fe94119d28ef</anchor>
+      <anchor>a5d76b81b0ad4c19007a781d4edb8181fa8f44784d154005a214e0fe94119d28ef</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a6b7b47dd702d9e331586d485013fd1eaa50d1448013c6f17125caee18aa418af7</anchor>
+      <anchor>a5d76b81b0ad4c19007a781d4edb8181fa50d1448013c6f17125caee18aa418af7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL_CLIPPED</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a6b7b47dd702d9e331586d485013fd1eaac40cefd2a096660da3f41d6ee6352889</anchor>
+      <anchor>a5d76b81b0ad4c19007a781d4edb8181fac40cefd2a096660da3f41d6ee6352889</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL_CLIPPED_BOUNDARY</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a6b7b47dd702d9e331586d485013fd1eaaca06c44d4221f47f9d61534ca1e35752</anchor>
+      <anchor>a5d76b81b0ad4c19007a781d4edb8181faca06c44d4221f47f9d61534ca1e35752</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>EXPONENTIAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a6b7b47dd702d9e331586d485013fd1eaaa6055a3a8ab1aed0594419b51d9ec15e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>KERNEL</name>
-      <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a6b7b47dd702d9e331586d485013fd1eaa53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <anchor>a5d76b81b0ad4c19007a781d4edb8181faa6055a3a8ab1aed0594419b51d9ec15e</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_PARAM_GENERATORS</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a6b7b47dd702d9e331586d485013fd1eaab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
+      <anchor>a5d76b81b0ad4c19007a781d4edb8181fab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
       <type>param_generator_t</type>
       <name>param_generator_init</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>ae52a45690f00dfe7384a14645b3512de</anchor>
-      <arglist>(uint32_t hash, address_t *in_region)</arglist>
+      <anchor>adbbfc064d4b66fdcb5738b2a0852dd21</anchor>
+      <arglist>(uint32_t hash, void **in_region)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>accum</type>
       <name>param_generator_generate</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>ae85e6c376848da24228c97141d0d2027</anchor>
-      <arglist>(param_generator_t generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</arglist>
+      <anchor>afef726e38862303036b706f63cb5408d</anchor>
+      <arglist>(param_generator_t generator)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -10305,15 +9897,15 @@
       <type>param_generator_t</type>
       <name>param_generator_init</name>
       <anchorfile>param__generator_8h.html</anchorfile>
-      <anchor>a7f47aef417cd5ec8cf73a199d71dced2</anchor>
-      <arglist>(uint32_t hash, address_t *region)</arglist>
+      <anchor>aa8fc0d4f24db6ca96094f0aed98867cc</anchor>
+      <arglist>(uint32_t hash, void **region)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>accum</type>
       <name>param_generator_generate</name>
       <anchorfile>param__generator_8h.html</anchorfile>
-      <anchor>ae85e6c376848da24228c97141d0d2027</anchor>
-      <arglist>(param_generator_t generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</arglist>
+      <anchor>afef726e38862303036b706f63cb5408d</anchor>
+      <arglist>(param_generator_t generator)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -10333,8 +9925,8 @@
       <type>static void *</type>
       <name>param_generator_constant_initialize</name>
       <anchorfile>param__generator__constant_8h.html</anchorfile>
-      <anchor>a52720c983e24979540f5cf27d02b0c14</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a34e2ca57f5ca02c366171d011ce929a8</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -10344,11 +9936,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void</type>
+      <type>static accum</type>
       <name>param_generator_constant_generate</name>
       <anchorfile>param__generator__constant_8h.html</anchorfile>
-      <anchor>a22265a38730d1027e422da52c55b1925</anchor>
-      <arglist>(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</arglist>
+      <anchor>a77b1ea38243a82710e7a32d1ff1c1298</anchor>
+      <arglist>(void *generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10363,8 +9955,8 @@
       <type>static void *</type>
       <name>param_generator_exponential_initialize</name>
       <anchorfile>param__generator__exponential_8h.html</anchorfile>
-      <anchor>a518b5f87123dff22dbf32caeebf3bd62</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a91fcc830218bf9d51c08110a9ba370c0</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -10374,42 +9966,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void</type>
+      <type>static accum</type>
       <name>param_generator_exponential_generate</name>
       <anchorfile>param__generator__exponential_8h.html</anchorfile>
-      <anchor>a35c790b036e9fe9d1fa56d6f73481253</anchor>
-      <arglist>(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</arglist>
-    </member>
-  </compound>
-  <compound kind="file">
-    <name>param_generator_kernel.h</name>
-    <path>/github/workspace/neural_modelling/src/synapse_expander/param_generators/</path>
-    <filename>param__generator__kernel_8h.html</filename>
-    <includes id="common__kernel_8h" name="common_kernel.h" local="no" imported="no">synapse_expander/common_kernel.h</includes>
-    <includes id="common__mem_8h" name="common_mem.h" local="no" imported="no">synapse_expander/common_mem.h</includes>
-    <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
-    <class kind="struct">param_generator_kernel</class>
-    <class kind="struct">all_kernel_params</class>
-    <member kind="function" static="yes">
-      <type>static void *</type>
-      <name>param_generator_kernel_initialize</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a39733ff7b8e93862022624d1677e64d2</anchor>
-      <arglist>(address_t *region)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>param_generator_kernel_free</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a0e39efa09a5e7eaf0d1176854c932da0</anchor>
+      <anchor>a0b7052da706984ea9afd03182b04db9e</anchor>
       <arglist>(void *generator)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>param_generator_kernel_generate</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>ae8923c53570bb39fb37da751c4bc54e9</anchor>
-      <arglist>(void *generator, uint32_t n_synapses, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10424,8 +9985,8 @@
       <type>static void *</type>
       <name>param_generator_normal_initialize</name>
       <anchorfile>param__generator__normal_8h.html</anchorfile>
-      <anchor>ae437fca279630eb531de2055d33384d8</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>af7e93833ca106d2e4ee06afdb8924b2e</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -10435,11 +9996,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void</type>
+      <type>static accum</type>
       <name>param_generator_normal_generate</name>
       <anchorfile>param__generator__normal_8h.html</anchorfile>
-      <anchor>aab67db27d60f95cb89f416f5437337fa</anchor>
-      <arglist>(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</arglist>
+      <anchor>ab4675e8a38c5ceb893c1bfeb9855d674</anchor>
+      <arglist>(void *generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10461,8 +10022,8 @@
       <type>static void *</type>
       <name>param_generator_normal_clipped_initialize</name>
       <anchorfile>param__generator__normal__clipped_8h.html</anchorfile>
-      <anchor>a2e7a19b44cf70f55ce523967c2ebe963</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a54344636f79eebf5c8a0b38679ea7fb6</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -10472,11 +10033,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void</type>
+      <type>static accum</type>
       <name>param_generator_normal_clipped_generate</name>
       <anchorfile>param__generator__normal__clipped_8h.html</anchorfile>
-      <anchor>aee9da23a6c9386207ef4aa389c193465</anchor>
-      <arglist>(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</arglist>
+      <anchor>a2689af6a3a0e75893cb57cbb0f9225a3</anchor>
+      <arglist>(void *generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10491,8 +10052,8 @@
       <type>static void *</type>
       <name>param_generator_normal_clipped_boundary_initialize</name>
       <anchorfile>param__generator__normal__clipped__to__boundary_8h.html</anchorfile>
-      <anchor>aea1249b5291999b5c20957a84794d52f</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a19fd62d85e662f61ecd668f505c7440d</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -10502,11 +10063,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void</type>
+      <type>static accum</type>
       <name>param_generator_normal_clipped_boundary_generate</name>
       <anchorfile>param__generator__normal__clipped__to__boundary_8h.html</anchorfile>
-      <anchor>a4fc1e0ce8a65ceece5bd4692dfc3571f</anchor>
-      <arglist>(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</arglist>
+      <anchor>ab66a10e3ada868e5462a6b67c3c81d6d</anchor>
+      <arglist>(void *generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10521,8 +10082,8 @@
       <type>static void *</type>
       <name>param_generator_uniform_initialize</name>
       <anchorfile>param__generator__uniform_8h.html</anchorfile>
-      <anchor>aa98cee205ae39374662b092fc83c7f43</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>aa8b841fdabac07eeeb5f89ca3c43f789</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -10532,11 +10093,11 @@
       <arglist>(void *generator)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void</type>
+      <type>static accum</type>
       <name>param_generator_uniform_generate</name>
       <anchorfile>param__generator__uniform_8h.html</anchorfile>
-      <anchor>ae052c5aefd98b10fb363a5baf6ba0b00</anchor>
-      <arglist>(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</arglist>
+      <anchor>a2b29e827b33797b652c59eb606a042b5</anchor>
+      <arglist>(void *generator)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10545,81 +10106,81 @@
     <filename>rng_8c.html</filename>
     <includes id="rng_8h" name="rng.h" local="yes" imported="no">rng.h</includes>
     <includes id="common__mem_8h" name="common_mem.h" local="yes" imported="no">common_mem.h</includes>
-    <class kind="struct">rng</class>
-    <member kind="function">
-      <type>rng_t</type>
-      <name>rng_init</name>
-      <anchorfile>rng_8c.html</anchorfile>
-      <anchor>ac2b523470897c3c3e4168e8d82579d18</anchor>
-      <arglist>(address_t *region)</arglist>
-    </member>
     <member kind="function">
       <type>uint32_t</type>
       <name>rng_generator</name>
       <anchorfile>rng_8c.html</anchorfile>
-      <anchor>aa3c7d931977e162864cb4615442d96b7</anchor>
-      <arglist>(rng_t rng)</arglist>
+      <anchor>aad3647089384bbdbd3a58476639d7b47</anchor>
+      <arglist>(rng_t *rng)</arglist>
     </member>
     <member kind="function">
       <type>accum</type>
       <name>rng_exponential</name>
       <anchorfile>rng_8c.html</anchorfile>
-      <anchor>a12e0ea48f3cf6181063f30ece7b30c2d</anchor>
-      <arglist>(rng_t rng)</arglist>
+      <anchor>a26876180ba17fcab970dcf37b27f7e8e</anchor>
+      <arglist>(rng_t *rng)</arglist>
     </member>
     <member kind="function">
       <type>accum</type>
       <name>rng_normal</name>
       <anchorfile>rng_8c.html</anchorfile>
-      <anchor>a7afddf66f0bcc73ecd2637231a654f01</anchor>
-      <arglist>(rng_t rng)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>rng_free</name>
-      <anchorfile>rng_8c.html</anchorfile>
-      <anchor>a469702c3bba13b63ccfba049840500d8</anchor>
-      <arglist>(rng_t rng)</arglist>
+      <anchor>a5677399580a8c95d1359086be8b7d5c3</anchor>
+      <arglist>(rng_t *rng)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>rng.h</name>
     <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>rng_8h.html</filename>
+    <class kind="struct">rng_t</class>
     <member kind="function">
-      <type>rng_t</type>
+      <type>rng_t *</type>
       <name>rng_init</name>
       <anchorfile>rng_8h.html</anchorfile>
-      <anchor>ac2b523470897c3c3e4168e8d82579d18</anchor>
-      <arglist>(address_t *region)</arglist>
+      <anchor>a7ba7b829f8dcb70abb51419827be6f97</anchor>
+      <arglist>(void **region)</arglist>
     </member>
     <member kind="function">
       <type>uint32_t</type>
       <name>rng_generator</name>
       <anchorfile>rng_8h.html</anchorfile>
-      <anchor>aa3c7d931977e162864cb4615442d96b7</anchor>
-      <arglist>(rng_t rng)</arglist>
+      <anchor>aad3647089384bbdbd3a58476639d7b47</anchor>
+      <arglist>(rng_t *rng)</arglist>
     </member>
     <member kind="function">
       <type>accum</type>
       <name>rng_exponential</name>
       <anchorfile>rng_8h.html</anchorfile>
-      <anchor>a12e0ea48f3cf6181063f30ece7b30c2d</anchor>
-      <arglist>(rng_t rng)</arglist>
+      <anchor>a26876180ba17fcab970dcf37b27f7e8e</anchor>
+      <arglist>(rng_t *rng)</arglist>
     </member>
     <member kind="function">
       <type>accum</type>
       <name>rng_normal</name>
       <anchorfile>rng_8h.html</anchorfile>
-      <anchor>a7afddf66f0bcc73ecd2637231a654f01</anchor>
-      <arglist>(rng_t rng)</arglist>
+      <anchor>a5677399580a8c95d1359086be8b7d5c3</anchor>
+      <arglist>(rng_t *rng)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
       <name>rng_free</name>
       <anchorfile>rng_8h.html</anchorfile>
-      <anchor>a469702c3bba13b63ccfba049840500d8</anchor>
-      <arglist>(rng_t rng)</arglist>
+      <anchor>a834d6cf1f8eae1fcc729cc27548d39f8</anchor>
+      <arglist>(rng_t *rng)</arglist>
+    </member>
+    <member kind="variable">
+      <type>rng_t *</type>
+      <name>population_rng</name>
+      <anchorfile>rng_8h.html</anchorfile>
+      <anchor>aa5d23a2beb618420408ca4853051f042</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>rng_t *</type>
+      <name>core_rng</name>
+      <anchorfile>rng_8h.html</anchorfile>
+      <anchor>a5ca5c820c3873b51d8ca1ad0d35eb075</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -10629,22 +10190,23 @@
     <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" imported="no">matrix_generator.h</includes>
     <includes id="connection__generator_8h" name="connection_generator.h" local="yes" imported="no">connection_generator.h</includes>
     <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
+    <includes id="rng_8h" name="rng.h" local="yes" imported="no">rng.h</includes>
     <includes id="common__mem_8h" name="common_mem.h" local="yes" imported="no">common_mem.h</includes>
-    <class kind="struct">connection_builder_config</class>
-    <class kind="struct">expander_config</class>
+    <includes id="bit__field__expander_8h" name="bit_field_expander.h" local="yes" imported="no">bit_field_expander.h</includes>
+    <class kind="struct">connection_builder_config_t</class>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>read_connection_builder_region</name>
       <anchorfile>synapse__expander_8c.html</anchorfile>
-      <anchor>aa6bfc8d65fe33be9e28e4c0f18cd554b</anchor>
-      <arglist>(address_t *in_region, address_t synaptic_matrix_region, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, unsigned long accum *weight_scales)</arglist>
+      <anchor>a548180c2ae9037f4c97c68f173aff027</anchor>
+      <arglist>(void **region, void *synaptic_matrix, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t post_index, unsigned long accum *weight_scales, accum timestep_per_delay)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>run_synapse_expander</name>
       <anchorfile>synapse__expander_8c.html</anchorfile>
-      <anchor>a0698a34460c56bb3c76ceb2824a83934</anchor>
-      <arglist>(data_specification_metadata_t *ds_regions, address_t params_address)</arglist>
+      <anchor>aeb2b0ef5d12497ec1db7032e98249f94</anchor>
+      <arglist>(data_specification_metadata_t *ds_regions, void *params_address)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -10653,6 +10215,26 @@
       <anchor>aa14f4f1d4c84183b7bf7108bf930a23c</anchor>
       <arglist>(void)</arglist>
     </member>
+    <member kind="variable">
+      <type>rng_t *</type>
+      <name>population_rng</name>
+      <anchorfile>synapse__expander_8c.html</anchorfile>
+      <anchor>aa5d23a2beb618420408ca4853051f042</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>rng_t *</type>
+      <name>core_rng</name>
+      <anchorfile>synapse__expander_8c.html</anchorfile>
+      <anchor>a5ca5c820c3873b51d8ca1ad0d35eb075</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>type_writers.h</name>
+    <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
+    <filename>type__writers_8h.html</filename>
+    <class kind="struct">type_info</class>
   </compound>
   <compound kind="struct">
     <name>ac_source_t</name>
@@ -10660,28 +10242,61 @@
     <anchor>structac__source__t</anchor>
   </compound>
   <compound kind="struct">
+    <name>additional_input_params_t</name>
+    <filename>additional__input__none__impl_8h.html</filename>
+    <anchor>structadditional__input__params__t</anchor>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>tau_ca2</name>
+      <anchorfile>additional__input__none__impl_8h.html</anchorfile>
+      <anchor>ac22854ff32cfd7eff2c437e7cbe3d916</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>i_ca2</name>
+      <anchorfile>additional__input__none__impl_8h.html</anchorfile>
+      <anchor>a768961992bddb5df5196cbdcb5d66d19</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>i_alpha</name>
+      <anchorfile>additional__input__none__impl_8h.html</anchorfile>
+      <anchor>acf4f13bc8b7bec63ae92dc94c7c9dde7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>time_step</name>
+      <anchorfile>additional__input__none__impl_8h.html</anchorfile>
+      <anchor>abe999050dbc488cdc08c6a8948366a0e</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>additional_input_t</name>
     <filename>additional__input__none__impl_8h.html</filename>
     <anchor>structadditional__input__t</anchor>
     <member kind="variable">
       <type>REAL</type>
-      <name>exp_TauCa</name>
+      <name>exp_tau_ca2</name>
       <anchorfile>additional__input__none__impl_8h.html</anchorfile>
-      <anchor>a0c1f083f2abaa9a200f9bc6e26ccbb92</anchor>
+      <anchor>a4dda6255b178cc18bef923ca6851f071</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>REAL</type>
-      <name>I_Ca2</name>
+      <name>i_ca2</name>
       <anchorfile>additional__input__none__impl_8h.html</anchorfile>
-      <anchor>afd249bff7976a52de9117b84aea37673</anchor>
+      <anchor>aa5c8cc6ac6a4d5f5a1d26ddf2ab71fbf</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>REAL</type>
-      <name>I_alpha</name>
+      <name>i_alpha</name>
       <anchorfile>additional__input__none__impl_8h.html</anchorfile>
-      <anchor>a3099dc9d6b59766d49d803f62b22a5c5</anchor>
+      <anchor>a1ad6f4bf1f6cfcbfa432124040563c3e</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -10696,52 +10311,21 @@
     <anchor>structadditive__two__term__config__t</anchor>
   </compound>
   <compound kind="struct">
-    <name>address_and_row_length</name>
-    <filename>population__table__binary__search__impl_8c.html</filename>
-    <anchor>structaddress__and__row__length</anchor>
+    <name>address_list_entry</name>
+    <filename>population__table_8h.html</filename>
+    <anchor>structaddress__list__entry</anchor>
     <member kind="variable">
       <type>uint32_t</type>
       <name>row_length</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a1fb46843c73b7998401310d379339f64</anchor>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a358c3d5fb0251de6aa4e93494be8d7f0</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>address</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a05b647c59b38ca2dc9eff3b953972630</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>is_single</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>abf7a35a5644b46e2db354540b8190f33</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="union">
-    <name>address_list_entry</name>
-    <filename>population__table__binary__search__impl_8c.html</filename>
-    <anchor>unionaddress__list__entry</anchor>
-  </compound>
-  <compound kind="struct">
-    <name>all_kernel_params</name>
-    <filename>param__generator__kernel_8h.html</filename>
-    <anchor>structall__kernel__params</anchor>
-    <member kind="variable">
-      <type>struct param_generator_kernel</type>
-      <name>params</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a40993390d517d0a66144fd5d36523f57</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>accum *</type>
-      <name>values</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>aa55383a91c659f798dc4faf98cfd18ea</anchor>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a2e8ba6ab7ff064d79ef52417c492d38e</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -10749,72 +10333,49 @@
     <name>all_to_all</name>
     <filename>connection__generator__all__to__all_8h.html</filename>
     <anchor>structall__to__all</anchor>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>pre_lo</name>
-      <anchorfile>connection__generator__all__to__all_8h.html</anchorfile>
-      <anchor>a9323154e7036f6d2d04d52e15583b768</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>pre_hi</name>
-      <anchorfile>connection__generator__all__to__all_8h.html</anchorfile>
-      <anchor>aab410956d63d1b75a41c9a279ff197b5</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>post_lo</name>
-      <anchorfile>connection__generator__all__to__all_8h.html</anchorfile>
-      <anchor>a5a42da71ba22ccc58cd2022154ef8df1</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>post_hi</name>
-      <anchorfile>connection__generator__all__to__all_8h.html</anchorfile>
-      <anchor>a3f5deb2e9413e5ae2e0bca1ba02e3744</anchor>
-      <arglist></arglist>
-    </member>
   </compound>
   <compound kind="struct">
     <name>alpha_params_t</name>
     <filename>synapse__types__alpha__impl_8h.html</filename>
     <anchor>structalpha__params__t</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>alpha_state_t</name>
+    <filename>synapse__types__alpha__impl_8h.html</filename>
+    <anchor>structalpha__state__t</anchor>
     <member kind="variable">
       <type>input_t</type>
       <name>lin_buff</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a2b42cfcc4ba66835e143e623afdc99d6</anchor>
+      <anchor>a253cb401fd1c2188fb435ffab13eba04</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>input_t</type>
       <name>exp_buff</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a21fdb5217753bcf2c3d00f3c8d691189</anchor>
+      <anchor>a6078f398c1d684a158d1f2858e091033</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>input_t</type>
       <name>dt_divided_by_tau_sqr</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>a302d76f88428da70bcddb6d6eae4d078</anchor>
+      <anchor>af3b40b0c489ccdb3ad0c82c037b523d0</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>decay_t</type>
       <name>decay</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>af030e3f5a4c54671849dfe95356671a8</anchor>
+      <anchor>a32f6514c5d3f974068433464d9e65f67</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>input_t</type>
       <name>q_buff</name>
       <anchorfile>synapse__types__alpha__impl_8h.html</anchorfile>
-      <anchor>aef39e3e4d64c69ee81da23a792c42e11</anchor>
+      <anchor>a291abdeb86c6ce687eba035ca09f425c</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -10824,56 +10385,14 @@
     <anchor>structbitfield__info__t</anchor>
   </compound>
   <compound kind="struct">
+    <name>bitfield_recording_t</name>
+    <filename>neuron__expander_8c.html</filename>
+    <anchor>structbitfield__recording__t</anchor>
+  </compound>
+  <compound kind="struct">
     <name>bitfield_values_t</name>
     <filename>neuron__recording_8h.html</filename>
     <anchor>structbitfield__values__t</anchor>
-  </compound>
-  <compound kind="struct">
-    <name>builder_region_struct</name>
-    <filename>bit__field__expander_8c.html</filename>
-    <anchor>structbuilder__region__struct</anchor>
-    <member kind="variable">
-      <type>int</type>
-      <name>master_pop_region_id</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a6cc1f10fa0516c89cf9fe5c6f681f9a6</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>int</type>
-      <name>synaptic_matrix_region_id</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a1eb0a2251b321c5b7dae43b2df8a5148</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>int</type>
-      <name>direct_matrix_region_id</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a9a9c911f0c498e2e9f83c9a08580dd11</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>int</type>
-      <name>bit_field_region_id</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a9f1f0eb2d9f6b0f31c7c71359e5d42a2</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>int</type>
-      <name>bit_field_key_map_region_id</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>a80165df779a65726efc433467d5bc955</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>int</type>
-      <name>structural_matrix_region_id</name>
-      <anchorfile>bit__field__expander_8c.html</anchorfile>
-      <anchor>ae58e2079031afe22e9e02100fab9fbb4</anchor>
-      <arglist></arglist>
-    </member>
   </compound>
   <compound kind="struct">
     <name>combined_provenance</name>
@@ -10951,9 +10470,9 @@
     </member>
   </compound>
   <compound kind="struct">
-    <name>connection_builder_config</name>
+    <name>connection_builder_config_t</name>
     <filename>synapse__expander_8c.html</filename>
-    <anchor>structconnection__builder__config</anchor>
+    <anchor>structconnection__builder__config__t</anchor>
   </compound>
   <compound kind="struct">
     <name>connection_generator_info</name>
@@ -10967,10 +10486,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>initialize_func *</type>
+      <type>initialize_connector_func *</type>
       <name>initialize</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>aa84452ef3f1cb97053d14af2570129b5</anchor>
+      <anchor>a05e8e9c3a497781e378052ef25fb1ef1</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -11066,11 +10585,6 @@
     <anchor>structdc__source__t</anchor>
   </compound>
   <compound kind="struct">
-    <name>delay_builder_config</name>
-    <filename>delay__expander_8c.html</filename>
-    <anchor>structdelay__builder__config</anchor>
-  </compound>
-  <compound kind="struct">
     <name>delay_extension_provenance</name>
     <filename>delay__extension_8c.html</filename>
     <anchor>structdelay__extension__provenance</anchor>
@@ -11114,13 +10628,6 @@
       <name>n_delays</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
       <anchor>a3ca931b66220774b3aaf1dea3db2b392</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>times_tdma_fell_behind</name>
-      <anchorfile>delay__extension_8c.html</anchorfile>
-      <anchor>a91449b33fd2d1a77fac263c2de918e29</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -11226,13 +10733,6 @@
       <anchor>a419319f82ec1b09d73f76ef2a298eef9</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>delay_blocks</name>
-      <anchorfile>delay__extension_8h.html</anchorfile>
-      <anchor>ac96e823ff8133a64c9cdc218b44244aa</anchor>
-      <arglist>[]</arglist>
-    </member>
   </compound>
   <compound kind="struct">
     <name>delay_value</name>
@@ -11240,39 +10740,8 @@
     <anchor>structdelay__value</anchor>
   </compound>
   <compound kind="struct">
-    <name>delta_params_t</name>
-    <filename>synapse__types__delta__impl_8h.html</filename>
-    <anchor>structdelta__params__t</anchor>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>synaptic_input_value</name>
-      <anchorfile>synapse__types__delta__impl_8h.html</anchorfile>
-      <anchor>a338e5d451991384eced053db6a2b7942</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="struct">
     <name>dimension</name>
     <filename>structdimension.html</filename>
-  </compound>
-  <compound kind="struct">
-    <name>direct_matrix_data_t</name>
-    <filename>direct__synapses_8c.html</filename>
-    <anchor>structdirect__matrix__data__t</anchor>
-    <member kind="variable">
-      <type>const uint32_t</type>
-      <name>size</name>
-      <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a7b6f1aa45c96e6dfe18c9863ced8982a</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const uint32_t</type>
-      <name>data</name>
-      <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>acd4af094bcf79182ea98ef2185bf5568</anchor>
-      <arglist>[]</arglist>
-    </member>
   </compound>
   <compound kind="struct">
     <name>dma_buffer</name>
@@ -11339,65 +10808,46 @@
   </compound>
   <compound kind="struct">
     <name>exp_params_t</name>
-    <filename>synapse__types__semd__impl_8h.html</filename>
+    <filename>exp__synapse__utils_8h.html</filename>
     <anchor>structexp__params__t</anchor>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>tau</name>
+      <anchorfile>exp__synapse__utils_8h.html</anchorfile>
+      <anchor>a86cbc5a5d1b545e9f004a6c78b3e47a9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>init_input</name>
+      <anchorfile>exp__synapse__utils_8h.html</anchorfile>
+      <anchor>ab9f760588e813ff3fda651a1f2667e2d</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>exp_state_t</name>
+    <filename>exp__synapse__utils_8h.html</filename>
+    <anchor>structexp__state__t</anchor>
     <member kind="variable">
       <type>decay_t</type>
       <name>decay</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>aacee2e1a8db0f17984b2f3e4c42e7ee6</anchor>
+      <anchorfile>exp__synapse__utils_8h.html</anchorfile>
+      <anchor>a0fec90ff56755eb65c097f5557b28266</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>decay_t</type>
       <name>init</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>aaa23e193beba47e2f10741bffe80b786</anchor>
+      <anchorfile>exp__synapse__utils_8h.html</anchorfile>
+      <anchor>a496af27ea8ca909f1a97adc522410cb9</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>input_t</type>
       <name>synaptic_input_value</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>ac8b591da2d0dfcbcb814dbf8580cbd56</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="struct">
-    <name>expander_config</name>
-    <filename>synapse__expander_8c.html</filename>
-    <anchor>structexpander__config</anchor>
-  </compound>
-  <compound kind="struct">
-    <name>extra_info</name>
-    <filename>population__table__binary__search__impl_8c.html</filename>
-    <anchor>structextra__info</anchor>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>core_mask</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ac028589ad82b326aa64c8f71d8650c6a</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_words</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a30fce9306ac45fadef4dd737d177d467</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>mask_shift</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>ad3098b05fff6bb47f13fe6f9cf975414</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_neurons</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>aa4dfc64a68bcb1cf34110d310f67530c</anchor>
+      <anchorfile>exp__synapse__utils_8h.html</anchorfile>
+      <anchor>a1761fa531c92816be45a95a44e5f9411</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -11412,46 +10862,11 @@
       <anchor>a8ed1e9dc57252dc7895cc4922ae38687</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>rng_t</type>
-      <name>rng</name>
-      <anchorfile>connection__generator__fixed__post_8h.html</anchorfile>
-      <anchor>a1555dd530c7395bb4373b6bb5b699297</anchor>
-      <arglist></arglist>
-    </member>
   </compound>
   <compound kind="struct">
     <name>fixed_post_params</name>
     <filename>connection__generator__fixed__post_8h.html</filename>
     <anchor>structfixed__post__params</anchor>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>pre_lo</name>
-      <anchorfile>connection__generator__fixed__post_8h.html</anchorfile>
-      <anchor>a4eb03d0f757266d94efef44867b62729</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>pre_hi</name>
-      <anchorfile>connection__generator__fixed__post_8h.html</anchorfile>
-      <anchor>a8804d98e8134803269a43f1b560230fc</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>post_lo</name>
-      <anchorfile>connection__generator__fixed__post_8h.html</anchorfile>
-      <anchor>aab9411033f2f70c87c42301cf42fff13</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>post_hi</name>
-      <anchorfile>connection__generator__fixed__post_8h.html</anchorfile>
-      <anchor>a6cc17ffc0a60395bf1697e96ba776d52</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>allow_self_connections</name>
@@ -11473,44 +10888,11 @@
       <anchor>af4c0ed8a643a617c21ce2a377fd1952c</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_post_neurons</name>
-      <anchorfile>connection__generator__fixed__post_8h.html</anchorfile>
-      <anchor>a19ed05dac833a17b29f0c53d918bd1d2</anchor>
-      <arglist></arglist>
-    </member>
   </compound>
   <compound kind="struct">
     <name>fixed_pre</name>
     <filename>connection__generator__fixed__pre_8h.html</filename>
     <anchor>structfixed__pre</anchor>
-  </compound>
-  <compound kind="struct">
-    <name>fixed_pre_globals_t</name>
-    <filename>connection__generator__fixed__pre_8h.html</filename>
-    <anchor>structfixed__pre__globals__t</anchor>
-    <member kind="variable">
-      <type>void *</type>
-      <name>full_indices</name>
-      <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
-      <anchor>a9b06d08a35c06fc8558f75338b113065</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_pre_neurons_done</name>
-      <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
-      <anchor>a39a9876a13a2fe1e6700d4fa144de305</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>bool</type>
-      <name>in_sdram</name>
-      <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
-      <anchor>a466a132ae35d326ff7de39154149e91d</anchor>
-      <arglist></arglist>
-    </member>
   </compound>
   <compound kind="struct">
     <name>fixed_pre_params</name>
@@ -11597,11 +10979,6 @@
     </member>
   </compound>
   <compound kind="struct">
-    <name>global_neuron_params_t</name>
-    <filename>neuron__model__lif__impl_8h.html</filename>
-    <anchor>structglobal__neuron__params__t</anchor>
-  </compound>
-  <compound kind="struct">
     <name>global_parameters</name>
     <filename>spike__source__poisson_8c.html</filename>
     <anchor>structglobal__parameters</anchor>
@@ -11627,10 +11004,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>uint32_t</type>
-      <name>ticks_per_second</name>
+      <type>UREAL</type>
+      <name>ticks_per_ms</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a6725343f8032eb0ad9d37408b92dace8</anchor>
+      <anchor>a7c28ee6e0f3f9ee952400112f7ea2c82</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -11673,6 +11050,25 @@
       <name>spike_source_seed</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>aec7bae9f7db03e42be908930a8b67c20</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>input_type_params_t</name>
+    <filename>input__type__none_8h.html</filename>
+    <anchor>structinput__type__params__t</anchor>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>V_rev_E</name>
+      <anchorfile>input__type__none_8h.html</anchorfile>
+      <anchor>aed5e62439f9cc3e15745613d1eb75be4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>V_rev_I</name>
+      <anchorfile>input__type__none_8h.html</anchorfile>
+      <anchor>a0cfe5b36ead258b16787a37b25dc1f7a</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -11823,6 +11219,27 @@
       <anchor>a6e62b50597cf2d546f6d88836e0d57e2</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>weightsPresent</name>
+      <anchorfile>connection__generator__kernel_8h.html</anchorfile>
+      <anchor>a70f80ef8f5497723306b27b521e3b539</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>delaysPresent</name>
+      <anchorfile>connection__generator__kernel_8h.html</anchorfile>
+      <anchor>a61c278595d8c935eb49bde64137e1ba5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>accum</type>
+      <name>kernelWeightsAndDelays</name>
+      <anchorfile>connection__generator__kernel_8h.html</anchorfile>
+      <anchor>af812d0ccba12a11f928d6ecbfca0e48f</anchor>
+      <arglist>[]</arglist>
+    </member>
   </compound>
   <compound kind="struct">
     <name>key_atom_info_t</name>
@@ -11945,41 +11362,69 @@
   </compound>
   <compound kind="struct">
     <name>master_population_table_entry</name>
-    <filename>population__table__binary__search__impl_8c.html</filename>
+    <filename>population__table_8h.html</filename>
     <anchor>structmaster__population__table__entry</anchor>
     <member kind="variable">
       <type>uint32_t</type>
       <name>key</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchorfile>population__table_8h.html</anchorfile>
       <anchor>a0afdbef67c9cba4231a9c8cc63e0c005</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>mask</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchorfile>population__table_8h.html</anchorfile>
       <anchor>a5d5364d69a3eb267eba9b0e47ffd1db7</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>start</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchorfile>population__table_8h.html</anchorfile>
       <anchor>afb309e71903c16b95d149973e753b490</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>extra_info_flag</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchorfile>population__table_8h.html</anchorfile>
       <anchor>a12b8d8e12253bc56e1bbd8581ad3da81</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>count</name>
-      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchorfile>population__table_8h.html</anchorfile>
       <anchor>a1b52e9a32daa7fddff954e66cbd3bd4e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>core_mask</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>ae59418b8cf6553d964c4b5b4e5744b94</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>mask_shift</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>aee21924d6d59167beb18c026e986f485</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_neurons</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a2196632025af2e0113f8cfd4479463f1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_words</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>ab9d13dcb500adc5e34abdff7de94ba2a</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -11995,17 +11440,17 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>initialize_func *</type>
+      <type>initialize_matrix_func *</type>
       <name>initialize</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>af736a8d5f4b9f65470cf1cd338ed4391</anchor>
+      <anchor>a364a3eede465159244adb4b330713a22</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>generate_row_func *</type>
-      <name>write_row</name>
+      <type>write_synapse_func *</type>
+      <name>write_synapse</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>a7c885850d9bd6f81b8940ee96a48f3db</anchor>
+      <anchor>ac3ed4f419c523509c68803f006a1c8ae</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12021,29 +11466,170 @@
     <filename>matrix__generator__neuromodulation_8h.html</filename>
     <anchor>structmatrix__generator__neuromodulation</anchor>
   </compound>
+  <compound kind="union">
+    <name>matrix_generator_neuromodulation.__unnamed19__</name>
+    <filename>matrix__generator__neuromodulation_8h.html</filename>
+    <anchor>unionmatrix__generator__neuromodulation_8____unnamed19____</anchor>
+    <member kind="variable">
+      <type>uint32_t *</type>
+      <name>synaptic_matrix</name>
+      <anchorfile>matrix__generator__neuromodulation_8h.html</anchorfile>
+      <anchor>af6b400c26840513b7ee58df3bf0ac2be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synaptic_matrix_offset</name>
+      <anchorfile>matrix__generator__neuromodulation_8h.html</anchorfile>
+      <anchor>adcfd35c31907352e33cd6f35ef1fb389</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
   <compound kind="struct">
-    <name>matrix_generator_stdp</name>
+    <name>matrix_generator_stdp_data_t</name>
     <filename>matrix__generator__stdp_8h.html</filename>
-    <anchor>structmatrix__generator__stdp</anchor>
+    <anchor>structmatrix__generator__stdp__data__t</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_row_n_synapses</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a5373ffe70ce452ba9bb3f76d506b7ed1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_delayed_row_n_synapses</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>ad1e8ca16398cc8fc3414ef587d7b6739</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_row_n_words</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>abd7ab500589a86984b976070bc626b29</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_delayed_row_n_words</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a4f6423f80ded8e29e357b6b5cb9a6e7d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_type</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a1397a13cdf7986fe0dc619643b7f2e35</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_type_bits</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>ae24d1dfe8862caee856ac234da3f8c51</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_index_bits</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>aef196080cb2260eaca3cc93a38385a50</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_stage</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a14527414e8f4cc7e50b568075162f6cc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_delay_per_stage</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>ace136fe2521eb720c36274494ca3d6bb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>delay_bits</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a6ccfcbaddf0bbe569448ea56534b49cb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_pre_neurons</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a473d65f4a7583a8f9166549b15a2ba07</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_pre_neurons_per_core</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>abe6c585e4aa85cb2bbe7a201a3618ee1</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>n_half_words_per_pp_row_header</name>
       <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>aa5737732096b5f67fca029d1f2aed44c</anchor>
+      <anchor>aaf18d9fbe16ef43e0a03a2a6bf6eec8c</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>n_half_words_per_pp_synapse</name>
       <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>ab29da34a8c2311993638cb6a258d1b4a</anchor>
+      <anchor>a9f0a9c8b5ab09642db74da57a9404f87</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>weight_half_word</name>
       <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>ac7ef0134f0184dc3c7819ab29f022bbb</anchor>
+      <anchor>ac39c09c2359f42c6423c6abb3269bf4c</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="union">
+    <name>matrix_generator_stdp_data_t.__unnamed25__</name>
+    <filename>matrix__generator__stdp_8h.html</filename>
+    <anchor>unionmatrix__generator__stdp__data__t_8____unnamed25____</anchor>
+    <member kind="variable">
+      <type>uint32_t *</type>
+      <name>synaptic_matrix</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>af6b400c26840513b7ee58df3bf0ac2be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synaptic_matrix_offset</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>adcfd35c31907352e33cd6f35ef1fb389</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="union">
+    <name>matrix_generator_stdp_data_t.__unnamed27__</name>
+    <filename>matrix__generator__stdp_8h.html</filename>
+    <anchor>unionmatrix__generator__stdp__data__t_8____unnamed27____</anchor>
+    <member kind="variable">
+      <type>uint32_t *</type>
+      <name>delayed_synaptic_matrix</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>afe6ef05d5c6b9526753307f711cd2917</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>delayed_matrix_offset</name>
+      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
+      <anchor>a1bdd384087e001d00dfc05da0ecfa5c2</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -12051,6 +11637,119 @@
     <name>matrix_generator</name>
     <filename>matrix__generator_8c.html</filename>
     <anchor>structmatrix__generator</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>matrix_genetator_static_data_t</name>
+    <filename>matrix__generator__static_8h.html</filename>
+    <anchor>structmatrix__genetator__static__data__t</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_row_n_words</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>ab17ad26a258f2bf34d26b5324ab5b0d1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_delayed_row_n_words</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a0b9ac6ca34707b71f0325e2b51a89e66</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_type</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a023b645b884bb752059cebd4f26b5b5e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_type_bits</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>ad649241d0bf22e45459703b93954468e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_index_bits</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a078996ab63e0271dd437881d65d17414</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_stage</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a268f13326b542ca0e08352d4b8ddca9a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_delay_per_stage</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>abefb1ff584bf309aa6cc0633f099205a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>delay_bits</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a5f7f6082304d4ebd50bfd8b48718ab71</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_pre_neurons</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a9b3800fcbb5cf9d5670d6735d5e06c89</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_pre_neurons_per_core</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a1a17ebd5b4ccb7795574a8b227fd03e4</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="union">
+    <name>matrix_genetator_static_data_t.__unnamed21__</name>
+    <filename>matrix__generator__static_8h.html</filename>
+    <anchor>unionmatrix__genetator__static__data__t_8____unnamed21____</anchor>
+    <member kind="variable">
+      <type>uint32_t *</type>
+      <name>synaptic_matrix</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>af6b400c26840513b7ee58df3bf0ac2be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synaptic_matrix_offset</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>adcfd35c31907352e33cd6f35ef1fb389</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="union">
+    <name>matrix_genetator_static_data_t.__unnamed23__</name>
+    <filename>matrix__generator__static_8h.html</filename>
+    <anchor>unionmatrix__genetator__static__data__t_8____unnamed23____</anchor>
+    <member kind="variable">
+      <type>uint32_t *</type>
+      <name>delayed_synaptic_matrix</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>afe6ef05d5c6b9526753307f711cd2917</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>delayed_matrix_offset</name>
+      <anchorfile>matrix__generator__static_8h.html</anchorfile>
+      <anchor>a1bdd384087e001d00dfc05da0ecfa5c2</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="struct">
     <name>motor_control_config_t</name>
@@ -12200,80 +11899,102 @@
     <anchor>structneuromodulation__data__t</anchor>
   </compound>
   <compound kind="struct">
+    <name>neuron_core_parameters</name>
+    <filename>neuron_8c.html</filename>
+    <anchor>structneuron__core__parameters</anchor>
+  </compound>
+  <compound kind="struct">
     <name>neuron_current_source_t</name>
     <filename>current__source_8h.html</filename>
     <anchor>structneuron__current__source__t</anchor>
   </compound>
   <compound kind="struct">
-    <name>neuron_parameters</name>
-    <filename>neuron_8c.html</filename>
-    <anchor>structneuron__parameters</anchor>
+    <name>neuron_param_item_t</name>
+    <filename>neuron__expander_8c.html</filename>
+    <anchor>structneuron__param__item__t</anchor>
   </compound>
   <compound kind="struct">
-    <name>neuron_t</name>
+    <name>neuron_param_t</name>
+    <filename>neuron__expander_8c.html</filename>
+    <anchor>structneuron__param__t</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>neuron_params_struct_t</name>
+    <filename>neuron__expander_8c.html</filename>
+    <anchor>structneuron__params__struct__t</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>neuron_params_t</name>
     <filename>neuron__model__lif__impl_8h.html</filename>
-    <anchor>structneuron__t</anchor>
+    <anchor>structneuron__params__t</anchor>
     <member kind="variable">
       <type>REAL</type>
       <name>I_offset</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>af3312785809b054f13aeba3e3c2f000a</anchor>
+      <anchor>a4b4a2ba9fba6d6f10d8ef1e1c851a39e</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>REAL</type>
-      <name>this_h</name>
+      <name>time_step</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>a36618067ab7503cd84fcf76e9e9a1111</anchor>
+      <anchor>a6d28ebcdd47a7628df5f538f5e5b60a6</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>REAL</type>
-      <name>V_membrane</name>
+      <name>next_h</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>a86bb63a4a0e56518c44af0beefe8ac31</anchor>
+      <anchor>a44341613a6482efe24379ae9a3c758d3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>V_init</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a01195d3e2b315b7049b25bed7a00f322</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>REAL</type>
       <name>V_rest</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>a0448414012bd86a39307aa97378ca8f2</anchor>
+      <anchor>a390f6f7e76ae18b982c519ad517e74ad</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>REAL</type>
-      <name>R_membrane</name>
+      <name>c_m</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>aea78ba2caa325540d8571d35eba56b13</anchor>
+      <anchor>a0d2e44ce37bdc89bdeaba22c3fc65903</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>REAL</type>
-      <name>exp_TC</name>
+      <name>tau_m</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>ae86326c508ef052f75103f8fec5dff82</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>int32_t</type>
-      <name>refract_timer</name>
-      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>acf084ec01328ebc9b41115c053dff303</anchor>
+      <anchor>acd02a68c932cc69f2815114f26f1609c</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>REAL</type>
       <name>V_reset</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>ad64e3dbdebb524738dac569369fcb146</anchor>
+      <anchor>a1b77e28a1ebe5e091767984d96a1e41f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>T_refract_ms</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a2a4cc8608f712cd69e40daa4bcecb9b9</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>int32_t</type>
-      <name>T_refract</name>
+      <name>refract_timer_init</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>a960606546b094d62a8509eea60bd3dc2</anchor>
+      <anchor>ac2ffdee96e7211c98c8a5465cb277fd6</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -12289,9 +12010,9 @@
     </member>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>n_tdma_mises</name>
+      <name>n_tdma_misses</name>
       <anchorfile>structneuron__provenance.html</anchorfile>
-      <anchor>a9567e9ef2fd91cdd106404ec2e2ed282</anchor>
+      <anchor>ae102e3055f07cead0ad5a1b4adf08578</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12311,19 +12032,19 @@
   </compound>
   <compound kind="struct">
     <name>neuron_recording_header_t</name>
-    <filename>neuron__recording_8c.html</filename>
+    <filename>neuron__recording_8h.html</filename>
     <anchor>structneuron__recording__header__t</anchor>
     <member kind="variable">
       <type>uint32_t</type>
       <name>n_recorded_vars</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>abedd25f4658e60246836b650b8432a7b</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>n_bitfield_vars</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
+      <anchorfile>neuron__recording_8h.html</anchorfile>
       <anchor>aceb45219931c687ba2595c66b9561e18</anchor>
       <arglist></arglist>
     </member>
@@ -12331,6 +12052,13 @@
   <compound kind="struct">
     <name>neuron_regions</name>
     <filename>structneuron__regions.html</filename>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>core_params</name>
+      <anchorfile>structneuron__regions.html</anchorfile>
+      <anchor>aa2f7d26e8899ab7b5460127b53161bd2</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>neuron_params</name>
@@ -12350,6 +12078,88 @@
       <name>neuron_recording</name>
       <anchorfile>structneuron__regions.html</anchorfile>
       <anchor>a5eb67797af3ac013b128589af3237784</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>initial_values</name>
+      <anchorfile>structneuron__regions.html</anchorfile>
+      <anchor>a5dacc39c68db7093e1d086b404a9a112</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>neuron_t</name>
+    <filename>neuron__model__lif__impl_8h.html</filename>
+    <anchor>structneuron__t</anchor>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>I_offset</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>afa7f374c044dc5b6f4c0158ea694010e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>this_h</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>ac81d28edfc234c0304748c166baeb0ac</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>reset_h</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a1d7622da6c04a63fde21386757b3b332</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>V_membrane</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>ad66d54c7a07b1786b0d03888ba1c487d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>V_rest</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a33437019fe16a8c9bde9773714eee263</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>R_membrane</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a8d199c1f0e0423ae3707530f872afc75</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>exp_TC</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>ad8b828cd0ae1cfcd20f1493d629fbb81</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int32_t</type>
+      <name>refract_timer</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>affef55f4b097428004fad494ffaa7a26</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>V_reset</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a0c21f2095b2338097db6a4de641a9b0e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int32_t</type>
+      <name>T_refract</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a552b3d69763d3e600964e6a1ee7a5c89</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -12418,11 +12228,6 @@
     <name>normal_params</name>
     <filename>param__generator__normal_8h.html</filename>
     <anchor>structnormal__params</anchor>
-  </compound>
-  <compound kind="struct">
-    <name>one_to_one</name>
-    <filename>connection__generator__one__to__one_8h.html</filename>
-    <anchor>structone__to__one</anchor>
   </compound>
   <compound kind="struct">
     <name>packet_firing_data_t</name>
@@ -12505,10 +12310,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>initialize_func *</type>
+      <type>initialize_param_func *</type>
       <name>initialize</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>abdee600112c11cf006a45596433f7293</anchor>
+      <anchor>a126b6347bbad0c735f3c207060cf007a</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12523,116 +12328,6 @@
       <name>free</name>
       <anchorfile>param__generator_8c.html</anchorfile>
       <anchor>a10a8a08f2a3dd4c64e428987d2c55ab3</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="struct">
-    <name>param_generator_kernel</name>
-    <filename>param__generator__kernel_8h.html</filename>
-    <anchor>structparam__generator__kernel</anchor>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>preWidth</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a50ae2f03b893937f8d0529481c2a60a8</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>preHeight</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a561a1c087a1589446a958808ebe983d4</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>postWidth</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a2dba4c6db21eb4714b16bcf377cc4fb4</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>postHeight</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a012f441a8354f4adb8067835966ea0c5</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>startPreWidth</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a2cadcbfd06b082c35c8f177b42c9c471</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>startPreHeight</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>ad6042855868420916ec7c5bbb232e26f</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>startPostWidth</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>ae4797b99153df747828fb6cc02dae9b0</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>startPostHeight</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a3d3d004bc42595ff42bdb210bada594b</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>stepPreWidth</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a1e8efd89a833ec63e2f23a73fbd7c5cf</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>stepPreHeight</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>af28477f63c374f6522fa6a522e9e259c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>stepPostWidth</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a3865ce7c696b02b3edd50b56f347a825</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>stepPostHeight</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a0e44200f8fb728fd79e477862340e55c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>kernelWidth</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a0d01aa03a26db10e49797f513dbbd9ef</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint16_t</type>
-      <name>kernelHeight</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>ae62905eebe003437d597af683f38bcc5</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>post_slice_start</name>
-      <anchorfile>param__generator__kernel_8h.html</anchorfile>
-      <anchor>a4e6a2883a116a6d2af96d2b0c444995d</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -12802,7 +12497,7 @@
   </compound>
   <compound kind="struct">
     <name>pop_table_config_t</name>
-    <filename>population__table__binary__search__impl_8c.html</filename>
+    <filename>population__table_8h.html</filename>
     <anchor>structpop__table__config__t</anchor>
   </compound>
   <compound kind="struct">
@@ -12968,9 +12663,19 @@
     <anchor>structprovenance__data</anchor>
   </compound>
   <compound kind="struct">
+    <name>recording_index_t</name>
+    <filename>neuron__expander_8c.html</filename>
+    <anchor>structrecording__index__t</anchor>
+  </compound>
+  <compound kind="struct">
     <name>recording_info_t</name>
     <filename>neuron__recording_8h.html</filename>
     <anchor>structrecording__info__t</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>recording_params_t</name>
+    <filename>neuron__expander_8c.html</filename>
+    <anchor>structrecording__params__t</anchor>
   </compound>
   <compound kind="struct">
     <name>recording_values_t</name>
@@ -12988,9 +12693,9 @@
     <anchor>structrng__seed__t</anchor>
   </compound>
   <compound kind="struct">
-    <name>rng</name>
-    <filename>rng_8c.html</filename>
-    <anchor>structrng</anchor>
+    <name>rng_t</name>
+    <filename>rng_8h.html</filename>
+    <anchor>structrng__t</anchor>
   </compound>
   <compound kind="struct">
     <name>robot_motor_control_provenance</name>
@@ -13069,9 +12774,9 @@
     </member>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>is_neuromodulation</name>
+      <name>synapse_type</name>
       <anchorfile>matrix__generator__neuromodulation_8h.html</anchorfile>
-      <anchor>ad0be7518890904ee78bc08d1ab2729c6</anchor>
+      <anchor>a24c64bb4fb33311c61c8fda94efa08b0</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -13083,9 +12788,9 @@
     </member>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>synapse_type</name>
+      <name>is_neuromodulation</name>
       <anchorfile>matrix__generator__neuromodulation_8h.html</anchorfile>
-      <anchor>a24c64bb4fb33311c61c8fda94efa08b0</anchor>
+      <anchor>ad0be7518890904ee78bc08d1ab2729c6</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -13109,6 +12814,11 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>sdram_bitfield_recording_data_t</name>
+    <filename>neuron__expander_8c.html</filename>
+    <anchor>structsdram__bitfield__recording__data__t</anchor>
+  </compound>
+  <compound kind="struct">
     <name>sdram_config</name>
     <filename>spike__source__poisson_8c.html</filename>
     <anchor>structsdram__config</anchor>
@@ -13128,30 +12838,9 @@
     </member>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>n_neurons</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a6a591c0cd469068deef9515db3a5435d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_synapse_types</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a5aeda4c778a8f079554189f957410c9c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
       <name>n_synapse_cores</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>ac71da842b9ee9030342176197e40ba3b</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>synapse_index_bits</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>ac5dd25085ff51b0365a1a81144c5883d</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -13184,35 +12873,38 @@
     </member>
   </compound>
   <compound kind="struct">
-    <name>single_synaptic_row_t</name>
-    <filename>direct__synapses_8c.html</filename>
-    <anchor>structsingle__synaptic__row__t</anchor>
-    <member kind="variable">
-      <type>const uint32_t</type>
-      <name>n_plastic</name>
-      <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a1b6fa98c7e08a0ef08fc5211be5ae829</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const uint32_t</type>
-      <name>n_fixed</name>
-      <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a98e324626937fff9c6246c5fe23aa1a6</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>const uint32_t</type>
-      <name>n_plastic_controls</name>
-      <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a3f71526e9df46b5cef9c3b485e15dd6c</anchor>
-      <arglist></arglist>
-    </member>
+    <name>sdram_variable_recording_data_t</name>
+    <filename>neuron__expander_8c.html</filename>
+    <anchor>structsdram__variable__recording__data__t</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>source_expand_details</name>
+    <filename>spike__source__poisson_8c.html</filename>
+    <anchor>structsource__expand__details</anchor>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>synapse_datum</name>
-      <anchorfile>direct__synapses_8c.html</anchorfile>
-      <anchor>a009a320a0562e47977f8f408c72e2859</anchor>
+      <name>count</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a0b22dacb098532eb13061823df198d9b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>source_info</type>
+      <name>info</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>aa148724471d5c6680c4a1ad0a7182ced</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>source_expand_region</name>
+    <filename>spike__source__poisson_8c.html</filename>
+    <anchor>structsource__expand__region</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>rate_changed</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a536780c6b007db0857d07656546a8fb2</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -13235,10 +12927,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>spike_source_t</type>
-      <name>poissons</name>
+      <type>source_details</type>
+      <name>details</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a489d13f6c68c512fda05e069a5383947</anchor>
+      <anchor>a56c2077f5085d9d86a1a5a39d62a9029</anchor>
       <arglist>[]</arglist>
     </member>
   </compound>
@@ -13325,6 +13017,27 @@
       <name>max_transfer_timer_overrun</name>
       <anchorfile>spike__processing__fast_8h.html</anchorfile>
       <anchor>ad54eed3177f0c24003d53368aac34005</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>earliest_receive</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>ada0587dfdf0b6c93fd84124e948e0880</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>latest_receive</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>af092c1094a787efc5ecb2b5d78875b90</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_spikes_overflow</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a16b051ee2aa9d8627aa7067590241554</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -13497,81 +13210,6 @@
     <anchor>structstructural__recording__values__t</anchor>
   </compound>
   <compound kind="struct">
-    <name>synapse_param_t</name>
-    <filename>synapse__types__semd__impl_8h.html</filename>
-    <anchor>structsynapse__param__t</anchor>
-    <member kind="variable">
-      <type>alpha_params_t</type>
-      <name>exc</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a54c6d9b5e32ee070e6f3fc350bd3dc27</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>alpha_params_t</type>
-      <name>inh</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a603098082c6122c49eaaee5220b91c36</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>delta_params_t</type>
-      <name>exc</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a8f91b2c0aa9a88c2b44e086fc94e6e24</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>delta_params_t</type>
-      <name>inh</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a39087de65c4c33969bbfa69fee75697d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>exp_params_t</type>
-      <name>exc</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a54c6d9b5e32ee070e6f3fc350bd3dc27</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>exp_params_t</type>
-      <name>exc2</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>ac7188feb692fb36784afed3e29e1db7b</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>exp_params_t</type>
-      <name>inh</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a603098082c6122c49eaaee5220b91c36</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>multiplicator</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>ae5a2dbf2b4410eb054592c7dd981354a</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>exc2_old</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>a8d690bc6f7611e73dc3f2841d7bfbc91</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>input_t</type>
-      <name>scaling_factor</name>
-      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
-      <anchor>af29469cba3047bb7b6f9b64eb0daf0bf</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="struct">
     <name>synapse_params</name>
     <filename>synapses_8c.html</filename>
     <anchor>structsynapse__params</anchor>
@@ -13637,13 +13275,6 @@
       <name>synapse_params</name>
       <anchorfile>structsynapse__regions.html</anchorfile>
       <anchor>ae1bf2e2f2adb01f1790000e94584ddb0</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>direct_matrix</name>
-      <anchorfile>structsynapse__regions.html</anchorfile>
-      <anchor>ad77cc9eef3e62a3b7639207a9c91f956</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -13778,6 +13409,189 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>synapse_types_params_t</name>
+    <filename>synapse__types__semd__impl_8h.html</filename>
+    <anchor>structsynapse__types__params__t</anchor>
+    <member kind="variable">
+      <type>alpha_params_t</type>
+      <name>exc</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>ad823543feff17b1157436e0a29ae8f5a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>alpha_params_t</type>
+      <name>inh</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>afb38d764d2ac9d255d8851853d40b21d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>exp_params_t</type>
+      <name>exc</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>ad823543feff17b1157436e0a29ae8f5a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>exp_params_t</type>
+      <name>exc2</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>a5a088fb034ea4f71de588dcafd513e03</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>exp_params_t</type>
+      <name>inh</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>afb38d764d2ac9d255d8851853d40b21d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>input_t</type>
+      <name>multiplicator_init</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>a65cf181b7580785ec413b8b7ded9066b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>input_t</type>
+      <name>exc2_old_init</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>a2da19ce57b3c82cb1b9c9c118bdcb832</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>input_t</type>
+      <name>scaling_factor</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>a2b301f2f1ed46bcbdbc4fe5de4136048</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>timestep_ms</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>abba8bae897b58ed43a68e684c8a0e6e9</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>synapse_types_t</name>
+    <filename>synapse__types__semd__impl_8h.html</filename>
+    <anchor>structsynapse__types__t</anchor>
+    <member kind="variable">
+      <type>alpha_state_t</type>
+      <name>exc</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>aebbb0a0a65a17b0c580f03b50fccdeed</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>alpha_state_t</type>
+      <name>inh</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>ab566101b8fa8437032939f3b263a951b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>input_t</type>
+      <name>exc</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>af5938ab9da9b4ef7ab17de4e817c6523</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>input_t</type>
+      <name>inh</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>addcfd56e64defd09153ea1401a4c1b1f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>exp_state_t</type>
+      <name>exc</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>aebbb0a0a65a17b0c580f03b50fccdeed</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>exp_state_t</type>
+      <name>exc2</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>ae9976d113882ab8adc3576bc7f1e0ceb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>exp_state_t</type>
+      <name>inh</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>ab566101b8fa8437032939f3b263a951b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>input_t</type>
+      <name>multiplicator</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>a72d9546590f2bc47d6f598591059379c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>input_t</type>
+      <name>exc2_old</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>a00b09975c798929e901409393d042483</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>input_t</type>
+      <name>scaling_factor</name>
+      <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
+      <anchor>a2e454d97e37bc2abe34cb1f2043732a0</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>threshold_type_params_t</name>
+    <filename>threshold__type__static_8h.html</filename>
+    <anchor>structthreshold__type__params__t</anchor>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>du_th</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>a39a4a0cad4335ec0a6228e491c51b715</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>tau_th</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>a8765ecbcef96af7f1564c611b7f3ae70</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>v_thresh</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>a2a2c98c037d25d3e16f5fbed1f25885a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>time_step_ms</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>a6618b1cdebadeb52e86c0ea33d94ea8b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>REAL</type>
+      <name>threshold_value</name>
+      <anchorfile>threshold__type__static_8h.html</anchorfile>
+      <anchor>a6e1abe871ed27b99be9a050662871898</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>threshold_type_t</name>
     <filename>threshold__type__static_8h.html</filename>
     <anchor>structthreshold__type__t</anchor>
@@ -13844,6 +13658,11 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>type_info</name>
+    <filename>type__writers_8h.html</filename>
+    <anchor>structtype__info</anchor>
+  </compound>
+  <compound kind="struct">
     <name>uniform_params</name>
     <filename>param__generator__uniform_8h.html</filename>
     <anchor>structuniform__params</anchor>
@@ -13880,6 +13699,11 @@
       <anchor>a2d508676e6b481d3498c2920efee4d3a</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>variable_recording_t</name>
+    <filename>neuron__expander_8c.html</filename>
+    <anchor>structvariable__recording__t</anchor>
   </compound>
   <compound kind="struct">
     <name>vogels_2011_config_t</name>

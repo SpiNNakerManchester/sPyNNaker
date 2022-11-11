@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['final_5fstate_5ft_4804',['final_state_t',['../synapse__structure__weight__accumulator__impl_8h.html#a174a20aa9aac3b4c8ecda186d8db0083',1,'final_state_t():&#160;synapse_structure_weight_accumulator_impl.h'],['../synapse__structure__weight__impl_8h.html#a3f28e6a9e3f4b037ca7cd80997a3506d',1,'final_state_t():&#160;synapse_structure_weight_impl.h'],['../synapse__structure__weight__state__accumulator__impl_8h.html#a174a20aa9aac3b4c8ecda186d8db0083',1,'final_state_t():&#160;synapse_structure_weight_state_accumulator_impl.h'],['../synapse__structure__weight__state__accumulator__window__impl_8h.html#a174a20aa9aac3b4c8ecda186d8db0083',1,'final_state_t():&#160;synapse_structure_weight_state_accumulator_window_impl.h']]],
-  ['fract_4805',['FRACT',['../maths-util_8h.html#a1b5bb55fc4fc8f2e3a5b377aa6ab36ba',1,'maths-util.h']]],
-  ['free_5ffunc_4806',['free_func',['../generator__types_8h.html#a6b16387baa51e7bff16f0e21220c254e',1,'generator_types.h']]]
+  ['generate_5fconnection_5ffunc_4822',['generate_connection_func',['../generator__types_8h.html#ae7498b5ac57ed8c5279e034819ae4c3f',1,'generator_types.h']]],
+  ['generate_5fparam_5ffunc_4823',['generate_param_func',['../generator__types_8h.html#aeb13a16410f550a8620d9db733b00114',1,'generator_types.h']]],
+  ['generator_5fhash_5ft_4824',['generator_hash_t',['../generator__types_8h.html#a55f8d20fc9350939e3fa6a85d8aed90c',1,'generator_types.h']]]
 ];

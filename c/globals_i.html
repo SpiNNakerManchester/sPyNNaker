@@ -128,7 +128,7 @@ $(function() {
 : <a class="el" href="robot__motor__control_8c.html#a55ebafbff10f99685495e8f745ff53ca">robot_motor_control.c</a>
 </li>
 <li>INDIRECT_ADDRESS_SHIFT
-: <a class="el" href="population__table__binary__search__impl_8c.html#a36896ff3554f8b8ee7fe1599ec6c26f5">population_table_binary_search_impl.c</a>
+: <a class="el" href="population__table_8h.html#a36896ff3554f8b8ee7fe1599ec6c26f5">population_table.h</a>
 </li>
 <li>infinite_run
 : <a class="el" href="delay__extension_8c.html#a9ee6c18f2c55e2b60ea4194d4722f735">delay_extension.c</a>
@@ -145,9 +145,11 @@ $(function() {
 , <a class="el" href="synapse__types__delta__impl_8h.html#afcd85a8de2d9bb81e9a220ddf1427841a175c96e554c8359207394ef1e677b70d">synapse_types_delta_impl.h</a>
 , <a class="el" href="synapse__types__alpha__impl_8h.html#a3fc30879d6f7f95782bfeeccbca6bb20a175c96e554c8359207394ef1e677b70d">synapse_types_alpha_impl.h</a>
 </li>
+<li>INITIAL_VALUES_REGION
+: <a class="el" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a1b7dad0611f796bf47478691cacd5ddd">regions.h</a>
+</li>
 <li>initialise()
-: <a class="el" href="bit__field__expander_8c.html#a08e046aae605f0fc1ba5dc96b1d2f09a">bit_field_expander.c</a>
-, <a class="el" href="c__main_8c.html#abc8ec4992e18193766cc267a4968f1d7">c_main.c</a>
+: <a class="el" href="c__main_8c.html#abc8ec4992e18193766cc267a4968f1d7">c_main.c</a>
 , <a class="el" href="c__main__neurons_8c.html#abc8ec4992e18193766cc267a4968f1d7">c_main_neurons.c</a>
 , <a class="el" href="c__main__synapses_8c.html#abc8ec4992e18193766cc267a4968f1d7">c_main_synapses.c</a>
 </li>
@@ -159,15 +161,17 @@ $(function() {
 , <a class="el" href="spike__source__poisson_8c.html#a03a8e4045b51680cc94b4359837fa796">spike_source_poisson.c</a>
 , <a class="el" href="robot__motor__control_8c.html#a37f0b2315f3101f6ff9936c212c5bd84">robot_motor_control.c</a>
 </li>
-<li>initialize_func
-: <a class="el" href="generator__types_8h.html#a2eba3e6d9fed26ac5064e720ceed0f91">generator_types.h</a>
+<li>initialize_connector_func
+: <a class="el" href="generator__types_8h.html#aa2bb0f66f4f24dc4e04b844f1b8c8453">generator_types.h</a>
+</li>
+<li>initialize_matrix_func
+: <a class="el" href="generator__types_8h.html#a5cbf8d694bdaf766029ecedfa941d5a5">generator_types.h</a>
+</li>
+<li>initialize_param_func
+: <a class="el" href="generator__types_8h.html#a0a50a2e28c5d94827d681367fb6930f8">generator_types.h</a>
 </li>
 <li>input_buffer
 : <a class="el" href="local__only_8c.html#ace70899ad78873f586a55a1cce68769c">local_only.c</a>
-</li>
-<li>INPUT_SCALE_FACTOR
-: <a class="el" href="input__type__current_8h.html#a80a0eacdb1171eb336d3ff00ee1fa50a">input_type_current.h</a>
-, <a class="el" href="input__type__delta_8h.html#a80a0eacdb1171eb336d3ff00ee1fa50a">input_type_delta.h</a>
 </li>
 <li>input_t
 : <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">neuron-typedefs.h</a>
@@ -176,38 +180,40 @@ $(function() {
 : <a class="el" href="spike__source__poisson_8c.html#a148ad514a3ea3af1eae2a8a354f242c2">spike_source_poisson.c</a>
 </li>
 <li>input_type_array
-: <a class="el" href="neuron__impl__external__devices_8h.html#a31058212f43265088fe71863d4ea0907">neuron_impl_external_devices.h</a>
-, <a class="el" href="neuron__impl__standard_8h.html#a31058212f43265088fe71863d4ea0907">neuron_impl_standard.h</a>
+: <a class="el" href="neuron__impl__standard_8h.html#a31058212f43265088fe71863d4ea0907">neuron_impl_standard.h</a>
 </li>
 <li>input_type_convert_excitatory_input_to_current()
-: <a class="el" href="input__type_8h.html#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">input_type.h</a>
-, <a class="el" href="input__type__conductance_8h.html#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">input_type_conductance.h</a>
-, <a class="el" href="input__type__current_8h.html#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">input_type_current.h</a>
-, <a class="el" href="input__type__delta_8h.html#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">input_type_delta.h</a>
+: <a class="el" href="input__type__current_8h.html#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">input_type_current.h</a>
 , <a class="el" href="input__type__none_8h.html#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">input_type_none.h</a>
+, <a class="el" href="input__type__delta_8h.html#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">input_type_delta.h</a>
+, <a class="el" href="input__type__conductance_8h.html#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">input_type_conductance.h</a>
+, <a class="el" href="input__type_8h.html#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">input_type.h</a>
 </li>
 <li>input_type_convert_inhibitory_input_to_current()
-: <a class="el" href="input__type__none_8h.html#a07605d2b04f6d102c116229dd0ccc91c">input_type_none.h</a>
-, <a class="el" href="input__type__delta_8h.html#a07605d2b04f6d102c116229dd0ccc91c">input_type_delta.h</a>
+: <a class="el" href="input__type_8h.html#a07605d2b04f6d102c116229dd0ccc91c">input_type.h</a>
 , <a class="el" href="input__type__conductance_8h.html#a07605d2b04f6d102c116229dd0ccc91c">input_type_conductance.h</a>
-, <a class="el" href="input__type_8h.html#a07605d2b04f6d102c116229dd0ccc91c">input_type.h</a>
 , <a class="el" href="input__type__current_8h.html#a07605d2b04f6d102c116229dd0ccc91c">input_type_current.h</a>
+, <a class="el" href="input__type__delta_8h.html#a07605d2b04f6d102c116229dd0ccc91c">input_type_delta.h</a>
+, <a class="el" href="input__type__none_8h.html#a07605d2b04f6d102c116229dd0ccc91c">input_type_none.h</a>
 </li>
 <li>input_type_get_input_value()
 : <a class="el" href="input__type_8h.html#a81523b64ae8f05a21338702d0551e9e6">input_type.h</a>
-, <a class="el" href="input__type__conductance_8h.html#a81523b64ae8f05a21338702d0551e9e6">input_type_conductance.h</a>
-, <a class="el" href="input__type__current_8h.html#a81523b64ae8f05a21338702d0551e9e6">input_type_current.h</a>
-, <a class="el" href="input__type__delta_8h.html#a81523b64ae8f05a21338702d0551e9e6">input_type_delta.h</a>
 , <a class="el" href="input__type__none_8h.html#a81523b64ae8f05a21338702d0551e9e6">input_type_none.h</a>
+, <a class="el" href="input__type__delta_8h.html#a81523b64ae8f05a21338702d0551e9e6">input_type_delta.h</a>
+, <a class="el" href="input__type__current_8h.html#a81523b64ae8f05a21338702d0551e9e6">input_type_current.h</a>
+, <a class="el" href="input__type__conductance_8h.html#a81523b64ae8f05a21338702d0551e9e6">input_type_conductance.h</a>
 </li>
-<li>input_type_pointer_t
-: <a class="el" href="input__type_8h.html#af2eac2241adec660b95b59ab8cc519ff">input_type.h</a>
+<li>input_type_initialise()
+: <a class="el" href="input__type_8h.html#a26f363df8042bd869bd06d36744bfbee">input_type.h</a>
+</li>
+<li>input_type_save_state()
+: <a class="el" href="input__type_8h.html#ae174cb0d7c7d94f22ee29379c80b73b8">input_type.h</a>
 </li>
 <li>instance_key
 : <a class="el" href="munich__protocol_8h.html#a21aacafb9f4a3adc7afc7b0e4681e0bc">munich_protocol.h</a>
 </li>
 <li>INVALID_ADDRESS
-: <a class="el" href="population__table__binary__search__impl_8c.html#ac0e87c1d66cacc61454b23cdc12ff764">population_table_binary_search_impl.c</a>
+: <a class="el" href="population__table_8h.html#ac0e87c1d66cacc61454b23cdc12ff764">population_table.h</a>
 </li>
 <li>invalid_master_pop_hits
 : <a class="el" href="population__table_8h.html#a40086bc81cde7081da9ed9b52b6bfaff">population_table.h</a>
@@ -236,7 +242,7 @@ $(function() {
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:12 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

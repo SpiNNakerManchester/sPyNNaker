@@ -105,15 +105,15 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a2e7a19b44cf70f55ce523967c2ebe963"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__normal__clipped_8h.html#a2e7a19b44cf70f55ce523967c2ebe963">param_generator_normal_clipped_initialize</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:a2e7a19b44cf70f55ce523967c2ebe963"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to initialise the clipped normal RNG parameter generator.  <a href="param__generator__normal__clipped_8h.html#a2e7a19b44cf70f55ce523967c2ebe963">More...</a><br /></td></tr>
-<tr class="separator:a2e7a19b44cf70f55ce523967c2ebe963"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54344636f79eebf5c8a0b38679ea7fb6"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__normal__clipped_8h.html#a54344636f79eebf5c8a0b38679ea7fb6">param_generator_normal_clipped_initialize</a> (void **<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:a54344636f79eebf5c8a0b38679ea7fb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to initialise the clipped normal RNG parameter generator.  <a href="param__generator__normal__clipped_8h.html#a54344636f79eebf5c8a0b38679ea7fb6">More...</a><br /></td></tr>
+<tr class="separator:a54344636f79eebf5c8a0b38679ea7fb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9c765cadcfd29badb3aa2b96aa6ace2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__normal__clipped_8h.html#aa9c765cadcfd29badb3aa2b96aa6ace2">param_generator_normal_clipped_free</a> (void *generator)</td></tr>
 <tr class="memdesc:aa9c765cadcfd29badb3aa2b96aa6ace2"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to free any data for the clipped normal RNG parameter generator.  <a href="param__generator__normal__clipped_8h.html#aa9c765cadcfd29badb3aa2b96aa6ace2">More...</a><br /></td></tr>
 <tr class="separator:aa9c765cadcfd29badb3aa2b96aa6ace2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee9da23a6c9386207ef4aa389c193465"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__normal__clipped_8h.html#aee9da23a6c9386207ef4aa389c193465">param_generator_normal_clipped_generate</a> (void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</td></tr>
-<tr class="memdesc:aee9da23a6c9386207ef4aa389c193465"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate values with the clipped normal RNG parameter generator.  <a href="param__generator__normal__clipped_8h.html#aee9da23a6c9386207ef4aa389c193465">More...</a><br /></td></tr>
-<tr class="separator:aee9da23a6c9386207ef4aa389c193465"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2689af6a3a0e75893cb57cbb0f9225a3"><td class="memItemLeft" align="right" valign="top">static accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__normal__clipped_8h.html#a2689af6a3a0e75893cb57cbb0f9225a3">param_generator_normal_clipped_generate</a> (void *generator)</td></tr>
+<tr class="memdesc:a2689af6a3a0e75893cb57cbb0f9225a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate values with the clipped normal RNG parameter generator.  <a href="param__generator__normal__clipped_8h.html#a2689af6a3a0e75893cb57cbb0f9225a3">More...</a><br /></td></tr>
+<tr class="separator:a2689af6a3a0e75893cb57cbb0f9225a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Normally distributed random, redrawn if out of boundary, parameter generator implementation. </p>
@@ -186,19 +186,13 @@ high</td>
 params</td>
 <td class="fielddoc">
 </td></tr>
-<tr><td class="fieldtype">
-<a id="ab0ccbcbdc2057942ad0bbcb66b1a70ac"></a>rng_t</td>
-<td class="fieldname">
-rng</td>
-<td class="fielddoc">
-</td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a2e7a19b44cf70f55ce523967c2ebe963"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e7a19b44cf70f55ce523967c2ebe963">&#9670;&nbsp;</a></span>param_generator_normal_clipped_initialize()</h2>
+<a id="a54344636f79eebf5c8a0b38679ea7fb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54344636f79eebf5c8a0b38679ea7fb6">&#9670;&nbsp;</a></span>param_generator_normal_clipped_initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -209,7 +203,7 @@ rng</td>
         <tr>
           <td class="memname">static void* param_generator_normal_clipped_initialize </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramtype">void **&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
           <td></td>
         </tr>
@@ -230,7 +224,7 @@ rng</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator__normal__clipped_8h_source.html#l00060">60</a> of file <a class="el" href="param__generator__normal__clipped_8h_source.html">param_generator_normal_clipped.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator__normal__clipped_8h_source.html#l00059">59</a> of file <a class="el" href="param__generator__normal__clipped_8h_source.html">param_generator_normal_clipped.h</a>.</p>
 
 </div>
 </div>
@@ -266,12 +260,12 @@ rng</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator__normal__clipped_8h_source.html#l00083">83</a> of file <a class="el" href="param__generator__normal__clipped_8h_source.html">param_generator_normal_clipped.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator__normal__clipped_8h_source.html#l00079">79</a> of file <a class="el" href="param__generator__normal__clipped_8h_source.html">param_generator_normal_clipped.h</a>.</p>
 
 </div>
 </div>
-<a id="aee9da23a6c9386207ef4aa389c193465"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee9da23a6c9386207ef4aa389c193465">&#9670;&nbsp;</a></span>param_generator_normal_clipped_generate()</h2>
+<a id="a2689af6a3a0e75893cb57cbb0f9225a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2689af6a3a0e75893cb57cbb0f9225a3">&#9670;&nbsp;</a></span>param_generator_normal_clipped_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -280,39 +274,11 @@ rng</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void param_generator_normal_clipped_generate </td>
+          <td class="memname">static accum param_generator_normal_clipped_generate </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>generator</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n_indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">accum *&#160;</td>
-          <td class="paramname"><em>values</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -326,22 +292,19 @@ rng</td>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to use to generate values </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_indices</td><td>The number of values to generate </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the neuron in the pre-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>The <code>n_indices</code> post-neuron indices for each connection </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">values</td><td>An array into which to place the values; will be <code>n_indices</code> in size </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>The generated value </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator__normal__clipped_8h_source.html#l00099">99</a> of file <a class="el" href="param__generator__normal__clipped_8h_source.html">param_generator_normal_clipped.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator__normal__clipped_8h_source.html#l00088">88</a> of file <a class="el" href="param__generator__normal__clipped_8h_source.html">param_generator_normal_clipped.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

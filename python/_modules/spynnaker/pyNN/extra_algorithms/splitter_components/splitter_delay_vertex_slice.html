@@ -53,8 +53,6 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">import</span> <span class="nn">math</span>
-
 <span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">PacmanConfigurationException</span><span class="p">,</span> <span class="n">PacmanInvalidParameterException</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_splitters.abstract_splitters</span> <span class="kn">import</span> <span class="p">(</span>
@@ -63,14 +61,8 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractGenerateOnMachine</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">DelayExtensionVertex</span><span class="p">,</span> <span class="n">DelayExtensionMachineVertex</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays.delay_generator_data</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DelayGeneratorData</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">SplitterDelayVertexSlice</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="p">):</span>
@@ -159,7 +151,7 @@
 <span class="sd">        :rtype: DelayExtensionMachineVertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Delay extension for </span><span class="si">{</span><span class="n">source_app_vertex</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_used_by_atoms</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="n">sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_used_by_atoms</span><span class="p">()</span>
 
         <span class="n">machine_vertex</span> <span class="o">=</span> <span class="n">DelayExtensionMachineVertex</span><span class="p">(</span>
             <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">)</span>
@@ -167,67 +159,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_machine_vertex_by_slice</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">machine_vertex</span>
         <span class="k">return</span> <span class="n">machine_vertex</span></div>
 
-<div class="viewcode-block" id="SplitterDelayVertexSlice.get_sdram_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_sdram_used_by_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="SplitterDelayVertexSlice.get_sdram_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_sdram_used_by_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; returns the sdram used by the delay extension</span>
 
-<span class="sd">        :param ApplicationGraph graph: app graph</span>
-<span class="sd">        :param Slice vertex_slice: The slice to get the size of</span>
 <span class="sd">        :rtype: ConstantSDRAM</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ConstantSDRAM</span><span class="p">(</span>
             <span class="n">SYSTEM_BYTES_REQUIREMENT</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">delay_params_size</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">delay_params_size</span><span class="p">()</span> <span class="o">+</span>
             <span class="n">DelayExtensionMachineVertex</span><span class="o">.</span><span class="n">get_provenance_data_size</span><span class="p">(</span>
-                <span class="n">DelayExtensionMachineVertex</span><span class="o">.</span><span class="n">N_EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_get_size_of_generator_information</span><span class="p">())</span></div>
-
-    <span class="k">def</span> <span class="nf">_get_size_of_generator_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the size of the generator data</span>
-
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">gen_on_machine</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">out_edge</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">outgoing_edges</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="n">out_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">:</span>
-
-                <span class="c1"># Get the number of likely vertices</span>
-                <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">out_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">out_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">&lt;</span> <span class="n">max_atoms</span><span class="p">:</span>
-                    <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">out_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">n_atoms</span>
-                <span class="n">n_edge_vertices</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-                    <span class="n">out_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">max_atoms</span><span class="p">)))</span>
-
-                <span class="c1"># Get the size</span>
-                <span class="n">gen_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_edge_generator_size</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">gen_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">gen_on_machine</span> <span class="o">=</span> <span class="kc">True</span>
-                    <span class="n">size</span> <span class="o">+=</span> <span class="n">gen_size</span> <span class="o">*</span> <span class="n">n_edge_vertices</span>
-        <span class="k">if</span> <span class="n">gen_on_machine</span><span class="p">:</span>
-            <span class="n">size</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_EXPANDER_BASE_PARAMS_SIZE</span>
-        <span class="k">return</span> <span class="n">size</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_get_edge_generator_size</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the size of the generator data for a given synapse info object</span>
-
-<span class="sd">        :param SynapseInformation synapse_info: the synapse info</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">connector</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span>
-        <span class="n">dynamics</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span>
-        <span class="n">connector_gen</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span>
-            <span class="n">connector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">)</span> <span class="ow">and</span>
-            <span class="n">connector</span><span class="o">.</span><span class="n">generate_on_machine</span><span class="p">(</span>
-                <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">))</span>
-        <span class="n">synapse_gen</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dynamics</span><span class="p">,</span> <span class="n">AbstractGenerateOnMachine</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">connector_gen</span> <span class="ow">and</span> <span class="n">synapse_gen</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">sum</span><span class="p">((</span>
-                <span class="n">DelayGeneratorData</span><span class="o">.</span><span class="n">BASE_SIZE</span><span class="p">,</span>
-                <span class="n">connector</span><span class="o">.</span><span class="n">gen_delay_params_size_in_bytes</span><span class="p">(</span>
-                    <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">),</span>
-                <span class="n">connector</span><span class="o">.</span><span class="n">gen_connector_params_size_in_bytes</span><span class="p">))</span>
-        <span class="k">return</span> <span class="mi">0</span>
+                <span class="n">DelayExtensionMachineVertex</span><span class="o">.</span><span class="n">N_EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="SplitterDelayVertexSlice.machine_vertices_for_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.machine_vertices_for_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">machine_vertices_for_recording</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">machine_vertices_for_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_to_record</span><span class="p">):</span>

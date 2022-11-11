@@ -75,13 +75,16 @@ $(function() {
 <li>saturation_count
 : <a class="el" href="delay__extension_8c.html#af98038a462abb37d565a0f4e6fbc2b2a">delay_extension.c</a>
 </li>
-<li>saved_params_address
-: <a class="el" href="neuron_8c.html#a0a022907f7d958b27b03e3e079108327">neuron.c</a>
+<li>saved_initial_values_address
+: <a class="el" href="neuron_8c.html#ac29f7d6b5e1d2e4b5afcf4c724b51d13">neuron.c</a>
+</li>
+<li>saved_neuron_params_address
+: <a class="el" href="neuron_8c.html#af0054ecd50a9d83ec3b87837779e061a">neuron.c</a>
 </li>
 <li>SDP
-: <a class="el" href="robot__motor__control_8c.html#ad8ff0294897e11d77bb67c6f1e9a3386ad645defae8408de2415f3dc417f69773">robot_motor_control.c</a>
-, <a class="el" href="delay__extension_8c.html#a9754029f237bd209c67ffa701d8250c6ad645defae8408de2415f3dc417f69773">delay_extension.c</a>
+: <a class="el" href="delay__extension_8c.html#a9754029f237bd209c67ffa701d8250c6ad645defae8408de2415f3dc417f69773">delay_extension.c</a>
 , <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773">spike_source_poisson.c</a>
+, <a class="el" href="robot__motor__control_8c.html#ad8ff0294897e11d77bb67c6f1e9a3386ad645defae8408de2415f3dc417f69773">robot_motor_control.c</a>
 </li>
 <li>sdram_inputs
 : <a class="el" href="c__main__neurons_8c.html#a9f249060c5bd10f51d18ac31811e335a">c_main_neurons.c</a>
@@ -89,6 +92,9 @@ $(function() {
 </li>
 <li>SDRAM_PARAMS_REGION
 : <a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a83adee9297ce4e0afe12a39cc55f4562">spike_source_poisson.c</a>
+</li>
+<li>seed
+: <a class="el" href="random__util_8h.html#a242fd815ccc9f4b3ad34154405da64c6">random_util.h</a>
 </li>
 <li>send_to_motor()
 : <a class="el" href="robot__motor__control_8c.html#a9d116f770371127474391640debce621">robot_motor_control.c</a>
@@ -127,10 +133,19 @@ $(function() {
 : <a class="el" href="munich__protocol_8h.html#a63f78c33f4497c8732b5532c3985e627">munich_protocol.h</a>
 </li>
 <li>set_spike_source_rate()
-: <a class="el" href="spike__source__poisson_8c.html#a12c72782cb450237076bc0622fc90125">spike_source_poisson.c</a>
+: <a class="el" href="spike__source__poisson_8c.html#a8bf6651c51e0a26f22f653842a1dcba8">spike_source_poisson.c</a>
 </li>
 <li>SET_TIMER_COUNTER_FOR_TIMESTAMPS
 : <a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a74cd8f0dde766e3c78118ca85fd4f20e">munich_protocol.h</a>
+</li>
+<li>setup_nm_rows()
+: <a class="el" href="matrix__generator__neuromodulation_8h.html#aac7b4d7aaf8b502f118972ae9bdb0bef">matrix_generator_neuromodulation.h</a>
+</li>
+<li>setup_rows()
+: <a class="el" href="matrix__generator__static_8h.html#ad8a76e9758256ce53a6f257964452086">matrix_generator_static.h</a>
+</li>
+<li>setup_stdp_rows()
+: <a class="el" href="matrix__generator__stdp_8h.html#a730440b766c56973dcde444c94792da1">matrix_generator_stdp.h</a>
 </li>
 <li>setup_synaptic_dma_read()
 : <a class="el" href="spike__processing_8c.html#a28d3a38d21ac9445175abd0ca06abd04">spike_processing.c</a>
@@ -145,21 +160,15 @@ $(function() {
 : <a class="el" href="neuron__model__izh__impl_8h.html#a2a9449a2c1269d81389014e6c2df9573">neuron_model_izh_impl.h</a>
 </li>
 <li>simulation_ticks
-: <a class="el" href="spike__source__poisson_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">spike_source_poisson.c</a>
+: <a class="el" href="c__main_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">c_main.c</a>
+, <a class="el" href="spike__source__poisson_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">spike_source_poisson.c</a>
 , <a class="el" href="robot__motor__control_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">robot_motor_control.c</a>
 , <a class="el" href="c__main__synapses_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">c_main_synapses.c</a>
 , <a class="el" href="c__main__neurons_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">c_main_neurons.c</a>
-, <a class="el" href="c__main_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">c_main.c</a>
 , <a class="el" href="delay__extension_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">delay_extension.c</a>
-</li>
-<li>single_fixed_synapse
-: <a class="el" href="direct__synapses_8c.html#a5dd766c9e442321941ea5ccef7d32710">direct_synapses.c</a>
 </li>
 <li>slow_spike_source_get_time_to_spike()
 : <a class="el" href="spike__source__poisson_8c.html#aa2602e67f1b5a03f8e9440743171ef81">spike_source_poisson.c</a>
-</li>
-<li>sort_by_key()
-: <a class="el" href="bit__field__expander_8c.html#af9ca4dbc2f71c68e5140742c020f8380">bit_field_expander.c</a>
 </li>
 <li>source
 : <a class="el" href="spike__source__poisson_8c.html#a8fc9649bde3c5a1307c82861ad881004">spike_source_poisson.c</a>
@@ -183,8 +192,8 @@ $(function() {
 : <a class="el" href="sp__structs_8h.html#a556a46199d62d23cdff354c53b2c7906">sp_structs.h</a>
 </li>
 <li>sparse_axonal_delay()
-: <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#abade6b73a469c1ff0e54366f065343e5">synapse_dynamics_stdp_mad_impl.c</a>
-, <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#abade6b73a469c1ff0e54366f065343e5">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>
+: <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#abade6b73a469c1ff0e54366f065343e5">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>
+, <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#abade6b73a469c1ff0e54366f065343e5">synapse_dynamics_stdp_mad_impl.c</a>
 </li>
 <li>speed
 : <a class="el" href="robot__motor__control_8c.html#a218b4f7c6cc2681a99c23a3b089d68b1">robot_motor_control.c</a>
@@ -292,9 +301,6 @@ $(function() {
 <li>STDP_FIXED_POINT_ONE
 : <a class="el" href="stdp__typedefs_8h.html#aa17e993cea62822ef342b0db7ed156f5">stdp_typedefs.h</a>
 </li>
-<li>store_poisson_parameters()
-: <a class="el" href="spike__source__poisson_8c.html#ad3f5360b39be7e95723ff26506d24fbe">spike_source_poisson.c</a>
-</li>
 <li>store_provenance_data()
 : <a class="el" href="delay__extension_8c.html#a6a6f18428eca2d03be2d82834e642876">delay_extension.c</a>
 , <a class="el" href="c__main__neurons_8c.html#a6a6f18428eca2d03be2d82834e642876">c_main_neurons.c</a>
@@ -304,14 +310,8 @@ $(function() {
 <li>STRUCTURAL_DYNAMICS_REGION
 : <a class="el" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6acd7db540d3cd331b92037b99a0447167">regions.h</a>
 </li>
-<li>structural_matrix_region_base_address
-: <a class="el" href="bit__field__expander_8c.html#a37444ff66ef05a9fff67975a7b9a3427">bit_field_expander.c</a>
-</li>
 <li>structural_recording_values
 : <a class="el" href="topographic__map__impl_8c.html#a86abfa547d5ce057edf3ec291b2d0255">topographic_map_impl.c</a>
-</li>
-<li>success_shut_down()
-: <a class="el" href="bit__field__expander_8c.html#a1218cee1aa99ae955d38901097ba2eea">bit_field_expander.c</a>
 </li>
 <li>sum()
 : <a class="el" href="c__main__neurons_8c.html#a5ffff1e601916bbafe975ffd014d063b">c_main_neurons.c</a>
@@ -324,9 +324,9 @@ $(function() {
 , <a class="el" href="synapses_8h.html#ab03dd903d4fed6afbcd9648d49beb9ae">synapses.h</a>
 </li>
 <li>synapse_delay_mask
-: <a class="el" href="synapses_8h.html#a2ef4427415ac67eb603a14ca1bb86f83">synapses.h</a>
-, <a class="el" href="local__only_8c.html#a2ef4427415ac67eb603a14ca1bb86f83">local_only.c</a>
+: <a class="el" href="local__only_8c.html#a2ef4427415ac67eb603a14ca1bb86f83">local_only.c</a>
 , <a class="el" href="synapses_8c.html#a2ef4427415ac67eb603a14ca1bb86f83">synapses.c</a>
+, <a class="el" href="synapses_8h.html#a2ef4427415ac67eb603a14ca1bb86f83">synapses.h</a>
 </li>
 <li>synapse_delta_input_buffer_regions
 : <a class="el" href="synapse__types__delta__impl_8h.html#afcd85a8de2d9bb81e9a220ddf1427841">synapse_types_delta_impl.h</a>
@@ -341,8 +341,8 @@ $(function() {
 , <a class="el" href="synapse__dynamics__static__impl_8c.html#ac877b6394f131f1944a720c387af6ac1">synapse_dynamics_static_impl.c</a>
 </li>
 <li>synapse_dynamics_find_neuron()
-: <a class="el" href="synapse__dynamics_8h.html#a5893fd33bdac3b991ecb7cb61feb4188">synapse_dynamics.h</a>
-, <a class="el" href="synapse__dynamics__static__impl_8c.html#a5893fd33bdac3b991ecb7cb61feb4188">synapse_dynamics_static_impl.c</a>
+: <a class="el" href="synapse__dynamics__static__impl_8c.html#a5893fd33bdac3b991ecb7cb61feb4188">synapse_dynamics_static_impl.c</a>
+, <a class="el" href="synapse__dynamics_8h.html#a5893fd33bdac3b991ecb7cb61feb4188">synapse_dynamics.h</a>
 , <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a5893fd33bdac3b991ecb7cb61feb4188">synapse_dynamics_stdp_mad_impl.c</a>
 , <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a5893fd33bdac3b991ecb7cb61feb4188">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>
 </li>
@@ -358,14 +358,14 @@ $(function() {
 </li>
 <li>synapse_dynamics_initialise()
 : <a class="el" href="synapse__dynamics__static__impl_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_static_impl.c</a>
-, <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_stdp_mad_impl.c</a>
-, <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>
 , <a class="el" href="synapse__dynamics_8h.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics.h</a>
+, <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>
+, <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_stdp_mad_impl.c</a>
 </li>
 <li>synapse_dynamics_n_connections_in_row()
-: <a class="el" href="synapse__dynamics__stdp__common_8h.html#aca5fc1011c991013823ad76158bf57f3">synapse_dynamics_stdp_common.h</a>
-, <a class="el" href="synapse__dynamics_8h.html#aca5fc1011c991013823ad76158bf57f3">synapse_dynamics.h</a>
+: <a class="el" href="synapse__dynamics_8h.html#aca5fc1011c991013823ad76158bf57f3">synapse_dynamics.h</a>
 , <a class="el" href="synapse__dynamics__static__impl_8c.html#aca5fc1011c991013823ad76158bf57f3">synapse_dynamics_static_impl.c</a>
+, <a class="el" href="synapse__dynamics__stdp__common_8h.html#aca5fc1011c991013823ad76158bf57f3">synapse_dynamics_stdp_common.h</a>
 </li>
 <li>synapse_dynamics_print_plastic_synapses()
 : <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#ac0dc7f1b3f6348db279fbad8c8040b1c">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>
@@ -374,9 +374,9 @@ $(function() {
 , <a class="el" href="synapse__dynamics__static__impl_8c.html#acb203e3c4f9b3e72bb69ce5033e83543">synapse_dynamics_static_impl.c</a>
 </li>
 <li>synapse_dynamics_process_plastic_synapses()
-: <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a491304657275ae6d450c602d42c80a17">synapse_dynamics_stdp_mad_impl.c</a>
+: <a class="el" href="synapse__dynamics_8h.html#a5901a534a051a77429fc3982363ebe25">synapse_dynamics.h</a>
 , <a class="el" href="synapse__dynamics__static__impl_8c.html#aa7a03613a642c5f6647d0fb4776bf1df">synapse_dynamics_static_impl.c</a>
-, <a class="el" href="synapse__dynamics_8h.html#a5901a534a051a77429fc3982363ebe25">synapse_dynamics.h</a>
+, <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a491304657275ae6d450c602d42c80a17">synapse_dynamics_stdp_mad_impl.c</a>
 , <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a491304657275ae6d450c602d42c80a17">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>
 </li>
 <li>synapse_dynamics_process_post_synaptic_event()
@@ -389,9 +389,9 @@ $(function() {
 : <a class="el" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ab672882ccd8470f490be492ed18d717b">regions.h</a>
 </li>
 <li>synapse_dynamics_remove_neuron()
-: <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#af3e517401d329d33f14b0ba70743e127">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>
-, <a class="el" href="synapse__dynamics__static__impl_8c.html#af3e517401d329d33f14b0ba70743e127">synapse_dynamics_static_impl.c</a>
+: <a class="el" href="synapse__dynamics__static__impl_8c.html#af3e517401d329d33f14b0ba70743e127">synapse_dynamics_static_impl.c</a>
 , <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#af3e517401d329d33f14b0ba70743e127">synapse_dynamics_stdp_mad_impl.c</a>
+, <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#af3e517401d329d33f14b0ba70743e127">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>
 , <a class="el" href="synapse__dynamics_8h.html#af3e517401d329d33f14b0ba70743e127">synapse_dynamics.h</a>
 </li>
 <li>synapse_index_bits
@@ -403,15 +403,12 @@ $(function() {
 : <a class="el" href="synapses_8c.html#a84db6c41c7cf03558016d477d8df4d37">synapses.c</a>
 , <a class="el" href="synapses_8h.html#a84db6c41c7cf03558016d477d8df4d37">synapses.h</a>
 </li>
-<li>synapse_param_pointer_t
-: <a class="el" href="synapse__types_8h.html#a45cfd57493ca66ddc880bd013f1022fe">synapse_types.h</a>
-</li>
 <li>SYNAPSE_PARAMS_REGION
 : <a class="el" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a3e4b437e3952b8683d2dde3f61a15d80">regions.h</a>
 </li>
 <li>SYNAPSE_REGIONS
-: <a class="el" href="c__main_8c.html#aabee4d4d7d12350e84247cd6af69d388">c_main.c</a>
-, <a class="el" href="c__main__synapses_8c.html#aabee4d4d7d12350e84247cd6af69d388">c_main_synapses.c</a>
+: <a class="el" href="c__main__synapses_8c.html#aabee4d4d7d12350e84247cd6af69d388">c_main_synapses.c</a>
+, <a class="el" href="c__main_8c.html#aabee4d4d7d12350e84247cd6af69d388">c_main.c</a>
 </li>
 <li>synapse_row_convert_weight_to_input()
 : <a class="el" href="synapse__row_8h.html#ae4e41ab174db01514418797dd28118e6">synapse_row.h</a>
@@ -468,35 +465,35 @@ $(function() {
 : <a class="el" href="synapse__types__semd__impl_8h.html#ac5bb58bf4fa0e9ea571c2a09f810b511">synapse_types_semd_impl.h</a>
 </li>
 <li>synapse_structure_create_synapse()
-: <a class="el" href="synapse__structure_8h.html#a7d6d84bcbbb6e0a39a6e880d665c0511">synapse_structure.h</a>
-, <a class="el" href="synapse__structure__weight__accumulator__impl_8h.html#a7d6d84bcbbb6e0a39a6e880d665c0511">synapse_structure_weight_accumulator_impl.h</a>
-, <a class="el" href="synapse__structure__weight__impl_8h.html#a7d6d84bcbbb6e0a39a6e880d665c0511">synapse_structure_weight_impl.h</a>
+: <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#a7d6d84bcbbb6e0a39a6e880d665c0511">synapse_structure_weight_state_accumulator_window_impl.h</a>
 , <a class="el" href="synapse__structure__weight__state__accumulator__impl_8h.html#a7d6d84bcbbb6e0a39a6e880d665c0511">synapse_structure_weight_state_accumulator_impl.h</a>
-, <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#a7d6d84bcbbb6e0a39a6e880d665c0511">synapse_structure_weight_state_accumulator_window_impl.h</a>
+, <a class="el" href="synapse__structure__weight__impl_8h.html#a7d6d84bcbbb6e0a39a6e880d665c0511">synapse_structure_weight_impl.h</a>
+, <a class="el" href="synapse__structure__weight__accumulator__impl_8h.html#a7d6d84bcbbb6e0a39a6e880d665c0511">synapse_structure_weight_accumulator_impl.h</a>
+, <a class="el" href="synapse__structure_8h.html#a7d6d84bcbbb6e0a39a6e880d665c0511">synapse_structure.h</a>
 </li>
 <li>synapse_structure_decay_weight()
 : <a class="el" href="synapse__structure_8h.html#a68ea811bcff6f1ffbd471cf846e04347">synapse_structure.h</a>
 </li>
 <li>synapse_structure_get_final_state()
-: <a class="el" href="synapse__structure__weight__state__accumulator__impl_8h.html#ae90f5f94b04793a935e8daf9490b0806">synapse_structure_weight_state_accumulator_impl.h</a>
-, <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#ae90f5f94b04793a935e8daf9490b0806">synapse_structure_weight_state_accumulator_window_impl.h</a>
-, <a class="el" href="synapse__structure__weight__impl_8h.html#ae90f5f94b04793a935e8daf9490b0806">synapse_structure_weight_impl.h</a>
-, <a class="el" href="synapse__structure_8h.html#ae90f5f94b04793a935e8daf9490b0806">synapse_structure.h</a>
+: <a class="el" href="synapse__structure_8h.html#ae90f5f94b04793a935e8daf9490b0806">synapse_structure.h</a>
 , <a class="el" href="synapse__structure__weight__accumulator__impl_8h.html#ae90f5f94b04793a935e8daf9490b0806">synapse_structure_weight_accumulator_impl.h</a>
+, <a class="el" href="synapse__structure__weight__impl_8h.html#ae90f5f94b04793a935e8daf9490b0806">synapse_structure_weight_impl.h</a>
+, <a class="el" href="synapse__structure__weight__state__accumulator__impl_8h.html#ae90f5f94b04793a935e8daf9490b0806">synapse_structure_weight_state_accumulator_impl.h</a>
+, <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#ae90f5f94b04793a935e8daf9490b0806">synapse_structure_weight_state_accumulator_window_impl.h</a>
 </li>
 <li>synapse_structure_get_final_synaptic_word()
 : <a class="el" href="synapse__structure_8h.html#a37a088e619407ca72cc01a1c19d54fda">synapse_structure.h</a>
-, <a class="el" href="synapse__structure__weight__accumulator__impl_8h.html#a37a088e619407ca72cc01a1c19d54fda">synapse_structure_weight_accumulator_impl.h</a>
-, <a class="el" href="synapse__structure__weight__impl_8h.html#a37a088e619407ca72cc01a1c19d54fda">synapse_structure_weight_impl.h</a>
-, <a class="el" href="synapse__structure__weight__state__accumulator__impl_8h.html#a37a088e619407ca72cc01a1c19d54fda">synapse_structure_weight_state_accumulator_impl.h</a>
 , <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#a37a088e619407ca72cc01a1c19d54fda">synapse_structure_weight_state_accumulator_window_impl.h</a>
+, <a class="el" href="synapse__structure__weight__state__accumulator__impl_8h.html#a37a088e619407ca72cc01a1c19d54fda">synapse_structure_weight_state_accumulator_impl.h</a>
+, <a class="el" href="synapse__structure__weight__impl_8h.html#a37a088e619407ca72cc01a1c19d54fda">synapse_structure_weight_impl.h</a>
+, <a class="el" href="synapse__structure__weight__accumulator__impl_8h.html#a37a088e619407ca72cc01a1c19d54fda">synapse_structure_weight_accumulator_impl.h</a>
 </li>
 <li>synapse_structure_get_final_weight()
-: <a class="el" href="synapse__structure__weight__state__accumulator__impl_8h.html#abf18bb0d3b4ca4464892e6f5631fd455">synapse_structure_weight_state_accumulator_impl.h</a>
-, <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#abf18bb0d3b4ca4464892e6f5631fd455">synapse_structure_weight_state_accumulator_window_impl.h</a>
-, <a class="el" href="synapse__structure__weight__impl_8h.html#abf18bb0d3b4ca4464892e6f5631fd455">synapse_structure_weight_impl.h</a>
+: <a class="el" href="synapse__structure_8h.html#abf18bb0d3b4ca4464892e6f5631fd455">synapse_structure.h</a>
 , <a class="el" href="synapse__structure__weight__accumulator__impl_8h.html#abf18bb0d3b4ca4464892e6f5631fd455">synapse_structure_weight_accumulator_impl.h</a>
-, <a class="el" href="synapse__structure_8h.html#abf18bb0d3b4ca4464892e6f5631fd455">synapse_structure.h</a>
+, <a class="el" href="synapse__structure__weight__impl_8h.html#abf18bb0d3b4ca4464892e6f5631fd455">synapse_structure_weight_impl.h</a>
+, <a class="el" href="synapse__structure__weight__state__accumulator__impl_8h.html#abf18bb0d3b4ca4464892e6f5631fd455">synapse_structure_weight_state_accumulator_impl.h</a>
+, <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#abf18bb0d3b4ca4464892e6f5631fd455">synapse_structure_weight_state_accumulator_window_impl.h</a>
 </li>
 <li>synapse_structure_get_update_state()
 : <a class="el" href="synapse__structure_8h.html#a7d9484a9e3bcbe6f1beea90d958b93f2">synapse_structure.h</a>
@@ -509,15 +506,11 @@ $(function() {
 : <a class="el" href="synapse__structure_8h.html#a3a382e1f377e5359969deaffc03478f0">synapse_structure.h</a>
 </li>
 <li>synapse_structure_get_weight()
-: <a class="el" href="synapse__structure__weight__state__accumulator__impl_8h.html#aead91a129a9df6e8dfcae25ef764e7af">synapse_structure_weight_state_accumulator_impl.h</a>
-, <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#aead91a129a9df6e8dfcae25ef764e7af">synapse_structure_weight_state_accumulator_window_impl.h</a>
-, <a class="el" href="synapse__structure_8h.html#aead91a129a9df6e8dfcae25ef764e7af">synapse_structure.h</a>
+: <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#aead91a129a9df6e8dfcae25ef764e7af">synapse_structure_weight_state_accumulator_window_impl.h</a>
+, <a class="el" href="synapse__structure__weight__state__accumulator__impl_8h.html#aead91a129a9df6e8dfcae25ef764e7af">synapse_structure_weight_state_accumulator_impl.h</a>
 , <a class="el" href="synapse__structure__weight__accumulator__impl_8h.html#aead91a129a9df6e8dfcae25ef764e7af">synapse_structure_weight_accumulator_impl.h</a>
 , <a class="el" href="synapse__structure__weight__impl_8h.html#aead91a129a9df6e8dfcae25ef764e7af">synapse_structure_weight_impl.h</a>
-</li>
-<li>synapse_type_bits
-: <a class="el" href="synapses_8c.html#af20079aa1e3c31a3efd344176025ce0f">synapses.c</a>
-, <a class="el" href="synapses_8h.html#af20079aa1e3c31a3efd344176025ce0f">synapses.h</a>
+, <a class="el" href="synapse__structure_8h.html#aead91a129a9df6e8dfcae25ef764e7af">synapse_structure.h</a>
 </li>
 <li>SYNAPSE_TYPE_BITS
 : <a class="el" href="synapse__types__alpha__impl_8h.html#a6a9484756434bfd11111a5187ac8f4bb">synapse_types_alpha_impl.h</a>
@@ -526,12 +519,16 @@ $(function() {
 , <a class="el" href="synapse__types__exponential__impl_8h.html#a6a9484756434bfd11111a5187ac8f4bb">synapse_types_exponential_impl.h</a>
 , <a class="el" href="synapse__types__semd__impl_8h.html#a6a9484756434bfd11111a5187ac8f4bb">synapse_types_semd_impl.h</a>
 </li>
+<li>synapse_type_bits
+: <a class="el" href="synapses_8c.html#af20079aa1e3c31a3efd344176025ce0f">synapses.c</a>
+, <a class="el" href="synapses_8h.html#af20079aa1e3c31a3efd344176025ce0f">synapses.h</a>
+</li>
 <li>SYNAPSE_TYPE_COUNT
 : <a class="el" href="synapse__types__alpha__impl_8h.html#a5be51be8977cd8a1209495229df7c491">synapse_types_alpha_impl.h</a>
-, <a class="el" href="synapse__types__delta__impl_8h.html#a5be51be8977cd8a1209495229df7c491">synapse_types_delta_impl.h</a>
-, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#a5be51be8977cd8a1209495229df7c491">synapse_types_dual_excitatory_exponential_impl.h</a>
-, <a class="el" href="synapse__types__exponential__impl_8h.html#a5be51be8977cd8a1209495229df7c491">synapse_types_exponential_impl.h</a>
 , <a class="el" href="synapse__types__semd__impl_8h.html#a5be51be8977cd8a1209495229df7c491">synapse_types_semd_impl.h</a>
+, <a class="el" href="synapse__types__exponential__impl_8h.html#a5be51be8977cd8a1209495229df7c491">synapse_types_exponential_impl.h</a>
+, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#a5be51be8977cd8a1209495229df7c491">synapse_types_dual_excitatory_exponential_impl.h</a>
+, <a class="el" href="synapse__types__delta__impl_8h.html#a5be51be8977cd8a1209495229df7c491">synapse_types_delta_impl.h</a>
 </li>
 <li>synapse_type_index_bits
 : <a class="el" href="local__only_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516">local_only.c</a>
@@ -547,28 +544,32 @@ $(function() {
 , <a class="el" href="synapses_8h.html#af786c2a0c6f40c688029991d5b9711a7">synapses.h</a>
 </li>
 <li>synapse_types_add_neuron_input()
-: <a class="el" href="synapse__types_8h.html#aebfa05875ff9afaae47150029297e087">synapse_types.h</a>
-, <a class="el" href="synapse__types__alpha__impl_8h.html#aebfa05875ff9afaae47150029297e087">synapse_types_alpha_impl.h</a>
-, <a class="el" href="synapse__types__delta__impl_8h.html#aebfa05875ff9afaae47150029297e087">synapse_types_delta_impl.h</a>
-, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#aebfa05875ff9afaae47150029297e087">synapse_types_dual_excitatory_exponential_impl.h</a>
-, <a class="el" href="synapse__types__exponential__impl_8h.html#aebfa05875ff9afaae47150029297e087">synapse_types_exponential_impl.h</a>
-, <a class="el" href="synapse__types__semd__impl_8h.html#acf288f16ad00e587ffe9057de91c5b4e">synapse_types_semd_impl.h</a>
+: <a class="el" href="synapse__types_8h.html#a60079a7d7261fb6e7154977cad9341dc">synapse_types.h</a>
+, <a class="el" href="synapse__types__alpha__impl_8h.html#a60079a7d7261fb6e7154977cad9341dc">synapse_types_alpha_impl.h</a>
+, <a class="el" href="synapse__types__delta__impl_8h.html#a60079a7d7261fb6e7154977cad9341dc">synapse_types_delta_impl.h</a>
+, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#a60079a7d7261fb6e7154977cad9341dc">synapse_types_dual_excitatory_exponential_impl.h</a>
+, <a class="el" href="synapse__types__exponential__impl_8h.html#a60079a7d7261fb6e7154977cad9341dc">synapse_types_exponential_impl.h</a>
+, <a class="el" href="synapse__types__semd__impl_8h.html#a7b40e391b3478e22e6d301eb93e4628f">synapse_types_semd_impl.h</a>
+</li>
+<li>synapse_types_array
+: <a class="el" href="neuron__impl__standard_8h.html#aed1e3706b58fb9163d3009b05e9b41ef">neuron_impl_standard.h</a>
+, <a class="el" href="neuron__impl__external__devices_8h.html#aed1e3706b58fb9163d3009b05e9b41ef">neuron_impl_external_devices.h</a>
 </li>
 <li>synapse_types_get_excitatory_input()
-: <a class="el" href="synapse__types_8h.html#a445fbc87ae924aa89de5d72e6841cad6">synapse_types.h</a>
-, <a class="el" href="synapse__types__semd__impl_8h.html#a445fbc87ae924aa89de5d72e6841cad6">synapse_types_semd_impl.h</a>
-, <a class="el" href="synapse__types__exponential__impl_8h.html#a445fbc87ae924aa89de5d72e6841cad6">synapse_types_exponential_impl.h</a>
-, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#a445fbc87ae924aa89de5d72e6841cad6">synapse_types_dual_excitatory_exponential_impl.h</a>
-, <a class="el" href="synapse__types__delta__impl_8h.html#a445fbc87ae924aa89de5d72e6841cad6">synapse_types_delta_impl.h</a>
-, <a class="el" href="synapse__types__alpha__impl_8h.html#a445fbc87ae924aa89de5d72e6841cad6">synapse_types_alpha_impl.h</a>
+: <a class="el" href="synapse__types_8h.html#ab345936fa750094ee2248158b958fc06">synapse_types.h</a>
+, <a class="el" href="synapse__types__alpha__impl_8h.html#ab345936fa750094ee2248158b958fc06">synapse_types_alpha_impl.h</a>
+, <a class="el" href="synapse__types__delta__impl_8h.html#ab345936fa750094ee2248158b958fc06">synapse_types_delta_impl.h</a>
+, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#ab345936fa750094ee2248158b958fc06">synapse_types_dual_excitatory_exponential_impl.h</a>
+, <a class="el" href="synapse__types__exponential__impl_8h.html#ab345936fa750094ee2248158b958fc06">synapse_types_exponential_impl.h</a>
+, <a class="el" href="synapse__types__semd__impl_8h.html#ab345936fa750094ee2248158b958fc06">synapse_types_semd_impl.h</a>
 </li>
 <li>synapse_types_get_inhibitory_input()
-: <a class="el" href="synapse__types__semd__impl_8h.html#ae4d30d854f0664fe4cef10f4ecc00831">synapse_types_semd_impl.h</a>
-, <a class="el" href="synapse__types__alpha__impl_8h.html#ae4d30d854f0664fe4cef10f4ecc00831">synapse_types_alpha_impl.h</a>
-, <a class="el" href="synapse__types__exponential__impl_8h.html#ae4d30d854f0664fe4cef10f4ecc00831">synapse_types_exponential_impl.h</a>
-, <a class="el" href="synapse__types__delta__impl_8h.html#ae4d30d854f0664fe4cef10f4ecc00831">synapse_types_delta_impl.h</a>
-, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#ae4d30d854f0664fe4cef10f4ecc00831">synapse_types_dual_excitatory_exponential_impl.h</a>
-, <a class="el" href="synapse__types_8h.html#ae4d30d854f0664fe4cef10f4ecc00831">synapse_types.h</a>
+: <a class="el" href="synapse__types__semd__impl_8h.html#ae4c225f8ba56ac8fae7c48210f46530b">synapse_types_semd_impl.h</a>
+, <a class="el" href="synapse__types__exponential__impl_8h.html#ae4c225f8ba56ac8fae7c48210f46530b">synapse_types_exponential_impl.h</a>
+, <a class="el" href="synapse__types__delta__impl_8h.html#ae4c225f8ba56ac8fae7c48210f46530b">synapse_types_delta_impl.h</a>
+, <a class="el" href="synapse__types__alpha__impl_8h.html#ae4c225f8ba56ac8fae7c48210f46530b">synapse_types_alpha_impl.h</a>
+, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#ae4c225f8ba56ac8fae7c48210f46530b">synapse_types_dual_excitatory_exponential_impl.h</a>
+, <a class="el" href="synapse__types_8h.html#ae4c225f8ba56ac8fae7c48210f46530b">synapse_types.h</a>
 </li>
 <li>synapse_types_get_type_char()
 : <a class="el" href="synapse__types_8h.html#a33e2109c0192ac4353dd6b2de44e1bed">synapse_types.h</a>
@@ -578,29 +579,35 @@ $(function() {
 , <a class="el" href="synapse__types__exponential__impl_8h.html#a33e2109c0192ac4353dd6b2de44e1bed">synapse_types_exponential_impl.h</a>
 , <a class="el" href="synapse__types__semd__impl_8h.html#a33e2109c0192ac4353dd6b2de44e1bed">synapse_types_semd_impl.h</a>
 </li>
+<li>synapse_types_initialise()
+: <a class="el" href="synapse__types_8h.html#a30620978a602b7a044f6aaa5880e9341">synapse_types.h</a>
+</li>
 <li>synapse_types_print_input()
-: <a class="el" href="synapse__types_8h.html#a4d26d3dff1703c07eca4dbf846a0946d">synapse_types.h</a>
-, <a class="el" href="synapse__types__alpha__impl_8h.html#a4d26d3dff1703c07eca4dbf846a0946d">synapse_types_alpha_impl.h</a>
-, <a class="el" href="synapse__types__delta__impl_8h.html#a4d26d3dff1703c07eca4dbf846a0946d">synapse_types_delta_impl.h</a>
-, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#a4d26d3dff1703c07eca4dbf846a0946d">synapse_types_dual_excitatory_exponential_impl.h</a>
-, <a class="el" href="synapse__types__exponential__impl_8h.html#a4d26d3dff1703c07eca4dbf846a0946d">synapse_types_exponential_impl.h</a>
-, <a class="el" href="synapse__types__semd__impl_8h.html#a4d26d3dff1703c07eca4dbf846a0946d">synapse_types_semd_impl.h</a>
+: <a class="el" href="synapse__types_8h.html#a7b7cb2cf40fadcfa990bc69cc8986640">synapse_types.h</a>
+, <a class="el" href="synapse__types__semd__impl_8h.html#a7b7cb2cf40fadcfa990bc69cc8986640">synapse_types_semd_impl.h</a>
+, <a class="el" href="synapse__types__exponential__impl_8h.html#a7b7cb2cf40fadcfa990bc69cc8986640">synapse_types_exponential_impl.h</a>
+, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#a7b7cb2cf40fadcfa990bc69cc8986640">synapse_types_dual_excitatory_exponential_impl.h</a>
+, <a class="el" href="synapse__types__delta__impl_8h.html#a7b7cb2cf40fadcfa990bc69cc8986640">synapse_types_delta_impl.h</a>
+, <a class="el" href="synapse__types__alpha__impl_8h.html#a7b7cb2cf40fadcfa990bc69cc8986640">synapse_types_alpha_impl.h</a>
 </li>
 <li>synapse_types_print_parameters()
-: <a class="el" href="synapse__types__semd__impl_8h.html#a8c173175ef5d71b07f3bc7d511cc11c7">synapse_types_semd_impl.h</a>
-, <a class="el" href="synapse__types__exponential__impl_8h.html#a8c173175ef5d71b07f3bc7d511cc11c7">synapse_types_exponential_impl.h</a>
-, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#a8c173175ef5d71b07f3bc7d511cc11c7">synapse_types_dual_excitatory_exponential_impl.h</a>
-, <a class="el" href="synapse__types__alpha__impl_8h.html#a8c173175ef5d71b07f3bc7d511cc11c7">synapse_types_alpha_impl.h</a>
-, <a class="el" href="synapse__types_8h.html#a8c173175ef5d71b07f3bc7d511cc11c7">synapse_types.h</a>
-, <a class="el" href="synapse__types__delta__impl_8h.html#a8c173175ef5d71b07f3bc7d511cc11c7">synapse_types_delta_impl.h</a>
+: <a class="el" href="synapse__types__semd__impl_8h.html#ac952ce9bf740864faedaf4a2c146ca7c">synapse_types_semd_impl.h</a>
+, <a class="el" href="synapse__types__exponential__impl_8h.html#ac952ce9bf740864faedaf4a2c146ca7c">synapse_types_exponential_impl.h</a>
+, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#ac952ce9bf740864faedaf4a2c146ca7c">synapse_types_dual_excitatory_exponential_impl.h</a>
+, <a class="el" href="synapse__types__alpha__impl_8h.html#ac952ce9bf740864faedaf4a2c146ca7c">synapse_types_alpha_impl.h</a>
+, <a class="el" href="synapse__types_8h.html#ac952ce9bf740864faedaf4a2c146ca7c">synapse_types.h</a>
+, <a class="el" href="synapse__types__delta__impl_8h.html#ac952ce9bf740864faedaf4a2c146ca7c">synapse_types_delta_impl.h</a>
+</li>
+<li>synapse_types_save_state()
+: <a class="el" href="synapse__types_8h.html#a04321df403d140de964e5c5a152fe436">synapse_types.h</a>
 </li>
 <li>synapse_types_shape_input()
-: <a class="el" href="synapse__types_8h.html#a9252e28ec9676ec472c3128ff88c368d">synapse_types.h</a>
-, <a class="el" href="synapse__types__alpha__impl_8h.html#a9252e28ec9676ec472c3128ff88c368d">synapse_types_alpha_impl.h</a>
-, <a class="el" href="synapse__types__delta__impl_8h.html#a9252e28ec9676ec472c3128ff88c368d">synapse_types_delta_impl.h</a>
-, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#a9252e28ec9676ec472c3128ff88c368d">synapse_types_dual_excitatory_exponential_impl.h</a>
-, <a class="el" href="synapse__types__exponential__impl_8h.html#a9252e28ec9676ec472c3128ff88c368d">synapse_types_exponential_impl.h</a>
-, <a class="el" href="synapse__types__semd__impl_8h.html#a9252e28ec9676ec472c3128ff88c368d">synapse_types_semd_impl.h</a>
+: <a class="el" href="synapse__types_8h.html#adbe3014909741294cc935642b318df74">synapse_types.h</a>
+, <a class="el" href="synapse__types__alpha__impl_8h.html#adbe3014909741294cc935642b318df74">synapse_types_alpha_impl.h</a>
+, <a class="el" href="synapse__types__delta__impl_8h.html#adbe3014909741294cc935642b318df74">synapse_types_delta_impl.h</a>
+, <a class="el" href="synapse__types__dual__excitatory__exponential__impl_8h.html#adbe3014909741294cc935642b318df74">synapse_types_dual_excitatory_exponential_impl.h</a>
+, <a class="el" href="synapse__types__exponential__impl_8h.html#adbe3014909741294cc935642b318df74">synapse_types_exponential_impl.h</a>
+, <a class="el" href="synapse__types__semd__impl_8h.html#adbe3014909741294cc935642b318df74">synapse_types_semd_impl.h</a>
 </li>
 <li>SYNAPSE_WEIGHT_BITS
 : <a class="el" href="synapse__row_8h.html#a6e5ee3925245f54cf5f6c4312338c25c">synapse_row.h</a>
@@ -627,12 +634,12 @@ $(function() {
 : <a class="el" href="synapses_8h.html#aa1ad92bb519344d001dba972cdd0be5f">synapses.h</a>
 </li>
 <li>synapses_process_synaptic_row()
-: <a class="el" href="synapses_8c.html#aa1ceab23dea834d6189f496b5133d983">synapses.c</a>
-, <a class="el" href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">synapses.h</a>
+: <a class="el" href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">synapses.h</a>
+, <a class="el" href="synapses_8c.html#aa1ceab23dea834d6189f496b5133d983">synapses.c</a>
 </li>
 <li>synapses_resume()
-: <a class="el" href="synapses_8c.html#a96d59593a4844dc703e540f408d22321">synapses.c</a>
-, <a class="el" href="synapses_8h.html#a96d59593a4844dc703e540f408d22321">synapses.h</a>
+: <a class="el" href="synapses_8h.html#a96d59593a4844dc703e540f408d22321">synapses.h</a>
+, <a class="el" href="synapses_8c.html#a96d59593a4844dc703e540f408d22321">synapses.c</a>
 </li>
 <li>synapses_saturation_count
 : <a class="el" href="synapses_8c.html#a8b7881a6d9caca38f2050656c652cf26">synapses.c</a>
@@ -640,9 +647,6 @@ $(function() {
 </li>
 <li>synaptic_contributions
 : <a class="el" href="c__main__neurons_8c.html#a7ec04742355ddb6ef2646f8fe73537f3">c_main_neurons.c</a>
-</li>
-<li>synaptic_matrix_base_address
-: <a class="el" href="bit__field__expander_8c.html#aa848568a69120df24c0430e5ee983c5c">bit_field_expander.c</a>
 </li>
 <li>SYNAPTIC_MATRIX_REGION
 : <a class="el" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad5778663b1d738822f9b1b5ce9dd9061">regions.h</a>
@@ -706,7 +710,7 @@ $(function() {
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:12 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

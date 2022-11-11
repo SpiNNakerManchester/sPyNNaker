@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['spike_5ft_4821',['spike_t',['../neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32',1,'neuron-typedefs.h']]],
-  ['state_5ft_4822',['state_t',['../neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17',1,'neuron-typedefs.h']]],
-  ['synapse_5fparam_5fpointer_5ft_4823',['synapse_param_pointer_t',['../synapse__types_8h.html#a45cfd57493ca66ddc880bd013f1022fe',1,'synapse_types.h']]],
-  ['synaptic_5frow_5ft_4824',['synaptic_row_t',['../neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859',1,'neuron-typedefs.h']]]
+  ['ufract_4838',['UFRACT',['../maths-util_8h.html#a8cf409d4308be505fbdb5683525213ba',1,'maths-util.h']]],
+  ['update_5fstate_5ft_4839',['update_state_t',['../synapse__structure__weight__impl_8h.html#ac4fd00ce43d4ad3f6181dde377224723',1,'synapse_structure_weight_impl.h']]],
+  ['ureal_4840',['UREAL',['../maths-util_8h.html#a2e4c6b7f842497114d81356c763536c4',1,'maths-util.h']]]
 ];

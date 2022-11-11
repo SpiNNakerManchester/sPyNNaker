@@ -83,28 +83,27 @@ $(function() {
 <code>#include &quot;<a class="el" href="neuron__impl_8h_source.html">implementations/neuron_impl.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="current__source_8h_source.html">current_sources/current_source.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="synapse__dynamics_8h_source.html">plasticity/synapse_dynamics.h</a>&quot;</code><br />
-<code>#include &quot;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8h.html">tdma_processing.h</a>&quot;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
 </div>
 <p><a href="neuron_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
-<tr class="memitem:structneuron__parameters"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#structneuron__parameters">neuron_parameters</a></td></tr>
-<tr class="memdesc:structneuron__parameters"><td class="mdescLeft">&#160;</td><td class="mdescRight">parameters that reside in the neuron_parameter_data_region  <a href="neuron_8c.html#structneuron__parameters">More...</a><br /></td></tr>
-<tr class="separator:structneuron__parameters"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structneuron__core__parameters"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#structneuron__core__parameters">neuron_core_parameters</a></td></tr>
+<tr class="memdesc:structneuron__core__parameters"><td class="mdescLeft">&#160;</td><td class="mdescRight">parameters that reside in the neuron_parameter_data_region  <a href="neuron_8c.html#structneuron__core__parameters">More...</a><br /></td></tr>
+<tr class="separator:structneuron__core__parameters"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a9f74a3915bdd91fc758c4682c54568a5"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#a9f74a3915bdd91fc758c4682c54568a5">neuron_load_neuron_parameters</a> (void)</td></tr>
-<tr class="memdesc:a9f74a3915bdd91fc758c4682c54568a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">does the memory copy for the neuron parameters  <a href="neuron_8c.html#a9f74a3915bdd91fc758c4682c54568a5">More...</a><br /></td></tr>
-<tr class="separator:a9f74a3915bdd91fc758c4682c54568a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab8eb2155951459c0acf8b990dd29e69"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#aab8eb2155951459c0acf8b990dd29e69">neuron_resume</a> (void)</td></tr>
-<tr class="memdesc:aab8eb2155951459c0acf8b990dd29e69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare to resume simulation of the neurons.  <a href="neuron_8c.html#aab8eb2155951459c0acf8b990dd29e69">More...</a><br /></td></tr>
-<tr class="separator:aab8eb2155951459c0acf8b990dd29e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace6f63d291f13e8e89dc1c8b8d433743"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#ace6f63d291f13e8e89dc1c8b8d433743">neuron_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> cs_address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> recording_address, uint32_t *n_rec_regions_used)</td></tr>
-<tr class="memdesc:ace6f63d291f13e8e89dc1c8b8d433743"><td class="mdescLeft">&#160;</td><td class="mdescRight">translate the data stored in the NEURON_PARAMS data region in SDRAM and convert it into c based objects for use.  <a href="neuron_8c.html#ace6f63d291f13e8e89dc1c8b8d433743">More...</a><br /></td></tr>
-<tr class="separator:ace6f63d291f13e8e89dc1c8b8d433743"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff90525477e8305d9754a5876cbdfb18"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#aff90525477e8305d9754a5876cbdfb18">neuron_load_neuron_parameters</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
+<tr class="memdesc:aff90525477e8305d9754a5876cbdfb18"><td class="mdescLeft">&#160;</td><td class="mdescRight">does the memory copy for the neuron parameters  <a href="neuron_8c.html#aff90525477e8305d9754a5876cbdfb18">More...</a><br /></td></tr>
+<tr class="separator:aff90525477e8305d9754a5876cbdfb18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82283d81b442ae011e830b3c3ab7882b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#a82283d81b442ae011e830b3c3ab7882b">neuron_resume</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
+<tr class="memdesc:a82283d81b442ae011e830b3c3ab7882b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare to resume simulation of the neurons.  <a href="neuron_8c.html#a82283d81b442ae011e830b3c3ab7882b">More...</a><br /></td></tr>
+<tr class="separator:a82283d81b442ae011e830b3c3ab7882b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e3fd26136f3e14f31f40f95bf4e9e54"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#a0e3fd26136f3e14f31f40f95bf4e9e54">neuron_initialise</a> (void *core_params_address, void *neuron_params_address, void *current_sources_address, void *recording_address, void *initial_values_address, uint32_t *n_rec_regions_used)</td></tr>
+<tr class="memdesc:a0e3fd26136f3e14f31f40f95bf4e9e54"><td class="mdescLeft">&#160;</td><td class="mdescRight">translate the data stored in the NEURON_PARAMS data region in SDRAM and convert it into c based objects for use.  <a href="neuron_8c.html#a0e3fd26136f3e14f31f40f95bf4e9e54">More...</a><br /></td></tr>
+<tr class="separator:a0e3fd26136f3e14f31f40f95bf4e9e54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09464219c59d7e79cbd4cf0acb9f96a1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#a09464219c59d7e79cbd4cf0acb9f96a1">neuron_pause</a> (void)</td></tr>
 <tr class="memdesc:a09464219c59d7e79cbd4cf0acb9f96a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform steps needed before pausing a simulation.  <a href="neuron_8c.html#a09464219c59d7e79cbd4cf0acb9f96a1">More...</a><br /></td></tr>
 <tr class="separator:a09464219c59d7e79cbd4cf0acb9f96a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,62 +153,66 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#ade696d20461dc712b7daafcbcad6ba4b">ring_buffer_to_input_left_shifts</a></td></tr>
 <tr class="memdesc:ade696d20461dc712b7daafcbcad6ba4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Amount to left shift the ring buffer by to make it an input. <br /></td></tr>
 <tr class="separator:ade696d20461dc712b7daafcbcad6ba4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a022907f7d958b27b03e3e079108327"><td class="memItemLeft" align="right" valign="top"><a id="a0a022907f7d958b27b03e3e079108327"></a>
-static <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#a0a022907f7d958b27b03e3e079108327">saved_params_address</a></td></tr>
-<tr class="memdesc:a0a022907f7d958b27b03e3e079108327"><td class="mdescLeft">&#160;</td><td class="mdescRight">The address where the actual neuron parameters start. <br /></td></tr>
-<tr class="separator:a0a022907f7d958b27b03e3e079108327"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa269b2afc1811a0714dcaf06deb457c1"><td class="memItemLeft" align="right" valign="top"><a id="aa269b2afc1811a0714dcaf06deb457c1"></a>
-static <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#aa269b2afc1811a0714dcaf06deb457c1">current_source_address</a></td></tr>
-<tr class="memdesc:aa269b2afc1811a0714dcaf06deb457c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The address for the current source parameters. <br /></td></tr>
-<tr class="separator:aa269b2afc1811a0714dcaf06deb457c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0054ecd50a9d83ec3b87837779e061a"><td class="memItemLeft" align="right" valign="top"><a id="af0054ecd50a9d83ec3b87837779e061a"></a>
+static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#af0054ecd50a9d83ec3b87837779e061a">saved_neuron_params_address</a></td></tr>
+<tr class="memdesc:af0054ecd50a9d83ec3b87837779e061a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The address where the actual neuron parameters start. <br /></td></tr>
+<tr class="separator:af0054ecd50a9d83ec3b87837779e061a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ed312627afac83b5285c86756231886"><td class="memItemLeft" align="right" valign="top"><a id="a3ed312627afac83b5285c86756231886"></a>
+static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#a3ed312627afac83b5285c86756231886">current_source_address</a></td></tr>
+<tr class="memdesc:a3ed312627afac83b5285c86756231886"><td class="mdescLeft">&#160;</td><td class="mdescRight">The address for the current source parameters. <br /></td></tr>
+<tr class="separator:a3ed312627afac83b5285c86756231886"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac29f7d6b5e1d2e4b5afcf4c724b51d13"><td class="memItemLeft" align="right" valign="top"><a id="ac29f7d6b5e1d2e4b5afcf4c724b51d13"></a>
+static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#ac29f7d6b5e1d2e4b5afcf4c724b51d13">saved_initial_values_address</a></td></tr>
+<tr class="memdesc:ac29f7d6b5e1d2e4b5afcf4c724b51d13"><td class="mdescLeft">&#160;</td><td class="mdescRight">The address to save initial values to. <br /></td></tr>
+<tr class="separator:ac29f7d6b5e1d2e4b5afcf4c724b51d13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>implementation of the <a class="el" href="neuron_8h.html" title="interface for neurons">neuron.h</a> interface. </p>
 
 <p class="definition">Definition in file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 </div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
-<a name="structneuron__parameters" id="structneuron__parameters"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structneuron__parameters">&#9670;&nbsp;</a></span>neuron_parameters</h2>
+<a name="structneuron__core__parameters" id="structneuron__core__parameters"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structneuron__core__parameters">&#9670;&nbsp;</a></span>neuron_core_parameters</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct neuron_parameters</td>
+          <td class="memname">struct neuron_core_parameters</td>
         </tr>
       </table>
 </div><div class="memdoc">
 <div class="textblock"><p>parameters that reside in the neuron_parameter_data_region </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00062">62</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00064">64</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a id="a5856ca969e9356b1e36f1f6d582e1840"></a>uint32_t</td>
+<a id="a3da227c15b886b84c05238b290a15722"></a>uint32_t</td>
 <td class="fieldname">
 has_key</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a44f6d21940c25635a594d70503030c9c"></a>uint32_t</td>
+<a id="abc0d1064be5ceeb4fb7fe313d7f7a669"></a>uint32_t</td>
 <td class="fieldname">
 n_neurons_to_simulate</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a151434de5393e2556a92d12b6fc96ce1"></a>uint32_t</td>
+<a id="a9b009ce74ebd6b24b2aed4a825763c31"></a>uint32_t</td>
 <td class="fieldname">
 n_neurons_peak</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a1bdd33c16f5e82badb8e3d6ee0ab75c8"></a>uint32_t</td>
+<a id="ac233de0833490e0f9bf2307ff6df3a4f"></a>uint32_t</td>
 <td class="fieldname">
 n_synapse_types</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="ac4446d2310c2fb4904e3b71eb915dc0f"></a>uint32_t</td>
+<a id="ae1af971947b0576b5ac23e36c6cb3012"></a>uint32_t</td>
 <td class="fieldname">
 ring_buffer_shifts[]</td>
 <td class="fielddoc">
@@ -219,8 +222,8 @@ ring_buffer_shifts[]</td>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a9f74a3915bdd91fc758c4682c54568a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f74a3915bdd91fc758c4682c54568a5">&#9670;&nbsp;</a></span>neuron_load_neuron_parameters()</h2>
+<a id="aff90525477e8305d9754a5876cbdfb18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff90525477e8305d9754a5876cbdfb18">&#9670;&nbsp;</a></span>neuron_load_neuron_parameters()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -231,8 +234,8 @@ ring_buffer_shifts[]</td>
         <tr>
           <td class="memname">static bool neuron_load_neuron_parameters </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -244,14 +247,20 @@ ring_buffer_shifts[]</td>
 </div><div class="memdoc">
 
 <p>does the memory copy for the neuron parameters </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the current time step </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the memory copies worked, false otherwise </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00074">74</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00077">77</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
-<a id="aab8eb2155951459c0acf8b990dd29e69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab8eb2155951459c0acf8b990dd29e69">&#9670;&nbsp;</a></span>neuron_resume()</h2>
+<a id="a82283d81b442ae011e830b3c3ab7882b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82283d81b442ae011e830b3c3ab7882b">&#9670;&nbsp;</a></span>neuron_resume()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -259,22 +268,28 @@ ring_buffer_shifts[]</td>
         <tr>
           <td class="memname">bool neuron_resume </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Prepare to resume simulation of the neurons. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The time of the resume </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>bool which is true if the resume was successful or not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00083">83</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00087">87</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
-<a id="ace6f63d291f13e8e89dc1c8b8d433743"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ace6f63d291f13e8e89dc1c8b8d433743">&#9670;&nbsp;</a></span>neuron_initialise()</h2>
+<a id="a0e3fd26136f3e14f31f40f95bf4e9e54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e3fd26136f3e14f31f40f95bf4e9e54">&#9670;&nbsp;</a></span>neuron_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -282,20 +297,32 @@ ring_buffer_shifts[]</td>
         <tr>
           <td class="memname">bool neuron_initialise </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
-          <td class="paramname"><em>address</em>, </td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>core_params_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
-          <td class="paramname"><em>cs_address</em>, </td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>neuron_params_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>current_sources_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>recording_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>initial_values_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -314,15 +341,18 @@ ring_buffer_shifts[]</td>
 <p>translate the data stored in the NEURON_PARAMS data region in SDRAM and convert it into c based objects for use. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the absolute address in SDRAM for the start of the NEURON_PARAMS data region in SDRAM </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">core_params_address</td><td>the absolute address in SDRAM for the start of the core parameters data region in SDRAM </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">neuron_params_address</td><td>The absolute address in SDRAM for the start of the neuron parameters data region in SDRAM </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">current_sources_address</td><td>The absolute address in SDRAM for the start of the current sources data region in SDRAM </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">recording_address</td><td>the recording parameters in SDRAM (contains which regions are active and how big they are) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">initial_values_address</td><td>The address where initial values can be written to for later reading. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">n_rec_regions_used</td><td>The number of regions used by neuron recording </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the translation was successful, otherwise False </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00096">96</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00099">99</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -345,7 +375,7 @@ ring_buffer_shifts[]</td>
 <p>Perform steps needed before pausing a simulation. </p>
 <p>Stores neuron parameters back into SDRAM. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00174">174</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00175">175</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -384,7 +414,7 @@ ring_buffer_shifts[]</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00180">180</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00181">181</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -412,7 +442,7 @@ ring_buffer_shifts[]</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00196">196</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00192">192</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -435,7 +465,7 @@ ring_buffer_shifts[]</td>
 <p>Print the inputs to the neurons. </p>
 <p>Only available in debug mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00222">222</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00218">218</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -458,7 +488,7 @@ ring_buffer_shifts[]</td>
 <p>Print the neurons' synapse parameters. </p>
 <p>Only available in debug mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00226">226</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00222">222</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -487,7 +517,7 @@ ring_buffer_shifts[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a single character that describes the synapse. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00230">230</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00226">226</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -507,7 +537,7 @@ ring_buffer_shifts[]</td>
 <p>The keys to be used by the neurons (one per neuron) </p>
 <p>Keys for each neuron. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00031">31</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00030">30</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -526,7 +556,7 @@ ring_buffer_shifts[]</td>
 <p>Whether to use key from <a class="el" href="neuron_8c.html" title="implementation of the neuron.h interface.">neuron.c</a>. </p>
 <p>A checker that says if this model should be transmitting. If set to false by the data region, then this model should not have a key. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00035">35</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00034">34</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -545,7 +575,7 @@ ring_buffer_shifts[]</td>
 <p>Latest time in a timestep that any neuron has sent a spike. </p>
 <p>Latest time from <a class="el" href="neuron_8c.html" title="implementation of the neuron.h interface.">neuron.c</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00038">38</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00037">37</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -564,14 +594,14 @@ ring_buffer_shifts[]</td>
 <p>Earliest time in a timestep that any neuron has sent a spike. </p>
 <p>Earliest time from <a class="el" href="neuron_8c.html" title="implementation of the neuron.h interface.">neuron.c</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00041">41</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00040">40</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

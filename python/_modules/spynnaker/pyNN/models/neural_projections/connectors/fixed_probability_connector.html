@@ -56,7 +56,9 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="p">(</span>
@@ -64,18 +66,17 @@
 <span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span> <span class="n">ConnectorIDs</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.abstract_connector_supports_views_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_host</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 <span class="n">N_GEN_PARAMS</span> <span class="o">=</span> <span class="mi">6</span>
 
 
 <span class="k">class</span> <span class="nc">FixedProbabilityConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span>
-                                <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">,</span>
-                                <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">):</span>
+                                <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; For each pair of pre-post cells, the connection probability is \</span>
 <span class="sd">        constant.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -110,9 +111,17 @@
 <span class="sd">            .. note::</span>
 <span class="sd">                Not supported by sPyNNaker.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">p_connect</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="c1"># Support 1.0 by using maximum U032.  Warn the user because this isn&#39;t</span>
+        <span class="c1"># *quite* the same</span>
+        <span class="k">if</span> <span class="n">p_connect</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">p_connect</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Probability of 1.0 in the FixedProbabilityConnector will use&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">p_connect</span><span class="si">}</span><span class="s2"> instead.  If this is a problem, use the&quot;</span>
+                <span class="s2">&quot; AllToAllConnector instead.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">p_connect</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;The probability must be between 0 and 1 (inclusive)&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;The probability must be &gt;= 0 and &lt; 1&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span> <span class="o">=</span> <span class="n">p_connect</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span> <span class="o">=</span> <span class="n">allow_self_connections</span>
@@ -174,10 +183,9 @@
 
 <div class="viewcode-block" id="FixedProbabilityConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FixedProbabilityConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnHost</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">n_items</span> <span class="o">=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
+        <span class="n">n_items</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
         <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">n_items</span><span class="p">)</span>
 
         <span class="c1"># If self connections are not allowed, remove possibility the self</span>
@@ -185,21 +193,20 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span><span class="p">:</span>
             <span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n_items</span><span class="p">:</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
 
-        <span class="n">present</span> <span class="o">=</span> <span class="n">items</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span>
+        <span class="n">present</span> <span class="o">=</span> <span class="n">items</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">present</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">n_connections</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">present</span><span class="p">)</span>
 
         <span class="n">block</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_connections</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NUMPY_SYNAPSES_DTYPE</span><span class="p">)</span>
-        <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">ids</span> <span class="o">//</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
+        <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ids</span> <span class="o">//</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="p">(</span><span class="n">ids</span> <span class="o">%</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_weights</span><span class="p">(</span>
-            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_delays</span><span class="p">(</span>
-            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;synapse_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synapse_type</span>
         <span class="k">return</span> <span class="n">block</span></div>
 
@@ -212,27 +219,16 @@
         <span class="k">return</span> <span class="n">ConnectorIDs</span><span class="o">.</span><span class="n">FIXED_PROBABILITY_CONNECTOR</span><span class="o">.</span><span class="n">value</span>
 
 <div class="viewcode-block" id="FixedProbabilityConnector.gen_connector_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FixedProbabilityConnector.gen_connector_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_params</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basic_connector_params</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
-        <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span><span class="p">)</span>
-
-        <span class="c1"># If prob=1.0 has been specified, take care when scaling value to</span>
-        <span class="c1"># ensure that it doesn&#39;t wrap round to zero as an unsigned long fract</span>
-        <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="o">.</span><span class="n">encode_as_int</span><span class="p">(</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="o">.</span><span class="n">max</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span> <span class="o">==</span> <span class="mf">1.0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span><span class="p">))</span>
-
-        <span class="n">params</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_connector_seed</span><span class="p">(</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span><span class="p">),</span>
+            <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="o">.</span><span class="n">encode_as_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_params_size_in_bytes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">gen_connector_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># view + params + seeds</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_view_params_bytes</span> <span class="o">+</span> <span class="p">(</span><span class="n">N_GEN_PARAMS</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">p_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

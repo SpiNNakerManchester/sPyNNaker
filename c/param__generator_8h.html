@@ -82,12 +82,12 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a7f47aef417cd5ec8cf73a199d71dced2"><td class="memItemLeft" align="right" valign="top">param_generator_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator_8h.html#a7f47aef417cd5ec8cf73a199d71dced2">param_generator_init</a> (uint32_t hash, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:a7f47aef417cd5ec8cf73a199d71dced2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a specific parameter generator.  <a href="param__generator_8h.html#a7f47aef417cd5ec8cf73a199d71dced2">More...</a><br /></td></tr>
-<tr class="separator:a7f47aef417cd5ec8cf73a199d71dced2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae85e6c376848da24228c97141d0d2027"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator_8h.html#ae85e6c376848da24228c97141d0d2027">param_generator_generate</a> (param_generator_t generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</td></tr>
-<tr class="memdesc:ae85e6c376848da24228c97141d0d2027"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate values with a parameter generator.  <a href="param__generator_8h.html#ae85e6c376848da24228c97141d0d2027">More...</a><br /></td></tr>
-<tr class="separator:ae85e6c376848da24228c97141d0d2027"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8fc0d4f24db6ca96094f0aed98867cc"><td class="memItemLeft" align="right" valign="top">param_generator_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator_8h.html#aa8fc0d4f24db6ca96094f0aed98867cc">param_generator_init</a> (uint32_t hash, void **<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:aa8fc0d4f24db6ca96094f0aed98867cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a specific parameter generator.  <a href="param__generator_8h.html#aa8fc0d4f24db6ca96094f0aed98867cc">More...</a><br /></td></tr>
+<tr class="separator:aa8fc0d4f24db6ca96094f0aed98867cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afef726e38862303036b706f63cb5408d"><td class="memItemLeft" align="right" valign="top">accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator_8h.html#afef726e38862303036b706f63cb5408d">param_generator_generate</a> (param_generator_t generator)</td></tr>
+<tr class="memdesc:afef726e38862303036b706f63cb5408d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate value with a parameter generator.  <a href="param__generator_8h.html#afef726e38862303036b706f63cb5408d">More...</a><br /></td></tr>
+<tr class="separator:afef726e38862303036b706f63cb5408d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20b9f761fb073750e083d131cf49812e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator_8h.html#a20b9f761fb073750e083d131cf49812e">param_generator_free</a> (param_generator_t generator)</td></tr>
 <tr class="memdesc:a20b9f761fb073750e083d131cf49812e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finish with a parameter generator.  <a href="param__generator_8h.html#a20b9f761fb073750e083d131cf49812e">More...</a><br /></td></tr>
 <tr class="separator:a20b9f761fb073750e083d131cf49812e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -97,8 +97,8 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="param__generator_8h_source.html">param_generator.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a7f47aef417cd5ec8cf73a199d71dced2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7f47aef417cd5ec8cf73a199d71dced2">&#9670;&nbsp;</a></span>param_generator_init()</h2>
+<a id="aa8fc0d4f24db6ca96094f0aed98867cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8fc0d4f24db6ca96094f0aed98867cc">&#9670;&nbsp;</a></span>param_generator_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -112,7 +112,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramtype">void **&#160;</td>
           <td class="paramname"><em>region</em>&#160;</td>
         </tr>
         <tr>
@@ -133,67 +133,36 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An initialised parameter generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00115">115</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00108">108</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
 
 </div>
 </div>
-<a id="ae85e6c376848da24228c97141d0d2027"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae85e6c376848da24228c97141d0d2027">&#9670;&nbsp;</a></span>param_generator_generate()</h2>
+<a id="afef726e38862303036b706f63cb5408d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afef726e38862303036b706f63cb5408d">&#9670;&nbsp;</a></span>param_generator_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void param_generator_generate </td>
+          <td class="memname">accum param_generator_generate </td>
           <td>(</td>
           <td class="paramtype">param_generator_t&#160;</td>
-          <td class="paramname"><em>generator</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n_indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">accum *&#160;</td>
-          <td class="paramname"><em>values</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Generate values with a parameter generator. </p>
+<p>Generate value with a parameter generator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to use to generate values </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_indices</td><td>The number of values to generate </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the neuron in the pre-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>The n_indices post-neuron indices for each connection </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">values</td><td>An array into which to place the values; will be n_indices in size </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>The value generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00142">142</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00135">135</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
 
 </div>
 </div>
@@ -221,14 +190,14 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00149">149</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00139">139</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -142,13 +142,15 @@
             <span class="nb">len</span><span class="p">(</span><span class="n">structural_projections</span><span class="p">))</span>
 
         <span class="c1"># Write the pre-population info</span>
-        <span class="n">pop_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_prepopulation_info</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">structural_projections</span><span class="p">,</span>
-            <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">)</span>
+        <span class="n">pop_index</span><span class="p">,</span> <span class="n">subpop_index</span><span class="p">,</span> <span class="n">lo_atom_index</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">__write_prepopulation_info</span><span class="p">(</span>
+                <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">structural_projections</span><span class="p">,</span>
+                <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">)</span>
 
         <span class="c1"># Write the post-to-pre table</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__write_post_to_pre_table</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">subpop_index</span><span class="p">,</span> <span class="n">lo_atom_index</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span>
+            <span class="n">vertex_slice</span><span class="p">)</span>
 
         <span class="c1"># Write the component parameters</span>
         <span class="c1"># pylint: disable=no-member, protected-access</span>
@@ -261,6 +263,8 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing pre-population info&quot;</span><span class="p">)</span>
         <span class="n">pop_index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
+        <span class="n">subpop_index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">lo_atom_index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">structural_projections</span><span class="p">:</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing pre-population info for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -300,7 +304,7 @@
             <span class="c1"># Total number of atoms in pre-vertex</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
             <span class="c1"># Machine edge information</span>
-            <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">out_verts</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sub</span><span class="p">,</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out_verts</span><span class="p">):</span>
                 <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
                     <span class="n">m_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
                 <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
@@ -309,11 +313,16 @@
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">synaptic_matrices</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span>
-                    <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">m_vertex</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">pop_index</span>
+                    <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">))</span>
+                <span class="n">lo</span> <span class="o">=</span> <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">subpop_index</span><span class="p">[</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub</span>
+                    <span class="n">lo_atom_index</span><span class="p">[</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">lo</span>
+        <span class="k">return</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">subpop_index</span><span class="p">,</span> <span class="n">lo_atom_index</span>
 
     <span class="k">def</span> <span class="nf">__write_post_to_pre_table</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">subpop_index</span><span class="p">,</span> <span class="n">lo_atom_index</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span>
+            <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Post to pre table is basically the transpose of the synaptic\</span>
 <span class="sd">            matrix.</span>
 
@@ -330,22 +339,23 @@
         <span class="n">slice_conns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">]</span>
         <span class="c1"># Make a single large array of connections</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">conn</span> <span class="k">for</span> <span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">])</span>
+            <span class="p">[</span><span class="n">conn</span> <span class="k">for</span> <span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">])</span>
         <span class="c1"># Make a single large array of population index</span>
-        <span class="n">conn_lens</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">]</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">a_edge</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">:</span>
+        <span class="n">conn_lens</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">a_edge</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">a_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pop_index</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Help!&quot;</span><span class="p">)</span>
         <span class="n">pop_indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
             <span class="p">[</span><span class="n">pop_index</span><span class="p">[</span><span class="n">a_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">s_info</span><span class="p">]</span>
-             <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">a_edge</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">],</span> <span class="n">conn_lens</span><span class="p">)</span>
+             <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">a_edge</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">],</span> <span class="n">conn_lens</span><span class="p">)</span>
         <span class="c1"># Make a single large array of sub-population index</span>
-        <span class="n">subpop_indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">pre_index</span> <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">pre_index</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">],</span> <span class="n">conn_lens</span><span class="p">)</span>
+        <span class="n">subpop_indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="n">subpop_index</span><span class="p">[</span><span class="n">a_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">s_info</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">conns</span><span class="p">,</span> <span class="n">a_edge</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">conns</span><span class="p">])</span>
         <span class="c1"># Get the low atom for each source and subtract</span>
-        <span class="n">lo_atoms</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">pre_slice</span><span class="o">.</span><span class="n">lo_atom</span>
-             <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">],</span> <span class="n">conn_lens</span><span class="p">)</span>
+        <span class="n">lo_atoms</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="n">lo_atom_index</span><span class="p">[</span><span class="n">a_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">s_info</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">conns</span><span class="p">,</span> <span class="n">a_edge</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">conns</span><span class="p">])</span>
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">lo_atoms</span>
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
 

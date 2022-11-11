@@ -97,15 +97,15 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae437fca279630eb531de2055d33384d8"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__normal_8h.html#ae437fca279630eb531de2055d33384d8">param_generator_normal_initialize</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:ae437fca279630eb531de2055d33384d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to initialise the normal RNG parameter generator.  <a href="param__generator__normal_8h.html#ae437fca279630eb531de2055d33384d8">More...</a><br /></td></tr>
-<tr class="separator:ae437fca279630eb531de2055d33384d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7e93833ca106d2e4ee06afdb8924b2e"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__normal_8h.html#af7e93833ca106d2e4ee06afdb8924b2e">param_generator_normal_initialize</a> (void **<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:af7e93833ca106d2e4ee06afdb8924b2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to initialise the normal RNG parameter generator.  <a href="param__generator__normal_8h.html#af7e93833ca106d2e4ee06afdb8924b2e">More...</a><br /></td></tr>
+<tr class="separator:af7e93833ca106d2e4ee06afdb8924b2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5da899810d276b0a718b0802fb176783"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__normal_8h.html#a5da899810d276b0a718b0802fb176783">param_generator_normal_free</a> (void *generator)</td></tr>
 <tr class="memdesc:a5da899810d276b0a718b0802fb176783"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to free any data for the normal RNG parameter generator.  <a href="param__generator__normal_8h.html#a5da899810d276b0a718b0802fb176783">More...</a><br /></td></tr>
 <tr class="separator:a5da899810d276b0a718b0802fb176783"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab67db27d60f95cb89f416f5437337fa"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__normal_8h.html#aab67db27d60f95cb89f416f5437337fa">param_generator_normal_generate</a> (void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</td></tr>
-<tr class="memdesc:aab67db27d60f95cb89f416f5437337fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate values with the normal RNG parameter generator.  <a href="param__generator__normal_8h.html#aab67db27d60f95cb89f416f5437337fa">More...</a><br /></td></tr>
-<tr class="separator:aab67db27d60f95cb89f416f5437337fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4675e8a38c5ceb893c1bfeb9855d674"><td class="memItemLeft" align="right" valign="top">static accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__normal_8h.html#ab4675e8a38c5ceb893c1bfeb9855d674">param_generator_normal_generate</a> (void *generator)</td></tr>
+<tr class="memdesc:ab4675e8a38c5ceb893c1bfeb9855d674"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate values with the normal RNG parameter generator.  <a href="param__generator__normal_8h.html#ab4675e8a38c5ceb893c1bfeb9855d674">More...</a><br /></td></tr>
+<tr class="separator:ab4675e8a38c5ceb893c1bfeb9855d674"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Normally distributed random parameter generator implementation. </p>
@@ -166,19 +166,13 @@ sigma</td>
 params</td>
 <td class="fielddoc">
 </td></tr>
-<tr><td class="fieldtype">
-<a id="a09b78f92aca474798830ca3f933804f7"></a>rng_t</td>
-<td class="fieldname">
-rng</td>
-<td class="fielddoc">
-</td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ae437fca279630eb531de2055d33384d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae437fca279630eb531de2055d33384d8">&#9670;&nbsp;</a></span>param_generator_normal_initialize()</h2>
+<a id="af7e93833ca106d2e4ee06afdb8924b2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7e93833ca106d2e4ee06afdb8924b2e">&#9670;&nbsp;</a></span>param_generator_normal_initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -189,7 +183,7 @@ rng</td>
         <tr>
           <td class="memname">static void* param_generator_normal_initialize </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramtype">void **&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
           <td></td>
         </tr>
@@ -210,7 +204,7 @@ rng</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator__normal_8h_source.html#l00052">52</a> of file <a class="el" href="param__generator__normal_8h_source.html">param_generator_normal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator__normal_8h_source.html#l00051">51</a> of file <a class="el" href="param__generator__normal_8h_source.html">param_generator_normal.h</a>.</p>
 
 </div>
 </div>
@@ -246,12 +240,12 @@ rng</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator__normal_8h_source.html#l00074">74</a> of file <a class="el" href="param__generator__normal_8h_source.html">param_generator_normal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator__normal_8h_source.html#l00070">70</a> of file <a class="el" href="param__generator__normal_8h_source.html">param_generator_normal.h</a>.</p>
 
 </div>
 </div>
-<a id="aab67db27d60f95cb89f416f5437337fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab67db27d60f95cb89f416f5437337fa">&#9670;&nbsp;</a></span>param_generator_normal_generate()</h2>
+<a id="ab4675e8a38c5ceb893c1bfeb9855d674"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4675e8a38c5ceb893c1bfeb9855d674">&#9670;&nbsp;</a></span>param_generator_normal_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -260,39 +254,11 @@ rng</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void param_generator_normal_generate </td>
+          <td class="memname">static accum param_generator_normal_generate </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>generator</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n_indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">accum *&#160;</td>
-          <td class="paramname"><em>values</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -306,22 +272,19 @@ rng</td>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to use to generate values </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_indices</td><td>The number of values to generate </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the neuron in the pre-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>The <code>n_indices</code> post-neuron indices for each connection </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">values</td><td>An array into which to place the values; will be <code>n_indices</code> in size </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>The generated value </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator__normal_8h_source.html#l00090">90</a> of file <a class="el" href="param__generator__normal_8h_source.html">param_generator_normal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator__normal_8h_source.html#l00079">79</a> of file <a class="el" href="param__generator__normal_8h_source.html">param_generator_normal.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -124,10 +124,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_minimum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="n">n_conns_max</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_n_connections</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_n_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">        :rtype: tuple(int, cset.connset.CSet)</span>
@@ -142,7 +140,7 @@
 
         <span class="c1"># use CSA to cross the range of this vertex&#39;s neurons with the cset</span>
         <span class="n">pair_list</span> <span class="o">=</span> <span class="n">csa</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span>
-            <span class="nb">range</span><span class="p">(</span><span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
+            <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">),</span>
             <span class="nb">range</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> \
             <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__full_cset</span>
 
@@ -179,10 +177,9 @@
 
 <div class="viewcode-block" id="CSAConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.CSAConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnHost</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="n">n_connections</span><span class="p">,</span> <span class="n">pair_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_n_connections</span><span class="p">(</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
 
         <span class="c1"># Use whatever has been set up in _get_n_connections here</span>
         <span class="c1"># to send into the block structure</span>
@@ -199,11 +196,11 @@
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pair_list</span><span class="p">]</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pair_list</span><span class="p">]</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_weights</span><span class="p">(</span>
-            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_delays</span><span class="p">(</span>
-            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;synapse_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synapse_type</span>
         <span class="k">return</span> <span class="n">block</span></div>
 

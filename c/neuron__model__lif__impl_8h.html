@@ -83,15 +83,24 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
-<tr class="memitem:structneuron__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_pointer_t</a></td></tr>
+<tr class="memitem:structneuron__params__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__params__t">neuron_params_t</a></td></tr>
+<tr class="memdesc:structneuron__params__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state parameters of an Izhekevich model neuron.  <a href="neuron__model__lif__impl_8h.html#structneuron__params__t">More...</a><br /></td></tr>
+<tr class="separator:structneuron__params__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structneuron__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a></td></tr>
 <tr class="memdesc:structneuron__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state variables of an Izhekevich model neuron.  <a href="neuron__model__lif__impl_8h.html#structneuron__t">More...</a><br /></td></tr>
 <tr class="separator:structneuron__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:structglobal__neuron__params__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a></td></tr>
-<tr class="memdesc:structglobal__neuron__params__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global neuron parameters for Izhekevich model neuron.  <a href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">More...</a><br /></td></tr>
-<tr class="separator:structglobal__neuron__params__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a9657bc9566431a1077df6f73dae27baf"><td class="memItemLeft" align="right" valign="top">static int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8h.html#a9657bc9566431a1077df6f73dae27baf">lif_ceil_accum</a> (<a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> value)</td></tr>
+<tr class="memdesc:a9657bc9566431a1077df6f73dae27baf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a ceil operation on an accum.  <a href="neuron__model__lif__impl_8h.html#a9657bc9566431a1077df6f73dae27baf">More...</a><br /></td></tr>
+<tr class="separator:a9657bc9566431a1077df6f73dae27baf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5fc11951300c8a7321586ffb24b4107"><td class="memItemLeft" align="right" valign="top"><a id="ac5fc11951300c8a7321586ffb24b4107"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_model_initialise</b> (<a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *state, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__params__t">neuron_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>, uint32_t <a class="el" href="neuron__impl__standard_8h.html#adc2145aaa2f8435401d2c077d42c7b91">n_steps_per_timestep</a>)</td></tr>
+<tr class="separator:ac5fc11951300c8a7321586ffb24b4107"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add9582f47143d4a943af8bbd50082d4a"><td class="memItemLeft" align="right" valign="top"><a id="add9582f47143d4a943af8bbd50082d4a"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_model_save_state</b> (<a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *state, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__params__t">neuron_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>)</td></tr>
+<tr class="separator:add9582f47143d4a943af8bbd50082d4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acdc543d115e02324c243ebbfdd303214"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8h.html#acdc543d115e02324c243ebbfdd303214">lif_neuron_closed_form</a> (<a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> V_prev, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> <a class="el" href="spike__source__poisson_8c.html#a148ad514a3ea3af1eae2a8a354f242c2">input_this_timestep</a>)</td></tr>
 <tr class="memdesc:acdc543d115e02324c243ebbfdd303214"><td class="mdescLeft">&#160;</td><td class="mdescRight">simple Leaky I&amp;F ODE  <a href="neuron__model__lif__impl_8h.html#acdc543d115e02324c243ebbfdd303214">More...</a><br /></td></tr>
 <tr class="separator:acdc543d115e02324c243ebbfdd303214"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -104,12 +113,136 @@ Functions</h2></td></tr>
 <tr class="memitem:a36ed2fe89ac12da019a6bcee8b6672c9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8h.html#a36ed2fe89ac12da019a6bcee8b6672c9">neuron_model_get_membrane_voltage</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
 <tr class="memdesc:a36ed2fe89ac12da019a6bcee8b6672c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the neuron membrane voltage for a given neuron parameter set  <a href="neuron__model__lif__impl_8h.html#a36ed2fe89ac12da019a6bcee8b6672c9">More...</a><br /></td></tr>
 <tr class="separator:a36ed2fe89ac12da019a6bcee8b6672c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34e146df45faa9cdf07da003881f0181"><td class="memItemLeft" align="right" valign="top"><a id="a34e146df45faa9cdf07da003881f0181"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_model_print_state_variables</b> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
+<tr class="separator:a34e146df45faa9cdf07da003881f0181"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae984b1ab35b6ea027f5d622074c21212"><td class="memItemLeft" align="right" valign="top"><a id="ae984b1ab35b6ea027f5d622074c21212"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_model_print_parameters</b> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
+<tr class="separator:ae984b1ab35b6ea027f5d622074c21212"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Leaky Integrate and Fire neuron type. </p>
 
 <p class="definition">Definition in file <a class="el" href="neuron__model__lif__impl_8h_source.html">neuron_model_lif_impl.h</a>.</p>
 </div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
+<a name="structneuron__params__t" id="structneuron__params__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structneuron__params__t">&#9670;&nbsp;</a></span>neuron_params_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct neuron_params_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>The state parameters of an Izhekevich model neuron. </p>
+<p>definition for LIF neuron parameters </p>
+
+<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8h_source.html#l00026">26</a> of file <a class="el" href="neuron__model__izh__impl_8h_source.html">neuron_model_izh_impl.h</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a09dfcb6dca0125b67b65ca41c402c663"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+A</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a91734a898ea21b399bc1daff27bfa36e"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+B</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a966d619bd1b75e6f6a298e06fe3c91ef"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+C</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a08327f5d67bf6d0a4b191cbe6e46ecde"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+D</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a35ab06945f08f58f0c685a37ab91ce43"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+V</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a4fb864e2005fd5020a5599aa87b9400b"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+U</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a4b4a2ba9fba6d6f10d8ef1e1c851a39e"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+I_offset</td>
+<td class="fielddoc">
+offset current [nA] </td></tr>
+<tr><td class="fieldtype">
+<a id="a6d28ebcdd47a7628df5f538f5e5b60a6"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+time_step</td>
+<td class="fielddoc">
+current timestep in ms <p>The time step in milliseconds. </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a44341613a6482efe24379ae9a3c758d3"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+next_h</td>
+<td class="fielddoc">
+next value of this_h (saved) </td></tr>
+<tr><td class="fieldtype">
+<a id="a01195d3e2b315b7049b25bed7a00f322"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+V_init</td>
+<td class="fielddoc">
+membrane voltage [mV] </td></tr>
+<tr><td class="fieldtype">
+<a id="a390f6f7e76ae18b982c519ad517e74ad"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+V_rest</td>
+<td class="fielddoc">
+membrane resting voltage [mV] </td></tr>
+<tr><td class="fieldtype">
+<a id="a0d2e44ce37bdc89bdeaba22c3fc65903"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+c_m</td>
+<td class="fielddoc">
+membrane capacitance [nF] </td></tr>
+<tr><td class="fieldtype">
+<a id="acd02a68c932cc69f2815114f26f1609c"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+tau_m</td>
+<td class="fielddoc">
+membrane decay time constant </td></tr>
+<tr><td class="fieldtype">
+<a id="a1b77e28a1ebe5e091767984d96a1e41f"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+V_reset</td>
+<td class="fielddoc">
+post-spike reset membrane voltage [mV] </td></tr>
+<tr><td class="fieldtype">
+<a id="a2a4cc8608f712cd69e40daa4bcecb9b9"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+T_refract_ms</td>
+<td class="fielddoc">
+refractory time of neuron [ms] </td></tr>
+<tr><td class="fieldtype">
+<a id="ac2ffdee96e7211c98c8a5465cb277fd6"></a>int32_t</td>
+<td class="fieldname">
+refract_timer_init</td>
+<td class="fielddoc">
+initial refractory timer value (saved) </td></tr>
+</table>
+
+</div>
+</div>
 <a name="structneuron__t" id="structneuron__t"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#structneuron__t">&#9670;&nbsp;</a></span>neuron_t</h2>
 
@@ -122,98 +255,104 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <div class="textblock"><p>The state variables of an Izhekevich model neuron. </p>
-<p>definition for LIF neuron parameters </p>
+<p>definition for LIF neuron state </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8h_source.html#l00026">26</a> of file <a class="el" href="neuron__model__izh__impl_8h_source.html">neuron_model_izh_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8h_source.html#l00048">48</a> of file <a class="el" href="neuron__model__izh__impl_8h_source.html">neuron_model_izh_impl.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a id="ad130907faf9847e5c665ea8f98d2b7ee"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="ac27f43527e901f816f9fd6f370a93c43"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 A</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a6a19cab2bf1eb1b63bfd2445c828f09f"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="a2c9da96b8c1fcd8b9abf081c6706d109"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 B</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a0713a6fa18f353911f1ea987343396ae"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="a966fa57bf3ff12044fbbddbe66353f19"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 C</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a041a10da092c1b4913a81a259d947f69"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="a33dd2a36fec401bb02acca52af928233"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 D</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a5de1084851119f9911d03d81a69b249d"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="a73e82c1a5c434895289d06f42cab79a6"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 V</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="ac69ebbc2e2732fda330027204ea40f51"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="a2c24309c4d455f87daaa065940d0f1b4"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 U</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="af3312785809b054f13aeba3e3c2f000a"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="afa7f374c044dc5b6f4c0158ea694010e"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 I_offset</td>
 <td class="fielddoc">
 offset current [nA] </td></tr>
 <tr><td class="fieldtype">
-<a id="a36618067ab7503cd84fcf76e9e9a1111"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="ac81d28edfc234c0304748c166baeb0ac"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 this_h</td>
 <td class="fielddoc">
-current timestep - simple correction for threshold </td></tr>
+current timestep </td></tr>
 <tr><td class="fieldtype">
-<a id="a86bb63a4a0e56518c44af0beefe8ac31"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="a1d7622da6c04a63fde21386757b3b332"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+reset_h</td>
+<td class="fielddoc">
+timestep to reset to when not just spiked </td></tr>
+<tr><td class="fieldtype">
+<a id="ad66d54c7a07b1786b0d03888ba1c487d"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 V_membrane</td>
 <td class="fielddoc">
 membrane voltage [mV] </td></tr>
 <tr><td class="fieldtype">
-<a id="a0448414012bd86a39307aa97378ca8f2"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="a33437019fe16a8c9bde9773714eee263"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 V_rest</td>
 <td class="fielddoc">
 membrane resting voltage [mV] </td></tr>
 <tr><td class="fieldtype">
-<a id="aea78ba2caa325540d8571d35eba56b13"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="a8d199c1f0e0423ae3707530f872afc75"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 R_membrane</td>
 <td class="fielddoc">
 membrane resistance [MOhm] </td></tr>
 <tr><td class="fieldtype">
-<a id="ae86326c508ef052f75103f8fec5dff82"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="ad8b828cd0ae1cfcd20f1493d629fbb81"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 exp_TC</td>
 <td class="fielddoc">
 <p>'fixed' computation parameter - time constant multiplier for closed-form solution exp(-(machine time step in ms)/(R * C)) [.] </p>
 </td></tr>
 <tr><td class="fieldtype">
-<a id="acf084ec01328ebc9b41115c053dff303"></a>int32_t</td>
+<a id="affef55f4b097428004fad494ffaa7a26"></a>int32_t</td>
 <td class="fieldname">
 refract_timer</td>
 <td class="fielddoc">
 countdown to end of next refractory period [timesteps] </td></tr>
 <tr><td class="fieldtype">
-<a id="ad64e3dbdebb524738dac569369fcb146"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a id="a0c21f2095b2338097db6a4de641a9b0e"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 V_reset</td>
 <td class="fielddoc">
 post-spike reset membrane voltage [mV] </td></tr>
 <tr><td class="fieldtype">
-<a id="a960606546b094d62a8509eea60bd3dc2"></a>int32_t</td>
+<a id="a552b3d69763d3e600964e6a1ee7a5c89"></a>int32_t</td>
 <td class="fieldname">
 T_refract</td>
 <td class="fielddoc">
@@ -222,34 +361,44 @@ refractory time of neuron [timesteps] </td></tr>
 
 </div>
 </div>
-<a name="structglobal__neuron__params__t" id="structglobal__neuron__params__t"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structglobal__neuron__params__t">&#9670;&nbsp;</a></span>global_neuron_params_t</h2>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a9657bc9566431a1077df6f73dae27baf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9657bc9566431a1077df6f73dae27baf">&#9670;&nbsp;</a></span>lif_ceil_accum()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">struct global_neuron_params_t</td>
+          <td class="memname">static int32_t lif_ceil_accum </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
-</div><div class="memdoc">
-<div class="textblock"><p>Global neuron parameters for Izhekevich model neuron. </p>
-<p>LIF global parameters. </p>
-
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8h_source.html#l00045">45</a> of file <a class="el" href="neuron__model__izh__impl_8h_source.html">neuron_model_izh_impl.h</a>.</p>
-</div><table class="fieldtable">
-<tr><th colspan="3">Data Fields</th></tr>
-<tr><td class="fieldtype">
-<a id="ad832da5997bc8db0d81a27ebc9b72ec4"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-machine_timestep_ms</td>
-<td class="fielddoc">
-</td></tr>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
 </table>
+</div><div class="memdoc">
+
+<p>Performs a ceil operation on an accum. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>The value to ceil </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The ceil of the value </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="neuron__model__lif__impl_8h_source.html#l00088">88</a> of file <a class="el" href="neuron__model__lif__impl_8h_source.html">neuron_model_lif_impl.h</a>.</p>
 
 </div>
 </div>
-<h2 class="groupheader">Function Documentation</h2>
 <a id="acdc543d115e02324c243ebbfdd303214"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acdc543d115e02324c243ebbfdd303214">&#9670;&nbsp;</a></span>lif_neuron_closed_form()</h2>
 
@@ -300,7 +449,7 @@ machine_timestep_ms</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__lif__impl_8h_source.html#l00063">63</a> of file <a class="el" href="neuron__model__lif__impl_8h_source.html">neuron_model_lif_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__model__lif__impl_8h_source.html#l00120">120</a> of file <a class="el" href="neuron__model__lif__impl_8h_source.html">neuron_model_lif_impl.h</a>.</p>
 
 </div>
 </div>
@@ -363,7 +512,7 @@ machine_timestep_ms</td>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -382,7 +531,7 @@ machine_timestep_ms</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the value to be compared with a threshold value to determine if the neuron has spiked </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__lif__impl_8h_source.html#l00086">86</a> of file <a class="el" href="neuron__model__lif__impl_8h_source.html">neuron_model_lif_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__model__lif__impl_8h_source.html#l00143">143</a> of file <a class="el" href="neuron__model__lif__impl_8h_source.html">neuron_model_lif_impl.h</a>.</p>
 
 </div>
 </div>
@@ -405,7 +554,7 @@ machine_timestep_ms</td>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -418,7 +567,7 @@ machine_timestep_ms</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__lif__impl_8h_source.html#l00118">118</a> of file <a class="el" href="neuron__model__lif__impl_8h_source.html">neuron_model_lif_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__model__lif__impl_8h_source.html#l00175">175</a> of file <a class="el" href="neuron__model__lif__impl_8h_source.html">neuron_model_lif_impl.h</a>.</p>
 
 </div>
 </div>
@@ -441,7 +590,7 @@ machine_timestep_ms</td>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -455,14 +604,14 @@ machine_timestep_ms</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the membrane voltage for a given neuron with the neuron parameters specified in neuron </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__lif__impl_8h_source.html#l00131">131</a> of file <a class="el" href="neuron__model__lif__impl_8h_source.html">neuron_model_lif_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__model__lif__impl_8h_source.html#l00188">188</a> of file <a class="el" href="neuron__model__lif__impl_8h_source.html">neuron_model_lif_impl.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

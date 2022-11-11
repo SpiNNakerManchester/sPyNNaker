@@ -55,12 +55,13 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationSpiNNakerLinkVertex</span>
 <span class="kn">from</span> <span class="nn">pacman.model.routing_info</span> <span class="kn">import</span> <span class="n">BaseKeyAndMask</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationSpiNNakerLinkVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">MultiCastCommand</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">PopulationApplicationVertex</span>
 
 
 <span class="k">def</span> <span class="nf">get_y_from_fpga_retina</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
@@ -100,7 +101,8 @@
 
 
 <span class="k">class</span> <span class="nc">ExternalFPGARetinaDevice</span><span class="p">(</span>
-        <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">):</span>
+        <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">,</span> <span class="n">PopulationApplicationVertex</span><span class="p">,</span>
+        <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__fixed_key&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__fixed_mask&quot;</span><span class="p">]</span>

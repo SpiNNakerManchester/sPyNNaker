@@ -71,7 +71,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SynapseInformation</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">,</span> <span class="n">FromListConnector</span><span class="p">)</span>
+    <span class="n">FromListConnector</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">ConnectionHolder</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SynapseDynamicsStatic</span><span class="p">)</span>
@@ -127,10 +127,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
 
-        <span class="n">pre_is_view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_population</span><span class="p">(</span>
-            <span class="n">pre_synaptic_population</span><span class="p">,</span> <span class="n">connector</span><span class="p">)</span>
-        <span class="n">post_is_view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_population</span><span class="p">(</span>
-            <span class="n">post_synaptic_population</span><span class="p">,</span> <span class="n">connector</span><span class="p">)</span>
+        <span class="n">pre_is_view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_population</span><span class="p">(</span><span class="n">pre_synaptic_population</span><span class="p">)</span>
+        <span class="n">post_is_view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_population</span><span class="p">(</span><span class="n">post_synaptic_population</span><span class="p">)</span>
 
         <span class="c1"># set default label</span>
         <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -240,10 +238,9 @@
             <span class="n">pre_vertex</span><span class="o">.</span><span class="n">add_outgoing_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__check_population</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">connector</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__check_population</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~spynnaker.pyNN.models.populations.PopulationBase param:</span>
-<span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">        :return: Whether the parameter is a view</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -254,10 +251,6 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;Unexpected parameter type </span><span class="si">{}</span><span class="s2">. Expected Population&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="nb">type</span><span class="p">(</span><span class="n">param</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Projections over views not currently supported with the </span><span class="si">{}</span><span class="s2">&quot;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">connector</span><span class="p">))</span>
         <span class="c1"># Check whether the array is contiguous or not</span>
         <span class="n">inds</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">_indexes</span>  <span class="c1"># pylint: disable=protected-access</span>
         <span class="k">if</span> <span class="n">inds</span> <span class="o">!=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">inds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>

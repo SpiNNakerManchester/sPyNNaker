@@ -68,7 +68,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">connection_generator_one_to_one.h File Reference</div>  </div>
@@ -81,76 +80,25 @@ $(function() {
 </div>
 <p><a href="connection__generator__one__to__one_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Data Structures</h2></td></tr>
-<tr class="memitem:structone__to__one"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__one__to__one_8h.html#structone__to__one">one_to_one</a></td></tr>
-<tr class="memdesc:structone__to__one"><td class="mdescLeft">&#160;</td><td class="mdescRight">The parameters to be passed around for this connector.  <a href="connection__generator__one__to__one_8h.html#structone__to__one">More...</a><br /></td></tr>
-<tr class="separator:structone__to__one"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aacacd3d03b90bd854ba61a48097b0e97"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__one__to__one_8h.html#aacacd3d03b90bd854ba61a48097b0e97">connection_generator_one_to_one_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:aacacd3d03b90bd854ba61a48097b0e97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the one-to-one connection generator.  <a href="connection__generator__one__to__one_8h.html#aacacd3d03b90bd854ba61a48097b0e97">More...</a><br /></td></tr>
-<tr class="separator:aacacd3d03b90bd854ba61a48097b0e97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65db4882285a7d23efb818a6716f2ef3"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__one__to__one_8h.html#a65db4882285a7d23efb818a6716f2ef3">connection_generator_one_to_one_initialise</a> (void **<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:a65db4882285a7d23efb818a6716f2ef3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the one-to-one connection generator.  <a href="connection__generator__one__to__one_8h.html#a65db4882285a7d23efb818a6716f2ef3">More...</a><br /></td></tr>
+<tr class="separator:a65db4882285a7d23efb818a6716f2ef3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a519a2706ae01863c6124c8dc78a6a8a7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__one__to__one_8h.html#a519a2706ae01863c6124c8dc78a6a8a7">connection_generator_one_to_one_free</a> (void *generator)</td></tr>
 <tr class="memdesc:a519a2706ae01863c6124c8dc78a6a8a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free the one-to-one connection generator.  <a href="connection__generator__one__to__one_8h.html#a519a2706ae01863c6124c8dc78a6a8a7">More...</a><br /></td></tr>
 <tr class="separator:a519a2706ae01863c6124c8dc78a6a8a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa595e91deb02bd7ae09d16c0cd3d1de"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__one__to__one_8h.html#afa595e91deb02bd7ae09d16c0cd3d1de">connection_generator_one_to_one_generate</a> (void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</td></tr>
-<tr class="memdesc:afa595e91deb02bd7ae09d16c0cd3d1de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with the one-to-one connection generator.  <a href="connection__generator__one__to__one_8h.html#afa595e91deb02bd7ae09d16c0cd3d1de">More...</a><br /></td></tr>
-<tr class="separator:afa595e91deb02bd7ae09d16c0cd3d1de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0995920e464679529f2a804431341768"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__one__to__one_8h.html#a0995920e464679529f2a804431341768">connection_generator_one_to_one_generate</a> (void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t <a class="el" href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a>)</td></tr>
+<tr class="memdesc:a0995920e464679529f2a804431341768"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with the one-to-one connection generator.  <a href="connection__generator__one__to__one_8h.html#a0995920e464679529f2a804431341768">More...</a><br /></td></tr>
+<tr class="separator:a0995920e464679529f2a804431341768"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>One-to-One Connection generator implementation. </p>
 
 <p class="definition">Definition in file <a class="el" href="connection__generator__one__to__one_8h_source.html">connection_generator_one_to_one.h</a>.</p>
-</div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
-<a name="structone__to__one" id="structone__to__one"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structone__to__one">&#9670;&nbsp;</a></span>one_to_one</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct one_to_one</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<div class="textblock"><p>The parameters to be passed around for this connector. </p>
-
-<p class="definition">Definition at line <a class="el" href="connection__generator__one__to__one_8h_source.html#l00028">28</a> of file <a class="el" href="connection__generator__one__to__one_8h_source.html">connection_generator_one_to_one.h</a>.</p>
-</div><table class="fieldtable">
-<tr><th colspan="3">Data Fields</th></tr>
-<tr><td class="fieldtype">
-<a id="acd4e648e5517da10cc8dd53f4bbea377"></a>uint32_t</td>
-<td class="fieldname">
-pre_lo</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="adcd7b7eaffd574edb9103922565ad0f3"></a>uint32_t</td>
-<td class="fieldname">
-pre_hi</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a673b52b89c128e8a7a67bfb072d659eb"></a>uint32_t</td>
-<td class="fieldname">
-post_lo</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a0c3a83121da9bbd45ab1bac2018a26cd"></a>uint32_t</td>
-<td class="fieldname">
-post_hi</td>
-<td class="fielddoc">
-</td></tr>
-</table>
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="aacacd3d03b90bd854ba61a48097b0e97"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aacacd3d03b90bd854ba61a48097b0e97">&#9670;&nbsp;</a></span>connection_generator_one_to_one_initialise()</h2>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a65db4882285a7d23efb818a6716f2ef3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65db4882285a7d23efb818a6716f2ef3">&#9670;&nbsp;</a></span>connection_generator_one_to_one_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -161,7 +109,7 @@ post_hi</td>
         <tr>
           <td class="memname">static void* connection_generator_one_to_one_initialise </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramtype">void **&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
           <td></td>
         </tr>
@@ -182,7 +130,7 @@ post_hi</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__one__to__one_8h_source.html#l00041">41</a> of file <a class="el" href="connection__generator__one__to__one_8h_source.html">connection_generator_one_to_one.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__one__to__one_8h_source.html#l00031">31</a> of file <a class="el" href="connection__generator__one__to__one_8h_source.html">connection_generator_one_to_one.h</a>.</p>
 
 </div>
 </div>
@@ -218,12 +166,12 @@ post_hi</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__one__to__one_8h_source.html#l00060">60</a> of file <a class="el" href="connection__generator__one__to__one_8h_source.html">connection_generator_one_to_one.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__one__to__one_8h_source.html#l00042">42</a> of file <a class="el" href="connection__generator__one__to__one_8h_source.html">connection_generator_one_to_one.h</a>.</p>
 
 </div>
 </div>
-<a id="afa595e91deb02bd7ae09d16c0cd3d1de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa595e91deb02bd7ae09d16c0cd3d1de">&#9670;&nbsp;</a></span>connection_generator_one_to_one_generate()</h2>
+<a id="a0995920e464679529f2a804431341768"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0995920e464679529f2a804431341768">&#9670;&nbsp;</a></span>connection_generator_one_to_one_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -232,7 +180,7 @@ post_hi</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static uint32_t connection_generator_one_to_one_generate </td>
+          <td class="memname">static bool connection_generator_one_to_one_generate </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>generator</em>, </td>
@@ -241,19 +189,31 @@ post_hi</td>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_slice_start</em>, </td>
+          <td class="paramname"><em>pre_lo</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_slice_count</em>, </td>
+          <td class="paramname"><em>pre_hi</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
+          <td class="paramname"><em>post_lo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>post_hi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>post_index</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -270,14 +230,32 @@ post_hi</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>max_row_length</em>, </td>
+          <td class="paramtype">unsigned long accum&#160;</td>
+          <td class="paramname"><em>weight_scale</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>&#160;</td>
+          <td class="paramtype">accum&#160;</td>
+          <td class="paramname"><em>timestep_per_delay</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">param_generator_t&#160;</td>
+          <td class="paramname"><em>weight_generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">param_generator_t&#160;</td>
+          <td class="paramname"><em>delay_generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">matrix_generator_t&#160;</td>
+          <td class="paramname"><em>matrix_generator</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -308,14 +286,14 @@ post_hi</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of connections generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__one__to__one_8h_source.html#l00083">83</a> of file <a class="el" href="connection__generator__one__to__one_8h_source.html">connection_generator_one_to_one.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__one__to__one_8h_source.html#l00065">65</a> of file <a class="el" href="connection__generator__one__to__one_8h_source.html">connection_generator_one_to_one.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -89,7 +89,6 @@ $(function() {
 <code>#include &quot;<a class="el" href="param__generator__normal__clipped_8h_source.html">param_generators/param_generator_normal_clipped.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="param__generator__normal__clipped__to__boundary_8h_source.html">param_generators/param_generator_normal_clipped_to_boundary.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="param__generator__exponential_8h_source.html">param_generators/param_generator_exponential.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="param__generator__kernel_8h_source.html">param_generators/param_generator_kernel.h</a>&quot;</code><br />
 </div>
 <p><a href="param__generator_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -104,29 +103,28 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a6b7b47dd702d9e331586d485013fd1ea"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
-&#160;&#160;<a class="el" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa83972670b57415508523b5641bb46116">CONSTANT</a>
-, <a class="el" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa8f44784d154005a214e0fe94119d28ef">UNIFORM</a>
-, <a class="el" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa50d1448013c6f17125caee18aa418af7">NORMAL</a>
-, <a class="el" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaac40cefd2a096660da3f41d6ee6352889">NORMAL_CLIPPED</a>
+<tr class="memitem:a5d76b81b0ad4c19007a781d4edb8181f"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
+&#160;&#160;<a class="el" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fa83972670b57415508523b5641bb46116">CONSTANT</a>
+, <a class="el" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fa8f44784d154005a214e0fe94119d28ef">UNIFORM</a>
+, <a class="el" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fa50d1448013c6f17125caee18aa418af7">NORMAL</a>
+, <a class="el" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fac40cefd2a096660da3f41d6ee6352889">NORMAL_CLIPPED</a>
 , <br />
-&#160;&#160;<a class="el" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaaca06c44d4221f47f9d61534ca1e35752">NORMAL_CLIPPED_BOUNDARY</a>
-, <a class="el" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaaa6055a3a8ab1aed0594419b51d9ec15e">EXPONENTIAL</a>
-, <a class="el" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa53c6e691e7db9eceefc0fb37cb724cd2">KERNEL</a>
-, <a class="el" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaab8047ff7dfdb2c76ef1e78a7e6347777">N_PARAM_GENERATORS</a> = 7
+&#160;&#160;<a class="el" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181faca06c44d4221f47f9d61534ca1e35752">NORMAL_CLIPPED_BOUNDARY</a>
+, <a class="el" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181faa6055a3a8ab1aed0594419b51d9ec15e">EXPONENTIAL</a>
+, <a class="el" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fab8047ff7dfdb2c76ef1e78a7e6347777">N_PARAM_GENERATORS</a>
 <br />
  }</td></tr>
-<tr class="memdesc:a6b7b47dd702d9e331586d485013fd1ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "hashes" for parameter generators.  <a href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1ea">More...</a><br /></td></tr>
-<tr class="separator:a6b7b47dd702d9e331586d485013fd1ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:a5d76b81b0ad4c19007a781d4edb8181f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "hashes" for parameter generators.  <a href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181f">More...</a><br /></td></tr>
+<tr class="separator:a5d76b81b0ad4c19007a781d4edb8181f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae52a45690f00dfe7384a14645b3512de"><td class="memItemLeft" align="right" valign="top">param_generator_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator_8c.html#ae52a45690f00dfe7384a14645b3512de">param_generator_init</a> (uint32_t hash, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *in_region)</td></tr>
-<tr class="memdesc:ae52a45690f00dfe7384a14645b3512de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a specific parameter generator.  <a href="param__generator_8c.html#ae52a45690f00dfe7384a14645b3512de">More...</a><br /></td></tr>
-<tr class="separator:ae52a45690f00dfe7384a14645b3512de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae85e6c376848da24228c97141d0d2027"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator_8c.html#ae85e6c376848da24228c97141d0d2027">param_generator_generate</a> (param_generator_t generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</td></tr>
-<tr class="memdesc:ae85e6c376848da24228c97141d0d2027"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate values with a parameter generator.  <a href="param__generator_8c.html#ae85e6c376848da24228c97141d0d2027">More...</a><br /></td></tr>
-<tr class="separator:ae85e6c376848da24228c97141d0d2027"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbbfc064d4b66fdcb5738b2a0852dd21"><td class="memItemLeft" align="right" valign="top">param_generator_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator_8c.html#adbbfc064d4b66fdcb5738b2a0852dd21">param_generator_init</a> (uint32_t hash, void **in_region)</td></tr>
+<tr class="memdesc:adbbfc064d4b66fdcb5738b2a0852dd21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a specific parameter generator.  <a href="param__generator_8c.html#adbbfc064d4b66fdcb5738b2a0852dd21">More...</a><br /></td></tr>
+<tr class="separator:adbbfc064d4b66fdcb5738b2a0852dd21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afef726e38862303036b706f63cb5408d"><td class="memItemLeft" align="right" valign="top">accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator_8c.html#afef726e38862303036b706f63cb5408d">param_generator_generate</a> (param_generator_t generator)</td></tr>
+<tr class="memdesc:afef726e38862303036b706f63cb5408d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate value with a parameter generator.  <a href="param__generator_8c.html#afef726e38862303036b706f63cb5408d">More...</a><br /></td></tr>
+<tr class="separator:afef726e38862303036b706f63cb5408d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20b9f761fb073750e083d131cf49812e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator_8c.html#a20b9f761fb073750e083d131cf49812e">param_generator_free</a> (param_generator_t generator)</td></tr>
 <tr class="memdesc:a20b9f761fb073750e083d131cf49812e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finish with a parameter generator.  <a href="param__generator_8c.html#a20b9f761fb073750e083d131cf49812e">More...</a><br /></td></tr>
 <tr class="separator:a20b9f761fb073750e083d131cf49812e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -156,7 +154,7 @@ Variables</h2></td></tr>
 <div class="textblock"><p>A "class" for parameter generators. </p>
 <p>! </p>
 
-<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00058">58</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00055">55</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -167,13 +165,13 @@ hash</td>
 The hash of the generator. <p>For now, hash is just an index agreed between Python and here. </p>
 </td></tr>
 <tr><td class="fieldtype">
-<a id="abdee600112c11cf006a45596433f7293"></a><a class="el" href="generator__types_8h.html#a2eba3e6d9fed26ac5064e720ceed0f91">initialize_func</a> *</td>
+<a id="a126b6347bbad0c735f3c207060cf007a"></a><a class="el" href="generator__types_8h.html#a0a50a2e28c5d94827d681367fb6930f8">initialize_param_func</a> *</td>
 <td class="fieldname">
 initialize</td>
 <td class="fielddoc">
 Initialise the generator. </td></tr>
 <tr><td class="fieldtype">
-<a id="ad9c1ec831eb4ff50829162738b662847"></a><a class="el" href="generator__types_8h.html#a776082247e99447649d185bdd6b8f777">generate_param_func</a> *</td>
+<a id="ad9c1ec831eb4ff50829162738b662847"></a><a class="el" href="generator__types_8h.html#aeb13a16410f550a8620d9db733b00114">generate_param_func</a> *</td>
 <td class="fieldname">
 generate</td>
 <td class="fielddoc">
@@ -202,7 +200,7 @@ Free any data for the generator. </td></tr>
 <div class="textblock"><p>The data for a parameter generator. </p>
 <p>Parameter generator "object". </p>
 
-<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00076">76</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00073">73</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -222,8 +220,8 @@ data</td>
 </div>
 </div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="a6b7b47dd702d9e331586d485013fd1ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b7b47dd702d9e331586d485013fd1ea">&#9670;&nbsp;</a></span>anonymous enum</h2>
+<a id="a5d76b81b0ad4c19007a781d4edb8181f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d76b81b0ad4c19007a781d4edb8181f">&#9670;&nbsp;</a></span>anonymous enum</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -236,31 +234,29 @@ data</td>
 
 <p>The "hashes" for parameter generators. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a6b7b47dd702d9e331586d485013fd1eaa83972670b57415508523b5641bb46116"></a>CONSTANT&#160;</td><td class="fielddoc"><p>A parameter that is a constant. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a5d76b81b0ad4c19007a781d4edb8181fa83972670b57415508523b5641bb46116"></a>CONSTANT&#160;</td><td class="fielddoc"><p>A parameter that is a constant. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6b7b47dd702d9e331586d485013fd1eaa8f44784d154005a214e0fe94119d28ef"></a>UNIFORM&#160;</td><td class="fielddoc"><p>A parameter that is a uniformly-distributed random variable. </p>
+<tr><td class="fieldname"><a id="a5d76b81b0ad4c19007a781d4edb8181fa8f44784d154005a214e0fe94119d28ef"></a>UNIFORM&#160;</td><td class="fielddoc"><p>A parameter that is a uniformly-distributed random variable. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6b7b47dd702d9e331586d485013fd1eaa50d1448013c6f17125caee18aa418af7"></a>NORMAL&#160;</td><td class="fielddoc"><p>A parameter that is a normally-distributed random variable. </p>
+<tr><td class="fieldname"><a id="a5d76b81b0ad4c19007a781d4edb8181fa50d1448013c6f17125caee18aa418af7"></a>NORMAL&#160;</td><td class="fielddoc"><p>A parameter that is a normally-distributed random variable. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6b7b47dd702d9e331586d485013fd1eaac40cefd2a096660da3f41d6ee6352889"></a>NORMAL_CLIPPED&#160;</td><td class="fielddoc"><p>A parameter that is a clipped-normally-distributed random variable. </p>
+<tr><td class="fieldname"><a id="a5d76b81b0ad4c19007a781d4edb8181fac40cefd2a096660da3f41d6ee6352889"></a>NORMAL_CLIPPED&#160;</td><td class="fielddoc"><p>A parameter that is a clipped-normally-distributed random variable. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6b7b47dd702d9e331586d485013fd1eaaca06c44d4221f47f9d61534ca1e35752"></a>NORMAL_CLIPPED_BOUNDARY&#160;</td><td class="fielddoc"><p>A parameter that is a clamped-normally-distributed random variable. </p>
+<tr><td class="fieldname"><a id="a5d76b81b0ad4c19007a781d4edb8181faca06c44d4221f47f9d61534ca1e35752"></a>NORMAL_CLIPPED_BOUNDARY&#160;</td><td class="fielddoc"><p>A parameter that is a clamped-normally-distributed random variable. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6b7b47dd702d9e331586d485013fd1eaaa6055a3a8ab1aed0594419b51d9ec15e"></a>EXPONENTIAL&#160;</td><td class="fielddoc"><p>A parameter that is an exponentially-distributed random variable. </p>
+<tr><td class="fieldname"><a id="a5d76b81b0ad4c19007a781d4edb8181faa6055a3a8ab1aed0594419b51d9ec15e"></a>EXPONENTIAL&#160;</td><td class="fielddoc"><p>A parameter that is an exponentially-distributed random variable. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6b7b47dd702d9e331586d485013fd1eaa53c6e691e7db9eceefc0fb37cb724cd2"></a>KERNEL&#160;</td><td class="fielddoc"><p>A parameter that is used with a convolution kernel connector. </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a6b7b47dd702d9e331586d485013fd1eaab8047ff7dfdb2c76ef1e78a7e6347777"></a>N_PARAM_GENERATORS&#160;</td><td class="fielddoc"><p>The number of known generators. </p>
+<tr><td class="fieldname"><a id="a5d76b81b0ad4c19007a781d4edb8181fab8047ff7dfdb2c76ef1e78a7e6347777"></a>N_PARAM_GENERATORS&#160;</td><td class="fielddoc"><p>The number of known generators. </p>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00036">36</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00035">35</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ae52a45690f00dfe7384a14645b3512de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae52a45690f00dfe7384a14645b3512de">&#9670;&nbsp;</a></span>param_generator_init()</h2>
+<a id="adbbfc064d4b66fdcb5738b2a0852dd21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbbfc064d4b66fdcb5738b2a0852dd21">&#9670;&nbsp;</a></span>param_generator_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -274,7 +270,7 @@ data</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramtype">void **&#160;</td>
           <td class="paramname"><em>region</em>&#160;</td>
         </tr>
         <tr>
@@ -295,67 +291,36 @@ data</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An initialised parameter generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00115">115</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00108">108</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
 
 </div>
 </div>
-<a id="ae85e6c376848da24228c97141d0d2027"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae85e6c376848da24228c97141d0d2027">&#9670;&nbsp;</a></span>param_generator_generate()</h2>
+<a id="afef726e38862303036b706f63cb5408d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afef726e38862303036b706f63cb5408d">&#9670;&nbsp;</a></span>param_generator_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void param_generator_generate </td>
+          <td class="memname">accum param_generator_generate </td>
           <td>(</td>
           <td class="paramtype">param_generator_t&#160;</td>
-          <td class="paramname"><em>generator</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n_indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">accum *&#160;</td>
-          <td class="paramname"><em>values</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Generate values with a parameter generator. </p>
+<p>Generate value with a parameter generator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to use to generate values </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_indices</td><td>The number of values to generate </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the neuron in the pre-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>The n_indices post-neuron indices for each connection </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">values</td><td>An array into which to place the values; will be n_indices in size </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>The value generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00142">142</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00135">135</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
 
 </div>
 </div>
@@ -383,7 +348,7 @@ data</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00149">149</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator_8c_source.html#l00139">139</a> of file <a class="el" href="param__generator_8c_source.html">param_generator.c</a>.</p>
 
 </div>
 </div>
@@ -408,63 +373,55 @@ data</td>
 </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">    {<a class="code" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa83972670b57415508523b5641bb46116">CONSTANT</a>,</div>
-<div class="line">            <a class="code" href="param__generator__constant_8h.html#a52720c983e24979540f5cf27d02b0c14">param_generator_constant_initialize</a>,</div>
-<div class="line">            <a class="code" href="param__generator__constant_8h.html#a22265a38730d1027e422da52c55b1925">param_generator_constant_generate</a>,</div>
+<div class="line">    {<a class="code" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fa83972670b57415508523b5641bb46116">CONSTANT</a>,</div>
+<div class="line">            <a class="code" href="param__generator__constant_8h.html#a34e2ca57f5ca02c366171d011ce929a8">param_generator_constant_initialize</a>,</div>
+<div class="line">            <a class="code" href="param__generator__constant_8h.html#a77b1ea38243a82710e7a32d1ff1c1298">param_generator_constant_generate</a>,</div>
 <div class="line">            <a class="code" href="param__generator__constant_8h.html#ae74a9c20cfc678e6ddd497a11385af04">param_generator_constant_free</a>},</div>
-<div class="line">    {<a class="code" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa8f44784d154005a214e0fe94119d28ef">UNIFORM</a>,</div>
-<div class="line">            <a class="code" href="param__generator__uniform_8h.html#aa98cee205ae39374662b092fc83c7f43">param_generator_uniform_initialize</a>,</div>
-<div class="line">            <a class="code" href="param__generator__uniform_8h.html#ae052c5aefd98b10fb363a5baf6ba0b00">param_generator_uniform_generate</a>,</div>
+<div class="line">    {<a class="code" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fa8f44784d154005a214e0fe94119d28ef">UNIFORM</a>,</div>
+<div class="line">            <a class="code" href="param__generator__uniform_8h.html#aa8b841fdabac07eeeb5f89ca3c43f789">param_generator_uniform_initialize</a>,</div>
+<div class="line">            <a class="code" href="param__generator__uniform_8h.html#a2b29e827b33797b652c59eb606a042b5">param_generator_uniform_generate</a>,</div>
 <div class="line">            <a class="code" href="param__generator__uniform_8h.html#a445a600b3abdfaa44355db5151482756">param_generator_uniform_free</a>},</div>
-<div class="line">    {<a class="code" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa50d1448013c6f17125caee18aa418af7">NORMAL</a>,</div>
-<div class="line">            <a class="code" href="param__generator__normal_8h.html#ae437fca279630eb531de2055d33384d8">param_generator_normal_initialize</a>,</div>
-<div class="line">            <a class="code" href="param__generator__normal_8h.html#aab67db27d60f95cb89f416f5437337fa">param_generator_normal_generate</a>,</div>
+<div class="line">    {<a class="code" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fa50d1448013c6f17125caee18aa418af7">NORMAL</a>,</div>
+<div class="line">            <a class="code" href="param__generator__normal_8h.html#af7e93833ca106d2e4ee06afdb8924b2e">param_generator_normal_initialize</a>,</div>
+<div class="line">            <a class="code" href="param__generator__normal_8h.html#ab4675e8a38c5ceb893c1bfeb9855d674">param_generator_normal_generate</a>,</div>
 <div class="line">            <a class="code" href="param__generator__normal_8h.html#a5da899810d276b0a718b0802fb176783">param_generator_normal_free</a>},</div>
-<div class="line">    {<a class="code" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaac40cefd2a096660da3f41d6ee6352889">NORMAL_CLIPPED</a>,</div>
-<div class="line">            <a class="code" href="param__generator__normal__clipped_8h.html#a2e7a19b44cf70f55ce523967c2ebe963">param_generator_normal_clipped_initialize</a>,</div>
-<div class="line">            <a class="code" href="param__generator__normal__clipped_8h.html#aee9da23a6c9386207ef4aa389c193465">param_generator_normal_clipped_generate</a>,</div>
+<div class="line">    {<a class="code" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fac40cefd2a096660da3f41d6ee6352889">NORMAL_CLIPPED</a>,</div>
+<div class="line">            <a class="code" href="param__generator__normal__clipped_8h.html#a54344636f79eebf5c8a0b38679ea7fb6">param_generator_normal_clipped_initialize</a>,</div>
+<div class="line">            <a class="code" href="param__generator__normal__clipped_8h.html#a2689af6a3a0e75893cb57cbb0f9225a3">param_generator_normal_clipped_generate</a>,</div>
 <div class="line">            <a class="code" href="param__generator__normal__clipped_8h.html#aa9c765cadcfd29badb3aa2b96aa6ace2">param_generator_normal_clipped_free</a>},</div>
-<div class="line">    {<a class="code" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaaca06c44d4221f47f9d61534ca1e35752">NORMAL_CLIPPED_BOUNDARY</a>,</div>
-<div class="line">            <a class="code" href="param__generator__normal__clipped__to__boundary_8h.html#aea1249b5291999b5c20957a84794d52f">param_generator_normal_clipped_boundary_initialize</a>,</div>
-<div class="line">            <a class="code" href="param__generator__normal__clipped__to__boundary_8h.html#a4fc1e0ce8a65ceece5bd4692dfc3571f">param_generator_normal_clipped_boundary_generate</a>,</div>
+<div class="line">    {<a class="code" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181faca06c44d4221f47f9d61534ca1e35752">NORMAL_CLIPPED_BOUNDARY</a>,</div>
+<div class="line">            <a class="code" href="param__generator__normal__clipped__to__boundary_8h.html#a19fd62d85e662f61ecd668f505c7440d">param_generator_normal_clipped_boundary_initialize</a>,</div>
+<div class="line">            <a class="code" href="param__generator__normal__clipped__to__boundary_8h.html#ab66a10e3ada868e5462a6b67c3c81d6d">param_generator_normal_clipped_boundary_generate</a>,</div>
 <div class="line">            <a class="code" href="param__generator__normal__clipped__to__boundary_8h.html#a5da6f0676e55afbd36f5a0922c5c33f9">param_generator_normal_clipped_boundary_free</a>},</div>
-<div class="line">    {<a class="code" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaaa6055a3a8ab1aed0594419b51d9ec15e">EXPONENTIAL</a>,</div>
-<div class="line">            <a class="code" href="param__generator__exponential_8h.html#a518b5f87123dff22dbf32caeebf3bd62">param_generator_exponential_initialize</a>,</div>
-<div class="line">            <a class="code" href="param__generator__exponential_8h.html#a35c790b036e9fe9d1fa56d6f73481253">param_generator_exponential_generate</a>,</div>
-<div class="line">            <a class="code" href="param__generator__exponential_8h.html#a5e6bcf3faf8c177cd11b9aa85f8332ab">param_generator_exponential_free</a>},</div>
-<div class="line">    {<a class="code" href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa53c6e691e7db9eceefc0fb37cb724cd2">KERNEL</a>,</div>
-<div class="line">            <a class="code" href="param__generator__kernel_8h.html#a39733ff7b8e93862022624d1677e64d2">param_generator_kernel_initialize</a>,</div>
-<div class="line">            <a class="code" href="param__generator__kernel_8h.html#ae8923c53570bb39fb37da751c4bc54e9">param_generator_kernel_generate</a>,</div>
-<div class="line">            <a class="code" href="param__generator__kernel_8h.html#a0e39efa09a5e7eaf0d1176854c932da0">param_generator_kernel_free</a>},</div>
+<div class="line">    {<a class="code" href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181faa6055a3a8ab1aed0594419b51d9ec15e">EXPONENTIAL</a>,</div>
+<div class="line">            <a class="code" href="param__generator__exponential_8h.html#a91fcc830218bf9d51c08110a9ba370c0">param_generator_exponential_initialize</a>,</div>
+<div class="line">            <a class="code" href="param__generator__exponential_8h.html#a0b7052da706984ea9afd03182b04db9e">param_generator_exponential_generate</a>,</div>
+<div class="line">            <a class="code" href="param__generator__exponential_8h.html#a5e6bcf3faf8c177cd11b9aa85f8332ab">param_generator_exponential_free</a>}</div>
 <div class="line">}</div>
-<div class="ttc" id="aparam__generator_8c_html_a6b7b47dd702d9e331586d485013fd1eaa50d1448013c6f17125caee18aa418af7"><div class="ttname"><a href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa50d1448013c6f17125caee18aa418af7">NORMAL</a></div><div class="ttdeci">@ NORMAL</div><div class="ttdoc">A parameter that is a normally-distributed random variable.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00042">param_generator.c:42</a></div></div>
-<div class="ttc" id="aparam__generator_8c_html_a6b7b47dd702d9e331586d485013fd1eaa53c6e691e7db9eceefc0fb37cb724cd2"><div class="ttname"><a href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa53c6e691e7db9eceefc0fb37cb724cd2">KERNEL</a></div><div class="ttdeci">@ KERNEL</div><div class="ttdoc">A parameter that is used with a convolution kernel connector.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00050">param_generator.c:50</a></div></div>
-<div class="ttc" id="aparam__generator_8c_html_a6b7b47dd702d9e331586d485013fd1eaa83972670b57415508523b5641bb46116"><div class="ttname"><a href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa83972670b57415508523b5641bb46116">CONSTANT</a></div><div class="ttdeci">@ CONSTANT</div><div class="ttdoc">A parameter that is a constant.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00038">param_generator.c:38</a></div></div>
-<div class="ttc" id="aparam__generator_8c_html_a6b7b47dd702d9e331586d485013fd1eaa8f44784d154005a214e0fe94119d28ef"><div class="ttname"><a href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaa8f44784d154005a214e0fe94119d28ef">UNIFORM</a></div><div class="ttdeci">@ UNIFORM</div><div class="ttdoc">A parameter that is a uniformly-distributed random variable.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00040">param_generator.c:40</a></div></div>
-<div class="ttc" id="aparam__generator_8c_html_a6b7b47dd702d9e331586d485013fd1eaaa6055a3a8ab1aed0594419b51d9ec15e"><div class="ttname"><a href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaaa6055a3a8ab1aed0594419b51d9ec15e">EXPONENTIAL</a></div><div class="ttdeci">@ EXPONENTIAL</div><div class="ttdoc">A parameter that is an exponentially-distributed random variable.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00048">param_generator.c:48</a></div></div>
-<div class="ttc" id="aparam__generator_8c_html_a6b7b47dd702d9e331586d485013fd1eaac40cefd2a096660da3f41d6ee6352889"><div class="ttname"><a href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaac40cefd2a096660da3f41d6ee6352889">NORMAL_CLIPPED</a></div><div class="ttdeci">@ NORMAL_CLIPPED</div><div class="ttdoc">A parameter that is a clipped-normally-distributed random variable.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00044">param_generator.c:44</a></div></div>
-<div class="ttc" id="aparam__generator_8c_html_a6b7b47dd702d9e331586d485013fd1eaaca06c44d4221f47f9d61534ca1e35752"><div class="ttname"><a href="param__generator_8c.html#a6b7b47dd702d9e331586d485013fd1eaaca06c44d4221f47f9d61534ca1e35752">NORMAL_CLIPPED_BOUNDARY</a></div><div class="ttdeci">@ NORMAL_CLIPPED_BOUNDARY</div><div class="ttdoc">A parameter that is a clamped-normally-distributed random variable.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00046">param_generator.c:46</a></div></div>
-<div class="ttc" id="aparam__generator__constant_8h_html_a22265a38730d1027e422da52c55b1925"><div class="ttname"><a href="param__generator__constant_8h.html#a22265a38730d1027e422da52c55b1925">param_generator_constant_generate</a></div><div class="ttdeci">static void param_generator_constant_generate(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</div><div class="ttdoc">How to generate values with the constant parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__constant_8h_source.html#l00072">param_generator_constant.h:72</a></div></div>
-<div class="ttc" id="aparam__generator__constant_8h_html_a52720c983e24979540f5cf27d02b0c14"><div class="ttname"><a href="param__generator__constant_8h.html#a52720c983e24979540f5cf27d02b0c14">param_generator_constant_initialize</a></div><div class="ttdeci">static void * param_generator_constant_initialize(address_t *region)</div><div class="ttdoc">How to initialise the constant parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__constant_8h_source.html#l00041">param_generator_constant.h:41</a></div></div>
+<div class="ttc" id="aparam__generator_8c_html_a5d76b81b0ad4c19007a781d4edb8181fa50d1448013c6f17125caee18aa418af7"><div class="ttname"><a href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fa50d1448013c6f17125caee18aa418af7">NORMAL</a></div><div class="ttdeci">@ NORMAL</div><div class="ttdoc">A parameter that is a normally-distributed random variable.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00041">param_generator.c:41</a></div></div>
+<div class="ttc" id="aparam__generator_8c_html_a5d76b81b0ad4c19007a781d4edb8181fa83972670b57415508523b5641bb46116"><div class="ttname"><a href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fa83972670b57415508523b5641bb46116">CONSTANT</a></div><div class="ttdeci">@ CONSTANT</div><div class="ttdoc">A parameter that is a constant.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00037">param_generator.c:37</a></div></div>
+<div class="ttc" id="aparam__generator_8c_html_a5d76b81b0ad4c19007a781d4edb8181fa8f44784d154005a214e0fe94119d28ef"><div class="ttname"><a href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fa8f44784d154005a214e0fe94119d28ef">UNIFORM</a></div><div class="ttdeci">@ UNIFORM</div><div class="ttdoc">A parameter that is a uniformly-distributed random variable.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00039">param_generator.c:39</a></div></div>
+<div class="ttc" id="aparam__generator_8c_html_a5d76b81b0ad4c19007a781d4edb8181faa6055a3a8ab1aed0594419b51d9ec15e"><div class="ttname"><a href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181faa6055a3a8ab1aed0594419b51d9ec15e">EXPONENTIAL</a></div><div class="ttdeci">@ EXPONENTIAL</div><div class="ttdoc">A parameter that is an exponentially-distributed random variable.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00047">param_generator.c:47</a></div></div>
+<div class="ttc" id="aparam__generator_8c_html_a5d76b81b0ad4c19007a781d4edb8181fac40cefd2a096660da3f41d6ee6352889"><div class="ttname"><a href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181fac40cefd2a096660da3f41d6ee6352889">NORMAL_CLIPPED</a></div><div class="ttdeci">@ NORMAL_CLIPPED</div><div class="ttdoc">A parameter that is a clipped-normally-distributed random variable.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00043">param_generator.c:43</a></div></div>
+<div class="ttc" id="aparam__generator_8c_html_a5d76b81b0ad4c19007a781d4edb8181faca06c44d4221f47f9d61534ca1e35752"><div class="ttname"><a href="param__generator_8c.html#a5d76b81b0ad4c19007a781d4edb8181faca06c44d4221f47f9d61534ca1e35752">NORMAL_CLIPPED_BOUNDARY</a></div><div class="ttdeci">@ NORMAL_CLIPPED_BOUNDARY</div><div class="ttdoc">A parameter that is a clamped-normally-distributed random variable.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00045">param_generator.c:45</a></div></div>
+<div class="ttc" id="aparam__generator__constant_8h_html_a34e2ca57f5ca02c366171d011ce929a8"><div class="ttname"><a href="param__generator__constant_8h.html#a34e2ca57f5ca02c366171d011ce929a8">param_generator_constant_initialize</a></div><div class="ttdeci">static void * param_generator_constant_initialize(void **region)</div><div class="ttdoc">How to initialise the constant parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__constant_8h_source.html#l00041">param_generator_constant.h:41</a></div></div>
+<div class="ttc" id="aparam__generator__constant_8h_html_a77b1ea38243a82710e7a32d1ff1c1298"><div class="ttname"><a href="param__generator__constant_8h.html#a77b1ea38243a82710e7a32d1ff1c1298">param_generator_constant_generate</a></div><div class="ttdeci">static accum param_generator_constant_generate(void *generator)</div><div class="ttdoc">How to generate values with the constant parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__constant_8h_source.html#l00067">param_generator_constant.h:67</a></div></div>
 <div class="ttc" id="aparam__generator__constant_8h_html_ae74a9c20cfc678e6ddd497a11385af04"><div class="ttname"><a href="param__generator__constant_8h.html#ae74a9c20cfc678e6ddd497a11385af04">param_generator_constant_free</a></div><div class="ttdeci">static void param_generator_constant_free(void *generator)</div><div class="ttdoc">How to free any data for the constant parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__constant_8h_source.html#l00058">param_generator_constant.h:58</a></div></div>
-<div class="ttc" id="aparam__generator__exponential_8h_html_a35c790b036e9fe9d1fa56d6f73481253"><div class="ttname"><a href="param__generator__exponential_8h.html#a35c790b036e9fe9d1fa56d6f73481253">param_generator_exponential_generate</a></div><div class="ttdeci">static void param_generator_exponential_generate(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</div><div class="ttdoc">How to generate values with the exponential RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__exponential_8h_source.html#l00087">param_generator_exponential.h:87</a></div></div>
-<div class="ttc" id="aparam__generator__exponential_8h_html_a518b5f87123dff22dbf32caeebf3bd62"><div class="ttname"><a href="param__generator__exponential_8h.html#a518b5f87123dff22dbf32caeebf3bd62">param_generator_exponential_initialize</a></div><div class="ttdeci">static void * param_generator_exponential_initialize(address_t *region)</div><div class="ttdoc">How to initialise the exponential RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__exponential_8h_source.html#l00051">param_generator_exponential.h:51</a></div></div>
-<div class="ttc" id="aparam__generator__exponential_8h_html_a5e6bcf3faf8c177cd11b9aa85f8332ab"><div class="ttname"><a href="param__generator__exponential_8h.html#a5e6bcf3faf8c177cd11b9aa85f8332ab">param_generator_exponential_free</a></div><div class="ttdeci">static void param_generator_exponential_free(void *generator)</div><div class="ttdoc">How to free any data for the exponential RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__exponential_8h_source.html#l00071">param_generator_exponential.h:71</a></div></div>
-<div class="ttc" id="aparam__generator__kernel_8h_html_a0e39efa09a5e7eaf0d1176854c932da0"><div class="ttname"><a href="param__generator__kernel_8h.html#a0e39efa09a5e7eaf0d1176854c932da0">param_generator_kernel_free</a></div><div class="ttdeci">static void param_generator_kernel_free(void *generator)</div><div class="ttdoc">How to free any data for the convolution kernel parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__kernel_8h_source.html#l00103">param_generator_kernel.h:103</a></div></div>
-<div class="ttc" id="aparam__generator__kernel_8h_html_a39733ff7b8e93862022624d1677e64d2"><div class="ttname"><a href="param__generator__kernel_8h.html#a39733ff7b8e93862022624d1677e64d2">param_generator_kernel_initialize</a></div><div class="ttdeci">static void * param_generator_kernel_initialize(address_t *region)</div><div class="ttdoc">How to initialise the convolution kernel parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__kernel_8h_source.html#l00084">param_generator_kernel.h:84</a></div></div>
-<div class="ttc" id="aparam__generator__kernel_8h_html_ae8923c53570bb39fb37da751c4bc54e9"><div class="ttname"><a href="param__generator__kernel_8h.html#ae8923c53570bb39fb37da751c4bc54e9">param_generator_kernel_generate</a></div><div class="ttdeci">static void param_generator_kernel_generate(void *generator, uint32_t n_synapses, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</div><div class="ttdoc">How to generate values with the convolution kernel parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__kernel_8h_source.html#l00117">param_generator_kernel.h:117</a></div></div>
-<div class="ttc" id="aparam__generator__normal_8h_html_a5da899810d276b0a718b0802fb176783"><div class="ttname"><a href="param__generator__normal_8h.html#a5da899810d276b0a718b0802fb176783">param_generator_normal_free</a></div><div class="ttdeci">static void param_generator_normal_free(void *generator)</div><div class="ttdoc">How to free any data for the normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal_8h_source.html#l00074">param_generator_normal.h:74</a></div></div>
-<div class="ttc" id="aparam__generator__normal_8h_html_aab67db27d60f95cb89f416f5437337fa"><div class="ttname"><a href="param__generator__normal_8h.html#aab67db27d60f95cb89f416f5437337fa">param_generator_normal_generate</a></div><div class="ttdeci">static void param_generator_normal_generate(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</div><div class="ttdoc">How to generate values with the normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal_8h_source.html#l00090">param_generator_normal.h:90</a></div></div>
-<div class="ttc" id="aparam__generator__normal_8h_html_ae437fca279630eb531de2055d33384d8"><div class="ttname"><a href="param__generator__normal_8h.html#ae437fca279630eb531de2055d33384d8">param_generator_normal_initialize</a></div><div class="ttdeci">static void * param_generator_normal_initialize(address_t *region)</div><div class="ttdoc">How to initialise the normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal_8h_source.html#l00052">param_generator_normal.h:52</a></div></div>
-<div class="ttc" id="aparam__generator__normal__clipped_8h_html_a2e7a19b44cf70f55ce523967c2ebe963"><div class="ttname"><a href="param__generator__normal__clipped_8h.html#a2e7a19b44cf70f55ce523967c2ebe963">param_generator_normal_clipped_initialize</a></div><div class="ttdeci">static void * param_generator_normal_clipped_initialize(address_t *region)</div><div class="ttdoc">How to initialise the clipped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped_8h_source.html#l00060">param_generator_normal_clipped.h:60</a></div></div>
-<div class="ttc" id="aparam__generator__normal__clipped_8h_html_aa9c765cadcfd29badb3aa2b96aa6ace2"><div class="ttname"><a href="param__generator__normal__clipped_8h.html#aa9c765cadcfd29badb3aa2b96aa6ace2">param_generator_normal_clipped_free</a></div><div class="ttdeci">static void param_generator_normal_clipped_free(void *generator)</div><div class="ttdoc">How to free any data for the clipped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped_8h_source.html#l00083">param_generator_normal_clipped.h:83</a></div></div>
-<div class="ttc" id="aparam__generator__normal__clipped_8h_html_aee9da23a6c9386207ef4aa389c193465"><div class="ttname"><a href="param__generator__normal__clipped_8h.html#aee9da23a6c9386207ef4aa389c193465">param_generator_normal_clipped_generate</a></div><div class="ttdeci">static void param_generator_normal_clipped_generate(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</div><div class="ttdoc">How to generate values with the clipped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped_8h_source.html#l00099">param_generator_normal_clipped.h:99</a></div></div>
-<div class="ttc" id="aparam__generator__normal__clipped__to__boundary_8h_html_a4fc1e0ce8a65ceece5bd4692dfc3571f"><div class="ttname"><a href="param__generator__normal__clipped__to__boundary_8h.html#a4fc1e0ce8a65ceece5bd4692dfc3571f">param_generator_normal_clipped_boundary_generate</a></div><div class="ttdeci">static void param_generator_normal_clipped_boundary_generate(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</div><div class="ttdoc">How to generate values with the clamped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped__to__boundary_8h_source.html#l00094">param_generator_normal_clipped_to_boundary.h:94</a></div></div>
-<div class="ttc" id="aparam__generator__normal__clipped__to__boundary_8h_html_a5da6f0676e55afbd36f5a0922c5c33f9"><div class="ttname"><a href="param__generator__normal__clipped__to__boundary_8h.html#a5da6f0676e55afbd36f5a0922c5c33f9">param_generator_normal_clipped_boundary_free</a></div><div class="ttdeci">static void param_generator_normal_clipped_boundary_free(void *generator)</div><div class="ttdoc">How to free any data for the clamped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped__to__boundary_8h_source.html#l00078">param_generator_normal_clipped_to_boundary.h:78</a></div></div>
-<div class="ttc" id="aparam__generator__normal__clipped__to__boundary_8h_html_aea1249b5291999b5c20957a84794d52f"><div class="ttname"><a href="param__generator__normal__clipped__to__boundary_8h.html#aea1249b5291999b5c20957a84794d52f">param_generator_normal_clipped_boundary_initialize</a></div><div class="ttdeci">static void * param_generator_normal_clipped_boundary_initialize(address_t *region)</div><div class="ttdoc">How to initialise the clamped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped__to__boundary_8h_source.html#l00055">param_generator_normal_clipped_to_boundary.h:55</a></div></div>
-<div class="ttc" id="aparam__generator__uniform_8h_html_a445a600b3abdfaa44355db5151482756"><div class="ttname"><a href="param__generator__uniform_8h.html#a445a600b3abdfaa44355db5151482756">param_generator_uniform_free</a></div><div class="ttdeci">static void param_generator_uniform_free(void *generator)</div><div class="ttdoc">How to free any data for the uniform RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__uniform_8h_source.html#l00074">param_generator_uniform.h:74</a></div></div>
-<div class="ttc" id="aparam__generator__uniform_8h_html_aa98cee205ae39374662b092fc83c7f43"><div class="ttname"><a href="param__generator__uniform_8h.html#aa98cee205ae39374662b092fc83c7f43">param_generator_uniform_initialize</a></div><div class="ttdeci">static void * param_generator_uniform_initialize(address_t *region)</div><div class="ttdoc">How to initialise the uniform RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__uniform_8h_source.html#l00052">param_generator_uniform.h:52</a></div></div>
-<div class="ttc" id="aparam__generator__uniform_8h_html_ae052c5aefd98b10fb363a5baf6ba0b00"><div class="ttname"><a href="param__generator__uniform_8h.html#ae052c5aefd98b10fb363a5baf6ba0b00">param_generator_uniform_generate</a></div><div class="ttdeci">static void param_generator_uniform_generate(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</div><div class="ttdoc">How to generate values with the uniform RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__uniform_8h_source.html#l00090">param_generator_uniform.h:90</a></div></div>
+<div class="ttc" id="aparam__generator__exponential_8h_html_a0b7052da706984ea9afd03182b04db9e"><div class="ttname"><a href="param__generator__exponential_8h.html#a0b7052da706984ea9afd03182b04db9e">param_generator_exponential_generate</a></div><div class="ttdeci">static accum param_generator_exponential_generate(void *generator)</div><div class="ttdoc">How to generate values with the exponential RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__exponential_8h_source.html#l00077">param_generator_exponential.h:77</a></div></div>
+<div class="ttc" id="aparam__generator__exponential_8h_html_a5e6bcf3faf8c177cd11b9aa85f8332ab"><div class="ttname"><a href="param__generator__exponential_8h.html#a5e6bcf3faf8c177cd11b9aa85f8332ab">param_generator_exponential_free</a></div><div class="ttdeci">static void param_generator_exponential_free(void *generator)</div><div class="ttdoc">How to free any data for the exponential RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__exponential_8h_source.html#l00068">param_generator_exponential.h:68</a></div></div>
+<div class="ttc" id="aparam__generator__exponential_8h_html_a91fcc830218bf9d51c08110a9ba370c0"><div class="ttname"><a href="param__generator__exponential_8h.html#a91fcc830218bf9d51c08110a9ba370c0">param_generator_exponential_initialize</a></div><div class="ttdeci">static void * param_generator_exponential_initialize(void **region)</div><div class="ttdoc">How to initialise the exponential RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__exponential_8h_source.html#l00050">param_generator_exponential.h:50</a></div></div>
+<div class="ttc" id="aparam__generator__normal_8h_html_a5da899810d276b0a718b0802fb176783"><div class="ttname"><a href="param__generator__normal_8h.html#a5da899810d276b0a718b0802fb176783">param_generator_normal_free</a></div><div class="ttdeci">static void param_generator_normal_free(void *generator)</div><div class="ttdoc">How to free any data for the normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal_8h_source.html#l00070">param_generator_normal.h:70</a></div></div>
+<div class="ttc" id="aparam__generator__normal_8h_html_ab4675e8a38c5ceb893c1bfeb9855d674"><div class="ttname"><a href="param__generator__normal_8h.html#ab4675e8a38c5ceb893c1bfeb9855d674">param_generator_normal_generate</a></div><div class="ttdeci">static accum param_generator_normal_generate(void *generator)</div><div class="ttdoc">How to generate values with the normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal_8h_source.html#l00079">param_generator_normal.h:79</a></div></div>
+<div class="ttc" id="aparam__generator__normal_8h_html_af7e93833ca106d2e4ee06afdb8924b2e"><div class="ttname"><a href="param__generator__normal_8h.html#af7e93833ca106d2e4ee06afdb8924b2e">param_generator_normal_initialize</a></div><div class="ttdeci">static void * param_generator_normal_initialize(void **region)</div><div class="ttdoc">How to initialise the normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal_8h_source.html#l00051">param_generator_normal.h:51</a></div></div>
+<div class="ttc" id="aparam__generator__normal__clipped_8h_html_a2689af6a3a0e75893cb57cbb0f9225a3"><div class="ttname"><a href="param__generator__normal__clipped_8h.html#a2689af6a3a0e75893cb57cbb0f9225a3">param_generator_normal_clipped_generate</a></div><div class="ttdeci">static accum param_generator_normal_clipped_generate(void *generator)</div><div class="ttdoc">How to generate values with the clipped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped_8h_source.html#l00088">param_generator_normal_clipped.h:88</a></div></div>
+<div class="ttc" id="aparam__generator__normal__clipped_8h_html_a54344636f79eebf5c8a0b38679ea7fb6"><div class="ttname"><a href="param__generator__normal__clipped_8h.html#a54344636f79eebf5c8a0b38679ea7fb6">param_generator_normal_clipped_initialize</a></div><div class="ttdeci">static void * param_generator_normal_clipped_initialize(void **region)</div><div class="ttdoc">How to initialise the clipped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped_8h_source.html#l00059">param_generator_normal_clipped.h:59</a></div></div>
+<div class="ttc" id="aparam__generator__normal__clipped_8h_html_aa9c765cadcfd29badb3aa2b96aa6ace2"><div class="ttname"><a href="param__generator__normal__clipped_8h.html#aa9c765cadcfd29badb3aa2b96aa6ace2">param_generator_normal_clipped_free</a></div><div class="ttdeci">static void param_generator_normal_clipped_free(void *generator)</div><div class="ttdoc">How to free any data for the clipped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped_8h_source.html#l00079">param_generator_normal_clipped.h:79</a></div></div>
+<div class="ttc" id="aparam__generator__normal__clipped__to__boundary_8h_html_a19fd62d85e662f61ecd668f505c7440d"><div class="ttname"><a href="param__generator__normal__clipped__to__boundary_8h.html#a19fd62d85e662f61ecd668f505c7440d">param_generator_normal_clipped_boundary_initialize</a></div><div class="ttdeci">static void * param_generator_normal_clipped_boundary_initialize(void **region)</div><div class="ttdoc">How to initialise the clamped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped__to__boundary_8h_source.html#l00054">param_generator_normal_clipped_to_boundary.h:54</a></div></div>
+<div class="ttc" id="aparam__generator__normal__clipped__to__boundary_8h_html_a5da6f0676e55afbd36f5a0922c5c33f9"><div class="ttname"><a href="param__generator__normal__clipped__to__boundary_8h.html#a5da6f0676e55afbd36f5a0922c5c33f9">param_generator_normal_clipped_boundary_free</a></div><div class="ttdeci">static void param_generator_normal_clipped_boundary_free(void *generator)</div><div class="ttdoc">How to free any data for the clamped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped__to__boundary_8h_source.html#l00074">param_generator_normal_clipped_to_boundary.h:74</a></div></div>
+<div class="ttc" id="aparam__generator__normal__clipped__to__boundary_8h_html_ab66a10e3ada868e5462a6b67c3c81d6d"><div class="ttname"><a href="param__generator__normal__clipped__to__boundary_8h.html#ab66a10e3ada868e5462a6b67c3c81d6d">param_generator_normal_clipped_boundary_generate</a></div><div class="ttdeci">static accum param_generator_normal_clipped_boundary_generate(void *generator)</div><div class="ttdoc">How to generate values with the clamped normal RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__normal__clipped__to__boundary_8h_source.html#l00083">param_generator_normal_clipped_to_boundary.h:83</a></div></div>
+<div class="ttc" id="aparam__generator__uniform_8h_html_a2b29e827b33797b652c59eb606a042b5"><div class="ttname"><a href="param__generator__uniform_8h.html#a2b29e827b33797b652c59eb606a042b5">param_generator_uniform_generate</a></div><div class="ttdeci">static accum param_generator_uniform_generate(void *generator)</div><div class="ttdoc">How to generate values with the uniform RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__uniform_8h_source.html#l00080">param_generator_uniform.h:80</a></div></div>
+<div class="ttc" id="aparam__generator__uniform_8h_html_a445a600b3abdfaa44355db5151482756"><div class="ttname"><a href="param__generator__uniform_8h.html#a445a600b3abdfaa44355db5151482756">param_generator_uniform_free</a></div><div class="ttdeci">static void param_generator_uniform_free(void *generator)</div><div class="ttdoc">How to free any data for the uniform RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__uniform_8h_source.html#l00071">param_generator_uniform.h:71</a></div></div>
+<div class="ttc" id="aparam__generator__uniform_8h_html_aa8b841fdabac07eeeb5f89ca3c43f789"><div class="ttname"><a href="param__generator__uniform_8h.html#aa8b841fdabac07eeeb5f89ca3c43f789">param_generator_uniform_initialize</a></div><div class="ttdeci">static void * param_generator_uniform_initialize(void **region)</div><div class="ttdoc">How to initialise the uniform RNG parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator__uniform_8h_source.html#l00051">param_generator_uniform.h:51</a></div></div>
 </div><!-- fragment -->
 <p>An Array of known generators. </p>
 
@@ -475,7 +432,7 @@ data</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -55,44 +55,6 @@
 <section id="module-spynnaker.pyNN.models.utility_models.delays">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.utility_models.delays" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayBlock">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.utility_models.delays.</span></span><span class="sig-name descname"><span class="pre">DelayBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_delay_stages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayBlock" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>A block of delays for a vertex.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>delay_per_stage</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayBlock.add_delay">
-<span class="sig-name descname"><span class="pre">add_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_block.html#DelayBlock.add_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayBlock.add_delay" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>source_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayBlock.delay_block">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delay_block</span></span><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayBlock.delay_block" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.utility_models.delays.</span></span><span class="sig-name descname"><span class="pre">DelayExtensionMachineVertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sdram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code>, <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.provenance/#spinn_front_end_common.interface.provenance.ProvidesProvenanceDataFromMachineImpl" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesProvenanceDataFromMachineImpl</span></code></a>, <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models/#spinn_front_end_common.abstract_models.AbstractHasAssociatedBinary" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHasAssociatedBinary</span></code></a>, <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models/#spinn_front_end_common.abstract_models.AbstractGeneratesDataSpecification" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGeneratesDataSpecification</span></code></a></p>
@@ -134,12 +96,12 @@ created. If None, there is no such application vertex.</p></li>
 <p>An enumeration.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.MAX_BACKGROUND_QUEUED">
-<span class="sig-name descname"><span class="pre">MAX_BACKGROUND_QUEUED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">11</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.MAX_BACKGROUND_QUEUED" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">MAX_BACKGROUND_QUEUED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.MAX_BACKGROUND_QUEUED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_BACKGROUND_OVERLOADS">
-<span class="sig-name descname"><span class="pre">N_BACKGROUND_OVERLOADS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_BACKGROUND_OVERLOADS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">N_BACKGROUND_OVERLOADS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">11</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_BACKGROUND_OVERLOADS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -154,7 +116,7 @@ created. If None, there is no such application vertex.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_LATE_SPIKES">
-<span class="sig-name descname"><span class="pre">N_LATE_SPIKES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_LATE_SPIKES" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">N_LATE_SPIKES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_LATE_SPIKES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -164,12 +126,12 @@ created. If None, there is no such application vertex.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_DROPPED_DUE_TO_INVALID_KEY">
-<span class="sig-name descname"><span class="pre">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_DROPPED_DUE_TO_INVALID_KEY" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_DROPPED_DUE_TO_INVALID_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_LOST_DUE_TO_COUNT_SATURATION">
-<span class="sig-name descname"><span class="pre">N_PACKETS_LOST_DUE_TO_COUNT_SATURATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_LOST_DUE_TO_COUNT_SATURATION" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">N_PACKETS_LOST_DUE_TO_COUNT_SATURATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_LOST_DUE_TO_COUNT_SATURATION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -189,12 +151,7 @@ created. If None, there is no such application vertex.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_WITH_INVALID_NEURON_IDS">
-<span class="sig-name descname"><span class="pre">N_PACKETS_WITH_INVALID_NEURON_IDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_WITH_INVALID_NEURON_IDS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND">
-<span class="sig-name descname"><span class="pre">N_TIMES_TDMA_FELL_BEHIND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">N_PACKETS_WITH_INVALID_NEURON_IDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_WITH_INVALID_NEURON_IDS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -221,7 +178,7 @@ created. If None, there is no such application vertex.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES">
-<span class="sig-name descname"><span class="pre">N_EXTRA_PROVENANCE_DATA_ENTRIES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">13</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">N_EXTRA_PROVENANCE_DATA_ENTRIES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -243,20 +200,6 @@ created. If None, there is no such application vertex.</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_PACKETS_SENT_NAME">
 <span class="sig-name descname"><span class="pre">N_PACKETS_SENT_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Number_of_packets_sent'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_PACKETS_SENT_NAME" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.gen_on_machine">
-<span class="sig-name descname"><span class="pre">gen_on_machine</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_machine_vertex.html#DelayExtensionMachineVertex.gen_on_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.gen_on_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the given slice needs to be generated on the machine</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.generate_data_specification">
@@ -369,7 +312,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.utility_models.delays.</span></span><span class="sig-name descname"><span class="pre">DelayExtensionVertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_per_stage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_delay_stages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DelayExtension'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models.impl/#spinn_front_end_common.abstract_models.impl.TDMAAwareApplicationVertex" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TDMAAwareApplicationVertex</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages" title="spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHasDelayStages</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationVertex</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages" title="spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHasDelayStages</span></code></a></p>
 <p>Provide delays to incoming spikes in multiples of the maximum delays        of a neuron (typically 16 or 32)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -402,44 +345,6 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_delays">
-<span class="sig-name descname"><span class="pre">add_delays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.add_delays"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_delays" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add delayed connections for a given vertex slice</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
-<li><p><strong>source_ids</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – </p></li>
-<li><p><strong>stages</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_generator_data">
-<span class="sig-name descname"><span class="pre">add_generator_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_row_n_synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delayed_row_n_synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_information</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_stage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay_per_stage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.add_generator_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_generator_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add delays for a connection to be generated</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>max_row_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of synapses in a row</p></li>
-<li><p><strong>max_delayed_row_n_synapses</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of synapses in a delay row</p></li>
-<li><p><strong>pre_slices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a><em>)</em>) – The list of slices of the pre application vertex</p></li>
-<li><p><strong>post_slices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a><em>)</em>) – The list of slices of the post application vertex</p></li>
-<li><p><strong>pre_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the pre applcation vertex currently being
-considered</p></li>
-<li><p><strong>post_vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the post application vertex currently being
-considered</p></li>
-<li><p><strong>synapse_information</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – The synapse information of the connection</p></li>
-<li><p><strong>synapse_information</strong> – </p></li>
-<li><p><strong>max_stage</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum delay stage</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_outgoing_edge">
 <span class="sig-name descname"><span class="pre">add_outgoing_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.add_outgoing_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_outgoing_edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an outgoing edge to the delay extension</p>
@@ -451,24 +356,9 @@ considered</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_blocks_for">
-<span class="sig-name descname"><span class="pre">delay_blocks_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.delay_blocks_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_blocks_for" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_generator_data">
-<span class="sig-name descname"><span class="pre">delay_generator_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.delay_generator_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_generator_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_params_size">
-<span class="sig-name descname"><span class="pre">delay_params_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.delay_params_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_params_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>The size of the delay parameters for a given vertex slice</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>slice</strong> (<em>Slice</em>) – The slice to get the size of the parameters for</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">delay_params_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.delay_params_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_params_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the delay parameters</p>
 </dd></dl>
 
 <dl class="py property">
@@ -482,37 +372,9 @@ considered</p></li>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.gen_on_machine">
-<span class="sig-name descname"><span class="pre">gen_on_machine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.gen_on_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.gen_on_machine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the given slice needs to be generated on the machine</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_max_delay_ticks_supported">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_max_delay_ticks_supported</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delay_ticks_at_post_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.get_max_delay_ticks_supported"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_max_delay_ticks_supported" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_n_cores">
-<span class="sig-name descname"><span class="pre">get_n_cores</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.get_n_cores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_n_cores" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of cores this application vertex is using in             the TDMA.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the number of cores to use in the TDMA</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.n_atoms">
@@ -588,11 +450,6 @@ The maximum number of delay stages required by any connection            out of 
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.utility_models.delays package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.utility_models.delays">Module contents</a><ul>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayBlock"><code class="docutils literal notranslate"><span class="pre">DelayBlock</span></code></a><ul>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayBlock.add_delay"><code class="docutils literal notranslate"><span class="pre">DelayBlock.add_delay()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayBlock.delay_block"><code class="docutils literal notranslate"><span class="pre">DelayBlock.delay_block</span></code></a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.BACKGROUND_MAX_QUEUED_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.BACKGROUND_MAX_QUEUED_NAME</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.BACKGROUND_OVERLOADS_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.BACKGROUND_OVERLOADS_NAME</span></code></a></li>
@@ -611,7 +468,6 @@ The maximum number of delay stages required by any connection            out of 
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_RECEIVED"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_RECEIVED</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_SENT"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_SENT</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_WITH_INVALID_NEURON_IDS"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_WITH_INVALID_NEURON_IDS</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INPUT_BUFFER_LOST_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.INPUT_BUFFER_LOST_NAME</span></code></a></li>
@@ -623,7 +479,6 @@ The maximum number of delay stages required by any connection            out of 
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_PACKETS_PROCESSED_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.N_PACKETS_PROCESSED_NAME</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_PACKETS_RECEIVED_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.N_PACKETS_RECEIVED_NAME</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.N_PACKETS_SENT_NAME"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.N_PACKETS_SENT_NAME</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.gen_on_machine"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.gen_on_machine()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.generate_data_specification"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.generate_data_specification()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_binary_file_name"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.get_binary_file_name()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_binary_start_type"><code class="docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex.get_binary_start_type()</span></code></a></li>
@@ -638,17 +493,11 @@ The maximum number of delay stages required by any connection            out of 
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.MAX_SLOTS"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.MAX_SLOTS</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.SAFETY_FACTOR"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.SAFETY_FACTOR</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_delays"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.add_delays()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_generator_data"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.add_generator_data()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_outgoing_edge"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.add_outgoing_edge()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_blocks_for"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.delay_blocks_for()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_generator_data"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.delay_generator_data()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_params_size"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.delay_params_size()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_per_stage"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.delay_per_stage</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.drop_late_spikes"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.drop_late_spikes</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.gen_on_machine"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.gen_on_machine()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_max_delay_ticks_supported"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.get_max_delay_ticks_supported()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_n_cores"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.get_n_cores()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.n_atoms"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.n_atoms</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.n_delay_stages"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.n_delay_stages</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.outgoing_edges"><code class="docutils literal notranslate"><span class="pre">DelayExtensionVertex.outgoing_edges</span></code></a></li>

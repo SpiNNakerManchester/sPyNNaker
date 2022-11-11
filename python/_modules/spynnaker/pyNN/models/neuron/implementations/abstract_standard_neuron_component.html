@@ -55,41 +55,34 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
-<span class="kn">from</span> <span class="nn">.ranged_dict_vertex_slice</span> <span class="kn">import</span> <span class="n">RangedDictVertexSlice</span>
 
 
 <span class="k">class</span> <span class="nc">AbstractStandardNeuronComponent</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Represents a component of a standard neural model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__struct&quot;</span><span class="p">]</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__structs&quot;</span><span class="p">,</span> <span class="s2">&quot;__units&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_types</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structs</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param list(~data_specification.enums.DataType) data_types:</span>
-<span class="sd">            A list of data types in the component structure, in the order that</span>
-<span class="sd">            they appear</span>
+<span class="sd">        :param list(Struct) structs: The structs of the component</span>
+<span class="sd">        :param dict units: The units to use for each parameter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__struct</span> <span class="o">=</span> <span class="n">Struct</span><span class="p">(</span><span class="n">data_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__structs</span> <span class="o">=</span> <span class="n">structs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__units</span> <span class="o">=</span> <span class="n">units</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">struct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The structure of the component. This structure will have copies in\</span>
-<span class="sd">            both SDRAM (the initialisation values) and DTCM (the working copy).</span>
+    <span class="k">def</span> <span class="nf">structs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The structures of the component.  If there are multiple structs,</span>
+<span class="sd">            the order is how they will appear in memory; where there are</span>
+<span class="sd">            structs that repeat per neuron the repeats will appear adjacent</span>
+<span class="sd">            e.g. for non-repeating struct g, followed by repeating structs s1</span>
+<span class="sd">            and s2 with 3 neurons the layout will be:</span>
+<span class="sd">            [g, s1, s1, s1, s2, s2, s2].</span>
 
-<span class="sd">        :rtype: ~spynnaker.pyNN.utilities.struct.Struct</span>
+<span class="sd">        :rtype: list(~spynnaker.pyNN.utilities.struct.Struct)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__struct</span>
-
-<div class="viewcode-block" id="AbstractStandardNeuronComponent.get_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the SDRAM memory usage required</span>
-
-<span class="sd">        :param int n_neurons: The number of neurons to get the usage for</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">get_size_in_whole_words</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structs</span>
 
 <div class="viewcode-block" id="AbstractStandardNeuronComponent.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_parameters">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
@@ -108,91 +101,20 @@
 <span class="sd">            A holder of the state variables</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="AbstractStandardNeuronComponent.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_values">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the values to be written to the machine for this model</span>
-
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary parameters:</span>
-<span class="sd">            The holder of the parameters</span>
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary state_variables:</span>
-<span class="sd">            The holder of the state variables</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">            The slice of variables being retrieved</span>
-<span class="sd">        :param float ts:</span>
-<span class="sd">            The time to be advanced in one call to the update of this component</span>
-<span class="sd">        :return: A list with the same length as self.struct.field_types</span>
-<span class="sd">        :rtype: list(int or float or list(int) or list(float) or</span>
-<span class="sd">            ~spinn_utilities.ranged.RangedList)</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-<div class="viewcode-block" id="AbstractStandardNeuronComponent.get_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the data *to be written to the machine* for this model.</span>
-
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary parameters:</span>
-<span class="sd">            The holder of the parameters</span>
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary state_variables:</span>
-<span class="sd">            The holder of the state variables</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">            The slice of the vertex to generate parameters for</span>
-<span class="sd">        :param tuple(int) atoms_shape: The shape of the atoms in the vertex</span>
-<span class="sd">        :rtype: ~numpy.ndarray(~numpy.uint32)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AbstractStandardNeuronComponent.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.update_values">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Update the parameters and state variables with the given struct\</span>
-<span class="sd">            values that have been read from the machine</span>
-
-<span class="sd">        :param list(list) values:</span>
-<span class="sd">            The values read from the machine, one for each struct element</span>
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary parameters:</span>
-<span class="sd">            The holder of the parameters to update</span>
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary state_variables:</span>
-<span class="sd">            The holder of the state variables to update</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-<div class="viewcode-block" id="AbstractStandardNeuronComponent.read_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.read_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Read the parameters and state variables of the model\</span>
-<span class="sd">            *from the given data* (read from the machine)</span>
-
-<span class="sd">        :param data: The data to be read</span>
-<span class="sd">        :type data: bytes or bytearray</span>
-<span class="sd">        :param int offset: The offset where the data should be read from</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">            The slice of the vertex to read parameters for</span>
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary parameters:</span>
-<span class="sd">            The holder of the parameters to update</span>
-<span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary state_variables:</span>
-<span class="sd">            The holder of the state variables to update</span>
-<span class="sd">        :return: The offset after reading the data</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
-        <span class="n">offset</span> <span class="o">+=</span> <span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">get_size_in_whole_words</span><span class="p">(</span>
-            <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="n">RangedDictVertexSlice</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
-        <span class="n">variables</span> <span class="o">=</span> <span class="n">RangedDictVertexSlice</span><span class="p">(</span><span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">offset</span></div>
-
-<div class="viewcode-block" id="AbstractStandardNeuronComponent.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.has_variable">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractStandardNeuronComponent.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.has_variable">[docs]</a>    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine if this component has a variable by the given name</span>
 
 <span class="sd">        :param str variable: The name of the variable</span>
 <span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__units</span></div>
 
-<div class="viewcode-block" id="AbstractStandardNeuronComponent.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_units">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractStandardNeuronComponent.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the units of the given variable</span>
 
 <span class="sd">        :param str variable: The name of the variable</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__units</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
 </pre></div>
 
             <div class="clearer"></div>

@@ -69,6 +69,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">connection_generator_fixed_prob.h File Reference</div>  </div>
@@ -91,17 +92,23 @@ Data Structures</h2></td></tr>
 <tr class="memdesc:structfixed__prob"><td class="mdescLeft">&#160;</td><td class="mdescRight">The data structure to be passed around for this connector.  <a href="connection__generator__fixed__prob_8h.html#structfixed__prob">More...</a><br /></td></tr>
 <tr class="separator:structfixed__prob"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:ae9ca0628feac3703c950e34e8b843ee1"><td class="memItemLeft" align="right" valign="top"><a id="ae9ca0628feac3703c950e34e8b843ee1"></a>
+typedef unsigned long fract&#160;</td><td class="memItemRight" valign="bottom"><b>probability_t</b></td></tr>
+<tr class="separator:ae9ca0628feac3703c950e34e8b843ee1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a6436406b7bd4c57206d0491c42e62f2e"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__prob_8h.html#a6436406b7bd4c57206d0491c42e62f2e">connection_generator_fixed_prob_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:a6436406b7bd4c57206d0491c42e62f2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the fixed-probability connection generator.  <a href="connection__generator__fixed__prob_8h.html#a6436406b7bd4c57206d0491c42e62f2e">More...</a><br /></td></tr>
-<tr class="separator:a6436406b7bd4c57206d0491c42e62f2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00bb7467e04e5ec9d4386b74ed43beba"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__prob_8h.html#a00bb7467e04e5ec9d4386b74ed43beba">connection_generator_fixed_prob_initialise</a> (void **<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:a00bb7467e04e5ec9d4386b74ed43beba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the fixed-probability connection generator.  <a href="connection__generator__fixed__prob_8h.html#a00bb7467e04e5ec9d4386b74ed43beba">More...</a><br /></td></tr>
+<tr class="separator:a00bb7467e04e5ec9d4386b74ed43beba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5ab082c89ff3e5317a09aa7f67a6442"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__prob_8h.html#ad5ab082c89ff3e5317a09aa7f67a6442">connection_generator_fixed_prob_free</a> (void *generator)</td></tr>
 <tr class="memdesc:ad5ab082c89ff3e5317a09aa7f67a6442"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free the fixed-probability connection generator.  <a href="connection__generator__fixed__prob_8h.html#ad5ab082c89ff3e5317a09aa7f67a6442">More...</a><br /></td></tr>
 <tr class="separator:ad5ab082c89ff3e5317a09aa7f67a6442"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b905731d8c7fa5fafc3dfed1992b4f5"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__prob_8h.html#a7b905731d8c7fa5fafc3dfed1992b4f5">connection_generator_fixed_prob_generate</a> (void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</td></tr>
-<tr class="memdesc:a7b905731d8c7fa5fafc3dfed1992b4f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with the fixed-probability connection generator.  <a href="connection__generator__fixed__prob_8h.html#a7b905731d8c7fa5fafc3dfed1992b4f5">More...</a><br /></td></tr>
-<tr class="separator:a7b905731d8c7fa5fafc3dfed1992b4f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8b2f5a508831466425f0f0967a30604"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__prob_8h.html#ac8b2f5a508831466425f0f0967a30604">connection_generator_fixed_prob_generate</a> (void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t <a class="el" href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a>)</td></tr>
+<tr class="memdesc:ac8b2f5a508831466425f0f0967a30604"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with the fixed-probability connection generator.  <a href="connection__generator__fixed__prob_8h.html#ac8b2f5a508831466425f0f0967a30604">More...</a><br /></td></tr>
+<tr class="separator:ac8b2f5a508831466425f0f0967a30604"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Fixed-Probability Connection generator implementation. </p>
@@ -125,37 +132,13 @@ Functions</h2></td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a id="a2a5be3b78a140cd6dade66b76e747b08"></a>uint32_t</td>
-<td class="fieldname">
-pre_lo</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a51aa0ddc8d278ad0507d67efb1ba1926"></a>uint32_t</td>
-<td class="fieldname">
-pre_hi</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a66af1b43ad21011fcddca5b4cdd90613"></a>uint32_t</td>
-<td class="fieldname">
-post_lo</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a0ad3e107684b80dfa4513db2a666703a"></a>uint32_t</td>
-<td class="fieldname">
-post_hi</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a id="a0b7ee95ac9798ac8184bb57c9fe9f2a5"></a>uint32_t</td>
 <td class="fieldname">
 allow_self_connections</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a142078470e6730944a96bd405ac8044f"></a>_probability_t</td>
+<a id="a4dca2a7d5b486b92756bf9f11ca31d67"></a>probability_t</td>
 <td class="fieldname">
 probability</td>
 <td class="fielddoc">
@@ -178,7 +161,7 @@ probability</td>
 <div class="textblock"><p>The data structure to be passed around for this connector. </p>
 <p>This includes the parameters and an RNG. </p>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__prob_8h_source.html#l00044">44</a> of file <a class="el" href="connection__generator__fixed__prob_8h_source.html">connection_generator_fixed_prob.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__prob_8h_source.html#l00040">40</a> of file <a class="el" href="connection__generator__fixed__prob_8h_source.html">connection_generator_fixed_prob.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -187,19 +170,13 @@ probability</td>
 params</td>
 <td class="fielddoc">
 </td></tr>
-<tr><td class="fieldtype">
-<a id="a78946b7dcdc514706860f7e265ddaab2"></a>rng_t</td>
-<td class="fieldname">
-rng</td>
-<td class="fielddoc">
-</td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a6436406b7bd4c57206d0491c42e62f2e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6436406b7bd4c57206d0491c42e62f2e">&#9670;&nbsp;</a></span>connection_generator_fixed_prob_initialise()</h2>
+<a id="a00bb7467e04e5ec9d4386b74ed43beba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00bb7467e04e5ec9d4386b74ed43beba">&#9670;&nbsp;</a></span>connection_generator_fixed_prob_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -210,7 +187,7 @@ rng</td>
         <tr>
           <td class="memname">static void* connection_generator_fixed_prob_initialise </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramtype">void **&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
           <td></td>
         </tr>
@@ -231,7 +208,7 @@ rng</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__prob_8h_source.html#l00055">55</a> of file <a class="el" href="connection__generator__fixed__prob_8h_source.html">connection_generator_fixed_prob.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__prob_8h_source.html#l00050">50</a> of file <a class="el" href="connection__generator__fixed__prob_8h_source.html">connection_generator_fixed_prob.h</a>.</p>
 
 </div>
 </div>
@@ -267,12 +244,12 @@ rng</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__prob_8h_source.html#l00079">79</a> of file <a class="el" href="connection__generator__fixed__prob_8h_source.html">connection_generator_fixed_prob.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__prob_8h_source.html#l00069">69</a> of file <a class="el" href="connection__generator__fixed__prob_8h_source.html">connection_generator_fixed_prob.h</a>.</p>
 
 </div>
 </div>
-<a id="a7b905731d8c7fa5fafc3dfed1992b4f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7b905731d8c7fa5fafc3dfed1992b4f5">&#9670;&nbsp;</a></span>connection_generator_fixed_prob_generate()</h2>
+<a id="ac8b2f5a508831466425f0f0967a30604"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8b2f5a508831466425f0f0967a30604">&#9670;&nbsp;</a></span>connection_generator_fixed_prob_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -281,7 +258,7 @@ rng</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static uint32_t connection_generator_fixed_prob_generate </td>
+          <td class="memname">static bool connection_generator_fixed_prob_generate </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>generator</em>, </td>
@@ -290,19 +267,31 @@ rng</td>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_slice_start</em>, </td>
+          <td class="paramname"><em>pre_lo</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_slice_count</em>, </td>
+          <td class="paramname"><em>pre_hi</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
+          <td class="paramname"><em>post_lo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>post_hi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>post_index</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -319,14 +308,32 @@ rng</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>max_row_length</em>, </td>
+          <td class="paramtype">unsigned long accum&#160;</td>
+          <td class="paramname"><em>weight_scale</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>&#160;</td>
+          <td class="paramtype">accum&#160;</td>
+          <td class="paramname"><em>timestep_per_delay</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">param_generator_t&#160;</td>
+          <td class="paramname"><em>weight_generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">param_generator_t&#160;</td>
+          <td class="paramname"><em>delay_generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">matrix_generator_t&#160;</td>
+          <td class="paramname"><em>matrix_generator</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -357,14 +364,14 @@ rng</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of connections generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__prob_8h_source.html#l00104">104</a> of file <a class="el" href="connection__generator__fixed__prob_8h_source.html">connection_generator_fixed_prob.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__prob_8h_source.html#l00092">92</a> of file <a class="el" href="connection__generator__fixed__prob_8h_source.html">connection_generator_fixed_prob.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

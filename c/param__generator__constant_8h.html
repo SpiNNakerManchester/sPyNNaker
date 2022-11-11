@@ -91,15 +91,15 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a52720c983e24979540f5cf27d02b0c14"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__constant_8h.html#a52720c983e24979540f5cf27d02b0c14">param_generator_constant_initialize</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:a52720c983e24979540f5cf27d02b0c14"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to initialise the constant parameter generator.  <a href="param__generator__constant_8h.html#a52720c983e24979540f5cf27d02b0c14">More...</a><br /></td></tr>
-<tr class="separator:a52720c983e24979540f5cf27d02b0c14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34e2ca57f5ca02c366171d011ce929a8"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__constant_8h.html#a34e2ca57f5ca02c366171d011ce929a8">param_generator_constant_initialize</a> (void **<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:a34e2ca57f5ca02c366171d011ce929a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to initialise the constant parameter generator.  <a href="param__generator__constant_8h.html#a34e2ca57f5ca02c366171d011ce929a8">More...</a><br /></td></tr>
+<tr class="separator:a34e2ca57f5ca02c366171d011ce929a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae74a9c20cfc678e6ddd497a11385af04"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__constant_8h.html#ae74a9c20cfc678e6ddd497a11385af04">param_generator_constant_free</a> (void *generator)</td></tr>
 <tr class="memdesc:ae74a9c20cfc678e6ddd497a11385af04"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to free any data for the constant parameter generator.  <a href="param__generator__constant_8h.html#ae74a9c20cfc678e6ddd497a11385af04">More...</a><br /></td></tr>
 <tr class="separator:ae74a9c20cfc678e6ddd497a11385af04"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22265a38730d1027e422da52c55b1925"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__constant_8h.html#a22265a38730d1027e422da52c55b1925">param_generator_constant_generate</a> (void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</td></tr>
-<tr class="memdesc:a22265a38730d1027e422da52c55b1925"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate values with the constant parameter generator.  <a href="param__generator__constant_8h.html#a22265a38730d1027e422da52c55b1925">More...</a><br /></td></tr>
-<tr class="separator:a22265a38730d1027e422da52c55b1925"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77b1ea38243a82710e7a32d1ff1c1298"><td class="memItemLeft" align="right" valign="top">static accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="param__generator__constant_8h.html#a77b1ea38243a82710e7a32d1ff1c1298">param_generator_constant_generate</a> (void *generator)</td></tr>
+<tr class="memdesc:a77b1ea38243a82710e7a32d1ff1c1298"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate values with the constant parameter generator.  <a href="param__generator__constant_8h.html#a77b1ea38243a82710e7a32d1ff1c1298">More...</a><br /></td></tr>
+<tr class="separator:a77b1ea38243a82710e7a32d1ff1c1298"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Constant value parameter generator implementation. </p>
@@ -133,8 +133,8 @@ value</td>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a52720c983e24979540f5cf27d02b0c14"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52720c983e24979540f5cf27d02b0c14">&#9670;&nbsp;</a></span>param_generator_constant_initialize()</h2>
+<a id="a34e2ca57f5ca02c366171d011ce929a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34e2ca57f5ca02c366171d011ce929a8">&#9670;&nbsp;</a></span>param_generator_constant_initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -145,7 +145,7 @@ value</td>
         <tr>
           <td class="memname">static void* param_generator_constant_initialize </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramtype">void **&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
           <td></td>
         </tr>
@@ -206,8 +206,8 @@ value</td>
 
 </div>
 </div>
-<a id="a22265a38730d1027e422da52c55b1925"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a22265a38730d1027e422da52c55b1925">&#9670;&nbsp;</a></span>param_generator_constant_generate()</h2>
+<a id="a77b1ea38243a82710e7a32d1ff1c1298"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77b1ea38243a82710e7a32d1ff1c1298">&#9670;&nbsp;</a></span>param_generator_constant_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -216,39 +216,11 @@ value</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void param_generator_constant_generate </td>
+          <td class="memname">static accum param_generator_constant_generate </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>generator</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n_indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">accum *&#160;</td>
-          <td class="paramname"><em>values</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -262,22 +234,19 @@ value</td>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to use to generate values </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_indices</td><td>The number of values to generate </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the neuron in the pre-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>The <code>n_indices</code> post-neuron indices for each connection </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">values</td><td>An array into which to place the values; will be <code>n_indices</code> in size </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>The value generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="param__generator__constant_8h_source.html#l00072">72</a> of file <a class="el" href="param__generator__constant_8h_source.html">param_generator_constant.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="param__generator__constant_8h_source.html#l00067">67</a> of file <a class="el" href="param__generator__constant_8h_source.html">param_generator_constant.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

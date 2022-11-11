@@ -68,7 +68,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">synapse_types.h File Reference</div>  </div>
@@ -82,60 +81,140 @@ $(function() {
 </div>
 <p><a href="synapse__types_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a45cfd57493ca66ddc880bd013f1022fe"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#a45cfd57493ca66ddc880bd013f1022fe">synapse_param_pointer_t</a></td></tr>
-<tr class="separator:a45cfd57493ca66ddc880bd013f1022fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a9252e28ec9676ec472c3128ff88c368d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#a9252e28ec9676ec472c3128ff88c368d">synapse_types_shape_input</a> (<a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *parameters)</td></tr>
-<tr class="memdesc:a9252e28ec9676ec472c3128ff88c368d"><td class="mdescLeft">&#160;</td><td class="mdescRight">decays the stuff thats sitting in the input buffers as these have not yet been processed and applied to the neuron.  <a href="synapse__types_8h.html#a9252e28ec9676ec472c3128ff88c368d">More...</a><br /></td></tr>
-<tr class="separator:a9252e28ec9676ec472c3128ff88c368d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebfa05875ff9afaae47150029297e087"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#aebfa05875ff9afaae47150029297e087">synapse_types_add_neuron_input</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> synapse_type_index, <a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *parameters, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> input)</td></tr>
-<tr class="memdesc:aebfa05875ff9afaae47150029297e087"><td class="mdescLeft">&#160;</td><td class="mdescRight">adds the inputs for a give timer period to a given neuron that is being simulated by this model  <a href="synapse__types_8h.html#aebfa05875ff9afaae47150029297e087">More...</a><br /></td></tr>
-<tr class="separator:aebfa05875ff9afaae47150029297e087"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a445fbc87ae924aa89de5d72e6841cad6"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#a445fbc87ae924aa89de5d72e6841cad6">synapse_types_get_excitatory_input</a> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *excitatory_response, <a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *parameters)</td></tr>
-<tr class="memdesc:a445fbc87ae924aa89de5d72e6841cad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">extracts the excitatory input buffers from the buffers available for a given neuron ID  <a href="synapse__types_8h.html#a445fbc87ae924aa89de5d72e6841cad6">More...</a><br /></td></tr>
-<tr class="separator:a445fbc87ae924aa89de5d72e6841cad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4d30d854f0664fe4cef10f4ecc00831"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#ae4d30d854f0664fe4cef10f4ecc00831">synapse_types_get_inhibitory_input</a> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *inhibitory_response, <a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *parameters)</td></tr>
-<tr class="memdesc:ae4d30d854f0664fe4cef10f4ecc00831"><td class="mdescLeft">&#160;</td><td class="mdescRight">extracts the inhibitory input buffers from the buffers available for a given neuron ID  <a href="synapse__types_8h.html#ae4d30d854f0664fe4cef10f4ecc00831">More...</a><br /></td></tr>
-<tr class="separator:ae4d30d854f0664fe4cef10f4ecc00831"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30620978a602b7a044f6aaa5880e9341"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#a30620978a602b7a044f6aaa5880e9341">synapse_types_initialise</a> (<a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *state, <a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__params__t">synapse_types_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>, uint32_t n_steps_per_time_step)</td></tr>
+<tr class="memdesc:a30620978a602b7a044f6aaa5880e9341"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialise the structure from the parameters  <a href="synapse__types_8h.html#a30620978a602b7a044f6aaa5880e9341">More...</a><br /></td></tr>
+<tr class="separator:a30620978a602b7a044f6aaa5880e9341"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04321df403d140de964e5c5a152fe436"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#a04321df403d140de964e5c5a152fe436">synapse_types_save_state</a> (<a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *state, <a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__params__t">synapse_types_params_t</a> *<a class="el" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>)</td></tr>
+<tr class="memdesc:a04321df403d140de964e5c5a152fe436"><td class="mdescLeft">&#160;</td><td class="mdescRight">save parameters and state back to SDRAM for reading by host and recovery on restart  <a href="synapse__types_8h.html#a04321df403d140de964e5c5a152fe436">More...</a><br /></td></tr>
+<tr class="separator:a04321df403d140de964e5c5a152fe436"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbe3014909741294cc935642b318df74"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#adbe3014909741294cc935642b318df74">synapse_types_shape_input</a> (<a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *parameters)</td></tr>
+<tr class="memdesc:adbe3014909741294cc935642b318df74"><td class="mdescLeft">&#160;</td><td class="mdescRight">decays the stuff thats sitting in the input buffers as these have not yet been processed and applied to the neuron.  <a href="synapse__types_8h.html#adbe3014909741294cc935642b318df74">More...</a><br /></td></tr>
+<tr class="separator:adbe3014909741294cc935642b318df74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60079a7d7261fb6e7154977cad9341dc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#a60079a7d7261fb6e7154977cad9341dc">synapse_types_add_neuron_input</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> synapse_type_index, <a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *parameters, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> input)</td></tr>
+<tr class="memdesc:a60079a7d7261fb6e7154977cad9341dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">adds the inputs for a give timer period to a given neuron that is being simulated by this model  <a href="synapse__types_8h.html#a60079a7d7261fb6e7154977cad9341dc">More...</a><br /></td></tr>
+<tr class="separator:a60079a7d7261fb6e7154977cad9341dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab345936fa750094ee2248158b958fc06"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#ab345936fa750094ee2248158b958fc06">synapse_types_get_excitatory_input</a> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *excitatory_response, <a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *parameters)</td></tr>
+<tr class="memdesc:ab345936fa750094ee2248158b958fc06"><td class="mdescLeft">&#160;</td><td class="mdescRight">extracts the excitatory input buffers from the buffers available for a given neuron ID  <a href="synapse__types_8h.html#ab345936fa750094ee2248158b958fc06">More...</a><br /></td></tr>
+<tr class="separator:ab345936fa750094ee2248158b958fc06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4c225f8ba56ac8fae7c48210f46530b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#ae4c225f8ba56ac8fae7c48210f46530b">synapse_types_get_inhibitory_input</a> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *inhibitory_response, <a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *parameters)</td></tr>
+<tr class="memdesc:ae4c225f8ba56ac8fae7c48210f46530b"><td class="mdescLeft">&#160;</td><td class="mdescRight">extracts the inhibitory input buffers from the buffers available for a given neuron ID  <a href="synapse__types_8h.html#ae4c225f8ba56ac8fae7c48210f46530b">More...</a><br /></td></tr>
+<tr class="separator:ae4c225f8ba56ac8fae7c48210f46530b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33e2109c0192ac4353dd6b2de44e1bed"><td class="memItemLeft" align="right" valign="top">static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#a33e2109c0192ac4353dd6b2de44e1bed">synapse_types_get_type_char</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> synapse_type_index)</td></tr>
 <tr class="memdesc:a33e2109c0192ac4353dd6b2de44e1bed"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns a human readable character for the type of synapse.  <a href="synapse__types_8h.html#a33e2109c0192ac4353dd6b2de44e1bed">More...</a><br /></td></tr>
 <tr class="separator:a33e2109c0192ac4353dd6b2de44e1bed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c173175ef5d71b07f3bc7d511cc11c7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#a8c173175ef5d71b07f3bc7d511cc11c7">synapse_types_print_parameters</a> (<a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *parameters)</td></tr>
-<tr class="memdesc:a8c173175ef5d71b07f3bc7d511cc11c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">prints the parameters of the synapse type  <a href="synapse__types_8h.html#a8c173175ef5d71b07f3bc7d511cc11c7">More...</a><br /></td></tr>
-<tr class="separator:a8c173175ef5d71b07f3bc7d511cc11c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d26d3dff1703c07eca4dbf846a0946d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#a4d26d3dff1703c07eca4dbf846a0946d">synapse_types_print_input</a> (<a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *parameters)</td></tr>
-<tr class="memdesc:a4d26d3dff1703c07eca4dbf846a0946d"><td class="mdescLeft">&#160;</td><td class="mdescRight">prints the input for a neuron ID given the available inputs currently only executed when the models are in debug mode, as the prints are controlled from the <a class="el" href="synapses_8c.html" title="Implementation of non-inlined API in synapses.h.">synapses.c</a> print_inputs() method.  <a href="synapse__types_8h.html#a4d26d3dff1703c07eca4dbf846a0946d">More...</a><br /></td></tr>
-<tr class="separator:a4d26d3dff1703c07eca4dbf846a0946d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac952ce9bf740864faedaf4a2c146ca7c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#ac952ce9bf740864faedaf4a2c146ca7c">synapse_types_print_parameters</a> (<a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *parameters)</td></tr>
+<tr class="memdesc:ac952ce9bf740864faedaf4a2c146ca7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">prints the parameters of the synapse type  <a href="synapse__types_8h.html#ac952ce9bf740864faedaf4a2c146ca7c">More...</a><br /></td></tr>
+<tr class="separator:ac952ce9bf740864faedaf4a2c146ca7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b7cb2cf40fadcfa990bc69cc8986640"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types_8h.html#a7b7cb2cf40fadcfa990bc69cc8986640">synapse_types_print_input</a> (<a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *parameters)</td></tr>
+<tr class="memdesc:a7b7cb2cf40fadcfa990bc69cc8986640"><td class="mdescLeft">&#160;</td><td class="mdescRight">prints the input for a neuron ID given the available inputs currently only executed when the models are in debug mode, as the prints are controlled from the <a class="el" href="synapses_8c.html" title="Implementation of non-inlined API in synapses.h.">synapses.c</a> print_inputs() method.  <a href="synapse__types_8h.html#a7b7cb2cf40fadcfa990bc69cc8986640">More...</a><br /></td></tr>
+<tr class="separator:a7b7cb2cf40fadcfa990bc69cc8986640"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>API for synaptic behaviour types (see also <a class="el" href="dir_fca43316e7ff0a3b9103ea48cb1cd0df.html">src/neuron/input_types</a>) </p>
 
 <p class="definition">Definition in file <a class="el" href="synapse__types_8h_source.html">synapse_types.h</a>.</p>
-</div><h2 class="groupheader">Typedef Documentation</h2>
-<a id="a45cfd57493ca66ddc880bd013f1022fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45cfd57493ca66ddc880bd013f1022fe">&#9670;&nbsp;</a></span>synapse_param_pointer_t</h2>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a30620978a602b7a044f6aaa5880e9341"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30620978a602b7a044f6aaa5880e9341">&#9670;&nbsp;</a></span>synapse_types_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a>* <a class="el" href="synapse__types_8h.html#a45cfd57493ca66ddc880bd013f1022fe">synapse_param_pointer_t</a></td>
+          <td class="memname">static void synapse_types_initialise </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__params__t">synapse_types_params_t</a> *&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_steps_per_time_step</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-<p>Forward declaration of synapse type (creates a definition for a pointer to a synapse type parameter struct </p>
 
-<p class="definition">Definition at line <a class="el" href="synapse__types_8h_source.html#l00035">35</a> of file <a class="el" href="synapse__types_8h_source.html">synapse_types.h</a>.</p>
+<p>initialise the structure from the parameters </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">state</td><td>Pointer to the state to set up </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">params</td><td>Pointer to the parameters passed in from host </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_steps_per_timestep</td><td>The number of steps to run each update </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="a9252e28ec9676ec472c3128ff88c368d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9252e28ec9676ec472c3128ff88c368d">&#9670;&nbsp;</a></span>synapse_types_shape_input()</h2>
+<a id="a04321df403d140de964e5c5a152fe436"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04321df403d140de964e5c5a152fe436">&#9670;&nbsp;</a></span>synapse_types_save_state()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void synapse_types_save_state </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__params__t">synapse_types_params_t</a> *&#160;</td>
+          <td class="paramname"><em>params</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>save parameters and state back to SDRAM for reading by host and recovery on restart </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The current state </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">params</td><td>Pointer to structure into which parameter can be written </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="adbe3014909741294cc935642b318df74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbe3014909741294cc935642b318df74">&#9670;&nbsp;</a></span>synapse_types_shape_input()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -146,7 +225,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static void synapse_types_shape_input </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *&#160;</td>
           <td class="paramname"><em>parameters</em></td><td>)</td>
           <td></td>
         </tr>
@@ -168,8 +247,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aebfa05875ff9afaae47150029297e087"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aebfa05875ff9afaae47150029297e087">&#9670;&nbsp;</a></span>synapse_types_add_neuron_input()</h2>
+<a id="a60079a7d7261fb6e7154977cad9341dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60079a7d7261fb6e7154977cad9341dc">&#9670;&nbsp;</a></span>synapse_types_add_neuron_input()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -186,7 +265,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *&#160;</td>
           <td class="paramname"><em>parameters</em>, </td>
         </tr>
         <tr>
@@ -220,8 +299,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a445fbc87ae924aa89de5d72e6841cad6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a445fbc87ae924aa89de5d72e6841cad6">&#9670;&nbsp;</a></span>synapse_types_get_excitatory_input()</h2>
+<a id="ab345936fa750094ee2248158b958fc06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab345936fa750094ee2248158b958fc06">&#9670;&nbsp;</a></span>synapse_types_get_excitatory_input()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -238,7 +317,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *&#160;</td>
           <td class="paramname"><em>parameters</em>&#160;</td>
         </tr>
         <tr>
@@ -266,8 +345,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ae4d30d854f0664fe4cef10f4ecc00831"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae4d30d854f0664fe4cef10f4ecc00831">&#9670;&nbsp;</a></span>synapse_types_get_inhibitory_input()</h2>
+<a id="ae4c225f8ba56ac8fae7c48210f46530b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4c225f8ba56ac8fae7c48210f46530b">&#9670;&nbsp;</a></span>synapse_types_get_inhibitory_input()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -284,7 +363,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *&#160;</td>
           <td class="paramname"><em>parameters</em>&#160;</td>
         </tr>
         <tr>
@@ -347,8 +426,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a8c173175ef5d71b07f3bc7d511cc11c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c173175ef5d71b07f3bc7d511cc11c7">&#9670;&nbsp;</a></span>synapse_types_print_parameters()</h2>
+<a id="ac952ce9bf740864faedaf4a2c146ca7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac952ce9bf740864faedaf4a2c146ca7c">&#9670;&nbsp;</a></span>synapse_types_print_parameters()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -359,7 +438,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static void synapse_types_print_parameters </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *&#160;</td>
           <td class="paramname"><em>parameters</em></td><td>)</td>
           <td></td>
         </tr>
@@ -381,8 +460,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a4d26d3dff1703c07eca4dbf846a0946d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d26d3dff1703c07eca4dbf846a0946d">&#9670;&nbsp;</a></span>synapse_types_print_input()</h2>
+<a id="a7b7cb2cf40fadcfa990bc69cc8986640"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b7cb2cf40fadcfa990bc69cc8986640">&#9670;&nbsp;</a></span>synapse_types_print_input()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -393,7 +472,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static void synapse_types_print_input </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *&#160;</td>
           <td class="paramname"><em>parameters</em></td><td>)</td>
           <td></td>
         </tr>
@@ -418,7 +497,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

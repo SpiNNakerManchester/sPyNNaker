@@ -55,11 +55,10 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.abstract_neuron_model</span> <span class="kn">import</span> <span class="n">AbstractNeuronModel</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.implementations</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractStandardNeuronComponent</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 
 <span class="n">A</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
 <span class="n">B</span> <span class="o">=</span> <span class="s1">&#39;b&#39;</span>
@@ -68,19 +67,11 @@
 <span class="n">V</span> <span class="o">=</span> <span class="s1">&#39;v&#39;</span>
 <span class="n">U</span> <span class="o">=</span> <span class="s1">&#39;u&#39;</span>
 <span class="n">I_OFFSET</span> <span class="o">=</span> <span class="s1">&#39;i_offset&#39;</span>
-
-<span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">A</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">,</span>
-    <span class="n">B</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">,</span>
-    <span class="n">C</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span>
-    <span class="n">D</span><span class="p">:</span> <span class="s2">&quot;mV/ms&quot;</span><span class="p">,</span>
-    <span class="n">V</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span>
-    <span class="n">U</span><span class="p">:</span> <span class="s2">&quot;mV/ms&quot;</span><span class="p">,</span>
-    <span class="n">I_OFFSET</span><span class="p">:</span> <span class="s2">&quot;nA&quot;</span>
-<span class="p">}</span>
+<span class="n">TIMESTEP</span> <span class="o">=</span> <span class="s1">&#39;timestep&#39;</span>
+<span class="n">NEXT_H</span> <span class="o">=</span> <span class="s1">&#39;next_h&#39;</span>
 
 
-<span class="k">class</span> <span class="nc">NeuronModelIzh</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">NeuronModelIzh</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Model of neuron due to Eugene M. Izhikevich et al</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -115,15 +106,18 @@
 <span class="sd">            (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># a</span>
-             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># b</span>
-             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># c</span>
-             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># d</span>
-             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># v</span>
-             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># u</span>
-             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># i_offset</span>
-             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">],</span>  <span class="c1"># this_h (= machine_time_step)</span>
-            <span class="p">[</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># machine_time_step</span>
+            <span class="p">[</span><span class="n">Struct</span><span class="p">([</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">A</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">B</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">C</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">D</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">V</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">U</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">I_OFFSET</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">TIMESTEP</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">NEXT_H</span><span class="p">)])],</span>
+            <span class="p">{</span><span class="n">A</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">,</span> <span class="n">B</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span><span class="p">,</span> <span class="n">C</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span> <span class="n">D</span><span class="p">:</span> <span class="s2">&quot;mV/ms&quot;</span><span class="p">,</span> <span class="n">V</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span> <span class="n">U</span><span class="p">:</span> <span class="s2">&quot;mV/ms&quot;</span><span class="p">,</span>
+             <span class="n">I_OFFSET</span><span class="p">:</span> <span class="s2">&quot;nA&quot;</span><span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__a</span> <span class="o">=</span> <span class="n">a</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__b</span> <span class="o">=</span> <span class="n">b</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__c</span> <span class="o">=</span> <span class="n">c</span>
@@ -138,46 +132,15 @@
         <span class="n">parameters</span><span class="p">[</span><span class="n">B</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__b</span>
         <span class="n">parameters</span><span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__c</span>
         <span class="n">parameters</span><span class="p">[</span><span class="n">D</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__d</span>
-        <span class="n">parameters</span><span class="p">[</span><span class="n">I_OFFSET</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_offset</span></div>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">I_OFFSET</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_offset</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">TIMESTEP</span><span class="p">]</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="NeuronModelIzh.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.add_state_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
         <span class="n">state_variables</span><span class="p">[</span><span class="n">V</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_init</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">U</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__u_init</span></div>
-
-<div class="viewcode-block" id="NeuronModelIzh.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="NeuronModelIzh.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.has_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
-
-<div class="viewcode-block" id="NeuronModelIzh.get_global_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_global_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="o">.</span><span class="n">get_global_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_global_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="NeuronModelIzh.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param ts: machine time step</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Add the rest of the data</span>
-        <span class="k">return</span> <span class="p">[</span>
-            <span class="n">parameters</span><span class="p">[</span><span class="n">A</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">B</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">C</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">D</span><span class="p">],</span>
-            <span class="n">state_variables</span><span class="p">[</span><span class="n">V</span><span class="p">],</span> <span class="n">state_variables</span><span class="p">[</span><span class="n">U</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">I_OFFSET</span><span class="p">],</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
-        <span class="p">]</span></div>
-
-<div class="viewcode-block" id="NeuronModelIzh.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-
-        <span class="c1"># Decode the values</span>
-        <span class="n">_a</span><span class="p">,</span> <span class="n">_b</span><span class="p">,</span> <span class="n">_c</span><span class="p">,</span> <span class="n">_d</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">_i_offset</span><span class="p">,</span> <span class="n">_this_h</span> <span class="o">=</span> <span class="n">values</span>
-
-        <span class="c1"># Copy the changed data only</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">V</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">U</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span></div>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">U</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__u_init</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">NEXT_H</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">())</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

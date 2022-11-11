@@ -57,80 +57,60 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.threshold_types</span> <span class="kn">import</span> <span class="n">AbstractThresholdType</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
 
 <span class="n">DEVICE</span> <span class="o">=</span> <span class="s2">&quot;device&quot;</span>
-<span class="n">TIME_UNTIL_SEND</span> <span class="o">=</span> <span class="s2">&quot;time_until_send&quot;</span>
-
-<span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">DEVICE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">TIME_UNTIL_SEND</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
-<span class="p">}</span>
+<span class="n">KEY</span> <span class="o">=</span> <span class="s2">&quot;key&quot;</span>
+<span class="n">SCALE</span> <span class="o">=</span> <span class="s2">&quot;scale&quot;</span>
+<span class="n">MIN</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span>
+<span class="n">MAX</span> <span class="o">=</span> <span class="s2">&quot;max&quot;</span>
+<span class="n">TS_INTER_SEND</span> <span class="o">=</span> <span class="s2">&quot;ts_inter_send&quot;</span>
+<span class="n">TS_NEXT_SEND</span> <span class="o">=</span> <span class="s2">&quot;ts_next_send&quot;</span>
+<span class="n">TYPE</span> <span class="o">=</span> <span class="s2">&quot;type&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">ThresholdTypeMulticastDeviceControl</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A threshold type that can send multicast keys with the value of\</span>
 <span class="sd">        membrane voltage as the payload</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__device&quot;</span><span class="p">]</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__devices&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">devices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list(AbstractMulticastControllableDevice) device:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span>   <span class="c1"># control_key</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span>   <span class="c1"># control_uses_payload</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>    <span class="c1"># min_value</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>    <span class="c1"># max_value</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span>   <span class="c1"># time steps between sending</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span>   <span class="c1"># time steps until next send</span>
-            <span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">])</span>  <span class="c1"># type to send</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Struct</span><span class="p">([</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span> <span class="n">KEY</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span> <span class="n">SCALE</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">MIN</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">MAX</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span> <span class="n">TS_INTER_SEND</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span> <span class="n">TS_NEXT_SEND</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">)])],</span>
+            <span class="p">{</span><span class="n">KEY</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">SCALE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">MIN</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span> <span class="n">MAX</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span>
+             <span class="n">TS_INTER_SEND</span><span class="p">:</span> <span class="s2">&quot;time steps&quot;</span><span class="p">,</span> <span class="n">TS_NEXT_SEND</span><span class="p">:</span> <span class="s2">&quot;time steps&quot;</span><span class="p">,</span>
+             <span class="n">TYPE</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__devices</span> <span class="o">=</span> <span class="n">devices</span>
 
 <div class="viewcode-block" id="ThresholdTypeMulticastDeviceControl.add_parameters"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.add_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
-        <span class="n">parameters</span><span class="p">[</span><span class="n">DEVICE</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__device</span></div>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">KEY</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">device_control_key</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__devices</span><span class="p">]</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">SCALE</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">device_control_scaling_factor</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__devices</span><span class="p">]</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">MIN</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">device_control_min_value</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__devices</span><span class="p">]</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">MAX</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">device_control_max_value</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__devices</span><span class="p">]</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">TS_INTER_SEND</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">device_control_timesteps_between_sending</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__devices</span><span class="p">]</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">TYPE</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">device_control_send_type</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__devices</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="ThresholdTypeMulticastDeviceControl.add_state_variables"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.add_state_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">TIME_UNTIL_SEND</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div>
-
-<div class="viewcode-block" id="ThresholdTypeMulticastDeviceControl.get_units"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="ThresholdTypeMulticastDeviceControl.has_variable"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.has_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
-
-<div class="viewcode-block" id="ThresholdTypeMulticastDeviceControl.get_values"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="c1"># Add the rest of the data</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">parameters</span><span class="p">[</span><span class="n">DEVICE</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">device_control_key</span><span class="p">),</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">DEVICE</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">device_control_scaling_factor</span>
-                    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">device_control_uses_payload</span> <span class="k">else</span> <span class="mi">0</span><span class="p">),</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">DEVICE</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">device_control_min_value</span><span class="p">),</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">DEVICE</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">device_control_max_value</span><span class="p">),</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">DEVICE</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">device_control_timesteps_between_sending</span><span class="p">),</span>
-
-                <span class="c1"># This is the &quot;state&quot; variable that keeps track of how many</span>
-                <span class="c1"># timesteps to go before a send is done</span>
-                <span class="c1"># Set to a different value for each item to avoid being in step</span>
-                <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)],</span>
-                <span class="n">parameters</span><span class="p">[</span><span class="n">DEVICE</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">device_control_send_type</span><span class="o">.</span><span class="n">value</span><span class="p">)]</span></div>
-
-<div class="viewcode-block" id="ThresholdTypeMulticastDeviceControl.update_values"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="c1"># Read the data</span>
-        <span class="p">(</span><span class="n">_key</span><span class="p">,</span> <span class="n">_uses_payload</span><span class="p">,</span> <span class="n">_min</span><span class="p">,</span> <span class="n">_max</span><span class="p">,</span> <span class="n">_between</span><span class="p">,</span> <span class="n">time_until_send</span><span class="p">,</span>
-         <span class="n">_send_type</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">TIME_UNTIL_SEND</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_until_send</span></div>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">TS_NEXT_SEND</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div>
 </pre></div>
 
             <div class="clearer"></div>

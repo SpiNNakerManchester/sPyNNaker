@@ -84,7 +84,6 @@ $(function() {
 <code>#include &quot;c_main_common.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="neuron_2profile__tags_8h_source.html">profile_tags.h</a>&quot;</code><br />
 <code>#include &quot;dma_common.h&quot;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8h.html">tdma_processing.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api__params_8h.html">spin1_api_params.h</a>&gt;</code><br />
 </div>
 <p><a href="c__main__neurons_8c_source.html">Go to the source code of this file.</a></p>
@@ -146,13 +145,18 @@ Enumerations</h2></td></tr>
 , <b>PROFILER_REGION</b>
 , <b>RECORDING_REGION</b>
 , <br />
-&#160;&#160;<b>NEURON_PARAMS_REGION</b>
+&#160;&#160;<b>CORE_PARAMS_REGION</b>
+, <b>NEURON_PARAMS_REGION</b>
 , <b>CURRENT_SOURCE_PARAMS_REGION</b>
 , <b>NEURON_RECORDING_REGION</b>
-, <b>LOCAL_ONLY_REGION</b>
 , <br />
-&#160;&#160;<b>LOCAL_ONLY_PARAMS_REGION</b>
-, <b>SYSTEM_REGION</b>
+&#160;&#160;<b>LOCAL_ONLY_REGION</b>
+, <b>LOCAL_ONLY_PARAMS_REGION</b>
+, <b>NEURON_BUILDER_REGION</b>
+, <b>INITIAL_VALUES_REGION</b>
+, <br />
+&#160;&#160;<b>SYSTEM_REGION</b>
+, <b>CORE_PARAMS_REGION</b>
 , <b>PROVENANCE_DATA_REGION</b>
 , <b>PROFILER_REGION</b>
 , <br />
@@ -162,13 +166,13 @@ Enumerations</h2></td></tr>
 , <b>NEURON_RECORDING_REGION</b>
 , <br />
 &#160;&#160;<b>SDRAM_PARAMS_REGION</b>
+, <b>INITIAL_VALUES_REGION</b>
 , <b>SYSTEM_REGION</b>
 , <b>PROVENANCE_DATA_REGION</b>
-, <b>PROFILER_REGION</b>
 , <br />
-&#160;&#160;<b>RECORDING_REGION</b>
+&#160;&#160;<b>PROFILER_REGION</b>
+, <b>RECORDING_REGION</b>
 , <b>SYNAPSE_PARAMS_REGION</b>
-, <b>DIRECT_MATRIX_REGION</b>
 , <b>SYNAPTIC_MATRIX_REGION</b>
 , <br />
 &#160;&#160;<b>POPULATION_TABLE_REGION</b>
@@ -281,7 +285,7 @@ weight_t *&#160;</td><td class="memItemRight" valign="bottom"><b>as_weight</b></
 </div><div class="memdoc">
 <div class="textblock"><p>A region of SDRAM used to transfer synapses. </p>
 
-<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00085">85</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00088">88</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -299,29 +303,11 @@ size_in_bytes</td>
 The size of the input data to be transferred per core. <p>The size of the input data to be transferred. </p>
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a6a591c0cd469068deef9515db3a5435d"></a>uint32_t</td>
-<td class="fieldname">
-n_neurons</td>
-<td class="fielddoc">
-The number of neurons. </td></tr>
-<tr><td class="fieldtype">
-<a id="a5aeda4c778a8f079554189f957410c9c"></a>uint32_t</td>
-<td class="fieldname">
-n_synapse_types</td>
-<td class="fielddoc">
-The number of synapse types. </td></tr>
-<tr><td class="fieldtype">
 <a id="ac71da842b9ee9030342176197e40ba3b"></a>uint32_t</td>
 <td class="fieldname">
 n_synapse_cores</td>
 <td class="fielddoc">
 The number of synapse cores feeding into here. </td></tr>
-<tr><td class="fieldtype">
-<a id="ac5dd25085ff51b0365a1a81144c5883d"></a>uint32_t</td>
-<td class="fieldname">
-synapse_index_bits</td>
-<td class="fielddoc">
-The number of bits needed for the neurons. </td></tr>
 <tr><td class="fieldtype">
 <a id="a86b526324ed1f6013de23834e46a28b6"></a>uint32_t *</td>
 <td class="fieldname">
@@ -364,7 +350,7 @@ The weight to send for each active Poisson source. </td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>Provenance for this specific core. </p>
 
-<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00101">101</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00098">98</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -402,7 +388,7 @@ n_timer_overruns</td>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00044">44</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00043">43</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
 
 </div>
 </div>
@@ -439,7 +425,7 @@ n_timer_overruns</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00142">142</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00139">139</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
 
 </div>
 </div>
@@ -475,7 +461,7 @@ n_timer_overruns</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00165">165</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00163">163</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
 
 </div>
 </div>
@@ -514,7 +500,7 @@ n_timer_overruns</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00178">178</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00176">176</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
 
 </div>
 </div>
@@ -545,7 +531,7 @@ n_timer_overruns</td>
 <p>Initialises the model by reading in the regions and checking recording data. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if it successfully initialised, false otherwise </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00254">254</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00252">252</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
 
 </div>
 </div>
@@ -568,7 +554,7 @@ n_timer_overruns</td>
 <div class="line">    .recording = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a1fcdb0acbaceba25c8b18313a1efbcbd">RECORDING_REGION</a></div>
 <div class="line">}</div>
 <div class="ttc" id="acommand__sender__multicast__source_8c_html_a6e4d67a0bd74db4da98539f8d2e5ab32ad102acc20b0123ad06640d8c591c304f"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/command__sender__multicast__source_8c.html#a6e4d67a0bd74db4da98539f8d2e5ab32ad102acc20b0123ad06640d8c591c304f">SYSTEM_REGION</a></div><div class="ttdeci">SYSTEM_REGION</div></div>
-<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a1fcdb0acbaceba25c8b18313a1efbcbd"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a1fcdb0acbaceba25c8b18313a1efbcbd">RECORDING_REGION</a></div><div class="ttdeci">@ RECORDING_REGION</div><div class="ttdoc">general recording data; 16</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00044">regions.h:43</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a1fcdb0acbaceba25c8b18313a1efbcbd"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a1fcdb0acbaceba25c8b18313a1efbcbd">RECORDING_REGION</a></div><div class="ttdeci">@ RECORDING_REGION</div><div class="ttdoc">general recording data; 15</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00042">regions.h:42</a></div></div>
 </div><!-- fragment -->
 <p>From the regions, select those that are common. </p>
 
@@ -614,13 +600,17 @@ n_timer_overruns</td>
       </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    .core_params = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a0d3388e5865664c61df9083946894849">CORE_PARAMS_REGION</a>,</div>
 <div class="line">    .neuron_params = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8">NEURON_PARAMS_REGION</a>,</div>
 <div class="line">    .current_source_params = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6af43f04c9fca7f11ed6deb850fc90b223">CURRENT_SOURCE_PARAMS_REGION</a>,</div>
-<div class="line">    .neuron_recording = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad275180dd412ee1f4d842871435e2440">NEURON_RECORDING_REGION</a></div>
+<div class="line">    .neuron_recording = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad275180dd412ee1f4d842871435e2440">NEURON_RECORDING_REGION</a>,</div>
+<div class="line">    .initial_values = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a1b7dad0611f796bf47478691cacd5ddd">INITIAL_VALUES_REGION</a></div>
 <div class="line">}</div>
-<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8">NEURON_PARAMS_REGION</a></div><div class="ttdeci">@ NEURON_PARAMS_REGION</div><div class="ttdoc">neuron parameters; 1</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00028">regions.h:28</a></div></div>
-<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6ad275180dd412ee1f4d842871435e2440"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad275180dd412ee1f4d842871435e2440">NEURON_RECORDING_REGION</a></div><div class="ttdeci">@ NEURON_RECORDING_REGION</div><div class="ttdoc">recording; 8</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00035">regions.h:35</a></div></div>
-<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6af43f04c9fca7f11ed6deb850fc90b223"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6af43f04c9fca7f11ed6deb850fc90b223">CURRENT_SOURCE_PARAMS_REGION</a></div><div class="ttdeci">@ CURRENT_SOURCE_PARAMS_REGION</div><div class="ttdoc">current source parameters; 2</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00029">regions.h:29</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8">NEURON_PARAMS_REGION</a></div><div class="ttdeci">@ NEURON_PARAMS_REGION</div><div class="ttdoc">neuron parameters; 2</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00029">regions.h:29</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a0d3388e5865664c61df9083946894849"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a0d3388e5865664c61df9083946894849">CORE_PARAMS_REGION</a></div><div class="ttdeci">@ CORE_PARAMS_REGION</div><div class="ttdoc">core parameters; 1</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00028">regions.h:28</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a1b7dad0611f796bf47478691cacd5ddd"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a1b7dad0611f796bf47478691cacd5ddd">INITIAL_VALUES_REGION</a></div><div class="ttdeci">@ INITIAL_VALUES_REGION</div><div class="ttdoc">initial neuron state; 16</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00044">regions.h:43</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6ad275180dd412ee1f4d842871435e2440"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad275180dd412ee1f4d842871435e2440">NEURON_RECORDING_REGION</a></div><div class="ttdeci">@ NEURON_RECORDING_REGION</div><div class="ttdoc">recording; 9</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00036">regions.h:36</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6af43f04c9fca7f11ed6deb850fc90b223"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6af43f04c9fca7f11ed6deb850fc90b223">CURRENT_SOURCE_PARAMS_REGION</a></div><div class="ttdeci">@ CURRENT_SOURCE_PARAMS_REGION</div><div class="ttdoc">current source parameters; 3</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00030">regions.h:30</a></div></div>
 </div><!-- fragment --><p>From the regions, select those that are used for neuron-specific things </p>
 
 <p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00001">1</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
@@ -642,14 +632,14 @@ n_timer_overruns</td>
 <p>The current timer tick value. </p>
 <p>Declare that time exists. </p>
 
-<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00110">110</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main__neurons_8c_source.html#l00107">107</a> of file <a class="el" href="c__main__neurons_8c_source.html">c_main_neurons.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

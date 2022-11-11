@@ -60,17 +60,12 @@
 <span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span> <span class="n">ConnectorIDs</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.abstract_connector_supports_views_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_host</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">)</span>
 
-<span class="n">N_GEN_PARAMS</span> <span class="o">=</span> <span class="mi">1</span>
-
 
 <span class="k">class</span> <span class="nc">AllToAllConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span>
-                        <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">,</span>
-                        <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">):</span>
+                        <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Connects all cells in the presynaptic population to all cells in \</span>
 <span class="sd">        the postsynaptic population.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -99,28 +94,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span> <span class="o">=</span> <span class="n">allow_self_connections</span>
-
-    <span class="k">def</span> <span class="nf">_connection_slices</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a slice of the overall set of connections.</span>
-
-<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
-<span class="sd">        :param SynapseInformation synapse_info:</span>
-<span class="sd">        :rtype: list(slice)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">n_post_neurons</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span>
-        <span class="n">stop_atom</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span> <span class="ow">and</span>
-                <span class="n">pre_vertex_slice</span> <span class="ow">is</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
-            <span class="n">n_post_neurons</span> <span class="o">-=</span> <span class="mi">1</span>
-            <span class="n">stop_atom</span> <span class="o">-=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="p">[</span>
-            <span class="nb">slice</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="n">stop_atom</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
-                <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">*</span> <span class="n">n_post_neurons</span><span class="p">,</span>
-                <span class="p">(</span><span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_post_neurons</span><span class="p">,</span>
-                <span class="n">n_post_neurons</span><span class="p">)]</span>
 
 <div class="viewcode-block" id="AllToAllConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.AllToAllConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -163,41 +136,34 @@
 
 <div class="viewcode-block" id="AllToAllConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.AllToAllConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnHost</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span> <span class="ow">and</span>
-                <span class="n">pre_vertex_slice</span> <span class="ow">is</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
+        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span><span class="p">:</span>
             <span class="n">n_connections</span> <span class="o">-=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
-        <span class="n">connection_slices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection_slices</span><span class="p">(</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">block</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
             <span class="n">n_connections</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">NUMPY_SYNAPSES_DTYPE</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span> <span class="ow">and</span>
-                <span class="n">pre_vertex_slice</span> <span class="ow">is</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
-            <span class="n">n_atoms</span> <span class="o">=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span><span class="p">:</span>
+            <span class="n">n_atoms</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span>
             <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">][</span>
                 <span class="p">((</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">n_atoms</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="n">j</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_atoms</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
-            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
             <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
-                <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-                <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">),</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
             <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
                 <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-                <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+                <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">)</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_weights</span><span class="p">(</span>
-            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">connection_slices</span><span class="p">,</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_delays</span><span class="p">(</span>
-            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">connection_slices</span><span class="p">,</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+            <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">],</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;synapse_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synapse_type</span>
         <span class="k">return</span> <span class="n">block</span></div>
 
@@ -221,19 +187,15 @@
         <span class="k">return</span> <span class="n">ConnectorIDs</span><span class="o">.</span><span class="n">ALL_TO_ALL_CONNECTOR</span><span class="o">.</span><span class="n">value</span>
 
 <div class="viewcode-block" id="AllToAllConnector.gen_connector_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.AllToAllConnector.gen_connector_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_params</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basic_connector_params</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
-        <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_params_size_in_bytes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">gen_connector_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># view parameters + allow_self_connections</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_view_params_bytes</span> <span class="o">+</span> <span class="p">(</span><span class="n">N_GEN_PARAMS</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">BYTES_PER_WORD</span>
 </pre></div>
 
             <div class="clearer"></div>

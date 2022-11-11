@@ -92,15 +92,15 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ab16e17812b60db23d3d20cbfe6658bf6"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__kernel_8h.html#ab16e17812b60db23d3d20cbfe6658bf6">connection_generator_kernel_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
-<tr class="memdesc:ab16e17812b60db23d3d20cbfe6658bf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the convolution-kernel connection generator.  <a href="connection__generator__kernel_8h.html#ab16e17812b60db23d3d20cbfe6658bf6">More...</a><br /></td></tr>
-<tr class="separator:ab16e17812b60db23d3d20cbfe6658bf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8f0e149c087998c5d16ca12598785ca"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__kernel_8h.html#aa8f0e149c087998c5d16ca12598785ca">connection_generator_kernel_initialise</a> (void **<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:aa8f0e149c087998c5d16ca12598785ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the convolution-kernel connection generator.  <a href="connection__generator__kernel_8h.html#aa8f0e149c087998c5d16ca12598785ca">More...</a><br /></td></tr>
+<tr class="separator:aa8f0e149c087998c5d16ca12598785ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e3d6a7e01f6bcfe0c5f9063e879bff2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__kernel_8h.html#a0e3d6a7e01f6bcfe0c5f9063e879bff2">connection_generator_kernel_free</a> (void *generator)</td></tr>
 <tr class="memdesc:a0e3d6a7e01f6bcfe0c5f9063e879bff2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free the convolution-kernel connection generator.  <a href="connection__generator__kernel_8h.html#a0e3d6a7e01f6bcfe0c5f9063e879bff2">More...</a><br /></td></tr>
 <tr class="separator:a0e3d6a7e01f6bcfe0c5f9063e879bff2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12d662122a5300d729a5266a3736becf"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__kernel_8h.html#a12d662122a5300d729a5266a3736becf">connection_generator_kernel_generate</a> (void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</td></tr>
-<tr class="memdesc:a12d662122a5300d729a5266a3736becf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with the convolution-kernel connection generator.  <a href="connection__generator__kernel_8h.html#a12d662122a5300d729a5266a3736becf">More...</a><br /></td></tr>
-<tr class="separator:a12d662122a5300d729a5266a3736becf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d2040bb7df48fbe84c9ce51256964a3"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__kernel_8h.html#a9d2040bb7df48fbe84c9ce51256964a3">connection_generator_kernel_generate</a> (void *generator, uint32_t pre_lo, uint32_t pre_hi, uint32_t post_lo, uint32_t post_hi, uint32_t post_index, uint32_t post_slice_start, uint32_t post_slice_count, unsigned long accum weight_scale, accum timestep_per_delay, param_generator_t weight_generator, param_generator_t delay_generator, matrix_generator_t <a class="el" href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a>)</td></tr>
+<tr class="memdesc:a9d2040bb7df48fbe84c9ce51256964a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with the convolution-kernel connection generator.  <a href="connection__generator__kernel_8h.html#a9d2040bb7df48fbe84c9ce51256964a3">More...</a><br /></td></tr>
+<tr class="separator:a9d2040bb7df48fbe84c9ce51256964a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Kernel connection generator implementation. </p>
@@ -219,13 +219,32 @@ Convolution kernel grid width. </td></tr>
 kernelHeight</td>
 <td class="fielddoc">
 Convolution kernel grid height. </td></tr>
+<tr><td class="fieldtype">
+<a id="a70f80ef8f5497723306b27b521e3b539"></a>uint16_t</td>
+<td class="fieldname">
+weightsPresent</td>
+<td class="fielddoc">
+True if weights are present in the array below. </td></tr>
+<tr><td class="fieldtype">
+<a id="a61c278595d8c935eb49bde64137e1ba5"></a>uint16_t</td>
+<td class="fieldname">
+delaysPresent</td>
+<td class="fielddoc">
+True if delays are present in the array below. </td></tr>
+<tr><td class="fieldtype">
+<a id="af812d0ccba12a11f928d6ecbfca0e48f"></a>accum</td>
+<td class="fieldname">
+kernelWeightsAndDelays[]</td>
+<td class="fielddoc">
+<p>Kernel weights and delays This is an array of up to kernel width x height x 2 (one for each of weight and delay) depending on above flags </p>
+</td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ab16e17812b60db23d3d20cbfe6658bf6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab16e17812b60db23d3d20cbfe6658bf6">&#9670;&nbsp;</a></span>connection_generator_kernel_initialise()</h2>
+<a id="aa8f0e149c087998c5d16ca12598785ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8f0e149c087998c5d16ca12598785ca">&#9670;&nbsp;</a></span>connection_generator_kernel_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -236,7 +255,7 @@ Convolution kernel grid height. </td></tr>
         <tr>
           <td class="memname">static void* connection_generator_kernel_initialise </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramtype">void **&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
           <td></td>
         </tr>
@@ -257,7 +276,7 @@ Convolution kernel grid height. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__kernel_8h_source.html#l00078">78</a> of file <a class="el" href="connection__generator__kernel_8h_source.html">connection_generator_kernel.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__kernel_8h_source.html#l00085">85</a> of file <a class="el" href="connection__generator__kernel_8h_source.html">connection_generator_kernel.h</a>.</p>
 
 </div>
 </div>
@@ -293,12 +312,12 @@ Convolution kernel grid height. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__kernel_8h_source.html#l00098">98</a> of file <a class="el" href="connection__generator__kernel_8h_source.html">connection_generator_kernel.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__kernel_8h_source.html#l00116">116</a> of file <a class="el" href="connection__generator__kernel_8h_source.html">connection_generator_kernel.h</a>.</p>
 
 </div>
 </div>
-<a id="a12d662122a5300d729a5266a3736becf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12d662122a5300d729a5266a3736becf">&#9670;&nbsp;</a></span>connection_generator_kernel_generate()</h2>
+<a id="a9d2040bb7df48fbe84c9ce51256964a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d2040bb7df48fbe84c9ce51256964a3">&#9670;&nbsp;</a></span>connection_generator_kernel_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -307,7 +326,7 @@ Convolution kernel grid height. </td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static uint32_t connection_generator_kernel_generate </td>
+          <td class="memname">static bool connection_generator_kernel_generate </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>generator</em>, </td>
@@ -316,19 +335,31 @@ Convolution kernel grid height. </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_slice_start</em>, </td>
+          <td class="paramname"><em>pre_lo</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_slice_count</em>, </td>
+          <td class="paramname"><em>pre_hi</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>pre_neuron_index</em>, </td>
+          <td class="paramname"><em>post_lo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>post_hi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>post_index</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -345,14 +376,32 @@ Convolution kernel grid height. </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>max_row_length</em>, </td>
+          <td class="paramtype">unsigned long accum&#160;</td>
+          <td class="paramname"><em>weight_scale</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>indices</em>&#160;</td>
+          <td class="paramtype">accum&#160;</td>
+          <td class="paramname"><em>timestep_per_delay</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">param_generator_t&#160;</td>
+          <td class="paramname"><em>weight_generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">param_generator_t&#160;</td>
+          <td class="paramname"><em>delay_generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">matrix_generator_t&#160;</td>
+          <td class="paramname"><em>matrix_generator</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -383,14 +432,14 @@ Convolution kernel grid height. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of connections generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__kernel_8h_source.html#l00121">121</a> of file <a class="el" href="connection__generator__kernel_8h_source.html">connection_generator_kernel.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__kernel_8h_source.html#l00139">139</a> of file <a class="el" href="connection__generator__kernel_8h_source.html">connection_generator_kernel.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 27 2022 11:43:11 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Nov 11 2022 12:40:43 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

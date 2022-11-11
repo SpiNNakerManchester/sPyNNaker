@@ -61,6 +61,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.external_devices_models.push_bot</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractPushBotRetinaDevice</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">PopulationApplicationVertex</span>
 
 
 <span class="k">class</span> <span class="nc">DelayedPayloadMultiCastCommand</span><span class="p">(</span><span class="n">MultiCastCommand</span><span class="p">):</span>
@@ -84,7 +85,8 @@
 
 
 <span class="k">class</span> <span class="nc">PushBotSpiNNakerLinkRetinaDevice</span><span class="p">(</span>
-        <span class="n">AbstractPushBotRetinaDevice</span><span class="p">,</span> <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">):</span>
+        <span class="n">AbstractPushBotRetinaDevice</span><span class="p">,</span> <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">,</span>
+        <span class="n">PopulationApplicationVertex</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__new_key_command&quot;</span><span class="p">]</span>
 
     <span class="n">default_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;board_address&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
