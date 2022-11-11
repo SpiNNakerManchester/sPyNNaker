@@ -16,10 +16,12 @@
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetSpeakerDevice)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 class PushBotSpiNNakerLinkSpeakerDevice(
-        PushBotEthernetSpeakerDevice, ApplicationSpiNNakerLinkVertex):
+        PushBotEthernetSpeakerDevice, ApplicationSpiNNakerLinkVertex,
+        PopulationApplicationVertex):
     """ The speaker of a PushBot
     """
     __slots__ = []

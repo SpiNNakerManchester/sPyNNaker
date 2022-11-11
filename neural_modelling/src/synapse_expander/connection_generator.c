@@ -53,7 +53,7 @@ typedef struct connection_generator_info {
     generator_hash_t hash;
 
     //! \brief Initialises the generator
-    initialize_func *initialize;
+    initialize_connector_func *initialize;
 
     //! \brief Generate connections
     generate_connection_func *generate;
@@ -101,7 +101,7 @@ static const connection_generator_info connection_generators[] = {
 };
 
 connection_generator_t connection_generator_init(
-        uint32_t hash, address_t *in_region) {
+        uint32_t hash, void **in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_CONNECTION_GENERATORS; i++) {
         const connection_generator_info *type = &connection_generators[i];
@@ -128,15 +128,17 @@ connection_generator_t connection_generator_init(
     return NULL;
 }
 
-uint32_t connection_generator_generate(
-        connection_generator_t generator, uint32_t pre_slice_start,
-        uint32_t pre_slice_count, uint32_t pre_neuron_index,
+bool connection_generator_generate(
+        connection_generator_t generator, uint32_t pre_lo, uint32_t pre_hi,
+        uint32_t post_lo, uint32_t post_hi, uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
-        uint32_t max_row_length, uint16_t *indices) {
+        unsigned long accum weight_scale, accum timestep_per_delay,
+        param_generator_t weight_generator, param_generator_t delay_generator,
+        matrix_generator_t matrix_generator) {
     return generator->type->generate(
-            generator->data, pre_slice_start, pre_slice_count,
-            pre_neuron_index, post_slice_start, post_slice_count,
-            max_row_length, indices);
+            generator->data, pre_lo, pre_hi, post_lo, post_hi, post_index,
+            post_slice_start, post_slice_count, weight_scale, timestep_per_delay,
+            weight_generator, delay_generator, matrix_generator);
 }
 
 void connection_generator_free(connection_generator_t generator) {

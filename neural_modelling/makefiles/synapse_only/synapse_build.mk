@@ -166,7 +166,6 @@ OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 # List all the sources relative to one of SOURCE_DIRS
 SOURCES = neuron/c_main_synapses.c \
           neuron/synapses.c \
-          neuron/direct_synapses.c \
           neuron/spike_processing_fast.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \

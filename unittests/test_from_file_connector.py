@@ -87,7 +87,6 @@ def test_connector(
             assert extra_params[:, i].shape == (len(clist), )
 
     # Check weights and delays are used or ignored as expected
-    pre_slice = Slice(0, 10)
     post_slice = Slice(0, 10)
     synapse_info = SynapseInformation(
         connector=None, pre_population=MockPopulation(10, "Pre"),
@@ -96,6 +95,6 @@ def test_connector(
         synapse_type=None, receptor_type=None,
         synapse_type_from_dynamics=False, weights=weights, delays=delays)
     block = connector.create_synaptic_block(
-        [pre_slice], [post_slice], pre_slice, post_slice, 1, synapse_info)
+        [post_slice], post_slice, 1, synapse_info)
     assert numpy.array_equal(block["weight"], numpy.array(expected_weights))
     assert numpy.array_equal(block["delay"], numpy.array(expected_delays))

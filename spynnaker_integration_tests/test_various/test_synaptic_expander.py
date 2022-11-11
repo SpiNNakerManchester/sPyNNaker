@@ -83,14 +83,20 @@ def run_script():
     p.run(10)
 
     for weight, delay, connector, is_stdp, proj, check in projs:
-        weights = proj.get("weight", "list", with_address=False)
-        delays = proj.get("delay", "list", with_address=False)
-        conns = proj.get([], "list")
-        if not is_stdp:
-            check_params(weight, weights)
-        check_params(delay, delays)
-        check(conns)
-
+        try:
+            weights = proj.get("weight", "list", with_address=False)
+            delays = proj.get("delay", "list", with_address=False)
+            conns = proj.get([], "list")
+            if not is_stdp:
+                check_params(weight, weights)
+            check_params(delay, delays)
+            check(conns)
+        except AssertionError as e:
+            print(proj)
+            print("Weight:", weight, ":-", weights)
+            print("Delay:", delay, ":-", delays)
+            p.end()
+            raise e
     p.end()
 
 

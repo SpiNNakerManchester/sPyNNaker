@@ -32,15 +32,12 @@ int16_lut *tau_minus_lookup;
 // Functions
 //---------------------------------------
 address_t timing_initialise(address_t address) {
-    log_debug("timing_initialise: starting");
     log_debug("\tSTDP nearest-pair rule");
 
     // Copy LUTs from following memory
     address_t lut_address = address;
     tau_plus_lookup = maths_copy_int16_lut(&lut_address);
     tau_minus_lookup = maths_copy_int16_lut(&lut_address);
-
-    log_debug("timing_initialise: completed successfully");
 
     return lut_address;
 }

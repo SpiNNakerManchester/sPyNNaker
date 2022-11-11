@@ -13,14 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.application import Application2DFPGAVertex
-from pacman.model.graphs.application import FPGAConnection
+from pacman.model.graphs.application import (
+    Application2DFPGAVertex, FPGAConnection)
 from pacman.model.routing_info import BaseKeyAndMask
 from pacman.utilities.constants import BITS_IN_KEY
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from .spif_devices import (
     N_PIPES, N_FILTERS, SpiNNFPGARegister, SPIFRegister,
     set_field_mask, set_field_shift, set_field_limit,
@@ -29,8 +30,8 @@ from .spif_devices import (
 
 
 class SPIFRetinaDevice(
-        Application2DFPGAVertex, AbstractSendMeMulticastCommandsVertex,
-        HasShapeKeyFields):
+        Application2DFPGAVertex, PopulationApplicationVertex,
+        AbstractSendMeMulticastCommandsVertex, HasShapeKeyFields):
     """ A retina device connected to SpiNNaker using a SPIF board.
     """
 

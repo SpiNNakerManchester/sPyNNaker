@@ -84,8 +84,7 @@ class TestViews(BaseTestCase):
 
         # check all
         s1e = [[0, 7.], [1, 8.], [2, 9.], [3, 10.], [4, 11.], [5, 12.],
-               [6, 13.],
-               [7, 14.], [8, 15.], [9, 16.]]
+               [6, 13.], [7, 14.], [8, 15.], [9, 16.]]
         assert (numpy.array_equal(spikes1tuple, s1e))
         assert (numpy.array_equal(spikes1convert, s1e))
         assert (numpy.array_equal(v1convert, v1tuple))
