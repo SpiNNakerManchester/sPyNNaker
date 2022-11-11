@@ -22,7 +22,7 @@ from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from spynnaker.pyNN.utilities.constants import (
     POP_TABLE_MAX_ROW_LENGTH)
 
-_DELAY_PARAM_HEADER_WORDS = 8
+_DELAY_PARAM_HEADER_WORDS = 9
 
 
 class DelayExtensionVertex(
