@@ -32,7 +32,7 @@ from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
     MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl,
-    SPIFRetinaDevice, ICUBRetinaDevice)
+    SPIFRetinaDevice, ICUBRetinaDevice, SPIFOutputDevice)
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
     EthernetCommandConnection, EthernetControlConnection,
@@ -77,7 +77,7 @@ __all__ = [
     "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
     "MunichRetinaDevice", "MunichMotorDevice", "ArbitraryFPGADevice",
     "PushBotRetinaViewer", "ExternalDeviceLifControl", "SPIFRetinaDevice",
-    "ICUBRetinaDevice",
+    "ICUBRetinaDevice", "SPIFOutputDevice",
 
     # PushBot Parameters
     "MunichIoSpiNNakerLinkProtocol",
@@ -309,15 +309,3 @@ def SpikeInjector(
             database_notify_host, database_notify_port_num,
             database_ack_port_num)
     return ExternalDeviceSpikeInjector()
-
-
-def _set_simulator(simulator):
-    """
-    Should only be called by pyNN/__init__py setup method.
-
-    Any other uses is not supported.
-
-    :param spynnaker.pyNN.spinnaker.SpiNNaker simulator:
-    """
-    global __simulator
-    __simulator = simulator

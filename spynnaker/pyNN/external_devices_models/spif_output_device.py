@@ -31,10 +31,9 @@ class SPIFOutputDevice(
 
     __slots__ = ["__incoming_partition"]
 
-    def __init__(self, n_atoms, board_address=None, chip_coords=None,
-                 label=None):
+    def __init__(self, board_address=None, chip_coords=None, label=None):
         super(SPIFOutputDevice, self).__init__(
-            n_atoms,
+            n_atoms=None,
             outgoing_fpga_connection=FPGAConnection(
                 SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, board_address,
                 chip_coords),
