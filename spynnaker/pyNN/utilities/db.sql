@@ -29,7 +29,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS population_recording_sanity
 
 CREATE TABLE IF NOT EXISTS segment(
     segment_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    simulation_time_step_ms FLOAT NOT NULL);
+    simulation_time_step_ms FLOAT NOT NULL,
+    segment_number INTEGER NOT NULL);
 
 CREATE TABLE IF NOT EXISTS spikes_metadata(
     spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,

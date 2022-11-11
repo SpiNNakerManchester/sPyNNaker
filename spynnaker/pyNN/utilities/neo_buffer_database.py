@@ -94,9 +94,10 @@ class NeoBufferDatabase(BufferDatabase):
             cursor.execute(
                 """
                 INSERT INTO segment
-                (simulation_time_step_ms)
-                 VALUES (?)
-                """, [SpynnakerDataView.get_simulation_time_step_ms()])
+                (simulation_time_step_ms, segment_number)
+                 VALUES (?, ?)
+                """, [SpynnakerDataView.get_simulation_time_step_ms(),
+                      SpynnakerDataView.get_segment_counter()])
 
     def _get_simulation_time_step_ms(self, cursor):
         """
