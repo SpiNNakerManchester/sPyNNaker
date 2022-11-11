@@ -55,7 +55,7 @@ def record_weights_using_callback():
     LIFLayer = sim.Population(
         popNeurons["LIFLayer"], sim.IF_curr_exp(**neuronParameters["LIFL"]),
         label="LIFLayer")
-    LIFLayer.set(v=initNeuronParameters["LIFL"]["vInit"])
+    LIFLayer.initialize(v=initNeuronParameters["LIFL"]["vInit"])
 
     ######################################
     # Synapses
@@ -159,7 +159,7 @@ def record_weights_using_multirun():
     LIFLayer = sim.Population(
         popNeurons["LIFLayer"], sim.IF_curr_exp(**neuronParameters["LIFL"]),
         label="LIFLayer")
-    LIFLayer.set(v=initNeuronParameters["LIFL"]["vInit"])
+    LIFLayer.initialize(v=initNeuronParameters["LIFL"]["vInit"])
 
     ######################################
     # Synapses

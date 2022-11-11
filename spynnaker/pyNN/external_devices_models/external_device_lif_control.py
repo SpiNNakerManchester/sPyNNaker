@@ -97,7 +97,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
     def create_vertex(
             self, n_neurons, label, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size,
-            n_steps_per_timestep, drop_late_spikes, splitter):
+            n_steps_per_timestep, drop_late_spikes, splitter, seed):
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of devices in {}"
@@ -107,4 +107,4 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         return ExternalDeviceLifControlVertex(
             self._devices, self._create_edges, max_atoms, self._model, self,
             self._translator, spikes_per_second, label, ring_buffer_sigma,
-            incoming_spike_buffer_size, drop_late_spikes, splitter)
+            incoming_spike_buffer_size, drop_late_spikes, splitter, seed)

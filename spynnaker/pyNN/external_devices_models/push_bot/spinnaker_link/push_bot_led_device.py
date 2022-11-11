@@ -12,14 +12,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetLEDDevice)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 class PushBotSpiNNakerLinkLEDDevice(
-        PushBotEthernetLEDDevice, ApplicationSpiNNakerLinkVertex):
+        PushBotEthernetLEDDevice, ApplicationSpiNNakerLinkVertex,
+        PopulationApplicationVertex):
     """ The LED of a PushBot
     """
     __slots__ = []

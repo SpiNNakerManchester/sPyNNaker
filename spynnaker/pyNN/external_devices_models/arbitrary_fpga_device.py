@@ -13,11 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.graphs.application import ApplicationFPGAVertex
-from pacman.model.graphs.application import FPGAConnection
+from pacman.model.graphs.application import (
+    ApplicationFPGAVertex, FPGAConnection)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
-class ArbitraryFPGADevice(ApplicationFPGAVertex):
+class ArbitraryFPGADevice(ApplicationFPGAVertex, PopulationApplicationVertex):
     __slots__ = []
 
     def __init__(

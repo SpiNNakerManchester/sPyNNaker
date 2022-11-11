@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_event_recordable import AbstractEventRecordable
-from .abstract_neuron_recordable import AbstractNeuronRecordable
-from .abstract_spike_recordable import AbstractSpikeRecordable
 from .eieio_spike_recorder import EIEIOSpikeRecorder
 from .neuron_recorder import NeuronRecorder
 from .multi_spike_recorder import MultiSpikeRecorder
-from .simple_population_settable import SimplePopulationSettable
+from .parameter_holder import ParameterHolder
+from .population_application_vertex import (
+    PopulationApplicationVertex, RecordingType)
 
-__all__ = ["AbstractEventRecordable", "AbstractNeuronRecordable",
-           "AbstractSpikeRecordable", "EIEIOSpikeRecorder", "NeuronRecorder",
-           "MultiSpikeRecorder", "SimplePopulationSettable"]
+__all__ = ["EIEIOSpikeRecorder", "NeuronRecorder", "MultiSpikeRecorder",
+           "ParameterHolder", "PopulationApplicationVertex", "RecordingType"]
