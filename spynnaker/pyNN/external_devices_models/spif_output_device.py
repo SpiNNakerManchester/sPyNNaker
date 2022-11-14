@@ -21,6 +21,7 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SpiNNFPGARegister)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 
 class SPIFOutputDevice(
@@ -42,6 +43,9 @@ class SPIFOutputDevice(
 
     @overrides(ApplicationFPGAVertex.add_incoming_edge)
     def add_incoming_edge(self, edge, partition):
+        # Ignore non-spike partitions
+        if partition.identifier != SPIKE_PARTITION_ID:
+            return
         if self.__incoming_partition is not None:
             raise ValueError(
                 "Only one outgoing connection is supported per spif device"
