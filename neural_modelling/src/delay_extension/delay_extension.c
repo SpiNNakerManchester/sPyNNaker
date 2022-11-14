@@ -444,8 +444,7 @@ static void background_callback(uint local_time, UNUSED uint timer_count) {
                 // Calculate key all spikes coming from this neuron will be
                 // sent with
                 uint32_t neuron_index = ((d * num_neurons) + n);
-                uint32_t neuron_key = neuron_index + key;
-                uint32_t spike_key = (neuron_key << n_colour_bits) | colour;
+                uint32_t spike_key = (key + (neuron_index << n_colour_bits)) | colour;
 
                 log_debug("Neuron %u sending %u spikes after delay"
                         "stage %u with key %x",

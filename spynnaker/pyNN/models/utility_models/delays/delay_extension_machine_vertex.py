@@ -210,7 +210,8 @@ class DelayExtensionMachineVertex(
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition_id):
         n_keys = super().get_n_keys_for_partition(partition_id)
-        return n_keys * self.app_vertex.n_delay_stages
+        n_colours = 2 ** self.app_vertex.n_colour_bits
+        return n_keys * self.app_vertex.n_delay_stages * n_colours
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
@@ -230,7 +231,7 @@ class DelayExtensionMachineVertex(
         # Reserve memory:
         spec.comment("\nReserving memory space for data regions:\n\n")
 
-        # ###################################################################
+        # ###################################################################self
         # Reserve SDRAM space for memory areas:
         delay_params_sz = self._app_vertex.delay_params_size()
 
@@ -310,8 +311,9 @@ class DelayExtensionMachineVertex(
         spec.write_value(data=incoming_key)
         spec.write_value(data=incoming_mask)
 
-        # Write the number of neurons in the block:
-        spec.write_value(data=vertex_slice.n_atoms)
+        # Write the number of keys to mirror
+        n_keys = super().get_n_keys_for_partition(SPIKE_PARTITION_ID)
+        spec.write_value(data=n_keys)
 
         # Write the number of blocks of delays:
         spec.write_value(data=self._app_vertex.n_delay_stages)
