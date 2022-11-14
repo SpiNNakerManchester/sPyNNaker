@@ -65,7 +65,8 @@ class SPIFOutputDevice(
         self.__incoming_partition = partition
         if self.__create_database:
             SpynnakerDataView.add_live_output_vertex(
-                self.__incoming_partition.pre_vertex)
+                self.__incoming_partition.pre_vertex,
+                self.__incoming_partition.identifier)
 
     def _get_set_key_payload(self):
         """ Get the payload for the command to set the router key
