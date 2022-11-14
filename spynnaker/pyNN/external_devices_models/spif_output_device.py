@@ -33,7 +33,7 @@ class SPIFOutputDevice(
     """ Output (only) to a SPIF device
     """
 
-    __slots__ = ["__incoming_partition"]
+    __slots__ = ["__incoming_partition", "__create_database"]
 
     def __init__(self, board_address=None, chip_coords=None, label=None,
                  create_database=True, database_notify_host=None,
@@ -51,6 +51,7 @@ class SPIFOutputDevice(
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
                 database_notify_host, database_notify_port_num,
                 database_ack_port_num)
+        self.__create_database = create_database
 
     @overrides(ApplicationFPGAVertex.add_incoming_edge)
     def add_incoming_edge(self, edge, partition):
@@ -62,6 +63,9 @@ class SPIFOutputDevice(
                 "Only one outgoing connection is supported per spif device"
                 f" (existing partition: {self.__incoming_partition}")
         self.__incoming_partition = partition
+        if self.__create_database:
+            SpynnakerDataView.add_live_output_vertex(
+                self.__incoming_partition.pre_vertex)
 
     def _get_set_key_payload(self):
         """ Get the payload for the command to set the router key
