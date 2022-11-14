@@ -44,7 +44,8 @@ class SPIFOutputDevice(
     def add_incoming_edge(self, edge, partition):
         if self.__incoming_partition is not None:
             raise ValueError(
-                "Only one outgoing connection is supported per spif device")
+                "Only one outgoing connection is supported per spif device"
+                f" (existing partition: {self.__incoming_partition}")
         self.__incoming_partition = partition
 
     def _get_set_key_payload(self):
