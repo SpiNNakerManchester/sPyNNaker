@@ -13,15 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
+from spinn_utilities.config_holder import set_config
 from pacman.model.graphs.application import (
     ApplicationFPGAVertex, FPGAConnection)
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
+    SpynnakerExternalDevicePluginManager)
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SpiNNFPGARegister)
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 
 class SPIFOutputDevice(
@@ -32,7 +35,9 @@ class SPIFOutputDevice(
 
     __slots__ = ["__incoming_partition"]
 
-    def __init__(self, board_address=None, chip_coords=None, label=None):
+    def __init__(self, board_address=None, chip_coords=None, label=None,
+                 create_database=True, database_notify_host=None,
+                 database_notify_port_num=None, database_ack_port_num=None):
         super(SPIFOutputDevice, self).__init__(
             n_atoms=1,
             outgoing_fpga_connection=FPGAConnection(
@@ -40,6 +45,12 @@ class SPIFOutputDevice(
                 chip_coords),
             label=label)
         self.__incoming_partition = None
+        # Force creation of the database, to be used in the read side of things
+        if create_database:
+            set_config("Database", "create_database", "True")
+            SpynnakerExternalDevicePluginManager.add_database_socket_address(
+                database_notify_host, database_notify_port_num,
+                database_ack_port_num)
 
     @overrides(ApplicationFPGAVertex.add_incoming_edge)
     def add_incoming_edge(self, edge, partition):
