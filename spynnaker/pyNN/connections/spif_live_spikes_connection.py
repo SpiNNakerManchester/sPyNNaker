@@ -172,23 +172,6 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.__live_event_callbacks[label_id].append(
             (live_event_callback, translate_key))
 
-    def add_start_callback(self, label, start_callback):
-        """ Add a callback for the start of the simulation
-
-        :param start_callback: A function to be called when the start
-            message has been received. This function should take the label of
-            the referenced vertex, and an instance of this class, which can
-            be used to send events
-        :type start_callback: callable(str, LiveEventConnection) -> None
-        :param str label: the label of the function to be sent
-        """
-        logger.warning(
-            "the method 'add_start_callback(label, start_callback)' is in "
-            "deprecation, and will be replaced with the method "
-            "'add_start_resume_callback(label, start_resume_callback)' in a "
-            "future release.")
-        self.add_start_resume_callback(label, start_callback)
-
     def add_start_resume_callback(self, label, start_resume_callback):
         """ Add a callback for the start and resume state of the simulation
 
