@@ -36,7 +36,8 @@ from spynnaker.pyNN.external_devices_models import (
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
     EthernetCommandConnection, EthernetControlConnection,
-    SpynnakerLiveSpikesConnection, SpynnakerPoissonControlConnection)
+    SpynnakerLiveSpikesConnection, SpynnakerPoissonControlConnection,
+    SPIFLiveSpikesConnection)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.external_devices_models.push_bot.control import (
     PushBotLifEthernet, PushBotLifSpinnakerLink)
@@ -97,6 +98,7 @@ __all__ = [
     # Connections
     "SpynnakerLiveSpikesConnection",
     "SpynnakerPoissonControlConnection",
+    "SPIFLiveSpikesConnection",
 
     # Provided functions
     "activate_live_output_for",
