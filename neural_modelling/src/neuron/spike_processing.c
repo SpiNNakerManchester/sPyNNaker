@@ -252,6 +252,8 @@ static bool setup_synaptic_dma_read(dma_buffer *current_buffer,
             *n_synapse_processes += dma_n_spikes;
             dma_n_rewires = 0;
             dma_n_spikes = 0;
+            // Although we can reuse the buffer, the colour might be different
+            current_buffer->colour = colour;
         } else {
             // If the row is in SDRAM, set up the transfer and we are done
             do_dma_read(row, n_bytes_to_transfer, spike, colour, colour_mask);
