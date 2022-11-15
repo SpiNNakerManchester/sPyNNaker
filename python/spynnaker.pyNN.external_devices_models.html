@@ -890,6 +890,69 @@ conditions.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.SPIFOutputDevice">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">SPIFOutputDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chip_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_database</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_notify_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_notify_port_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_ack_port_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.SPIFOutputDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationFPGAVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
+<p>Output (only) to a SPIF device</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of atoms in the vertex</p></li>
+<li><p><strong>incoming_fpga_connections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>FPGAConnection</em><em>) or </em><em>None</em>) – The connections from one or more FPGAs that that packets are
+expected to be received from for this device, or None if no
+incoming traffic is expected from the device</p></li>
+<li><p><strong>outgoing_fpga_connection</strong> (<em>FPGAConnection</em><em> or </em><em>None</em>) – The connection to an FPGA that packets to be sent to this device
+should be sent down, or None if no outgoing traffic is expected to
+be sent to the device.</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The optional name of the vertex.</p></li>
+<li><p><strong>n_machine_vertices_per_link</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The optional number of machine vertices to create for each FPGA
+link (1 by default)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.SPIFOutputDevice.add_incoming_edge">
+<span class="sig-name descname"><span class="pre">add_incoming_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_output_device.html#SPIFOutputDevice.add_incoming_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.SPIFOutputDevice.add_incoming_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an edge incoming to this vertex.  This is ignored by default,
+but could be used to track incoming edges, and/or report faults.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.SPIFOutputDevice.pause_stop_commands">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.SPIFOutputDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>The commands needed when pausing or stopping simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.SPIFOutputDevice.start_resume_commands">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.SPIFOutputDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>The commands needed when starting or resuming simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.SPIFOutputDevice.timed_commands">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.SPIFOutputDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>The commands to be sent at given times in the simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.SPIFRetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">SPIFRetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_x_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_y_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chip_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Application2DFPGAVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">HasShapeKeyFields</span></code></p>
@@ -1186,6 +1249,13 @@ in the order of the fields</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.pause_stop_commands</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.start_resume_commands</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">MunichRetinaDevice.timed_commands</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFOutputDevice"><code class="docutils literal notranslate"><span class="pre">SPIFOutputDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFOutputDevice.add_incoming_edge"><code class="docutils literal notranslate"><span class="pre">SPIFOutputDevice.add_incoming_edge()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFOutputDevice.pause_stop_commands"><code class="docutils literal notranslate"><span class="pre">SPIFOutputDevice.pause_stop_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFOutputDevice.start_resume_commands"><code class="docutils literal notranslate"><span class="pre">SPIFOutputDevice.start_resume_commands</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFOutputDevice.timed_commands"><code class="docutils literal notranslate"><span class="pre">SPIFOutputDevice.timed_commands</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice</span></code></a><ul>

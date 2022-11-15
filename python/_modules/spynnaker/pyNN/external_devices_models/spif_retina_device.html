@@ -60,112 +60,15 @@
 <span class="kn">from</span> <span class="nn">pacman.utilities.constants</span> <span class="kn">import</span> <span class="n">BITS_IN_KEY</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">MultiCastCommand</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">HasShapeKeyFields</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">PopulationApplicationVertex</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
-
-<span class="n">_REPEATS</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">_DELAY_BETWEEN_REPEATS</span> <span class="o">=</span> <span class="mi">1</span>
-
-<span class="c1">#: Base key to send packets to SpiNNaker FPGA (add register offset)</span>
-<span class="n">_LC_KEY</span> <span class="o">=</span> <span class="mh">0xFFFFFE00</span>
-
-<span class="c1">#: Base key to send packets to SPIF (add register offset)</span>
-<span class="n">_RC_KEY</span> <span class="o">=</span> <span class="mh">0xFFFFFF00</span>
-
-<span class="c1">#: The number of pipes</span>
-<span class="n">_N_PIPES</span> <span class="o">=</span> <span class="mi">2</span>
-
-<span class="c1">#: The number of fields supported for each pipe</span>
-<span class="n">_N_FIELDS</span> <span class="o">=</span> <span class="mi">4</span>
-
-<span class="c1">#: The number of filters supported for each pipe</span>
-<span class="n">_N_FILTERS</span> <span class="o">=</span> <span class="mi">8</span>
-
-
-<span class="k">class</span> <span class="nc">_SPIFRegister</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
-    <span class="n">REPLY_KEY</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">IR_KEY_BASE</span> <span class="o">=</span> <span class="mi">16</span>
-    <span class="n">IR_MASK_BASE</span> <span class="o">=</span> <span class="mi">32</span>
-    <span class="n">IR_ROUTE_BASE</span> <span class="o">=</span> <span class="mi">48</span>
-    <span class="n">OUT_PERIPH_PKT_CNT</span> <span class="o">=</span> <span class="mi">64</span>
-    <span class="n">CONFIG_PKT_CNT</span> <span class="o">=</span> <span class="mi">65</span>
-    <span class="n">DROPPED_PKT_CNT</span> <span class="o">=</span> <span class="mi">66</span>
-    <span class="n">IN_PERIPH_PKT_CNT</span> <span class="o">=</span> <span class="mi">67</span>
-    <span class="n">MP_KEY_BASE</span> <span class="o">=</span> <span class="mi">80</span>
-    <span class="n">MP_FLD_MASK_BASE</span> <span class="o">=</span> <span class="mi">96</span>
-    <span class="n">MP_FLD_SHIFT_BASE</span> <span class="o">=</span> <span class="mi">112</span>
-    <span class="n">MP_FLD_LIMIT_BASE</span> <span class="o">=</span> <span class="mi">128</span>
-    <span class="n">FL_VALUE_BASE</span> <span class="o">=</span> <span class="mi">144</span>
-    <span class="n">FL_MASK_BASE</span> <span class="o">=</span> <span class="mi">176</span>
-
-    <span class="k">def</span> <span class="nf">cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">MultiCastCommand</span><span class="p">(</span>
-            <span class="n">_RC_KEY</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">index</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="n">_REPEATS</span><span class="p">,</span>
-            <span class="n">delay_between_repeats</span><span class="o">=</span><span class="n">_DELAY_BETWEEN_REPEATS</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">set_mapper_key</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">MP_KEY_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">pipe</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">set_field_mask</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">MP_FLD_MASK_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">_N_FIELDS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">set_field_shift</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">MP_FLD_SHIFT_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
-        <span class="n">shift</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">_N_FIELDS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">set_field_limit</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">limit</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">MP_FLD_LIMIT_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
-        <span class="n">limit</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">_N_FIELDS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">set_filter_value</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">FL_VALUE_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
-        <span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">_N_FILTERS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">set_filter_mask</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">FL_MASK_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
-        <span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">_N_FILTERS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">set_input_key</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">IR_KEY_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">set_input_mask</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">IR_MASK_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">set_input_route</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">route</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">IR_ROUTE_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">_SpiNNFPGARegister</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
-    <span class="c1"># Peripheral</span>
-    <span class="n">P_KEY</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">P_MASK</span> <span class="o">=</span> <span class="mi">3</span>
-
-    <span class="c1"># SpiNNLink key</span>
-    <span class="n">LC_KEY</span> <span class="o">=</span> <span class="mi">12</span>
-    <span class="n">LC_MASK</span> <span class="o">=</span> <span class="mi">13</span>
-
-    <span class="c1"># SPIF key</span>
-    <span class="n">RC_KEY</span> <span class="o">=</span> <span class="mi">14</span>
-    <span class="n">RC_MASK</span> <span class="o">=</span> <span class="mi">15</span>
-    <span class="n">STOP</span> <span class="o">=</span> <span class="mi">16</span>
-    <span class="n">START</span> <span class="o">=</span> <span class="mi">17</span>
-
-    <span class="k">def</span> <span class="nf">cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">MultiCastCommand</span><span class="p">(</span>
-            <span class="n">_LC_KEY</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="n">_REPEATS</span><span class="p">,</span>
-            <span class="n">delay_between_repeats</span><span class="o">=</span><span class="n">_DELAY_BETWEEN_REPEATS</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.spif_devices</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SPIF_FPGA_ID</span><span class="p">,</span> <span class="n">SPIF_OUTPUT_FPGA_LINK</span><span class="p">,</span> <span class="n">SPIF_INPUT_FPGA_LINKS</span><span class="p">,</span>
+    <span class="n">N_PIPES</span><span class="p">,</span> <span class="n">N_FILTERS</span><span class="p">,</span> <span class="n">SpiNNFPGARegister</span><span class="p">,</span> <span class="n">SPIFRegister</span><span class="p">,</span>
+    <span class="n">set_field_mask</span><span class="p">,</span> <span class="n">set_field_shift</span><span class="p">,</span> <span class="n">set_field_limit</span><span class="p">,</span>
+    <span class="n">set_filter_mask</span><span class="p">,</span> <span class="n">set_filter_value</span><span class="p">,</span> <span class="n">set_mapper_key</span><span class="p">,</span>
+    <span class="n">set_input_key</span><span class="p">,</span> <span class="n">set_input_mask</span><span class="p">,</span> <span class="n">set_input_route</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">SPIFRetinaDevice</span><span class="p">(</span>
@@ -238,9 +141,9 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;The sub-squares must be &gt;=4 x &gt;= 2&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">sub_width</span><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><span class="n">sub_height</span><span class="si">}</span><span class="s2"> specified)&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pipe</span> <span class="o">&gt;=</span> <span class="n">_N_PIPES</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pipe</span> <span class="o">&gt;=</span> <span class="n">N_PIPES</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Pipe </span><span class="si">{</span><span class="n">pipe</span><span class="si">}</span><span class="s2"> is bigger than maximum allowed </span><span class="si">{</span><span class="n">_N_PIPES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;Pipe </span><span class="si">{</span><span class="n">pipe</span><span class="si">}</span><span class="s2"> is bigger than maximum allowed </span><span class="si">{</span><span class="n">N_PIPES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Call the super</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -297,15 +200,16 @@
 <span class="sd">        :rtype: list(FPGAConnection)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># We use every other odd link</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">FPGAConnection</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">FPGAConnection</span><span class="p">(</span><span class="n">SPIF_FPGA_ID</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">SPIF_INPUT_FPGA_LINKS</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__outgoing_fpga</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the outgoing FPGA connection</span>
+        <span class="sd">&quot;&quot;&quot; Get the outgoing FPGA connection (for commands)</span>
 
 <span class="sd">        :rtype: FGPA_Connection</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">FPGAConnection</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">FPGAConnection</span><span class="p">(</span>
+            <span class="n">SPIF_FPGA_ID</span><span class="p">,</span> <span class="n">SPIF_OUTPUT_FPGA_LINK</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__fpga_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpga_link_id</span><span class="p">):</span>
         <span class="c1"># We use every other odd link, so we can work out the &quot;index&quot; of the</span>
@@ -349,13 +253,13 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="o">.</span><span class="n">start_resume_commands</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">start_resume_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Make sure everything has stopped</span>
-        <span class="n">commands</span> <span class="o">=</span> <span class="p">[</span><span class="n">_SpiNNFPGARegister</span><span class="o">.</span><span class="n">STOP</span><span class="o">.</span><span class="n">cmd</span><span class="p">()]</span>
+        <span class="n">commands</span> <span class="o">=</span> <span class="p">[</span><span class="n">SpiNNFPGARegister</span><span class="o">.</span><span class="n">STOP</span><span class="o">.</span><span class="n">cmd</span><span class="p">()]</span>
 
         <span class="c1"># Clear the counters</span>
-        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">OUT_PERIPH_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">CONFIG_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">DROPPED_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">IN_PERIPH_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SPIFRegister</span><span class="o">.</span><span class="n">OUT_PERIPH_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SPIFRegister</span><span class="o">.</span><span class="n">CONFIG_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SPIFRegister</span><span class="o">.</span><span class="n">DROPPED_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SPIFRegister</span><span class="o">.</span><span class="n">IN_PERIPH_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 
         <span class="c1"># Configure the creation of packets from fields to keys using the</span>
         <span class="c1"># &quot;standard&quot; input to SPIF (X | P | Y) and convert to (Y | X)</span>
@@ -379,10 +283,10 @@
 
         <span class="c1"># Don&#39;t filter</span>
         <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
-            <span class="n">set_filter_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_N_FILTERS</span><span class="p">)</span>
+            <span class="n">set_filter_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_FILTERS</span><span class="p">)</span>
         <span class="p">])</span>
         <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
-            <span class="n">set_filter_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_N_FILTERS</span><span class="p">)</span>
+            <span class="n">set_filter_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_FILTERS</span><span class="p">)</span>
         <span class="p">])</span>
 
         <span class="c1"># Configure the output routing key</span>
@@ -391,21 +295,23 @@
 
         <span class="c1"># Configure the links to send packets to the 8 FPGAs using the</span>
         <span class="c1"># lower bits</span>
-        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">set_input_key</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span>
-                                      <span class="bp">self</span><span class="o">.</span><span class="n">__spif_key</span><span class="p">(</span><span class="mi">15</span> <span class="o">-</span> <span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)))</span>
-                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
-        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">set_input_mask</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spif_mask</span><span class="p">)</span>
-                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
-        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">set_input_route</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span> <span class="n">i</span><span class="p">)</span>
-                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="n">set_input_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spif_key</span><span class="p">(</span><span class="mi">15</span> <span class="o">-</span> <span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="n">set_input_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spif_mask</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="n">set_input_route</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
 
         <span class="c1"># Send the start signal</span>
-        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SpiNNFPGARegister</span><span class="o">.</span><span class="n">START</span><span class="o">.</span><span class="n">cmd</span><span class="p">())</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SpiNNFPGARegister</span><span class="o">.</span><span class="n">START</span><span class="o">.</span><span class="n">cmd</span><span class="p">())</span>
 
         <span class="k">return</span> <span class="n">commands</span>
 
-    <span class="k">def</span> <span class="nf">__spif_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fpga_indices</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__spif_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpga_link_id</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fpga_indices</span><span class="p">(</span><span class="n">fpga_link_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">__base_key</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_shift</span><span class="p">)</span> <span class="o">+</span>
                 <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_x_shift</span><span class="p">)</span> <span class="o">+</span>
                 <span class="p">(</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_y_shift</span><span class="p">))</span>
@@ -414,7 +320,7 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="o">.</span><span class="n">pause_stop_commands</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">pause_stop_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Send the stop signal</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">_SpiNNFPGARegister</span><span class="o">.</span><span class="n">STOP</span><span class="o">.</span><span class="n">cmd</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">SpiNNFPGARegister</span><span class="o">.</span><span class="n">STOP</span><span class="o">.</span><span class="n">cmd</span><span class="p">()]</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="o">.</span><span class="n">timed_commands</span><span class="p">)</span>

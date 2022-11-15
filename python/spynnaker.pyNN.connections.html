@@ -114,6 +114,116 @@ this control connection will listen to.</p></li>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.connections.SPIFLiveSpikesConnection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.connections.</span></span><span class="sig-name descname"><span class="pre">SPIFLiveSpikesConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receive_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spif_host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spif_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3332</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events_per_packet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_per_packet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DatabaseConnection</span></code></p>
+<p>A connection for receiving live spikes from spif</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receive_labels</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – Labels of vertices from which live events will be received.</p></li>
+<li><p><strong>spif_host</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The location of the SPIF board receiving packets</p></li>
+<li><p><strong>spif_port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The port of the SPIF board (default 3332)</p></li>
+<li><p><strong>events_per_packet</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of events in each packet.  SPIF will be
+configured to send a packet as soon as it reaches this size if not
+before (default is 32)</p></li>
+<li><p><strong>time_per_packet</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum time between sending non-empty packets.  SPIF will be
+configured to send a packet that isn’t empty after this many
+microseconds (default is 500)</p></li>
+<li><p><strong>local_host</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Optional specification of the local hostname or IP address of the
+interface to listen on</p></li>
+<li><p><strong>local_port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Optional specification of the local port to listen on. Must match
+the port that the toolchain will send the notification on (19999
+by default)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_init_callback">
+<span class="sig-name descname"><span class="pre">add_init_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spif_live_spikes_connection.html#SPIFLiveSpikesConnection.add_init_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_init_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback to be called to initialise a vertex</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex to be notified about. Must be one of the
+vertices listed in the constructor</p></li>
+<li><p><strong>init_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) </em><em>-&gt; None</em>) – A function to be called to initialise the
+vertex. This should take as parameters the label of the vertex,
+the number of neurons in the population, the run time of the
+simulation in milliseconds, and the simulation timestep in
+milliseconds</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_pause_stop_callback">
+<span class="sig-name descname"><span class="pre">add_pause_stop_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pause_stop_callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spif_live_spikes_connection.html#SPIFLiveSpikesConnection.add_pause_stop_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_pause_stop_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the pause and stop state of the simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the label of the function to be sent</p></li>
+<li><p><strong>pause_stop_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the pause
+or stop message has been received. This function should take the
+label of the referenced  vertex, and an instance of this class,
+which can be used to send events.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_receive_callback">
+<span class="sig-name descname"><span class="pre">add_receive_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">live_event_callback</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translate_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spif_live_spikes_connection.html#SPIFLiveSpikesConnection.add_receive_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_receive_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the reception of live events from a vertex</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex to be notified about.
+Must be one of the vertices listed in the constructor</p></li>
+<li><p><strong>live_event_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em><em>) </em><em>-&gt; None</em>) – A function to be called when events are
+received. This should take as parameters the label of the vertex,
+and an array-like of atom IDs.</p></li>
+<li><p><strong>translate_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – True if the key is to be converted to an atom ID, False if the
+key should stay a key</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_receive_label">
+<span class="sig-name descname"><span class="pre">add_receive_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spif_live_spikes_connection.html#SPIFLiveSpikesConnection.add_receive_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_receive_label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_start_resume_callback">
+<span class="sig-name descname"><span class="pre">add_start_resume_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_resume_callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spif_live_spikes_connection.html#SPIFLiveSpikesConnection.add_start_resume_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_start_resume_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the start and resume state of the simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the label of the function to be sent</p></li>
+<li><p><strong>start_resume_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the start
+or resume message has been received. This function should take
+the label of the referenced vertex, and an instance of this
+class, which can be used to send events.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.connections.</span></span><span class="sig-name descname"><span class="pre">SpynnakerLiveSpikesConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receive_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">19999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">live_packet_gather_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LiveSpikeReceiver'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LiveEventConnection</span></code></p>
@@ -342,6 +452,14 @@ class, which can be used to send events.</p></li>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.connections.EthernetControlConnection"><code class="docutils literal notranslate"><span class="pre">EthernetControlConnection</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.connections.EthernetControlConnection.add_translator"><code class="docutils literal notranslate"><span class="pre">EthernetControlConnection.add_translator()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection"><code class="docutils literal notranslate"><span class="pre">SPIFLiveSpikesConnection</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_init_callback"><code class="docutils literal notranslate"><span class="pre">SPIFLiveSpikesConnection.add_init_callback()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_pause_stop_callback"><code class="docutils literal notranslate"><span class="pre">SPIFLiveSpikesConnection.add_pause_stop_callback()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_receive_callback"><code class="docutils literal notranslate"><span class="pre">SPIFLiveSpikesConnection.add_receive_callback()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_receive_label"><code class="docutils literal notranslate"><span class="pre">SPIFLiveSpikesConnection.add_receive_label()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_start_resume_callback"><code class="docutils literal notranslate"><span class="pre">SPIFLiveSpikesConnection.add_start_resume_callback()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection"><code class="docutils literal notranslate"><span class="pre">SpynnakerLiveSpikesConnection</span></code></a><ul>
