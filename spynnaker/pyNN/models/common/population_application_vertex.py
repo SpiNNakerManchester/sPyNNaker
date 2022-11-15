@@ -12,10 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.model.graphs.application import ApplicationVertex
 from enum import Enum
+from spinn_utilities.overrides import overrides
 from spinn_utilities.helpful_functions import is_singleton
+from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
+from pacman.utilities.utility_calls import get_field_based_keys
 
 
 class RecordingType(Enum):
@@ -26,7 +29,7 @@ class RecordingType(Enum):
     EVENT = 2
 
 
-class PopulationApplicationVertex(ApplicationVertex):
+class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     """ A vertex that can be used in a Population.
 
         Provides some default functions that can be overridden if the vertex
@@ -336,3 +339,11 @@ class PopulationApplicationVertex(ApplicationVertex):
         :rtype: int
         """
         return 0
+
+    @overrides(HasCustomAtomKeyMap.get_atom_key_map)
+    def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
+        base_key = routing_info.get_first_key_from_pre_vertex(
+            pre_vertex, partition_id)
+        vertex_slice = pre_vertex.vertex_slice
+        keys = get_field_based_keys(base_key, vertex_slice, self.n_colour_bits)
+        return enumerate(keys, vertex_slice.lo_atom)

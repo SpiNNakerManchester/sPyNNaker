@@ -131,8 +131,12 @@ class SpynnakerExternalDevicePluginManager(object):
         if host is None:
             host = get_config_str("Recording", "live_spike_host")
 
-        # Use the right-shift to remove the colour
-        received_key_right_shift = population._vertex.n_colour_bits
+        # Use the right-shift to remove the colour from translated keys
+        n_colour_bits = population._vertex.n_colour_bits
+        translated_key_right_shift = n_colour_bits
+
+        # Use the mask to remove the colour from non-translated keys
+        received_key_mask = 0xFFFFFFFF & ~((2 ** n_colour_bits) - 1)
 
         # pylint: disable=too-many-arguments, too-many-locals
         params = LivePacketGatherParameters(
@@ -145,8 +149,9 @@ class SpynnakerExternalDevicePluginManager(object):
             payload_right_shift=payload_right_shift,
             number_of_packets_sent_per_time_step=(
                 number_of_packets_sent_per_time_step),
-            label="LiveSpikeReceiver", translate_keys=translate_keys,
-            received_key_right_shift=received_key_right_shift)
+            label="LiveSpikeReceiver", received_key_mask=received_key_mask,
+            translate_keys=translate_keys,
+            translated_key_right_shift=translated_key_right_shift)
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
             population._vertex, params, [SPIKE_PARTITION_ID])
 
