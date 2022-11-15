@@ -237,7 +237,7 @@ static inline bool get_next_spike(uint32_t time, spike_t *spike) {
         // Process event if not self-connected (if it is, this happens later)
     	if (!key_config.self_connected) {
             synapse_dynamics_process_post_synaptic_event(
-                    time, *spike & key_config.spike_id_mask);
+                    time, (*spike & key_config.spike_id_mask) >> key_config.colour_shift);
     	}
         return key_config.self_connected;
     }
