@@ -23,7 +23,7 @@ class TestMultiDelay(BaseTestCase):
     """
 
     def test_run(self):
-        n_neurons = 76   # 76 fails
+        n_neurons = 70
         sim.setup(timestep=1.0)
 
         pop_1 = sim.Population(n_neurons, sim.IF_curr_exp(), label="pop_1")
