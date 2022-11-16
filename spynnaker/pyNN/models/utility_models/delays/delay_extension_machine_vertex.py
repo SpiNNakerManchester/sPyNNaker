@@ -311,9 +311,8 @@ class DelayExtensionMachineVertex(
         spec.write_value(data=incoming_key)
         spec.write_value(data=incoming_mask)
 
-        # Write the number of keys to mirror
-        n_keys = super().get_n_keys_for_partition(SPIKE_PARTITION_ID)
-        spec.write_value(data=n_keys)
+        # Write the number of neurons in the block:
+        spec.write_value(data=vertex_slice.n_atoms)
 
         # Write the number of blocks of delays:
         spec.write_value(data=self._app_vertex.n_delay_stages)
