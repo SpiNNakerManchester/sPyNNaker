@@ -344,6 +344,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
         base_key = routing_info.get_first_key_from_pre_vertex(
             pre_vertex, partition_id)
+        # This might happen if there are no edges
+        if base_key is None:
+            base_key = 0
         vertex_slice = pre_vertex.vertex_slice
         keys = get_field_based_keys(base_key, vertex_slice, self.n_colour_bits)
         return enumerate(keys, vertex_slice.lo_atom)
