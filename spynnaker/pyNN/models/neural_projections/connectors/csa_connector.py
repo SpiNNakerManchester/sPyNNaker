@@ -83,10 +83,8 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         return self._get_delay_minimum(
             synapse_info.delays, n_conns_max, synapse_info)
 
-    def _get_n_connections(
-            self, pre_vertex_slice, post_vertex_slice, synapse_info):
+    def _get_n_connections(self, post_vertex_slice, synapse_info):
         """
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param SynapseInformation synapse_info:
         :rtype: tuple(int, cset.connset.CSet)
@@ -101,7 +99,7 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
         # use CSA to cross the range of this vertex's neurons with the cset
         pair_list = csa.cross(
-            range(pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom+1),
+            range(0, synapse_info.n_pre_neurons),
             range(post_vertex_slice.lo_atom, post_vertex_slice.hi_atom+1)) \
             * self.__full_cset
 
@@ -138,10 +136,9 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         n_connections, pair_list = self._get_n_connections(
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            post_vertex_slice, synapse_info)
 
         # Use whatever has been set up in _get_n_connections here
         # to send into the block structure
@@ -158,11 +155,11 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         block["source"] = [x[0] for x in pair_list]
         block["target"] = [x[1] for x in pair_list]
         block["weight"] = self._generate_weights(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 

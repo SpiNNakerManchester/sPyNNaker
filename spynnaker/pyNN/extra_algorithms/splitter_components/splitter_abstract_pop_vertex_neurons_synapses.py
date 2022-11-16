@@ -17,6 +17,7 @@ import logging
 from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import MultiRegionSDRAM
 from pacman.model.partitioner_splitters.abstract_splitters import (
@@ -39,7 +40,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spinn_utilities.ordered_set import OrderedSet
+from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
             SynapseRegions)
@@ -53,9 +55,7 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.bit_field_utilities import (
-    get_estimated_sdram_for_bit_field_region,
-    get_estimated_sdram_for_key_region,
-    exact_sdram_for_bit_field_builder_region)
+    get_sdram_for_bit_field_region)
 
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
@@ -67,6 +67,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 # The maximum number of bits for the ring buffer index that are likely to
 # fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
 MAX_RING_BUFFER_BITS = 14
+
+# The maximum number of cores to consider acceptable for a single chip
+_MAX_CORES = 15
 
 
 class SplitterAbstractPopulationVertexNeuronsSynapses(
@@ -140,6 +143,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         """
         super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__()
         AbstractSpynnakerSplitterDelay.__init__(self)
+
+        if n_synapse_vertices + 1 > _MAX_CORES:
+            raise SynapticConfigurationException(
+                f"At most, there can be {_MAX_CORES - 1} synaptic vertices")
+
         self.__n_synapse_vertices = n_synapse_vertices
         self.__max_delay = max_delay
         self.__user_max_delay = max_delay
@@ -245,22 +253,27 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             app_vertex.get_synapses_size(atoms_per_core), BYTES_PER_WORD)
         shared_synapse_sdram = self.__get_shared_synapse_sdram(
             atoms_per_core, all_syn_block_sz, structural_sz)
-        sdram = self.__get_synapse_sdram(
+        lead_synapse_core_sdram = self.__get_synapse_sdram(
             atoms_per_core, shared_synapse_sdram)
-        shared_synapse_sdram = self.__get_synapse_sdram(atoms_per_core)
+        shared_synapse_core_sdram = self.__get_synapse_sdram(atoms_per_core)
+        synapse_regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
+        synaptic_matrices = SynapticMatrices(
+            app_vertex, synapse_regions, atoms_per_core, weight_scales,
+            all_syn_block_sz)
+        neuron_data = NeuronData(app_vertex)
 
         # Keep track of the SDRAM for each group of vertices
-        total_sdram = neuron_sdram + sdram
+        total_sdram = neuron_sdram + lead_synapse_core_sdram
         for _ in range(self.__n_synapse_vertices - 1):
-            total_sdram += shared_synapse_sdram
+            total_sdram += shared_synapse_core_sdram
 
         for index, vertex_slice in enumerate(self.__get_fixed_slices()):
 
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
-                vertex_slice, total_sdram, label, index, rb_shifts,
-                weight_scales)
-            chip_counter.add_core(total_sdram)
+                vertex_slice, neuron_sdram, label, index, rb_shifts,
+                weight_scales, neuron_data, atoms_per_core)
+            chip_counter.add_core(neuron_sdram)
 
             # Keep track of synapse vertices for each neuron vertex and
             # resources used by each core (neuron core is added later)
@@ -270,18 +283,19 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             # Add the first vertex
             synapse_references, syn_label, feedback_partition = \
                 self.__add_lead_synapse_core(
-                    vertex_slice, all_syn_block_sz, structural_sz,
-                    sdram, label, rb_shifts, weight_scales,
-                    synapse_vertices, neuron_vertex)
-            chip_counter.add_core(sdram)
+                    vertex_slice, structural_sz, lead_synapse_core_sdram,
+                    label, rb_shifts, weight_scales, synapse_vertices,
+                    neuron_vertex, atoms_per_core,
+                    synaptic_matrices)
+            chip_counter.add_core(lead_synapse_core_sdram)
 
             # Do the remaining synapse cores
             for i in range(1, self.__n_synapse_vertices):
                 self.__add_shared_synapse_core(
                     syn_label, i, vertex_slice, synapse_references,
-                    shared_synapse_sdram, feedback_partition,
+                    shared_synapse_core_sdram, feedback_partition,
                     synapse_vertices, neuron_vertex)
-                chip_counter.add_core(shared_synapse_sdram)
+                chip_counter.add_core(shared_synapse_core_sdram)
 
             # Add resources for Poisson vertices up to core limit
             poisson_vertices = incoming_direct_poisson[vertex_slice]
@@ -323,7 +337,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __add_neuron_core(
             self, vertex_slice, sdram, label, index, rb_shifts,
-            weight_scales):
+            weight_scales, neuron_data, atoms_per_core):
         """ Add a neuron core for for a slice of neurons
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -344,22 +358,23 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             label, vertex_slice.lo_atom, vertex_slice.hi_atom)
         neuron_vertex = PopulationNeuronsMachineVertex(
             sdram, neuron_label, app_vertex,
-            vertex_slice, index, rb_shifts, weight_scales)
+            vertex_slice, index, rb_shifts, weight_scales, neuron_data,
+            atoms_per_core)
         app_vertex.remember_machine_vertex(neuron_vertex)
         self.__neuron_vertices.append(neuron_vertex)
 
         return neuron_vertex
 
     def __add_lead_synapse_core(
-            self, vertex_slice, all_syn_block_sz, structural_sz,
-            sdram, label, rb_shifts, weight_scales,
-            synapse_vertices, neuron_vertex):
+            self, vertex_slice, structural_sz, lead_synapse_core_sdram, label,
+            rb_shifts, weight_scales, synapse_vertices, neuron_vertex,
+            atoms_per_core, synaptic_matrices):
         """ Add the first synapse core for a neuron core.  This core will
             generate all the synaptic data required.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons on the neuron core
-        :param int sdram:
+        :param int lead_synapse_core_sdram:
             The SDRAM that will be used by every lead synapse core
         :param int proj_dependent_sdram:
             The SDRAM that will be used by the synapse core to handle a given
@@ -375,6 +390,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             A list to add the core to
         :param PopulationNeuronsMachineVertex neuron_vertex:
             The neuron vertex the synapses will feed into
+        :param int atoms_per_core: The maximum atoms per core
         :return: References to the synapse regions that can be used by a shared
             synapse core, and the basic label for the synapse cores
         :rtype: tuple(SynapseRegions, str)
@@ -385,9 +401,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # Do the lead synapse core
         lead_synapse_vertex = PopulationSynapsesMachineVertexLead(
-            sdram, "{}(0)".format(syn_label), self._governed_app_vertex,
-            vertex_slice, rb_shifts, weight_scales, all_syn_block_sz,
-            structural_sz, synapse_references)
+            lead_synapse_core_sdram, "{}(0)".format(syn_label),
+            self._governed_app_vertex, vertex_slice, rb_shifts, weight_scales,
+            structural_sz, synapse_references, atoms_per_core,
+            synaptic_matrices)
         self._governed_app_vertex.remember_machine_vertex(lead_synapse_vertex)
         self.__synapse_vertices.append(lead_synapse_vertex)
         synapse_vertices.append(lead_synapse_vertex)
@@ -463,6 +480,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 neuron_vertex, SPIKE_PARTITION_ID)
         return None
 
+    @property
+    def __too_many_cores(self):
+        incoming = self._governed_app_vertex.incoming_poisson_projections
+        return len(incoming) + self.__n_synapse_vertices + 1 > _MAX_CORES
+
     def __handle_poisson_sources(self, label):
         """ Go through the incoming projections and find Poisson sources with
             splitters that work with us, and one-to-one connections that will
@@ -472,7 +494,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         """
         self.__poisson_sources = set()
         incoming_direct_poisson = defaultdict(list)
-        for proj in self._governed_app_vertex.incoming_projections:
+        # If there are going to be too many to fit on a chip, don't do direct
+        # Poisson
+        if self.__too_many_cores:
+            return incoming_direct_poisson
+        for proj in self._governed_app_vertex.incoming_poisson_projections:
             # pylint: disable=protected-access
             pre_vertex = proj._projection_edge.pre_vertex
             conn = proj._synapse_information.connector
@@ -494,8 +520,20 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__poisson_sources.add(pre_vertex)
         return incoming_direct_poisson
 
-    @staticmethod
-    def is_direct_poisson_source(pre_vertex, connector, dynamics):
+    @overrides(AbstractSupportsOneToOneSDRAMInput.handles_source_vertex)
+    def handles_source_vertex(self, projection):
+        # If there are too many incoming Poisson sources, we can't do this
+        if self.__too_many_cores:
+            return False
+
+        # pylint: disable=protected-access
+        edge = projection._projection_edge
+        pre_vertex = edge.pre_vertex
+        connector = projection._synapse_information.connector
+        dynamics = projection._synapse_information.synapse_dynamics
+        return self.is_direct_poisson_source(pre_vertex, connector, dynamics)
+
+    def is_direct_poisson_source(self, pre_vertex, connector, dynamics):
         """ Determine if a given Poisson source can be created by this splitter
 
         :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
@@ -577,11 +615,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # vertices
         sources = source_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
-        if n_sources < self.__n_synapse_vertices:
-            sources_per_vertex = 1
-        else:
-            sources_per_vertex = int(2 ** math.ceil(math.log2(
-                n_sources / self.__n_synapse_vertices)))
+        sources_per_vertex = max(1, int(2 ** math.ceil(math.log2(
+            n_sources / self.__n_synapse_vertices))))
 
         # Start on a different index each time to "even things out"
         index = self.__next_synapse_index
@@ -677,29 +712,19 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
+        regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
         sdram = MultiRegionSDRAM()
         sdram.merge(independent_synapse_sdram)
         sdram.merge(proj_dependent_sdram)
-        sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .synaptic_matrix, all_syn_block_sz)
-        sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS.direct_matrix,
-            self._governed_app_vertex.direct_matrix_size)
-        sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .structural_dynamics, structural_sz)
-        sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .synapse_dynamics, dynamics_sz)
+        sdram.add_cost(regions.synaptic_matrix, all_syn_block_sz)
+        sdram.add_cost(regions.structural_dynamics, structural_sz)
+        sdram.add_cost(regions.synapse_dynamics, dynamics_sz)
         return sdram
 
     def __get_shared_synapse_sdram(
             self, n_atoms, all_syn_block_sz, structural_sz):
-        app_vertex = self._governed_app_vertex
         independent_synapse_sdram = self.__independent_synapse_sdram()
-        proj_dependent_sdram = self.__proj_dependent_synapse_sdram(
-            app_vertex.incoming_projections)
+        proj_dependent_sdram = self.__proj_dependent_synapse_sdram()
         dynamics_sz = self._governed_app_vertex.get_synapse_dynamics_size(
             n_atoms)
         dynamics_sz = max(dynamics_sz, BYTES_PER_WORD)
@@ -746,18 +771,15 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
+        regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
         app_vertex = self._governed_app_vertex
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS.synapse_params,
+            regions.synapse_params,
             max(app_vertex.get_synapse_params_size(), BYTES_PER_WORD))
-        sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .bitfield_builder,
-            max(exact_sdram_for_bit_field_builder_region(), BYTES_PER_WORD))
         return sdram
 
-    def __proj_dependent_synapse_sdram(self, incoming_projections):
+    def __proj_dependent_synapse_sdram(self):
         """ Get the SDRAM used by synapse cores dependent on the projections
 
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
@@ -765,25 +787,20 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         app_vertex = self._governed_app_vertex
+        regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS.pop_table,
+            regions.pop_table,
             max(MasterPopTableAsBinarySearch.get_master_population_table_size(
-                    incoming_projections), BYTES_PER_WORD))
+                    app_vertex.incoming_projections), BYTES_PER_WORD))
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .connection_builder,
+            regions.connection_builder,
             max(app_vertex.get_synapse_expander_size(),
                 BYTES_PER_WORD))
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .bitfield_filter,
-            max(get_estimated_sdram_for_bit_field_region(incoming_projections),
-                BYTES_PER_WORD))
-        sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .bitfield_key_map,
-            max(get_estimated_sdram_for_key_region(incoming_projections),
+            regions.bitfield_filter,
+            max(get_sdram_for_bit_field_region(
+                    app_vertex.incoming_projections),
                 BYTES_PER_WORD))
         return sdram
 

@@ -107,12 +107,6 @@ else
 		    ADDITIONAL_INPUT_H := $(call replace_source_dirs,$(ADDITIONAL_INPUT_H))
 		endif
 		
-		ifndef NEURON_MODEL
-		    $(error NEURON_MODEL is not set.  Please choose a neuron model to compile)
-		else
-		    NEURON_MODEL := $(call strip_source_dirs,$(NEURON_MODEL))
-		endif
-		
 		ifndef NEURON_MODEL_H
 		    $(error NEURON_MODEL_H is not set.  Please select a neuron model header file)
 		else
@@ -143,14 +137,15 @@ else
 		    CURRENT_SOURCE_H := $(call replace_source_dirs,$(CURRENT_SOURCE_H))
 		endif
 		
-		NEURON_INCLUDES := \
-	      -include $(NEURON_MODEL_H) \
-	      -include $(SYNAPSE_TYPE_H) \
-	      -include $(INPUT_TYPE_H) \
-	      -include $(THRESHOLD_TYPE_H) \
-	      -include $(ADDITIONAL_INPUT_H) \
-	      -include $(CURRENT_SOURCE_H) \
-	      -include $(NEURON_IMPL_H)
+		NEURON_INCLUDE_FILES := \
+	      $(NEURON_MODEL_H) \
+	      $(SYNAPSE_TYPE_H) \
+	      $(INPUT_TYPE_H) \
+	      $(THRESHOLD_TYPE_H) \
+	      $(ADDITIONAL_INPUT_H) \
+	      $(CURRENT_SOURCE_H) \
+	      $(NEURON_IMPL_H) 
+		NEURON_INCLUDES := $(NEURON_INCLUDE_FILES:%=-include %)
     endif
 endif
 
@@ -230,17 +225,16 @@ ifdef ELIMINATION
     ELIMINATION_O := $(BUILD_DIR)$(ELIMINATION:%.c=%.o)
 endif
 
+
 OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
 # List all the sources relative to one of SOURCE_DIRS
 SOURCES = neuron/c_main.c \
           neuron/synapses.c \
-          neuron/direct_synapses.c \
           neuron/neuron.c \
-          neuron/neuron_recording.c \
           neuron/spike_processing.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
-          $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
+          $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
           $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) \
           $(PARTNER_SELECTION) $(FORMATION) $(ELIMINATION) $(OTHER_SOURCES_CONVERTED)
 
@@ -261,11 +255,6 @@ $(BUILD_DIR)neuron/synapses.o: $(MODIFIED_DIR)neuron/synapses.c
 	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/direct_synapses.o: $(MODIFIED_DIR)neuron/direct_synapses.c
-	#direct_synapses.c
-	-mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
-
 $(BUILD_DIR)neuron/spike_processing.o: $(MODIFIED_DIR)neuron/spike_processing.c
 	#spike_processing.c
 	-@mkdir -p $(dir $@)
@@ -283,7 +272,7 @@ endif
 
 #STDP Build rules If and only if STDP used
 ifeq ($(STDP_ENABLED), 1)
-    STDP_INCLUDES:= -include $(SYNAPSE_TYPE_H) -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H)
+    STDP_INCLUDES:= -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H)
     STDP_COMPILE = $(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED) -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) $(STDP_INCLUDES)
 
     $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
@@ -314,44 +303,39 @@ else
 
 endif
 
-$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE_C) $(SYNAPSE_TYPE_H)
+$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE_C) $(SYNAPSE_TYPE_H) $(MAKEFILE_LIST)
 	# WEIGHT_DEPENDENCE_O
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -o $@ $<
 
 $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE_C) $(SYNAPSE_TYPE_H) \
-                        $(WEIGHT_DEPENDENCE_H)
+                        $(WEIGHT_DEPENDENCE_H) $(MAKEFILE_LIST)
 	# TIMING_DEPENDENCE_O
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
-$(PARTNER_SELECTION_O): $(PARTNER_SELECTION_C) $(SYNAPSE_TYPE_H)
+$(PARTNER_SELECTION_O): $(PARTNER_SELECTION_C) $(SYNAPSE_TYPE_H) $(MAKEFILE_LIST)
 	# PARTNER_SELECTION_O
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(FORMATION_O): $(FORMATION_C) $(SYNAPSE_TYPE_H)
+$(FORMATION_O): $(FORMATION_C) $(SYNAPSE_TYPE_H) $(MAKEFILE_LIST)
 	# FORMATION_O
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(ELIMINATION_O): $(ELIMINATION_C) $(SYNAPSE_TYPE_H)
+$(ELIMINATION_O): $(ELIMINATION_C) $(SYNAPSE_TYPE_H) $(MAKEFILE_LIST)
 	# ELIMINATION_O
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c
+$(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_INCLUDE_FILES) $(MAKEFILE_LIST)
 	# neuron.o
-	-@mkdir -p $(dir $@)
-	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
-	
-$(BUILD_DIR)neuron/neuron_recording.o: $(MODIFIED_DIR)neuron/neuron_recording.c
-	# neuron_recording.o
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
 

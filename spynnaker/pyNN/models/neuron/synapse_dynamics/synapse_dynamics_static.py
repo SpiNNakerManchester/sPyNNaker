@@ -17,19 +17,17 @@ import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
-from spynnaker.pyNN.exceptions import InvalidParameterType,\
-    SynapticConfigurationException
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class SynapseDynamicsStatic(
-        AbstractStaticSynapseDynamics, AbstractSettable,
+        AbstractStaticSynapseDynamics,
         AbstractGenerateOnMachine):
     """ The dynamics of a synapse that does not change over time.
     """
@@ -98,9 +96,10 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.get_static_synaptic_data)
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses):
+            post_vertex_slice, n_synapse_types, max_n_synapses,
+            max_atoms_per_core):
         # pylint: disable=too-many-arguments
-        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
+        n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
         n_synapse_type_bits = get_n_bits(n_synapse_types)
 
@@ -156,10 +155,11 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractStaticSynapseDynamics.read_static_synaptic_data)
     def read_static_synaptic_data(
-            self, post_vertex_slice, n_synapse_types, ff_size, ff_data):
+            self, post_vertex_slice, n_synapse_types, ff_size, ff_data,
+            max_atoms_per_core):
 
         n_synapse_type_bits = get_n_bits(n_synapse_types)
-        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
+        n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
         data = numpy.concatenate(ff_data)
@@ -174,21 +174,6 @@ class SynapseDynamicsStatic(
 
         return connections
 
-    @overrides(AbstractSettable.get_value)
-    def get_value(self, key):
-        if hasattr(self, key):
-            return getattr(self, key)
-        raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
-
-    @overrides(AbstractSettable.set_value)
-    def set_value(self, key, value):
-        if hasattr(self, key):
-            setattr(self, key, value)
-            SpynnakerDataView.set_requires_mapping()
-        raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
-
     @overrides(AbstractStaticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):
         return ['weight', 'delay']
@@ -201,6 +186,32 @@ class SynapseDynamicsStatic(
     @overrides(AbstractGenerateOnMachine.gen_matrix_id)
     def gen_matrix_id(self):
         return MatrixGeneratorID.STATIC_MATRIX.value
+
+    @overrides(AbstractGenerateOnMachine.gen_matrix_params)
+    def gen_matrix_params(
+            self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
+            synapse_info, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core):
+        vertex = app_edge.post_vertex
+        n_synapse_type_bits = get_n_bits(
+            vertex.neuron_impl.get_n_synapse_types())
+        n_synapse_index_bits = get_n_bits(max_post_atoms_per_core)
+        max_delay = app_edge.post_vertex.splitter.max_support_delay()
+        max_delay_bits = get_n_bits(max_delay)
+        return numpy.array([
+            synaptic_matrix_offset, delayed_matrix_offset,
+            max_row_info.undelayed_max_words, max_row_info.delayed_max_words,
+            synapse_info.synapse_type, n_synapse_type_bits,
+            n_synapse_index_bits, app_edge.n_delay_stages + 1,
+            max_delay, max_delay_bits, app_edge.pre_vertex.n_atoms,
+            max_pre_atoms_per_core],
+            dtype=numpy.uint32)
+
+    @property
+    @overrides(AbstractGenerateOnMachine.
+               gen_matrix_params_size_in_bytes)
+    def gen_matrix_params_size_in_bytes(self):
+        return 12 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractStaticSynapseDynamics.changes_during_run)
@@ -221,3 +232,8 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.pad_to_length)
     def pad_to_length(self):
         return self.__pad_to_length
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.is_combined_core_capable)
+    def is_combined_core_capable(self):
+        return True

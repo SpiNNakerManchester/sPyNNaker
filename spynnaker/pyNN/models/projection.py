@@ -30,7 +30,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.models.neural_projections import (
     SynapseInformation, ProjectionApplicationEdge)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnectorSupportsViewsOnMachine, FromListConnector)
+    FromListConnector)
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic)
@@ -86,10 +86,8 @@ class Projection(object):
         self.__projection_edge = None
         self.__label = label
 
-        pre_is_view = self.__check_population(
-            pre_synaptic_population, connector)
-        post_is_view = self.__check_population(
-            post_synaptic_population, connector)
+        pre_is_view = self.__check_population(pre_synaptic_population)
+        post_is_view = self.__check_population(post_synaptic_population)
 
         # set default label
         if label is None:
@@ -199,10 +197,9 @@ class Projection(object):
             pre_vertex.add_outgoing_projection(self)
 
     @staticmethod
-    def __check_population(param, connector):
+    def __check_population(param):
         """
         :param ~spynnaker.pyNN.models.populations.PopulationBase param:
-        :param AbstractConnector connector:
         :return: Whether the parameter is a view
         :rtype: bool
         """
@@ -213,10 +210,6 @@ class Projection(object):
             raise ConfigurationException(
                 "Unexpected parameter type {}. Expected Population".format(
                     type(param)))
-        if not isinstance(connector, AbstractConnectorSupportsViewsOnMachine):
-            raise NotImplementedError(
-                "Projections over views not currently supported with the {}"
-                .format(connector))
         # Check whether the array is contiguous or not
         inds = param._indexes  # pylint: disable=protected-access
         if inds != tuple(range(inds[0], inds[-1] + 1)):

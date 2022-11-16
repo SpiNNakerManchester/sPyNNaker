@@ -16,10 +16,9 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_threshold_type import AbstractThresholdType
+from spynnaker.pyNN.utilities.struct import Struct
 
 V_THRESH = "v_thresh"
-
-UNITS = {V_THRESH: "mV"}
 
 
 class ThresholdTypeStatic(AbstractThresholdType):
@@ -34,8 +33,9 @@ class ThresholdTypeStatic(AbstractThresholdType):
             float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         """
-        super().__init__([
-            DataType.S1615])  # v_thresh
+        super().__init__(
+            [Struct([(DataType.S1615, V_THRESH)])],
+            {V_THRESH: "mV"})
         self.__v_thresh = v_thresh
 
     @overrides(AbstractThresholdType.add_parameters)
@@ -44,24 +44,6 @@ class ThresholdTypeStatic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
-        pass
-
-    @overrides(AbstractThresholdType.get_units)
-    def get_units(self, variable):
-        return UNITS[variable]
-
-    @overrides(AbstractThresholdType.has_variable)
-    def has_variable(self, variable):
-        return variable in UNITS
-
-    @overrides(AbstractThresholdType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-
-        # Add the rest of the data
-        return [parameters[V_THRESH]]
-
-    @overrides(AbstractThresholdType.update_values)
-    def update_values(self, values, parameters, state_variables):
         pass
 
     @property

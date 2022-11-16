@@ -90,7 +90,7 @@ def test_connectors(
     max_source = 0
     max_row_length = None
     max_col_length = None
-    for seed in range(10):
+    for _ in range(10):
         numpy.random.seed(random.randint(0, 1000))
         connector = create_connector()
         synapse_info = SynapseInformation(
@@ -102,18 +102,13 @@ def test_connectors(
             weights=weight, delays=delay)
         connector.set_projection_information(synapse_info=synapse_info)
 
-        pre_slices = [
-            Slice(i, i + n_in_slice - 1) for i in range(0, n_pre, n_in_slice)]
         post_slices = [
             Slice(i, i + n_in_slice - 1) for i in range(0, n_post, n_in_slice)]
-        pre_slice_index = 0
         post_slice_index = 0
-        pre_vertex_slice = pre_slices[pre_slice_index]
         post_vertex_slice = post_slices[post_slice_index]
         synapse_type = 0
-        pre_slice = pre_slices[pre_slice_index]
         post_slice = post_slices[post_slice_index]
-        pre_range = numpy.arange(pre_slice.lo_atom, pre_slice.hi_atom + 2)
+        pre_range = numpy.arange(0, n_pre + 1)
         post_range = numpy.arange(post_slice.lo_atom, post_slice.hi_atom + 2)
 
         max_delay = connector.get_delay_maximum(synapse_info)
@@ -133,8 +128,7 @@ def test_connectors(
             assert (max_col_length == connector.
                     get_n_connections_to_post_vertex_maximum(synapse_info))
         synaptic_block = connector.create_synaptic_block(
-            pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info)
+            post_slices, post_vertex_slice, synapse_type, synapse_info)
         source_histogram = numpy.histogram(
             synaptic_block["source"], pre_range)[0]
         target_histogram = numpy.histogram(
@@ -150,16 +144,7 @@ def test_connectors(
         if len(post_slices) > post_slice_index + 1:
             test_post_slice = post_slices[post_slice_index + 1]
             test_synaptic_block = connector.create_synaptic_block(
-                pre_slices, post_slices, pre_vertex_slice, test_post_slice,
-                synapse_type, synapse_info)
-            if len(test_synaptic_block) > 0:
-                assert not numpy.array_equal(
-                    test_synaptic_block, synaptic_block)
-        if len(pre_slices) > pre_slice_index + 1:
-            test_pre_slice = pre_slices[pre_slice_index + 1]
-            test_synaptic_block = connector.create_synaptic_block(
-                pre_slices, post_slices, test_pre_slice, post_vertex_slice,
-                synapse_type, synapse_info)
+                post_slices, test_post_slice, synapse_type, synapse_info)
             if len(test_synaptic_block) > 0:
                 assert not numpy.array_equal(
                     test_synaptic_block, synaptic_block)

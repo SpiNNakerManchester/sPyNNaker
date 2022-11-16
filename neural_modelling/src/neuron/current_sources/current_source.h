@@ -60,7 +60,6 @@ static bool current_source_initialise(address_t cs_address, uint32_t n_neurons) 
     // Avoid the loops if no current sources
     #if !defined(_CURRENT_SOURCE_DC_H_) && !defined(_CURRENT_SOURCE_AC_H) && \
 		!defined(_CURRENT_SOURCE_STEP_H_) && !defined(_CURRENT_SOURCE_NOISY_H_)
-    io_printf(IO_BUF, "no current sources defined \n");
     return true;
     #else
 
@@ -91,9 +90,6 @@ static bool current_source_initialise(address_t cs_address, uint32_t n_neurons) 
         n_ac_sources = (uint32_t) cs_address[next++];
         n_step_sources = (uint32_t) cs_address[next++];
         n_noisy_sources = (uint32_t) cs_address[next++];
-
-//        log_debug("Check numbers of sources: AC %u DC %u STEP %u NOISY %u",
-//                n_dc_sources, n_ac_sources, n_step_sources, n_noisy_sources);
 
 		// Now initialise separate sources
 #ifdef _CURRENT_SOURCE_DC_H_

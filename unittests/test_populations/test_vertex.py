@@ -15,11 +15,11 @@
 
 import pytest
 import numpy
+import pyNN.spiNNaker as sim
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.models.neuron.neuron_models import AbstractNeuronModel
 from spynnaker.pyNN.models.defaults import default_initial_values, defaults
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
@@ -27,7 +27,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
 
 class EmptyNeuronComponent(AbstractStandardNeuronComponent):
     def __init__(self):
-        super().__init__([])
+        super().__init__([], [])
 
     def add_parameters(self, parameters):
         pass
@@ -59,7 +59,7 @@ class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
         return None
 
 
-class _MyNeuronModel(AbstractNeuronModel):
+class _MyNeuronModel(AbstractStandardNeuronComponent):
     def __init__(self, foo, bar):
         super().__init__([], [])
         self._foo = foo
@@ -106,45 +106,49 @@ class MockNeuron(AbstractPopulationVertex):
             max_atoms_per_core=None, spikes_per_second=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
             neuron_impl=foo_bar.model, pynn_model=foo_bar,
-            drop_late_spikes=True, splitter=None, rb_left_shifts=None)
+            drop_late_spikes=True, splitter=None, seed=None,
+            rb_left_shifts=None)
 
 
 def test_initializable():
     unittest_setup()
+    sim.setup(1.0)
     neuron = MockNeuron()
-    assert [1, 1, 1, 1, 1] == neuron.get_initial_value("foo")
-    neuron.initialize("foo", 2)
-    assert [2, 2, 2, 2, 2] == neuron.get_initial_value("foo_init")
-    assert [11, 11, 11, 11, 11] == neuron.get_initial_value("bar_init")
-    assert [11, 11, 11, 11, 11] == neuron.get_initial_value("bar")
+    assert [1, 1, 1, 1, 1] == neuron.get_initial_state_values("foo")
+    neuron.set_initial_state_values("foo", 2)
+    assert [11, 11, 11, 11, 11] == neuron.get_initial_state_values("bar")
 
 
 def test_init_by_in():
     unittest_setup()
+    sim.setup(1.0)
     neuron = MockNeuron()
-    assert [1, 1, 1, 1, 1] == neuron.get_initial_value("foo")
-    neuron.initialize(variable="foo", value=11, selector=1)
-    assert [1, 11, 1, 1, 1] == neuron.get_initial_value("foo")
-    neuron.initialize(variable="foo", value=12, selector=2)
-    assert [1, 11, 12, 1, 1] == neuron.get_initial_value("foo")
-    assert [11] == neuron.get_initial_value("bar", selector=1)
-    assert [12] == neuron.get_initial_value("foo", selector=2)
+    assert [1, 1, 1, 1, 1] == neuron.get_initial_state_values("foo")
+    neuron.set_initial_state_values("foo", 11, selector=1)
+    assert [1, 11, 1, 1, 1] == neuron.get_initial_state_values("foo")
+    neuron.set_initial_state_values("foo", 12, selector=2)
+    assert [1, 11, 12, 1, 1] == neuron.get_initial_state_values("foo")
+    assert 11 == neuron.get_initial_state_values("bar", selector=1)
+    assert 12 == neuron.get_initial_state_values("foo", selector=2)
 
 
 def test_init_bad():
     unittest_setup()
     neuron = MockNeuron()
     with pytest.raises(KeyError):
-        neuron.get_initial_value("badvariable")
+        neuron.get_initial_state_values("badvariable")
     with pytest.raises(KeyError):
-        assert 1 == neuron.initialize("anotherbad", "junk")
+        assert 1 == neuron.set_initial_state_values("anotherbad", "junk")
 
 
 def test_initial_values():
     unittest_setup()
+    sim.setup(1.0)
     neuron = MockNeuron()
-    initial_values = neuron.initial_values
+    initial_values = neuron.get_initial_state_values(
+        neuron.get_state_variables())
     assert "foo" in initial_values
     assert "bar" in initial_values
-    initial_values = neuron.get_initial_values(selector=3)
-    assert {"foo": [1], "bar": [11]} == initial_values
+    initial_values = neuron.get_initial_state_values(
+        neuron.get_state_variables(), selector=3)
+    assert {"foo": 1, "bar": 11} == initial_values

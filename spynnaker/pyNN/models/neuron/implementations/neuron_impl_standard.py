@@ -12,21 +12,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import numpy
-
 from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from .abstract_neuron_impl import AbstractNeuronImpl
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 
 # The size of the n_steps_per_timestep parameter
 _N_STEPS_PER_TIMESTEP_SIZE = 1 * BYTES_PER_WORD
 
 # The default number of steps per timestep
 _DEFAULT_N_STEPS_PER_TIMESTEP = 1
+
+_STEPS_PER_TIMESTEP = "n_steps_per_timestep"
+_STEPS_PER_TIMESTEP_STRUCT = Struct(
+    [(DataType.UINT32, _STEPS_PER_TIMESTEP)], repeat_type=StructRepeat.GLOBAL)
 
 
 class NeuronImplStandard(AbstractNeuronImpl):
@@ -104,17 +105,12 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def binary_name(self):
         return self.__binary
 
-    @overrides(AbstractNeuronImpl.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        total = _N_STEPS_PER_TIMESTEP_SIZE
-        total += self.__neuron_model.get_sdram_usage_in_bytes(n_neurons)
-        total += self.__synapse_type.get_sdram_usage_in_bytes(n_neurons)
-        total += self.__input_type.get_sdram_usage_in_bytes(n_neurons)
-        total += self.__threshold_type.get_sdram_usage_in_bytes(n_neurons)
-        if self.__additional_input_type is not None:
-            total += self.__additional_input_type.get_sdram_usage_in_bytes(
-                n_neurons)
-        return total
+    @property
+    @overrides(AbstractNeuronImpl.structs)
+    def structs(self):
+        structs = [_STEPS_PER_TIMESTEP_STRUCT]
+        structs.extend(s for c in self.__components for s in c.structs)
+        return structs
 
     @overrides(AbstractNeuronImpl.get_global_weight_scale)
     def get_global_weight_scale(self):
@@ -154,6 +150,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     @overrides(AbstractNeuronImpl.add_parameters)
     def add_parameters(self, parameters):
+        parameters[_STEPS_PER_TIMESTEP] = self.__n_steps_per_timestep
         for component in self.__components:
             component.add_parameters(parameters)
 
@@ -161,27 +158,6 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def add_state_variables(self, state_variables):
         for component in self.__components:
             component.add_state_variables(state_variables)
-
-    @overrides(AbstractNeuronImpl.get_data)
-    def get_data(self, parameters, state_variables, vertex_slice, atoms_shape):
-        # Work out the time step per step
-        ts = SpynnakerDataView.get_simulation_time_step_us()
-        ts /= self.__n_steps_per_timestep
-        items = [numpy.array([self.__n_steps_per_timestep], dtype="uint32")]
-        items.extend(
-            component.get_data(
-                parameters, state_variables, vertex_slice, atoms_shape, ts)
-            for component in self.__components)
-        return numpy.concatenate(items)
-
-    @overrides(AbstractNeuronImpl.read_data)
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
-        offset += _N_STEPS_PER_TIMESTEP_SIZE
-        for component in self.__components:
-            offset = component.read_data(
-                data, offset, vertex_slice, parameters, state_variables)
-        return offset
 
     @overrides(AbstractNeuronImpl.get_units)
     def get_units(self, variable):
