@@ -93,6 +93,8 @@ uint32_t max_late_spike = 0;
 //! Number of neurons
 static uint32_t n_neurons_peak;
 
+static uint32_t synapse_delay_mask_shifted = 0;
+
 
 /* PRIVATE FUNCTIONS */
 
@@ -211,7 +213,6 @@ static inline bool process_fixed_synapses(
 
     // Pre-mask the time and account for colour delay
     uint32_t colour_delay_shifted = colour_delay << synapse_type_index_bits;
-    uint32_t synapse_delay_mask_shifted = synapse_delay_mask << synapse_type_index_bits;
     uint32_t masked_time = ((time - colour_delay) & synapse_delay_mask) << synapse_type_index_bits;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
@@ -306,6 +307,7 @@ bool synapses_initialise(
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
     synapse_delay_bits = log_max_delay;
     synapse_delay_mask = (1 << synapse_delay_bits) - 1;
+    synapse_delay_mask_shifted = synapse_delay_mask << synapse_type_index_bits;
 
     n_neurons_peak = 1 << log_n_neurons;
 

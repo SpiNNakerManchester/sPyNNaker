@@ -90,6 +90,21 @@ typedef struct {
     master_population_table_entry data[];
 } pop_table_config_t;
 
+//! \brief A structure to hold a response to a population table lookup
+typedef struct {
+	// Updated with the address of the row
+	synaptic_row_t row_address;
+
+	// Updated with the number of bytes to read
+    size_t n_bytes_to_transfer;
+
+    // Updated with the spike colour
+    uint32_t colour;
+
+    // Updated with the spike colour mask
+    uint32_t colour_mask;
+} pop_table_lookup_result_t;
+
 //! \name Support functions
 //! \{
 
@@ -158,23 +173,22 @@ static inline uint32_t get_local_neuron_id(
 //! \param[in] item The address list item
 //! \param[in] synaptic_rows_based_address The address of all synaptic rows
 //! \param[in] neuron_id The incoming neuron to get the address of
-//! \param[out] row_address Holder of the row address on return
-//! \param[out] n_bytes_to_transfer Holder of the bytes to transfer on return
+//! \param[out] result The place to write results to
 static inline void get_row_addr_and_size(address_list_entry item,
 		uint32_t synaptic_rows_base_address, uint32_t neuron_id,
-		synaptic_row_t *row_address, uint32_t *n_bytes_to_transfer) {
+		pop_table_lookup_result_t *result) {
 	uint32_t row_length = get_row_length(item);
 	uint32_t block_address = get_address(item, synaptic_rows_base_address);
 	uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
 	uint32_t neuron_offset = neuron_id * stride * sizeof(uint32_t);
 
-	*row_address = (synaptic_row_t) (block_address + neuron_offset);
-	*n_bytes_to_transfer = stride * sizeof(uint32_t);
+	result->row_address = (synaptic_row_t) (block_address + neuron_offset);
+	result->n_bytes_to_transfer = stride * sizeof(uint32_t);
 
     log_debug("neuron_id = %u, block_address = 0x%.8x, "
             "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-            neuron_id, block_address, row_length, *row_address,
-            *n_bytes_to_transfer);
+            neuron_id, block_address, row_length, result->row_address,
+            result->n_bytes_to_transfer);
 }
 
 //! \brief the number of times a DMA resulted in 0 entries
@@ -225,15 +239,10 @@ bool population_table_load_bitfields(filter_region_t *filter_region);
 
 //! \brief Get the first row data for the given input spike
 //! \param[in] spike: The spike received
-//! \param[out] row_address: Updated with the address of the row
-//! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
-//! \param[out] colour: Updated with the spike colour
-//! \param[out] colour_mask: Updated with the spike colour mask
+//! \param[out] result: Updated with the lookup details
 //! \return True if there is a row to read, False if not
 bool population_table_get_first_address(
-        spike_t spike, synaptic_row_t* row_address,
-        size_t* n_bytes_to_transfer, uint32_t *colour,
-		uint32_t *colour_mask);
+        spike_t spike, pop_table_lookup_result_t *result);
 
 //! \brief Determine if there are more items with the same key
 //! \return Whether there are more items
@@ -244,14 +253,9 @@ static inline bool population_table_is_next(void) {
 //! \brief Get the next row data for a previously given spike.  If no spike has
 //!        been given, return False.
 //! \param[out] spike: The initiating spike
-//! \param[out] row_address: Updated with the address of the row
-//! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
-//! \param[out] colour: Updated with the spike colour
-//! \param[out] colour_mask: Updated with the spike colour mask
+//! \param[out] result: Updated with the lookup details
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
-        spike_t *spike, synaptic_row_t* row_address,
-        size_t* n_bytes_to_transfer, uint32_t *colour,
-		uint32_t *colour_mask);
+        spike_t *spike, pop_table_lookup_result_t *result);
 
 #endif // _POPULATION_TABLE_H_

@@ -121,47 +121,39 @@ static uint32_t p_per_ts_region;
 /* PRIVATE FUNCTIONS - static for inlining */
 
 //! \brief Perform a DMA read of a synaptic row
-//! \param[in] row: Where in SDRAM to read the row from
-//! \param[in] n_bytes_to_transfer: The size of the synaptic row
 //! \param[in] spike: The spike that triggered this read
-//! \param[in] colour The spike colour to indicate delay
-//! \param[in] colour_mask The spike colour mask to apply
+//! \param[in] result: The result of the lookup
 static inline void do_dma_read(
-        synaptic_row_t row, size_t n_bytes_to_transfer, spike_t spike,
-        uint32_t colour, uint32_t colour_mask) {
+        spike_t spike, pop_table_lookup_result_t *result) {
     // Write the SDRAM address of the plastic region and the
     // Key of the originating spike to the beginning of DMA buffer
     dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
-    next_buffer->sdram_writeback_address = row;
+    next_buffer->sdram_writeback_address = result->row_address;
     next_buffer->originating_spike = spike;
-    next_buffer->n_bytes_transferred = n_bytes_to_transfer;
-    next_buffer->colour = colour;
-    next_buffer->colour_mask = colour_mask;
+    next_buffer->n_bytes_transferred = result->n_bytes_to_transfer;
+    next_buffer->colour = result->colour;
+    next_buffer->colour_mask = result->colour_mask;
 
     // Start a DMA transfer to fetch this synaptic row into current
     // buffer
     buffer_being_read = next_buffer_to_fill;
     while (!spin1_dma_transfer(
-            DMA_TAG_READ_SYNAPTIC_ROW, row, next_buffer->row, DMA_READ,
-            n_bytes_to_transfer)) {
+            DMA_TAG_READ_SYNAPTIC_ROW, result->row_address, next_buffer->row, DMA_READ,
+            result->n_bytes_to_transfer)) {
         // Do Nothing
     }
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
 //! \brief Check if there is anything to do. If not, DMA is not busy
-//! \param[out] row:
-//!     The address of the synaptic row that has been processed
-//! \param[out] n_bytes_to_transfer: The size of the processed synaptic row
 //! \param[out] spike: The spike being processed
+//! \param[out] result: The result of the pop table lookup
 //! \param[in,out] n_rewire: Accumulator of number of rewirings
 //! \param[in,out] n_process_spike: Accumulator of number of processed spikes
 //! \return True if there's something to do
-//! \param[out] colour The spike colour to indicate delay
-//! \param[out] colour_mask The spike colour mask to apply
 static inline bool is_something_to_do(
-        synaptic_row_t *row, size_t *n_bytes_to_transfer, spike_t *spike,
-        uint32_t *colour, uint32_t *colour_mask, uint32_t *n_rewire, uint32_t *n_process_spike) {
+        spike_t *spike, pop_table_lookup_result_t *result, uint32_t *n_rewire,
+		uint32_t *n_process_spike) {
     // Disable interrupts here as dma_busy modification is a critical section
     uint cpsr = spin1_int_disable();
 
@@ -169,8 +161,7 @@ static inline bool is_something_to_do(
     while (rewires_to_do) {
         rewires_to_do--;
         spin1_mode_restore(cpsr);
-        if (synaptogenesis_dynamics_rewire(time, spike, row,
-                n_bytes_to_transfer)) {
+        if (synaptogenesis_dynamics_rewire(time, spike, result)) {
             *n_rewire += 1;
             return true;
         }
@@ -179,7 +170,7 @@ static inline bool is_something_to_do(
 
     // Is there another address in the population table?
     spin1_mode_restore(cpsr);
-    if (population_table_get_next_address(spike, row, n_bytes_to_transfer, colour, colour_mask)) {
+    if (population_table_get_next_address(spike, result)) {
         *n_process_spike += 1;
         return true;
     }
@@ -196,8 +187,7 @@ static inline bool is_something_to_do(
         // Enable interrupts while looking up in the master pop table,
         // as this can be slow
         spin1_mode_restore(cpsr);
-        if (population_table_get_first_address(
-                *spike, row, n_bytes_to_transfer, colour, colour_mask)) {
+        if (population_table_get_first_address(*spike, result)) {
             synaptogenesis_spike_received(time, *spike);
             *n_process_spike += 1;
             return true;
@@ -231,20 +221,17 @@ static inline bool is_something_to_do(
 static bool setup_synaptic_dma_read(dma_buffer *current_buffer,
         uint32_t *n_rewires, uint32_t *n_synapse_processes) {
     // Set up to store the DMA location and size to read
-    synaptic_row_t row;
-    size_t n_bytes_to_transfer;
     spike_t spike;
-    uint32_t colour;
-    uint32_t colour_mask;
+    pop_table_lookup_result_t result;
     dma_n_spikes = 0;
     dma_n_rewires = 0;
 
     // Keep looking if there is something to do until a DMA can be done
     bool setup_done = false;
-    while (!setup_done && is_something_to_do(&row, &n_bytes_to_transfer,
-            &spike, &colour, &colour_mask, &dma_n_rewires, &dma_n_spikes)) {
+    while (!setup_done && is_something_to_do(
+            &spike, &result, &dma_n_rewires, &dma_n_spikes)) {
         if (current_buffer != NULL &&
-                current_buffer->sdram_writeback_address == row) {
+                current_buffer->sdram_writeback_address == result.row_address) {
             // If we can reuse the row, add on what we can use it for
             // Note that only one of these will have a value of 1 with the
             // other being set to 0, but we add both as it is simple
@@ -253,10 +240,10 @@ static bool setup_synaptic_dma_read(dma_buffer *current_buffer,
             dma_n_rewires = 0;
             dma_n_spikes = 0;
             // Although we can reuse the buffer, the colour might be different
-            current_buffer->colour = colour;
+            current_buffer->colour = result.colour;
         } else {
             // If the row is in SDRAM, set up the transfer and we are done
-            do_dma_read(row, n_bytes_to_transfer, spike, colour, colour_mask);
+            do_dma_read(spike, &result);
             setup_done = true;
         }
 

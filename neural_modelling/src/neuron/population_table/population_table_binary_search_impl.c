@@ -262,9 +262,7 @@ bool population_table_initialise(
     return true;
 }
 
-bool population_table_get_first_address(
-        spike_t spike, synaptic_row_t *row_address,
-        size_t *n_bytes_to_transfer, uint32_t *colour, uint32_t *colour_mask) {
+bool population_table_get_first_address(spike_t spike, pop_table_lookup_result_t *result) {
 
     // check we don't have a complete miss
     uint32_t position;
@@ -306,9 +304,7 @@ bool population_table_get_first_address(
     // A local address is used here as the interface requires something
     // to be passed in but using the address of an argument is odd!
     uint32_t local_spike_id;
-    bool get_next = population_table_get_next_address(
-            &local_spike_id, row_address, n_bytes_to_transfer, colour,
-			colour_mask);
+    bool get_next = population_table_get_next_address(&local_spike_id, result);
 
     // tracks surplus DMAs
     if (!get_next) {
@@ -317,9 +313,7 @@ bool population_table_get_first_address(
     return get_next;
 }
 
-bool population_table_get_next_address(
-        spike_t *spike, synaptic_row_t *row_address,
-        size_t *n_bytes_to_transfer, uint32_t *colour, uint32_t *colour_mask) {
+bool population_table_get_next_address(spike_t *spike, pop_table_lookup_result_t *result) {
     // If there are no more items in the list, return false
     if (items_to_go == 0) {
         return false;
@@ -331,10 +325,10 @@ bool population_table_get_next_address(
         if (item.address != INVALID_ADDRESS) {
 
         	get_row_addr_and_size(item, synaptic_rows_base_address,
-        			last_neuron_id, row_address, n_bytes_to_transfer);
+        			last_neuron_id, result);
             *spike = last_spike;
-            *colour = last_colour;
-            *colour_mask = last_colour_mask;
+            result->colour = last_colour;
+            result->colour_mask = last_colour_mask;
             is_valid = true;
         }
 
