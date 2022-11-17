@@ -217,21 +217,27 @@ class PopulationMachineNeurons(
             spec.write_value(data=0)
             keys = [0] * n_atoms
         else:
+            n_colour_bits = self._app_vertex.n_colour_bits
             spec.write_value(data=1)
             # Quick and dirty way to avoid using field based keys in cases
             # which use grids but not local-only neuron models
             if isinstance(self._app_vertex.synapse_dynamics,
                           AbstractLocalOnly):
-                keys = get_field_based_keys(self._key, self._vertex_slice)
+                keys = get_field_based_keys(
+                    self._key, self._vertex_slice, n_colour_bits)
             else:
                 # keys are consecutive from the base value
-                keys = [self._key + nn for nn in range(n_atoms)]
+                keys = [self._key + (nn << n_colour_bits)
+                        for nn in range(n_atoms)]
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
 
         # Write the maximum number of neurons based on the max atoms per core
         spec.write_value(data=2**get_n_bits(self._max_atoms_per_core))
+
+        # Write the number of colour bits
+        spec.write_value(self._app_vertex.n_colour_bits)
 
         # Write the ring buffer data
         # This is only the synapse types that need a ring buffer i.e. not

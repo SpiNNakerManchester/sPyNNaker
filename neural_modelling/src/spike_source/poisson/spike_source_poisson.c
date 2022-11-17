@@ -137,6 +137,8 @@ typedef struct global_parameters {
     uint32_t n_spike_sources;
     //! Maximum expected spikes per tick (for recording)
     uint32_t max_spikes_per_tick;
+    //! Number of bits to use for colour
+    uint32_t n_colour_bits;
     //! The seed for the Poisson generation process
     rng_seed_t spike_source_seed;
 } global_parameters;
@@ -244,7 +246,14 @@ static uint16_t *input_this_timestep;
 //! The timesteps per second
 static UREAL ts_per_second;
 
+//! Buffer for rate change packets
 static circular_buffer rate_change_buffer;
+
+//! The colour of the current time step
+static uint32_t colour;
+
+//! The mask to apply to the time to get the colour
+static uint32_t colour_mask;
 
 //! \brief Random number generation for the Poisson sources.
 //!        This is a local version for speed of operation.
@@ -489,6 +498,8 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
                 keys_size, ssp_params.n_spike_sources);
     }
     spin1_memcpy(keys, &(sdram_globals[1]), keys_size);
+
+    colour_mask = (1 << ssp_params.n_colour_bits) - 1;
 
     log_info("\tset rate mask = %08x",
             ssp_params.set_rate_neuron_id_mask);
@@ -870,7 +881,7 @@ static void process_fast_source(index_t s_id, spike_source_t *source) {
             // If no key has been given, do not send spikes to fabric
             if (ssp_params.has_key) {
                 // Send spikes
-                const uint32_t spike_key = keys[s_id];
+                const uint32_t spike_key = keys[s_id] | colour;
                 send_spike_mc_payload(spike_key, num_spikes);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
@@ -907,7 +918,8 @@ static void process_slow_source(index_t s_id, spike_source_t *source) {
             // if no key has been given, do not send spike to fabric.
             if (ssp_params.has_key) {
                 // Send package
-                send_spike_mc_payload(keys[s_id], count);
+                const uint32_t spike_key = keys[s_id] | colour;
+                send_spike_mc_payload(spike_key, count);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
                     sdram_inputs->weights[s_id] * count;
@@ -953,6 +965,9 @@ static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
         simulation_ready_to_read();
         return;
     }
+
+    // Set the colour for the time step
+    colour = time & colour_mask;
 
     // Do any rate changes
     while (circular_buffer_size(rate_change_buffer) >= 2) {

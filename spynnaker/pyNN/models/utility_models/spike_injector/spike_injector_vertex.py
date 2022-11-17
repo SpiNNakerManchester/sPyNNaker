@@ -106,7 +106,8 @@ class SpikeInjectorVertex(
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
-                else 0)
+                else 0,
+            self.n_colour_bits)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
