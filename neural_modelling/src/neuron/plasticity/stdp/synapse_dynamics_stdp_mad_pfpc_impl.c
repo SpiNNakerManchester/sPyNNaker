@@ -77,18 +77,18 @@ static inline final_state_t plasticity_update_synapse(
             post_event_history, window_begin_time, window_end_time);
 
 
-    if (print_plasticity){
-        log_info("\tPerforming deferred synapse update at time:%u", time);
-        log_info("\t\tbegin_time:%u, end_time:%u - prev_time:%u, num_events:%u",
-            window_begin_time, window_end_time, post_window.prev_time,
-            post_window.num_events);
-    	io_printf(IO_BUF, "    Printing CF history\n");
-    	print_event_history(post_event_history);
-    }
+//    if (print_plasticity){
+//        log_info("\tPerforming deferred synapse update at time:%u", time);
+//        log_info("\t\tbegin_time:%u, end_time:%u - prev_time:%u, num_events:%u",
+//            window_begin_time, window_end_time, post_window.prev_time,
+//            post_window.num_events);
+//    	io_printf(IO_BUF, "    Printing CF history\n");
+//    	print_event_history(post_event_history);
+//    }
 
-    if (print_plasticity){
-    	io_printf(IO_BUF, "\n    Looping over climbing fibre spikes:\n");
-    }
+//    if (print_plasticity){
+//    	io_printf(IO_BUF, "\n    Looping over climbing fibre spikes:\n");
+//    }
 
     delay_dendritic = 0;
 
@@ -99,32 +99,32 @@ static inline final_state_t plasticity_update_synapse(
 
         uint32_t pf_begin_time = (delayed_post_time < 255) ? 0 : (delayed_post_time - 255);
 
-        if (print_plasticity){
-        	io_printf(IO_BUF, "      Applying post-synaptic event at delayed time:%u\n",
-              delayed_post_time);
-        }
+//        if (print_plasticity){
+//        	io_printf(IO_BUF, "      Applying post-synaptic event at delayed time:%u\n",
+//              delayed_post_time);
+//        }
 
         post_event_window_t pre_window = post_events_get_window_delayed(
         		pre_event_history, pf_begin_time, delayed_post_time);
 
-        if (print_plasticity){
-        	io_printf(IO_BUF, "        Looping over PF window for this CF spike\n",
-                      delayed_post_time);
-        }
+//        if (print_plasticity){
+//        	io_printf(IO_BUF, "        Looping over PF window for this CF spike\n",
+//                      delayed_post_time);
+//        }
 
         while (pre_window.num_events > 0) {
 
             const uint32_t delayed_pre_time = *pre_window.next_time
                                                + delay_dendritic;
 
-            if (print_plasticity){
-            	io_printf(IO_BUF, "        PF Spike: %u \n", delayed_pre_time);
-
-            	io_printf(IO_BUF, "            delta t = %u (delayed PF = %u, delayed CF = %u)\n",
-            		delayed_post_time - delayed_pre_time,
-					delayed_pre_time,
-					delayed_post_time);
-            }
+//            if (print_plasticity){
+//            	io_printf(IO_BUF, "        PF Spike: %u \n", delayed_pre_time);
+//
+//            	io_printf(IO_BUF, "            delta t = %u (delayed PF = %u, delayed CF = %u)\n",
+//            		delayed_post_time - delayed_pre_time,
+//					delayed_pre_time,
+//					delayed_post_time);
+//            }
 
         	current_state = timing_apply_post_spike(
         			delayed_post_time, *post_window.next_trace,
@@ -142,10 +142,10 @@ static inline final_state_t plasticity_update_synapse(
 
     const uint32_t delayed_pre_time = time + delay_axonal;
 
-    if (print_plasticity){
-    	log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
-              delayed_pre_time, post_window.prev_time);
-    }
+//    if (print_plasticity){
+//    	log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
+//              delayed_pre_time, post_window.prev_time);
+//    }
 
     // Apply spike to state
     // **NOTE** dendritic delay is subtracted
@@ -261,9 +261,9 @@ bool synapse_dynamics_process_plastic_synapses(
     post_events_add(time, &plastic_region_address->history, 0);
 
     // Update pre-synaptic trace
-    if (print_plasticity){
-    	io_printf(IO_BUF, "\nAdding pre-synaptic event (parallel fibre spike) at time: %u\n\n", time);
-    }
+//    if (print_plasticity){
+//    	io_printf(IO_BUF, "\nAdding pre-synaptic event (parallel fibre spike) at time: %u\n\n", time);
+//    }
 
     timing_add_pre_spike(time, last_pre_time, last_pre_trace);
 
@@ -287,9 +287,9 @@ bool synapse_dynamics_process_plastic_synapses(
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index) {
 
-	if (print_plasticity){
-		log_debug("Adding post-synaptic event to trace at time:%u", time);
-	}
+//	if (print_plasticity){
+//		log_debug("Adding post-synaptic event to trace at time:%u", time);
+//	}
 
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];

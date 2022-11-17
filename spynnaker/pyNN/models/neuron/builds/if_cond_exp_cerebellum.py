@@ -20,14 +20,13 @@ from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
-MAX_ATOMS_PER_CORE = 128
-
 
 class IFCondExpCerebellum(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         conductance input. Also includes ability to record last spike down
         a particular receptor
     """
+    __slots__ = []
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(
@@ -42,10 +41,6 @@ class IFCondExpCerebellum(AbstractPyNNNeuronModelStandard):
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
         input_type = InputTypeConductance(e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(v_thresh)
-
-        super(IFCondExpCerebellum,
-              self).set_model_max_atoms_per_dimension_per_core(
-                  n_atoms=MAX_ATOMS_PER_CORE)
 
         super(IFCondExpCerebellum, self).__init__(
             model_name="IF_cond_exp_cerebellum",

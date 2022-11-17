@@ -827,13 +827,6 @@ class Population(PopulationBase):
         # Setting custom RB LS
         if rb_left_shifts is not None:
             self.__vertex.set_rb_left_shifts(rb_left_shifts)
-        # Introspect properties of the vertex
-        self.__vertex_population_settable = \
-            isinstance(self.__vertex, AbstractPopulationSettable)
-        self.__vertex_population_initializable = \
-            isinstance(self.__vertex, AbstractPopulationInitializable)
-        self.__vertex_contains_units = \
-            isinstance(self.__vertex, AbstractContainsUnits)
 
     @staticmethod
     def create(cellclass, cellparams=None, n=1):

@@ -31,8 +31,9 @@ TIMESTEP = "timestep"
 REFRACT_TIMER = "refract_timer"
 T_LAST = "t_last"
 
+
 class NeuronModelLeakyIntegrateAndFireTLast(AbstractStandardNeuronComponent):
-    """ Classic leaky integrate and fire neuron model.
+    """ Classic leaky integrate and fire neuron model, including last T.
     """
     __slots__ = [
         "__v_init",
@@ -87,7 +88,7 @@ class NeuronModelLeakyIntegrateAndFireTLast(AbstractStandardNeuronComponent):
                 (DataType.INT32, REFRACT_TIMER),
                 (DataType.S1615, TIMESTEP)])],
             {V: 'mV', V_REST: 'mV', TAU_M: 'ms', CM: 'nF', I_OFFSET: 'nA',
-             V_RESET: 'mV', TAU_REFRAC: 'ms', T_LAST: 'ms'})
+             V_RESET: 'mV', TAU_REFRAC: 'ms'})
 
         if v_init is None:
             v_init = v_rest

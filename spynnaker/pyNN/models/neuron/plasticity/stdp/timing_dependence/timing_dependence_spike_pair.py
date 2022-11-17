@@ -140,9 +140,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
             self, spec, global_weight_scale, synapse_weight_scales):
 
         # Write lookup tables
-        print("LUT tau plus ", self.__tau_plus_data)
         spec.write_array(self.__tau_plus_data)
-        print("LUT tau minus ", self.__tau_minus_data)
         spec.write_array(self.__tau_minus_data)
 
     @property

@@ -38,8 +38,8 @@ address_t weight_initialise(
         address_t address, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
 
-    io_printf(IO_BUF, "mfvn weight_initialise: starting\n");
-    io_printf(IO_BUF, "\tSTDP mfvn  weight dependence\n");
+//    io_printf(IO_BUF, "mfvn weight_initialise: starting\n");
+//    io_printf(IO_BUF, "\tSTDP mfvn  weight dependence\n");
 
     // Copy plasticity region data from address
     // **NOTE** this seems somewhat safer than relying on sizeof
@@ -69,14 +69,14 @@ address_t weight_initialise(
         // Get the weight shift for switching from int16 to accum
         weight_shift[s] = ring_buffer_to_input_buffer_left_shifts[s];
 
-        io_printf(IO_BUF,
-            "\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
-            " Weight multiply right shift:%u\n",
-            s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,
-            dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus, weight_shift[s]);
+//        io_printf(IO_BUF,
+//            "\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
+//            " Weight multiply right shift:%u\n",
+//            s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,
+//            dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus, weight_shift[s]);
     }
 
-    io_printf(IO_BUF, "mfvn weight initialisation: completed successfully\n");
+//    io_printf(IO_BUF, "mfvn weight initialisation: completed successfully\n");
 
     // Return end address of region
     return (address_t) config;

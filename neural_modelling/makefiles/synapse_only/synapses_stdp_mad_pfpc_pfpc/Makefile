@@ -13,21 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = IF_curr_exp_neuron\
-         IZK_curr_exp_neuron\
-         IF_cond_exp_neuron\
-         IZK_cond_exp_neuron\
-         IF_curr_exp_ca2_adaptive_neuron\
-         IF_curr_exp_dual_neuron\
-         IF_curr_exp_sEMD_neuron\
-         IF_curr_delta_neuron\
-         IF_curr_alpha_neuron\
-         IF_cond_exp_stoc_neuron\
-         IF_cond_exp_cerebellum_neuron\
-         external_device_lif_control_neuron
+APP = $(notdir $(CURDIR))
 
-all:
-	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/stdp/synapse_dynamics_stdp_mad_pfpc_impl.c
+TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pfpc_impl.c
+TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pfpc_impl.h
+WEIGHT_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_pfpc_impl.c
+WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_pfpc_impl.h
 
-clean:
-	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done
+include ../synapse_build.mk

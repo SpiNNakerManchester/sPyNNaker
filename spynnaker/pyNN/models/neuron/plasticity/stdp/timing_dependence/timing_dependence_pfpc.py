@@ -54,12 +54,7 @@ class TimingDependencePFPC(AbstractTimingDependence):
 
         self._synapse_structure = SynapseStructureWeightOnly()
 
-        # provenance data
-        dummy_spec = []
-        self._tau_plus_data = write_pfpc_lut(
-            dummy_spec, peak_time=self._t_peak,
-            time_probe=None, lut_size=LUT_SIZE,
-            shift=0, kernel_scaling=self._alpha)
+        self._tau_plus_data = None
         self._tau_minus_data = None
 
     @property
@@ -119,7 +114,7 @@ class TimingDependencePFPC(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return BYTES_PER_WORD * len(self._tau_plus_data)
+        return BYTES_PER_WORD * LUT_SIZE
 
     @property
     def n_weight_terms(self):
@@ -135,7 +130,10 @@ class TimingDependencePFPC(AbstractTimingDependence):
                 "exp_sin LUT generation currently only supports 1ms timesteps")
 
         # Write exp_sin lookup table
-        spec.write_array(self._tau_plus_data)
+        self._tau_plus_data = write_pfpc_lut(
+            spec, peak_time=self._t_peak,
+            time_probe=None, lut_size=LUT_SIZE,
+            shift=0, kernel_scaling=self._alpha)
 
     @property
     def synaptic_structure(self):

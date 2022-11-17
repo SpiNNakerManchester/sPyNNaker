@@ -69,17 +69,17 @@ static inline post_trace_t timing_add_post_spike(
     use(last_time);
     use(&last_trace);
 
-	if (print_plasticity){
-		io_printf(IO_BUF, "Adding pre spike to event history (from vestibular nuclei)\n");
-	}
+//	if (print_plasticity){
+//		io_printf(IO_BUF, "Adding pre spike to event history (from vestibular nuclei)\n");
+//	}
 
     // Add energy caused by new spike to trace
     // **NOTE** o2 trace is pre-multiplied by a3_plus
-    int32_t new_o1_trace = 0; //decayed_o1_trace + STDP_FIXED_POINT_ONE;
+//    int32_t new_o1_trace = 0; //decayed_o1_trace + STDP_FIXED_POINT_ONE;
 
     // Return new pre- synaptic event with decayed trace values with energy
     // for new spike added
-    return (post_trace_t) new_o1_trace;
+    return (post_trace_t) 0;
 }
 
 //---------------------------------------
@@ -104,11 +104,11 @@ static inline update_state_t timing_apply_pre_spike(
     use(&last_pre_trace);
     use(&last_post_trace);
 
-    // Here we will potentiate by the fixed amount alpha
-    if (print_plasticity){
-    	io_printf(IO_BUF, "\n############ Phase 3 #############");
-    	io_printf(IO_BUF, "\n    Now do potentiation\n");
-    }
+//    // Here we will potentiate by the fixed amount alpha
+//    if (print_plasticity){
+//    	io_printf(IO_BUF, "\n############ Phase 3 #############");
+//    	io_printf(IO_BUF, "\n    Now do potentiation\n");
+//    }
 
     return weight_one_term_apply_potentiation(previous_state, 0);
 }
@@ -131,25 +131,25 @@ static inline update_state_t timing_apply_post_spike(
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = last_pre_time; //time - last_pre_time;
 
-    if (print_plasticity){
-    	io_printf(IO_BUF, "        delta t = %u,    ", time_since_last_pre);
-    }
+//    if (print_plasticity){
+//    	io_printf(IO_BUF, "        delta t = %u,    ", time_since_last_pre);
+//    }
 
     if (time_since_last_pre < 255){
         int32_t multiplier = maths_lut_exponential_decay_time_shifted(
                 time_since_last_pre, TAU_PLUS_TIME_SHIFT, exp_cos_lookup);
 
-        if (print_plasticity){
-        	io_printf(IO_BUF, "multiplier: %k (fixed = %u)\n", multiplier << 4, multiplier);
-        }
+//        if (print_plasticity){
+//        	io_printf(IO_BUF, "multiplier: %k (fixed = %u)\n", multiplier << 4, multiplier);
+//        }
 
         return weight_one_term_apply_depression(previous_state, multiplier);
     }
 
-    if (print_plasticity){
-    	io_printf(IO_BUF, "        delta t = %u,    ", time_since_last_pre);
-    	io_printf(IO_BUF, "        out of LUT range - do nothing");
-    }
+//    if (print_plasticity){
+//    	io_printf(IO_BUF, "        delta t = %u,    ", time_since_last_pre);
+//    	io_printf(IO_BUF, "        out of LUT range - do nothing");
+//    }
 
     return previous_state;
 }

@@ -28,14 +28,14 @@ int16_lut *exp_cos_lookup;
 //---------------------------------------
 address_t timing_initialise(address_t address) {
 
-	io_printf(IO_BUF, "timing_mfvn_initialise: starting\n");
-    io_printf(IO_BUF, "\tCerebellum MFVN rule\n");
+//	io_printf(IO_BUF, "timing_mfvn_initialise: starting\n");
+//    io_printf(IO_BUF, "\tCerebellum MFVN rule\n");
 
     // Copy LUTs from following memory
     address_t lut_address = address;
     exp_cos_lookup = maths_copy_int16_lut(&lut_address);
 
-    io_printf(IO_BUF, "Timing_mfvn_initialise: completed successfully\n");
+//    io_printf(IO_BUF, "Timing_mfvn_initialise: completed successfully\n");
 
     return lut_address;
 }

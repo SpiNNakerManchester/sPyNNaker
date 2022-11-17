@@ -43,6 +43,9 @@ struct neuron_params_t {
     //! refractory time of neuron [ms]
     REAL     T_refract_ms;
 
+    //! Time of last CF spike (saved)
+    int32_t  t_last;
+
     //! initial refractory timer value (saved)
     int32_t  refract_timer_init;
 
@@ -75,10 +78,11 @@ typedef struct neuron_t {
     // post-spike reset membrane voltage [mV]
     REAL     V_reset;
 
+    // time of last CF spike
+    int32_t  t_last;
+
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
-
-    int32_t t_last; // time of last CF spike
 } neuron_t;
 
 //! \brief Performs a ceil operation on an accum
@@ -110,6 +114,7 @@ static inline void neuron_model_initialise(
 static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *params) {
     params->V_init = state->V_membrane;
     params->refract_timer_init = state->refract_timer;
+    params->t_last = state->t_last;
 }
 
 // simple Leaky I&F ODE
@@ -196,6 +201,7 @@ static state_t neuron_model_get_membrane_voltage(const neuron_t *neuron)  {
 static inline void neuron_model_print_state_variables(const neuron_t *neuron) {
     log_info("V membrane    = %11.4k mv", neuron->V_membrane);
     log_info("Refract timer = %u timesteps", neuron->refract_timer);
+    log_info("T_last        = $u", neuron->t_last);
 }
 
 static inline void neuron_model_print_parameters(const neuron_t *neuron) {

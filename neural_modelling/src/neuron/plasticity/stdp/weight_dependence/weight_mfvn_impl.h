@@ -72,19 +72,19 @@ static inline weight_state_t weight_get_initial(weight_t weight,
 //---------------------------------------
 static inline weight_state_t weight_one_term_apply_depression(
         weight_state_t state, int32_t depression_multiplier) {
-	if (print_plasticity){
-		io_printf(IO_BUF, "\n      Do Depression\n");
-		io_printf(IO_BUF, "          Weight prior to depression: %u\n", state.weight);
-	}
+//	if (print_plasticity){
+//		io_printf(IO_BUF, "\n      Do Depression\n");
+//		io_printf(IO_BUF, "          Weight prior to depression: %u\n", state.weight);
+//	}
 
     // Multiply by depression and subtract
     state.weight -= mul_accum_fixed(state.weight, depression_multiplier);
     state.weight = kbits(MAX(bitsk(state.weight), bitsk(state.weight_region->min_weight)));
 
-    if (print_plasticity){
-    	io_printf(IO_BUF, "          Weight after depression: %u\n\n",
-    			state.weight);
-    }
+//    if (print_plasticity){
+//    	io_printf(IO_BUF, "          Weight after depression: %u\n\n",
+//    			state.weight);
+//    }
 
     return state;
 }
@@ -93,11 +93,11 @@ static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t a2_plus) {
 
 	// add fixed amount
-	if (print_plasticity){
-		io_printf(IO_BUF, "        Adding fixed coontribution: %k (int %u)\n",
-			state.weight_region->a2_plus << 4,
-			state.weight_region->a2_plus);
-	}
+//	if (print_plasticity){
+//		io_printf(IO_BUF, "        Adding fixed coontribution: %k (int %u)\n",
+//			state.weight_region->a2_plus << 4,
+//			state.weight_region->a2_plus);
+//	}
 
     state.weight += state.weight_region->a2_plus;
     state.weight = kbits(MIN(bitsk(state.weight), bitsk(state.weight_region->max_weight)));
@@ -108,7 +108,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
 //---------------------------------------
 static inline weight_t weight_get_final(weight_state_t new_state) {
 
-    log_debug("\tnew_weight:%d\n", new_state.weight);
+//    log_debug("\tnew_weight:%d\n", new_state.weight);
 
     return (weight_t) (bitsk(new_state.weight) >> new_state.weight_shift);
 }

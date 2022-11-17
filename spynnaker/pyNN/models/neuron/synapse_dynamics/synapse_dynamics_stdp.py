@@ -591,7 +591,12 @@ class SynapseDynamicsSTDP(
     @property
     @overrides(AbstractPlasticSynapseDynamics.is_combined_core_capable)
     def is_combined_core_capable(self):
-        return self.__neuromodulation is None
+        timing_suffix = self.__timing_dependence.vertex_executable_suffix
+        weight_suffix = self.__weight_dependence.vertex_executable_suffix
+
+        return ((self.__neuromodulation is None) and
+                (timing_suffix != "mfvn") and (timing_suffix != "pfpc") and
+                (weight_suffix != "mfvn") and (weight_suffix != "pfpc"))
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
