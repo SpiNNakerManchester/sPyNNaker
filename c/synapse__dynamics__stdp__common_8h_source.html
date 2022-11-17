@@ -212,7 +212,7 @@ $(function() {
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;}</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <a class="code" href="synapse__dynamics__stdp__common_8h.html#structfixed__stdp__synapse">fixed_stdp_synapse</a> synapse_dynamics_stdp_get_fixed(</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        uint32_t control_word, uint32_t <a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>) {</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        uint32_t control_word, uint32_t <a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t colour_delay) {</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="comment">// Extract control-word components</span></div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="comment">// **NOTE** cunningly, control word is just the same as lower</span></div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="comment">// 16-bits of 32-bit fixed synapse so same functions can be used</span></div>
@@ -230,7 +230,7 @@ $(function() {
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;                control_word, <a class="code" href="synapses_8c.html#a84db6c41c7cf03558016d477d8df4d37">synapse_index_mask</a>),</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;       .type_index = type_index,</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;       .ring_buffer_index = <a class="code" href="synapse__row_8h.html#a8e60d389a3182e12627b3eec89a9dee5">synapse_row_get_ring_buffer_index_combined</a>(</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                delay_axonal + delay_dendritic + <a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, type_index,</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                (delay_axonal + delay_dendritic + <a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>) - colour_delay, type_index,</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;                <a class="code" href="local__only_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516">synapse_type_index_bits</a>, <a class="code" href="local__only_8c.html#a2ef4427415ac67eb603a14ca1bb86f83">synapse_delay_mask</a>)</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    };</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;}</div>
@@ -271,7 +271,7 @@ $(function() {
 <div class="ttc" id="amaths-util_8h_html_ac328e551bde3d39b6d7b8cc9e048d941"><div class="ttname"><a href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a></div><div class="ttdeci">#define ZERO</div><div class="ttdoc">A REAL 0.0.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00122">maths-util.h:122</a></div></div>
 <div class="ttc" id="amaths_8h_html"><div class="ttname"><a href="maths_8h.html">maths.h</a></div><div class="ttdoc">Support functions for STDP.</div></div>
 <div class="ttc" id="aneuron-typedefs_8h_html_ac412098e688b864e8f4e2f3c0ed86591"><div class="ttname"><a href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></div><div class="ttdeci">REAL input_t</div><div class="ttdoc">The type of an input.</div><div class="ttdef"><b>Definition:</b> <a href="neuron-typedefs_8h_source.html#l00122">neuron-typedefs.h:122</a></div></div>
-<div class="ttc" id="aneuron_8c_html_adedb27b3ece4d4dece0aee776a136427"><div class="ttname"><a href="neuron_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a></div><div class="ttdeci">static uint32_t n_synapse_types</div><div class="ttdoc">The number of synapse types.</div><div class="ttdef"><b>Definition:</b> <a href="neuron_8c_source.html#l00049">neuron.c:49</a></div></div>
+<div class="ttc" id="aneuron_8c_html_adedb27b3ece4d4dece0aee776a136427"><div class="ttname"><a href="neuron_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a></div><div class="ttdeci">static uint32_t n_synapse_types</div><div class="ttdoc">The number of synapse types.</div><div class="ttdef"><b>Definition:</b> <a href="neuron_8c_source.html#l00052">neuron.c:52</a></div></div>
 <div class="ttc" id="apost__events_8h_html"><div class="ttname"><a href="post__events_8h.html">post_events.h</a></div><div class="ttdoc">Post-synaptic events.</div></div>
 <div class="ttc" id="apost__events__with__da_8h_html_structpost__event__history__t"><div class="ttname"><a href="post__events__with__da_8h.html#structpost__event__history__t">post_event_history_t</a></div><div class="ttdoc">Trace history of post-synaptic events.</div><div class="ttdef"><b>Definition:</b> <a href="post__events_8h_source.html#l00040">post_events.h:40</a></div></div>
 <div class="ttc" id="aspin1__api_8h_html_a070d2ce7b6bb7e5c05602aa8c308d0c4"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></div><div class="ttdeci">#define NULL</div></div>
@@ -314,7 +314,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 15 2022 09:00:37 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Nov 17 2022 11:11:15 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

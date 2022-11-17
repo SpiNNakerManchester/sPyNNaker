@@ -53,10 +53,13 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.helpful_functions</span> <span class="kn">import</span> <span class="n">is_singleton</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">HasCustomAtomKeyMap</span>
+<span class="kn">from</span> <span class="nn">pacman.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_field_based_keys</span>
 
 
 <span class="k">class</span> <span class="nc">RecordingType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
@@ -67,7 +70,7 @@
     <span class="n">EVENT</span> <span class="o">=</span> <span class="mi">2</span>
 
 
-<span class="k">class</span> <span class="nc">PopulationApplicationVertex</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">PopulationApplicationVertex</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">,</span> <span class="n">HasCustomAtomKeyMap</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A vertex that can be used in a Population.</span>
 
 <span class="sd">        Provides some default functions that can be overridden if the vertex</span>
@@ -367,6 +370,27 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
             <span class="s2">&quot;This Population doesn&#39;t support injection&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_colour_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The number of colour bits sent by this vertex.</span>
+
+<span class="sd">            Assumed 0 unless overridden</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_atom_key_map"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_atom_key_map">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">HasCustomAtomKeyMap</span><span class="o">.</span><span class="n">get_atom_key_map</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_atom_key_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
+        <span class="n">base_key</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
+            <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">)</span>
+        <span class="c1"># This might happen if there are no edges</span>
+        <span class="k">if</span> <span class="n">base_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">base_key</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">get_field_based_keys</span><span class="p">(</span><span class="n">base_key</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

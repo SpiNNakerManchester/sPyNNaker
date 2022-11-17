@@ -114,12 +114,12 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ab6d3068e1fb4b07be8e94d52ded9afa6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#ab6d3068e1fb4b07be8e94d52ded9afa6">do_dma_read</a> (<a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> n_bytes_to_transfer, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike)</td></tr>
-<tr class="memdesc:ab6d3068e1fb4b07be8e94d52ded9afa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a DMA read of a synaptic row.  <a href="spike__processing_8c.html#ab6d3068e1fb4b07be8e94d52ded9afa6">More...</a><br /></td></tr>
-<tr class="separator:ab6d3068e1fb4b07be8e94d52ded9afa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad055cfcbe798048f28f1dfbce6d5296"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#aad055cfcbe798048f28f1dfbce6d5296">is_something_to_do</a> (<a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *row, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *n_bytes_to_transfer, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, uint32_t *n_rewire, uint32_t *n_process_spike)</td></tr>
-<tr class="memdesc:aad055cfcbe798048f28f1dfbce6d5296"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if there is anything to do. If not, DMA is not busy.  <a href="spike__processing_8c.html#aad055cfcbe798048f28f1dfbce6d5296">More...</a><br /></td></tr>
-<tr class="separator:aad055cfcbe798048f28f1dfbce6d5296"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7864846d55171d96eba62635e0d61a49"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a7864846d55171d96eba62635e0d61a49">do_dma_read</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, <a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *result)</td></tr>
+<tr class="memdesc:a7864846d55171d96eba62635e0d61a49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a DMA read of a synaptic row.  <a href="spike__processing_8c.html#a7864846d55171d96eba62635e0d61a49">More...</a><br /></td></tr>
+<tr class="separator:a7864846d55171d96eba62635e0d61a49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabdb3130b5c92cc4badbc4ea8109b079"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#aabdb3130b5c92cc4badbc4ea8109b079">is_something_to_do</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *result, uint32_t *n_rewire, uint32_t *n_process_spike)</td></tr>
+<tr class="memdesc:aabdb3130b5c92cc4badbc4ea8109b079"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if there is anything to do. If not, DMA is not busy.  <a href="spike__processing_8c.html#aabdb3130b5c92cc4badbc4ea8109b079">More...</a><br /></td></tr>
+<tr class="separator:aabdb3130b5c92cc4badbc4ea8109b079"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28d3a38d21ac9445175abd0ca06abd04"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a28d3a38d21ac9445175abd0ca06abd04">setup_synaptic_dma_read</a> (<a class="el" href="structdma__buffer.html">dma_buffer</a> *current_buffer, uint32_t *n_rewires, uint32_t *n_synapse_processes)</td></tr>
 <tr class="memdesc:a28d3a38d21ac9445175abd0ca06abd04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up a new synaptic DMA read.  <a href="spike__processing_8c.html#a28d3a38d21ac9445175abd0ca06abd04">More...</a><br /></td></tr>
 <tr class="separator:a28d3a38d21ac9445175abd0ca06abd04"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -251,13 +251,13 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00051">51</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00057">57</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ab6d3068e1fb4b07be8e94d52ded9afa6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab6d3068e1fb4b07be8e94d52ded9afa6">&#9670;&nbsp;</a></span>do_dma_read()</h2>
+<a id="a7864846d55171d96eba62635e0d61a49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7864846d55171d96eba62635e0d61a49">&#9670;&nbsp;</a></span>do_dma_read()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -268,20 +268,14 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
         <tr>
           <td class="memname">static void do_dma_read </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a>&#160;</td>
-          <td class="paramname"><em>row</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a>&#160;</td>
-          <td class="paramname"><em>n_bytes_to_transfer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a>&#160;</td>
-          <td class="paramname"><em>spike</em>&#160;</td>
+          <td class="paramname"><em>spike</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -299,19 +293,18 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <p>Perform a DMA read of a synaptic row. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>Where in SDRAM to read the row from </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_bytes_to_transfer</td><td>The size of the synaptic row </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">spike</td><td>The spike that triggered this read </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">result</td><td>The result of the lookup </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00121">121</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00126">126</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
-<a id="aad055cfcbe798048f28f1dfbce6d5296"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aad055cfcbe798048f28f1dfbce6d5296">&#9670;&nbsp;</a></span>is_something_to_do()</h2>
+<a id="aabdb3130b5c92cc4badbc4ea8109b079"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabdb3130b5c92cc4badbc4ea8109b079">&#9670;&nbsp;</a></span>is_something_to_do()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -322,20 +315,14 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
         <tr>
           <td class="memname">static bool is_something_to_do </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *&#160;</td>
-          <td class="paramname"><em>row</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *&#160;</td>
-          <td class="paramname"><em>n_bytes_to_transfer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *&#160;</td>
           <td class="paramname"><em>spike</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -365,9 +352,8 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <p>Check if there is anything to do. If not, DMA is not busy. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">row</td><td>The address of the synaptic row that has been processed </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">n_bytes_to_transfer</td><td>The size of the processed synaptic row </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">spike</td><td>The spike being processed </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>The result of the pop table lookup </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">n_rewire</td><td>Accumulator of number of rewirings </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">n_process_spike</td><td>Accumulator of number of processed spikes </td></tr>
   </table>
@@ -375,7 +361,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there's something to do </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00149">149</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00154">154</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -421,7 +407,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 
 <p>Set up a new synaptic DMA read. </p>
 <p>If a current_buffer is passed in, any spike found that matches the originating spike of the buffer will increment a count, and the DMA of that row will be skipped. The number of times a row should be rewired and the number of times synaptic processing should be done on a row is returned.</p>
-<p>Calls <a class="el" href="spike__processing_8c.html#aad055cfcbe798048f28f1dfbce6d5296" title="Check if there is anything to do. If not, DMA is not busy.">is_something_to_do()</a>, do_direct_row() and <a class="el" href="spike__processing_8c.html#ab6d3068e1fb4b07be8e94d52ded9afa6" title="Perform a DMA read of a synaptic row.">do_dma_read()</a> </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Calls <a class="el" href="spike__processing_8c.html#aabdb3130b5c92cc4badbc4ea8109b079" title="Check if there is anything to do. If not, DMA is not busy.">is_something_to_do()</a>, do_direct_row() and <a class="el" href="spike__processing_8c.html#a7864846d55171d96eba62635e0d61a49" title="Perform a DMA read of a synaptic row.">do_dma_read()</a> </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">current_buffer</td><td>The current buffer, if any. </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">n_rewires</td><td>Accumulator of number of rewirings </td></tr>
@@ -431,7 +417,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether an actual DMA was set up or not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00218">218</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00221">221</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -478,7 +464,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00257">257</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00261">261</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -525,7 +511,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00298">298</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00302">302</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -572,7 +558,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00308">308</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00312">312</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -619,7 +605,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00324">324</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00328">328</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -658,7 +644,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00392">392</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00397">397</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -686,7 +672,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00409">409</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00414">414</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -754,7 +740,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if initialisation succeeded </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00426">426</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00431">431</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -782,7 +768,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00463">463</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00468">468</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -811,7 +797,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>currently always true </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00472">472</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00477">477</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -866,7 +852,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <p>The number of rewires to do when the DMA completes. </p>
 <p>When a DMA is first set up, only this or <a class="el" href="spike__processing_8c.html#a2b782d1e539bf132657dd7c00abd91f5" title="The number of spikes to do when the DMA completes.">dma_n_spikes</a> can be 1 with the other being 0. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00079">79</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00085">85</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -893,14 +879,14 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <p>The number of spikes to do when the DMA completes. </p>
 <p>When a DMA is first set up, only this or <a class="el" href="spike__processing_8c.html#af760c32944840948570708761ca97038" title="The number of rewires to do when the DMA completes.">dma_n_rewires</a> can be 1 with the other being 0. </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00084">84</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00090">90</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 15 2022 09:00:38 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Nov 17 2022 11:11:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

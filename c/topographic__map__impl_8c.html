@@ -132,9 +132,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topo
 <tr class="memitem:ad4efac9c7152c9f89d5c7ae05fb7ab53"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#ad4efac9c7152c9f89d5c7ae05fb7ab53">synaptogenesis_dynamics_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> sdram_sp_address, uint32_t *recording_regions_used)</td></tr>
 <tr class="memdesc:ad4efac9c7152c9f89d5c7ae05fb7ab53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialisation of synaptic rewiring (synaptogenesis) parameters (random seed, spread of receptive field etc.)  <a href="topographic__map__impl_8c.html#ad4efac9c7152c9f89d5c7ae05fb7ab53">More...</a><br /></td></tr>
 <tr class="separator:ad4efac9c7152c9f89d5c7ae05fb7ab53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5cdd3772a85bf8d042932b9ec4e57125"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#a5cdd3772a85bf8d042932b9ec4e57125">synaptogenesis_dynamics_rewire</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *synaptic_row, uint32_t *n_bytes)</td></tr>
-<tr class="memdesc:a5cdd3772a85bf8d042932b9ec4e57125"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trigger the process of synaptic rewiring.  <a href="topographic__map__impl_8c.html#a5cdd3772a85bf8d042932b9ec4e57125">More...</a><br /></td></tr>
-<tr class="separator:a5cdd3772a85bf8d042932b9ec4e57125"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02d8b50126664d08cc5af3b42058a75f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#a02d8b50126664d08cc5af3b42058a75f">synaptogenesis_dynamics_rewire</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *result)</td></tr>
+<tr class="memdesc:a02d8b50126664d08cc5af3b42058a75f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trigger the process of synaptic rewiring.  <a href="topographic__map__impl_8c.html#a02d8b50126664d08cc5af3b42058a75f">More...</a><br /></td></tr>
+<tr class="separator:a02d8b50126664d08cc5af3b42058a75f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67a28cf101eaae356ff05dda2e96a8ff"><td class="memItemLeft" align="right" valign="top"><a id="a67a28cf101eaae356ff05dda2e96a8ff"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><b>do_formation</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> restrict row, <a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict current_state)</td></tr>
 <tr class="separator:a67a28cf101eaae356ff05dda2e96a8ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -296,8 +296,8 @@ value</td>
 
 </div>
 </div>
-<a id="a5cdd3772a85bf8d042932b9ec4e57125"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5cdd3772a85bf8d042932b9ec4e57125">&#9670;&nbsp;</a></span>synaptogenesis_dynamics_rewire()</h2>
+<a id="a02d8b50126664d08cc5af3b42058a75f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02d8b50126664d08cc5af3b42058a75f">&#9670;&nbsp;</a></span>synaptogenesis_dynamics_rewire()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -317,14 +317,8 @@ value</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *&#160;</td>
-          <td class="paramname"><em>synaptic_row</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t *&#160;</td>
-          <td class="paramname"><em>n_bytes</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -339,8 +333,7 @@ value</td>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the current timestep </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">spike</td><td>variable to hold the spike </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">synaptic_row</td><td>variable to hold the address of the row </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">n_bytes</td><td>variable to hold the size of the row </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>The result of the population table lookup </td></tr>
   </table>
   </dd>
 </dl>
@@ -401,7 +394,7 @@ value</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the row was changed and needs to be written back </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00319">319</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00318">318</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -441,7 +434,7 @@ value</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the row was changed and needs to be written back </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00378">378</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00377">377</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -480,7 +473,7 @@ value</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00385">385</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00384">384</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -503,7 +496,7 @@ value</td>
 <p>Number of updates to do of synaptogenesis this time step. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of updates to do this time step </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00389">389</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00388">388</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -556,7 +549,7 @@ value</td>
 </div><div class="memdoc">
 
 <p>Free current states. </p>
-<p><a class="el" href="topographic__map__impl_8c.html#a5cdd3772a85bf8d042932b9ec4e57125" title="Trigger the process of synaptic rewiring.">synaptogenesis_dynamics_rewire()</a> moves states from here to <a class="el" href="topographic__map__impl_8c.html#a617d5ccf1e27648321a85cfc2498eedf" title="Current states in use.">current_state_queue</a> </p>
+<p><a class="el" href="topographic__map__impl_8c.html#a02d8b50126664d08cc5af3b42058a75f" title="Trigger the process of synaptic rewiring.">synaptogenesis_dynamics_rewire()</a> moves states from here to <a class="el" href="topographic__map__impl_8c.html#a617d5ccf1e27648321a85cfc2498eedf" title="Current states in use.">current_state_queue</a> </p>
 
 <p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00086">86</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
@@ -565,7 +558,7 @@ value</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 15 2022 09:00:38 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Nov 17 2022 11:11:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

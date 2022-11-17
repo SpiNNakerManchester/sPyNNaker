@@ -69,7 +69,7 @@
 
 
 <span class="n">_DIMENSION_SIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
-<span class="n">_KEY_INFO_SIZE</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+<span class="n">_KEY_INFO_SIZE</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 <span class="n">_CONN_SIZE</span> <span class="o">=</span> <span class="n">_KEY_INFO_SIZE</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
 <span class="n">_DIM_DTYPE</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="s2">&quot;uint32&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;shift&quot;</span><span class="p">,</span> <span class="s2">&quot;uint32&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;pre_start&quot;</span><span class="p">,</span> <span class="s2">&quot;uint16&quot;</span><span class="p">),</span>
               <span class="p">(</span><span class="s2">&quot;pre_in_post_start&quot;</span><span class="p">,</span> <span class="s2">&quot;uint16&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;pre_in_post_end&quot;</span><span class="p">,</span> <span class="s2">&quot;uint16&quot;</span><span class="p">),</span>
@@ -302,11 +302,12 @@
 
 <div class="viewcode-block" id="PoolDenseConnector.write_local_only_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.PoolDenseConnector.write_local_only_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_local_only_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+            <span class="n">key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
 
         <span class="c1"># Write source key info</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">n_colour_bits</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
 
         <span class="c1"># Write numbers of things</span>
         <span class="n">n_dims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>

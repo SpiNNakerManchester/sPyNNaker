@@ -172,7 +172,12 @@
         <span class="k">if</span> <span class="n">host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">host</span> <span class="o">=</span> <span class="n">get_config_str</span><span class="p">(</span><span class="s2">&quot;Recording&quot;</span><span class="p">,</span> <span class="s2">&quot;live_spike_host&quot;</span><span class="p">)</span>
 
-        <span class="c1"># add new edge and vertex if required to SpiNNaker graph</span>
+        <span class="c1"># Use the right-shift to remove the colour from translated keys</span>
+        <span class="n">n_colour_bits</span> <span class="o">=</span> <span class="n">population</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span>
+        <span class="n">translated_key_right_shift</span> <span class="o">=</span> <span class="n">n_colour_bits</span>
+
+        <span class="c1"># Use the mask to remove the colour from non-translated keys</span>
+        <span class="n">received_key_mask</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span> <span class="o">&amp;</span> <span class="o">~</span><span class="p">((</span><span class="mi">2</span> <span class="o">**</span> <span class="n">n_colour_bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">LivePacketGatherParameters</span><span class="p">(</span>
@@ -185,7 +190,9 @@
             <span class="n">payload_right_shift</span><span class="o">=</span><span class="n">payload_right_shift</span><span class="p">,</span>
             <span class="n">number_of_packets_sent_per_time_step</span><span class="o">=</span><span class="p">(</span>
                 <span class="n">number_of_packets_sent_per_time_step</span><span class="p">),</span>
-            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;LiveSpikeReceiver&quot;</span><span class="p">,</span> <span class="n">translate_keys</span><span class="o">=</span><span class="n">translate_keys</span><span class="p">)</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;LiveSpikeReceiver&quot;</span><span class="p">,</span> <span class="n">received_key_mask</span><span class="o">=</span><span class="n">received_key_mask</span><span class="p">,</span>
+            <span class="n">translate_keys</span><span class="o">=</span><span class="n">translate_keys</span><span class="p">,</span>
+            <span class="n">translated_key_right_shift</span><span class="o">=</span><span class="n">translated_key_right_shift</span><span class="p">)</span>
         <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">update_live_packet_gather_tracker</span><span class="p">(</span>
             <span class="n">population</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="p">[</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">])</span>
 
@@ -229,21 +236,7 @@
 <span class="sd">        :type vertex_to_record_from:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex or</span>
 <span class="sd">            ~pacman.model.graphs.machine.MachineVertex</span>
-<span class="sd">        :param str lpg_label:</span>
-<span class="sd">        :param int port:</span>
-<span class="sd">        :param str hostname:</span>
-<span class="sd">        :param int tag:</span>
-<span class="sd">        :param bool strip_sdp:</span>
-<span class="sd">        :param bool use_prefix:</span>
-<span class="sd">        :param int key_prefix:</span>
-<span class="sd">        :param ~spinnman.messages.eieio.EIEIOPrefix prefix_type:</span>
-<span class="sd">        :param ~spinnman.messages.eieio.EIEIOType message_type:</span>
-<span class="sd">        :param int right_shift:</span>
-<span class="sd">        :param bool payload_as_time_stamps:</span>
-<span class="sd">        :param bool use_payload_prefix:</span>
-<span class="sd">        :param int payload_prefix:</span>
-<span class="sd">        :param int payload_right_shift:</span>
-<span class="sd">        :param int number_of_packets_sent_per_time_step:</span>
+<span class="sd">        :param LivePacketGatherParameters params:</span>
 <span class="sd">        :param list(str) partition_ids:</span>
 <span class="sd">        :param bool translate_keys:</span>
 <span class="sd">        &quot;&quot;&quot;</span>

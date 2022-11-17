@@ -63,7 +63,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">)</span>
 
-<span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">=</span> <span class="mi">9</span>
 
 
 <span class="k">class</span> <span class="nc">DelayExtensionVertex</span><span class="p">(</span>
@@ -77,7 +77,8 @@
         <span class="s2">&quot;__delay_per_stage&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_delay_stages&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__outgoing_edges&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__outgoing_edges&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__n_colour_bits&quot;</span><span class="p">]</span>
 
     <span class="c1"># this maps to what master assumes</span>
     <span class="n">MAX_SLOTS</span> <span class="o">=</span> <span class="mi">8</span>
@@ -89,7 +90,7 @@
         <span class="s2">&quot;yet feasible. Please report it to Spinnaker user mail list.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;DelayExtension&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param partition: The parition this Delay is supporting</span>
@@ -111,6 +112,8 @@
             <span class="s2">&quot;Simulation&quot;</span><span class="p">,</span> <span class="s2">&quot;drop_late_spikes&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span> <span class="o">=</span> <span class="n">n_colour_bits</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -178,6 +181,10 @@
 <span class="sd">        :rtype: list(DelayApplicationEdge)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_edges</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_colour_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span>
 </pre></div>
 
             <div class="clearer"></div>

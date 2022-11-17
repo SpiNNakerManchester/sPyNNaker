@@ -17,7 +17,7 @@ var searchData=
   ['get_5fnm_5frow_621',['get_nm_row',['../matrix__generator__neuromodulation_8h.html#adb49a447e52dc2d7f8bd96b5003ad5b7',1,'matrix_generator_neuromodulation.h']]],
   ['get_5foffset_622',['get_offset',['../population__table_8h.html#a071de88b0691d4747c55dbea8cc58f86',1,'population_table.h']]],
   ['get_5frow_623',['get_row',['../matrix__generator__common_8h.html#a59540be417d878df2430b21bad1eb91c',1,'matrix_generator_common.h']]],
-  ['get_5frow_5faddr_5fand_5fsize_624',['get_row_addr_and_size',['../population__table_8h.html#a1bd7c13d57e46e337171e57af8f345fe',1,'population_table.h']]],
+  ['get_5frow_5faddr_5fand_5fsize_624',['get_row_addr_and_size',['../population__table_8h.html#a45f32a7841183cdb7aab2be2a91fd6ba',1,'population_table.h']]],
   ['get_5frow_5flength_625',['get_row_length',['../population__table_8h.html#a44d4641d18cf8073f34f171a7e9a0f54',1,'population_table.h']]],
   ['get_5fstdp_5ffixed_5frow_626',['get_stdp_fixed_row',['../matrix__generator__stdp_8h.html#a7fd79284f87d27ffb21c99534d6b8156',1,'matrix_generator_stdp.h']]],
   ['get_5ftype_5fchar_627',['get_type_char',['../synapses_8c.html#a5af3d86ffc14ed6815aeeec7dbe9412a',1,'synapses.c']]],

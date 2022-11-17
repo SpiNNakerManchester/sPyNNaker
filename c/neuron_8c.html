@@ -137,6 +137,9 @@ Variables</h2></td></tr>
 <tr class="memitem:adb470808676e08ce78789a18a99da76e"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#adb470808676e08ce78789a18a99da76e">earliest_send_time</a> = 0</td></tr>
 <tr class="memdesc:adb470808676e08ce78789a18a99da76e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Earliest time in a timestep that any neuron has sent a spike.  <a href="neuron_8c.html#adb470808676e08ce78789a18a99da76e">More...</a><br /></td></tr>
 <tr class="separator:adb470808676e08ce78789a18a99da76e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5bdac4fec3cf570ebe861aea93346316"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#a5bdac4fec3cf570ebe861aea93346316">colour</a> = 0</td></tr>
+<tr class="memdesc:a5bdac4fec3cf570ebe861aea93346316"><td class="mdescLeft">&#160;</td><td class="mdescRight">The colour of the time step to handle delayed spikes.  <a href="neuron_8c.html#a5bdac4fec3cf570ebe861aea93346316">More...</a><br /></td></tr>
+<tr class="separator:a5bdac4fec3cf570ebe861aea93346316"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7368643a28282d8b3429f0fb145aa5db"><td class="memItemLeft" align="right" valign="top"><a id="a7368643a28282d8b3429f0fb145aa5db"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a></td></tr>
 <tr class="memdesc:a7368643a28282d8b3429f0fb145aa5db"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of neurons on the core. <br /></td></tr>
@@ -149,6 +152,10 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a></td></tr>
 <tr class="memdesc:adedb27b3ece4d4dece0aee776a136427"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of synapse types. <br /></td></tr>
 <tr class="separator:adedb27b3ece4d4dece0aee776a136427"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4aa662177b306e9085f7ef20b3a6a2c1"><td class="memItemLeft" align="right" valign="top"><a id="a4aa662177b306e9085f7ef20b3a6a2c1"></a>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#a4aa662177b306e9085f7ef20b3a6a2c1">colour_mask</a></td></tr>
+<tr class="memdesc:a4aa662177b306e9085f7ef20b3a6a2c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mask of the colour. <br /></td></tr>
+<tr class="separator:a4aa662177b306e9085f7ef20b3a6a2c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade696d20461dc712b7daafcbcad6ba4b"><td class="memItemLeft" align="right" valign="top"><a id="ade696d20461dc712b7daafcbcad6ba4b"></a>
 static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#ade696d20461dc712b7daafcbcad6ba4b">ring_buffer_to_input_left_shifts</a></td></tr>
 <tr class="memdesc:ade696d20461dc712b7daafcbcad6ba4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Amount to left shift the ring buffer by to make it an input. <br /></td></tr>
@@ -184,7 +191,7 @@ static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 </div><div class="memdoc">
 <div class="textblock"><p>parameters that reside in the neuron_parameter_data_region </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00064">64</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00070">70</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -203,6 +210,12 @@ n_neurons_to_simulate</td>
 <a id="a9b009ce74ebd6b24b2aed4a825763c31"></a>uint32_t</td>
 <td class="fieldname">
 n_neurons_peak</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="ae3994a7b702d611d165d36fbf2760c75"></a>uint32_t</td>
+<td class="fieldname">
+n_colour_bits</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -255,7 +268,7 @@ ring_buffer_shifts[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the memory copies worked, false otherwise </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00077">77</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00084">84</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -284,7 +297,7 @@ ring_buffer_shifts[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>bool which is true if the resume was successful or not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00087">87</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00094">94</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -352,7 +365,7 @@ ring_buffer_shifts[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the translation was successful, otherwise False </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00099">99</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00106">106</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -375,7 +388,7 @@ ring_buffer_shifts[]</td>
 <p>Perform steps needed before pausing a simulation. </p>
 <p>Stores neuron parameters back into SDRAM. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00175">175</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00185">185</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -414,7 +427,7 @@ ring_buffer_shifts[]</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00181">181</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00191">191</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -442,7 +455,7 @@ ring_buffer_shifts[]</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00192">192</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00205">205</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -465,7 +478,7 @@ ring_buffer_shifts[]</td>
 <p>Print the inputs to the neurons. </p>
 <p>Only available in debug mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00218">218</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00231">231</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -488,7 +501,7 @@ ring_buffer_shifts[]</td>
 <p>Print the neurons' synapse parameters. </p>
 <p>Only available in debug mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00222">222</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00235">235</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -517,7 +530,7 @@ ring_buffer_shifts[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a single character that describes the synapse. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00226">226</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00239">239</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
 
 </div>
 </div>
@@ -598,10 +611,29 @@ ring_buffer_shifts[]</td>
 
 </div>
 </div>
+<a id="a5bdac4fec3cf570ebe861aea93346316"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5bdac4fec3cf570ebe861aea93346316">&#9670;&nbsp;</a></span>colour</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t colour = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The colour of the time step to handle delayed spikes. </p>
+<p>The time step colour to account for delay. </p>
+
+<p class="definition">Definition at line <a class="el" href="neuron_8c_source.html#l00043">43</a> of file <a class="el" href="neuron_8c_source.html">neuron.c</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 15 2022 09:00:37 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Nov 17 2022 11:11:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -62,7 +62,7 @@
 <span class="k">class</span> <span class="nc">SpikeSourceArray</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="p">):</span>
 
     <span class="n">default_population_parameters</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;splitter&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="s2">&quot;splitter&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;n_colour_bits&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike_times</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">spike_times</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -72,11 +72,12 @@
 <div class="viewcode-block" id="SpikeSourceArray.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.SpikeSourceArray.create_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">,</span>
                <span class="n">additional_arguments</span><span class="o">=</span><span class="n">default_population_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">):</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_max_atoms_per_dimension_per_core</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">SpikeSourceArrayVertex</span><span class="p">(</span>
-            <span class="n">n_neurons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_times</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span></div>
+            <span class="n">n_neurons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_times</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span>
+            <span class="n">n_colour_bits</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

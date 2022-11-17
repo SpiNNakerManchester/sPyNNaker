@@ -116,16 +116,16 @@
         <span class="c1"># The mask to select the relevant bits of key for matching</span>
         <span class="p">(</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">),</span>
         <span class="c1"># The index into address_list for this entry</span>
-        <span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
-        <span class="c1"># Flag to indicate if an extra_info struct is present</span>
-        <span class="p">(</span><span class="s2">&quot;extra_info_flag&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span>
+        <span class="c1"># The number of colour bits used (or 0 if no colour bits)</span>
+        <span class="p">(</span><span class="s2">&quot;n_colour_bits&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
         <span class="c1"># The number of entries in ::address_list for this entry</span>
         <span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
         <span class="c1"># The mask to apply to the key once shifted get the core index</span>
         <span class="p">(</span><span class="s2">&quot;core_mask&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
         <span class="c1"># The shift to apply to the key to get the core part (0-31)</span>
         <span class="p">(</span><span class="s2">&quot;mask_shift&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
-        <span class="c1"># The number of neurons per core (up to 2048)</span>
+        <span class="c1"># The number of neurons per core</span>
         <span class="p">(</span><span class="s2">&quot;n_neurons&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
         <span class="c1"># The number of words required for n_neurons</span>
         <span class="p">(</span><span class="s2">&quot;n_words&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_uint32</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
@@ -205,9 +205,13 @@
         <span class="c1"># Where in the key that the core id is held</span>
         <span class="s2">&quot;__core_shift&quot;</span><span class="p">,</span>
         <span class="c1"># The number of neurons on every core except the last</span>
-        <span class="s2">&quot;__n_neurons&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__n_neurons&quot;</span><span class="p">,</span>
+        <span class="c1"># The number of bits reserved for the colour</span>
+        <span class="s2">&quot;__n_colour_bits&quot;</span>
+        <span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span>
+                 <span class="n">n_colour_bits</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int routing_key: The key to match for this entry</span>
 <span class="sd">        :param int mask: The mask to match for this entry</span>
@@ -222,6 +226,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__core_mask</span> <span class="o">=</span> <span class="n">core_mask</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__core_shift</span> <span class="o">=</span> <span class="n">core_shift</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_neurons</span> <span class="o">=</span> <span class="n">n_neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span> <span class="o">=</span> <span class="n">n_colour_bits</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">):</span>
@@ -323,8 +328,7 @@
         <span class="n">next_addr</span> <span class="o">=</span> <span class="n">start</span>
         <span class="n">n_entries</span> <span class="o">=</span> <span class="n">count</span>
 
-        <span class="c1"># Add extra info</span>
-        <span class="n">entry</span><span class="o">.</span><span class="n">extra_info_flag</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">n_colour_bits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span>
         <span class="n">entry</span><span class="o">.</span><span class="n">core_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_mask</span>
         <span class="n">entry</span><span class="o">.</span><span class="n">n_words</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__n_neurons</span> <span class="o">/</span> <span class="n">BIT_IN_A_WORD</span><span class="p">))</span>
@@ -431,7 +435,7 @@
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.add_application_entry"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_application_entry">[docs]</a>    <span class="k">def</span> <span class="nf">add_application_entry</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span>
-            <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+            <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an entry for an application-edge to the population table.</span>
 
 <span class="sd">        :param int block_start_addr: where the synaptic matrix block starts</span>
@@ -443,6 +447,8 @@
 <span class="sd">        :param int core_shift: The shift of the mask to get to the core_mask</span>
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">            The number of neurons in each machine vertex (bar the last)</span>
+<span class="sd">        :param int n_colour_bits:</span>
+<span class="sd">            The number of bits to use for colour</span>
 <span class="sd">        :return: The index of the entry, to be used to retrieve it</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:</span>
@@ -462,11 +468,11 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__update_master_population_table</span><span class="p">(</span>
             <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span>
-            <span class="n">n_neurons</span><span class="p">)</span></div>
+            <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__update_master_population_table</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span>
-            <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+            <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an entry in the binary search to deal with the synaptic matrix</span>
 
 <span class="sd">        :param int block_start_addr: where the synaptic matrix block starts</span>
@@ -478,6 +484,7 @@
 <span class="sd">        :param int core_shift: The shift of the mask to get to the core_mask</span>
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">            The number of neurons in each machine vertex (bar the last)</span>
+<span class="sd">        :param int n_colour_bits: The number of bits to use for colour</span>
 <span class="sd">        :return: The index of the entry, to be used to retrieve it</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:</span>
@@ -496,13 +503,14 @@
         <span class="n">row_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_allowed_row_length</span><span class="p">(</span><span class="n">row_length</span><span class="p">)</span>
 
         <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_entry</span><span class="p">(</span>
-            <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">)</span>
+            <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_addr</span><span class="p">,</span> <span class="n">row_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">index</span>
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.add_invalid_application_entry"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_invalid_application_entry">[docs]</a>    <span class="k">def</span> <span class="nf">add_invalid_application_entry</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">core_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_neurons</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span>
+            <span class="n">n_colour_bits</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an entry to the table from an application vertex that doesn&#39;t</span>
 <span class="sd">            point to anywhere.  Used to keep indices in synchronisation between</span>
 <span class="sd">            e.g. normal and delay entries and between entries on different</span>
@@ -518,6 +526,8 @@
 <span class="sd">        :param int core_shift: The shift of the mask to get to the core_mask</span>
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">            The number of neurons in each machine vertex (bar the last)</span>
+<span class="sd">        :param int n_colour_bits:</span>
+<span class="sd">            The number of bits to use for colour</span>
 <span class="sd">        :return: The index of the added entry</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -533,10 +543,11 @@
                 <span class="s2">&quot;The core mask of </span><span class="si">{}</span><span class="s2"> is too big (maximum </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">core_mask</span><span class="p">,</span> <span class="n">_MAX_CORE_MASK</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_invalid_entry</span><span class="p">(</span>
-            <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">)</span></div>
+            <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__add_invalid_entry</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span>
+            <span class="n">n_colour_bits</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an entry to the table that doesn&#39;t point to anywhere.  Used</span>
 <span class="sd">            to keep indices in synchronisation between e.g. normal and delay</span>
 <span class="sd">            entries and between entries on different cores.</span>
@@ -551,16 +562,20 @@
 <span class="sd">        :param int core_shift: The shift of the mask to get to the core_mask</span>
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">            The number of neurons in each machine vertex (bar the last)</span>
+<span class="sd">        :param int n_colour_bits:</span>
+<span class="sd">            The number of bits used for colour</span>
 <span class="sd">        :return: The index of the added entry</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_entry</span><span class="p">(</span>
-            <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">)</span>
+            <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">append_invalid</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">index</span>
 
-    <span class="k">def</span> <span class="nf">__add_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__add_entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span>
+            <span class="n">n_colour_bits</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">&gt;=</span> <span class="n">_MAX_ADDRESS_START</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;The table already contains </span><span class="si">{}</span><span class="s2"> entries;&quot;</span>
@@ -568,7 +583,7 @@
         <span class="k">if</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
             <span class="n">entry</span> <span class="o">=</span> <span class="n">_MasterPopEntry</span><span class="p">(</span>
                 <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span>
-                <span class="n">n_neurons</span><span class="p">)</span>
+                <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
             <span class="k">return</span> <span class="n">entry</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>

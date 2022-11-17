@@ -86,9 +86,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics_8h.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
 <tr class="memdesc:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse dynamics.  <a href="synapse__dynamics_8h.html#a4a1c98d660ba6a17d4678ae9ef2a5526">More...</a><br /></td></tr>
 <tr class="separator:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5901a534a051a77429fc3982363ebe25"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics_8h.html#a5901a534a051a77429fc3982363ebe25">synapse_dynamics_process_plastic_synapses</a> (<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_data, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, weight_t *<a class="el" href="synapses_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, bool *write_back)</td></tr>
-<tr class="memdesc:a5901a534a051a77429fc3982363ebe25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the dynamics of the synapses.  <a href="synapse__dynamics_8h.html#a5901a534a051a77429fc3982363ebe25">More...</a><br /></td></tr>
-<tr class="separator:a5901a534a051a77429fc3982363ebe25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64f836033fa394ddca67b3e12a23b45e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics_8h.html#a64f836033fa394ddca67b3e12a23b45e">synapse_dynamics_process_plastic_synapses</a> (<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a> *plastic_region_data, <a class="el" href="synapse__row_8h.html#structsynapse__row__fixed__part__t">synapse_row_fixed_part_t</a> *fixed_region, weight_t *<a class="el" href="synapses_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t colour_delay, bool *write_back)</td></tr>
+<tr class="memdesc:a64f836033fa394ddca67b3e12a23b45e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the dynamics of the synapses.  <a href="synapse__dynamics_8h.html#a64f836033fa394ddca67b3e12a23b45e">More...</a><br /></td></tr>
+<tr class="separator:a64f836033fa394ddca67b3e12a23b45e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics_8h.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> neuron_index)</td></tr>
 <tr class="memdesc:a5087bc7e79f5dc3850f73239c5c463a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inform the synapses that the neuron fired.  <a href="synapse__dynamics_8h.html#a5087bc7e79f5dc3850f73239c5c463a3">More...</a><br /></td></tr>
 <tr class="separator:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,12 +169,12 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the initialisation succeeded. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00275">275</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00277">277</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
 
 </div>
 </div>
-<a id="a5901a534a051a77429fc3982363ebe25"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5901a534a051a77429fc3982363ebe25">&#9670;&nbsp;</a></span>synapse_dynamics_process_plastic_synapses()</h2>
+<a id="a64f836033fa394ddca67b3e12a23b45e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64f836033fa394ddca67b3e12a23b45e">&#9670;&nbsp;</a></span>synapse_dynamics_process_plastic_synapses()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -206,6 +206,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>colour_delay</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">bool *&#160;</td>
           <td class="paramname"><em>write_back</em>&#160;</td>
         </tr>
@@ -230,7 +236,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the processing was successful or not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00458">458</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00461">461</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
 
 </div>
 </div>
@@ -315,7 +321,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00319">319</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00316">316</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
 
 </div>
 </div>
@@ -429,7 +435,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>was the search successful? </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00509">509</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00513">513</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
 
 </div>
 </div>
@@ -469,7 +475,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>was the removal successful? </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00539">539</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00543">543</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
 
 </div>
 </div>
@@ -530,7 +536,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>was the addition successful? </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00557">557</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00561">561</a> of file <a class="el" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html">synapse_dynamics_stdp_izhikevich_neuromodulation.c</a>.</p>
 
 </div>
 </div>
@@ -566,7 +572,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 15 2022 09:00:37 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Nov 17 2022 11:11:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

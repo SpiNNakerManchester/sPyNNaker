@@ -251,7 +251,8 @@
 <div class="viewcode-block" id="DelayExtensionMachineVertex.get_n_keys_for_partition"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_n_keys_for_partition">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_keys_for_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
         <span class="n">n_keys</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">(</span><span class="n">partition_id</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">n_keys</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span></div>
+        <span class="n">n_colours</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span>
+        <span class="k">return</span> <span class="n">n_keys</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">*</span> <span class="n">n_colours</span></div>
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.get_binary_file_name"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_binary_file_name">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_binary_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -361,7 +362,10 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_per_stage</span><span class="p">)</span>
 
         <span class="c1"># write whether to throw away spikes</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span><span class="p">))</span></div>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span><span class="p">))</span>
+
+        <span class="c1"># Write the number of colour bits</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

@@ -438,6 +438,11 @@
 <div class="viewcode-block" id="PopulationMachineVertex.set_do_synapse_regeneration"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.set_do_synapse_regeneration">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationMachineSynapses</span><span class="o">.</span><span class="n">set_do_synapse_regeneration</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_do_synapse_regeneration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__regenerate_synapse_data</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="PopulationMachineVertex.get_n_keys_for_partition"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_n_keys_for_partition">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationMachineCommon</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_n_keys_for_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
+        <span class="n">n_colours</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">n_colours</span></div>
 </pre></div>
 
             <div class="clearer"></div>

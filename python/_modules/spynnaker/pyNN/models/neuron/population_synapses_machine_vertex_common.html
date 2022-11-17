@@ -74,8 +74,9 @@
 <span class="n">SDRAM_PARAMS_SIZE</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
 <span class="c1"># Size of the Key config params = 1 work for key + 1 word for mask</span>
-<span class="c1">#  + 1 word for spike mask + 1 word for self connection boolean</span>
-<span class="n">KEY_CONFIG_SIZE</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+<span class="c1">#  + 1 word for spike mask + 1 word for colour shift</span>
+<span class="c1">#  + 1 word for self connection boolean</span>
+<span class="n">KEY_CONFIG_SIZE</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
 
 <span class="k">class</span> <span class="nc">SpikeProcessingFastProvenance</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">):</span>
@@ -281,6 +282,7 @@
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="o">~</span><span class="n">r_info</span><span class="o">.</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">self_projection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))</span>
 
 <div class="viewcode-block" id="PopulationSynapsesMachineVertexCommon.sdram_requirement"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon.sdram_requirement">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SendsSynapticInputsOverSDRAM</span><span class="o">.</span><span class="n">sdram_requirement</span><span class="p">)</span>

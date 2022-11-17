@@ -91,9 +91,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ab86f19d1020a1bcb82decd7fa71e4075"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ab86f19d1020a1bcb82decd7fa71e4075">synapses_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synapse_params_address, uint32_t *<a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t *<a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, weight_t **<a class="el" href="synapses_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t **ring_buffer_to_input_buffer_left_shifts, bool *clear_input_buffers_of_late_packets_init, uint32_t *incoming_spike_buffer_size)</td></tr>
 <tr class="memdesc:ab86f19d1020a1bcb82decd7fa71e4075"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse processing.  <a href="synapses_8h.html#ab86f19d1020a1bcb82decd7fa71e4075">More...</a><br /></td></tr>
 <tr class="separator:ab86f19d1020a1bcb82decd7fa71e4075"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1ceab23dea834d6189f496b5133d983"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">synapses_process_synaptic_row</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row, bool *write_back)</td></tr>
-<tr class="memdesc:aa1ceab23dea834d6189f496b5133d983"><td class="mdescLeft">&#160;</td><td class="mdescRight">process a synaptic row  <a href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">More...</a><br /></td></tr>
-<tr class="separator:aa1ceab23dea834d6189f496b5133d983"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adabc60315fbcf7e2da81a0e556d9956f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#adabc60315fbcf7e2da81a0e556d9956f">synapses_process_synaptic_row</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t spike_colour, uint32_t <a class="el" href="spike__source__poisson_8c.html#a4aa662177b306e9085f7ef20b3a6a2c1">colour_mask</a>, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row, bool *write_back)</td></tr>
+<tr class="memdesc:adabc60315fbcf7e2da81a0e556d9956f"><td class="mdescLeft">&#160;</td><td class="mdescRight">process a synaptic row  <a href="synapses_8h.html#adabc60315fbcf7e2da81a0e556d9956f">More...</a><br /></td></tr>
+<tr class="separator:adabc60315fbcf7e2da81a0e556d9956f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa95d63df3a6fbedaaf3a0d36f824df35"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa95d63df3a6fbedaaf3a0d36f824df35">synapses_get_pre_synaptic_events</a> (void)</td></tr>
 <tr class="memdesc:aa95d63df3a6fbedaaf3a0d36f824df35"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the counters for plastic and fixed pre synaptic events based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0  <a href="synapses_8h.html#aa95d63df3a6fbedaaf3a0d36f824df35">More...</a><br /></td></tr>
 <tr class="separator:aa95d63df3a6fbedaaf3a0d36f824df35"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,6 +137,16 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memitem:a8b7881a6d9caca38f2050656c652cf26"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a8b7881a6d9caca38f2050656c652cf26">synapses_saturation_count</a></td></tr>
 <tr class="memdesc:a8b7881a6d9caca38f2050656c652cf26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count of the number of times the synapses have saturated their weights.  <a href="synapses_8h.html#a8b7881a6d9caca38f2050656c652cf26">More...</a><br /></td></tr>
 <tr class="separator:a8b7881a6d9caca38f2050656c652cf26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af61f61aa805ba87019bb5f3f8e44bf0f"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#af61f61aa805ba87019bb5f3f8e44bf0f">skipped_synapses</a></td></tr>
+<tr class="separator:af61f61aa805ba87019bb5f3f8e44bf0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd1bff16aec3ed124894cc931af73cda"><td class="memItemLeft" align="right" valign="top"><a id="acd1bff16aec3ed124894cc931af73cda"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#acd1bff16aec3ed124894cc931af73cda">late_spikes</a></td></tr>
+<tr class="memdesc:acd1bff16aec3ed124894cc931af73cda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count of the spikes that are received late. <br /></td></tr>
+<tr class="separator:acd1bff16aec3ed124894cc931af73cda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00a6393e4b2d3b0e80f886244476c8ca"><td class="memItemLeft" align="right" valign="top"><a id="a00a6393e4b2d3b0e80f886244476c8ca"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a00a6393e4b2d3b0e80f886244476c8ca">max_late_spike</a></td></tr>
+<tr class="memdesc:a00a6393e4b2d3b0e80f886244476c8ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum lateness of a spike. <br /></td></tr>
+<tr class="separator:a00a6393e4b2d3b0e80f886244476c8ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Operations on synapses. </p>
@@ -186,7 +196,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8h_source.html#l00059">59</a> of file <a class="el" href="synapses_8h_source.html">synapses.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8h_source.html#l00069">69</a> of file <a class="el" href="synapses_8h_source.html">synapses.h</a>.</p>
 
 </div>
 </div>
@@ -261,12 +271,12 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if successfully initialised. False otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00248">248</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00269">269</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
-<a id="aa1ceab23dea834d6189f496b5133d983"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa1ceab23dea834d6189f496b5133d983">&#9670;&nbsp;</a></span>synapses_process_synaptic_row()</h2>
+<a id="adabc60315fbcf7e2da81a0e556d9956f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adabc60315fbcf7e2da81a0e556d9956f">&#9670;&nbsp;</a></span>synapses_process_synaptic_row()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -276,6 +286,18 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
           <td>(</td>
           <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>spike_colour</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>colour_mask</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -301,6 +323,8 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the simulated time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">spike_colour</td><td>the colour extracted from the spike key </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">colour_mask</td><td>the colour mask extracted from the pop table </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>the synaptic row in question </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">write_back</td><td>whether to write back to SDRAM </td></tr>
   </table>
@@ -308,7 +332,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00330">330</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00352">352</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -331,7 +355,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <p>returns the counters for plastic and fixed pre synaptic events based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0 </p>
 <dl class="section return"><dt>Returns</dt><dd>the counter for plastic and fixed pre synaptic events or 0 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00366">366</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00406">406</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -359,7 +383,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00371">371</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00411">411</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -387,7 +411,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00315">315</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00337">337</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -536,10 +560,35 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 
 </div>
 </div>
+<a id="af61f61aa805ba87019bb5f3f8e44bf0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af61f61aa805ba87019bb5f3f8e44bf0f">&#9670;&nbsp;</a></span>skipped_synapses</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t skipped_synapses</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Count of the synapses that have been skipped because the delay wasn't big enough given how long the spike took to arrive </p>
+
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00085">85</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 15 2022 09:00:38 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Nov 17 2022 11:11:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

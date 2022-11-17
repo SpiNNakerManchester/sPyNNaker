@@ -70,7 +70,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 
 <span class="c1">#: The number of 32-bit words in the source_key_info struct</span>
-<span class="n">SOURCE_KEY_INFO_WORDS</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">SOURCE_KEY_INFO_WORDS</span> <span class="o">=</span> <span class="mi">7</span>
 
 <span class="c1">#: The number of 16-bit shorts in the connector struct,</span>
 <span class="c1">#: ignoring the source_key_info struct and the weights (which are dynamic)</span>
@@ -380,7 +380,8 @@
             <span class="p">(</span><span class="n">n_weights</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">))</span>
 
 <div class="viewcode-block" id="ConvolutionConnector.write_local_only_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.write_local_only_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_local_only_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">,</span>
+            <span class="n">weight_scales</span><span class="p">):</span>
         <span class="c1"># Get info about things</span>
         <span class="n">kernel_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">ps_x</span><span class="p">,</span> <span class="n">ps_y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
@@ -390,6 +391,7 @@
         <span class="c1"># Write source key info</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">n_colour_bits</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
 
         <span class="c1"># Write the column and row mask and shifts to extract the column and</span>
         <span class="c1"># row from the incoming spike</span>

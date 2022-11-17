@@ -79,7 +79,7 @@
 <p>Records spikes using EIEIO format</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_spikes">
-<span class="sig-name descname"><span class="pre">get_spikes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_key_function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder.get_spikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_spikes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_spikes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_key_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_colour_bits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder.get_spikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_spikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the recorded spikes from the object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -88,6 +88,7 @@
 <li><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>application_vertex</strong> (<em>ApplicationVertex</em>) – </p></li>
 <li><p><strong>base_key_function</strong> (<em>callable</em><em>(</em><em>MachineVertex</em><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – </p></li>
+<li><p><strong>n_colour_bits</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -738,7 +739,7 @@ all. See:
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.</span></span><span class="sig-name descname"><span class="pre">PopulationApplicationVertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationVertex</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">HasCustomAtomKeyMap</span></code></p>
 <p>A vertex that can be used in a Population.</p>
 <p>Provides some default functions that can be overridden if the vertex
 supports these.</p>
@@ -797,6 +798,30 @@ conductance based input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_atom_key_map">
+<span class="sig-name descname"><span class="pre">get_atom_key_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_atom_key_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_atom_key_map" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the mapping between atoms and keys for the given partition id,</dt><dd><p>and for the given machine pre-vertex</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pre_vertex</strong> (<em>MachineVertex</em>) – The machine vertex to get the map for</p></li>
+<li><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The partition to get the map for</p></li>
+<li><p><strong>routing_info</strong> (<em>RoutingInfo</em>) – Routing information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of (atom_id, key)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>,<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>))</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1035,6 +1060,20 @@ for all. See:
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.n_colour_bits">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_colour_bits</span></span><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.n_colour_bits" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of colour bits sent by this vertex.</p>
+<blockquote>
+<div><p>Assumed 0 unless overridden</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.set_current_state_values">
 <span class="sig-name descname"><span class="pre">set_current_state_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.set_current_state_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_current_state_values" title="Permalink to this definition">¶</a></dt>
@@ -1245,6 +1284,7 @@ time step, in milliseconds</p></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.can_record"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.can_record()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.clear_recording_data"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.clear_recording_data()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.conductance_based"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.conductance_based</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_atom_key_map"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.get_atom_key_map()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_current_state_values"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.get_current_state_values()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_initial_state_values"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.get_initial_state_values()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_parameter_values"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.get_parameter_values()</span></code></a></li>
@@ -1259,6 +1299,7 @@ time step, in milliseconds</p></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_units"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.get_units()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.inject"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.inject()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.is_recording_variable"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.is_recording_variable()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.n_colour_bits"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.n_colour_bits</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_current_state_values"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.set_current_state_values()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_initial_state_values"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.set_initial_state_values()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_not_recording"><code class="docutils literal notranslate"><span class="pre">PopulationApplicationVertex.set_not_recording()</span></code></a></li>

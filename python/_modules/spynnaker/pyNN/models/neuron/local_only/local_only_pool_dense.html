@@ -142,7 +142,8 @@
                     <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__merge_key_and_mask</span><span class="p">(</span>
                         <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span><span class="p">,</span> <span class="n">r_info</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">r_info</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
                 <span class="n">incoming_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="p">(</span><span class="n">incoming</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span><span class="p">))</span>
+                    <span class="p">(</span><span class="n">incoming</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">group_key</span><span class="p">,</span> <span class="n">group_mask</span><span class="p">,</span>
+                     <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">))</span>
 
         <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_parameters_usage_in_bytes</span><span class="p">(</span>
             <span class="n">machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span>
@@ -158,13 +159,13 @@
 
         <span class="c1"># Write spec for each connector, sorted by key</span>
         <span class="n">incoming_info</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">incoming</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">incoming_info</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">incoming</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">n_colour_bits</span> <span class="ow">in</span> <span class="n">incoming_info</span><span class="p">:</span>
             <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">s_info</span> <span class="o">=</span> <span class="n">incoming</span><span class="o">.</span><span class="n">_synapse_information</span>
             <span class="n">app_edge</span> <span class="o">=</span> <span class="n">incoming</span><span class="o">.</span><span class="n">_projection_edge</span>
             <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">write_local_only_data</span><span class="p">(</span>
                 <span class="n">spec</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span>
-                <span class="n">weight_scales</span><span class="p">)</span></div>
+                <span class="n">n_colour_bits</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__merge_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_a</span><span class="p">,</span> <span class="n">mask_a</span><span class="p">,</span> <span class="n">key_b</span><span class="p">,</span> <span class="n">mask_b</span><span class="p">):</span>
         <span class="n">new_xs</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">key_a</span> <span class="o">^</span> <span class="n">key_b</span><span class="p">)</span>

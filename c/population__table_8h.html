@@ -95,6 +95,9 @@ Data Structures</h2></td></tr>
 <tr class="memitem:structpop__table__config__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#structpop__table__config__t">pop_table_config_t</a></td></tr>
 <tr class="memdesc:structpop__table__config__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The memory layout in SDRAM of the first part of the population table configuration. Address list data (array of ::address_and_row_length) is packed on the end.  <a href="population__table_8h.html#structpop__table__config__t">More...</a><br /></td></tr>
 <tr class="separator:structpop__table__config__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structpop__table__lookup__result__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a></td></tr>
+<tr class="memdesc:structpop__table__lookup__result__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">A structure to hold a response to a population table lookup.  <a href="population__table_8h.html#structpop__table__lookup__result__t">More...</a><br /></td></tr>
+<tr class="separator:structpop__table__lookup__result__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
@@ -162,9 +165,9 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memitem:a48c705b7db3ec689ae14c6173df1de60"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a48c705b7db3ec689ae14c6173df1de60">get_local_neuron_id</a> (<a class="el" href="population__table_8h.html#structmaster__population__table__entry">master_population_table_entry</a> entry, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike)</td></tr>
 <tr class="memdesc:a48c705b7db3ec689ae14c6173df1de60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the neuron id of the neuron on the source core, for a spike with extra info.  <a href="population__table_8h.html#a48c705b7db3ec689ae14c6173df1de60">More...</a><br /></td></tr>
 <tr class="separator:a48c705b7db3ec689ae14c6173df1de60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1bd7c13d57e46e337171e57af8f345fe"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a1bd7c13d57e46e337171e57af8f345fe">get_row_addr_and_size</a> (<a class="el" href="population__table_8h.html#structaddress__list__entry">address_list_entry</a> item, uint32_t <a class="el" href="population__table__binary__search__impl_8c.html#a3808a62ff90d026b89ca198c9a503295">synaptic_rows_base_address</a>, uint32_t neuron_id, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *row_address, uint32_t *n_bytes_to_transfer)</td></tr>
-<tr class="memdesc:a1bd7c13d57e46e337171e57af8f345fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the row address and size for a given neuron.  <a href="population__table_8h.html#a1bd7c13d57e46e337171e57af8f345fe">More...</a><br /></td></tr>
-<tr class="separator:a1bd7c13d57e46e337171e57af8f345fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45f32a7841183cdb7aab2be2a91fd6ba"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a45f32a7841183cdb7aab2be2a91fd6ba">get_row_addr_and_size</a> (<a class="el" href="population__table_8h.html#structaddress__list__entry">address_list_entry</a> item, uint32_t <a class="el" href="population__table__binary__search__impl_8c.html#a3808a62ff90d026b89ca198c9a503295">synaptic_rows_base_address</a>, uint32_t neuron_id, <a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *result)</td></tr>
+<tr class="memdesc:a45f32a7841183cdb7aab2be2a91fd6ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the row address and size for a given neuron.  <a href="population__table_8h.html#a45f32a7841183cdb7aab2be2a91fd6ba">More...</a><br /></td></tr>
+<tr class="separator:a45f32a7841183cdb7aab2be2a91fd6ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b783bdc820853519d04fe41adb0b7de"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a0b783bdc820853519d04fe41adb0b7de">population_table_setup</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> table_address, uint32_t *row_max_n_words, uint32_t *master_pop_table_length, <a class="el" href="population__table_8h.html#structmaster__population__table__entry">master_population_table_entry</a> **master_pop_table, <a class="el" href="population__table_8h.html#structaddress__list__entry">address_list_entry</a> **<a class="el" href="population__table__binary__search__impl_8c.html#a7dca3eb9efb99180a67a18d70e3e7e0d">address_list</a>)</td></tr>
 <tr class="memdesc:a0b783bdc820853519d04fe41adb0b7de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up and return the table for outside use.  <a href="population__table_8h.html#a0b783bdc820853519d04fe41adb0b7de">More...</a><br /></td></tr>
 <tr class="separator:a0b783bdc820853519d04fe41adb0b7de"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,15 +177,15 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memitem:a4e78f94389fe12981acf2cea7e8bfe91"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a4e78f94389fe12981acf2cea7e8bfe91">population_table_load_bitfields</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_region_t</a> *filter_region)</td></tr>
 <tr class="memdesc:a4e78f94389fe12981acf2cea7e8bfe91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the bitfield filtering system.  <a href="population__table_8h.html#a4e78f94389fe12981acf2cea7e8bfe91">More...</a><br /></td></tr>
 <tr class="separator:a4e78f94389fe12981acf2cea7e8bfe91"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a511a4004e5621e6ec83228d4e4f94672"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a511a4004e5621e6ec83228d4e4f94672">population_table_get_first_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *row_address, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *n_bytes_to_transfer)</td></tr>
-<tr class="memdesc:a511a4004e5621e6ec83228d4e4f94672"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the first row data for the given input spike.  <a href="population__table_8h.html#a511a4004e5621e6ec83228d4e4f94672">More...</a><br /></td></tr>
-<tr class="separator:a511a4004e5621e6ec83228d4e4f94672"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b234fa7be2bc90125b4d3f7644de260"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a8b234fa7be2bc90125b4d3f7644de260">population_table_get_first_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, <a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *result)</td></tr>
+<tr class="memdesc:a8b234fa7be2bc90125b4d3f7644de260"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the first row data for the given input spike.  <a href="population__table_8h.html#a8b234fa7be2bc90125b4d3f7644de260">More...</a><br /></td></tr>
+<tr class="separator:a8b234fa7be2bc90125b4d3f7644de260"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6af50f83e29bc2f5340724898921df93"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a6af50f83e29bc2f5340724898921df93">population_table_is_next</a> (void)</td></tr>
 <tr class="memdesc:a6af50f83e29bc2f5340724898921df93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if there are more items with the same key.  <a href="population__table_8h.html#a6af50f83e29bc2f5340724898921df93">More...</a><br /></td></tr>
 <tr class="separator:a6af50f83e29bc2f5340724898921df93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06008941811a064b8c67dcf3a5846cde"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a06008941811a064b8c67dcf3a5846cde">population_table_get_next_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *row_address, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *n_bytes_to_transfer)</td></tr>
-<tr class="memdesc:a06008941811a064b8c67dcf3a5846cde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next row data for a previously given spike. If no spike has been given, return False.  <a href="population__table_8h.html#a06008941811a064b8c67dcf3a5846cde">More...</a><br /></td></tr>
-<tr class="separator:a06008941811a064b8c67dcf3a5846cde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1027d2b00f18099c520d5ac97df369ae"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a1027d2b00f18099c520d5ac97df369ae">population_table_get_next_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *result)</td></tr>
+<tr class="memdesc:a1027d2b00f18099c520d5ac97df369ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next row data for a previously given spike. If no spike has been given, return False.  <a href="population__table_8h.html#a1027d2b00f18099c520d5ac97df369ae">More...</a><br /></td></tr>
+<tr class="separator:a1027d2b00f18099c520d5ac97df369ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Master pop(ulation) table API. </p>
@@ -220,15 +223,15 @@ The mask to select the relevant bits of <code>key</code> for matching. </td></tr
 <tr><td class="fieldtype">
 <a id="afb309e71903c16b95d149973e753b490"></a>uint32_t</td>
 <td class="fieldname">
-start: 15</td>
+start: 13</td>
 <td class="fielddoc">
 The index into <a class="el" href="population__table__binary__search__impl_8c.html#a7dca3eb9efb99180a67a18d70e3e7e0d" title="The array of information that points into the synaptic matrix.">address_list</a> for this entry. </td></tr>
 <tr><td class="fieldtype">
-<a id="a12b8d8e12253bc56e1bbd8581ad3da81"></a>uint32_t</td>
+<a id="a8dbf8ef74605e734a08c4b376959215e"></a>uint32_t</td>
 <td class="fieldname">
-extra_info_flag: 1</td>
+n_colour_bits: 3</td>
 <td class="fielddoc">
-Flag to indicate if core mask etc. is valid. </td></tr>
+The number of bits of key used for colour (0 if no colour) </td></tr>
 <tr><td class="fieldtype">
 <a id="a1b52e9a32daa7fddff954e66cbd3bd4e"></a>uint32_t</td>
 <td class="fieldname">
@@ -333,6 +336,50 @@ data[]</td>
 
 </div>
 </div>
+<a name="structpop__table__lookup__result__t" id="structpop__table__lookup__result__t"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structpop__table__lookup__result__t">&#9670;&nbsp;</a></span>pop_table_lookup_result_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct pop_table_lookup_result_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>A structure to hold a response to a population table lookup. </p>
+
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00094">94</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a id="a3edef096d8a18c0f9bf39fc7982ce40a"></a><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a></td>
+<td class="fieldname">
+row_address</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="ada92dca97da88a6ad5ef88be5bc82e40"></a><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a></td>
+<td class="fieldname">
+n_bytes_to_transfer</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a4bfbe7e333178c28603b6465e20a120a"></a>uint32_t</td>
+<td class="fieldname">
+colour</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a223130013536bf61076d3a7c533f1c55"></a>uint32_t</td>
+<td class="fieldname">
+colour_mask</td>
+<td class="fielddoc">
+</td></tr>
+</table>
+
+</div>
+</div>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ac0e87c1d66cacc61454b23cdc12ff764"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac0e87c1d66cacc61454b23cdc12ff764">&#9670;&nbsp;</a></span>INVALID_ADDRESS</h2>
@@ -387,7 +434,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a row address (which is an offset) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00101">101</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00116">116</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
 
 </div>
 </div>
@@ -434,7 +481,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a row address </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00108">108</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00123">123</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
 
 </div>
 </div>
@@ -472,7 +519,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the row length </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00118">118</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00133">133</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
 
 </div>
 </div>
@@ -520,7 +567,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the source core index in the list of source cores </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00126">126</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00141">141</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
 
 </div>
 </div>
@@ -568,7 +615,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the base neuron number of this core </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00134">134</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00149">149</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
 
 </div>
 </div>
@@ -616,7 +663,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the neuron ID </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00142">142</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00157">157</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
 
 </div>
 </div>
@@ -664,12 +711,12 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the source neuron id local to the core </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00152">152</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00167">167</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
 
 </div>
 </div>
-<a id="a1bd7c13d57e46e337171e57af8f345fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1bd7c13d57e46e337171e57af8f345fe">&#9670;&nbsp;</a></span>get_row_addr_and_size()</h2>
+<a id="a45f32a7841183cdb7aab2be2a91fd6ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45f32a7841183cdb7aab2be2a91fd6ba">&#9670;&nbsp;</a></span>get_row_addr_and_size()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -698,14 +745,8 @@ data[]</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *&#160;</td>
-          <td class="paramname"><em>row_address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t *&#160;</td>
-          <td class="paramname"><em>n_bytes_to_transfer</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -726,13 +767,12 @@ data[]</td>
     <tr><td class="paramdir">[in]</td><td class="paramname">item</td><td>The address list item </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">synaptic_rows_based_address</td><td>The address of all synaptic rows </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">neuron_id</td><td>The incoming neuron to get the address of </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">row_address</td><td>Holder of the row address on return </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">n_bytes_to_transfer</td><td>Holder of the bytes to transfer on return </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>The place to write results to </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00163">163</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00177">177</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
 
 </div>
 </div>
@@ -793,7 +833,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the table was setup successfully, False otherwise </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00208">208</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00204">204</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -840,7 +880,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the table was initialised successfully, False otherwise </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00255">255</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00251">251</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -869,12 +909,12 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True on success </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00115">115</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00119">119</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
-<a id="a511a4004e5621e6ec83228d4e4f94672"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a511a4004e5621e6ec83228d4e4f94672">&#9670;&nbsp;</a></span>population_table_get_first_address()</h2>
+<a id="a8b234fa7be2bc90125b4d3f7644de260"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b234fa7be2bc90125b4d3f7644de260">&#9670;&nbsp;</a></span>population_table_get_first_address()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -888,14 +928,8 @@ data[]</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *&#160;</td>
-          <td class="paramname"><em>row_address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *&#160;</td>
-          <td class="paramname"><em>n_bytes_to_transfer</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -909,14 +943,13 @@ data[]</td>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">spike</td><td>The spike received </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">row_address</td><td>Updated with the address of the row </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">n_bytes_to_transfer</td><td>Updated with the number of bytes to read </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>Updated with the lookup details </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there is a row to read, False if not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00269">269</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00265">265</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -947,12 +980,12 @@ data[]</td>
 <p>Determine if there are more items with the same key. </p>
 <dl class="section return"><dt>Returns</dt><dd>Whether there are more items </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00237">237</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00249">249</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
 
 </div>
 </div>
-<a id="a06008941811a064b8c67dcf3a5846cde"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a06008941811a064b8c67dcf3a5846cde">&#9670;&nbsp;</a></span>population_table_get_next_address()</h2>
+<a id="a1027d2b00f18099c520d5ac97df369ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1027d2b00f18099c520d5ac97df369ae">&#9670;&nbsp;</a></span>population_table_get_next_address()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -966,14 +999,8 @@ data[]</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *&#160;</td>
-          <td class="paramname"><em>row_address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *&#160;</td>
-          <td class="paramname"><em>n_bytes_to_transfer</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -987,14 +1014,13 @@ data[]</td>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">spike</td><td>The initiating spike </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">row_address</td><td>Updated with the address of the row </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">n_bytes_to_transfer</td><td>Updated with the number of bytes to read </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>Updated with the lookup details </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there is a row to read, False if not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00319">319</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00316">316</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -1022,7 +1048,7 @@ data[]</td>
 <p>the number of times packet isn't in the master pop table at all! </p>
 <p>the number of times packet isn't in the master pop table at all! </p>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00058">58</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00064">64</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -1049,14 +1075,14 @@ data[]</td>
 <p>The number of addresses from the same spike left to process. </p>
 <p>The number of relevant items remaining in the <a class="el" href="population__table__binary__search__impl_8c.html#a7dca3eb9efb99180a67a18d70e3e7e0d" title="The array of information that points into the synaptic matrix.">address_list</a> NOTE: Exported for speed of check </p>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00049">49</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00055">55</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 15 2022 09:00:38 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Nov 17 2022 11:11:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

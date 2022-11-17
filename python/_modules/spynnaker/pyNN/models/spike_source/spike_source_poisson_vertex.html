@@ -125,14 +125,15 @@
         <span class="s2">&quot;__outgoing_projections&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__incoming_control_edge&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__structure&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__allowed_parameters&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__allowed_parameters&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__n_colour_bits&quot;</span><span class="p">]</span>
 
     <span class="n">SPIKE_RECORDING_REGION_ID</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
             <span class="n">rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rates</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">starts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">durations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">durations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">        :param str label:</span>
@@ -290,6 +291,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__allowed_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="s2">&quot;duration&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__last_rate_read_time</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span> <span class="o">=</span> <span class="n">n_colour_bits</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span> <span class="o">=</span> <span class="n">get_config_int</span><span class="p">(</span>
+                <span class="s2">&quot;Simulation&quot;</span><span class="p">,</span> <span class="s2">&quot;n_colour_bits&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.set_structure"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_structure">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SupportsStructure</span><span class="o">.</span><span class="n">set_structure</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
@@ -606,6 +612,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_colour_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span>
 </pre></div>
 
             <div class="clearer"></div>

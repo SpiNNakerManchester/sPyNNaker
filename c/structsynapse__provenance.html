@@ -105,6 +105,18 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsynapse__provenance.html#a5ecd8b0730953e302c74d60403925a33">n_filtered_by_bitfield</a></td></tr>
 <tr class="memdesc:a5ecd8b0730953e302c74d60403925a33"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of spikes that a bit field filtered, stopping a DMA. <br /></td></tr>
 <tr class="separator:a5ecd8b0730953e302c74d60403925a33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39d38c88172c1869c1fa6e1915777406"><td class="memItemLeft" align="right" valign="top"><a id="a39d38c88172c1869c1fa6e1915777406"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsynapse__provenance.html#a39d38c88172c1869c1fa6e1915777406">n_synapses_skipped</a></td></tr>
+<tr class="memdesc:a39d38c88172c1869c1fa6e1915777406"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of synapses that were skipped due to late spikes. <br /></td></tr>
+<tr class="separator:a39d38c88172c1869c1fa6e1915777406"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad984a0a3e70c68213bd51a73dfcd904d"><td class="memItemLeft" align="right" valign="top"><a id="ad984a0a3e70c68213bd51a73dfcd904d"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsynapse__provenance.html#ad984a0a3e70c68213bd51a73dfcd904d">n_late_spikes</a></td></tr>
+<tr class="memdesc:ad984a0a3e70c68213bd51a73dfcd904d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of spikes that were detected as late. <br /></td></tr>
+<tr class="separator:ad984a0a3e70c68213bd51a73dfcd904d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdb7619856544343a2cc33b518586d38"><td class="memItemLeft" align="right" valign="top"><a id="acdb7619856544343a2cc33b518586d38"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsynapse__provenance.html#acdb7619856544343a2cc33b518586d38">max_late_spike</a></td></tr>
+<tr class="memdesc:acdb7619856544343a2cc33b518586d38"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum lateness of a spike. <br /></td></tr>
+<tr class="separator:acdb7619856544343a2cc33b518586d38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The provenance information for synaptic processing. </p>
@@ -237,13 +249,67 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 
 </div>
 </div>
+<a id="a39d38c88172c1869c1fa6e1915777406"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39d38c88172c1869c1fa6e1915777406">&#9670;&nbsp;</a></span>n_synapses_skipped</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t synapse_provenance::n_synapses_skipped</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The number of synapses that were skipped due to late spikes. </p>
+
+<p class="definition">Definition at line <a class="el" href="c__main__synapse__common_8h_source.html#l00061">61</a> of file <a class="el" href="c__main__synapse__common_8h_source.html">c_main_synapse_common.h</a>.</p>
+
+</div>
+</div>
+<a id="ad984a0a3e70c68213bd51a73dfcd904d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad984a0a3e70c68213bd51a73dfcd904d">&#9670;&nbsp;</a></span>n_late_spikes</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t synapse_provenance::n_late_spikes</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The number of spikes that were detected as late. </p>
+
+<p class="definition">Definition at line <a class="el" href="c__main__synapse__common_8h_source.html#l00063">63</a> of file <a class="el" href="c__main__synapse__common_8h_source.html">c_main_synapse_common.h</a>.</p>
+
+</div>
+</div>
+<a id="acdb7619856544343a2cc33b518586d38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdb7619856544343a2cc33b518586d38">&#9670;&nbsp;</a></span>max_late_spike</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t synapse_provenance::max_late_spike</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The maximum lateness of a spike. </p>
+
+<p class="definition">Definition at line <a class="el" href="c__main__synapse__common_8h_source.html#l00065">65</a> of file <a class="el" href="c__main__synapse__common_8h_source.html">c_main_synapse_common.h</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li>src/neuron/<a class="el" href="c__main__synapse__common_8h_source.html">c_main_synapse_common.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 15 2022 09:00:38 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Nov 17 2022 11:11:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

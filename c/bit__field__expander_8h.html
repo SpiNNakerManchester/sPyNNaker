@@ -88,9 +88,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aae677d854d4a3416d03ae6268e268215"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8h.html#aae677d854d4a3416d03ae6268e268215">do_sdram_read_and_test</a> (<a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row_data, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row, uint32_t n_bytes_to_transfer)</td></tr>
-<tr class="memdesc:aae677d854d4a3416d03ae6268e268215"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read row and test if there are any synapses.  <a href="bit__field__expander_8h.html#aae677d854d4a3416d03ae6268e268215">More...</a><br /></td></tr>
-<tr class="separator:aae677d854d4a3416d03ae6268e268215"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aedbb9078114fc3e4f94a7e6c4ca3c5ae"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8h.html#aedbb9078114fc3e4f94a7e6c4ca3c5ae">do_sdram_read_and_test</a> (<a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row_data, <a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *result)</td></tr>
+<tr class="memdesc:aedbb9078114fc3e4f94a7e6c4ca3c5ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read row and test if there are any synapses.  <a href="bit__field__expander_8h.html#aedbb9078114fc3e4f94a7e6c4ca3c5ae">More...</a><br /></td></tr>
+<tr class="separator:aedbb9078114fc3e4f94a7e6c4ca3c5ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15cfb9de720808f7005d7d93f426c162"><td class="memItemLeft" align="right" valign="top"><a id="a15cfb9de720808f7005d7d93f426c162"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8h.html#a15cfb9de720808f7005d7d93f426c162">determine_redundancy</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_region_t</a> *bitfield_filters)</td></tr>
 <tr class="memdesc:a15cfb9de720808f7005d7d93f426c162"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine which bit fields are redundant. <br /></td></tr>
@@ -120,8 +120,8 @@ static <a class="el" href="population__table_8h.html#structaddress__list__entry"
 
 <p class="definition">Definition in file <a class="el" href="bit__field__expander_8h_source.html">bit_field_expander.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="aae677d854d4a3416d03ae6268e268215"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae677d854d4a3416d03ae6268e268215">&#9670;&nbsp;</a></span>do_sdram_read_and_test()</h2>
+<a id="aedbb9078114fc3e4f94a7e6c4ca3c5ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aedbb9078114fc3e4f94a7e6c4ca3c5ae">&#9670;&nbsp;</a></span>do_sdram_read_and_test()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -138,14 +138,8 @@ static <a class="el" href="population__table_8h.html#structaddress__list__entry"
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a>&#160;</td>
-          <td class="paramname"><em>row</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n_bytes_to_transfer</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="population__table_8h.html#structpop__table__lookup__result__t">pop_table_lookup_result_t</a> *&#160;</td>
+          <td class="paramname"><em>result</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -236,14 +230,14 @@ static <a class="el" href="population__table_8h.html#structaddress__list__entry"
 <p>Create the bitfield for this master pop table and synaptic matrix. </p>
 <dl class="section return"><dt>Returns</dt><dd>Whether it was successful at generating the bitfield </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bit__field__expander_8h_source.html#l00080">80</a> of file <a class="el" href="bit__field__expander_8h_source.html">bit_field_expander.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bit__field__expander_8h_source.html#l00079">79</a> of file <a class="el" href="bit__field__expander_8h_source.html">bit_field_expander.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 15 2022 09:00:38 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Nov 17 2022 11:11:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -1559,6 +1559,27 @@
       <anchor>ac8502bcf887a00b1f6f9193d43365488</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_colour_bits</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a94d9d348a8da10a4851d8c5cc344ab27</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>colour_mask</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a4aa662177b306e9085f7ef20b3a6a2c1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>colour</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a5bdac4fec3cf570ebe861aea93346316</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>delay_extension.h</name>
@@ -3450,6 +3471,13 @@
       <anchor>adb470808676e08ce78789a18a99da76e</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>colour</name>
+      <anchorfile>neuron_8c.html</anchorfile>
+      <anchor>a5bdac4fec3cf570ebe861aea93346316</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="variable" static="yes">
       <type>static uint32_t</type>
       <name>n_neurons</name>
@@ -3469,6 +3497,13 @@
       <name>n_synapse_types</name>
       <anchorfile>neuron_8c.html</anchorfile>
       <anchor>adedb27b3ece4d4dece0aee776a136427</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>colour_mask</name>
+      <anchorfile>neuron_8c.html</anchorfile>
+      <anchor>a4aa662177b306e9085f7ef20b3a6a2c1</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -4089,8 +4124,8 @@
       <type>bool</type>
       <name>synapse_dynamics_process_plastic_synapses</name>
       <anchorfile>synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html</anchorfile>
-      <anchor>a491304657275ae6d450c602d42c80a17</anchor>
-      <arglist>(synapse_row_plastic_data_t *plastic_region_address, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers, uint32_t time, bool *write_back)</arglist>
+      <anchor>afaa7bb6d8e094b3447e52c9b94eebcbd</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_address, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers, uint32_t time, uint32_t colour_delay, bool *write_back)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -4112,6 +4147,13 @@
       <anchorfile>synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html</anchorfile>
       <anchor>ac877b6394f131f1944a720c387af6ac1</anchor>
       <arglist>(uint32_t id, synaptic_row_t row, weight_t weight, uint32_t delay, uint32_t type)</arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>skipped_synapses</name>
+      <anchorfile>synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html</anchorfile>
+      <anchor>af61f61aa805ba87019bb5f3f8e44bf0f</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -4160,8 +4202,8 @@
       <type>bool</type>
       <name>synapse_dynamics_process_plastic_synapses</name>
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>a491304657275ae6d450c602d42c80a17</anchor>
-      <arglist>(synapse_row_plastic_data_t *plastic_region_address, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers, uint32_t time, bool *write_back)</arglist>
+      <anchor>afaa7bb6d8e094b3447e52c9b94eebcbd</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_address, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers, uint32_t time, uint32_t colour_delay, bool *write_back)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -5504,8 +5546,8 @@
       <type>bool</type>
       <name>synapse_dynamics_process_plastic_synapses</name>
       <anchorfile>synapse__dynamics_8h.html</anchorfile>
-      <anchor>a5901a534a051a77429fc3982363ebe25</anchor>
-      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers, uint32_t time, bool *write_back)</arglist>
+      <anchor>a64f836033fa394ddca67b3e12a23b45e</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers, uint32_t time, uint32_t colour_delay, bool *write_back)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -5588,8 +5630,8 @@
       <type>bool</type>
       <name>synapse_dynamics_process_plastic_synapses</name>
       <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>aa7a03613a642c5f6647d0fb4776bf1df</anchor>
-      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffer, uint32_t time, bool *write_back)</arglist>
+      <anchor>aaefbee0b2c6af4b88af6bfb696eda140</anchor>
+      <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffer, uint32_t time, uint32_t colour_delay, bool *write_back)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -5650,6 +5692,7 @@
     <class kind="struct">master_population_table_entry</class>
     <class kind="struct">address_list_entry</class>
     <class kind="struct">pop_table_config_t</class>
+    <class kind="struct">pop_table_lookup_result_t</class>
     <member kind="define">
       <type>#define</type>
       <name>BITS_PER_WORD</name>
@@ -5780,8 +5823,8 @@
       <type>static void</type>
       <name>get_row_addr_and_size</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a1bd7c13d57e46e337171e57af8f345fe</anchor>
-      <arglist>(address_list_entry item, uint32_t synaptic_rows_base_address, uint32_t neuron_id, synaptic_row_t *row_address, uint32_t *n_bytes_to_transfer)</arglist>
+      <anchor>a45f32a7841183cdb7aab2be2a91fd6ba</anchor>
+      <arglist>(address_list_entry item, uint32_t synaptic_rows_base_address, uint32_t neuron_id, pop_table_lookup_result_t *result)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -5808,8 +5851,8 @@
       <type>bool</type>
       <name>population_table_get_first_address</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a511a4004e5621e6ec83228d4e4f94672</anchor>
-      <arglist>(spike_t spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a8b234fa7be2bc90125b4d3f7644de260</anchor>
+      <arglist>(spike_t spike, pop_table_lookup_result_t *result)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -5822,8 +5865,8 @@
       <type>bool</type>
       <name>population_table_get_next_address</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a06008941811a064b8c67dcf3a5846cde</anchor>
-      <arglist>(spike_t *spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a1027d2b00f18099c520d5ac97df369ae</anchor>
+      <arglist>(spike_t *spike, pop_table_lookup_result_t *result)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -5878,15 +5921,15 @@
       <type>bool</type>
       <name>population_table_get_first_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a511a4004e5621e6ec83228d4e4f94672</anchor>
-      <arglist>(spike_t spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a8b234fa7be2bc90125b4d3f7644de260</anchor>
+      <arglist>(spike_t spike, pop_table_lookup_result_t *result)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>population_table_get_next_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a06008941811a064b8c67dcf3a5846cde</anchor>
-      <arglist>(spike_t *spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a1027d2b00f18099c520d5ac97df369ae</anchor>
+      <arglist>(spike_t *spike, pop_table_lookup_result_t *result)</arglist>
     </member>
     <member kind="variable" static="yes">
       <type>static master_population_table_entry *</type>
@@ -5921,6 +5964,20 @@
       <name>last_spike</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>af5f8c1b781901d417e09126b75d60140</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>last_colour</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a2fc529e22b2269c4c8d9e75152288a94</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>last_colour_mask</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>a879944bd1ee487bf01f13a19d4e42be6</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -5990,15 +6047,15 @@
       <type>bool</type>
       <name>population_table_get_first_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a511a4004e5621e6ec83228d4e4f94672</anchor>
-      <arglist>(spike_t spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a8b234fa7be2bc90125b4d3f7644de260</anchor>
+      <arglist>(spike_t spike, pop_table_lookup_result_t *result)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>population_table_get_next_address</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
-      <anchor>a06008941811a064b8c67dcf3a5846cde</anchor>
-      <arglist>(spike_t *spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+      <anchor>a1027d2b00f18099c520d5ac97df369ae</anchor>
+      <arglist>(spike_t *spike, pop_table_lookup_result_t *result)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -6210,15 +6267,15 @@
       <type>static void</type>
       <name>do_dma_read</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>ab6d3068e1fb4b07be8e94d52ded9afa6</anchor>
-      <arglist>(synaptic_row_t row, size_t n_bytes_to_transfer, spike_t spike)</arglist>
+      <anchor>a7864846d55171d96eba62635e0d61a49</anchor>
+      <arglist>(spike_t spike, pop_table_lookup_result_t *result)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>is_something_to_do</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>aad055cfcbe798048f28f1dfbce6d5296</anchor>
-      <arglist>(synaptic_row_t *row, size_t *n_bytes_to_transfer, spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike)</arglist>
+      <anchor>aabdb3130b5c92cc4badbc4ea8109b079</anchor>
+      <arglist>(spike_t *spike, pop_table_lookup_result_t *result, uint32_t *n_rewire, uint32_t *n_process_spike)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -6850,8 +6907,8 @@
       <type>bool</type>
       <name>synaptogenesis_dynamics_rewire</name>
       <anchorfile>topographic__map__impl_8c.html</anchorfile>
-      <anchor>a5cdd3772a85bf8d042932b9ec4e57125</anchor>
-      <arglist>(uint32_t time, spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes)</arglist>
+      <anchor>a02d8b50126664d08cc5af3b42058a75f</anchor>
+      <arglist>(uint32_t time, spike_t *spike, pop_table_lookup_result_t *result)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
@@ -6957,6 +7014,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/structural_plasticity/</path>
     <filename>synaptogenesis__dynamics_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="population__table_8h" name="population_table.h" local="no" imported="no">neuron/population_table/population_table.h</includes>
     <member kind="function">
       <type>bool</type>
       <name>synaptogenesis_dynamics_initialise</name>
@@ -6968,8 +7026,8 @@
       <type>bool</type>
       <name>synaptogenesis_dynamics_rewire</name>
       <anchorfile>synaptogenesis__dynamics_8h.html</anchorfile>
-      <anchor>a5cdd3772a85bf8d042932b9ec4e57125</anchor>
-      <arglist>(uint32_t time, spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes)</arglist>
+      <anchor>a02d8b50126664d08cc5af3b42058a75f</anchor>
+      <arglist>(uint32_t time, spike_t *spike, pop_table_lookup_result_t *result)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -7016,8 +7074,8 @@
       <type>bool</type>
       <name>synaptogenesis_dynamics_rewire</name>
       <anchorfile>synaptogenesis__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>a5cdd3772a85bf8d042932b9ec4e57125</anchor>
-      <arglist>(uint32_t time, spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes)</arglist>
+      <anchor>a02d8b50126664d08cc5af3b42058a75f</anchor>
+      <arglist>(uint32_t time, spike_t *spike, pop_table_lookup_result_t *result)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -7885,8 +7943,8 @@
       <type>static bool</type>
       <name>process_fixed_synapses</name>
       <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>aa1af43227da048950da85c91ca255075</anchor>
-      <arglist>(synapse_row_fixed_part_t *fixed_region, uint32_t time)</arglist>
+      <anchor>a2432de7c3330e43bd5979f60adc456d0</anchor>
+      <arglist>(synapse_row_fixed_part_t *fixed_region, uint32_t time, uint32_t colour_delay)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -7906,8 +7964,8 @@
       <type>bool</type>
       <name>synapses_process_synaptic_row</name>
       <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>aa1ceab23dea834d6189f496b5133d983</anchor>
-      <arglist>(uint32_t time, synaptic_row_t row, bool *write_back)</arglist>
+      <anchor>adabc60315fbcf7e2da81a0e556d9956f</anchor>
+      <arglist>(uint32_t time, uint32_t spike_colour, uint32_t colour_mask, synaptic_row_t row, bool *write_back)</arglist>
     </member>
     <member kind="function">
       <type>uint32_t</type>
@@ -8035,11 +8093,39 @@
       <anchor>a8b7881a6d9caca38f2050656c652cf26</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>skipped_synapses</name>
+      <anchorfile>synapses_8c.html</anchorfile>
+      <anchor>af61f61aa805ba87019bb5f3f8e44bf0f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>late_spikes</name>
+      <anchorfile>synapses_8c.html</anchorfile>
+      <anchor>acd1bff16aec3ed124894cc931af73cda</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_late_spike</name>
+      <anchorfile>synapses_8c.html</anchorfile>
+      <anchor>a00a6393e4b2d3b0e80f886244476c8ca</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="variable" static="yes">
       <type>static uint32_t</type>
       <name>n_neurons_peak</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>a6b1b7d48e24674f12efcb5a84266f969</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>synapse_delay_mask_shifted</name>
+      <anchorfile>synapses_8c.html</anchorfile>
+      <anchor>ac8536be403f204fda0c5af4f9ff6fc35</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -8067,8 +8153,8 @@
       <type>bool</type>
       <name>synapses_process_synaptic_row</name>
       <anchorfile>synapses_8h.html</anchorfile>
-      <anchor>aa1ceab23dea834d6189f496b5133d983</anchor>
-      <arglist>(uint32_t time, synaptic_row_t row, bool *write_back)</arglist>
+      <anchor>adabc60315fbcf7e2da81a0e556d9956f</anchor>
+      <arglist>(uint32_t time, uint32_t spike_colour, uint32_t colour_mask, synaptic_row_t row, bool *write_back)</arglist>
     </member>
     <member kind="function">
       <type>uint32_t</type>
@@ -8152,6 +8238,27 @@
       <name>synapses_saturation_count</name>
       <anchorfile>synapses_8h.html</anchorfile>
       <anchor>a8b7881a6d9caca38f2050656c652cf26</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>skipped_synapses</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>af61f61aa805ba87019bb5f3f8e44bf0f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>late_spikes</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>acd1bff16aec3ed124894cc931af73cda</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_late_spike</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>a00a6393e4b2d3b0e80f886244476c8ca</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -8926,6 +9033,27 @@
       <anchor>a3d336819c22c6a3bcda7ba321da3741b</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable" static="yes">
+      <type>static circular_buffer</type>
+      <name>rate_change_buffer</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a1725d9f0f0d4af892f22a0181e4fdeac</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>colour</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a5bdac4fec3cf570ebe861aea93346316</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>colour_mask</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a4aa662177b306e9085f7ef20b3a6a2c1</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>bit_field_expander.h</name>
@@ -8938,8 +9066,8 @@
       <type>static bool</type>
       <name>do_sdram_read_and_test</name>
       <anchorfile>bit__field__expander_8h.html</anchorfile>
-      <anchor>aae677d854d4a3416d03ae6268e268215</anchor>
-      <arglist>(synaptic_row_t row_data, synaptic_row_t row, uint32_t n_bytes_to_transfer)</arglist>
+      <anchor>aedbb9078114fc3e4f94a7e6c4ca3c5ae</anchor>
+      <arglist>(synaptic_row_t row_data, pop_table_lookup_result_t *result)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -10733,6 +10861,13 @@
       <anchor>a419319f82ec1b09d73f76ef2a298eef9</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_colour_bits</name>
+      <anchorfile>delay__extension_8h.html</anchorfile>
+      <anchor>a720c7d3fc7c1875823ccd6e4f936fd5e</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="struct">
     <name>delay_value</name>
@@ -10765,6 +10900,20 @@
       <name>n_bytes_transferred</name>
       <anchorfile>structdma__buffer.html</anchorfile>
       <anchor>a764511923c4c18e2c1303c4386aaf5e3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>colour</name>
+      <anchorfile>structdma__buffer.html</anchorfile>
+      <anchor>ad5b25dca0387e7c4debcd39f9932ea15</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>colour_mask</name>
+      <anchorfile>structdma__buffer.html</anchorfile>
+      <anchor>ae07dbaaac8f55342c93dba29f9cd3d9a</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -11046,6 +11195,13 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_colour_bits</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a1b18e5c964abcc146e709319f2650948</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
       <type>rng_seed_t</type>
       <name>spike_source_seed</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
@@ -11273,6 +11429,13 @@
     </member>
     <member kind="variable">
       <type>uint32_t</type>
+      <name>colour_shift</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>af696358bad26f021081f06a403fdf835</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
       <name>self_connected</name>
       <anchorfile>spike__processing__fast_8h.html</anchorfile>
       <anchor>a62e84dad881a32b0dc9621b7404d8405</anchor>
@@ -11387,9 +11550,9 @@
     </member>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>extra_info_flag</name>
+      <name>n_colour_bits</name>
       <anchorfile>population__table_8h.html</anchorfile>
-      <anchor>a12b8d8e12253bc56e1bbd8581ad3da81</anchor>
+      <anchor>a8dbf8ef74605e734a08c4b376959215e</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -12501,6 +12664,11 @@
     <anchor>structpop__table__config__t</anchor>
   </compound>
   <compound kind="struct">
+    <name>pop_table_lookup_result_t</name>
+    <filename>population__table_8h.html</filename>
+    <anchor>structpop__table__lookup__result__t</anchor>
+  </compound>
+  <compound kind="struct">
     <name>post_event_history_t</name>
     <filename>post__events__with__da_8h.html</filename>
     <anchor>structpost__event__history__t</anchor>
@@ -13264,6 +13432,27 @@
       <name>n_filtered_by_bitfield</name>
       <anchorfile>structsynapse__provenance.html</anchorfile>
       <anchor>a5ecd8b0730953e302c74d60403925a33</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_synapses_skipped</name>
+      <anchorfile>structsynapse__provenance.html</anchorfile>
+      <anchor>a39d38c88172c1869c1fa6e1915777406</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_late_spikes</name>
+      <anchorfile>structsynapse__provenance.html</anchorfile>
+      <anchor>ad984a0a3e70c68213bd51a73dfcd904d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_late_spike</name>
+      <anchorfile>structsynapse__provenance.html</anchorfile>
+      <anchor>acdb7619856544343a2cc33b518586d38</anchor>
       <arglist></arglist>
     </member>
   </compound>

@@ -159,9 +159,10 @@
 <span class="c1"># 5. REAL slow_rate_per_tick_cutoff; 6. REAL fast_rate_per_tick_cutoff;</span>
 <span class="c1"># 7. unt32_t first_source_id; 8. uint32_t n_spike_sources;</span>
 <span class="c1"># 9. uint32_t max_spikes_per_timestep;</span>
-<span class="c1"># 10,11,12,13 mars_kiss64_seed_t (uint[4]) spike_source_seed;</span>
-<span class="c1"># 14. Rate changed flag</span>
-<span class="n">PARAMS_BASE_WORDS</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="c1"># 10. uint32_t n_colour_bits;</span>
+<span class="c1"># 11,12,13,14 mars_kiss64_seed_t (uint[4]) spike_source_seed;</span>
+<span class="c1"># 15. Rate changed flag</span>
+<span class="n">PARAMS_BASE_WORDS</span> <span class="o">=</span> <span class="mi">15</span>
 
 <span class="c1"># uint32_t n_rates; uint32_t index</span>
 <span class="n">PARAMS_WORDS_PER_NEURON</span> <span class="o">=</span> <span class="mi">2</span>
@@ -495,7 +496,8 @@
             <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">keys</span> <span class="o">=</span> <span class="n">get_field_based_keys</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="n">get_field_based_keys</span><span class="p">(</span>
+                <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">)</span>
 
         <span class="c1"># Write the incoming mask if there is one</span>
         <span class="n">incoming_mask</span> <span class="o">=</span> <span class="mi">0</span>
@@ -533,6 +535,9 @@
 
         <span class="c1"># Write the maximum spikes per tick</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_spikes_per_ts</span><span class="p">())</span>
+
+        <span class="c1"># Write the number of colour bits</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">)</span>
 
         <span class="c1"># Write the random seed (4 words), generated randomly!</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">kiss_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
@@ -589,6 +594,11 @@
             <span class="k">return</span> <span class="n">sdram_machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">n_bytes_for_transfer</span>
         <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
             <span class="s2">&quot;Unknown post vertex type in edge </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sdram_machine_edge</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.get_n_keys_for_partition"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.get_n_keys_for_partition">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_n_keys_for_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
+        <span class="n">n_colours</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">n_colours</span></div>
 </pre></div>
 
             <div class="clearer"></div>
