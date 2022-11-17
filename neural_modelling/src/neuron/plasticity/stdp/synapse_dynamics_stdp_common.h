@@ -144,7 +144,7 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
 }
 
 static inline fixed_stdp_synapse synapse_dynamics_stdp_get_fixed(
-        uint32_t control_word, uint32_t time) {
+        uint32_t control_word, uint32_t time, uint32_t colour_delay) {
     // Extract control-word components
     // **NOTE** cunningly, control word is just the same as lower
     // 16-bits of 32-bit fixed synapse so same functions can be used
@@ -162,7 +162,7 @@ static inline fixed_stdp_synapse synapse_dynamics_stdp_get_fixed(
                 control_word, synapse_index_mask),
        .type_index = type_index,
        .ring_buffer_index = synapse_row_get_ring_buffer_index_combined(
-                delay_axonal + delay_dendritic + time, type_index,
+                (delay_axonal + delay_dendritic + time) - colour_delay, type_index,
                 synapse_type_index_bits, synapse_delay_mask)
     };
 }

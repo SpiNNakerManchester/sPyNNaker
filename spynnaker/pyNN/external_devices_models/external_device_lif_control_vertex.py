@@ -45,7 +45,7 @@ class ExternalDeviceLifControlVertex(
             pynn_model, translator=None, spikes_per_second=None, label=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
             drop_late_spikes=None, splitter=None, seed=None,
-            rb_left_shifts=None):
+            n_colour_bits=None, rb_left_shifts=None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
             The AbstractMulticastControllableDevice instances to be controlled
@@ -67,13 +67,15 @@ class ExternalDeviceLifControlVertex(
         :param splitter: splitter from app to machine
         :type splitter: None or
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+        :param int n_colour_bits: The number of colour bits to use
+        :param int rb_left_shifts: The left shifts to use (or None to calc)
         """
         # pylint: disable=too-many-arguments
         super().__init__(
             len(devices), label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter, seed,
-            rb_left_shifts)
+            n_colour_bits, rb_left_shifts)
 
         if not devices:
             raise ConfigurationException("No devices specified")

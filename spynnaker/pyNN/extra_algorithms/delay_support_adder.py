@@ -145,7 +145,7 @@ class _DelaySupportAdder(object):
             delay_name = "{}_delayed".format(app_edge.pre_vertex.label)
             delay_app_vertex = DelayExtensionVertex(
                 app_outgoing_edge_partition, delay_per_stage, n_delay_stages,
-                label=delay_name)
+                app_edge.pre_vertex.n_colour_bits, label=delay_name)
 
             # set trackers
             delay_app_vertex.splitter = SplitterDelayVertexSlice()

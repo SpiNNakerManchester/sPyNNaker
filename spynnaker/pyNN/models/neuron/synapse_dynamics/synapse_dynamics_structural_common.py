@@ -52,8 +52,9 @@ class SynapseDynamicsStructuralCommon(
     # + 3 32-bit numbers (weight; connection_type; total_no_atoms)
     _PRE_POP_INFO_BASE_SIZE = (4 * BYTES_PER_SHORT) + (3 * BYTES_PER_WORD)
 
-    # 5 32-bit numbers (key; mask; n_atoms; lo_atom; m_pop_index)
-    _KEY_ATOM_INFO_SIZE = (5 * BYTES_PER_WORD)
+    # 6 32-bit numbers (key; mask; n_atoms; n_colour_bits; lo_atom;
+    # m_pop_index)
+    _KEY_ATOM_INFO_SIZE = (6 * BYTES_PER_WORD)
 
     # 1 16-bit number (neuron_index)
     # + 2 8-bit numbers (sub_pop_index; pop_index)
@@ -269,6 +270,7 @@ class SynapseDynamicsStructuralCommon(
                 vertex_slice = m_vertex.vertex_slice
                 spec.write_value(r_info.key)
                 spec.write_value(r_info.mask)
+                spec.write_value(m_vertex.app_vertex.n_colour_bits)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(

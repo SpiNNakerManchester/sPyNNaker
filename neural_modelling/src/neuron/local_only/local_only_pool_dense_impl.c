@@ -42,6 +42,7 @@ typedef struct {
 typedef struct {
     uint32_t key;
     uint32_t mask;
+    uint32_t n_colour_bits;
 } source_key_info;
 
 // A reciprocal of a 16-bit signed integer will have 1 sign bit, 1 integer bit
@@ -149,6 +150,7 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
     for (uint32_t i = 0; i < config.n_connectors; i++) {
         connector *c = connectors[i];
         if ((spike & c->key_info.mask) == c->key_info.key) {
+        	uint32_t local_spike = (spike & ~c->key_info.mask) & c->key_info.n_colour_bits;
             *conn = c;
 
             // Now work out the index into the weights from the coordinates
@@ -158,7 +160,7 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
                 dimension *dim = &c->dimensions[j];
 
                 // Get the coordinate for this dimension from the spike
-                uint32_t coord = (spike & dim->mask) >> dim->shift;
+                uint32_t coord = (local_spike & dim->mask) >> dim->shift;
 
                 // Work out the position in the global space
                 coord += dim->pre_start;

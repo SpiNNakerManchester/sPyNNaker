@@ -246,8 +246,10 @@ bool synapse_dynamics_initialise(
 static inline plastic_synapse_t process_plastic_synapse(
         uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
         pre_trace_t new_pre_trace, weight_t *ring_buffers, uint32_t time,
-        plastic_synapse_t synapse, pre_event_history_t *pre_event_history) {
-    fixed_stdp_synapse s = synapse_dynamics_stdp_get_fixed(control_word, time);
+        uint32_t colour_delay, plastic_synapse_t synapse,
+        pre_event_history_t *pre_event_history) {
+    fixed_stdp_synapse s = synapse_dynamics_stdp_get_fixed(control_word, time,
+            colour_delay);
 
     // Create update state from the plastic synaptic word
     update_state_t current_state = synapse_structure_get_update_state(
@@ -257,13 +259,15 @@ static inline plastic_synapse_t process_plastic_synapse(
     uint32_t post_delay = s.delay_dendritic;
 
     final_state_t final_state = plasticity_update_synapse(
-            time, last_pre_time, last_pre_trace, new_pre_trace,
+            time - colour_delay, last_pre_time, last_pre_trace, new_pre_trace,
             post_delay, s.delay_axonal, current_state,
             &post_event_history[s.index], pre_event_history);
 
-    // Add weight to ring-buffer entry
-    int32_t weight = synapse_structure_get_final_weight(final_state);
-    synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s, weight);
+    // Add weight to ring-buffer entry, but only if not too late
+    if (s.delay_axonal + s.delay_dendritic >= colour_delay) {
+        int32_t weight = synapse_structure_get_final_weight(final_state);
+        synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s, weight);
+    }
 
     return synapse_structure_get_final_synaptic_word(final_state);
 }
@@ -271,7 +275,8 @@ static inline plastic_synapse_t process_plastic_synapse(
 bool synapse_dynamics_process_plastic_synapses(
         synapse_row_plastic_data_t *plastic_region_address,
         synapse_row_fixed_part_t *fixed_region,
-        weight_t *ring_buffers, uint32_t time, bool *write_back) {
+        weight_t *ring_buffers, uint32_t time, uint32_t colour_delay,
+        bool *write_back) {
 
 //	if (print_plasticity){
 //		io_printf(IO_BUF, "\n############ New Plasticity Update #############\n");
@@ -289,14 +294,14 @@ bool synapse_dynamics_process_plastic_synapses(
     const uint32_t recorded_spikes_minus_one =
             plastic_region_address->history.num_recorded_mf_spikes_minus_one;
     const uint32_t last_pre_time =
-            plastic_region_address->history.mf_times[recorded_spikes_minus_one];
+            plastic_region_address->history.mf_times[recorded_spikes_minus_one]; // colour_delay?
 
     // no longer need to manage this trace
-//    const pre_trace_t last_pre_trace = 0;
+    const pre_trace_t last_pre_trace = 0;
 
     // add pre spike to struct capturing pre synaptic event history
     // NOTE: this uses the post_event_history_t handling code
-    post_events_add(time, &plastic_region_address->history, 0);
+    post_events_add(time - colour_delay, &plastic_region_address->history, 0);
 
     // Update pre-synaptic trace
 //    if (print_plasticity){
@@ -304,7 +309,7 @@ bool synapse_dynamics_process_plastic_synapses(
 //    		"\nAdding pre-synaptic event (mossy fibre spike) at time: %u\n\n", time);
 //    }
 
-    timing_add_pre_spike(time, last_pre_time, 0); // last_pre_trace);
+    timing_add_pre_spike(time - colour_delay, last_pre_time, 0); // last_pre_trace);
 
     // Loop through plastic synapses
     for (; n_plastic_synapses > 0; n_plastic_synapses--) {
@@ -313,8 +318,8 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t control_word = *control_words++;
 
         plastic_words[0] = process_plastic_synapse(
-                control_word, last_pre_time, 0,
-                0, ring_buffers, time,
+                control_word, last_pre_time, last_pre_trace,
+                last_pre_trace, ring_buffers, time, colour_delay,
                 plastic_words[0], &plastic_region_address->history);
         plastic_words++;
     }

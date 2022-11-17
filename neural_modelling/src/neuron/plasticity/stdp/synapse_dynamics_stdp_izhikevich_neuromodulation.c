@@ -87,6 +87,8 @@ static int16_lut *tau_d_lookup;
 
 static uint32_t *nm_weight_shift;
 
+extern uint32_t skipped_synapses;
+
 #define DECAY_LOOKUP_TAU_C(time) \
     maths_lut_exponential_decay(time, tau_c_lookup)
 #define DECAY_LOOKUP_TAU_D(time) \
@@ -300,10 +302,6 @@ bool synapse_dynamics_initialise(
     nm_params_t *sdram_params = (nm_params_t *) address;
     spin1_memcpy(&nm_params, sdram_params, sizeof(nm_params_t));
 
-    log_info("Constant %k, min weight %k, max weight %k",
-            nm_params.weight_update_constant_component,
-            nm_params.min_weight, nm_params.max_weight);
-
     // Read lookup tables
     address_t lut_address = (void *) &sdram_params[1];
     tau_c_lookup = maths_copy_int16_lut(&lut_address);
@@ -317,7 +315,6 @@ bool synapse_dynamics_initialise(
     }
     for (uint32_t s = 0; s < n_synapse_types; s++) {
         nm_weight_shift[s] = ring_buffer_to_input_buffer_left_shifts[s];
-        log_info("Weight shift %u = %u", s, nm_weight_shift[s]);
     }
 
     return true;
@@ -405,8 +402,9 @@ void synapse_dynamics_process_post_synaptic_event(
 static inline neuromodulated_synapse_t process_plastic_synapse(
         uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
 		pre_trace_t new_pre_trace, weight_t *ring_buffers, uint32_t time,
-		neuromodulated_synapse_t synapse) {
-    fixed_stdp_synapse s = synapse_dynamics_stdp_get_fixed(control_word, time);
+		uint32_t colour_delay, neuromodulated_synapse_t synapse) {
+    fixed_stdp_synapse s = synapse_dynamics_stdp_get_fixed(control_word, time,
+            colour_delay);
 
     // Create update state from the plastic synaptic word
     nm_update_state_t current_state = get_nm_update_state(synapse, s.type);
@@ -418,12 +416,17 @@ static inline neuromodulated_synapse_t process_plastic_synapse(
 	}
 	nm_final_state_t final_state =
 	    izhikevich_neuromodulation_plasticity_update_synapse(
-            time, last_pre_time, last_pre_trace, new_pre_trace,
+            time - colour_delay, last_pre_time, last_pre_trace, new_pre_trace,
             post_delay, s.delay_axonal, current_state,
             &post_event_history[s.index]);
 
-	// Add weight to ring-buffer entry
-	synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s, final_state.weight);
+	// Add weight to ring-buffer entry, but only if not too late
+    if (s.delay_dendritic + s.delay_axonal >= colour_delay) {
+        synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s,
+                final_state.weight);
+    } else {
+        skipped_synapses++;
+    }
 
     return get_nm_final_synaptic_word(final_state);
 }
@@ -468,7 +471,8 @@ static inline void process_neuromodulation(
 bool synapse_dynamics_process_plastic_synapses(
         synapse_row_plastic_data_t *plastic_region_address,
         synapse_row_fixed_part_t *fixed_region,
-        weight_t *ring_buffers, uint32_t time, bool *write_back) {
+        weight_t *ring_buffers, uint32_t time, uint32_t colour_delay,
+        bool *write_back) {
 
     // If the flag is set, this is neuromodulation
     if (plastic_region_address->neuromodulation.is_neuromodulation) {
@@ -491,9 +495,9 @@ bool synapse_dynamics_process_plastic_synapses(
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    plastic_region_address->history.prev_time = time;
+    plastic_region_address->history.prev_time = time - colour_delay;
     plastic_region_address->history.prev_trace =
-            timing_add_pre_spike(time, last_pre_time, last_pre_trace);
+            timing_add_pre_spike(time - colour_delay, last_pre_time, last_pre_trace);
 
     // Loop through plastic synapses
     for (; n_plastic_synapses > 0; n_plastic_synapses--) {
@@ -503,7 +507,7 @@ bool synapse_dynamics_process_plastic_synapses(
         plastic_words[0] = process_plastic_synapse(
                 control_word, last_pre_time, last_pre_trace,
                 plastic_region_address->history.prev_trace, ring_buffers, time,
-                plastic_words[0]);
+                colour_delay, plastic_words[0]);
         plastic_words++;
     }
     *write_back = true;

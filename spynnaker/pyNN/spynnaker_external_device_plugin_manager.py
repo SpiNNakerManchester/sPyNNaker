@@ -132,7 +132,12 @@ class SpynnakerExternalDevicePluginManager(object):
         if host is None:
             host = get_config_str("Recording", "live_spike_host")
 
-        # add new edge and vertex if required to SpiNNaker graph
+        # Use the right-shift to remove the colour from translated keys
+        n_colour_bits = population._vertex.n_colour_bits
+        translated_key_right_shift = n_colour_bits
+
+        # Use the mask to remove the colour from non-translated keys
+        received_key_mask = 0xFFFFFFFF & ~((2 ** n_colour_bits) - 1)
 
         # pylint: disable=too-many-arguments, too-many-locals
         params = LivePacketGatherParameters(
@@ -145,7 +150,9 @@ class SpynnakerExternalDevicePluginManager(object):
             payload_right_shift=payload_right_shift,
             number_of_packets_sent_per_time_step=(
                 number_of_packets_sent_per_time_step),
-            label="LiveSpikeReceiver", translate_keys=translate_keys)
+            label="LiveSpikeReceiver", received_key_mask=received_key_mask,
+            translate_keys=translate_keys,
+            translated_key_right_shift=translated_key_right_shift)
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
             population._vertex, params, [SPIKE_PARTITION_ID])
 
@@ -191,21 +198,7 @@ class SpynnakerExternalDevicePluginManager(object):
         :type vertex_to_record_from:
             ~pacman.model.graphs.application.ApplicationVertex or
             ~pacman.model.graphs.machine.MachineVertex
-        :param str lpg_label:
-        :param int port:
-        :param str hostname:
-        :param int tag:
-        :param bool strip_sdp:
-        :param bool use_prefix:
-        :param int key_prefix:
-        :param ~spinnman.messages.eieio.EIEIOPrefix prefix_type:
-        :param ~spinnman.messages.eieio.EIEIOType message_type:
-        :param int right_shift:
-        :param bool payload_as_time_stamps:
-        :param bool use_payload_prefix:
-        :param int payload_prefix:
-        :param int payload_right_shift:
-        :param int number_of_packets_sent_per_time_step:
+        :param LivePacketGatherParameters params:
         :param list(str) partition_ids:
         :param bool translate_keys:
         """

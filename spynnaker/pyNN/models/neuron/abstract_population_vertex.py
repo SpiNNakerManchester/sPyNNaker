@@ -141,7 +141,8 @@ class AbstractPopulationVertex(
         "__connection_cache",
         "__read_initial_values",
         "__have_read_initial_values",
-        "__last_parameter_read_time"]
+        "__last_parameter_read_time",
+        "__n_colour_bits"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -158,15 +159,15 @@ class AbstractPopulationVertex(
     _SYNAPSE_BASE_N_CPU_CYCLES_PER_NEURON = 22
     _SYNAPSE_BASE_N_CPU_CYCLES = 10
 
-    # 5 elements before the start of global parameters
-    # 1. has key, 2. key, 3. n atoms, 4. n_atoms_peak 5. n_synapse_types
+    # Elements before the start of global parameters
+    # 1. has key, 2. key, 3. n atoms, 4. n_atoms_peak 5. n_colour_bits
     CORE_PARAMS_BASE_SIZE = 5 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes, splitter, seed,
-            rb_left_shifts):
+            n_colour_bits, rb_left_shifts):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -192,6 +193,8 @@ class AbstractPopulationVertex(
         :param seed:
             The Population seed, used to ensure the same random generation
             on each run.
+        :param int n_colour_bits: The number of colour bits to use
+        :param int rb_left_shifts: The left shifts to use
         """
 
         # pylint: disable=too-many-arguments
@@ -230,6 +233,10 @@ class AbstractPopulationVertex(
         self.__initial_state_variables = RangeDictionary(n_neurons)
         self.__neuron_impl.add_state_variables(self.__initial_state_variables)
         self.__state_variables = self.__initial_state_variables.copy()
+        self.__n_colour_bits = n_colour_bits
+        if self.__n_colour_bits is None:
+            self.__n_colour_bits = get_config_int(
+                "Simulation", "n_colour_bits")
 
         # Set up for recording
         neuron_recordable_variables = list(
@@ -1427,6 +1434,11 @@ class AbstractPopulationVertex(
         for vertex in self.machine_vertices:
             if isinstance(vertex, PopulationMachineNeurons):
                 vertex.set_do_neuron_regeneration()
+
+    @property
+    @overrides(PopulationApplicationVertex.n_colour_bits)
+    def n_colour_bits(self):
+        return self.__n_colour_bits
 
 
 class _Stats(object):
