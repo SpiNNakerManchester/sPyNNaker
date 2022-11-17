@@ -93,6 +93,7 @@ uint32_t max_late_spike = 0;
 //! Number of neurons
 static uint32_t n_neurons_peak;
 
+//! The mask of the delay shifted into position i.e. pre-shift
 static uint32_t synapse_delay_mask_shifted = 0;
 
 
@@ -352,10 +353,10 @@ bool synapses_process_synaptic_row(
         uint32_t time, uint32_t spike_colour, uint32_t colour_mask,
 		synaptic_row_t row, bool *write_back) {
 
-    // Work out how much delay take off or add on to the actual delay because
+    // Work out how much delay takes off or adds on to the actual delay because
     // of a delayed spike arrival time, or delayed change of time step in the
     // current core.  Spikes can be as late as the bits in colour_mask dictates.
-	/// Masked difference is used to calculate this, which will always be
+	// Masked difference is used to calculate this, which will always be
 	// positive because the mask removes the negative bit.
 	// Example: time colour 8, spike colour 13, colour mask 0xF means time
 	// colour has gone up to 15 and then wrapped since spike was sent.

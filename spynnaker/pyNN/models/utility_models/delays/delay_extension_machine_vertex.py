@@ -231,7 +231,7 @@ class DelayExtensionMachineVertex(
         # Reserve memory:
         spec.comment("\nReserving memory space for data regions:\n\n")
 
-        # ###################################################################self
+        # ###################################################################
         # Reserve SDRAM space for memory areas:
         delay_params_sz = self._app_vertex.delay_params_size()
 
