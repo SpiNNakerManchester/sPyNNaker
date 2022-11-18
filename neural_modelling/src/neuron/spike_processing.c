@@ -27,7 +27,7 @@
 #include <common/in_spikes.h>
 #include <recording.h>
 
-extern bool timer_callback_active;
+//extern bool timer_callback_active;
 
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
@@ -297,26 +297,26 @@ static inline void start_dma_loop(void) {
         }
     }
 
-#if LOG_LEVEL >= LOG_DEBUG
-    // if timer is getting low, don't do next DMA and instead flush spike buffer
-    // originally 6657 clock cycles from the end of the interval was used
-    if (tc[T1_COUNT] < 6657) {
-    	    uint cpsr = spin1_int_disable();
-    	    uint32_t spikes_remaining = in_spikes_flush_buffer();
-    	    timer_callback_active = true;
-    	    spin1_mode_restore(cpsr);
-
-    	    if (spikes_remaining > 0){
-    	    	total_flushed_spikes += spikes_remaining;
-
-    	    	if (spikes_remaining > max_flushed_spikes){
-    	    		max_flushed_spikes = spikes_remaining;
-    	    	}
-
-//    	    	log_debug("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
-    	    }
-    }
-#endif
+//#if LOG_LEVEL >= LOG_DEBUG
+//    // if timer is getting low, don't do next DMA and instead flush spike buffer
+//    // originally 6657 clock cycles from the end of the interval was used
+//    if (tc[T1_COUNT] < 6657) {
+//    	    uint cpsr = spin1_int_disable();
+//    	    uint32_t spikes_remaining = in_spikes_flush_buffer();
+//    	    timer_callback_active = true;
+//    	    spin1_mode_restore(cpsr);
+//
+//    	    if (spikes_remaining > 0){
+//    	    	total_flushed_spikes += spikes_remaining;
+//
+//    	    	if (spikes_remaining > max_flushed_spikes){
+//    	    		max_flushed_spikes = spikes_remaining;
+//    	    	}
+//
+////    	    	log_debug("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
+//    	    }
+//    }
+//#endif
 }
 
 //! \brief Called when a multicast packet is received

@@ -40,6 +40,10 @@
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <spin1_api_params.h>
 
+// FLUSH SPIKES
+bool timer_callback_active = false;
+extern volatile bool dma_busy;
+
 //! values for the priority for each callback
 typedef enum callback_priorities {
     MC = -1, DMA = -2, TIMER = 0, SDP = 0

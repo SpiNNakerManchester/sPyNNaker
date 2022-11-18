@@ -27,6 +27,8 @@
 #include <debug.h>
 #include <wfi.h>
 
+extern bool timer_callback_active;
+
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
 typedef struct dma_buffer {
@@ -537,6 +539,24 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
             // a callback function is too slow!  This is therefore a busy wait.
             // wait_for_interrupt();
         }
+
+#if LOG_LEVEL >= LOG_DEBUG
+		// if timer is getting low, don't do next DMA and instead flush spike buffer
+		// originally 6657 clock cycles from the end of the interval was used
+		if (tc[T1_COUNT] < 6657) {
+				uint cpsr = spin1_int_disable();
+				uint32_t spikes_remaining = in_spikes_flush_buffer();
+				timer_callback_active = true;
+				spin1_mode_restore(cpsr);
+				if (spikes_remaining > 0){
+					total_flushed_spikes += spikes_remaining;
+
+					if (spikes_remaining > max_flushed_spikes){
+						max_flushed_spikes = spikes_remaining;
+					}
+				}
+		}
+#endif
 
         // If the timer has gone off, that takes precedence
         if (is_end_of_time_step()) {
