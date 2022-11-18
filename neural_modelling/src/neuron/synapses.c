@@ -296,10 +296,10 @@ bool synapses_initialise(
     // read in min_weights
     spin1_memcpy(min_weights, params->min_weights, min_weights_bytes);
     *min_weights_out = min_weights;
-    for (uint32_t s = 0; s < n_synapse_types; s++) {
-        log_info("synapse initialise, min_weights_out[%u] = %k",
-                s, min_weights_out[s]);
-    }
+//    for (uint32_t s = 0; s < n_synapse_types; s++) {
+//        log_info("synapse initialise, min_weights_out[%u] = %k",
+//                s, min_weights_out[s]);
+//    }
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
