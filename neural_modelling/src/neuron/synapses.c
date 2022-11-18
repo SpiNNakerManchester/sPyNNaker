@@ -329,7 +329,7 @@ bool synapses_initialise(
     }
     *ring_buffers_out = ring_buffers;
 
-    log_info("Ready to process synapses for %u neurons with %u synapse types",
+    log_debug("Ready to process synapses for %u neurons with %u synapse types",
             n_neurons, n_synapse_types);
 
     return true;
