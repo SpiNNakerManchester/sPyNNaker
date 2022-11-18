@@ -151,7 +151,7 @@ static bool current_source_load_parameters(address_t cs_address) {
     // Avoid the loops if no current sources
     #if !defined(_CURRENT_SOURCE_DC_H_) && !defined(_CURRENT_SOURCE_AC_H) && \
         !defined(_CURRENT_SOURCE_STEP_H_) && !defined(_CURRENT_SOURCE_NOISY_H_)
-    io_printf(IO_BUF, "no current sources defined \n");
+//    io_printf(IO_BUF, "no current sources defined \n");
     return true;
     #else
 
