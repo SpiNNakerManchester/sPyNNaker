@@ -267,7 +267,8 @@ bool synapse_dynamics_process_plastic_synapses(
 
     // Update pre-synaptic trace
 //    if (print_plasticity){
-//    	io_printf(IO_BUF, "\nAdding pre-synaptic event (parallel fibre spike) at time: %u\n\n", time);
+//    	io_printf(IO_BUF,
+//    			"\nAdding pre-synaptic event (parallel fibre spike) at time: %u\n\n", time);
 //    }
 
     timing_add_pre_spike(time - colour_delay, last_pre_time, last_pre_trace);

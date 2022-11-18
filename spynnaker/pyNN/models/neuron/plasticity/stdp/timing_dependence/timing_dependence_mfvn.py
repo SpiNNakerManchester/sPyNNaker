@@ -179,7 +179,7 @@ class TimingDependenceMFVN(AbstractTimingDependence):
                 self.__class__.__name__, "tau_minus_last_entry",
                 tauminus)
             if tauminus is not None:
-                if tauminus[-1] > 0:
+                if tauminus > 0:
                     db.insert_report(
                         f"The last entry in the STDP exponential lookup table "
                         f"for the tau_minus parameter of the "
