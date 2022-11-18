@@ -22,6 +22,7 @@ from spinn_utilities.abstract_base import (
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -86,6 +87,39 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     def delay(self):
         """ The delay of connections
         """
+
+    @abstractproperty
+    def is_combined_core_capable(self):
+        """ Determine if the synapse dynamics can run on a core combined with
+            the neuron, or if a separate core is needed.
+
+        :rtype: bool
+        """
+
+    def get_value(self, key):
+        """ Get a property
+
+        :param str key: the name of the property
+        :rtype: Any or float or int or list(float) or list(int)
+        """
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise InvalidParameterType(
+            f"Type {type(self)} does not have parameter {key}")
+
+    def set_value(self, key, value):
+        """ Set a property
+
+        :param str key: the name of the parameter to change
+        :param value: the new value of the parameter to assign
+        :type value: Any or float or int or list(float) or list(int)
+        """
+        if hasattr(self, key):
+            setattr(self, key, value)
+            SpynnakerDataView.set_requires_mapping()
+        else:
+            raise InvalidParameterType(
+                f"Type {type(self)} does not have parameter {key}")
 
     def get_delay_maximum(self, connector, synapse_info):
         """ Get the maximum delay for the synapses

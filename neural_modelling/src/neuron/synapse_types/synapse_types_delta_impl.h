@@ -49,16 +49,15 @@
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
-//! A synaptic input shaped as a Dirac delta
-typedef struct delta_params_t {
-    //! The synaptic input value
-    input_t synaptic_input_value;
-} delta_params_t;
+struct synapse_types_params_t {
+    input_t exc;
+    input_t inh;
+};
 
 //! Delta synapses support just a single excitatory and inhibitory input each
-struct synapse_param_t {
-    delta_params_t exc; //!< Excitatory synaptic input
-    delta_params_t inh; //!< Inhibitory synaptic input
+struct synapse_types_t {
+    input_t exc; //!< Excitatory synaptic input
+    input_t inh; //!< Inhibitory synaptic input
 };
 
 //! The supported synapse type indices
@@ -71,13 +70,15 @@ typedef enum {
 // Synapse shaping inline implementation
 //---------------------------------------
 
-//! \brief Decays the stuff thats sitting in the input buffers.
-//! \details
-//!     In this case, a delta shape means returning the value to zero
-//!     immediately.
-//! \param[out] delta_param: the parameter to update
-static inline void delta_shaping(delta_params_t *delta_param) {
-	delta_param->synaptic_input_value = 0;
+static inline void synapse_types_initialise(synapse_types_t *state,
+		synapse_types_params_t *params, UNUSED uint32_t n_steps_per_timestep) {
+	state->exc = params->exc;
+	state->inh = params->inh;
+}
+
+static void synapse_types_save_state(synapse_types_t *state, synapse_types_params_t *params) {
+	params->exc = state->exc;
+	params->inh = state->inh;
 }
 
 //! \brief decays the stuff thats sitting in the input buffers as these have not
@@ -89,18 +90,9 @@ static inline void delta_shaping(delta_params_t *delta_param) {
 //!
 //! \param[in,out] parameters: the pointer to the parameters to use
 static inline void synapse_types_shape_input(
-        synapse_param_t *parameters) {
-	delta_shaping(&parameters->exc);
-	delta_shaping(&parameters->inh);
-}
-
-//! \brief helper function to add input for a given timer period to a given
-//!     neuron
-//! \param[in,out] delta_param: the parameter to update
-//! \param[in] input: the input to add.
-static inline void add_input_delta(
-        delta_params_t *delta_param, input_t input) {
-	delta_param->synaptic_input_value += input;
+        synapse_types_t *parameters) {
+	parameters->exc = 0;
+	parameters->inh = 0;
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
@@ -110,14 +102,14 @@ static inline void add_input_delta(
 //! \param[in,out] parameters: the pointer to the parameters to use
 //! \param[in] input the inputs for that given synapse_type.
 static inline void synapse_types_add_neuron_input(
-        index_t synapse_type_index, synapse_param_t *parameters,
+        index_t synapse_type_index, synapse_types_t *parameters,
         input_t input) {
     switch (synapse_type_index) {
     case EXCITATORY:
-    	add_input_delta(&parameters->exc, input);
+    	parameters->exc += input;
     	break;
     case INHIBITORY:
-    	add_input_delta(&parameters->inh, input);
+    	parameters->inh += input;
     	break;
     }
 }
@@ -128,8 +120,8 @@ static inline void synapse_types_add_neuron_input(
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the excitatory input buffers for a given neuron ID.
 static inline input_t *synapse_types_get_excitatory_input(
-        input_t *excitatory_response, synapse_param_t *parameters) {
-    excitatory_response[0] = parameters->exc.synaptic_input_value;
+        input_t *excitatory_response, synapse_types_t *parameters) {
+    excitatory_response[0] = parameters->exc;
     return &excitatory_response[0];
 }
 
@@ -139,8 +131,8 @@ static inline input_t *synapse_types_get_excitatory_input(
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the inhibitory input buffers for a given neuron ID.
 static inline input_t *synapse_types_get_inhibitory_input(
-        input_t *inhibitory_response, synapse_param_t *parameters) {
-    inhibitory_response[0] = parameters->inh.synaptic_input_value;
+        input_t *inhibitory_response, synapse_types_t *parameters) {
+    inhibitory_response[0] = parameters->inh;
     return &inhibitory_response[0];
 }
 
@@ -167,17 +159,15 @@ static inline const char *synapse_types_get_type_char(
 //!     are controlled from the synapses.c print_inputs() method.
 //! \param[in] parameters: the pointer to the parameters to use
 static inline void synapse_types_print_input(
-        synapse_param_t *parameters) {
+        synapse_types_t *parameters) {
     io_printf(IO_BUF, "%12.6k - %12.6k",
-            parameters->exc.synaptic_input_value,
-            parameters->inh.synaptic_input_value);
+            parameters->exc, parameters->inh);
 }
 
 //! \brief printer call
 //! \param[in] parameters: the pointer to the parameters to print
 static inline void synapse_types_print_parameters(
-        synapse_param_t *parameters) {
-    synapse_types_print_input(parameters);
+        UNUSED synapse_types_t *parameters) {
 }
 
 #endif  // _SYNAPSE_TYPES_DELTA_IMPL_H_

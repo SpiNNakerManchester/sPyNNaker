@@ -29,7 +29,7 @@ from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: The number of 32-bit words in the source_key_info struct
-SOURCE_KEY_INFO_WORDS = 6
+SOURCE_KEY_INFO_WORDS = 7
 
 #: The number of 16-bit shorts in the connector struct,
 #: ignoring the source_key_info struct and the weights (which are dynamic)
@@ -349,7 +349,8 @@ class ConvolutionConnector(AbstractConnector):
             (n_weights * BYTES_PER_SHORT))
 
     def write_local_only_data(
-            self, spec, app_edge, vertex_slice, key, mask, weight_scales):
+            self, spec, app_edge, vertex_slice, key, mask, n_colour_bits,
+            weight_scales):
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
@@ -359,6 +360,7 @@ class ConvolutionConnector(AbstractConnector):
         # Write source key info
         spec.write_value(key, data_type=DataType.UINT32)
         spec.write_value(mask, data_type=DataType.UINT32)
+        spec.write_value(n_colour_bits, data_type=DataType.UINT32)
 
         # Write the column and row mask and shifts to extract the column and
         # row from the incoming spike

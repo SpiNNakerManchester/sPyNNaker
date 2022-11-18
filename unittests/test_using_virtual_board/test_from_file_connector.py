@@ -29,7 +29,7 @@ class TestFromFileConnector(BaseTestCase):
 
     def check_weights(
             self, projection, aslist, w_index, d_index, sources, destinations):
-        from_pro = projection.get(["weight", "delay"], "list")
+        from_pro = list(projection.get(["weight", "delay"], "list"))
         aslist.sort()
         as_index = 0
         for (source, dest, weight, delay) in from_pro:

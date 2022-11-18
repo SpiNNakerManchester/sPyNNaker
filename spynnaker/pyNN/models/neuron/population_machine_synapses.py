@@ -12,47 +12,29 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from collections import namedtuple
-
 from spinn_utilities.overrides import overrides
-from spinn_utilities.abstract_base import abstractproperty
+from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 
 from data_specification.enums import DataType
 
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (
-    AbstractSupportsBitFieldGeneration,
     AbstractSupportsBitFieldRoutingCompression)
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spynnaker.pyNN.utilities import bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, HasSynapses)
 
-from .synaptic_matrices import SynapticMatrices
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
-
-# Identifiers for synapse regions
-SYNAPSE_FIELDS = [
-    "synapse_params", "direct_matrix", "pop_table", "synaptic_matrix",
-    "synapse_dynamics", "structural_dynamics", "bitfield_builder",
-    "bitfield_key_map", "bitfield_filter", "connection_builder"]
-SynapseRegions = namedtuple(
-    "SynapseRegions", SYNAPSE_FIELDS)
-
-SynapseReferences = namedtuple(
-    "SynapseReferences",
-    ["direct_matrix_ref", "pop_table_ref", "synaptic_matrix_ref",
-     "bitfield_filter_ref"])
+from .synaptic_matrices import SynapseRegions, SYNAPSE_FIELDS
 
 
 class PopulationMachineSynapses(
         PopulationMachineSynapsesProvenance,
-        AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractSynapseExpandable,
         HasSynapses, allow_derivation=True):
@@ -82,10 +64,7 @@ class PopulationMachineSynapses(
 
     @abstractproperty
     def _synaptic_matrices(self):
-        """ The object holding synaptic matrices.
-
-        :note: This can be created by calling the _create_synaptic_matrices
-               method defined below.
+        """ The object holding synaptic matrices
 
         :rtype: SynapticMatrices
         """
@@ -97,6 +76,18 @@ class PopulationMachineSynapses(
         :rtype: .SynapseRegions
         """
 
+    @abstractproperty
+    def _max_atoms_per_core(self):
+        """ The maximum number of atoms on any core targetted by these synapses
+
+        :rtype: int
+        """
+
+    @abstractmethod
+    def set_do_synapse_regeneration(self):
+        """ Indicates that synaptic data regeneration is required
+        """
+
     @property
     def _synapse_references(self):
         """ The references to synapse regions.  Override to provide these.
@@ -105,37 +96,11 @@ class PopulationMachineSynapses(
         """
         return SynapseRegions(*[None for _ in range(len(SYNAPSE_FIELDS))])
 
-    def _create_synaptic_matrices(self, allow_direct=True):
-        """ Creates the synaptic matrices object.
-
-        :note: This is required because this object cannot have any storage
-
-        :rtype: SynapticMatrices
-        """
-        return SynapticMatrices(
-            self._vertex_slice,
-            self._app_vertex.neuron_impl.get_n_synapse_types(),
-            self._app_vertex.all_single_syn_size if allow_direct else 0,
-            self._synapse_regions.synaptic_matrix,
-            self._synapse_regions.direct_matrix,
-            self._synapse_regions.pop_table,
-            self._synapse_regions.connection_builder,
-            self._synapse_references.synaptic_matrix,
-            self._synapse_references.direct_matrix,
-            self._synapse_references.pop_table,
-            self._synapse_references.connection_builder)
-
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                bit_field_base_address)
     def bit_field_base_address(self, placement):
         return locate_memory_region_for_placement(
             placement=placement, region=self._synapse_regions.bitfield_filter)
-
-    @overrides(AbstractSupportsBitFieldGeneration.bit_field_builder_region)
-    def bit_field_builder_region(self, placement):
-        return locate_memory_region_for_placement(
-            placement=placement,
-            region=self._synapse_regions.bitfield_builder)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)
@@ -148,8 +113,7 @@ class PopulationMachineSynapses(
             self._synaptic_matrices.on_chip_generated_matrix_size)]
 
     def _write_synapse_data_spec(
-            self, spec, min_weights, weight_scales,
-            all_syn_block_sz, structural_sz):
+            self, spec, min_weights, weight_scales, structural_sz):
         """ Write the data specification for the synapse data
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -160,16 +124,16 @@ class PopulationMachineSynapses(
             The scaling to apply to weights to store them in the synapses
         :param int all_syn_block_sz: The maximum size of the synapses in bytes
         :param int structural_sz: The size of the structural data
+        :param int n_neuron_bits: The number of bits to use for neuron ids
         """
-        # Get incoming projections
-        incoming = self._app_vertex.incoming_projections
 
         # Write the synapse parameters
         self._write_synapse_parameters(spec, min_weights)
 
         # Write the synaptic matrices
+        self._synaptic_matrices.generate_data()
         self._synaptic_matrices.write_synaptic_data(
-            spec, incoming, all_syn_block_sz, weight_scales)
+            spec, self._vertex_slice, self._synapse_references)
 
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics
@@ -205,26 +169,6 @@ class PopulationMachineSynapses(
                 size=4, label='synapseDynamicsStructuralParams',
                 reference=self._synapse_references.structural_dynamics)
 
-        # write up the bitfield builder data
-        # reserve bit field region
-        bit_field_utilities.reserve_bit_field_regions(
-            spec, incoming, self._synapse_regions.bitfield_builder,
-            self._synapse_regions.bitfield_filter,
-            self._synapse_regions.bitfield_key_map,
-            self._synapse_references.bitfield_builder,
-            self._synapse_references.bitfield_filter,
-            self._synapse_references.bitfield_key_map)
-        bit_field_utilities.write_bitfield_init_data(
-            spec, incoming,
-            self._synapse_regions.bitfield_builder,
-            self._synapse_regions.pop_table,
-            self._synapse_regions.synaptic_matrix,
-            self._synapse_regions.direct_matrix,
-            self._synapse_regions.bitfield_filter,
-            self._synapse_regions.bitfield_key_map,
-            self._synapse_regions.structural_dynamics,
-            isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural))
-
     def _write_synapse_parameters(self, spec, min_weights):
         """ Write the synapse parameters data region
 
@@ -241,7 +185,7 @@ class PopulationMachineSynapses(
             reference=self._synapse_references.synapse_params)
 
         # Get values
-        n_neurons = self._vertex_slice.n_atoms
+        n_neurons = self._max_atoms_per_core
         # We only count neuron synapse types here, as this is related to
         # the ring buffers
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
@@ -287,12 +231,12 @@ class PopulationMachineSynapses(
         return self._synaptic_matrices.get_connections_from_machine(
             placement, app_edge, synapse_info)
 
-    def clear_connection_cache(self):
-        """ Flush the cache of connection information; needed for a second run
-        """
-        self._synaptic_matrices.clear_connection_cache()
-
     @property
     @overrides(AbstractSynapseExpandable.max_gen_data)
     def max_gen_data(self):
         return self._synaptic_matrices.max_gen_data
+
+    @property
+    @overrides(AbstractSynapseExpandable.bit_field_size)
+    def bit_field_size(self):
+        return self._synaptic_matrices.bit_field_size

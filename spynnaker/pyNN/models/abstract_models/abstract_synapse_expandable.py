@@ -71,3 +71,11 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
 
         :rtype: int
         """
+
+    @abstractproperty
+    def bit_field_size(self):
+        """ The amount of bit field data to be generated.  This is used to
+            calculate the timeout of the execution.
+
+        :rtype: int
+        """

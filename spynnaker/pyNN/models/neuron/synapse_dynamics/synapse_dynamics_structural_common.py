@@ -52,8 +52,9 @@ class SynapseDynamicsStructuralCommon(
     # + 3 32-bit numbers (weight; connection_type; total_no_atoms)
     _PRE_POP_INFO_BASE_SIZE = (4 * BYTES_PER_SHORT) + (3 * BYTES_PER_WORD)
 
-    # 5 32-bit numbers (key; mask; n_atoms; lo_atom; m_pop_index)
-    _KEY_ATOM_INFO_SIZE = (5 * BYTES_PER_WORD)
+    # 6 32-bit numbers (key; mask; n_atoms; n_colour_bits; lo_atom;
+    # m_pop_index)
+    _KEY_ATOM_INFO_SIZE = (6 * BYTES_PER_WORD)
 
     # 1 16-bit number (neuron_index)
     # + 2 8-bit numbers (sub_pop_index; pop_index)
@@ -101,13 +102,15 @@ class SynapseDynamicsStructuralCommon(
             len(structural_projections))
 
         # Write the pre-population info
-        pop_index = self.__write_prepopulation_info(
-            spec, app_vertex, structural_projections,
-            weight_scales, synaptic_matrices)
+        pop_index, subpop_index, lo_atom_index = \
+            self.__write_prepopulation_info(
+                spec, app_vertex, structural_projections,
+                weight_scales, synaptic_matrices)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
-            spec, pop_index, app_vertex, vertex_slice)
+            spec, pop_index, subpop_index, lo_atom_index, app_vertex,
+            vertex_slice)
 
         # Write the component parameters
         # pylint: disable=no-member, protected-access
@@ -220,6 +223,8 @@ class SynapseDynamicsStructuralCommon(
         spec.comment("Writing pre-population info")
         pop_index = dict()
         routing_info = SpynnakerDataView.get_routing_infos()
+        subpop_index = dict()
+        lo_atom_index = dict()
         index = 0
         for proj in structural_projections:
             spec.comment("Writing pre-population info for {}".format(
@@ -259,20 +264,26 @@ class SynapseDynamicsStructuralCommon(
             # Total number of atoms in pre-vertex
             spec.write_value(app_edge.pre_vertex.n_atoms)
             # Machine edge information
-            for m_vertex in out_verts:
+            for sub, m_vertex in enumerate(out_verts):
                 r_info = routing_info.get_routing_info_from_pre_vertex(
                     m_vertex, SPIKE_PARTITION_ID)
                 vertex_slice = m_vertex.vertex_slice
-                spec.write_value(r_info.first_key)
-                spec.write_value(r_info.first_mask)
+                spec.write_value(r_info.key)
+                spec.write_value(r_info.mask)
+                spec.write_value(m_vertex.app_vertex.n_colour_bits)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
-                    app_edge, synapse_info, m_vertex))
-        return pop_index
+                    app_edge, synapse_info))
+                lo = m_vertex.vertex_slice.lo_atom
+                for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+                    subpop_index[app_edge.pre_vertex, synapse_info, i] = sub
+                    lo_atom_index[app_edge.pre_vertex, synapse_info, i] = lo
+        return pop_index, subpop_index, lo_atom_index
 
     def __write_post_to_pre_table(
-            self, spec, pop_index, app_vertex, vertex_slice):
+            self, spec, pop_index, subpop_index, lo_atom_index, app_vertex,
+            vertex_slice):
         """ Post to pre table is basically the transpose of the synaptic\
             matrix.
 
@@ -289,22 +300,23 @@ class SynapseDynamicsStructuralCommon(
         slice_conns = self.connections[app_vertex, vertex_slice.lo_atom]
         # Make a single large array of connections
         connections = numpy.concatenate(
-            [conn for (conn, _, _, _, _) in slice_conns])
+            [conn for (conn, _, _) in slice_conns])
         # Make a single large array of population index
-        conn_lens = [len(conn) for (conn, _, _, _, _) in slice_conns]
-        for (_, a_edge, _, _, s_info) in slice_conns:
+        conn_lens = [len(conn) for (conn, _, _) in slice_conns]
+        for (_, a_edge, s_info) in slice_conns:
             if (a_edge.pre_vertex, s_info) not in pop_index:
                 print("Help!")
         pop_indices = numpy.repeat(
             [pop_index[a_edge.pre_vertex, s_info]
-             for (_, a_edge, _, _, s_info) in slice_conns], conn_lens)
+             for (_, a_edge, s_info) in slice_conns], conn_lens)
         # Make a single large array of sub-population index
-        subpop_indices = numpy.repeat(
-            [pre_index for (_, _, pre_index, _, _) in slice_conns], conn_lens)
+        subpop_indices = numpy.array([
+            subpop_index[a_edge.pre_vertex, s_info, c["source"]]
+            for (conns, a_edge, s_info) in slice_conns for c in conns])
         # Get the low atom for each source and subtract
-        lo_atoms = numpy.repeat(
-            [pre_slice.lo_atom
-             for (_, _, _, pre_slice, _) in slice_conns], conn_lens)
+        lo_atoms = numpy.array([
+            lo_atom_index[a_edge.pre_vertex, s_info, c["source"]]
+            for (conns, a_edge, s_info) in slice_conns for c in conns])
         connections["source"] = connections["source"] - lo_atoms
         connections["target"] = connections["target"] - vertex_slice.lo_atom
 

@@ -40,7 +40,6 @@ struct normal_params {
  */
 struct param_generator_normal {
     struct normal_params params;
-    rng_t rng;
 };
 
 /**
@@ -49,21 +48,18 @@ struct param_generator_normal {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *param_generator_normal_initialize(address_t *region) {
+static void *param_generator_normal_initialize(void **region) {
     // Allocate memory for the data
     struct param_generator_normal *obj =
             spin1_malloc(sizeof(struct param_generator_normal));
-    struct normal_params *params_sdram = (void *) *region;
+    struct normal_params *params_sdram = *region;
 
     // Copy the parameters in
-    obj->params = *params_sdram++;
-    *region = (void *) params_sdram;
+    obj->params = *params_sdram;
+    *region = &params_sdram[1];
 
     log_debug("normal mu = %k, sigma = %k",
             obj->params.mu, obj->params.sigma);
-
-    // Initialise the RNG for this generator
-    obj->rng = rng_init(region);
     return obj;
 }
 
@@ -72,28 +68,16 @@ static void *param_generator_normal_initialize(address_t *region) {
  * \param[in] generator: The generator to free
  */
 static void param_generator_normal_free(void *generator) {
-    struct param_generator_normal *obj = generator;
-    rng_free(obj->rng);
     sark_free(generator);
 }
 
 /**
  * \brief How to generate values with the normal RNG parameter generator
  * \param[in] generator: The generator to use to generate values
- * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
- * \param[in] indices: The \p n_indices post-neuron indices for each connection
- * \param[out] values: An array into which to place the values; will be
- *                     \p n_indices in size
+ * \return The generated value
  */
-static void param_generator_normal_generate(
-        void *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,
-        UNUSED uint16_t *indices, accum *values) {
+static accum param_generator_normal_generate(void *generator) {
     // For each index, generate a normally distributed random value
     struct param_generator_normal *obj = generator;
-    for (uint32_t i = 0; i < n_indices; i++) {
-        accum value = rng_normal(obj->rng);
-        values[i] = obj->params.mu + (value * obj->params.sigma);
-    }
+    return (rng_normal(core_rng) * obj->params.sigma) + obj->params.mu;
 }

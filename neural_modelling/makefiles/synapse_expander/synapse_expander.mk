@@ -20,6 +20,7 @@ SOURCES = synapse_expander/rng.c \
           synapse_expander/param_generator.c \
           synapse_expander/connection_generator.c \
           synapse_expander/matrix_generator.c \
-          synapse_expander/synapse_expander.c
+          synapse_expander/synapse_expander.c \
+          neuron/population_table/population_table_binary_search_impl.c
 
 include ../neural_support.mk

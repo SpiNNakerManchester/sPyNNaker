@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import pyNN.spiNNaker as p
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    DURATION_FOREVER)
 from spinnaker_testbase import BaseTestCase
 import scipy
 import numpy
@@ -30,103 +32,106 @@ def variable_rate_options():
     run_time = 20000
     seed = 0
 
-    pop_a = p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
-        rates=[10, 20, 50],
-        starts=[0, 5000, 10000]),
-        label="pop_a",
-        additional_parameters={"seed": seed})
-    pop_a.record("spikes")
+    pops = list()
 
-    pop_b = p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
-        rates=[[1, 2, 5], [10, 20, 50]],
-        starts=[0, 5000, 10000]),
-        label="pop_b",
-        additional_parameters={"seed": seed})
-    pop_b.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
+            rates=[10, 20, 50],
+            starts=[0, 5000, 10000]),
+            label="pop_a",
+            additional_parameters={"seed": seed}))
 
-    pop_c = p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
-        rates=[10, 20, 50],
-        starts=[100, 6000, 12000],
-        durations=[5000, 5000, 5000]),
-        label="pop_c",
-        additional_parameters={"seed": seed})
-    pop_c.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
+            rates=[[1, 2, 5], [10, 20, 50]],
+            starts=[0, 5000, 10000]),
+            label="pop_b",
+            additional_parameters={"seed": seed}))
 
-    pop_d = p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
-        rates=[[1, 2, 5], [10, 20, 50]],
-        starts=[0, 5000, 10000],
-        durations=[5000, 4000, 3000]),
-        label="pop_d",
-        additional_parameters={"seed": seed})
-    pop_d.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
+            rates=[10, 20, 50],
+            starts=[100, 6000, 12000],
+            durations=[5000, 5000, 5000]),
+            label="pop_c",
+            additional_parameters={"seed": seed}))
 
-    pop_e = p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
-        rates=[[1, 2, 5], [10, 20, 50]],
-        starts=[[0, 5000, 10000], [1000, 6000, 11000]],
-        durations=[4000, 3000, 2000]),
-        label="pop_e",
-        additional_parameters={"seed": seed})
-    pop_e.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
+            rates=[[1, 2, 5], [10, 20, 50]],
+            starts=[0, 5000, 10000],
+            durations=[5000, 4000, 3000]),
+            label="pop_d",
+            additional_parameters={"seed": seed}))
 
-    pop_f = p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
-        rates=[[1, 2, 5], [10, 20, 50]],
-        starts=[[0, 5000, 10000], [1000, 6000, 11000]],
-        durations=[[4000, 3000, 2000], [3000, 2000, 1000]]),
-        label="pop_f",
-        additional_parameters={"seed": seed})
-    pop_f.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
+            rates=[[1, 2, 5], [10, 20, 50]],
+            starts=[[0, 5000, 10000], [1000, 6000, 11000]],
+            durations=[4000, 3000, 2000]),
+            label="pop_e",
+            additional_parameters={"seed": seed}))
 
-    pop_g = p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
-        rates=[[1, 2, 5], [10, 50]],
-        starts=[[0, 1000, 2000], [2000, 3000]]),
-        label="pop_g",
-        additional_parameters={"seed": seed})
-    pop_g.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
+            rates=[[1, 2, 5], [10, 20, 50]],
+            starts=[[0, 5000, 10000], [1000, 6000, 11000]],
+            durations=[[4000, 3000, 2000], [3000, 2000, 1000]]),
+            label="pop_f",
+            additional_parameters={"seed": seed}))
 
-    pop_h = p.Population(n_neurons, p.SpikeSourcePoisson(rate=1),
-                         label="pop_h", additional_parameters={"seed": seed})
-    pop_h.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.extra_models.SpikeSourcePoissonVariable(
+            rates=[[1, 2, 5], [10, 50]],
+            starts=[[0, 1000, 2000], [2000, 3000]]),
+            label="pop_g",
+            additional_parameters={"seed": seed}))
 
-    pop_i = p.Population(n_neurons, p.SpikeSourcePoisson(rate=1, start=100),
-                         label="pop_i", additional_parameters={"seed": seed})
-    pop_i.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.SpikeSourcePoisson(rate=1),
+                     label="pop_h", additional_parameters={"seed": seed}))
 
-    pop_j = p.Population(n_neurons, p.SpikeSourcePoisson(rate=[1, 10]),
-                         label="pop_j", additional_parameters={"seed": seed})
-    pop_j.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.SpikeSourcePoisson(rate=1, start=100),
+                     label="pop_i", additional_parameters={"seed": seed}))
 
-    pop_k = p.Population(
-        n_neurons, p.SpikeSourcePoisson(rate=1, start=[0, 5000]),
-        label="pop_k",
-        additional_parameters={"seed": seed})
-    pop_k.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.SpikeSourcePoisson(rate=[1, 10]),
+                     label="pop_j", additional_parameters={"seed": seed + 1}))
 
-    pop_l = p.Population(
-        n_neurons, p.SpikeSourcePoisson(rate=1, start=10, duration=5000),
-        label="pop_l",
-        additional_parameters={"seed": seed})
-    pop_l.record("spikes")
+    pops.append(
+        p.Population(
+            n_neurons, p.SpikeSourcePoisson(rate=1, start=[0, 5000]),
+            label="pop_k",
+            additional_parameters={"seed": seed}))
 
-    pop_m = p.Population(n_neurons, p.SpikeSourcePoisson(
-        rate=[1, 10], start=[0, 5000], duration=5000),
-        label="pop_m",
-        additional_parameters={"seed": seed})
-    pop_m.record("spikes")
+    pops.append(
+        p.Population(
+            n_neurons, p.SpikeSourcePoisson(rate=1, start=10, duration=5000),
+            label="pop_l",
+            additional_parameters={"seed": seed}))
 
-    pop_n = p.Population(n_neurons, p.SpikeSourcePoisson(
-        rate=[1, 10], start=[0, 5000], duration=[5000, 8000]),
-        label="pop_n",
-        additional_parameters={"seed": seed})
-    pop_n.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.SpikeSourcePoisson(
+            rate=[1, 10], start=[0, 5000], duration=5000),
+            label="pop_m",
+            additional_parameters={"seed": seed}))
 
-    pop_o = p.Population(
-        n_neurons, p.SpikeSourcePoisson(rate=1, duration=5000), label="pop_o")
-    pop_o.record("spikes")
+    pops.append(
+        p.Population(n_neurons, p.SpikeSourcePoisson(
+            rate=[1, 10], start=[0, 5000], duration=[5000, 8000]),
+            label="pop_n",
+            additional_parameters={"seed": seed}))
+
+    pops.append(
+        p.Population(n_neurons, p.SpikeSourcePoisson(
+            rate=1, duration=5000), label="pop_o"))
+
+    for pop in pops:
+        pop.record("spikes")
 
     p.run(run_time)
 
-    pops = [pop_a, pop_b, pop_c, pop_d, pop_e, pop_f, pop_g, pop_h,
-            pop_i, pop_j, pop_k, pop_l, pop_m, pop_n, pop_o]
     all_spikes = list()
     for pop in pops:
         all_spikes.append(pop.get_data("spikes").segments[0].spiketrains)
@@ -155,9 +160,9 @@ def variable_rate_options():
                 array(values[0]), array(values[1]), array(values[2]))
             ends = list()
             for j, (start, duration) in enumerate(zip(starts, durations)):
-                if duration is None and (j + 1) >= len(starts):
+                if duration == DURATION_FOREVER and (j + 1) >= len(starts):
                     ends.append(run_time)
-                elif duration is None:
+                elif duration == DURATION_FOREVER:
                     ends.append(starts[j + 1])
                 else:
                     ends.append(start + duration)
@@ -272,6 +277,6 @@ class TestCreatePoissons(BaseTestCase):
 
 
 if __name__ == '__main__':
-    # variable_rate_options()
+    variable_rate_options()
     # variable_rate_reset()
-    variable_rate_100us()
+    # variable_rate_100us()

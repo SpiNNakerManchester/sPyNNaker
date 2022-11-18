@@ -13,12 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .connection_holder_finisher import finish_connection_holders
-from .on_chip_bit_field_generator import on_chip_bitfield_generator
 from .redundant_packet_count_report import redundant_packet_count_report
 from .spynnaker_connection_holder_generations import (
     SpYNNakerConnectionHolderGenerator)
-from .spynnaker_data_specification_writer import (
-    spynnaker_data_specification_writer)
 from .spynnaker_machine_bit_field_router_compressor import (
     spynnaker_machine_bitfield_ordered_covering_compressor,
     spynnaker_machine_bitField_pair_router_compressor)
@@ -27,16 +24,15 @@ from .spynnaker_neuron_network_specification_report import (
 from .spynnaker_synaptic_matrix_report import SpYNNakerSynapticMatrixReport
 from .synapse_expander import synapse_expander
 from .delay_support_adder import delay_support_adder
+from .neuron_expander import neuron_expander
 
 __all__ = [
     "delay_support_adder",
     "finish_connection_holders",
-    "on_chip_bitfield_generator",
     "redundant_packet_count_report",
     "SpYNNakerConnectionHolderGenerator",
-    "spynnaker_data_specification_writer",
     "spynnaker_machine_bitField_pair_router_compressor",
     "spynnaker_machine_bitfield_ordered_covering_compressor",
     "spynnaker_neuron_graph_network_specification_report",
     "SpYNNakerSynapticMatrixReport",
-    "synapse_expander"]
+    "synapse_expander", "neuron_expander"]

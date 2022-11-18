@@ -72,7 +72,6 @@ def test_connector(
             assert extra_params[:, i].shape == (len(clist), )
 
     # Check weights and delays are used or ignored as expected
-    pre_slice = Slice(0, 10)
     post_slice = Slice(0, 10)
     synapse_info = SynapseInformation(
             connector=None, pre_population=MockPopulation(10, "Pre"),
@@ -81,7 +80,7 @@ def test_connector(
             synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False, weights=weights, delays=delays)
     block = connector.create_synaptic_block(
-        [pre_slice], [post_slice], pre_slice, post_slice, 1, synapse_info)
+        [post_slice], post_slice, 1, synapse_info)
     assert numpy.array_equal(block["weight"], numpy.array(expected_weights))
     assert numpy.array_equal(block["delay"], numpy.array(expected_delays))
 
@@ -94,8 +93,8 @@ class MockFromListConnector(FromListConnector):
             conn_list, safe=safe, verbose=verbose, column_names=column_names)
         self._split_count = 0
 
-    def _split_connections(self, pre_slices, post_slices):
-        split = super()._split_connections(pre_slices, post_slices)
+    def _split_connections(self, post_slices):
+        split = super()._split_connections(post_slices)
         if split:
             self._split_count += 1
         return split
@@ -106,12 +105,9 @@ def test_connector_split():
     n_sources = 1000
     n_targets = 1000
     n_connections = 10000
-    pre_neurons_per_core = 57
     post_neurons_per_core = 59
     sources = numpy.random.randint(0, n_sources, n_connections)
     targets = numpy.random.randint(0, n_targets, n_connections)
-    pre_slices = [Slice(i, i + pre_neurons_per_core - 1)
-                  for i in range(0, n_sources, pre_neurons_per_core)]
     post_slices = [Slice(i, i + post_neurons_per_core - 1)
                    for i in range(0, n_targets, post_neurons_per_core)]
 
@@ -128,17 +124,13 @@ def test_connector_split():
     has_block = set()
     try:
         # Check each connection is in the right place
-        for pre_slice in pre_slices:
-            for post_slice in post_slices:
-                block = connector.create_synaptic_block(
-                    pre_slices, post_slices, pre_slice, post_slice, 1,
-                    synapse_info)
-                for source in block["source"]:
-                    assert pre_slice.lo_atom <= source <= pre_slice.hi_atom
-                for target in block["target"]:
-                    assert post_slice.lo_atom <= target <= post_slice.hi_atom
-                for item in block:
-                    has_block.add((item["source"], item["target"]))
+        for post_slice in post_slices:
+            block = connector.create_synaptic_block(
+                post_slices, post_slice, 1, synapse_info)
+            for target in block["target"]:
+                assert post_slice.lo_atom <= target <= post_slice.hi_atom
+            for item in block:
+                has_block.add((item["source"], item["target"]))
 
         # Check each connection has a place
         for source, target in zip(sources, targets):

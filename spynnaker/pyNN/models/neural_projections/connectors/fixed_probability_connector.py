@@ -15,7 +15,9 @@
 
 import math
 import numpy
+import logging
 from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import (
@@ -23,18 +25,17 @@ from spynnaker.pyNN.utilities.utility_calls import (
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
-from .abstract_connector_supports_views_on_machine import (
-    AbstractConnectorSupportsViewsOnMachine)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 N_GEN_PARAMS = 6
 
 
 class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
-                                AbstractGenerateConnectorOnHost,
-                                AbstractConnectorSupportsViewsOnMachine):
+                                AbstractGenerateConnectorOnHost):
     """ For each pair of pre-post cells, the connection probability is \
         constant.
     """
@@ -69,9 +70,17 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             .. note::
                 Not supported by sPyNNaker.
         """
-        if not 0.0 <= p_connect <= 1.0:
+        # Support 1.0 by using maximum U032.  Warn the user because this isn't
+        # *quite* the same
+        if p_connect == 1.0:
+            p_connect = float(DataType.U032.max)
+            logger.warning(
+                "Probability of 1.0 in the FixedProbabilityConnector will use"
+                f" {p_connect} instead.  If this is a problem, use the"
+                " AllToAllConnector instead.")
+        if not 0.0 <= p_connect < 1.0:
             raise ConfigurationException(
-                "The probability must be between 0 and 1 (inclusive)")
+                "The probability must be >= 0 and < 1")
         super().__init__(safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
@@ -133,10 +142,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
-        n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
+        n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
 
         # If self connections are not allowed, remove possibility the self
@@ -144,21 +152,20 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         if not self.__allow_self_connections:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
-        present = items <= self._p_connect
+        present = items < self._p_connect
         ids = numpy.where(present)[0]
         n_connections = numpy.sum(present)
 
         block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = (
-            (ids // post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
+        block["source"] = ids // post_vertex_slice.n_atoms
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 
@@ -171,27 +178,16 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR.value
 
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
-        params = self._basic_connector_params(synapse_info)
-        params.append(self.__allow_self_connections)
-
-        # If prob=1.0 has been specified, take care when scaling value to
-        # ensure that it doesn't wrap round to zero as an unsigned long fract
-        params.append(DataType.U032.encode_as_int(
-            DataType.U032.max if self._p_connect == 1.0 else self._p_connect))
-
-        params.extend(self._get_connector_seed(
-            pre_vertex_slice, post_vertex_slice, self._rng))
-        return numpy.array(params, dtype="uint32")
+    def gen_connector_params(self):
+        return numpy.array([
+            int(self.__allow_self_connections),
+            DataType.U032.encode_as_int(self._p_connect)], dtype="uint32")
 
     @property
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        # view + params + seeds
-        return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)
+        return 2 * BYTES_PER_WORD
 
     @property
     def p_connect(self):

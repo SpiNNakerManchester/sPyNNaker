@@ -57,23 +57,28 @@ class PopulationNeuronsMachineVertex(
     """
 
     __slots__ = [
-        "__change_requires_neuron_parameters_reload",
         "__key",
         "__sdram_partition",
         "__min_weights",
         "__weight_scales",
-        "__slice_index"]
+        "__slice_index",
+        "__neuron_data",
+        "__max_atoms_per_core",
+        "__regenerate_data"]
 
     class REGIONS(Enum):
         """Regions for populations."""
         SYSTEM = 0
-        PROVENANCE_DATA = 1
-        PROFILING = 2
-        RECORDING = 3
-        NEURON_PARAMS = 4
-        CURRENT_SOURCE_PARAMS = 5
-        NEURON_RECORDING = 6
-        SDRAM_EDGE_PARAMS = 7
+        CORE_PARAMS = 1
+        PROVENANCE_DATA = 2
+        PROFILING = 3
+        RECORDING = 4
+        NEURON_PARAMS = 5
+        CURRENT_SOURCE_PARAMS = 6
+        NEURON_RECORDING = 7
+        SDRAM_EDGE_PARAMS = 8
+        NEURON_BUILDER = 9
+        INITIAL_VALUES = 10
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -84,9 +89,12 @@ class PopulationNeuronsMachineVertex(
 
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
+        core_params=REGIONS.CORE_PARAMS.value,
         neuron_params=REGIONS.NEURON_PARAMS.value,
         current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
-        neuron_recording=REGIONS.NEURON_RECORDING.value
+        neuron_recording=REGIONS.NEURON_RECORDING.value,
+        neuron_builder=REGIONS.NEURON_BUILDER.value,
+        initial_values=REGIONS.INITIAL_VALUES.value
     )
 
     _PROFILE_TAG_LABELS = {
@@ -94,7 +102,7 @@ class PopulationNeuronsMachineVertex(
 
     def __init__(
             self, sdram, label, app_vertex, vertex_slice, slice_index,
-            min_weights, weight_scales):
+            min_weights, weight_scales, neuron_data, max_atoms_per_core):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The sdram used by the vertex
@@ -109,17 +117,23 @@ class PopulationNeuronsMachineVertex(
             The computed minimum weights to be used in the simulation
         :param list(int) weight_scales:
             The scaling to apply to weights to store them in the synapses
+        :param NeuronData neuron_data:
+            The handler of neuron data
+        :param int max_atoms_per_core:
+            The maximum number of atoms per core
         """
         super(PopulationNeuronsMachineVertex, self).__init__(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + NeuronMainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None
-        self.__change_requires_neuron_parameters_reload = False
         self.__sdram_partition = None
         self.__slice_index = slice_index
         self.__min_weights = min_weights
         self.__weight_scales = weight_scales
+        self.__neuron_data = neuron_data
+        self.__max_atoms_per_core = max_atoms_per_core
+        self.__regenerate_data = False
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
@@ -139,6 +153,16 @@ class PopulationNeuronsMachineVertex(
     @overrides(PopulationMachineNeurons._neuron_regions)
     def _neuron_regions(self):
         return self.NEURON_REGIONS
+
+    @property
+    @overrides(PopulationMachineNeurons._neuron_data)
+    def _neuron_data(self):
+        return self.__neuron_data
+
+    @property
+    @overrides(PopulationMachineNeurons._max_atoms_per_core)
+    def _max_atoms_per_core(self):
+        return self.__max_atoms_per_core
 
     def set_sdram_partition(self, sdram_partition):
         """ Set the SDRAM partition.  Must only be called once per instance
@@ -170,7 +194,7 @@ class PopulationNeuronsMachineVertex(
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         self._parse_neuron_provenance(
-            label, x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
+            x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
 
         neuron_prov = NeuronMainProvenance(
             *provenance_data[-NeuronMainProvenance.N_ITEMS:])
@@ -203,8 +227,6 @@ class PopulationNeuronsMachineVertex(
         self._write_neuron_data_spec(spec, self.__min_weights)
 
         # Write information about SDRAM
-        n_neurons = self._vertex_slice.n_atoms
-        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         spec.reserve_memory_region(
             region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
@@ -212,10 +234,7 @@ class PopulationNeuronsMachineVertex(
         spec.write_value(
             self.__sdram_partition.get_sdram_base_address_for(self))
         spec.write_value(self.n_bytes_for_transfer)
-        spec.write_value(n_neurons)
-        spec.write_value(n_synapse_types)
         spec.write_value(len(self.__sdram_partition.pre_vertices))
-        spec.write_value(get_n_bits(n_neurons))
 
         # End the writing of this specification:
         spec.end_specification()
@@ -223,32 +242,19 @@ class PopulationNeuronsMachineVertex(
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # write the neuron params into the new DSG region
-        self._write_neuron_parameters(spec, self.__min_weights)
-
-        # write the current source params into the new DSG region
-        self._write_current_source_parameters(spec)
+        # Write the other parameters
+        self._rewrite_neuron_data_spec(spec)
 
         # close spec
         spec.end_specification()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
-        return self.__change_requires_neuron_parameters_reload
+        return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        self.__change_requires_neuron_parameters_reload = new_value
-
-    @property
-    @overrides(ReceivesSynapticInputsOverSDRAM.n_target_neurons)
-    def n_target_neurons(self):
-        return self._vertex_slice.n_atoms
-
-    @property
-    @overrides(ReceivesSynapticInputsOverSDRAM.n_target_synapse_types)
-    def n_target_synapse_types(self):
-        return self._app_vertex.neuron_impl.get_n_synapse_types()
+        self.__regenerate_data = new_value
 
     @property
     @overrides(ReceivesSynapticInputsOverSDRAM.weight_scales)
@@ -270,7 +276,8 @@ class PopulationNeuronsMachineVertex(
     @overrides(ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer)
     def n_bytes_for_transfer(self):
         return self.get_n_bytes_for_transfer(
-            self.n_target_neurons, self.n_target_synapse_types)
+            self.__max_atoms_per_core,
+            self._app_vertex.neuron_impl.get_n_synapse_types())
 
     @overrides(ReceivesSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):
@@ -279,3 +286,13 @@ class PopulationNeuronsMachineVertex(
             return self.n_bytes_for_transfer
         raise SynapticConfigurationException(
             "Unknown pre vertex type in edge {}".format(sdram_machine_edge))
+
+    @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
+    def set_do_neuron_regeneration(self):
+        self.__regenerate_data = True
+        self.__neuron_data.reset_generation()
+
+    @overrides(PopulationMachineCommon.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, partition_id):
+        n_colours = 2 ** self._app_vertex.n_colour_bits
+        return self._vertex_slice.n_atoms * n_colours

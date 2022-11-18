@@ -28,7 +28,7 @@ from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 
 
 _DIMENSION_SIZE = (2 * BYTES_PER_WORD) + (6 * BYTES_PER_SHORT)
-_KEY_INFO_SIZE = 2 * BYTES_PER_WORD
+_KEY_INFO_SIZE = 3 * BYTES_PER_WORD
 _CONN_SIZE = _KEY_INFO_SIZE + (2 * BYTES_PER_WORD) + (2 * BYTES_PER_SHORT)
 _DIM_DTYPE = [("mask", "uint32"), ("shift", "uint32"), ("pre_start", "uint16"),
               ("pre_in_post_start", "uint16"), ("pre_in_post_end", "uint16"),
@@ -271,11 +271,12 @@ class PoolDenseConnector(AbstractConnector):
 
     def write_local_only_data(
             self, spec, app_edge, pre_vertex_slice, post_vertex_slice,
-            key, mask, weight_scales):
+            key, mask, n_colour_bits, weight_scales):
 
         # Write source key info
         spec.write_value(key, data_type=DataType.UINT32)
         spec.write_value(mask, data_type=DataType.UINT32)
+        spec.write_value(n_colour_bits, data_type=DataType.UINT32)
 
         # Write numbers of things
         n_dims = len(pre_vertex_slice.shape)

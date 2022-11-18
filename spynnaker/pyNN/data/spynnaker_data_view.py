@@ -211,7 +211,7 @@ class SpynnakerDataView(FecDataView):
         from spynnaker.pyNN.models.populations.population import Population
         cls.check_user_can_act()
         if not isinstance(population, Population):
-            raise TypeError("The population must be a Projection")
+            raise TypeError("The population must be a Population")
         if population in cls.__spy_data._populations:
             raise NotImplementedError(
                 "This method should only be called from the Population init")

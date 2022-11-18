@@ -98,47 +98,11 @@ class AbstractConnector(object, metaclass=AbstractBase):
         self._rng = (self._rng or NumpyRNG())
         self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
-    def _check_parameter(self, values, name, allow_lists):
-        """ Check that the types of the values is supported.
-
-        :param values:
-        :type values: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
-        :param str name:
-        :param bool allow_lists:
-        """
-        if (not numpy.isscalar(values) and
-                not (isinstance(values, RandomDistribution)) and
-                not hasattr(values, "__getitem__")):
-            raise SpynnakerException("Parameter {} format unsupported".format(
-                name))
-        if not allow_lists and hasattr(values, "__getitem__"):
-            raise NotImplementedError(
-                "Lists of {} are not supported by the implementation of {} on "
-                "this platform".format(name, self.__class__))
-
-    def _check_parameters(self, weights, delays, allow_lists=False):
-        """ Check the types of the weights and delays are supported; lists can\
-            be disallowed if desired.
-
-        :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
-        :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
-        :param bool allow_lists:
-        """
-        self._check_parameter(weights, "weights", allow_lists)
-        self._check_parameter(delays, "delays", allow_lists)
-
     def _get_delay_minimum(self, delays, n_connections, synapse_info):
-        """ Get the minimum delay given a float, RandomDistribution or list of\
-            delays.
+        """ Get the minimum delay given a float or RandomDistribution
 
         :param delays: the delays
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
         :param int n_connections: how many connections
         """
         if isinstance(delays, RandomDistribution):
@@ -155,18 +119,14 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.min(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
-        elif hasattr(delays, "__getitem__"):
-            return numpy.min(delays)
         raise SpynnakerException("Unrecognised delay format: {:s}".format(
             type(delays)))
 
     def _get_delay_maximum(self, delays, n_connections, synapse_info):
-        """ Get the maximum delay given a float, RandomDistribution or list of\
-            delays.
+        """ Get the maximum delay given a float or RandomDistribution
 
         :param delays:
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
         :param int n_connections:
         """
         if isinstance(delays, RandomDistribution):
@@ -183,10 +143,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
-        elif hasattr(delays, "__getitem__"):
-            return numpy.max(delays)
-        raise SpynnakerException("Unrecognised delay format: {:s}".format(
-            type(delays)))
+        raise SpynnakerException(f"Unrecognised delay format: {type(delays)}")
 
     @abstractmethod
     def get_delay_maximum(self, synapse_info):
@@ -211,7 +168,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param delays:
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
         :rtype: float
         """
         if isinstance(delays, RandomDistribution):
@@ -221,8 +177,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return 0.0
-        elif hasattr(delays, "__getitem__"):
-            return numpy.var(delays)
         raise SpynnakerException("Unrecognised delay format")
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
@@ -234,7 +188,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param delays:
         :type delays: ~numpy.ndarray or pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
         :param int n_total_connections:
         :param int n_connections:
         :param float min_delay:
@@ -244,8 +197,15 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(delays, RandomDistribution):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
-                n_total_connections, n_connections, prob_in_range)))
+            if prob_in_range > 0:
+                v = int(math.ceil(utility_calls.get_probable_maximum_selected(
+                    n_total_connections, n_connections, prob_in_range)))
+                # If the probability is so low as to result in 0, assume
+                # at least 1 if there is some probability that the delay is
+                # in range
+                return max(v, 1)
+            else:
+                return 0
         elif isinstance(delays, str):
             d = self._get_distances(delays, synapse_info)
             delays = _expr_context.eval(delays, d=d)
@@ -262,22 +222,11 @@ class AbstractConnector(object, metaclass=AbstractBase):
             if min_delay <= delays <= max_delay:
                 return int(math.ceil(n_connections))
             return 0
-        elif hasattr(delays, "__getitem__"):
-            n_delayed = sum([len([
-                delay for delay in delays
-                if min_delay <= delay <= max_delay])])
-            if n_delayed == 0:
-                return 0
-            n_total = len(delays)
-            prob_delayed = float(n_delayed) / float(n_total)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
-                n_total_connections, n_connections, prob_delayed)))
         raise SpynnakerException("Unrecognised delay format")
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_post_atoms, synapse_info, min_delay=None,
-            max_delay=None):
+            self, n_post_atoms, synapse_info, min_delay=None, max_delay=None):
         """ Get the maximum number of connections from any
             neuron in the pre vertex to the neurons in the post_vertex_slice,
             for connections with a delay between min_delay and max_delay
@@ -285,7 +234,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param delays:
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
         :param int n_post_atoms:
         :param SynapseInformation synapse_info:
         :param min_delay:
@@ -309,7 +257,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param weights:
         :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
@@ -319,8 +266,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.mean(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
-        elif hasattr(weights, "__getitem__"):
-            return numpy.mean(weights)
         raise SpynnakerException("Unrecognised weight format")
 
     def get_weight_minimum(self, weights, weight_random_sigma, synapse_info):
@@ -374,7 +319,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param weights:
         :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
         :param int n_connections:
         :rtype: float
         """
@@ -399,8 +343,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
-        elif hasattr(weights, "__getitem__"):
-            return numpy.amax(numpy.abs(weights))
         raise SpynnakerException("Unrecognised weight format")
 
     @abstractmethod
@@ -416,7 +358,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param weights:
         :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
@@ -426,8 +367,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return 0.0
-        elif hasattr(weights, "__getitem__"):
-            return numpy.var(weights)
         raise SpynnakerException("Unrecognised weight format")
 
     def _expand_distances(self, d_expression):
@@ -459,15 +398,14 @@ class AbstractConnector(object, metaclass=AbstractBase):
             expand_distances)
 
     def _generate_random_values(
-            self, values, n_connections, pre_vertex_slice, post_vertex_slice):
+            self, values, n_connections, post_vertex_slice):
         """
         :param ~pyNN.random.NumpyRNG values:
         :param int n_connections:
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: ~numpy.ndarray
         """
-        key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
+        key = (id(post_vertex_slice), id(values))
         seed = self.__param_seeds.get(key, None)
         if seed is None:
             seed = int(values.rng.next() * 0x7FFFFFFF)
@@ -481,22 +419,19 @@ class AbstractConnector(object, metaclass=AbstractBase):
         return copy_rd.next(n_connections)
 
     def _generate_values(
-            self, values, sources, targets, n_connections, connection_slices,
-            pre_slice, post_slice, synapse_info):
+            self, values, sources, targets, n_connections, post_slice,
+            synapse_info):
         """
         :param values:
-        :type values: ~pyNN.random.NumpyRNG or int or float or list(int) or
-            list(float) or ~numpy.ndarray or str or callable
+        :type values: ~pyNN.random.NumpyRNG or int or float or str or callable
         :param int n_connections:
-        :param list(slice) connection_slices:
-        :param ~pacman.model.graphs.common.Slice pre_slice:
         :param ~pacman.model.graphs.common.Slice post_slice:
         :param SynapseInformation synapse_info:
         :rtype: ~numpy.ndarray
         """
         if isinstance(values, RandomDistribution):
             return self._generate_random_values(
-                values, n_connections, pre_slice, post_slice)
+                values, n_connections, post_slice)
         elif isinstance(values, str) or callable(values):
             if self.__space is None:
                 raise SpynnakerException(
@@ -529,28 +464,20 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return values(d)
         elif numpy.isscalar(values):
             return numpy.repeat([values], n_connections).astype("float64")
-        elif hasattr(values, "__getitem__"):
-            return numpy.concatenate([
-                values[connection_slice]
-                for connection_slice in connection_slices]).astype("float64")
-        raise SpynnakerException("Unrecognised values format {} - what on "
-                                 "earth are you giving me?".format(values))
+        raise SpynnakerException("Unrecognised values {}".format(values))
 
     def _generate_weights(
-            self, sources, targets, n_connections, connection_slices,
-            pre_slice, post_slice, synapse_info):
+            self, sources, targets, n_connections, post_slice, synapse_info):
         """ Generate weight values.
 
         :param int n_connections:
-        :param list(slice) connection_slices:
-        :param ~pacman.model.graphs.common.Slice pre_slice:
         :param ~pacman.model.graphs.common.Slice post_slice:
         :param SynapseInformation synapse_info:
         :rtype: ~numpy.ndarray
         """
         weights = self._generate_values(
-            synapse_info.weights, sources, targets, n_connections,
-            connection_slices, pre_slice, post_slice, synapse_info)
+            synapse_info.weights, sources, targets, n_connections, post_slice,
+            synapse_info)
         if self.__safe:
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
@@ -581,20 +508,17 @@ class AbstractConnector(object, metaclass=AbstractBase):
         return delays
 
     def _generate_delays(
-            self, sources, targets, n_connections, connection_slices,
-            pre_slice, post_slice, synapse_info):
+            self, sources, targets, n_connections, post_slice, synapse_info):
         """ Generate valid delay values.
 
         :param int n_connections:
-        :param list(slice) connection_slices:
-        :param ~pacman.model.graphs.common.Slice pre_slice:
         :param ~pacman.model.graphs.common.Slice post_slice:
         :param SynapseInformation synapse_info:
         :rtype: ~numpy.ndarray
         """
         delays = self._generate_values(
-            synapse_info.delays, sources, targets, n_connections,
-            connection_slices, pre_slice, post_slice, synapse_info)
+            synapse_info.delays, sources, targets, n_connections, post_slice,
+            synapse_info)
 
         return self._clip_delays(delays)
 

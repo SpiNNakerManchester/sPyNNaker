@@ -95,14 +95,14 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             # Merge edges with the same source
             for (_, vertex_slice), edge_list in edges_for_source.items():
-                group_key = edge_list[0][1].first_key
-                group_mask = edge_list[0][1].first_mask
+                group_key = edge_list[0][1].key
+                group_mask = edge_list[0][1].mask
                 for _, r_info in edge_list:
                     group_key, group_mask = self.__merge_key_and_mask(
-                        group_key, group_mask, r_info.first_key,
-                        r_info.first_mask)
+                        group_key, group_mask, r_info.key, r_info.mask)
                 incoming_info.append(
-                    (incoming, vertex_slice, group_key, group_mask))
+                    (incoming, vertex_slice, group_key, group_mask,
+                     app_edge.pre_vertex.n_colour_bits))
 
         size = self.get_parameters_usage_in_bytes(
             machine_vertex.vertex_slice.n_atoms,
@@ -118,13 +118,13 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Write spec for each connector, sorted by key
         incoming_info.sort(key=lambda e: e[3])
-        for incoming, vertex_slice, key, mask in incoming_info:
+        for incoming, vertex_slice, key, mask, n_colour_bits in incoming_info:
             # pylint: disable=protected-access
             s_info = incoming._synapse_information
             app_edge = incoming._projection_edge
             s_info.connector.write_local_only_data(
                 spec, app_edge, vertex_slice, post_slice, key, mask,
-                weight_scales)
+                n_colour_bits, weight_scales)
 
     def __merge_key_and_mask(self, key_a, mask_a, key_b, mask_b):
         new_xs = ~(key_a ^ key_b)

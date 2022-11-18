@@ -20,7 +20,7 @@ from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_generate_connector_on_machine import (
-    AbstractGenerateConnectorOnMachine, ConnectorIDs, PARAM_TYPE_KERNEL)
+    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -234,7 +234,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             "as specified by the shape kernel values.")
 
     def __compute_statistics(
-            self, weights, delays, pre_vertex_slice, post_vertex_slice):
+            self, weights, delays, post_vertex_slice, n_pre_neurons):
         """ Compute the relevant information required for the connections.
 
         :param weights:
@@ -243,7 +243,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         :param delays:
         :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
             or ConvolutionKernel
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         """
         # If __compute_statistics is called more than once, there's
@@ -264,8 +263,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         post_lo = post_vertex_slice.lo_atom
 
         # Loop over pre-vertices
-        for pre_idx in range(
-                pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1):
+        for pre_idx in range(n_pre_neurons):
             pre_r, pre_c = divmod(pre_idx, self._pre_w)
             coords[pre_idx] = []
 
@@ -324,13 +322,13 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
+        # Use the kernel delays if user has supplied them
+        if self._krn_delays is not None:
+            return numpy.max(self._krn_delays)
+
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel delays if user has supplied them
-        if self._krn_delays is not None:
-            return self._get_delay_maximum(
-                self._krn_delays, n_conns, synapse_info)
 
         # if not then use the values that came in
         return self._get_delay_maximum(
@@ -338,17 +336,25 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
+        # Use the kernel delays if user has supplied them
+        if self._krn_delays is not None:
+            return numpy.min(self._krn_delays)
+
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel delays if user has supplied them
-        if self._krn_delays is not None:
-            return self._get_delay_minimum(
-                self._krn_delays, n_conns, synapse_info)
 
         # if not then use the values that came in
         return self._get_delay_minimum(
             synapse_info.delays, n_conns, synapse_info)
+
+    @overrides(AbstractConnector.get_delay_variance)
+    def get_delay_variance(self, delays, synapse_info):
+        if self._krn_delays is not None:
+            return numpy.var(self._krn_delays)
+
+        return super(KernelConnector, self).get_delay_variance(
+            delays, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -364,14 +370,13 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self._krn_weights is not None:
+            return numpy.max(self._krn_weights)
+
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel weights if user has supplied them
-        if self._krn_weights is not None:
-            return self._get_weight_maximum(
-                self._krn_weights, n_conns, synapse_info)
-
         return self._get_weight_maximum(
             synapse_info.weights, n_conns, synapse_info)
 
@@ -385,18 +390,35 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return super(KernelConnector, self).get_weight_minimum(
             weights, weight_random_sigma, synapse_info)
 
+    @overrides(AbstractConnector.get_weight_mean)
+    def get_weight_mean(self, weights, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self._krn_weights is not None:
+            return numpy.mean(self._krn_weights)
+
+        return super(KernelConnector, self).get_weight_mean(
+            weights, synapse_info)
+
+    @overrides(AbstractConnector.get_weight_variance)
+    def get_weight_variance(self, weights, synapse_info):
+        # Use the kernel weights if user has supplied them
+        if self._krn_weights is not None:
+            return numpy.var(self._krn_weights)
+
+        return super(KernelConnector, self).get_weight_variance(
+            weights, synapse_info)
+
     def __repr__(self):
         return "KernelConnector(shape_kernel[{},{}])".format(
             self._kernel_w, self._kernel_h)
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         (n_connections, all_post, all_pre_in_range, all_pre_in_range_delays,
          all_pre_in_range_weights) = self.__compute_statistics(
-            synapse_info.weights, synapse_info.delays, pre_vertex_slice,
-            post_vertex_slice)
+            synapse_info.weights, synapse_info.delays, post_vertex_slice,
+            synapse_info.n_pre_neurons)
 
         syn_dtypes = AbstractConnector.NUMPY_SYNAPSES_DTYPE
 
@@ -414,11 +436,13 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     @property
-    def _kernel_properties(self):
-        """
-        :rtype: list(int)
-        """
-        return [
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
+    def gen_connector_id(self):
+        return ConnectorIDs.KERNEL_CONNECTOR.value
+
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
+    def gen_connector_params(self):
+        data = numpy.array([
             shape2word(self._common_w, self._common_h),
             shape2word(self._pre_w, self._pre_h),
             shape2word(self._post_w, self._post_h),
@@ -426,69 +450,20 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             shape2word(self._post_start_w, self._post_start_h),
             shape2word(self._pre_step_w, self._pre_step_h),
             shape2word(self._post_step_w, self._post_step_h),
-            shape2word(self._kernel_w, self._kernel_h)]
-
-    @overrides(AbstractGenerateConnectorOnMachine.gen_delays_id)
-    def gen_delays_id(self, delays):
-        if self._krn_delays is not None:
-            return PARAM_TYPE_KERNEL
-        return super().gen_delays_id(delays)
-
-    @overrides(
-        AbstractGenerateConnectorOnMachine.gen_delay_params_size_in_bytes)
-    def gen_delay_params_size_in_bytes(self, delays):
-        if self._krn_delays is not None:
-            return (N_KERNEL_PARAMS + 1 + self._krn_delays.size) * \
-                BYTES_PER_WORD
-        return super().gen_delay_params_size_in_bytes(delays)
-
-    @overrides(AbstractGenerateConnectorOnMachine.gen_delay_params)
-    def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
-        if self._krn_delays is not None:
-            properties = self._kernel_properties
-            properties.append(post_vertex_slice.lo_atom)
-            data = numpy.array(properties, dtype="uint32")
-            values = DataType.S1615.encode_as_numpy_int_array(self._krn_delays)
-            return numpy.concatenate((data, values.flatten()))
-        return super().gen_delay_params(
-            delays, pre_vertex_slice, post_vertex_slice)
-
-    @overrides(AbstractGenerateConnectorOnMachine.gen_weights_id)
-    def gen_weights_id(self, weights):
+            shape2word(self._kernel_w, self._kernel_h),
+            shape2word(int(self._krn_weights is not None),
+                       int(self._krn_delays is not None))], dtype="uint32")
+        extra_data = []
         if self._krn_weights is not None:
-            return PARAM_TYPE_KERNEL
-        return super().gen_weights_id(weights)
+            extra_data.append(DataType.S1615.encode_as_numpy_int_array(
+                self._krn_weights.flatten()))
+        if self._krn_delays is not None:
+            extra_data.append(DataType.S1615.encode_as_numpy_int_array(
+                self._krn_delays.flatten()))
 
-    @overrides(
-        AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes)
-    def gen_weight_params_size_in_bytes(self, weights):
-        if self._krn_weights is not None:
-            return (N_KERNEL_PARAMS + 1 + self._krn_weights.size) * \
-                BYTES_PER_WORD
-        return super().gen_weight_params_size_in_bytes(weights)
-
-    @overrides(AbstractGenerateConnectorOnMachine.gen_weights_params)
-    def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
-        if self._krn_weights is not None:
-            properties = self._kernel_properties
-            properties.append(post_vertex_slice.lo_atom)
-            data = numpy.array(properties, dtype="uint32")
-            values = DataType.S1615.encode_as_numpy_int_array(
-                self._krn_weights)
-            return numpy.concatenate((data, values.flatten()))
-        return super().gen_weights_params(
-            weights, pre_vertex_slice, post_vertex_slice)
-
-    @property
-    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
-    def gen_connector_id(self):
-        return ConnectorIDs.KERNEL_CONNECTOR.value
-
-    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
-        return numpy.array(self._kernel_properties, dtype="uint32")
+        if extra_data:
+            return numpy.concatenate((data, *extra_data))
+        return data
 
     @property
     @overrides(

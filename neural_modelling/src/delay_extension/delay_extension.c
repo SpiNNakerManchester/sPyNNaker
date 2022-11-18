@@ -27,7 +27,7 @@
 #include <debug.h>
 #include <simulation.h>
 #include <spin1_api.h>
-#include <tdma_processing.h>
+#include <common/send_mc.h>
 
 //! the size of the circular queue for packets.
 #define IN_BUFFER_SIZE 256
@@ -59,8 +59,6 @@ struct delay_extension_provenance {
     uint32_t n_buffer_overflows;
     //! Number of times we had to back off because the comms hardware was busy
     uint32_t n_delays;
-    //! number of times the TDMA fell behind its slot
-    uint32_t times_tdma_fell_behind;
     //! number of packets lost due to count saturation of uint8
     uint32_t n_packets_lost_due_to_count_saturation;
     //! number of packets dropped due to invalid neuron value
@@ -112,9 +110,6 @@ static uint32_t infinite_run;
 //! ::num_delay_slots_mask, and neuron IDs are extracted from the spike key by
 //! masking with ::incoming_neuron_mask
 static uint8_t **spike_counters = NULL;
-//! \brief Array of bitfields describing which neurons to deliver spikes to,
-//! from which bucket
-static bit_field_t *neuron_delay_stage_config = NULL;
 //! The number of delay stages.
 static uint32_t num_delay_stages = 0;
 //! The number of delays within a delay stage
@@ -164,6 +159,15 @@ static uint32_t n_background_overloads = 0;
 
 //! The maximum number of background tasks queued
 static uint32_t max_backgrounds_queued = 0;
+
+//! The number of colour bits (both from source and to send)
+static uint32_t n_colour_bits = 0;
+
+//! The mask to apply to get the colour from the current timestep or key
+static uint32_t colour_mask = 0;
+
+//! The colour for the current time step
+static uint32_t colour = 0;
 
 //---------------------------------------
 // Because we don't want to include string.h or strings.h for memset
@@ -231,46 +235,6 @@ static bool read_parameters(struct delay_parameters *params) {
             num_delay_stages, num_delay_slots, num_delay_slots_pot,
             num_delay_slots_mask, n_delay_in_a_stage);
 
-    // Create array containing a bitfield specifying whether each neuron should
-    // emit spikes after each delay stage
-    neuron_delay_stage_config =
-            spin1_malloc(num_delay_stages * sizeof(bit_field_t));
-    if (neuron_delay_stage_config == NULL) {
-        log_error("failed to allocate memory for array of size %u bytes",
-                num_delay_stages * sizeof(bit_field_t));
-        return false;
-    }
-
-    // Loop through delay stages
-    for (uint32_t d = 0; d < num_delay_stages; d++) {
-        log_debug("\t delay stage %u", d);
-
-        // Allocate bit-field
-        neuron_delay_stage_config[d] =
-                spin1_malloc(neuron_bit_field_words * sizeof(uint32_t));
-        if (neuron_delay_stage_config[d] == NULL) {
-            log_error("failed to allocate memory for bitfield of size %u bytes",
-                    neuron_bit_field_words * sizeof(uint32_t));
-            return false;
-        }
-
-        // Copy delay stage configuration bits into delay stage configuration
-        // bit-field
-        spin1_memcpy(neuron_delay_stage_config[d],
-                &params->delay_blocks[d * neuron_bit_field_words],
-                neuron_bit_field_words * sizeof(uint32_t));
-
-#if LOG_LEVEL >= LOG_DEBUG
-        io_printf(IO_BUF, "\t\tNeurons set:");
-        for (uint32_t i = 0; i < num_neurons; i++) {
-            if (bit_field_test(neuron_delay_stage_config[d], i)) {
-                io_printf(IO_BUF, " %d", i);
-            }
-        }
-        io_printf(IO_BUF, "\n");
-#endif
-    }
-
     // Allocate array of counters for each delay slot
     spike_counters = spin1_malloc(num_delay_slots_pot * sizeof(uint8_t*));
     if (spike_counters == NULL) {
@@ -290,6 +254,9 @@ static bool read_parameters(struct delay_parameters *params) {
         zero_spike_counters(spike_counters[s], num_neurons);
     }
 
+    n_colour_bits = params->n_colour_bits;
+    colour_mask = (1 << n_colour_bits) - 1;
+
     log_debug("read_parameters: completed successfully");
     return true;
 }
@@ -307,7 +274,6 @@ static void store_provenance_data(address_t provenance_region) {
     prov->n_packets_sent = n_spikes_sent;
     prov->n_buffer_overflows = in_spikes_get_n_buffer_overflows();
     prov->n_delays = n_delays;
-    prov->times_tdma_fell_behind = tdma_processing_times_behind();
     prov->n_packets_lost_due_to_count_saturation = saturation_count;
     prov->n_packets_dropped_due_to_invalid_neuron_value =
         n_packets_dropped_due_to_invalid_neuron_value;
@@ -349,12 +315,6 @@ static bool initialize(void) {
     // Get the parameters
     if (!read_parameters(data_specification_get_region(
             DELAY_PARAMS, ds_regions))) {
-        return false;
-    }
-
-    // get TDMA parameters
-    void *data_addr = data_specification_get_region(TDMA_REGION, ds_regions);
-    if (!tdma_processing_initialise(&data_addr)) {
         return false;
     }
 
@@ -400,13 +360,6 @@ static inline index_t key_n(key_t k) {
 //! \brief Processes spikes queued by ::incoming_spike_callback()
 static inline void spike_process(void) {
 
-    // Get current time slot of incoming spike counters
-    uint32_t current_time_slot = time & num_delay_slots_mask;
-    uint8_t *current_time_slot_spike_counters =
-            spike_counters[current_time_slot];
-
-    log_debug("%d: Current time slot %u", time, current_time_slot);
-
     // While there are any incoming spikes
     spike_t s;
     uint32_t state = spin1_int_disable();
@@ -416,18 +369,29 @@ static inline void spike_process(void) {
 
         if ((s & incoming_mask) == incoming_key) {
             // Mask out neuron ID
-            uint32_t neuron_id = key_n(s);
+            uint32_t spike_id = key_n(s);
+            uint32_t spike_colour = spike_id & colour_mask;
+            uint32_t neuron_id = spike_id >> n_colour_bits;
             if (neuron_id < num_neurons) {
+
+            	// Account for delayed spikes
+            	int32_t colour_diff = colour - spike_colour;
+            	uint32_t colour_delay = colour_diff & colour_mask;
+
+            	// Get current time slot of incoming spike counters
+				uint32_t time_slot = (time + colour_delay) & num_delay_slots_mask;
+				uint8_t *time_slot_spike_counters = spike_counters[time_slot];
+
                 // Increment counter
-                if (current_time_slot_spike_counters[neuron_id] ==
+                if (time_slot_spike_counters[neuron_id] ==
                         COUNTER_SATURATION_VALUE) {
                     saturation_count += 1;
                 } else {
-                    current_time_slot_spike_counters[neuron_id]++;
+                	time_slot_spike_counters[neuron_id]++;
                 }
                 log_debug("Incrementing counter %u = %u\n",
                         neuron_id,
-                        current_time_slot_spike_counters[neuron_id]);
+						time_slot_spike_counters[neuron_id]);
                 n_spikes_added++;
             } else {
                 n_packets_dropped_due_to_invalid_neuron_value += 1;
@@ -457,68 +421,54 @@ static void user_callback(UNUSED uint unused0, UNUSED uint unused1) {
 //! \param[in] local_time: current simulation time
 //! \param[in] timer_count: unused
 static void background_callback(uint local_time, UNUSED uint timer_count) {
-    // reset the TDMA for this next cycle.
-    tdma_processing_reset_phase();
-
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
-        // If any neurons emit spikes after this delay stage
-        bit_field_t delay_stage_config = neuron_delay_stage_config[d];
-        if (nonempty_bit_field(delay_stage_config, neuron_bit_field_words)) {
-            // Get key mask for this delay stage and its time slot
-            uint32_t delay_stage_delay = (d + 1) * n_delay_in_a_stage;
-            if (local_time >= delay_stage_delay) {
-                uint32_t delay_stage_time_slot =
-                        (local_time - delay_stage_delay) & num_delay_slots_mask;
-                uint8_t *delay_stage_spike_counters =
-                        spike_counters[delay_stage_time_slot];
+        uint32_t delay_stage_delay = (d + 1) * n_delay_in_a_stage;
+        if (local_time >= delay_stage_delay) {
+            uint32_t delay_stage_time_slot =
+                    (local_time - delay_stage_delay) & num_delay_slots_mask;
+            uint8_t *delay_stage_spike_counters =
+                    spike_counters[delay_stage_time_slot];
 
-                log_debug("%u: Checking time slot %u for delay stage %u",
-                        local_time, delay_stage_time_slot, d);
+            log_debug("%u: Checking time slot %u for delay stage %u (delay %u)",
+                    local_time, delay_stage_time_slot, d, delay_stage_delay);
 
-                // Loop through neurons
-                for (uint32_t n = 0; n < num_neurons; n++) {
+            // Loop through neurons
+            for (uint32_t n = 0; n < num_neurons; n++) {
 
-                    // If this neuron emits a spike after this stage
-                    if (bit_field_test(delay_stage_config, n)) {
+                // If no spikes to send, skip
+                if (delay_stage_spike_counters[n] == 0) {
+                    continue;
+                }
 
-                        // Calculate key all spikes coming from this neuron will be
-                        // sent with
-                        uint32_t neuron_index = ((d * num_neurons) + n);
-                        uint32_t spike_key = neuron_index + key;
+                // Calculate key all spikes coming from this neuron will be
+                // sent with
+                uint32_t neuron_index = ((d * num_neurons) + n);
+                uint32_t spike_key = (key + (neuron_index << n_colour_bits)) | colour;
 
-#if LOG_LEVEL >= LOG_DEBUG
-                        if (delay_stage_spike_counters[n] > 0) {
-                            log_debug("Neuron %u sending %u spikes after delay"
-                                    "stage %u with key %x",
-                                    n, delay_stage_spike_counters[n], d,
-                                    spike_key);
-                        }
-#endif
+                log_debug("Neuron %u sending %u spikes after delay"
+                        "stage %u with key %x",
+                        n, delay_stage_spike_counters[n], d,
+                        spike_key);
 
-                        // fire n spikes as payload, 1 as none payload.
-                        if (has_key) {
-                            if (delay_stage_spike_counters[n] > 1) {
-                                log_debug(
-                                    "%d: sending packet with key %d and payload %d",
-                                    time, spike_key, delay_stage_spike_counters[n]);
+                // fire n spikes as payload, 1 as none payload.
+                if (has_key) {
+                    if (delay_stage_spike_counters[n] > 1) {
+                        log_debug(
+                            "%d: sending packet with key 0x%08x and payload %d",
+                            time, spike_key, delay_stage_spike_counters[n]);
 
-                                tdma_processing_send_packet(
-                                    spike_key, delay_stage_spike_counters[n],
-                                    WITH_PAYLOAD, timer_count);
+                        send_spike_mc_payload(spike_key, delay_stage_spike_counters[n]);
 
-                                // update counter
-                                n_spikes_sent += delay_stage_spike_counters[n];
-                            } else if (delay_stage_spike_counters[n]  == 1) {
-                                log_debug("%d: sending spike with key %d", time, spike_key);
+                        // update counter
+                        n_spikes_sent += delay_stage_spike_counters[n];
+                    } else if (delay_stage_spike_counters[n] == 1) {
+                        log_debug("%d: sending spike with key 0x%08x", time, spike_key);
 
-                                tdma_processing_send_packet(
-                                    spike_key, 0, NO_PAYLOAD, timer_count);
+                        send_spike_mc(spike_key);
 
-                                // update counter
-                                n_spikes_sent++;
-                            }
-                        }
+                        // update counter
+                        n_spikes_sent++;
                     }
                 }
             }
@@ -569,6 +519,9 @@ static void timer_callback(uint timer_count, UNUSED uint unused1) {
         spin1_mode_restore(state);
         return;
     }
+
+    // Set the colour for the time step
+    colour = time & colour_mask;
 
     if (!spin1_schedule_callback(background_callback, time, timer_count, BACKGROUND)) {
         // We have failed to do this timer tick!

@@ -30,7 +30,6 @@
 #include "param_generators/param_generator_normal_clipped.h"
 #include "param_generators/param_generator_normal_clipped_to_boundary.h"
 #include "param_generators/param_generator_exponential.h"
-#include "param_generators/param_generator_kernel.h"
 
 //! The "hashes" for parameter generators
 enum {
@@ -46,10 +45,8 @@ enum {
     NORMAL_CLIPPED_BOUNDARY,
     //! A parameter that is an exponentially-distributed random variable
     EXPONENTIAL,
-    //! A parameter that is used with a convolution kernel connector
-    KERNEL,
     //! The number of known generators
-    N_PARAM_GENERATORS = 7
+    N_PARAM_GENERATORS
 };
 
 /**
@@ -63,7 +60,7 @@ typedef struct param_generator_info {
      */
     generator_hash_t hash;
     //! Initialise the generator
-    initialize_func *initialize;
+    initialize_param_func *initialize;
     //! Generate values with a parameter generator
     generate_param_func *generate;
     //! Free any data for the generator
@@ -105,14 +102,10 @@ static const struct param_generator_info param_generators[] = {
     {EXPONENTIAL,
             param_generator_exponential_initialize,
             param_generator_exponential_generate,
-            param_generator_exponential_free},
-    {KERNEL,
-            param_generator_kernel_initialize,
-            param_generator_kernel_generate,
-            param_generator_kernel_free},
+            param_generator_exponential_free}
 };
 
-param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
+param_generator_t param_generator_init(uint32_t hash, void **in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_PARAM_GENERATORS; i++) {
         const param_generator_info *type = &param_generators[i];
@@ -139,11 +132,8 @@ param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
     return NULL;
 }
 
-void param_generator_generate(
-        param_generator_t generator, uint32_t n_indices,
-        uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
-    generator->type->generate(
-            generator->data, n_indices, pre_neuron_index, indices, values);
+accum param_generator_generate(param_generator_t generator) {
+    return generator->type->generate(generator->data);
 }
 
 void param_generator_free(param_generator_t generator) {

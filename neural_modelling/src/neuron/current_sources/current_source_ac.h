@@ -60,7 +60,7 @@ static bool current_source_ac_load_parameters(
 
 static REAL current_source_ac_get_offset(uint32_t cs_index, uint32_t time) {
     if ((time >= ac_source[cs_index]->start) && (time < ac_source[cs_index]->stop)) {
-        REAL time_value = (REAL) time - (REAL) ac_source[cs_index]->start;
+        REAL time_value = kbits((time - ac_source[cs_index]->start) << 15);
         REAL sin_value = sink((time_value * ac_source[cs_index]->frequency) +
                 ac_source[cs_index]->phase);
         REAL ac_current_offset = ac_source[cs_index]->offset + (
