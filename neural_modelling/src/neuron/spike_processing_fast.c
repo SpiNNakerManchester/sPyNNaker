@@ -725,4 +725,3 @@ uint32_t spike_processing_get_max_flushed_spikes(){
 	return max_flushed_spikes;
 }
 #endif
-
