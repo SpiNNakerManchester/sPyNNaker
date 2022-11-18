@@ -36,6 +36,7 @@
 #include "c_main_synapse_common.h"
 #include "c_main_common.h"
 #include "spike_processing_fast.h"
+#include "spike_profiling.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <spin1_api_params.h>
 
@@ -91,6 +92,12 @@ const struct synapse_regions SYNAPSE_REGIONS = {
     .bitfield_filter = BIT_FIELD_FILTER_REGION
 };
 
+//! spike profiling
+struct spike_holder_t spike_counter;
+struct spike_holder_t spike_cache;
+struct spike_holder_t spike_counter_inh;
+struct spike_holder_t spike_cache_inh;
+
 //! The current timer tick value.
 // the timer tick callback returning the same value.
 uint32_t time;
@@ -130,7 +137,19 @@ void resume_callback(void) {
 //! \param[in] unused0: unused
 //! \param[in] unused1: unused
 void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
-    time++;
+    // Get number of spikes in last tick, and reset spike counter
+    spike_processing_get_and_reset_spikes_this_tick();
+    spike_processing_get_and_reset_dmas_this_tick();
+    spike_processing_get_and_reset_pipeline_restarts_this_tick();
+
+    // cache and flush spike counters
+    // functions in file neural_modelling/src/neuron/spike_profiling.h
+	spike_profiling_cache_and_flush_spike_holder(&spike_counter,
+			&spike_cache);
+	spike_profiling_cache_and_flush_spike_holder(&spike_counter_inh,
+			&spike_cache_inh);
+
+	time++;
     if (simulation_is_finished()) {
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);

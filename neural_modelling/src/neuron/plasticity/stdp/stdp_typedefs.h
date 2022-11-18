@@ -38,7 +38,7 @@
 //! \return The product
 #define STDP_FIXED_MUL_16X16(a, b) maths_fixed_mul16(a, b, STDP_FIXED_POINT)
 
-#define print_plasticity false
+//#define print_plasticity false
 
 //! The amount of right shift required to take a weight from s1615 format
 //! to STDP_FIXED_POINT format (s4,11)

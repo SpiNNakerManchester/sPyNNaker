@@ -199,21 +199,21 @@ static state_t neuron_model_get_membrane_voltage(const neuron_t *neuron)  {
 }
 
 static inline void neuron_model_print_state_variables(const neuron_t *neuron) {
-    log_info("V membrane    = %11.4k mv", neuron->V_membrane);
-    log_info("Refract timer = %u timesteps", neuron->refract_timer);
-    log_info("T_last        = $u", neuron->t_last);
+    log_debug("V membrane    = %11.4k mv", neuron->V_membrane);
+    log_debug("Refract timer = %u timesteps", neuron->refract_timer);
+    log_debug("T_last        = $u", neuron->t_last);
 }
 
 static inline void neuron_model_print_parameters(const neuron_t *neuron) {
-    log_info("V reset       = %11.4k mv", neuron->V_reset);
-    log_info("V rest        = %11.4k mv", neuron->V_rest);
+    log_debug("V reset       = %11.4k mv", neuron->V_reset);
+    log_debug("V rest        = %11.4k mv", neuron->V_rest);
 
-    log_info("I offset      = %11.4k nA", neuron->I_offset);
-    log_info("R membrane    = %11.4k Mohm", neuron->R_membrane);
+    log_debug("I offset      = %11.4k nA", neuron->I_offset);
+    log_debug("R membrane    = %11.4k Mohm", neuron->R_membrane);
 
-    log_info("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
+    log_debug("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
 
-    log_info("T refract     = %u timesteps", neuron->T_refract);
+    log_debug("T refract     = %u timesteps", neuron->T_refract);
 }
 
 

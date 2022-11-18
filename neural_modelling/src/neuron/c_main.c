@@ -38,17 +38,11 @@
 #include "c_main_common.h"
 #include "regions.h"
 #include "profile_tags.h"
-#include "spike_profiling.h"
 #include "spike_processing.h"
 
-struct spike_holder_t spike_counter;
-struct spike_holder_t spike_cache;
-struct spike_holder_t spike_counter_inh;
-struct spike_holder_t spike_cache_inh;
-
 // FLUSH SPIKES
-bool timer_callback_active = false;
-extern volatile bool dma_busy;
+//bool timer_callback_active = false;
+//extern volatile bool dma_busy;
 
 //! The combined provenance from synapses and neurons
 struct combined_provenance {
@@ -190,17 +184,10 @@ void background_callback(uint timer_count, uint local_time) {
 //!            executed since start of simulation
 //! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(uint timer_count, UNUSED uint unused) {
-    // Get number of spikes in last tick, and reset spike counter
-    spike_processing_get_and_reset_spikes_this_tick();
-    spike_processing_get_and_reset_dmas_this_tick();
-    spike_processing_get_and_reset_pipeline_restarts_this_tick();
-
-    // cache and flush spike counters
-    // functions in file neural_modelling/src/neuron/spike_profiling.h
-	spike_profiling_cache_and_flush_spike_holder(&spike_counter,
-			&spike_cache);
-	spike_profiling_cache_and_flush_spike_holder(&spike_counter_inh,
-			&spike_cache_inh);
+//    // Get number of spikes in last tick, and reset spike counter
+//    spike_processing_get_and_reset_spikes_this_tick();
+//    spike_processing_get_and_reset_dmas_this_tick();
+//    spike_processing_get_and_reset_pipeline_restarts_this_tick();
 
 	// Disable interrupts to stop DMAs and MC getting in the way of this bit
     uint32_t state = spin1_int_disable();
@@ -283,7 +270,6 @@ static bool initialise(void) {
             &clear_input_buffer_of_late_packets, &n_rec_regions_used)) {
         return false;
     }
-    clear_input_buffer_of_late_packets = false;
 
     // Setup spike processing
     if (!spike_processing_initialise(

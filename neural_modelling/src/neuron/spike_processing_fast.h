@@ -80,6 +80,23 @@ struct spike_processing_fast_provenance {
     uint32_t latest_receive;
     //! The most spikes left at the end of any time step
     uint32_t max_spikes_overflow;
+    //! SpiNNCer-related provenance
+    //! The maximum number of spikes in a tick
+    uint32_t max_spikes_in_a_tick;
+    //! The maximum number of DMAs in a tick
+    uint32_t max_dmas_in_a_tick;
+    //! The maximum number of pipeline restarts
+    uint32_t max_pipeline_restarts;
+    //! Was the timer callback completed?
+    uint32_t timer_callback_completed;
+#if LOG_LEVEL >= LOG_DEBUG
+    //! Was the spike pipeline deactivated?
+    uint32_t spike_pipeline_deactivated;
+    //! The maximum number of flushed spikes in one step
+    uint32_t max_flushed_spikes;
+    //! Thet total number of flushed spikes
+    uint32_t total_flushed_spikes;
+#endif
 };
 
 //! \brief Set up spike processing
@@ -112,5 +129,35 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires);
 //! \param[in] prov The structure to store the provenance data in
 void spike_processing_fast_store_provenance(
         struct spike_processing_fast_provenance *prov);
+
+// Custom provenance from SpiNNCer
+
+//! \brief get number of spikes received since last timer event
+//! \return uint32_t number of spikes
+void spike_processing_get_and_reset_spikes_this_tick(void);
+
+//! \brief get number of dmas completed since last timer event
+//! \return uint32_t number of DMAs
+void spike_processing_get_and_reset_dmas_this_tick(void);
+
+//! \brief get number of time pipeline was restarted since last timer event
+//! \return uint32_t number of pipeline restarts
+void spike_processing_get_and_reset_pipeline_restarts_this_tick(void);
+
+#if LOG_LEVEL >= LOG_DEBUG
+//! \brief get time from T1 clock at which spike pipeline completed
+//! \return uint32_t pipeline deactivation time
+uint32_t spike_processing_get_pipeline_deactivation_time();
+
+// FLUSH SPIKES
+//! \brief returns the total unprocessed spikes from a simulation
+//! \return total unprocessed spikes
+uint32_t spike_processing_get_total_flushed_spikes();
+
+//! \brief returns the maximum unprocessed spikes from a single
+//! simulation timestep.
+//! \return maximum unprocessed spikes from a single timestep.
+uint32_t spike_processing_get_max_flushed_spikes();
+#endif
 
 #endif // _SPIKE_PROCESSING_FAST_H_

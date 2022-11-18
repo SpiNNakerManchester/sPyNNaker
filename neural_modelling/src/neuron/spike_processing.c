@@ -111,19 +111,6 @@ static uint32_t biggest_fill_size_of_input_buffer;
 //!     end of a timer tick.
 static bool clear_input_buffers_of_late_packets;
 
-static uint32_t max_spikes_in_a_tick;
-static uint32_t max_dmas_in_a_tick;
-static uint32_t dma_complete_count;
-static uint32_t max_pipeline_restarts;
-static uint32_t spike_pipeline_deactivation_time = 0;
-static uint32_t timer_callback_completed = 0;
-static uint32_t spikes_this_time_step = 0;
-static uint32_t dmas_this_time_step = 0;
-static uint32_t pipeline_restarts = 0;
-
-static uint32_t max_flushed_spikes = 0;
-static uint32_t total_flushed_spikes = 0;
-
 //! the number of packets received this time step
 static struct {
     uint32_t time;
@@ -337,7 +324,7 @@ static inline void start_dma_loop(void) {
 //! \param[in] unused: Only specified to match API
 static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
     p_per_ts_struct.packets_this_time_step += 1;
-    spikes_this_time_step += 1;
+//    spikes_this_time_step += 1;
     if (in_spikes_add_spike(key)) {
         start_dma_loop();
     }
@@ -348,7 +335,7 @@ static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
 //! \param[in] payload: the payload of the packet. The count.
 static void multicast_packet_pl_received_callback(uint key, uint payload) {
     p_per_ts_struct.packets_this_time_step += 1;
-    spikes_this_time_step += 1;
+//    spikes_this_time_step += 1;
 
     // cycle through the packet insertion
     bool added = false;
@@ -366,8 +353,8 @@ static void multicast_packet_pl_received_callback(uint key, uint payload) {
 static void dma_complete_callback(UNUSED uint unused, UNUSED uint tag) {
 
     // increment the dma complete count for provenance generation
-    dmas_this_time_step += 1;
-    dma_complete_count += 1;
+//    dmas_this_time_step++;
+    dma_complete_count++;
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;
@@ -439,7 +426,7 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
     dma_n_spikes = 0;
 
     // Increment counter for spike processing pipeline restarts
-    pipeline_restarts++;
+//    pipeline_restarts++;
 
     if (buffer_being_read < N_DMA_BUFFERS) {
         // If the DMA buffer is full of valid data, attempt to reuse it on the
@@ -491,7 +478,7 @@ bool spike_processing_initialise( // EXPORTED
 
     // Allocate incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
-    	io_printf(IO_BUF, "Spike buffer failed to initialise - insufficient DTCM \n");
+    	log_error("Spike buffer failed to initialise - insufficient DTCM \n");
         return false;
     }
 
@@ -514,13 +501,15 @@ void spike_processing_store_provenance(struct spike_processing_provenance *prov)
     prov->n_rewires = n_successful_rewires;
     prov->n_packets_dropped_from_lateness = count_input_buffer_packets_late;
     prov->max_filled_input_buffer_size = biggest_fill_size_of_input_buffer;
-    prov->max_spikes_in_a_tick = max_spikes_in_a_tick;
-    prov->max_dmas_in_a_tick = max_dmas_in_a_tick;
-    prov->max_pipeline_restarts = max_pipeline_restarts;
-    prov->timer_callback_completed = timer_callback_completed;
-    prov->spike_pipeline_deactivated = spike_pipeline_deactivation_time;
-    prov->max_flushed_spikes = max_flushed_spikes;
-    prov->total_flushed_spikes = total_flushed_spikes;
+//    prov->max_spikes_in_a_tick = max_spikes_in_a_tick;
+//    prov->max_dmas_in_a_tick = max_dmas_in_a_tick;
+//    prov->max_pipeline_restarts = max_pipeline_restarts;
+//    prov->timer_callback_completed = timer_callback_completed;
+//#if LOG_LEVEL >= LOG_DEBUG
+//    prov->spike_pipeline_deactivated = spike_pipeline_deactivation_time;
+//    prov->max_flushed_spikes = max_flushed_spikes;
+//    prov->total_flushed_spikes = total_flushed_spikes;
+//#endif
 }
 
 bool spike_processing_do_rewiring(int number_of_rewires) {
@@ -532,40 +521,3 @@ bool spike_processing_do_rewiring(int number_of_rewires) {
     spin1_mode_restore(cpsr);
     return true;
 }
-
-// Custom provenance from SpiNNCer
-void spike_processing_get_and_reset_spikes_this_tick(void ) {
-	if (spikes_this_time_step > max_spikes_in_a_tick) {
-		max_spikes_in_a_tick = spikes_this_time_step;
-	}
-	spikes_this_time_step = 0;
-}
-
-void spike_processing_get_and_reset_dmas_this_tick(void) {
-	if (dmas_this_time_step > max_dmas_in_a_tick){
-		max_dmas_in_a_tick = dmas_this_time_step;
-	}
-	dmas_this_time_step = 0;
-}
-
-void spike_processing_get_and_reset_pipeline_restarts_this_tick(void) {
-	if (pipeline_restarts > max_pipeline_restarts) {
-		max_pipeline_restarts = pipeline_restarts;
-	}
-	pipeline_restarts = 0;
-}
-
-#if LOG_LEVEL >= LOG_DEBUG
-uint32_t spike_processing_get_pipeline_deactivation_time(){
-	return spike_pipeline_deactivation_time;
-}
-
-// FLUSHED SPIKES
-uint32_t spike_processing_get_total_flushed_spikes(){
-	return total_flushed_spikes;
-}
-
-uint32_t spike_processing_get_max_flushed_spikes(){
-	return max_flushed_spikes;
-}
-#endif
