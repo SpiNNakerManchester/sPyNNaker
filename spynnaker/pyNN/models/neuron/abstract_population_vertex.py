@@ -50,15 +50,11 @@ from spinn_front_end_common.interface.provenance import (
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import NeuronRecorder
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractAcceptsIncomingSynapses, AbstractMaxSpikes, HasSynapses,
-    SupportsStructure)
+    AbstractAcceptsIncomingSynapses, HasSynapses, SupportsStructure)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import float_gcd
-# from spynnaker.pyNN.utilities.constants import (
-#     POSSION_SIGMA_SUMMATION_LIMIT)
-# from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural)
-# AbstractSupportsSignedWeights)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
