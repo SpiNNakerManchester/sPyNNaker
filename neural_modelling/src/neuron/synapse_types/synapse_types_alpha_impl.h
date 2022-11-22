@@ -38,9 +38,9 @@
 //! Number of inhibitory receptors
 #define NUM_INHIBITORY_RECEPTORS 1
 
-#include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
+#include <neuron/decay.h>
 
 //---------------------------------------
 // Synapse parameters
@@ -222,7 +222,7 @@ static inline const char *synapse_types_get_type_char(
 //! \param[in] parameters: the pointer to the parameters to print
 static inline void synapse_types_print_input(
         synapse_types_t *parameters) {
-    io_printf(IO_BUF, "%12.6k - %12.6k",
+    log_debug("%12.6k - %12.6k",
             parameters->exc.lin_buff * parameters->exc.exp_buff,
             parameters->inh.lin_buff * parameters->inh.exp_buff);
 }
