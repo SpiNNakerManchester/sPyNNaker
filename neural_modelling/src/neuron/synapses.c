@@ -300,15 +300,15 @@ bool synapses_initialise(
         return false;
     }
 
-    // read in min_weights
+    // read in min_weights and reciprocals
     spin1_memcpy(min_weights, params->min_weights_recip, min_weights_bytes);
-    spin1_memcpy(min_weights_recip, &params->min_weights_recip[n_synapse_types], min_weights_bytes);
+    spin1_memcpy(
+    		min_weights_recip, &params->min_weights_recip[n_synapse_types], min_weights_bytes);
 	*min_weights_out = min_weights;
 	*min_weights_recip_out = min_weights_recip;
 //    for (uint32_t s = 0; s < n_synapse_types; s++) {
-//        log_info("synapse initialise, min_weights_out[%u] = %k, min_weights_recip_out[%u] = %k %k %k",
-//                s, min_weights_out[s], s, min_weights_recip_out[s],
-//				min_weights[s], min_weights_recip[s]);
+//        log_info("synapse initialise, min_weights_out[%u] = %k, min_weights_recip_out[%u] = %k",
+//                s, min_weights_out[s], s, min_weights_recip_out[s]);
 //    }
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
