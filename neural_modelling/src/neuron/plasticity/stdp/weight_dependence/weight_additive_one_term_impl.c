@@ -76,9 +76,9 @@ address_t weight_initialise(
         min_weight[s] = min_weights[s];
         min_weight_recip[s] = min_weights_recip[s];
 
-        log_info("\tSynapse type %u: Min weight:%k, Max weight:%k, A2+:%k, A2-:%k min_weight %k recip %k",
-                s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,
-                dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus, min_weight[s], min_weight_recip[s]);
+        log_debug("\tSynapse type %u: Min w:%k, Max w:%k, A2+:%k, A2-:%k min_weight %k recip %k",
+        		s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight, dtcm_copy[s].a2_plus,
+				dtcm_copy[s].a2_minus, min_weight[s], min_weight_recip[s]);
     }
 
     // Return end address of region
