@@ -1166,7 +1166,8 @@ class AbstractPopulationVertex(
         # This will only hold ring buffer scaling for the neuron synapse
         # types
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
-                (BYTES_PER_WORD * self.__neuron_impl.get_n_synapse_types()))
+                (BYTES_PER_WORD * 2 * self.__neuron_impl.get_n_synapse_types(
+                    )))
 
     def get_synapse_dynamics_size(self, n_atoms):
         """ Get the size of the synapse dynamics region

@@ -200,9 +200,11 @@ class PopulationMachineSynapses(
         spec.write_value(get_n_bits(max_delay))
         spec.write_value(int(self._app_vertex.drop_late_spikes))
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
-        # Write the minimum weights
+        # Write the minimum weights and the reciprocals (no machine division)
         for min_w in min_weights:
             spec.write_value(min_w, data_type=DataType.S1615)
+        for min_w in min_weights:
+            spec.write_value(1 / min_w, data_type=DataType.S1615)
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)
     def gen_on_machine(self):

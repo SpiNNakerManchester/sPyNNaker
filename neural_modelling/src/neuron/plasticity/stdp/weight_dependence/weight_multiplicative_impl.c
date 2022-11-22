@@ -27,6 +27,7 @@ plasticity_weight_region_data_t *plasticity_weight_region_data;
 
 //! Plasticity min_weight array, in DTCM
 REAL *min_weight;
+REAL *min_weight_recip;
 
 //! \brief How the configuration data for multiplicative is laid out in SDRAM.
 //! The layout is an array of these.
@@ -42,7 +43,7 @@ typedef struct {
 //---------------------------------------
 
 address_t weight_initialise(
-        address_t address, uint32_t n_synapse_types, REAL *min_weights) {
+        address_t address, uint32_t n_synapse_types, REAL *min_weights, REAL *min_weights_recip) {
     log_debug("weight_initialise: starting");
     log_debug("\tSTDP multiplicative weight dependence");
     // Copy plasticity region data from address
@@ -59,6 +60,11 @@ address_t weight_initialise(
         log_error("Could not initialise weight region data");
         return NULL;
     }
+    min_weight_recip = spin1_malloc(sizeof(REAL) * n_synapse_types);
+    if (min_weight_recip == NULL) {
+        log_error("Could not initialise weight region data");
+        return NULL;
+    }
 
     multiplicative_config_t *config = (multiplicative_config_t *) address;
     for (uint32_t s = 0; s < n_synapse_types; s++, config++) {
@@ -69,6 +75,7 @@ address_t weight_initialise(
         dtcm_copy[s].a2_minus = config->a2_minus;
 
         min_weight[s] = min_weights[s];
+        min_weight_recip[s] = min_weights_recip[s];
 
         log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d, min_weight %k",
                 s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,

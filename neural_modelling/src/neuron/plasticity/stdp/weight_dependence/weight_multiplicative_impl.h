@@ -44,6 +44,7 @@ typedef struct {
     accum weight;        //!< The current weight
 
     REAL min_weight;         //!< The min weight
+    REAL min_weight_recip;         //!< The min weight
 
     //! Reference to the configuration data
     const plasticity_weight_region_data_t *weight_region;
@@ -70,6 +71,7 @@ static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
     extern plasticity_weight_region_data_t *plasticity_weight_region_data;
     extern REAL *min_weight;
+    extern REAL *min_weight_recip;
 
     uint64_t mw = (uint64_t) bitsk(min_weight[synapse_type]);
     uint64_t w = (uint64_t) (weight);
@@ -79,6 +81,7 @@ static inline weight_state_t weight_get_initial(
     return (weight_state_t) {
         .weight = s1615_weight,
         .min_weight = min_weight[synapse_type],
+		.min_weight_recip = min_weight_recip[synapse_type],
         .weight_region = &plasticity_weight_region_data[synapse_type]
     };
 }
@@ -124,8 +127,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
  * \return The new weight.
  */
 static inline weight_t weight_get_final(weight_state_t state) {
-//    log_info("\tnew_weight:%d\n", state.weight);
-    return (weight_t) (bitsk(state.weight) / bitsk(state.min_weight));
+    return (weight_t) (state.weight * state.min_weight_recip);
 }
 
 static inline void weight_decay(weight_state_t *state, int32_t decay) {

@@ -46,7 +46,7 @@
  * \return the end of the weight region as an absolute SDRAM memory address.
  */
 address_t weight_initialise(
-        address_t address, uint32_t n_synapse_types, REAL *min_weights);
+        address_t address, uint32_t n_synapse_types, REAL *min_weights, REAL *min_weights_recip);
 
 /*!
  * \brief Gets the initial weight state.

@@ -91,7 +91,7 @@ static inline void synapses_print_weight(
 bool synapses_initialise(
         address_t synapse_params_address,
         uint32_t *n_neurons_out, uint32_t *n_synapse_types_out,
-        weight_t **ring_buffers_out, REAL **min_weights_out,
+        weight_t **ring_buffers_out, REAL **min_weights_out, REAL **min_weights_recip_out,
         bool* clear_input_buffers_of_late_packets_init,
         uint32_t *incoming_spike_buffer_size);
 

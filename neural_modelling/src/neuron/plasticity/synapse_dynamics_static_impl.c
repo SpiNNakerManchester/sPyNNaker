@@ -29,7 +29,8 @@
 
 bool synapse_dynamics_initialise(
         UNUSED address_t address, UNUSED uint32_t n_neurons,
-        UNUSED uint32_t n_synapse_types, UNUSED REAL *min_weights) {
+        UNUSED uint32_t n_synapse_types, UNUSED REAL *min_weights,
+		UNUSED REAL *min_weights_recip) {
     return true;
 }
 

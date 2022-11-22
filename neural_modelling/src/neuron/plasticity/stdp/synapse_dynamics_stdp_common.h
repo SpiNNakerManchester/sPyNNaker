@@ -113,7 +113,7 @@ static uint32_t plastic_saturation_count = 0;
 
 static inline bool synapse_dynamics_stdp_init(
         address_t *address, stdp_params *params, uint32_t n_synapse_types,
-        REAL *min_weights) {
+        REAL *min_weights, REAL *min_weights_recip) {
 
     // Load parameters
     stdp_params *sdram_params = (stdp_params *) *address;
@@ -128,7 +128,7 @@ static inline bool synapse_dynamics_stdp_init(
 
     // Load weight dependence data
     address_t weight_result = weight_initialise(
-            weight_region_address, n_synapse_types, min_weights);
+            weight_region_address, n_synapse_types, min_weights, min_weights_recip);
     if (weight_result == NULL) {
         return false;
     }
