@@ -130,7 +130,7 @@ $(function() {
 <div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="matrix__generator__static_8h.html#ad8a76e9758256ce53a6f257964452086">   90</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="matrix__generator__static_8h.html#ad8a76e9758256ce53a6f257964452086">setup_rows</a>(uint32_t *matrix, uint32_t n_rows, uint32_t max_row_n_words) {</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordflow">for</span> (uint32_t i = 0; i &lt; n_rows; i++) {</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <a class="code" href="matrix__generator__static_8h.html#structstatic__row__t">static_row_t</a> *row = <a class="code" href="matrix__generator__common_8h.html#a59540be417d878df2430b21bad1eb91c">get_row</a>(matrix, max_row_n_words, i);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#af4431e39155e80c53e1f9aab22d5a0ef">log_info</a>(<span class="stringliteral">&quot;Setting up row %u at 0x%08x with %u max words&quot;</span>, i, row, max_row_n_words);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;Setting up row %u at 0x%08x with %u max words&quot;</span>, i, row, max_row_n_words);</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        row-&gt;<a class="code" href="matrix__generator__static_8h.html#a517f946e7eb90f3e7adaad0aad281bba">plastic_plastic_size</a> = 0;</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        row-&gt;<a class="code" href="matrix__generator__static_8h.html#a478e204c92e1d085b8f6649bfac26abd">fixed_plastic_size</a> = 0;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        row-&gt;<a class="code" href="matrix__generator__static_8h.html#a42b25ad87ad6746a462ba9ba0db13be4">fixed_fixed_size</a> = 0;</div>
@@ -226,7 +226,7 @@ $(function() {
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;}</div>
 <div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
 <div class="ttc" id="adebug_8h_html_a06b347c50387b36e0ff903e76be1c1d4"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a06b347c50387b36e0ff903e76be1c1d4">log_warning</a></div><div class="ttdeci">void log_warning(const char *message,...)</div></div>
-<div class="ttc" id="adebug_8h_html_af4431e39155e80c53e1f9aab22d5a0ef"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#af4431e39155e80c53e1f9aab22d5a0ef">log_info</a></div><div class="ttdeci">void log_info(const char *message,...)</div></div>
+<div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
 <div class="ttc" id="adelay__extension_8h_html"><div class="ttname"><a href="delay__extension_8h.html">delay_extension.h</a></div><div class="ttdoc">Declarations for delay extensions.</div></div>
 <div class="ttc" id="agenerator__types_8h_html"><div class="ttname"><a href="generator__types_8h.html">generator_types.h</a></div><div class="ttdoc">General types associated with generators.</div></div>
 <div class="ttc" id="agenerator__types_8h_html_a5ee0662d7b826e8ba7abfa68bbe6a327"><div class="ttname"><a href="generator__types_8h.html#a5ee0662d7b826e8ba7abfa68bbe6a327">rescale_weight</a></div><div class="ttdeci">static uint16_t rescale_weight(accum weight, unsigned long accum weight_scale)</div><div class="ttdoc">Rescales a weight to account for weight granularity and type-converts it.</div><div class="ttdef"><b>Definition:</b> <a href="generator__types_8h_source.html#l00143">generator_types.h:143</a></div></div>
@@ -270,7 +270,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Nov 17 2022 11:11:16 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Nov 22 2022 15:18:59 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
