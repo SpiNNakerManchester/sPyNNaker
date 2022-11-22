@@ -84,7 +84,7 @@ static inline post_trace_t timing_decay_post(
     // (as it's sampled BEFORE the spike),
     // otherwise, add on energy caused by last spike and decay that
     int32_t new_o2 = 0;
-    int32_t next_spike_time = last_trace.last_spike_time;
+    uint32_t next_spike_time = last_trace.last_spike_time;
     if (last_trace.last_spike_time == 0) {
         int32_t decay = maths_lut_exponential_decay(delta_time, tau_y_lookup);
         new_o2 = STDP_FIXED_MUL_16X16(last_trace.o2, decay);
