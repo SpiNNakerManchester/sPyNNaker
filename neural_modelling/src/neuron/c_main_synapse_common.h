@@ -107,12 +107,11 @@ static inline bool initialise_synapse_regions(
         uint32_t *n_recording_regions_used) {
     // Set up the synapses
     REAL *min_weights;
-    REAL *min_weights_recip;
     uint32_t n_neurons;
     uint32_t n_synapse_types;
     if (!synapses_initialise(
             data_specification_get_region(regions.synapse_params, ds_regions),
-            &n_neurons, &n_synapse_types, ring_buffers, &min_weights, &min_weights_recip,
+            &n_neurons, &n_synapse_types, ring_buffers, &min_weights,
             clear_input_buffer_of_late_packets,
             incoming_spike_buffer_size)) {
         return false;
@@ -125,10 +124,11 @@ static inline bool initialise_synapse_regions(
             row_max_n_words)) {
         return false;
     }
+
     // Set up the synapse dynamics
     if (!synapse_dynamics_initialise(
             data_specification_get_region(regions.synapse_dynamics, ds_regions),
-            n_neurons, n_synapse_types, min_weights, min_weights_recip)) {
+            n_neurons, n_synapse_types, min_weights)) {
         return false;
     }
 
@@ -137,6 +137,7 @@ static inline bool initialise_synapse_regions(
             regions.structural_dynamics, ds_regions), n_recording_regions_used)) {
         return false;
     }
+
 
     return true;
 }

@@ -180,8 +180,6 @@ class PopulationMachineNeurons(
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param list(int) ring_buffer_shifts:
-            The shifts to apply to convert ring buffer values to S1615 values
         """
 
         # Write the current source parameters

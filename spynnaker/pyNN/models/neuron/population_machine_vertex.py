@@ -312,8 +312,8 @@ class PopulationMachineVertex(
 
         if self.__regenerate_synapse_data:
             self._write_synapse_data_spec(
-                spec, self.__ring_buffer_shifts,
-                self.__min_weights, self.__structural_sz)
+                spec, self.__min_weights,
+                self.__weight_scales, self.__structural_sz)
             self.__regenerate_synapse_data = False
 
         # close spec

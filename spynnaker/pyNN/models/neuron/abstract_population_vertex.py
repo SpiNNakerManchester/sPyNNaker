@@ -168,7 +168,7 @@ class AbstractPopulationVertex(
     _SYNAPSE_BASE_N_CPU_CYCLES = 10
 
     # Elements before the start of global parameters
-    # 1. has key, 2. key, 3. n atoms, 4. n_atoms_peak 5. n_colour_bits
+    # 1 has key 2 n atoms 3 n_atoms_peak 4 n_colour_bits 5 n_synapse_types
     CORE_PARAMS_BASE_SIZE = 5 * BYTES_PER_WORD
 
     def __init__(
@@ -1165,9 +1165,8 @@ class AbstractPopulationVertex(
         """
         # This will only hold ring buffer scaling for the neuron synapse
         # types
-        return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
-                (BYTES_PER_WORD * 2 * self.__neuron_impl.get_n_synapse_types(
-                    )))
+        return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES + (
+            BYTES_PER_WORD * 2 * self.__neuron_impl.get_n_synapse_types()))
 
     def get_synapse_dynamics_size(self, n_atoms):
         """ Get the size of the synapse dynamics region

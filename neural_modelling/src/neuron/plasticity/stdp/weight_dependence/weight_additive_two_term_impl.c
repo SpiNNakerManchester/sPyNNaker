@@ -44,7 +44,7 @@ REAL *min_weight_recip;
 // Functions
 //---------------------------------------
 address_t weight_initialise(
-        address_t address, uint32_t n_synapse_types, REAL *min_weights, REAL *min_weights_recip) {
+        address_t address, uint32_t n_synapse_types, REAL *min_weights) {
     log_debug("weight_initialise: starting");
     log_debug("\tSTDP additive two-term weight dependance");
     // Copy plasticity region data from address
@@ -80,7 +80,7 @@ address_t weight_initialise(
         dtcm_copy[s].a3_minus = config->a3_minus;
 
         min_weight[s] = min_weights[s];
-        min_weight_recip[s] = min_weights_recip[s];
+        min_weight_recip[s] = min_weights[s+n_synapse_types];
 
         log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d, min_weight %k"
                 " A3+:%d, A3-:%d",

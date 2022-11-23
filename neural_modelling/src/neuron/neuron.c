@@ -148,7 +148,7 @@ bool neuron_initialise(
     current_source_address = current_sources_address;
     saved_initial_values_address = initial_values_address;
 
-    log_debug("\t n_neurons = %u, peak %u, n_synapse_types %u",
+    log_info("\t n_neurons = %u, peak %u, n_synapse_types %u",
             n_neurons, n_neurons_peak, n_synapse_types);
 
     // Call the neuron implementation initialise function to setup DTCM etc.

@@ -49,10 +49,8 @@ static uint32_t ring_buffer_size;
 //! Ring buffer mask
 static uint32_t ring_buffer_mask;
 
-// The minimum of the weight value represented by the LSB of a weight,
-// and the recioprocal of these minimum values
+// The minimum weight value, and the reciprocal of these minimum values
 static REAL *min_weights;
-static REAL *min_weights_recip;
 
 //! \brief Number of bits needed for the synapse type and index
 //! \details
@@ -272,7 +270,7 @@ struct synapse_params {
 bool synapses_initialise(
         address_t synapse_params_address,
         uint32_t *n_neurons_out, uint32_t *n_synapse_types_out,
-        weight_t **ring_buffers_out, REAL **min_weights_out, REAL **min_weights_recip_out,
+        weight_t **ring_buffers_out, REAL **min_weights_out,
         bool* clear_input_buffers_of_late_packets_init,
         uint32_t *incoming_spike_buffer_size) {
     struct synapse_params *params = (struct synapse_params *) synapse_params_address;
@@ -288,28 +286,16 @@ bool synapses_initialise(
     uint32_t log_max_delay = params->log_max_delay;
 
     // Set up min_weights
-    uint32_t min_weights_bytes = n_synapse_types * sizeof(REAL);
+    uint32_t min_weights_bytes = 2 * n_synapse_types * sizeof(REAL);
     min_weights = spin1_malloc(min_weights_bytes);
     if (min_weights == NULL) {
-        log_error("Not enough memory to allocate min weights");
-        return false;
-    }
-    min_weights_recip = spin1_malloc(min_weights_bytes);
-    if (min_weights_recip == NULL) {
         log_error("Not enough memory to allocate min weights");
         return false;
     }
 
     // read in min_weights and reciprocals
     spin1_memcpy(min_weights, params->min_weights_recip, min_weights_bytes);
-    spin1_memcpy(
-    		min_weights_recip, &params->min_weights_recip[n_synapse_types], min_weights_bytes);
 	*min_weights_out = min_weights;
-	*min_weights_recip_out = min_weights_recip;
-//    for (uint32_t s = 0; s < n_synapse_types; s++) {
-//        log_info("synapse initialise, min_weights_out[%u] = %k, min_weights_recip_out[%u] = %k",
-//                s, min_weights_out[s], s, min_weights_recip_out[s]);
-//    }
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;

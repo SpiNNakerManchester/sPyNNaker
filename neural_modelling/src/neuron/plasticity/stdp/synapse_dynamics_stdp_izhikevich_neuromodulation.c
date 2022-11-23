@@ -279,10 +279,10 @@ static inline nm_final_state_t izhikevich_neuromodulation_plasticity_update_syna
 
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        REAL *min_weights, REAL *min_weights_recip) {
+        REAL *min_weights) {
 
     if (!synapse_dynamics_stdp_init(
-            &address, &params, n_synapse_types, min_weights, min_weights_recip)) {
+            &address, &params, n_synapse_types, min_weights)) {
         return false;
     }
 
