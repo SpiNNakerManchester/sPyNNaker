@@ -343,6 +343,14 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
+        elif hasattr(weights, "__getitem__"):
+            # Have to assume here that the list of weights that has been
+            # provided has different (non-zero) values in it.
+            non_zero_weights = numpy.abs(weights)[
+                numpy.nonzero(numpy.abs(weights))]
+            if len(non_zero_weights) == 0:
+                return 0.0
+            return numpy.max(non_zero_weights)
         raise SpynnakerException("Unrecognised weight format")
 
     @abstractmethod
