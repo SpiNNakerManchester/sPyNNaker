@@ -311,4 +311,4 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
     def __handle_unknown_key(self, key):
         if key not in self.__error_keys:
             self.__error_keys.add(key)
-            logger.warning("Received unexpected key {}".format(key))
+            logger.warning("Received unexpected key {}".format(hex(key)))
