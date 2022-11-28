@@ -49,7 +49,8 @@ CREATE TABLE IF NOT EXISTS eieio_spikes_metadata(
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     base_key INT NOT NULL,
     vertex_slice TEXT NOT NULL,
-    atoms_shape TEXT NOT NULL);
+    atoms_shape TEXT NOT NULL,
+    n_colour_bits INT NOT NULL);
 
 CREATE TABLE IF NOT EXISTS multi_spikes_metadata(
     multi_spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,

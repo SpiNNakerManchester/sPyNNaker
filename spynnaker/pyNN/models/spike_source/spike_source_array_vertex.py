@@ -303,7 +303,7 @@ class SpikeSourceArrayVertex(
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
         with NeoBufferDatabase() as db:
-            return db.get_deta(self.app_vertex.label, name)
+            return db.get_deta(self.label, name)
 
     @overrides(PopulationApplicationVertex.write_recording_metadata)
     def write_recording_metadata(self):
@@ -312,7 +312,7 @@ class SpikeSourceArrayVertex(
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0,
-            self.__n_colour_bits)
+            self.n_colour_bits)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):

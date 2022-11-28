@@ -376,9 +376,10 @@ class Recorder(object):
                     segment=segment, event_array=data, variable=variable,
                     recording_start_time=self.__recording_start_time)
             elif var_type == RecordingType.MATRIX:
+                m_data, neurons, sampling_interval = data
                 indices = self.__vertex.get_recording_indices(variable)
                 self.__add_neo_analog_signals(
-                    segment=segment, block=block, signal_array=data,
+                    segment=segment, block=block, signal_array=m_data,
                     data_indexes=indices, view_indexes=view_indexes,
                     variable=variable,
                     recording_start_time=self.__recording_start_time,

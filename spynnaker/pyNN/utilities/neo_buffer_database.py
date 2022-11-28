@@ -282,7 +282,7 @@ class NeoBufferDatabase(BufferDatabase):
 
     def _get_eieio_spike_by_region(
             self, cursor, region_id, simulation_time_step_ms, base_key,
-            vertex_slice, atoms_shape, results):
+            vertex_slice, atoms_shape, n_colour_bits, results):
         """
         Adds spike data for this region to the list
 
@@ -298,7 +298,7 @@ class NeoBufferDatabase(BufferDatabase):
 
         number_of_bytes_written = len(spike_data)
         offset = 0
-        indices = get_field_based_index(base_key, vertex_slice)
+        indices = get_field_based_index(base_key, vertex_slice, n_colour_bits)
         slice_ids = vertex_slice.get_raster_ids(atoms_shape)
         while offset < number_of_bytes_written:
             length, time = self._TWO_WORDS.unpack_from(spike_data, offset)
@@ -335,7 +335,8 @@ class NeoBufferDatabase(BufferDatabase):
 
         rows = list(cursor.execute(
             """
-            SELECT region_id, base_key, vertex_slice, atoms_shape
+            SELECT region_id, base_key, vertex_slice, atoms_shape, 
+                   n_colour_bits
             FROM eieio_spikes_metadata
             WHERE pop_rec_id = ?
             """, [pop_rec_id]))
@@ -345,7 +346,8 @@ class NeoBufferDatabase(BufferDatabase):
             atoms_shape = self.string_to_array(row["atoms_shape"])
             self._get_eieio_spike_by_region(
                 cursor, row["region_id"], simulation_time_step_ms,
-                row["base_key"], vertex_slice, atoms_shape, results)
+                row["base_key"], vertex_slice, atoms_shape,
+                row["n_colour_bits"], results)
 
         if not results:
             return numpy.empty(shape=(0, 2))
@@ -353,7 +355,7 @@ class NeoBufferDatabase(BufferDatabase):
         return result[numpy.lexsort((result[:, 1], result[:, 0]))]
 
     def write_eieio_spikes_metadata(
-            self, vertex, variable, region, base_key):
+            self, vertex, variable, region, base_key, n_colour_bits):
         """
 
          Write the metadata to retrieve spikes based on just the data
@@ -362,6 +364,8 @@ class NeoBufferDatabase(BufferDatabase):
         :param str variable: name of the variable. typically "spikes"
         :param int region: local region this vertex will write to
         :param int base_key:base key to add to each spike index
+        :param int n_colour_bits:
+            The number of colour bits sent by this vertex.
         """
         with self.transaction() as cursor:
             pop_rec_id = self._get_population_recording_id(
@@ -374,11 +378,12 @@ class NeoBufferDatabase(BufferDatabase):
             cursor.execute(
                 """
                 INSERT INTO eieio_spikes_metadata
-                (pop_rec_id, region_id, base_key, vertex_slice, atoms_shape)
-                 VALUES (?, ?, ?, ?, ?)
+                (pop_rec_id, region_id, base_key, vertex_slice, atoms_shape,
+                 n_colour_bits)
+                 VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (pop_rec_id, region_id, base_key, str(vertex.vertex_slice),
-                 str(vertex.app_vertex.atoms_shape)))
+                 str(vertex.app_vertex.atoms_shape), n_colour_bits))
 
     def _get_multi_spikes_by_region(
             self, cursor, region_id, simulation_time_step_ms, vertex_slice,
