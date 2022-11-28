@@ -497,7 +497,8 @@ class Recorder(object):
                 sampling_interval=sampling_interval,
                 source_population=label,
                 source_id=self.__population.index_to_id(index),
-                source_index=index)
+                source_index=index,
+                channel_id=index)
             segment.spiketrains.append(spiketrain)
 
     _SELECTIVE_RECORDED_MSG = (
@@ -550,12 +551,10 @@ class Recorder(object):
             sampling_period=sampling_period,
             name=variable,
             source_population=label,
-            source_ids=ids)
-        channel_index = self.__get_channel_index(indexes, block)
-        data_array.channel_index = channel_index
+            source_ids=ids,
+            channel_names=indexes)
         data_array.shape = (data_array.shape[0], data_array.shape[1])
         segment.analogsignals.append(data_array)
-        channel_index.analogsignals.append(data_array)
 
     def __add_neo_events(
             self, segment, event_array, variable, recording_start_time):
@@ -609,14 +608,3 @@ class Recorder(object):
         segment.events.append(formation_event_array)
 
         segment.events.append(elimination_event_array)
-
-    @staticmethod
-    def __get_channel_index(ids, block):
-        for channel_index in block.channel_indexes:
-            if numpy.array_equal(channel_index.index, ids):
-                return channel_index
-        count = len(block.channel_indexes)
-        channel_index = neo.ChannelIndex(
-            name="Index {}".format(count), index=ids)
-        block.channel_indexes.append(channel_index)
-        return channel_index
