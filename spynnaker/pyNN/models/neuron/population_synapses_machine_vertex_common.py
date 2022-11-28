@@ -33,8 +33,9 @@ from .population_machine_synapses_provenance import SynapseProvenance
 SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 # Size of the Key config params = 1 work for key + 1 word for mask
-#  + 1 word for spike mask + 1 word for self connection boolean
-KEY_CONFIG_SIZE = 4 * BYTES_PER_WORD
+#  + 1 word for spike mask + 1 word for colour shift
+#  + 1 word for self connection boolean
+KEY_CONFIG_SIZE = 5 * BYTES_PER_WORD
 
 
 class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
@@ -240,6 +241,7 @@ class PopulationSynapsesMachineVertexCommon(
             spec.write_value(r_info.key)
             spec.write_value(r_info.mask)
             spec.write_value(~r_info.mask & 0xFFFFFFFF)
+            spec.write_value(self._app_vertex.n_colour_bits)
             spec.write_value(int(self._app_vertex.self_projection is not None))
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)

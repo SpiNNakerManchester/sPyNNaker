@@ -67,14 +67,14 @@ static inline bool potential_presynaptic_partner(
         }
     }
     *sub_population_id = subpop_id;
+    key_atom_info_t *kai = &preapppop_info->key_atom_info[subpop_id];
 
     // Select a presynaptic neuron ID
-    n_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-            preapppop_info->key_atom_info[subpop_id].n_atoms;
+    n_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * kai->n_atoms;
 
     *neuron_id = n_id;
-    *spike = preapppop_info->key_atom_info[subpop_id].key | n_id;
-    *m_pop_index = preapppop_info->key_atom_info[subpop_id].m_pop_index;
+    *spike = kai->key | (n_id << kai->n_colour_bits);
+    *m_pop_index = kai->m_pop_index;
     return true;
 }
 

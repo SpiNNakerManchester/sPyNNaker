@@ -26,6 +26,7 @@
 #define _SYNAPTOGENESIS_DYNAMICS_H_
 
 #include <common/neuron-typedefs.h>
+#include <neuron/population_table/population_table.h>
 
 //! \brief Initialisation of synaptic rewiring (synaptogenesis)
 //!     parameters (random seed, spread of receptive field etc.)
@@ -41,11 +42,10 @@ bool synaptogenesis_dynamics_initialise(
 //! \details Usually called on a timer registered in c_main()
 //! \param[in] time: the current timestep
 //! \param[out] spike: variable to hold the spike
-//! \param[out] synaptic_row: variable to hold the address of the row
-//! \param[out] n_bytes: variable to hold the size of the row
+//! \param[out] result: The result of the population table lookup
 //! \return True if a row is to be transferred, false otherwise
 bool synaptogenesis_dynamics_rewire(uint32_t time,
-        spike_t *spike, synaptic_row_t *synaptic_row, uint32_t *n_bytes);
+        spike_t *spike, pop_table_lookup_result_t *result);
 
 //! \brief Perform the actual restructuring of a row
 //! \param[in] time: The time of the restructure
