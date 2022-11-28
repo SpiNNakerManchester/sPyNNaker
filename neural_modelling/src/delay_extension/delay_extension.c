@@ -160,6 +160,15 @@ static uint32_t n_background_overloads = 0;
 //! The maximum number of background tasks queued
 static uint32_t max_backgrounds_queued = 0;
 
+//! The number of colour bits (both from source and to send)
+static uint32_t n_colour_bits = 0;
+
+//! The mask to apply to get the colour from the current timestep or key
+static uint32_t colour_mask = 0;
+
+//! The colour for the current time step
+static uint32_t colour = 0;
+
 //---------------------------------------
 // Because we don't want to include string.h or strings.h for memset
 //! \brief Sets an array of counters to zero
@@ -244,6 +253,9 @@ static bool read_parameters(struct delay_parameters *params) {
         }
         zero_spike_counters(spike_counters[s], num_neurons);
     }
+
+    n_colour_bits = params->n_colour_bits;
+    colour_mask = (1 << n_colour_bits) - 1;
 
     log_debug("read_parameters: completed successfully");
     return true;
@@ -348,13 +360,6 @@ static inline index_t key_n(key_t k) {
 //! \brief Processes spikes queued by ::incoming_spike_callback()
 static inline void spike_process(void) {
 
-    // Get current time slot of incoming spike counters
-    uint32_t current_time_slot = time & num_delay_slots_mask;
-    uint8_t *current_time_slot_spike_counters =
-            spike_counters[current_time_slot];
-
-    log_debug("%d: Current time slot %u", time, current_time_slot);
-
     // While there are any incoming spikes
     spike_t s;
     uint32_t state = spin1_int_disable();
@@ -364,18 +369,29 @@ static inline void spike_process(void) {
 
         if ((s & incoming_mask) == incoming_key) {
             // Mask out neuron ID
-            uint32_t neuron_id = key_n(s);
+            uint32_t spike_id = key_n(s);
+            uint32_t spike_colour = spike_id & colour_mask;
+            uint32_t neuron_id = spike_id >> n_colour_bits;
             if (neuron_id < num_neurons) {
+
+            	// Account for delayed spikes
+            	int32_t colour_diff = colour - spike_colour;
+            	uint32_t colour_delay = colour_diff & colour_mask;
+
+            	// Get current time slot of incoming spike counters
+				uint32_t time_slot = (time + colour_delay) & num_delay_slots_mask;
+				uint8_t *time_slot_spike_counters = spike_counters[time_slot];
+
                 // Increment counter
-                if (current_time_slot_spike_counters[neuron_id] ==
+                if (time_slot_spike_counters[neuron_id] ==
                         COUNTER_SATURATION_VALUE) {
                     saturation_count += 1;
                 } else {
-                    current_time_slot_spike_counters[neuron_id]++;
+                	time_slot_spike_counters[neuron_id]++;
                 }
                 log_debug("Incrementing counter %u = %u\n",
                         neuron_id,
-                        current_time_slot_spike_counters[neuron_id]);
+						time_slot_spike_counters[neuron_id]);
                 n_spikes_added++;
             } else {
                 n_packets_dropped_due_to_invalid_neuron_value += 1;
@@ -428,7 +444,7 @@ static void background_callback(uint local_time, UNUSED uint timer_count) {
                 // Calculate key all spikes coming from this neuron will be
                 // sent with
                 uint32_t neuron_index = ((d * num_neurons) + n);
-                uint32_t spike_key = neuron_index + key;
+                uint32_t spike_key = (key + (neuron_index << n_colour_bits)) | colour;
 
                 log_debug("Neuron %u sending %u spikes after delay"
                         "stage %u with key %x",
@@ -503,6 +519,9 @@ static void timer_callback(uint timer_count, UNUSED uint unused1) {
         spin1_mode_restore(state);
         return;
     }
+
+    // Set the colour for the time step
+    colour = time & colour_mask;
 
     if (!spin1_schedule_callback(background_callback, time, timer_count, BACKGROUND)) {
         // We have failed to do this timer tick!

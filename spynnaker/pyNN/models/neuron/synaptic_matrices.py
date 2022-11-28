@@ -355,7 +355,8 @@ class SynapticMatrices(object):
         spec.write_array(self.__generated_data)
         spec.write_array(self.__bit_field_key_map)
 
-    def __get_app_key_and_mask(self, r_info, n_stages, max_atoms_per_core):
+    def __get_app_key_and_mask(
+            self, r_info, n_stages, max_atoms_per_core, n_colour_bits):
         """ Get a key and mask for an incoming application vertex as a whole
 
         :param list(tuple(int, Slice)) keys:
@@ -363,6 +364,7 @@ class SynapticMatrices(object):
             application vertex
         :param int mask: The mask that covers all keys
         :param n_stages: The number of delay stages
+        :param n_colour_bits: The number of colour bits sent
         :rtype: None or _AppKeyInfo
         """
 
@@ -373,7 +375,7 @@ class SynapticMatrices(object):
         n_atoms = min(max_atoms_per_core, pre.n_atoms)
 
         return _AppKeyInfo(r_info.key, r_info.mask, core_mask,
-                           mask_size, n_atoms * n_stages)
+                           mask_size, n_atoms * n_stages, n_colour_bits)
 
     def __app_key_and_mask(self, app_edge):
         """ Get a key and mask for an incoming application vertex as a whole
@@ -388,7 +390,8 @@ class SynapticMatrices(object):
         if r_info is None:
             return None
         return self.__get_app_key_and_mask(
-            r_info, 1, app_edge.pre_vertex.get_max_atoms_per_core())
+            r_info, 1, app_edge.pre_vertex.get_max_atoms_per_core(),
+            app_edge.pre_vertex.n_colour_bits)
 
     def __delay_app_key_and_mask(self, app_edge):
         """ Get a key and mask for a whole incoming delayed application\
@@ -409,7 +412,8 @@ class SynapticMatrices(object):
         # is split according to this
         return self.__get_app_key_and_mask(
             r_info, app_edge.n_delay_stages,
-            app_edge.pre_vertex.get_max_atoms_per_core())
+            app_edge.pre_vertex.get_max_atoms_per_core(),
+            app_edge.pre_vertex.n_colour_bits)
 
     def get_connections_from_machine(self, placement, app_edge, synapse_info):
         """ Get the synaptic connections from the machine
@@ -462,9 +466,11 @@ class _AppKeyInfo(object):
         details
     """
 
-    __slots__ = ["app_key", "app_mask", "core_mask", "core_shift", "n_neurons"]
+    __slots__ = ["app_key", "app_mask", "core_mask", "core_shift", "n_neurons",
+                 "n_colour_bits"]
 
-    def __init__(self, app_key, app_mask, core_mask, core_shift, n_neurons):
+    def __init__(self, app_key, app_mask, core_mask, core_shift, n_neurons,
+                 n_colour_bits):
         """
 
         :param int app_key: The application-level key
@@ -473,12 +479,14 @@ class _AppKeyInfo(object):
         :param int core_shift: The shift to get the core from the key
         :param int n_neurons:
             The neurons in each core (except possibly the last)
+        :param int n_colour_bits: The number of colour bits sent
         """
         self.app_key = app_key
         self.app_mask = app_mask
         self.core_mask = core_mask
         self.core_shift = core_shift
         self.n_neurons = n_neurons
+        self.n_colour_bits = n_colour_bits
 
     @property
     def key_and_mask(self):

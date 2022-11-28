@@ -22,7 +22,7 @@ from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
 from spynnaker.pyNN.utilities.constants import (
     POP_TABLE_MAX_ROW_LENGTH)
 
-_DELAY_PARAM_HEADER_WORDS = 8
+_DELAY_PARAM_HEADER_WORDS = 9
 
 
 class DelayExtensionVertex(
@@ -36,7 +36,8 @@ class DelayExtensionVertex(
         "__delay_per_stage",
         "__n_delay_stages",
         "__drop_late_spikes",
-        "__outgoing_edges"]
+        "__outgoing_edges",
+        "__n_colour_bits"]
 
     # this maps to what master assumes
     MAX_SLOTS = 8
@@ -48,7 +49,7 @@ class DelayExtensionVertex(
         "yet feasible. Please report it to Spinnaker user mail list.")
 
     def __init__(
-            self, partition, delay_per_stage, n_delay_stages,
+            self, partition, delay_per_stage, n_delay_stages, n_colour_bits,
             label="DelayExtension"):
         """
         :param partition: The parition this Delay is supporting
@@ -70,6 +71,8 @@ class DelayExtensionVertex(
             "Simulation", "drop_late_spikes")
 
         self.__outgoing_edges = list()
+
+        self.__n_colour_bits = n_colour_bits
 
     @property
     def n_atoms(self):
@@ -137,3 +140,7 @@ class DelayExtensionVertex(
         :rtype: list(DelayApplicationEdge)
         """
         return self.__outgoing_edges
+
+    @property
+    def n_colour_bits(self):
+        return self.__n_colour_bits

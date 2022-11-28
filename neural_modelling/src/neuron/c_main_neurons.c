@@ -270,10 +270,6 @@ static bool initialise(void) {
             SDRAM_PARAMS_REGION, ds_regions);
     spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
 
-    log_info("Transferring ring buffers from 0x%08x for %d cores using %d bytes!"
-            " per core", sdram_inputs.address, sdram_inputs.n_synapse_cores,
-            sdram_inputs.size_in_bytes);
-
     uint32_t n_words = sdram_inputs.size_in_bytes >> 2;
     for (uint32_t i = 0; i < N_SYNAPTIC_BUFFERS; i++) {
         synaptic_contributions[i] = spin1_malloc(sdram_inputs.size_in_bytes);

@@ -156,7 +156,8 @@ class SynapticMatrixApp(object):
             self.__index = poptable.add_invalid_application_entry(
                 self.__app_key_info.key_and_mask,
                 self.__app_key_info.core_mask, self.__app_key_info.core_shift,
-                self.__app_key_info.n_neurons)
+                self.__app_key_info.n_neurons,
+                self.__app_key_info.n_colour_bits)
             return block_addr
 
         # Write a matrix for the whole application vertex
@@ -164,7 +165,8 @@ class SynapticMatrixApp(object):
         self.__index = poptable.add_application_entry(
             block_addr,  self.__max_row_info.undelayed_max_words,
             self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
-            self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
+            self.__app_key_info.core_shift, self.__app_key_info.n_neurons,
+            self.__app_key_info.n_colour_bits)
         self.__syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
         return block_addr
@@ -189,7 +191,8 @@ class SynapticMatrixApp(object):
                 self.__delay_app_key_info.key_and_mask,
                 self.__delay_app_key_info.core_mask,
                 self.__delay_app_key_info.core_shift,
-                self.__delay_app_key_info.n_neurons)
+                self.__delay_app_key_info.n_neurons,
+                self.__delay_app_key_info.n_colour_bits)
             return block_addr
 
         # Write a matrix for the whole application vertex
@@ -199,7 +202,8 @@ class SynapticMatrixApp(object):
             self.__delay_app_key_info.key_and_mask,
             self.__delay_app_key_info.core_mask,
             self.__delay_app_key_info.core_shift,
-            self.__delay_app_key_info.n_neurons)
+            self.__delay_app_key_info.n_neurons,
+            self.__delay_app_key_info.n_colour_bits)
         self.__delay_syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
         return block_addr

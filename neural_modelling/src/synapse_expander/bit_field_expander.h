@@ -37,19 +37,18 @@ static address_list_entry *address_list;
 //!     how many bytes to read to get the synaptic row
 //! \return Whether there is target
 static bool do_sdram_read_and_test(
-        synaptic_row_t row_data, synaptic_row_t row,
-        uint32_t n_bytes_to_transfer) {
-    spin1_memcpy(row_data, row, n_bytes_to_transfer);
+        synaptic_row_t row_data, pop_table_lookup_result_t *result) {
+    spin1_memcpy(row_data, result->row_address, result->n_bytes_to_transfer);
     log_debug("Process synaptic row");
 
     // get address of plastic region from row
-    if (synapse_row_plastic_size(row) > 0) {
+    if (synapse_row_plastic_size(row_data) > 0) {
         log_debug("Plastic row had entries, so cant be pruned");
         return true;
     }
 
     // Get address of non-plastic region from row
-    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row_data);
     uint32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     if (fixed_synapse == 0) {
         log_debug("Plastic and fixed do not have entries, so can be pruned");
@@ -136,13 +135,12 @@ static inline bool generate_bit_field(filter_region_t *bitfield_filters,
 						continue;
 					}
 
-					synaptic_row_t row;
-					uint32_t n_bytes_to_transfer;
+					pop_table_lookup_result_t result;
 					get_row_addr_and_size(entry, (uint32_t) synaptic_matrix,
-					        n, &row, &n_bytes_to_transfer);
+					        n, &result);
 
 					// Check if the row is non-empty and if so set a bit
-					if (do_sdram_read_and_test(row_data, row, n_bytes_to_transfer)) {
+					if (do_sdram_read_and_test(row_data, &result)) {
 						bit_field_set(bit_field, n);
 					}
 				}
