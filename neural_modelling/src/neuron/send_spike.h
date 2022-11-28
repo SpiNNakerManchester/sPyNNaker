@@ -32,6 +32,9 @@ extern uint32_t earliest_send_time;
 //! Latest time from neuron.c
 extern uint32_t latest_send_time;
 
+//! The time step colour to account for delay
+extern uint32_t colour;
+
 //! \brief Performs the sending of a spike.  Inlined for speed.
 //! \param[in] timer_count The global timer count when the time step started
 //! \param[in] time The current time step
@@ -42,7 +45,7 @@ static inline void send_spike(UNUSED uint32_t timer_count, uint32_t time,
     synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
     if (use_key) {
-        send_spike_mc(neuron_keys[neuron_index]);
+        send_spike_mc(neuron_keys[neuron_index] | colour);
 
         // Keep track of provenance data
         uint32_t clocks = tc[T1_COUNT];

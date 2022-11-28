@@ -39,6 +39,9 @@ uint32_t latest_send_time = 0xFFFFFFFF;
 //! Earliest time in a timestep that any neuron has sent a spike
 uint32_t earliest_send_time = 0;
 
+//! The colour of the time step to handle delayed spikes
+uint32_t colour = 0;
+
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
@@ -47,6 +50,9 @@ static uint32_t n_neurons_peak;
 
 //! The number of synapse types
 static uint32_t n_synapse_types;
+
+//! The mask of the colour
+static uint32_t colour_mask;
 
 //! Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
@@ -65,6 +71,7 @@ struct neuron_core_parameters {
     uint32_t has_key;
     uint32_t n_neurons_to_simulate;
     uint32_t n_neurons_peak;
+    uint32_t n_colour_bits;
     uint32_t n_synapse_types;
     uint32_t ring_buffer_shifts[];
     // Following this struct in memory (as it can't be expressed in C) is:
@@ -110,6 +117,9 @@ bool neuron_initialise(
     n_neurons = params->n_neurons_to_simulate;
     n_neurons_peak = params->n_neurons_peak;
     n_synapse_types = params->n_synapse_types;
+
+    // Get colour details
+    colour_mask = (1 << params->n_colour_bits) - 1;
 
     // Set up ring buffer left shifts
     uint32_t ring_buffer_bytes = n_synapse_types * sizeof(uint32_t);
@@ -187,6 +197,9 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
 
     // Record the recorded variables
     neuron_recording_record(time);
+
+    // Update the colour
+    colour = (colour + 1) & colour_mask;
 }
 
 void neuron_transfer(weight_t *syns) { // EXPORTED

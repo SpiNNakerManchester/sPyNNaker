@@ -33,7 +33,7 @@ bool synaptogenesis_dynamics_initialise(
 
 bool synaptogenesis_dynamics_rewire(
         UNUSED uint32_t time, UNUSED spike_t *spike,
-        UNUSED synaptic_row_t *synaptic_row, UNUSED uint32_t *n_bytes) {
+        UNUSED pop_table_lookup_result_t *result) {
     return false;
 }
 

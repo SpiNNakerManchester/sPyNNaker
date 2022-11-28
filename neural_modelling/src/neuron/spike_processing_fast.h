@@ -44,6 +44,8 @@ struct key_config {
     uint32_t mask;
     //! The mask to get the spike ID
     uint32_t spike_id_mask;
+    //! The colour shift to apply after masking
+    uint32_t colour_shift;
     //! Is the node self connected
     uint32_t self_connected;
 };
