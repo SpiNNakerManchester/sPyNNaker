@@ -46,7 +46,8 @@ bool synapse_dynamics_initialise(
 bool synapse_dynamics_process_plastic_synapses(
         synapse_row_plastic_data_t *plastic_region_data,
         synapse_row_fixed_part_t *fixed_region,
-        weight_t *ring_buffers, uint32_t time, bool *write_back);
+        weight_t *ring_buffers, uint32_t time, uint32_t colour_delay,
+        bool *write_back);
 
 //! \brief Inform the synapses that the neuron fired
 //! \param[in] time: The current simulation time

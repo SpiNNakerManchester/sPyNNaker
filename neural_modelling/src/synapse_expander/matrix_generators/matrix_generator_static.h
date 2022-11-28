@@ -90,7 +90,7 @@ typedef struct matrix_generator_static_data {
 static void setup_rows(uint32_t *matrix, uint32_t n_rows, uint32_t max_row_n_words) {
     for (uint32_t i = 0; i < n_rows; i++) {
         static_row_t *row = get_row(matrix, max_row_n_words, i);
-        log_info("Setting up row %u at 0x%08x with %u max words", i, row, max_row_n_words);
+        log_debug("Setting up row %u at 0x%08x with %u max words", i, row, max_row_n_words);
         row->plastic_plastic_size = 0;
         row->fixed_plastic_size = 0;
         row->fixed_fixed_size = 0;

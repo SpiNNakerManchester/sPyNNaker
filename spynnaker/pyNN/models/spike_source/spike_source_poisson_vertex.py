@@ -84,14 +84,15 @@ class SpikeSourcePoissonVertex(
         "__outgoing_projections",
         "__incoming_control_edge",
         "__structure",
-        "__allowed_parameters"]
+        "__allowed_parameters",
+        "__n_colour_bits"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
             self, n_neurons, label, seed, max_atoms_per_core, model,
             rate=None, start=None, duration=None, rates=None, starts=None,
-            durations=None, max_rate=None, splitter=None):
+            durations=None, max_rate=None, splitter=None, n_colour_bits=None):
         """
         :param int n_neurons:
         :param str label:
@@ -249,6 +250,11 @@ class SpikeSourcePoissonVertex(
             self.__allowed_parameters = {"rate", "duration", "start"}
 
         self.__last_rate_read_time = None
+
+        self.__n_colour_bits = n_colour_bits
+        if self.__n_colour_bits is None:
+            self.__n_colour_bits = get_config_int(
+                "Simulation", "n_colour_bits")
 
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure):
@@ -565,3 +571,7 @@ class SpikeSourcePoissonVertex(
     @property
     def data(self):
         return self.__data
+
+    @property
+    def n_colour_bits(self):
+        return self.__n_colour_bits

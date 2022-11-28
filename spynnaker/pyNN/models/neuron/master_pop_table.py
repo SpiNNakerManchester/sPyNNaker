@@ -75,16 +75,16 @@ class _MasterPopEntryCType(ctypes.LittleEndianStructure):
         # The mask to select the relevant bits of key for matching
         ("mask", ctypes.c_uint32),
         # The index into address_list for this entry
-        ("start", ctypes.c_uint32, 15),
-        # Flag to indicate if an extra_info struct is present
-        ("extra_info_flag", ctypes.c_uint32, 1),
+        ("start", ctypes.c_uint32, 13),
+        # The number of colour bits used (or 0 if no colour bits)
+        ("n_colour_bits", ctypes.c_uint32, 3),
         # The number of entries in ::address_list for this entry
         ("count", ctypes.c_uint32, 16),
         # The mask to apply to the key once shifted get the core index
         ("core_mask", ctypes.c_uint32, 16),
         # The shift to apply to the key to get the core part (0-31)
         ("mask_shift", ctypes.c_uint32, 16),
-        # The number of neurons per core (up to 2048)
+        # The number of neurons per core
         ("n_neurons", ctypes.c_uint32, 16),
         # The number of words required for n_neurons
         ("n_words", ctypes.c_uint32, 16)
@@ -164,9 +164,13 @@ class _MasterPopEntry(object):
         # Where in the key that the core id is held
         "__core_shift",
         # The number of neurons on every core except the last
-        "__n_neurons"]
+        "__n_neurons",
+        # The number of bits reserved for the colour
+        "__n_colour_bits"
+        ]
 
-    def __init__(self, routing_key, mask, core_mask, core_shift, n_neurons):
+    def __init__(self, routing_key, mask, core_mask, core_shift, n_neurons,
+                 n_colour_bits):
         """
         :param int routing_key: The key to match for this entry
         :param int mask: The mask to match for this entry
@@ -181,6 +185,7 @@ class _MasterPopEntry(object):
         self.__core_mask = core_mask
         self.__core_shift = core_shift
         self.__n_neurons = n_neurons
+        self.__n_colour_bits = n_colour_bits
         self.__addresses_and_row_lengths = list()
 
     def append(self, address, row_length):
@@ -282,8 +287,7 @@ class _MasterPopEntry(object):
         next_addr = start
         n_entries = count
 
-        # Add extra info
-        entry.extra_info_flag = True
+        entry.n_colour_bits = self.__n_colour_bits
         entry.core_mask = self.__core_mask
         entry.n_words = int(math.ceil(
             self.__n_neurons / BIT_IN_A_WORD))
@@ -390,7 +394,7 @@ class MasterPopTableAsBinarySearch(object):
 
     def add_application_entry(
             self, block_start_addr, row_length, key_and_mask, core_mask,
-            core_shift, n_neurons):
+            core_shift, n_neurons, n_colour_bits):
         """ Add an entry for an application-edge to the population table.
 
         :param int block_start_addr: where the synaptic matrix block starts
@@ -402,6 +406,8 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
+        :param int n_colour_bits:
+            The number of bits to use for colour
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
         :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
@@ -421,11 +427,11 @@ class MasterPopTableAsBinarySearch(object):
 
         return self.__update_master_population_table(
             block_start_addr, row_length, key_and_mask, core_mask, core_shift,
-            n_neurons)
+            n_neurons, n_colour_bits)
 
     def __update_master_population_table(
             self, block_start_addr, row_length, key_and_mask, core_mask,
-            core_shift, n_neurons):
+            core_shift, n_neurons, n_colour_bits):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param int block_start_addr: where the synaptic matrix block starts
@@ -437,6 +443,7 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
+        :param int n_colour_bits: The number of bits to use for colour
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
         :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
@@ -455,13 +462,14 @@ class MasterPopTableAsBinarySearch(object):
         row_length = self.get_allowed_row_length(row_length)
 
         entry = self.__add_entry(
-            key_and_mask, core_mask, core_shift, n_neurons)
+            key_and_mask, core_mask, core_shift, n_neurons, n_colour_bits)
         index = entry.append(start_addr, row_length - 1)
         self.__n_addresses += 1
         return index
 
     def add_invalid_application_entry(
-            self, key_and_mask, core_mask=0, core_shift=0, n_neurons=0):
+            self, key_and_mask, core_mask, core_shift, n_neurons,
+            n_colour_bits):
         """ Add an entry to the table from an application vertex that doesn't
             point to anywhere.  Used to keep indices in synchronisation between
             e.g. normal and delay entries and between entries on different
@@ -477,6 +485,8 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
+        :param int n_colour_bits:
+            The number of bits to use for colour
         :return: The index of the added entry
         :rtype: int
         """
@@ -492,10 +502,11 @@ class MasterPopTableAsBinarySearch(object):
                 "The core mask of {} is too big (maximum {})".format(
                     core_mask, _MAX_CORE_MASK))
         return self.__add_invalid_entry(
-            key_and_mask, core_mask, core_shift, n_neurons)
+            key_and_mask, core_mask, core_shift, n_neurons, n_colour_bits)
 
     def __add_invalid_entry(
-            self, key_and_mask, core_mask, core_shift, n_neurons):
+            self, key_and_mask, core_mask, core_shift, n_neurons,
+            n_colour_bits):
         """ Add an entry to the table that doesn't point to anywhere.  Used
             to keep indices in synchronisation between e.g. normal and delay
             entries and between entries on different cores.
@@ -510,16 +521,20 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
+        :param int n_colour_bits:
+            The number of bits used for colour
         :return: The index of the added entry
         :rtype: int
         """
         entry = self.__add_entry(
-            key_and_mask, core_mask, core_shift, n_neurons)
+            key_and_mask, core_mask, core_shift, n_neurons, n_colour_bits)
         index = entry.append_invalid()
         self.__n_addresses += 1
         return index
 
-    def __add_entry(self, key_and_mask, core_mask, core_shift, n_neurons):
+    def __add_entry(
+            self, key_and_mask, core_mask, core_shift, n_neurons,
+            n_colour_bits):
         if self.__n_addresses >= _MAX_ADDRESS_START:
             raise SynapticConfigurationException(
                 "The table already contains {} entries;"
@@ -527,7 +542,7 @@ class MasterPopTableAsBinarySearch(object):
         if key_and_mask.key not in self.__entries:
             entry = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
-                n_neurons)
+                n_neurons, n_colour_bits)
             self.__entries[key_and_mask.key] = entry
             return entry
         entry = self.__entries[key_and_mask.key]

@@ -219,8 +219,7 @@ bool synaptogenesis_dynamics_initialise(
 }
 
 bool synaptogenesis_dynamics_rewire(
-        uint32_t time, spike_t *spike, synaptic_row_t *synaptic_row,
-        uint32_t *n_bytes) {
+        uint32_t time, spike_t *spike, pop_table_lookup_result_t *result) {
 
     // Randomly choose a postsynaptic (application neuron)
     uint32_t post_id = rand_int(rewiring_data.app_no_atoms,
@@ -253,17 +252,17 @@ bool synaptogenesis_dynamics_rewire(
     pre_info_t *prepop_info = pre_info.prepop_info[pre_app_pop];
     key_atom_info_t *key_atom_info = &prepop_info->key_atom_info[pre_sub_pop];
     if (entry.neuron_index != 0xFFFF) {
-        *spike = key_atom_info->key | neuron_id;
+        *spike = key_atom_info->key | (neuron_id << key_atom_info->n_colour_bits);
         m_pop_index = key_atom_info->m_pop_index;
     }
 
-    if (!population_table_get_first_address(*spike, synaptic_row, n_bytes)) {
+    if (!population_table_get_first_address(*spike, result)) {
         log_error("FAIL@key %d", *spike);
         rt_error(RTE_SWERR);
     }
     uint32_t index = 0;
     while (index < m_pop_index) {
-        if (!population_table_get_next_address(spike, synaptic_row, n_bytes)) {
+        if (!population_table_get_next_address(spike, result)) {
             log_error("FAIL@key %d, index %d (failed at %d)",
                     *spike, m_pop_index, index);
             rt_error(RTE_SWERR);

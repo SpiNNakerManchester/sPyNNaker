@@ -38,6 +38,12 @@ static uint32_t synaptic_rows_base_address;
 //! \brief The last spike received
 static spike_t last_spike = 0;
 
+//! \brief The last colour received
+static uint32_t last_colour = 0;
+
+//! \brief The last colour mask used
+static uint32_t last_colour_mask = 0;
+
 //! \brief The last neuron id for the key
 static uint32_t last_neuron_id = 0;
 
@@ -75,10 +81,8 @@ static inline void print_master_population_table(void) {
         log_info("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
         int count = entry.count;
         int start = entry.start;
-        if (entry.extra_info_flag) {
-            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
-                    entry.core_mask, entry.mask_shift, entry.n_neurons, entry.n_words);
-        }
+		log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u, n_colour_bits: %u",
+				entry.core_mask, entry.mask_shift, entry.n_neurons, entry.n_words, entry.n_colour_bits);
         for (uint16_t j = start; j < (start + count); j++) {
             address_list_entry addr = address_list[j];
             if (addr.address == INVALID_ADDRESS) {
@@ -119,7 +123,6 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
     }
     // No filters = nothing to load
     if (filter_region->n_filters == 0) {
-        log_info("No bitfields detected!");
         return true;
     }
     // try allocating DTCM for starting array for bitfields
@@ -160,13 +163,6 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
              uint32_t size = sizeof(bit_field_t) * n_words;
              connectivity_bit_field[mp_i] = spin1_malloc(size);
              if (connectivity_bit_field[mp_i] == NULL) {
-                 // If allocation fails, we can still continue
-                 log_info(
-                         "Could not initialise bit field for key %d, packets with "
-                         "that key will use a DMA to check if the packet targets "
-                         "anything within this core. Potentially slowing down the "
-                         "execution of neurons on this core.",
-                         master_population_table[mp_i].key);
                  // There might be more than one that has failed
                  failed_bit_field_reads += 1;
              } else {
@@ -266,9 +262,7 @@ bool population_table_initialise(
     return true;
 }
 
-bool population_table_get_first_address(
-        spike_t spike, synaptic_row_t *row_address,
-        size_t *n_bytes_to_transfer) {
+bool population_table_get_first_address(spike_t spike, pop_table_lookup_result_t *result) {
 
     // check we don't have a complete miss
     uint32_t position;
@@ -282,12 +276,16 @@ bool population_table_get_first_address(
     last_spike = spike;
     next_item = entry.start;
     items_to_go = entry.count;
-    if (entry.extra_info_flag) {
-        uint32_t local_neuron_id = get_local_neuron_id(entry, spike);
-        last_neuron_id = local_neuron_id + get_core_sum(entry, spike);
-    } else {
-        last_neuron_id = get_neuron_id(entry, spike);
-    }
+	uint32_t local_neuron_id = get_local_neuron_id(entry, spike);
+	if (entry.n_colour_bits) {
+		last_colour_mask = (1 << entry.n_colour_bits) - 1;
+	    last_colour = local_neuron_id & last_colour_mask;
+	    last_neuron_id = (local_neuron_id >> entry.n_colour_bits) + get_core_sum(entry, spike);
+	} else {
+		last_colour = 0;
+		last_colour_mask = 0;
+		last_neuron_id = local_neuron_id + get_core_sum(entry, spike);
+	}
 
     // check we have a entry in the bit field for this (possible not to due to
     // DTCM limitations or router table compression). If not, go to DMA check.
@@ -306,8 +304,7 @@ bool population_table_get_first_address(
     // A local address is used here as the interface requires something
     // to be passed in but using the address of an argument is odd!
     uint32_t local_spike_id;
-    bool get_next = population_table_get_next_address(
-            &local_spike_id, row_address, n_bytes_to_transfer);
+    bool get_next = population_table_get_next_address(&local_spike_id, result);
 
     // tracks surplus DMAs
     if (!get_next) {
@@ -316,9 +313,7 @@ bool population_table_get_first_address(
     return get_next;
 }
 
-bool population_table_get_next_address(
-        spike_t *spike, synaptic_row_t *row_address,
-        size_t *n_bytes_to_transfer) {
+bool population_table_get_next_address(spike_t *spike, pop_table_lookup_result_t *result) {
     // If there are no more items in the list, return false
     if (items_to_go == 0) {
         return false;
@@ -330,8 +325,10 @@ bool population_table_get_next_address(
         if (item.address != INVALID_ADDRESS) {
 
         	get_row_addr_and_size(item, synaptic_rows_base_address,
-        			last_neuron_id, row_address, n_bytes_to_transfer);
+        			last_neuron_id, result);
             *spike = last_spike;
+            result->colour = last_colour;
+            result->colour_mask = last_colour_mask;
             is_valid = true;
         }
 
