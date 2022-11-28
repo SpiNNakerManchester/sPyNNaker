@@ -177,7 +177,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_mean_positive_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        pos_weights = conn.weights[conn.weights > 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return weights
+        pos_weights = weights[weights > 0]
         if not len(pos_weights):
             return 0
         return numpy.mean(pos_weights)
@@ -186,7 +189,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_mean_negative_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        neg_weights = conn.weights[conn.weights < 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return weights
+        neg_weights = weights[weights < 0]
         if not len(neg_weights):
             return 0
         return numpy.mean(neg_weights)
@@ -195,7 +201,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_variance_positive_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        pos_weights = conn.weights[conn.weights > 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return 0
+        pos_weights = weights[weights > 0]
         if not len(pos_weights):
             return 0
         return numpy.var(pos_weights)
@@ -204,7 +213,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_variance_negative_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        neg_weights = conn.weights[conn.weights < 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return 0
+        neg_weights = weights[weights < 0]
         if not len(neg_weights):
             return 0
         return numpy.var(neg_weights)

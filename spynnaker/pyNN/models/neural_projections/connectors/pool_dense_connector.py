@@ -234,6 +234,8 @@ class PoolDenseConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
+        if isinstance(self.__weights, Iterable):
+            return numpy.amax(numpy.abs(self.__weights))
         n_conns = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         return super(PoolDenseConnector, self)._get_weight_maximum(
             self.__weights, n_conns, synapse_info)
