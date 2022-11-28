@@ -37,7 +37,7 @@ def mock_v_all(_self, _variable):
     for i in range(100):
         for j in indexes:
             data[i][j] = -65 + j + i/100
-    return data
+    return data, indexes, 1
 
 
 def mock_v_one_two(_self, _variable):
@@ -46,7 +46,7 @@ def mock_v_one_two(_self, _variable):
     for i in range(100):
         for j in range(len(indexes)):
             data[i][j] = -65 + indexes[j] + i/100
-    return data
+    return data, indexes, 1
 
 
 def trim_spikes(spikes, indexes):
@@ -89,7 +89,7 @@ class TestGetting(BaseTestCase):
         Recorder.get_data = mock_v_all
         neo = pop.get_v()
         v = neo.segments[0].filter(name='v')[0].magnitude
-        target = mock_v_all(None, "any")
+        target, _, _ = mock_v_all(None, "any")
         assert numpy.array_equal(v,  target)
 
         neo = pop.get_gsyn()
@@ -180,7 +180,7 @@ class TestGetting(BaseTestCase):
         view = pop[1:3]
         neo = view.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
-        target = mock_v_one_two(None, "v")
+        target, _, _ = mock_v_one_two(None, "v")
         assert v.shape == target.shape
         assert numpy.array_equal(v,  target)
 
@@ -200,7 +200,7 @@ class TestGetting(BaseTestCase):
         view = pop[0:3]
         neo = view.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
-        target = mock_v_one_two(None, "v")
+        target, _, _ = mock_v_one_two(None, "v")
         assert numpy.array_equal(
             [1, 2], neo.segments[0].filter(name='v')[0].channel_index.index)
         assert v.shape == target.shape

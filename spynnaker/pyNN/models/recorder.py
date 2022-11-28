@@ -184,7 +184,7 @@ class Recorder(object):
         # Only matrix variables are currently supported through this function
         if self.__vertex.get_recording_type(variable) != RecordingType.MATRIX:
             raise NotImplementedError(f"{variable} not supported")
-        data = self.get_data(variable)
+        data, indexes, frequency = self.get_data(variable)
         sampling_interval = self.__vertex.get_recording_sampling_interval(
             variable)
         ids = self.__vertex.get_recording_indices(variable)
@@ -225,7 +225,7 @@ class Recorder(object):
             raise KeyError(f"Variable {variable} is not being recorded")
         var_type = self.__vertex.get_recording_type(variable)
         if var_type == RecordingType.MATRIX:
-            return numpy.zeros((0, 3))
+            return numpy.zeros(0), [], 0
         if var_type == RecordingType.BIT_FIELD:
             return numpy.zeros((0, 2))
         if var_type == RecordingType.EVENT:
