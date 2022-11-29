@@ -623,6 +623,7 @@ class Recorder(object):
         block.channel_indexes.append(channel_index)
         return channel_index
 
+
 def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
     """ Converts data between sPyNNaker format and Neo format
 

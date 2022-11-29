@@ -152,7 +152,7 @@ class NeoBufferDatabase(BufferDatabase):
         cursor.execute(
             """
             INSERT INTO population_recording
-            (label, variable, data_type, function, t_start, 
+            (label, variable, data_type, function, t_start,
             sampling_interval_ms, first_id)
             VALUES (?, ?, ?, ?, 0, ?, ?)
             """, (pop_label, variable, data_type_name, str(data_function),
@@ -173,7 +173,7 @@ class NeoBufferDatabase(BufferDatabase):
         """
         for row in cursor.execute(
                 """
-                SELECT pop_rec_id,  data_type, function,  t_start, 
+                SELECT pop_rec_id,  data_type, function,  t_start,
                        sampling_interval_ms, first_id
                 FROM population_recording
                 WHERE label = ? AND variable = ?
@@ -350,7 +350,7 @@ class NeoBufferDatabase(BufferDatabase):
 
         rows = list(cursor.execute(
             """
-            SELECT region_id, base_key, vertex_slice, atoms_shape, 
+            SELECT region_id, base_key, vertex_slice, atoms_shape,
                    n_colour_bits
             FROM eieio_spikes_metadata
             WHERE pop_rec_id = ?
@@ -551,7 +551,8 @@ class NeoBufferDatabase(BufferDatabase):
         :param ~sqlite3.Cursor cursor:
         :param int pop_rec_id:
         :param DataType data_type: type of data to extract
-        :param sampling_interval_ms: the simulation time in ms between sampling.
+        :param sampling_interval_ms:
+            the simulation time in ms between sampling.
         :return: numpy array of the data, neurons, sampling_interval in ms
         ;rtype: tuple(~numpy.ndarray,list(int), float)
         """
@@ -603,7 +604,7 @@ class NeoBufferDatabase(BufferDatabase):
         if len(neurons) == 0:
             return
         sampling_interval = sampling_rate * \
-                            SpynnakerDataView.get_simulation_time_step_ms()
+            SpynnakerDataView.get_simulation_time_step_ms()
         with self.transaction() as cursor:
             pop_rec_id = self._get_population_recording_id(
                 cursor, vertex.app_vertex.label, variable, data_type,
@@ -730,8 +731,8 @@ class NeoBufferDatabase(BufferDatabase):
         :rtype  ~numpy.ndarray
         """
         with self.transaction() as cursor:
-            pop_rec_id, data_type, function, t_start, sampling_interval_ms,\
-            first_id = self._get_population_metadeta(
+            (pop_rec_id, data_type, function, t_start, sampling_interval_ms,
+             first_id) = self._get_population_metadeta(
                 cursor, pop_label, variable)
 
             if function == RetrievalFunction.Neuron_spikes:

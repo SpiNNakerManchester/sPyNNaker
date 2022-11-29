@@ -17,6 +17,7 @@ import logging
 import math
 import numpy
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -457,7 +458,7 @@ class NeuronRecorder(object):
             sampling_rate = self.__sampling_rates[variable]
             data_type = self.__data_types[variable]
         sampling_interval_ms = sampling_rate * \
-                               SpynnakerDataView.get_simulation_time_step_ms()
+            SpynnakerDataView.get_simulation_time_step_ms()
         self.__write_matrix_metadata(
             application_vertex, sampling_interval_ms, data_type, variable,
             first_id)
@@ -471,7 +472,7 @@ class NeuronRecorder(object):
         :param int first_id: The ID of the first member of the population.
         """
         sampling_interval_ms = self.__sampling_rates[self.SPIKES] * \
-                               SpynnakerDataView.get_simulation_time_step_ms()
+            SpynnakerDataView.get_simulation_time_step_ms()
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
                 self.SPIKES))
