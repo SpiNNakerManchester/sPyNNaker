@@ -101,15 +101,16 @@ class SpikeInjectorVertex(
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
         with NeoBufferDatabase() as db:
-            return db.get_deta(self.app_vertex.label, name)
+            return db.get_deta(self.label, name)
 
-    def write_recording_metadata(self):
+    @overrides(PopulationApplicationVertex.write_recording_metadata)
+    def write_recording_metadata(self, first_id):
         self.__spike_recorder.write_spike_metadata(
             0, self, lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0,
-            self.n_colour_bits)
+            self.n_colour_bits, first_id)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
