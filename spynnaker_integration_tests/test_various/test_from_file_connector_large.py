@@ -122,7 +122,7 @@ class FromFileConnectorLargeTest(BaseTestCase):
         v, spikes = do_run(plot=False)
         # any checks go here
         spikes_test = neo_convertor.convert_spikes(spikes)
-        self.assertEquals(2, len(spikes_test))
+        self.assertEqual(2, len(spikes_test))
 
     def test_do_run(self):
         self.runsafe(self.do_run)
