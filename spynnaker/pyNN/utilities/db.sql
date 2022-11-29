@@ -22,7 +22,10 @@ CREATE TABLE IF NOT EXISTS population_recording (
     label TEXT NOT NULL,
     variable TEXT NOT NULL,
     data_type TEXT,
-    function TEXT NOT NULL);
+    function TEXT NOT NULL,
+    t_start float NOT NULL,
+    sampling_interval_ms float,
+    first_id int NOT NULL);
 
 CREATE UNIQUE INDEX IF NOT EXISTS population_recording_sanity
     ON population_recording(label ASC, variable ASC);
@@ -30,7 +33,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS population_recording_sanity
 CREATE TABLE IF NOT EXISTS segment(
     segment_id INTEGER PRIMARY KEY AUTOINCREMENT,
     simulation_time_step_ms FLOAT NOT NULL,
-    segment_number INTEGER NOT NULL);
+    segment_number INTEGER NOT NULL,
+    t_stop FLOAT);
 
 CREATE TABLE IF NOT EXISTS spikes_metadata(
     spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,8 +71,7 @@ CREATE TABLE IF NOT EXISTS matrix_metadata(
 		REFERENCES population_recording(pop_rec_id) ON DELETE RESTRICT,
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
-    neurons_st TEXT NOT NULL,
-    sampling_rate float NOT NULL);
+    neurons_st TEXT NOT NULL);
 
 CREATE TABLE IF NOT EXISTS rewires_metadata(
     rewires_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,

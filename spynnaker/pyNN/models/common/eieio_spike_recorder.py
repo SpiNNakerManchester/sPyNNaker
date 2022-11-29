@@ -16,6 +16,7 @@
 import logging
 import struct
 from spinn_utilities.log import FormatAdapter
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -55,7 +56,7 @@ class EIEIOSpikeRecorder(object):
 
     def write_spike_metadata(
             self, region, application_vertex, base_key_function,
-            n_colour_bits):
+            n_colour_bits, first_id):
         """
          Write the metadata to retrieve spikes based on just the data
 
@@ -65,6 +66,7 @@ class EIEIOSpikeRecorder(object):
         :param method base_key_function: Function to calculate the base key
         :param int n_colour_bits:
             The number of colour bits sent by this vertex.
+        :param int first_id: The ID of the first member of the population.
         """
         with NeoBufferDatabase() as db:
             vertices = application_vertex.machine_vertices
@@ -72,4 +74,5 @@ class EIEIOSpikeRecorder(object):
                 vertex._update_virtual_key()
                 db.write_eieio_spikes_metadata(
                     vertex, "spikes", region, base_key_function(vertex),
-                    n_colour_bits)
+                    n_colour_bits,
+                    SpynnakerDataView.get_simulation_time_step_ms(), first_id)

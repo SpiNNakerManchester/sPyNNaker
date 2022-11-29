@@ -749,9 +749,9 @@ class AbstractPopulationVertex(
             self.__synapse_recorder.is_recording(name))
 
     @overrides(PopulationApplicationVertex.write_recording_metadata)
-    def write_recording_metadata(self):
-        self.__neuron_recorder.write_recording_metadata(self)
-        self.__synapse_recorder.write_recording_metadata(self)
+    def write_recording_metadata(self, first_id):
+        self.__neuron_recorder.write_recording_metadata(self, first_id)
+        self.__synapse_recorder.write_recording_metadata(self, first_id)
 
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
