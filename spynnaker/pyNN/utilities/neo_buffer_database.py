@@ -318,6 +318,8 @@ class NeoBufferDatabase(BufferDatabase):
         offset = 0
         indices = get_field_based_index(base_key, vertex_slice, n_colour_bits)
         slice_ids = vertex_slice.get_raster_ids(atoms_shape)
+        colour_mask = (2 ** n_colour_bits) - 1
+        inv_colour_mask = ~colour_mask & 0xFFFFFFFF
         while offset < number_of_bytes_written:
             length, time = self._TWO_WORDS.unpack_from(spike_data, offset)
             time *= simulation_time_step_ms
@@ -334,6 +336,7 @@ class NeoBufferDatabase(BufferDatabase):
             keys = numpy.frombuffer(
                 spike_data, dtype="<u{}".format(key_bytes),
                 count=eieio_header.count, offset=data_offset)
+            keys = numpy.bitwise_and(keys, inv_colour_mask)
             local_ids = numpy.array([indices[key] for key in keys])
             neuron_ids = slice_ids[local_ids]
             offset += length + 2 * BYTES_PER_WORD
