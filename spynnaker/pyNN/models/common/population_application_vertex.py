@@ -273,7 +273,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         raise KeyError("This Population does not support recording")
 
-    def write_recording_metadata(self, first_id):
+    def write_recording_metadata(self, population):
         """
         Writes the metatdata to get_recorded_data from NeoBufferedDatabase
 
@@ -282,7 +282,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
         If the data comes from the BufferExtractor than it can be skipped
 
-        :param int first_id: The ID of the first member of the population.
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
         """
         pass
 

@@ -72,12 +72,14 @@ class MultiSpikeRecorder(object):
         with NeoBufferDatabase() as db:
             return db.get_deta(application_vertex.label, "spikes")
 
-    def write_spike_metadata(self, application_vertex, region, first_id):
+    def write_spike_metadata(self, application_vertex, region, population):
         """
         Write the metadata to retrieve spikes based on just the data
 
         :param ApplicatioNvertex application_vertex:
         :param int region: local region this vertex will write to
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
         """
         if self.record:
             with NeoBufferDatabase() as db:
@@ -86,4 +88,4 @@ class MultiSpikeRecorder(object):
                     db.write_multi_spikes_metadata(
                         vertex, "spikes", region,
                         SpynnakerDataView.get_simulation_time_step_ms(),
-                        first_id)
+                        population)

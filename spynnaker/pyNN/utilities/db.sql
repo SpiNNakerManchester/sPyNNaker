@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS population_recording (
     function TEXT NOT NULL,
     t_start float NOT NULL,
     sampling_interval_ms float,
-    first_id int NOT NULL);
+    first_id int NOT NULL,
+    description TEXT);
 
 CREATE UNIQUE INDEX IF NOT EXISTS population_recording_sanity
     ON population_recording(label ASC, variable ASC);

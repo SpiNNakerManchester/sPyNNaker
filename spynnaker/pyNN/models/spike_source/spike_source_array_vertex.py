@@ -306,13 +306,13 @@ class SpikeSourceArrayVertex(
             return db.get_deta(self.label, name)
 
     @overrides(PopulationApplicationVertex.write_recording_metadata)
-    def write_recording_metadata(self, first_id):
+    def write_recording_metadata(self, population):
         self.__spike_recorder.write_spike_metadata(
             0, self, lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0,
-            self.n_colour_bits, first_id)
+            self.n_colour_bits, population)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):

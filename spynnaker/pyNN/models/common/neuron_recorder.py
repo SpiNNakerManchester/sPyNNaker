@@ -421,7 +421,7 @@ class NeuronRecorder(object):
 
     def __write_matrix_metadata(
             self, application_vertex,
-            sampling_interval_ms, data_type, variable, first_id):
+            sampling_interval_ms, data_type, variable, population):
         """
         Write the metadata to retrieve matrix data based on just the database
 
@@ -431,7 +431,8 @@ class NeuronRecorder(object):
             Typically the sampling rate * simulation_timestep_ms
         :param DataType data_type: type of data being recorded
         :param str variable: name of the variable.
-        :param int first_id: The ID of the first member of the population.
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
         """
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
@@ -448,9 +449,9 @@ class NeuronRecorder(object):
             with NeoBufferDatabase() as db:
                 db.write_matrix_metadata(
                     vertex, variable, region, neurons, data_type,
-                    sampling_interval_ms, first_id)
+                    sampling_interval_ms, population)
 
-    def _write_matrix_metadata(self, application_vertex, variable, first_id):
+    def _write_matrix_metadata(self, application_vertex, variable, population):
         if variable in self.__per_timestep_variables:
             sampling_rate = 1
             data_type = self.__per_timestep_datatypes[variable]
@@ -461,15 +462,16 @@ class NeuronRecorder(object):
             SpynnakerDataView.get_simulation_time_step_ms()
         self.__write_matrix_metadata(
             application_vertex, sampling_interval_ms, data_type, variable,
-            first_id)
+            population)
 
-    def _write_spike_metadata(self, application_vertex, first_id):
+    def _write_spike_metadata(self, application_vertex, population):
         """
         Write the metadata to retreive spikes based on just the database
 
         :param ApplicationVertex application_vertex:
             vertex which will supply the data
-        :param int first_id: The ID of the first member of the population.
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
         """
         sampling_interval_ms = self.__sampling_rates[self.SPIKES] * \
             SpynnakerDataView.get_simulation_time_step_ms()
@@ -484,15 +486,16 @@ class NeuronRecorder(object):
                     self.SPIKES, vertex.vertex_slice,
                     application_vertex.atoms_shape)
                 db.write_spikes_metadata(vertex, self.SPIKES, region, neurons,
-                                         sampling_interval_ms, first_id)
+                                         sampling_interval_ms, population)
 
-    def __write_rewires_metadata(self, application_vertex, first_id):
+    def __write_rewires_metadata(self, application_vertex, population):
         """
         Write the metadata to retrieve rewires data based on just the database
 
         :param ApplicationVeretx application_vertex:
         :param str variable: name of the variable.
-        :param int first_id: The ID of the first member of the population.
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
         """
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
@@ -502,26 +505,28 @@ class NeuronRecorder(object):
         for i, vertex in enumerate(vertices):
             with NeoBufferDatabase() as db:
                 db.write_rewires_metadata(
-                    vertex, self.REWIRING, region, first_id)
+                    vertex, self.REWIRING, region, population)
 
-    def write_recording_metadata(self, application_vertex, first_id):
+    def write_recording_metadata(self, application_vertex, population):
         """
         Write the metdatabase to the database so it can be used standalone
 
         :param application_vertex:
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
         :return:
         """
         for variable in self.recording_variables:
             if variable == self.SPIKES:
-                self._write_spike_metadata(application_vertex, first_id)
+                self._write_spike_metadata(application_vertex, population)
             elif variable == self.REWIRING:
-                self.__write_rewires_metadata(application_vertex, first_id)
+                self.__write_rewires_metadata(application_vertex, population)
             elif variable in self.__events_per_core_variables:
                 raise NotImplementedError(
                     f"Unexpected Event variable: {variable}")
             else:
                 self._write_matrix_metadata(
-                    application_vertex, variable, first_id)
+                    application_vertex, variable, population)
 
     def get_recordable_variables(self):
         """

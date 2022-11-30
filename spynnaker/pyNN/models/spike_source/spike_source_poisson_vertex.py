@@ -543,9 +543,10 @@ class SpikeSourcePoissonVertex(
                 SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 
     @overrides(PopulationApplicationVertex.write_recording_metadata)
-    def write_recording_metadata(self, first_id):
+    def write_recording_metadata(self, population):
         self.__spike_recorder.write_spike_metadata(
-            self, SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID, first_id)
+            self, SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
+            population)
 
     def describe(self):
         """ Return a human-readable description of the cell or synapse type.

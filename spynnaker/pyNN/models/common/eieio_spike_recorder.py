@@ -56,7 +56,7 @@ class EIEIOSpikeRecorder(object):
 
     def write_spike_metadata(
             self, region, application_vertex, base_key_function,
-            n_colour_bits, first_id):
+            n_colour_bits, population):
         """
          Write the metadata to retrieve spikes based on just the data
 
@@ -66,7 +66,8 @@ class EIEIOSpikeRecorder(object):
         :param method base_key_function: Function to calculate the base key
         :param int n_colour_bits:
             The number of colour bits sent by this vertex.
-        :param int first_id: The ID of the first member of the population.
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
         """
         with NeoBufferDatabase() as db:
             vertices = application_vertex.machine_vertices
@@ -75,4 +76,5 @@ class EIEIOSpikeRecorder(object):
                 db.write_eieio_spikes_metadata(
                     vertex, "spikes", region, base_key_function(vertex),
                     n_colour_bits,
-                    SpynnakerDataView.get_simulation_time_step_ms(), first_id)
+                    SpynnakerDataView.get_simulation_time_step_ms(),
+                    population)
