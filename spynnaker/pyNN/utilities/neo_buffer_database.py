@@ -183,14 +183,14 @@ class NeoBufferDatabase(BufferDatabase):
         :param ~spynnaker.pyNN.models.populations.Population population:
             the population to record for
         """
-        pop_id = self._get_population_id(cursor, pop_label, population)
         for row in cursor.execute(
                 """
-                SELECT rec_id FROM recording
-                WHERE pop_id = ? AND variable = ?
+                SELECT rec_id FROM recording_view
+                WHERE label = ? AND variable = ?
                 LIMIT 1
-                """, (pop_id, variable)):
+                """, (pop_label, variable)):
             return row["rec_id"]
+        pop_id = self._get_population_id(cursor, pop_label, population)
         if data_type:
             data_type_name = data_type.name
         else:
@@ -223,6 +223,33 @@ class NeoBufferDatabase(BufferDatabase):
                 """, (pop_label,)):
             return str(row["description"], 'utf-8')
         raise Exception(f"No metedata for {pop_label}")
+
+    def get_recording_populations(self):
+        results = []
+        with self.transaction() as cursor:
+            for row in cursor.execute(
+                    """
+                    SELECT label
+                    FROM population
+                    """):
+                results.append(str(row["label"], 'utf-8'))
+        return results
+
+    def get_recording_variables(self, label):
+        with self.transaction() as cursor:
+            return self._get_recording_variables(label, cursor)
+
+    def _get_recording_variables(self, label, cursor):
+        results = []
+        for row in cursor.execute(
+                """
+                SELECT variable 
+                FROM recording_view
+                WHERE label = ?
+                GROUP BY variable
+                """, (label, )):
+            results.append(str(row["variable"], 'utf-8'))
+        return results
 
     def _get_recording_metadeta(
             self, cursor, pop_label, variable):
@@ -838,6 +865,11 @@ class NeoBufferDatabase(BufferDatabase):
             name="segment{}".format(segment_number),
             description=description,
             rec_datetime=rec_datetime)
+
+        if isinstance(variables, str):
+            variables = [variables]
+        if 'all' in variables:
+            variables = None
 
         return segment
 
