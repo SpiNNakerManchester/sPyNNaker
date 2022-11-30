@@ -21,12 +21,10 @@ from spinn_utilities.overrides import overrides
 from pacman.utilities.utility_calls import get_field_based_keys
 
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
-from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.utilities.utility_calls import convert_to
@@ -52,11 +50,12 @@ class NeuronProvenance(ctypes.LittleEndianStructure):
 # Identifiers for neuron regions
 NeuronRegions = namedtuple(
     "NeuronRegions",
-    ["neuron_params", "current_source_params", "neuron_recording"])
+    ["core_params", "neuron_params", "current_source_params",
+     "neuron_recording", "neuron_builder", "initial_values"])
 
 
 class PopulationMachineNeurons(
-        AbstractReadParametersBeforeSet, allow_derivation=True):
+        AbstractNeuronExpandable, allow_derivation=True):
     """ Mix-in for machine vertices that have neurons in them
     """
 
@@ -111,11 +110,29 @@ class PopulationMachineNeurons(
         :rtype: .NeuronRegions
         """
 
-    def _parse_neuron_provenance(
-            self, label, x, y, p, provenance_data):
+    @abstractproperty
+    def _neuron_data(self):
+        """ The neuron data handler
+
+        :rtype: NeuronData
+        """
+
+    @abstractproperty
+    def _max_atoms_per_core(self):
+        """ The maximum number of atoms on a core, used for neuron data
+            transfer
+
+        :rtype: int
+        """
+
+    @abstractmethod
+    def set_do_neuron_regeneration(self):
+        """ Indicate that data re-generation of neuron parameters is required
+        """
+
+    def _parse_neuron_provenance(self, x, y, p, provenance_data):
         """ Extract and yield neuron provenance
 
-        :param str label: The label of the node
         :param int x: x coordinate of the chip where this core
         :param int y: y coordinate of the core where this core
         :param int p: virtual id of the core
@@ -124,8 +141,6 @@ class PopulationMachineNeurons(
         :rtype: iterator of ProvenanceDataItem
         """
         neuron_prov = NeuronProvenance(*provenance_data)
-        self._app_vertex.get_tdma_provenance_item(
-            x, y, p, label, neuron_prov.n_tdma_misses)
         with ProvenanceWriter() as db:
             db.insert_core(
                 x, y, p, "Last_timer_tic_the_core_ran_to",
@@ -148,23 +163,33 @@ class PopulationMachineNeurons(
         self._set_key(routing_info.get_first_key_from_pre_vertex(
             self, SPIKE_PARTITION_ID))
 
-        # Write the neuron parameters
-        self._write_neuron_parameters(spec, ring_buffer_shifts)
+        # Write the neuron core parameters
+        self._write_neuron_core_parameters(spec, ring_buffer_shifts)
 
         # Write the current source parameters
         self._write_current_source_parameters(spec)
 
-        # Write the neuron recording region
-        neuron_recorder = self._app_vertex.neuron_recorder
-        spec.reserve_memory_region(
-            region=self._neuron_regions.neuron_recording,
-            size=neuron_recorder.get_metadata_sdram_usage_in_bytes(
-                self._vertex_slice.n_atoms),
-            label="neuron recording")
-        neuron_recorder.write_neuron_recording_region(
-            spec, self._neuron_regions.neuron_recording, self._vertex_slice)
+        # Write the other parameters
+        self._neuron_data.write_data(
+            spec, self._vertex_slice, self._neuron_regions)
 
-    def _write_neuron_parameters(self, spec, ring_buffer_shifts):
+    def _rewrite_neuron_data_spec(self, spec):
+        """ Re-Write the data specification of the neuron data
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        :param list(int) ring_buffer_shifts:
+            The shifts to apply to convert ring buffer values to S1615 values
+        """
+
+        # Write the current source parameters
+        self._write_current_source_parameters(spec)
+
+        # Write the other parameters after forcing a regeneration
+        self._neuron_data.write_data(
+            spec, self._vertex_slice, self._neuron_regions, False)
+
+    def _write_neuron_core_parameters(self, spec, ring_buffer_shifts):
         """ Write the neuron parameters region
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -172,7 +197,6 @@ class PopulationMachineNeurons(
         :param list(int) ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
-        self._app_vertex.set_has_run()
 
         # pylint: disable=too-many-arguments
         n_atoms = self._vertex_slice.n_atoms
@@ -180,17 +204,12 @@ class PopulationMachineNeurons(
             n_atoms))
 
         # Reserve and switch to the memory region
-        params_size = self._app_vertex.get_sdram_usage_for_neuron_params(
+        params_size = self._app_vertex.get_sdram_usage_for_core_neuron_params(
             n_atoms)
         spec.reserve_memory_region(
-            region=self._neuron_regions.neuron_params, size=params_size,
-            label='NeuronParams')
-        spec.switch_write_focus(self._neuron_regions.neuron_params)
-
-        # store the tdma data here for this slice.
-        data = self._app_vertex.generate_tdma_data_specification_data(
-            self._slice_index)
-        spec.write_array(data)
+            region=self._neuron_regions.core_params, size=params_size,
+            label='Neuron Core Params')
+        spec.switch_write_focus(self._neuron_regions.core_params)
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used
@@ -198,23 +217,27 @@ class PopulationMachineNeurons(
             spec.write_value(data=0)
             keys = [0] * n_atoms
         else:
+            n_colour_bits = self._app_vertex.n_colour_bits
             spec.write_value(data=1)
             # Quick and dirty way to avoid using field based keys in cases
             # which use grids but not local-only neuron models
             if isinstance(self._app_vertex.synapse_dynamics,
                           AbstractLocalOnly):
-                keys = get_field_based_keys(self._key, self._vertex_slice)
+                keys = get_field_based_keys(
+                    self._key, self._vertex_slice, n_colour_bits)
             else:
                 # keys are consecutive from the base value
-                keys = [self._key + nn for nn in range(n_atoms)]
+                keys = [self._key + (nn << n_colour_bits)
+                        for nn in range(n_atoms)]
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
-        # Write the peak neurons (closest above power of 2 of n_atoms)
-        if (n_atoms == 1):
-            spec.write_value(data=n_atoms)
-        else:
-            spec.write_value(data=2**get_n_bits(n_atoms))
+
+        # Write the maximum number of neurons based on the max atoms per core
+        spec.write_value(data=2**get_n_bits(self._max_atoms_per_core))
+
+        # Write the number of colour bits
+        spec.write_value(self._app_vertex.n_colour_bits)
 
         # Write the ring buffer data
         # This is only the synapse types that need a ring buffer i.e. not
@@ -225,12 +248,6 @@ class PopulationMachineNeurons(
 
         # Write the keys
         spec.write_array(keys)
-
-        # Write the neuron parameters
-        neuron_data = self._app_vertex.neuron_impl.get_data(
-            self._app_vertex.parameters, self._app_vertex.state_variables,
-            self._vertex_slice, self._app_vertex.atoms_shape)
-        spec.write_array(neuron_data)
 
     def _write_current_source_parameters(self, spec):
         # pylint: disable=too-many-arguments
@@ -340,31 +357,37 @@ class PopulationMachineNeurons(
                                 value, cs_data_types[key]).view("uint32")
                             spec.write_value(data=value_convert)
 
-    @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
-    def read_parameters_from_machine(self, placement, vertex_slice):
+    def read_parameters_from_machine(self, placement):
+        """ Read the parameters and state of the neurons from the machine
+            at the current time
 
-        # locate SDRAM address to where the neuron parameters are stored
-        neuron_region_sdram_address = \
-            helpful_functions.locate_memory_region_for_placement(
-                placement, self._neuron_regions.neuron_params)
+        :param Placement placement: Where to read the data from
+        """
+        self._neuron_data.read_data(placement, self._neuron_regions)
 
-        # shift past the extra stuff before neuron parameters that we don't
-        # need to read
-        neurons_pre_size = self._app_vertex.get_neuron_params_position(
-            self._vertex_slice.n_atoms)
-        neuron_parameters_sdram_address = (
-            neuron_region_sdram_address + neurons_pre_size)
+    def read_initial_parameters_from_machine(self, placement):
+        """ Read the parameters and state of the neurons from the machine
+            as they were at the last time 0
 
-        # get size of neuron params
-        size_of_region = self._app_vertex.get_sdram_usage_for_neuron_params(
-            vertex_slice.n_atoms) - neurons_pre_size
+        :param Placement placement: Where to read the data from
+        """
+        self._neuron_data.read_initial_data(placement, self._neuron_regions)
 
-        # get data from the machine
-        byte_array = SpynnakerDataView.read_memory(
-            placement.x, placement.y, neuron_parameters_sdram_address,
-            size_of_region)
+    @overrides(AbstractNeuronExpandable.gen_neurons_on_machine)
+    def gen_neurons_on_machine(self):
+        return self._neuron_data.gen_on_machine
 
-        # update python neuron parameters with the data
-        self._app_vertex.neuron_impl.read_data(
-            byte_array, 0, vertex_slice, self._app_vertex.parameters,
-            self._app_vertex.state_variables)
+    @property
+    @overrides(AbstractNeuronExpandable.neuron_generator_region)
+    def neuron_generator_region(self):
+        return self._neuron_regions.neuron_builder
+
+    @overrides(AbstractNeuronExpandable.read_generated_initial_values)
+    def read_generated_initial_values(self, placement):
+        # Only do this if we actually need the data now i.e. if someone has
+        # requested that the data be read before calling run
+        if self._app_vertex.read_initial_values:
+
+            # If we do decide to read now, we can also copy the initial values
+            self._neuron_data.read_data(placement, self._neuron_regions)
+            self._app_vertex.copy_initial_state_variables(self._vertex_slice)

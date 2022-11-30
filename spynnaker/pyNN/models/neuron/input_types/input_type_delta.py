@@ -16,6 +16,10 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_input_type import AbstractInputType
+from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.data import SpynnakerDataView
+
+TIME_STEP = "time_step"
 
 
 class InputTypeDelta(AbstractInputType):
@@ -26,33 +30,18 @@ class InputTypeDelta(AbstractInputType):
     def __init__(self):
         """
         """
-        super().__init__([
-            DataType.S1615])  # scale_factor, calculated from timestep
+        super().__init__(
+            # scale_factor, calculated from timestep
+            [Struct([(DataType.S1615, TIME_STEP)])],
+            dict())
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters):
-        pass
+        parameters[TIME_STEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractInputType.add_state_variables)
     def add_state_variables(self, state_variables):
         pass
-
-    @overrides(AbstractInputType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-        scale_factor = 1000.0 / float(ts)
-        return [scale_factor]
-
-    @overrides(AbstractInputType.update_values)
-    def update_values(self, values, parameters, state_variables):
-        pass
-
-    @overrides(AbstractInputType.get_units)
-    def get_units(self, variable):
-        raise KeyError(variable)
-
-    @overrides(AbstractInputType.has_variable)
-    def has_variable(self, variable):
-        return False
 
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):

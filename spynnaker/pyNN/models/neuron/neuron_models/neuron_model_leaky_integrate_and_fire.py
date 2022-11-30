@@ -13,12 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from .abstract_neuron_model import AbstractNeuronModel
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
+from spynnaker.pyNN.utilities.struct import Struct
+from spynnaker.pyNN.data import SpynnakerDataView
 
 V = "v"
 V_REST = "v_rest"
@@ -27,20 +27,11 @@ CM = "cm"
 I_OFFSET = "i_offset"
 V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
-COUNT_REFRAC = "count_refrac"
-
-UNITS = {
-    V: 'mV',
-    V_REST: 'mV',
-    TAU_M: 'ms',
-    CM: 'nF',
-    I_OFFSET: 'nA',
-    V_RESET: 'mV',
-    TAU_REFRAC: 'ms'
-}
+TIMESTEP = "timestep"
+REFRACT_TIMER = "refract_timer"
 
 
-class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
+class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
     """ Classic leaky integrate and fire neuron model.
     """
     __slots__ = [
@@ -84,14 +75,18 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
             (mapping) function
         """
         super().__init__(
-            [DataType.S1615,   # v
-             DataType.S1615,   # v_rest
-             DataType.S1615,   # r_membrane (= tau_m / cm)
-             DataType.U032,   # exp_tc (= e^(-ts / tau_m))
-             DataType.S1615,   # i_offset
-             DataType.INT32,   # count_refrac
-             DataType.S1615,   # v_reset
-             DataType.INT32])  # tau_refrac
+            [Struct([
+                (DataType.S1615, V),
+                (DataType.S1615, V_REST),
+                (DataType.S1615, CM),
+                (DataType.S1615, TAU_M),
+                (DataType.S1615, I_OFFSET),
+                (DataType.S1615, V_RESET),
+                (DataType.S1615, TAU_REFRAC),
+                (DataType.INT32, REFRACT_TIMER),
+                (DataType.S1615, TIMESTEP)])],
+            {V: 'mV', V_REST: 'mV', TAU_M: 'ms', CM: 'nF', I_OFFSET: 'nA',
+             V_RESET: 'mV', TAU_REFRAC: 'ms'})
 
         if v_init is None:
             v_init = v_rest
@@ -111,45 +106,12 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         parameters[I_OFFSET] = self.__i_offset
         parameters[V_RESET] = self.__v_reset
         parameters[TAU_REFRAC] = self.__tau_refrac
+        parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self.__v_init
-        state_variables[COUNT_REFRAC] = 0
-
-    @overrides(AbstractStandardNeuronComponent.get_units)
-    def get_units(self, variable):
-        return UNITS[variable]
-
-    @overrides(AbstractStandardNeuronComponent.has_variable)
-    def has_variable(self, variable):
-        return variable in UNITS
-
-    @overrides(AbstractStandardNeuronComponent.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-        """
-        :param int ts: machine time step
-        """
-        # Add the rest of the data
-        return [state_variables[V], parameters[V_REST],
-                parameters[TAU_M] / parameters[CM],
-                parameters[TAU_M].apply_operation(
-                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
-                parameters[I_OFFSET], state_variables[COUNT_REFRAC],
-                parameters[V_RESET],
-                parameters[TAU_REFRAC].apply_operation(
-                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0))))]
-
-    @overrides(AbstractStandardNeuronComponent.update_values)
-    def update_values(self, values, parameters, state_variables):
-
-        # Read the data
-        (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-         _v_reset, _tau_refrac) = values
-
-        # Copy the changed data only
-        state_variables[V] = v
-        state_variables[COUNT_REFRAC] = count_refrac
+        state_variables[REFRACT_TIMER] = 0
 
     @property
     def v_init(self):

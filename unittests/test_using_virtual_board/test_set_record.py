@@ -26,14 +26,14 @@ class TestSetRecord(BaseTestCase):
         sim.setup(timestep=1)
         if_curr = sim.Population(1, sim.IF_curr_exp())
         self.assertCountEqual(
-            [], if_curr._recorder.get_all_recording_variables())
+            [], if_curr._vertex.get_recording_variables())
         ssa = sim.Population(
             1, sim.SpikeSourceArray(spike_times=[0]))
         ssp = sim.Population(2, sim.SpikeSourcePoisson(rate=100.0),
                              additional_parameters={"seed": 1})
         if_curr.record("spikes")
         self.assertCountEqual(
-            ["spikes"], if_curr._recorder.get_all_recording_variables())
+            ["spikes"], if_curr._vertex.get_recording_variables())
         ssa.record("spikes")
         ssp.record("spikes")
         sim.end()
@@ -48,18 +48,12 @@ class TestSetRecord(BaseTestCase):
         if_curr.record("v")
 
         # SpikeSourceArray must throw if asked to record voltage
-        with self.assertRaises(Exception) as e:
+        with self.assertRaises(Exception):
             ssa.record("v")
-        self.assertEqual(
-            "This population does not support the recording of v!",
-            str(e.exception))
 
         # SpikeSourcePoisson must throw if asked to record voltage
-        with self.assertRaises(Exception) as e:
+        with self.assertRaises(Exception):
             ssp.record("v")
-        self.assertEqual(
-            "This population does not support the recording of v!",
-            str(e.exception))
 
         sim.end()
 
@@ -74,13 +68,13 @@ class TestSetRecord(BaseTestCase):
         self.assertCountEqual(
             ["spikes", "v", "gsyn_inh", "gsyn_exc", "packets-per-timestep",
              "rewiring"],
-            if_curr._recorder.get_all_recording_variables())
+            if_curr._vertex.get_recording_variables())
         ssa.record("all")
         self.assertCountEqual(
-            ["spikes"], ssa._recorder.get_all_recording_variables())
+            ["spikes"], ssa._vertex.get_recording_variables())
         ssp.record("all")
         self.assertCountEqual(
-            ["spikes"], ssp._recorder.get_all_recording_variables())
+            ["spikes"], ssp._vertex.get_recording_variables())
         sim.end()
 
     def test_set_spikes_interval(self):
@@ -88,7 +82,7 @@ class TestSetRecord(BaseTestCase):
         if_curr = sim.Population(1, sim.IF_curr_exp())
         recorder = if_curr._vertex.neuron_recorder
         self.assertCountEqual(
-            [], if_curr._recorder.get_all_recording_variables())
+            [], if_curr._vertex.get_recording_variables())
         ssa = sim.Population(
             1, sim.SpikeSourceArray(spike_times=[0]))
         ssp = sim.Population(2, sim.SpikeSourcePoisson(rate=100.0),
@@ -97,19 +91,19 @@ class TestSetRecord(BaseTestCase):
         ssa.record("spikes", sampling_interval=2)
         ssp.record("spikes", sampling_interval=2)
         self.assertCountEqual(
-            ["spikes"], if_curr._recorder.get_all_recording_variables())
-        assert recorder.get_neuron_sampling_interval("spikes") == 2
+            ["spikes"], if_curr._vertex.get_recording_variables())
+        assert recorder.get_sampling_interval("spikes") == 2
 
     def test_set_spikes_interval2(self):
         sim.setup(timestep=0.5)
         if_curr = sim.Population(1, sim.IF_curr_exp())
         recorder = if_curr._vertex.neuron_recorder
         self.assertCountEqual(
-            [], if_curr._recorder.get_all_recording_variables())
+            [], if_curr._vertex.get_recording_variables())
         if_curr.record("spikes", sampling_interval=2.5)
         self.assertCountEqual(
-            ["spikes"], if_curr._recorder.get_all_recording_variables())
-        assert recorder.get_neuron_sampling_interval("spikes") == 2.5
+            ["spikes"], if_curr._vertex.get_recording_variables())
+        assert recorder.get_sampling_interval("spikes") == 2.5
 
     def test_set_spikes_indexes(self):
         sim.setup(timestep=1)
@@ -123,7 +117,7 @@ class TestSetRecord(BaseTestCase):
         ssa[1, 2, 4].record("spikes")
         ssp[1, 2, 4].record("spikes")
         self.assertCountEqual(
-            ["spikes"], if_curr._recorder.get_all_recording_variables())
+            ["spikes"], if_curr._vertex.get_recording_variables())
         assert recorder._indexes["spikes"] == [1, 2, 4]
 
     def test_set_spikes_indexes2(self):
@@ -133,7 +127,7 @@ class TestSetRecord(BaseTestCase):
         if_curr[1, 2, 4].record("spikes")
         if_curr[1, 3].record("spikes")
         self.assertCountEqual(
-            ["spikes"], if_curr._recorder.get_all_recording_variables())
+            ["spikes"], if_curr._vertex.get_recording_variables())
         assert recorder._indexes["spikes"] == [1, 2, 3, 4]
 
     def test_turn_off_spikes_indexes(self):
@@ -142,14 +136,14 @@ class TestSetRecord(BaseTestCase):
         if_curr.record("spikes")
         if_curr.record(None)
         self.assertCountEqual(
-            [], if_curr._recorder.get_all_recording_variables())
+            [], if_curr._vertex.get_recording_variables())
 
     def test_set_spikes_indexes3(self):
         sim.setup(timestep=1)
         if_curr = sim.Population(5, sim.IF_curr_exp())
         if_curr.record("spikes")
         self.assertCountEqual(
-            ["spikes"], if_curr._recorder.get_all_recording_variables())
+            ["spikes"], if_curr._vertex.get_recording_variables())
 
     # These test are currently directly on NeuronRecorder as no pynn way
     # to do this

@@ -16,10 +16,12 @@
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetLaserDevice)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 class PushBotSpiNNakerLinkLaserDevice(
-        PushBotEthernetLaserDevice, ApplicationSpiNNakerLinkVertex):
+        PushBotEthernetLaserDevice, ApplicationSpiNNakerLinkVertex,
+        PopulationApplicationVertex):
     """ The Laser of a PushBot
     """
     __slots__ = []

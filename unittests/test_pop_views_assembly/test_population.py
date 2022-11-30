@@ -100,16 +100,16 @@ class TestPopulation(BaseTestCase):
         pop_1.set(tau_m=2)
         values = pop_1.get("tau_m")
         self.assertEqual([2, 2, 2, 2, 2], values)
-        values = pop_1._get_by_selector(slice(1, 3), "tau_m")
+        values = pop_1[1:3].get("tau_m")
         self.assertEqual([2, 2], values)
-        pop_1.set_by_selector(slice(1, 3), "tau_m", 3)
+        pop_1[1:3].set(tau_m=3)
         values = pop_1.get("tau_m")
         self.assertEqual([2, 3, 3, 2, 2], values)
         values = pop_1.get(["cm", "v_thresh"])
         self.assertEqual([1.0, 1.0, 1.0, 1.0, 1.0], values['cm'])
         self.assertEqual(
             [-50.0, -50.0, -50.0, -50.0, -50.0], values["v_thresh"])
-        values = pop_1._get_by_selector([1, 3, 4], ["cm", "v_thresh"])
+        values = pop_1[1, 3, 4].get(["cm", "v_thresh"])
         self.assertEqual([1.0, 1.0, 1.0], values['cm'])
         self.assertEqual(
             [-50.0, -50.0, -50.0], values["v_thresh"])
@@ -119,10 +119,10 @@ class TestPopulation(BaseTestCase):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp())
         assert [-65.0, -65.0, -65.0, -65.0] == pop.initial_values["v"]
-        pop._initialize(variable="v", value=-60, selector=1)
+        pop[1:2].initialize(v=-60)
         assert [-65, -60, -65, -65] == pop.initial_values["v"]
-        pop._initialize(variable="v", value=12, selector=2)
-        assert [-60] == pop._get_initial_value("v", selector=1)
+        pop[2:3].initialize(v=12)
+        assert -60 == pop[1].get_initial_value("v")
         sim.end()
 
     def test_init_bad(self):
@@ -149,7 +149,7 @@ class TestPopulation(BaseTestCase):
             cellclass=sim.IF_curr_exp, cellparams=None, n=4)
         initial_values = pop.initial_values
         assert "v" in initial_values
-        initial_values = pop._get_initial_values(selector=3)
+        initial_values = pop[3:4].initial_values
         assert {"v": [-65], "isyn_exc": [0], "isyn_inh": [0]} == initial_values
         sim.end()
 

@@ -15,7 +15,6 @@
 
 APP = $(notdir $(CURDIR))
 
-NEURON_MODEL = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
 NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
 INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_current.h
 NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h

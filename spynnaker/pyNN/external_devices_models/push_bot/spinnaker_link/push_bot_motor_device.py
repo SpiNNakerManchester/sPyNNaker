@@ -16,10 +16,12 @@
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
     PushBotEthernetMotorDevice)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 class PushBotSpiNNakerLinkMotorDevice(
-        PushBotEthernetMotorDevice, ApplicationSpiNNakerLinkVertex):
+        PushBotEthernetMotorDevice, ApplicationSpiNNakerLinkVertex,
+        PopulationApplicationVertex):
     """ The motor of a PushBot
     """
     __slots__ = []

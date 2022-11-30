@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pytest
-from pyNN.random import RandomDistribution, NumpyRNG
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.populations import PopulationView
 import pyNN.spiNNaker as sim
@@ -137,12 +136,6 @@ class Test_IDMixin(BaseTestCase):
         self.assertEqual([-65, -60, -65, -60, -65], pop.initial_values["v"])
         self.assertEqual([-60, -60], view.initial_values["v"])
         self.assertEqual([-60, -65], view2.initial_values["v"])
-        rand_distr = RandomDistribution("uniform",
-                                        parameters_pos=[-65.0, -55.0],
-                                        rng=NumpyRNG(seed=85524))
-        view.initialize(v=rand_distr)
-        self.assertEqual([-64.43349869042906, -63.663421790102184],
-                         view.initial_values["v"])
         view.initialize(v=lambda i: -65 + i / 10.0)
         self.assertEqual([-64.9, -64.7], view.initial_values["v"])
         sim.end()

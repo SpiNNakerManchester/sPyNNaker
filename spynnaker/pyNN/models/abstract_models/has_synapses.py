@@ -31,8 +31,3 @@ class HasSynapses(object):
         :param SynapseInformation synapse_info:
             The specific projection within the edge
         """
-
-    @abstractmethod
-    def clear_connection_cache(self):
-        """ Flush the cache of connection information; needed for a second run
-        """

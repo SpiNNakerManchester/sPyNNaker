@@ -119,7 +119,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             app_edge = incoming._projection_edge
             s_info.connector.write_local_only_data(
                 spec, app_edge, source.vertex_slice, source.key,
-                source.mask, weight_scales)
+                source.mask, app_edge.pre_vertex.n_colour_bits, weight_scales)
 
     def __merge_key_and_mask(self, key_a, mask_a, key_b, mask_b):
         new_xs = ~(key_a ^ key_b)

@@ -44,6 +44,8 @@ struct key_config {
     uint32_t mask;
     //! The mask to get the spike ID
     uint32_t spike_id_mask;
+    //! The colour shift to apply after masking
+    uint32_t colour_shift;
     //! Is the node self connected
     uint32_t self_connected;
 };
@@ -72,6 +74,12 @@ struct spike_processing_fast_provenance {
     uint32_t n_skipped_time_steps;
     //! The maximum additional time taken to transfer
     uint32_t max_transfer_timer_overrun;
+    //! The earliest received time of a spike
+    uint32_t earliest_receive;
+    //! The latest received time of a spike
+    uint32_t latest_receive;
+    //! The most spikes left at the end of any time step
+    uint32_t max_spikes_overflow;
 };
 
 //! \brief Set up spike processing

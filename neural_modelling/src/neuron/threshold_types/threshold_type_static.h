@@ -22,11 +22,25 @@
 
 #include "threshold_type.h"
 
+struct threshold_type_params_t {
+	//! The value of the static threshold
+	REAL threshold_value;
+};
+
 //! Static threshold configuration
 struct threshold_type_t {
     //! The value of the static threshold
     REAL threshold_value;
 };
+
+static void threshold_type_initialise(threshold_type_t *state,
+		threshold_type_params_t *params, UNUSED uint32_t n_steps_per_timestep) {
+	state->threshold_value = params->threshold_value;
+}
+
+static void threshold_type_save_state(UNUSED threshold_type_t *state,
+		UNUSED threshold_type_params_t *params) {
+}
 
 //! \brief Determines if the value given is above the threshold value
 //! \param[in] value: The value to determine if it is above the threshold

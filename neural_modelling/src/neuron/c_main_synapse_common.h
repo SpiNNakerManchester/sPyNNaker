@@ -24,14 +24,11 @@
 #include "population_table/population_table.h"
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
-#include "direct_synapses.h"
 
 //! The region IDs used by synapse processing
 struct synapse_regions {
     //! The parameters of the synapse processing
     uint32_t synapse_params;
-    //! The direct or single matrix to be copied to DTCM
-    uint32_t direct_matrix;
     //! The table to map from keys to memory addresses
     uint32_t pop_table;
     //! The SDRAM-based matrix of source spikes to target neurons
@@ -60,6 +57,12 @@ struct synapse_provenance {
     uint32_t n_invalid_master_pop_table_hits;
     //! The number of spikes that a bit field filtered, stopping a DMA
     uint32_t n_filtered_by_bitfield;
+    //! The number of synapses that were skipped due to late spikes
+    uint32_t n_synapses_skipped;
+    //! The number of spikes that were detected as late
+    uint32_t n_late_spikes;
+    //! The maximum lateness of a spike
+    uint32_t max_late_spike;
 };
 
 //! \brief Callback to store synapse provenance data (format: synapse_provenance).
@@ -75,6 +78,9 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
     prov->n_failed_bitfield_reads = failed_bit_field_reads;
     prov->n_invalid_master_pop_table_hits = invalid_master_pop_hits;
     prov->n_filtered_by_bitfield = bit_field_filtered_packets;
+    prov->n_synapses_skipped = skipped_synapses;
+    prov->n_late_spikes = late_spikes;
+    prov->max_late_spike = max_late_spike;
 }
 
 //! \brief Read data to set up synapse processing
@@ -112,19 +118,11 @@ static inline bool initialise_synapse_regions(
         return false;
     }
 
-    // set up direct synapses
-    address_t direct_synapses_address;
-    if (!direct_synapses_initialise(
-            data_specification_get_region(regions.direct_matrix, ds_regions),
-            &direct_synapses_address)) {
-        return false;
-    }
-
     // Set up the population table
     if (!population_table_initialise(
             data_specification_get_region(regions.pop_table, ds_regions),
             data_specification_get_region(regions.synaptic_matrix, ds_regions),
-            direct_synapses_address, row_max_n_words)) {
+            row_max_n_words)) {
         return false;
     }
     // Set up the synapse dynamics

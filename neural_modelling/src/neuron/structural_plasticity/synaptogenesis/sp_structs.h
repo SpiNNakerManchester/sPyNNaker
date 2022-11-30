@@ -49,6 +49,7 @@ typedef struct post_to_pre_entry {
 typedef struct {
     uint32_t key;
     uint32_t mask;
+    uint32_t n_colour_bits;
     uint32_t n_atoms;
     uint32_t lo_atom;
     uint32_t m_pop_index;
@@ -149,7 +150,7 @@ static inline bool sp_structs_find_by_spike(
             if ((spike & kai->mask) == kai->key) {
                 *population_id = i;
                 *sub_population_id = j;
-                *neuron_id = spike & ~kai->mask;
+                *neuron_id = (spike & ~kai->mask) >> kai->n_colour_bits;
                 *m_pop_index = kai->m_pop_index;
                 return true;
             }
@@ -176,11 +177,12 @@ static inline bool sp_structs_get_sub_pop_info(
             pre_pop_info_table->prepop_info[population_id];
     uint32_t neuron_id = pop_neuron_id;
     for (uint32_t i = 0; i < app_pop_info->no_pre_vertices; i++) {
-        uint32_t n_atoms = app_pop_info->key_atom_info[i].n_atoms;
+    	key_atom_info_t *kai = &app_pop_info->key_atom_info[i];
+        uint32_t n_atoms = kai->n_atoms;
         if (neuron_id < n_atoms) {
             *sub_population_id = i;
             *sub_pop_neuron_id = neuron_id;
-            *spike = app_pop_info->key_atom_info[i].key | neuron_id;
+            *spike = kai->key | (neuron_id << kai->n_colour_bits);
             return true;
         }
         neuron_id -= n_atoms;
