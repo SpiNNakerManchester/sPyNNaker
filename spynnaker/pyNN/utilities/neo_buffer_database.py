@@ -252,7 +252,7 @@ class NeoBufferDatabase(BufferDatabase):
             function = RetrievalFunction[str(row["function"], 'utf-8')]
             return (row["rec_id"], data_type, function, row["t_start"],
                     row["sampling_interval_ms"], row["first_id"])
-        raise Exception(f"No metedata for {variable} on {pop_label}")
+        raise KeyError(f"No metedata for {variable} on {pop_label}")
 
     def _get_spikes_by_region(
             self, cursor, region_id, neurons, simulation_time_step_ms,
