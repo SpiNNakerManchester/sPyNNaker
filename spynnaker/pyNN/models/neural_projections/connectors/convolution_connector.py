@@ -355,7 +355,8 @@ class ConvolutionConnector(AbstractConnector):
         # Write the column and row mask and shifts to extract the column and
         # row from the incoming spike
         if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
-            (c_start, c_mask, c_shift), (r_start, r_mask, r_shift) = \
+            (c_start, _c_end, c_mask, c_shift), \
+                (r_start, _r_end, r_mask, r_shift) = \
                 app_edge.pre_vertex.get_shape_key_fields(vertex_slice)
             start = (c_start, r_start)
             spec.write_value(c_mask, data_type=DataType.UINT32)
