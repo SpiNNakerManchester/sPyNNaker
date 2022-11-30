@@ -14,7 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import (auto, Enum)
+from datetime import datetime
 import math
+import neo
 import numpy
 import os
 import struct
@@ -82,7 +84,7 @@ class NeoBufferDatabase(BufferDatabase):
         # pylint: disable=no-member
         self._SQLiteDB__db.executescript(sql)
 
-    def write_segement_data(self):
+    def write_segment_data(self):
         """
         Writes the global information from the Views
 
@@ -94,10 +96,22 @@ class NeoBufferDatabase(BufferDatabase):
             cursor.execute(
                 """
                 INSERT INTO segment
-                (simulation_time_step_ms, segment_number)
-                 VALUES (?, ?)
+                (simulation_time_step_ms, segment_number, rec_datetime)
+                 VALUES (?, ?, ?)
                 """, [SpynnakerDataView.get_simulation_time_step_ms(),
-                      SpynnakerDataView.get_segment_counter()])
+                      SpynnakerDataView.get_segment_counter(),
+                      datetime.now()])
+
+    def _get_segment_info(self, cursor):
+        for row in cursor.execute(
+                """
+                SELECT segment_number, rec_datetime
+                FROM segment
+                LIMIT 1
+                """):
+            t_str = str(row["rec_datetime"], "utf-8")
+            time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
+            return row["segment_number"], time
 
     def _get_simulation_time_step_ms(self, cursor):
         """
@@ -117,7 +131,37 @@ class NeoBufferDatabase(BufferDatabase):
                 """):
             return row["simulation_time_step_ms"]
 
-    def _get_population_recording_id(
+    def _get_population_id(
+            self, cursor, pop_label, population):
+        """
+        Gets an id for this population label.
+
+        Will create a new population if required.
+
+        For speed does not verify the additional fields if a record already
+        exists.
+
+        :param ~sqlite3.Cursor cursor:
+        :param str pop_label:
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
+        """
+        for row in cursor.execute(
+                """
+                SELECT pop_id FROM population
+                WHERE label = ?
+                LIMIT 1
+                """, (pop_label,)):
+            return row["pop_id"]
+        cursor.execute(
+            """
+            INSERT INTO population
+            (label, first_id, description)
+            VALUES (?, ?, ?)
+            """, (pop_label, population.first_id, population.describe()))
+        return cursor.lastrowid
+
+    def _get_recording_id(
             self, cursor, pop_label, variable, data_type, data_function,
             sampling_interval_ms, population):
         """
@@ -139,29 +183,48 @@ class NeoBufferDatabase(BufferDatabase):
         :param ~spynnaker.pyNN.models.populations.Population population:
             the population to record for
         """
+        pop_id = self._get_population_id(cursor, pop_label, population)
         for row in cursor.execute(
                 """
-                SELECT pop_rec_id FROM population_recording
-                WHERE label = ? AND variable = ?
+                SELECT rec_id FROM recording
+                WHERE pop_id = ? AND variable = ?
                 LIMIT 1
-                """, (pop_label, variable)):
-            return row["pop_rec_id"]
+                """, (pop_id, variable)):
+            return row["rec_id"]
         if data_type:
             data_type_name = data_type.name
         else:
             data_type_name = None
         cursor.execute(
             """
-            INSERT INTO population_recording
-            (label, variable, data_type, function, t_start,
-            sampling_interval_ms, first_id, description)
-            VALUES (?, ?, ?, ?, 0, ?, ?, ?)
-            """, (pop_label, variable, data_type_name, str(data_function),
-                  sampling_interval_ms, population.first_id,
-                  population.describe()))
+            INSERT INTO recording
+            (pop_id, variable, data_type, function, t_start,
+            sampling_interval_ms)
+            VALUES (?, ?, ?, ?, 0, ?)
+            """, (pop_id, variable, data_type_name, str(data_function),
+                  sampling_interval_ms))
         return cursor.lastrowid
 
-    def _get_population_metadeta(
+    def _get_population_description(self, cursor, pop_label):
+        """
+        Gets the description for this population.
+
+        :param ~sqlite3.Cursor cursor:
+        :param str pop_label:
+        :return: description
+        :rtype: str
+        """
+        for row in cursor.execute(
+                """
+                SELECT description
+                FROM population
+                WHERE label = ?
+                LIMIT 1
+                """, (pop_label,)):
+            return str(row["description"], 'utf-8')
+        raise Exception(f"No metedata for {pop_label}")
+
+    def _get_recording_metadeta(
             self, cursor, pop_label, variable):
         """
         Gets the metadata id for this population and recording label
@@ -175,9 +238,9 @@ class NeoBufferDatabase(BufferDatabase):
         """
         for row in cursor.execute(
                 """
-                SELECT pop_rec_id,  data_type, function,  t_start,
+                SELECT rec_id,  data_type, function,  t_start,
                        sampling_interval_ms, first_id
-                FROM population_recording
+                FROM recording_view
                 WHERE label = ? AND variable = ?
                 LIMIT 1
                 """, (pop_label, variable)):
@@ -187,7 +250,7 @@ class NeoBufferDatabase(BufferDatabase):
             else:
                 data_type = None
             function = RetrievalFunction[str(row["function"], 'utf-8')]
-            return (row["pop_rec_id"], data_type, function, row["t_start"],
+            return (row["rec_id"], data_type, function, row["t_start"],
                     row["sampling_interval_ms"], row["first_id"])
         raise Exception(f"No metedata for {variable} on {pop_label}")
 
@@ -237,12 +300,12 @@ class NeoBufferDatabase(BufferDatabase):
             spike_ids.extend(indices)
             spike_times.extend(times)
 
-    def _get_spikes(self, cursor, pop_rec_id):
+    def _get_spikes(self, cursor, rec_id):
         """
         Gets the spikes for this population/recording id
 
         :param ~sqlite3.Cursor cursor:
-        :param int pop_rec_id:
+        :param int rec_id:
         :return: numpy array of spike ids and spike times
         :rtype  ~numpy.ndarray
         """
@@ -253,8 +316,8 @@ class NeoBufferDatabase(BufferDatabase):
             """
             SELECT region_id, neurons_st, selective_recording
             FROM spikes_metadata
-            WHERE pop_rec_id = ?
-            """, [pop_rec_id]))
+            WHERE rec_id = ?
+            """, [rec_id]))
         for row in rows:
             neurons = numpy.array(self.string_to_array(row["neurons_st"]))
 
@@ -283,7 +346,7 @@ class NeoBufferDatabase(BufferDatabase):
 
         """
         with self.transaction() as cursor:
-            pop_rec_id = self._get_population_recording_id(
+            rec_id = self._get_recording_id(
                 cursor, vertex.app_vertex.label, variable, DataType.INT32,
                 RetrievalFunction.Neuron_spikes, sampling_interval, population)
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
@@ -294,9 +357,9 @@ class NeoBufferDatabase(BufferDatabase):
             cursor.execute(
                 """
                 INSERT INTO spikes_metadata
-                (pop_rec_id, region_id, neurons_st, selective_recording)
+                (rec_id, region_id, neurons_st, selective_recording)
                  VALUES (?, ?, ?, ?)
-                """, (pop_rec_id, region_id, neurons_st, selective_recording))
+                """, (rec_id, region_id, neurons_st, selective_recording))
 
     def _get_eieio_spike_by_region(
             self, cursor, region_id, simulation_time_step_ms, base_key,
@@ -342,12 +405,12 @@ class NeoBufferDatabase(BufferDatabase):
             offset += length + 2 * BYTES_PER_WORD
             results.append(numpy.dstack((neuron_ids, timestamps))[0])
 
-    def _get_eieio_spikes(self, cursor, pop_rec_id):
+    def _get_eieio_spikes(self, cursor, rec_id):
         """
         Gets the spikes for this population/recording id
 
         :param ~sqlite3.Cursor cursor:
-        :param int pop_rec_id:
+        :param int rec_id:
         :return: numpy array of spike ids and spike times
         :rtype  ~numpy.ndarray
         """
@@ -359,8 +422,8 @@ class NeoBufferDatabase(BufferDatabase):
             SELECT region_id, base_key, vertex_slice, atoms_shape,
                    n_colour_bits
             FROM eieio_spikes_metadata
-            WHERE pop_rec_id = ?
-            """, [pop_rec_id]))
+            WHERE rec_id = ?
+            """, [rec_id]))
 
         for row in rows:
             vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
@@ -395,7 +458,7 @@ class NeoBufferDatabase(BufferDatabase):
             the population to record for
          """
         with self.transaction() as cursor:
-            pop_rec_id = self._get_population_recording_id(
+            rec_id = self._get_recording_id(
                 cursor, vertex.app_vertex.label, variable, DataType.INT32,
                 RetrievalFunction.EIEIO_spikes, sampling_interval_ms,
                 population)
@@ -406,11 +469,11 @@ class NeoBufferDatabase(BufferDatabase):
             cursor.execute(
                 """
                 INSERT INTO eieio_spikes_metadata
-                (pop_rec_id, region_id, base_key, vertex_slice, atoms_shape,
+                (rec_id, region_id, base_key, vertex_slice, atoms_shape,
                  n_colour_bits)
                  VALUES (?, ?, ?, ?, ?, ?)
                 """,
-                (pop_rec_id, region_id, base_key, str(vertex.vertex_slice),
+                (rec_id, region_id, base_key, str(vertex.vertex_slice),
                  str(vertex.app_vertex.atoms_shape), n_colour_bits))
 
     def _get_multi_spikes_by_region(
@@ -452,12 +515,12 @@ class NeoBufferDatabase(BufferDatabase):
             spike_ids.append(indices)
             spike_times.append(times)
 
-    def _get_multi_spikes(self, cursor, pop_rec_id):
+    def _get_multi_spikes(self, cursor, rec_id):
         """
         Gets the spikes for this population/recording id
 
         :param ~sqlite3.Cursor cursor:
-        :param int pop_rec_id:
+        :param int rec_id:
         :return: numpy array of spike ids and spike times
         :rtype  ~numpy.ndarray
         """
@@ -468,8 +531,8 @@ class NeoBufferDatabase(BufferDatabase):
             """
             SELECT region_id, vertex_slice, atoms_shape
             FROM multi_spikes_metadata
-            WHERE pop_rec_id = ?
-            """, [pop_rec_id]))
+            WHERE rec_id = ?
+            """, [rec_id]))
 
         for row in rows:
             vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
@@ -500,7 +563,7 @@ class NeoBufferDatabase(BufferDatabase):
             the population to record for
         """
         with self.transaction() as cursor:
-            pop_rec_id = self._get_population_recording_id(
+            rec_id = self._get_recording_id(
                 cursor, vertex.app_vertex.label, variable, DataType.INT32,
                 RetrievalFunction.Multi_spike, sampling_interval_ms,
                 population)
@@ -511,10 +574,10 @@ class NeoBufferDatabase(BufferDatabase):
             cursor.execute(
                 """
                 INSERT INTO multi_spikes_metadata
-                (pop_rec_id, region_id, vertex_slice, atoms_shape)
+                (rec_id, region_id, vertex_slice, atoms_shape)
                  VALUES (?, ?, ?, ?)
                 """,
-                (pop_rec_id, region_id, str(vertex.vertex_slice),
+                (rec_id, region_id, str(vertex.vertex_slice),
                  str(vertex.app_vertex.atoms_shape)))
 
     def _get_matrix_data_by_region(
@@ -553,12 +616,12 @@ class NeoBufferDatabase(BufferDatabase):
         return neurons, times, placement_data
 
     def _get_matrix_data(
-            self, cursor, pop_rec_id, data_type, sampling_interval_ms):
+            self, cursor, rec_id, data_type, sampling_interval_ms):
         """
         Gets the matrix data  for this population/recording id
 
         :param ~sqlite3.Cursor cursor:
-        :param int pop_rec_id:
+        :param int rec_id:
         :param DataType data_type: type of data to extract
         :param sampling_interval_ms:
             the simulation time in ms between sampling.
@@ -573,8 +636,8 @@ class NeoBufferDatabase(BufferDatabase):
             """
             SELECT region_id, neurons_st
             FROM matrix_metadata
-            WHERE pop_rec_id = ?
-            """, [pop_rec_id]))
+            WHERE rec_id = ?
+            """, [rec_id]))
 
         for row in rows:
             neurons = numpy.array(self.string_to_array(row["neurons_st"]))
@@ -616,7 +679,7 @@ class NeoBufferDatabase(BufferDatabase):
         sampling_interval = sampling_rate * \
             SpynnakerDataView.get_simulation_time_step_ms()
         with self.transaction() as cursor:
-            pop_rec_id = self._get_population_recording_id(
+            rec_id = self._get_recording_id(
                 cursor, vertex.app_vertex.label, variable, data_type,
                 RetrievalFunction.Matrix, sampling_interval, population)
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
@@ -626,9 +689,9 @@ class NeoBufferDatabase(BufferDatabase):
             cursor.execute(
                 """
                 INSERT INTO matrix_metadata
-                (pop_rec_id, region_id, neurons_st)
+                (rec_id, region_id, neurons_st)
                  VALUES (?, ?, ?)
-                """, (pop_rec_id, region_id, neurons_st))
+                """, (rec_id, region_id, neurons_st))
 
     def _get_rewires_by_region(
             self, cursor, region_id, vertex_slice, rewire_values,
@@ -672,12 +735,12 @@ class NeoBufferDatabase(BufferDatabase):
         rewire_preids.extend(pre_ids)
         rewire_times.extend(record_time)
 
-    def _get_rewires(self, cursor, pop_rec_id):
+    def _get_rewires(self, cursor, rec_id):
         """
         Extracts rewires data for this region a
 
         :param ~sqlite3.Cursor cursor:
-        :param int pop_rec_id:
+        :param int rec_id:
         :return: (rewire_values, rewire_postids, rewire_preids, rewire_times)
         :rtype: ~numpy.ndarray(tuple(int, int, int, int))
         """
@@ -690,8 +753,8 @@ class NeoBufferDatabase(BufferDatabase):
             """
             SELECT region_id, vertex_slice
             FROM rewires_metadata
-            WHERE pop_rec_id = ?
-            """, [pop_rec_id]))
+            WHERE rec_id = ?
+            """, [rec_id]))
 
         for row in rows:
             vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
@@ -719,7 +782,7 @@ class NeoBufferDatabase(BufferDatabase):
             the population to record for
         """
         with self.transaction() as cursor:
-            pop_rec_id = self._get_population_recording_id(
+            rec_id = self._get_recording_id(
                 cursor, vertex.app_vertex.label, variable, None,
                 RetrievalFunction.Rewires, None, population)
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
@@ -728,9 +791,9 @@ class NeoBufferDatabase(BufferDatabase):
             cursor.execute(
                 """
                 INSERT INTO rewires_metadata
-                (pop_rec_id, region_id, vertex_slice)
+                (rec_id, region_id, vertex_slice)
                  VALUES (?, ?, ?)
-                """, (pop_rec_id, region_id, str(vertex.vertex_slice)))
+                """, (rec_id, region_id, str(vertex.vertex_slice)))
 
     def get_deta(self, pop_label, variable):
         """
@@ -742,21 +805,21 @@ class NeoBufferDatabase(BufferDatabase):
         :rtype  ~numpy.ndarray
         """
         with self.transaction() as cursor:
-            (pop_rec_id, data_type, function, t_start, sampling_interval_ms,
-             first_id) = self._get_population_metadeta(
+            (rec_id, data_type, function, t_start, sampling_interval_ms,
+             first_id) = self._get_recording_metadeta(
                 cursor, pop_label, variable)
 
             if function == RetrievalFunction.Neuron_spikes:
-                return self._get_spikes(cursor, pop_rec_id)
+                return self._get_spikes(cursor, rec_id)
             elif function == RetrievalFunction.EIEIO_spikes:
-                return self._get_eieio_spikes(cursor, pop_rec_id)
+                return self._get_eieio_spikes(cursor, rec_id)
             elif function == RetrievalFunction.Multi_spike:
-                return self._get_multi_spikes(cursor, pop_rec_id)
+                return self._get_multi_spikes(cursor, rec_id)
             elif function == RetrievalFunction.Matrix:
                 return self._get_matrix_data(
-                    cursor, pop_rec_id, data_type, sampling_interval_ms)
+                    cursor, rec_id, data_type, sampling_interval_ms)
             elif function == RetrievalFunction.Rewires:
-                return self._get_rewires(cursor, pop_rec_id)
+                return self._get_rewires(cursor, rec_id)
             else:
                 raise NotImplementedError(function)
 
@@ -768,7 +831,15 @@ class NeoBufferDatabase(BufferDatabase):
         :type variables: str, list(str) or None
         :return: Segment with the requested data
         """
+        with self.transaction() as cursor:
+            segment_number, rec_datetime = self._get_segment_info(cursor)
+            description = self._get_population_description(cursor, pop_label)
+        segment = neo.Segment(
+            name="segment{}".format(segment_number),
+            description=description,
+            rec_datetime=rec_datetime)
 
+        return segment
 
     @staticmethod
     def array_to_string(indexes):

@@ -17,30 +17,41 @@
 -- messy historical reasons.
 PRAGMA foreign_keys = ON;
 
-CREATE TABLE IF NOT EXISTS population_recording (
-    pop_rec_id INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE IF NOT EXISTS population (
+    pop_id INTEGER PRIMARY KEY AUTOINCREMENT,
     label TEXT NOT NULL,
+    first_id int NOT NULL,
+    description TEXT NOT NULL);
+
+CREATE TABLE IF NOT EXISTS recording (
+    rec_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pop_id INTEGER NOT NULL
+		REFERENCES population(pop_id) ON DELETE RESTRICT,
     variable TEXT NOT NULL,
     data_type TEXT,
     function TEXT NOT NULL,
     t_start float NOT NULL,
-    sampling_interval_ms float,
-    first_id int NOT NULL,
-    description TEXT);
+    sampling_interval_ms float);
 
-CREATE UNIQUE INDEX IF NOT EXISTS population_recording_sanity
-    ON population_recording(label ASC, variable ASC);
+CREATE UNIQUE INDEX IF NOT EXISTS recording_sanity
+    ON recording(pop_id ASC, variable ASC);
+
+CREATE VIEW IF NOT EXISTS recording_view AS
+    SELECT rec_id, variable, label, data_type, function, t_start,
+        sampling_interval_ms, first_id
+    FROM population NATURAL JOIN recording;
 
 CREATE TABLE IF NOT EXISTS segment(
     segment_id INTEGER PRIMARY KEY AUTOINCREMENT,
     simulation_time_step_ms FLOAT NOT NULL,
     segment_number INTEGER NOT NULL,
-    t_stop FLOAT);
+    t_stop FLOAT,
+    rec_datetime TIMESTAMP NOT NULL);
 
 CREATE TABLE IF NOT EXISTS spikes_metadata(
     spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    pop_rec_id INTEGER NOT NULL
-		REFERENCES population_recording(pop_rec_id) ON DELETE RESTRICT,
+    rec_id INTEGER NOT NULL
+		REFERENCES recording(rec_id) ON DELETE RESTRICT,
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     neurons_st TEXT NOT NULL,
@@ -48,8 +59,8 @@ CREATE TABLE IF NOT EXISTS spikes_metadata(
 
 CREATE TABLE IF NOT EXISTS eieio_spikes_metadata(
     eieio_spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    pop_rec_id INTEGER NOT NULL
-		REFERENCES population_recording(pop_rec_id) ON DELETE RESTRICT,
+    rec_id INTEGER NOT NULL
+		REFERENCES recording(rec_id) ON DELETE RESTRICT,
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     base_key INT NOT NULL,
@@ -59,8 +70,8 @@ CREATE TABLE IF NOT EXISTS eieio_spikes_metadata(
 
 CREATE TABLE IF NOT EXISTS multi_spikes_metadata(
     multi_spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    pop_rec_id INTEGER NOT NULL
-		REFERENCES population_recording(pop_rec_id) ON DELETE RESTRICT,
+    rec_id INTEGER NOT NULL
+		REFERENCES recording(rec_id) ON DELETE RESTRICT,
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     vertex_slice TEXT NOT NULL,
@@ -68,16 +79,16 @@ CREATE TABLE IF NOT EXISTS multi_spikes_metadata(
 
 CREATE TABLE IF NOT EXISTS matrix_metadata(
     spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    pop_rec_id INTEGER NOT NULL
-		REFERENCES population_recording(pop_rec_id) ON DELETE RESTRICT,
+    rec_id INTEGER NOT NULL
+		REFERENCES recording(rec_id) ON DELETE RESTRICT,
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     neurons_st TEXT NOT NULL);
 
 CREATE TABLE IF NOT EXISTS rewires_metadata(
     rewires_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    pop_rec_id INTEGER NOT NULL
-		REFERENCES population_recording(pop_rec_id) ON DELETE RESTRICT,
+    rec_id INTEGER NOT NULL
+		REFERENCES recording(rec_id) ON DELETE RESTRICT,
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     vertex_slice TEXT NOT NULL);
