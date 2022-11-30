@@ -65,7 +65,7 @@ static inline void lif_neuron_closed_form(
         neuron_t *neuron, REAL V_prev, input_t input_this_timestep) {
     // accum = accum * accum + accum
 //    REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
-    REAL alpha = MULT_ROUND_NEAREST_ACCUM (
+    REAL alpha = MULT_ROUND_NEAREST_ACCUM(
         input_this_timestep, neuron->R_membrane) + neuron->V_rest;
 
     // update membrane voltage
