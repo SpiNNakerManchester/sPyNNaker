@@ -104,22 +104,21 @@ class SplitterAbstractPopulationVertexFixed(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
 
         ring_buffer_shifts = None
-        if self.__ring_buffer_shifts is None:
-            app_vertex = self._governed_app_vertex
-            if (hasattr(app_vertex, "rb_left_shifts") and
-                    app_vertex.rb_left_shifts is not None):
-                print("=" * 80)
-                print("Using given values for RB left shifts.")
-                ring_buffer_shifts = app_vertex.rb_left_shifts
-                print("RB left shifts for {:20}".format(app_vertex.label),
-                      "=", ring_buffer_shifts)
-                print("-" * 80)
-            else:
-                print("=" * 80)
-                print("Computing RB left shifts for", app_vertex.label)
-                ring_buffer_shifts = app_vertex.get_ring_buffer_shifts()
-                print("RB left shifts for {:20}".format(app_vertex.label),
-                      "=", ring_buffer_shifts)
+        app_vertex = self._governed_app_vertex
+        if (hasattr(app_vertex, "rb_left_shifts") and
+                app_vertex.rb_left_shifts is not None):
+            print("=" * 80)
+            print("Using given values for RB left shifts.")
+            ring_buffer_shifts = app_vertex.rb_left_shifts
+            print("RB left shifts for {:20}".format(app_vertex.label),
+                  "=", ring_buffer_shifts)
+            print("-" * 80)
+        else:
+            print("=" * 80)
+            print("Computing RB left shifts for", app_vertex.label)
+            ring_buffer_shifts = app_vertex.get_ring_buffer_shifts()
+            print("RB left shifts for {:20}".format(app_vertex.label),
+                  "=", ring_buffer_shifts)
 
         weight_scales = app_vertex.get_weight_scales(ring_buffer_shifts)
         all_syn_block_sz = app_vertex.get_synapses_size(
