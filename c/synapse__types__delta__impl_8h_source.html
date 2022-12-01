@@ -139,8 +139,8 @@ $(function() {
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
 <div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="synapse__types__delta__impl_8h.html#adbe3014909741294cc935642b318df74">   92</a></span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="synapse__types__delta__impl_8h.html#adbe3014909741294cc935642b318df74">synapse_types_shape_input</a>(</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <a class="code" href="synapse__types__semd__impl_8h.html#structsynapse__types__t">synapse_types_t</a> *parameters) {</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    parameters-&gt;<a class="code" href="synapse__types__semd__impl_8h.html#aebbb0a0a65a17b0c580f03b50fccdeed">exc</a> = 0;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    parameters-&gt;<a class="code" href="synapse__types__semd__impl_8h.html#ab566101b8fa8437032939f3b263a951b">inh</a> = 0;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    parameters-&gt;<a class="code" href="synapse__types__semd__impl_8h.html#aebbb0a0a65a17b0c580f03b50fccdeed">exc</a> = <a class="code" href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a>;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    parameters-&gt;<a class="code" href="synapse__types__semd__impl_8h.html#ab566101b8fa8437032939f3b263a951b">inh</a> = <a class="code" href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a>;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
 <div class="line"><a name="l00104"></a><span class="lineno"><a class="line" href="synapse__types__delta__impl_8h.html#a60079a7d7261fb6e7154977cad9341dc">  104</a></span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="synapse__types__delta__impl_8h.html#a60079a7d7261fb6e7154977cad9341dc">synapse_types_add_neuron_input</a>(</div>
@@ -195,6 +195,7 @@ $(function() {
 <div class="ttc" id="abit__field_8h_html_aab1410d3f3644ff465752cab5b56e420"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a></div><div class="ttdeci">uint32_t index_t</div></div>
 <div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
 <div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
+<div class="ttc" id="amaths-util_8h_html_ac328e551bde3d39b6d7b8cc9e048d941"><div class="ttname"><a href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a></div><div class="ttdeci">#define ZERO</div><div class="ttdoc">A REAL 0.0.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00122">maths-util.h:122</a></div></div>
 <div class="ttc" id="aneuron-typedefs_8h_html"><div class="ttname"><a href="neuron-typedefs_8h.html">neuron-typedefs.h</a></div><div class="ttdoc">Data type definitions for SpiNNaker Neuron-modelling.</div></div>
 <div class="ttc" id="aneuron-typedefs_8h_html_ac412098e688b864e8f4e2f3c0ed86591"><div class="ttname"><a href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></div><div class="ttdeci">REAL input_t</div><div class="ttdoc">The type of an input.</div><div class="ttdef"><b>Definition:</b> <a href="neuron-typedefs_8h_source.html#l00122">neuron-typedefs.h:122</a></div></div>
 <div class="ttc" id="aneuron__impl__external__devices_8h_html_adc2145aaa2f8435401d2c077d42c7b91"><div class="ttname"><a href="neuron__impl__external__devices_8h.html#adc2145aaa2f8435401d2c077d42c7b91">n_steps_per_timestep</a></div><div class="ttdeci">static uint n_steps_per_timestep</div><div class="ttdoc">The number of steps to run per timestep.</div><div class="ttdef"><b>Definition:</b> <a href="neuron__impl__external__devices_8h_source.html#l00102">neuron_impl_external_devices.h:102</a></div></div>
@@ -225,7 +226,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Dec 1 2022 08:11:26 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Dec 1 2022 14:02:15 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

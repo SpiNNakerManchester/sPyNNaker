@@ -312,8 +312,8 @@ $(function() {
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                    inh_syn_values, input_types, <a class="code" href="input__type_8h.html#a6dd746ed60f4dc54e7e604f239843aa6">NUM_INHIBITORY_RECEPTORS</a>);</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160; </div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            <span class="comment">// Sum g_syn contributions from all receptors for recording</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;            <a class="code" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> total_exc = 0;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;            <a class="code" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> total_inh = 0;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;            <a class="code" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> total_exc = <a class="code" href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a>;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;            <a class="code" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> total_inh = <a class="code" href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a>;</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="input__type_8h.html#ad780fbb2c43b8bbf0f73ff0561061174">NUM_EXCITATORY_RECEPTORS</a>; i++) {</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;                total_exc += exc_input_values[i];</div>
@@ -501,6 +501,7 @@ $(function() {
 <div class="ttc" id="ainput__type__none_8h_html_structinput__type__params__t"><div class="ttname"><a href="input__type__none_8h.html#structinput__type__params__t">input_type_params_t</a></div><div class="ttdoc">Conductance input parameters.</div><div class="ttdef"><b>Definition:</b> <a href="input__type__conductance_8h_source.html#l00026">input_type_conductance.h:26</a></div></div>
 <div class="ttc" id="ainput__type__none_8h_html_structinput__type__t"><div class="ttname"><a href="input__type__none_8h.html#structinput__type__t">input_type_t</a></div><div class="ttdoc">Conductance state.</div><div class="ttdef"><b>Definition:</b> <a href="input__type__conductance_8h_source.html#l00034">input_type_conductance.h:34</a></div></div>
 <div class="ttc" id="amaths-util_8h_html_a67277c5a9b43a598ef8c22aea7dbe1b6"><div class="ttname"><a href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></div><div class="ttdeci">accum REAL</div><div class="ttdoc">Type used for &quot;real&quot; numbers.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00090">maths-util.h:90</a></div></div>
+<div class="ttc" id="amaths-util_8h_html_ac328e551bde3d39b6d7b8cc9e048d941"><div class="ttname"><a href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a></div><div class="ttdeci">#define ZERO</div><div class="ttdoc">A REAL 0.0.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00122">maths-util.h:122</a></div></div>
 <div class="ttc" id="aneuron-typedefs_8h_html_ab5816efea940631eca6d71dd4ca99c17"><div class="ttname"><a href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a></div><div class="ttdeci">REAL state_t</div><div class="ttdoc">The type of a state variable.</div><div class="ttdef"><b>Definition:</b> <a href="neuron-typedefs_8h_source.html#l00125">neuron-typedefs.h:125</a></div></div>
 <div class="ttc" id="aneuron-typedefs_8h_html_ac412098e688b864e8f4e2f3c0ed86591"><div class="ttname"><a href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></div><div class="ttdeci">REAL input_t</div><div class="ttdoc">The type of an input.</div><div class="ttdef"><b>Definition:</b> <a href="neuron-typedefs_8h_source.html#l00122">neuron-typedefs.h:122</a></div></div>
 <div class="ttc" id="aneuron_8c_html_a7368643a28282d8b3429f0fb145aa5db"><div class="ttname"><a href="neuron_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a></div><div class="ttdeci">static uint32_t n_neurons</div><div class="ttdoc">The number of neurons on the core.</div><div class="ttdef"><b>Definition:</b> <a href="neuron_8c_source.html#l00046">neuron.c:46</a></div></div>
@@ -569,7 +570,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Dec 1 2022 08:11:26 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Dec 1 2022 14:02:15 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
