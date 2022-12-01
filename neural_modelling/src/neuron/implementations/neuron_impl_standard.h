@@ -274,8 +274,8 @@ static void neuron_impl_do_timestep_update(
                     inh_syn_values, input_types, NUM_INHIBITORY_RECEPTORS);
 
             // Sum g_syn contributions from all receptors for recording
-            REAL total_exc = 0;
-            REAL total_inh = 0;
+            REAL total_exc = ZERO;
+            REAL total_inh = ZERO;
 
             for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
                 total_exc += exc_input_values[i];
