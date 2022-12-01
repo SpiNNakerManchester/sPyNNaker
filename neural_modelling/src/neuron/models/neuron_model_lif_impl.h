@@ -68,7 +68,7 @@ struct neuron_t {
     //! 'fixed' computation parameter - time constant multiplier for
     //! closed-form solution
     //! exp(-(machine time step in ms)/(R * C)) [.]
-    UFRACT   exp_TC;
+    REAL     exp_TC;
 
     //! offset current [nA]
     REAL     I_offset;
