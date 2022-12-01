@@ -31,14 +31,15 @@ CREATE TABLE IF NOT EXISTS recording (
     data_type TEXT,
     function TEXT NOT NULL,
     t_start float NOT NULL,
-    sampling_interval_ms float);
+    sampling_interval_ms float,
+    units TEXT);
 
 CREATE UNIQUE INDEX IF NOT EXISTS recording_sanity
     ON recording(pop_id ASC, variable ASC);
 
 CREATE VIEW IF NOT EXISTS recording_view AS
     SELECT rec_id, variable, label, data_type, function, t_start,
-        sampling_interval_ms, first_id
+        sampling_interval_ms, first_id, units
     FROM population NATURAL JOIN recording;
 
 CREATE TABLE IF NOT EXISTS segment(

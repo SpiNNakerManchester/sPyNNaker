@@ -25,6 +25,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.data_cache import DataCache
 from spynnaker.pyNN.models.common import RecordingType
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 # needed as dealing with quantities
 # pylint: disable=c-extension-no-member
@@ -288,7 +289,11 @@ class Recorder(object):
                 block, previous, variables, view_indexes)
 
         # add to the segments the new block
-        self.__append_current_segment(block, variables, view_indexes, clear)
+        #self.__append_current_segment(block, variables, view_indexes, clear)
+        with NeoBufferDatabase() as db:
+            segment = db.get_segment(
+                self.__population.label, variables, view_indexes, block)
+        block.segments.append(segment)
 
         # add fluff to the neo block
         block.name = self.__population.label

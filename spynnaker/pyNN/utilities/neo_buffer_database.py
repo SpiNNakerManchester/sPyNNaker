@@ -13,12 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from enum import (auto, Enum)
+from collections import defaultdict
 from datetime import datetime
+from enum import (auto, Enum)
 import math
 import neo
 import numpy
 import os
+import quantities
 import struct
 import re
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
@@ -105,13 +107,16 @@ class NeoBufferDatabase(BufferDatabase):
     def _get_segment_info(self, cursor):
         for row in cursor.execute(
                 """
-                SELECT segment_number, rec_datetime
+                SELECT segment_number, rec_datetime, t_stop
                 FROM segment
                 LIMIT 1
                 """):
+            t_stop = row["t_stop"]
+            if t_stop is None:
+                tstop = SpynnakerDataView.get_current_run_time_ms()
             t_str = str(row["rec_datetime"], "utf-8")
             time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
-            return row["segment_number"], time
+            return row["segment_number"], time, t_stop
 
     def _get_simulation_time_step_ms(self, cursor):
         """
@@ -163,7 +168,7 @@ class NeoBufferDatabase(BufferDatabase):
 
     def _get_recording_id(
             self, cursor, pop_label, variable, data_type, data_function,
-            sampling_interval_ms, population):
+            sampling_interval_ms, population, units=None):
         """
         Gets an id for this population and recording label combination.
 
@@ -199,10 +204,10 @@ class NeoBufferDatabase(BufferDatabase):
             """
             INSERT INTO recording
             (pop_id, variable, data_type, function, t_start,
-            sampling_interval_ms)
-            VALUES (?, ?, ?, ?, 0, ?)
+            sampling_interval_ms, units)
+            VALUES (?, ?, ?, ?, 0, ?, ?)
             """, (pop_id, variable, data_type_name, str(data_function),
-                  sampling_interval_ms))
+                  sampling_interval_ms, units))
         return cursor.lastrowid
 
     def _get_population_description(self, cursor, pop_label):
@@ -239,7 +244,7 @@ class NeoBufferDatabase(BufferDatabase):
         with self.transaction() as cursor:
             return self._get_recording_variables(label, cursor)
 
-    def _get_recording_variables(self, label, cursor):
+    def _get_recording_variables(self, pop_label, cursor):
         results = []
         for row in cursor.execute(
                 """
@@ -247,7 +252,7 @@ class NeoBufferDatabase(BufferDatabase):
                 FROM recording_view
                 WHERE label = ?
                 GROUP BY variable
-                """, (label, )):
+                """, (pop_label,)):
             results.append(str(row["variable"], 'utf-8'))
         return results
 
@@ -266,7 +271,7 @@ class NeoBufferDatabase(BufferDatabase):
         for row in cursor.execute(
                 """
                 SELECT rec_id,  data_type, function,  t_start,
-                       sampling_interval_ms, first_id
+                       sampling_interval_ms, first_id, units
                 FROM recording_view
                 WHERE label = ? AND variable = ?
                 LIMIT 1
@@ -276,9 +281,13 @@ class NeoBufferDatabase(BufferDatabase):
                 data_type = DataType[data_type_st]
             else:
                 data_type = None
+            if row["units"]:
+                units = str(row["units"], 'utf-8')
+            else:
+                units = None
             function = RetrievalFunction[str(row["function"], 'utf-8')]
             return (row["rec_id"], data_type, function, row["t_start"],
-                    row["sampling_interval_ms"], row["first_id"])
+                    row["sampling_interval_ms"], row["first_id"], units)
         raise KeyError(f"No metedata for {variable} on {pop_label}")
 
     def _get_spikes_by_region(
@@ -333,8 +342,8 @@ class NeoBufferDatabase(BufferDatabase):
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
-        :return: numpy array of spike ids and spike times
-        :rtype  ~numpy.ndarray
+        :return: numpy array of spike ids and spike times, all ids recording
+        :rtype  ~numpy.ndarray, list(int)
         """
         spike_times = list()
         spike_ids = list()
@@ -345,15 +354,17 @@ class NeoBufferDatabase(BufferDatabase):
             FROM spikes_metadata
             WHERE rec_id = ?
             """, [rec_id]))
+        indexes = []
         for row in rows:
             neurons = numpy.array(self.string_to_array(row["neurons_st"]))
+            indexes.extend(neurons)
 
             self._get_spikes_by_region(
                 cursor, row["region_id"], neurons, simulation_time_step_ms,
                 row["selective_recording"], spike_times, spike_ids)
 
         result = numpy.column_stack((spike_ids, spike_times))
-        return result[numpy.lexsort((spike_times, spike_ids))]
+        return result[numpy.lexsort((spike_times, spike_ids))], indexes
 
     def write_spikes_metadata(self, vertex, variable, region, neurons,
                               sampling_interval, population):
@@ -400,7 +411,8 @@ class NeoBufferDatabase(BufferDatabase):
         :param int base_key:
         :param Slice vertex_slice:
         :param tuple(int) atoms_shape:
-        :return:
+        :return: all recording indexes spikes or not
+        :rtype: list(int)
         """
         spike_data = self._read_contents(cursor, region_id)
 
@@ -432,17 +444,20 @@ class NeoBufferDatabase(BufferDatabase):
             offset += length + 2 * BYTES_PER_WORD
             results.append(numpy.dstack((neuron_ids, timestamps))[0])
 
+            return slice_ids
+
     def _get_eieio_spikes(self, cursor, rec_id):
         """
         Gets the spikes for this population/recording id
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
-        :return: numpy array of spike ids and spike times
-        :rtype  ~numpy.ndarray
+        :return: numpy array of spike ids and spike times, all ids recording
+        :rtype  ~numpy.ndarray, lis(int)
         """
         simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
         results = []
+        indexes = []
 
         rows = list(cursor.execute(
             """
@@ -455,15 +470,15 @@ class NeoBufferDatabase(BufferDatabase):
         for row in rows:
             vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
             atoms_shape = self.string_to_array(row["atoms_shape"])
-            self._get_eieio_spike_by_region(
+            indexes.extend(self._get_eieio_spike_by_region(
                 cursor, row["region_id"], simulation_time_step_ms,
                 row["base_key"], vertex_slice, atoms_shape,
-                row["n_colour_bits"], results)
+                row["n_colour_bits"], results))
 
         if not results:
-            return numpy.empty(shape=(0, 2))
+            return numpy.empty(shape=(0, 2)), indexes
         result = numpy.vstack(results)
-        return result[numpy.lexsort((result[:, 1], result[:, 0]))]
+        return result[numpy.lexsort((result[:, 1], result[:, 0]))], indexes
 
     def write_eieio_spikes_metadata(
             self, vertex, variable, region, base_key, n_colour_bits,
@@ -516,6 +531,8 @@ class NeoBufferDatabase(BufferDatabase):
         :param tuple(int, int) atoms_shape:
         :param list(float) spike_times: List to add spike times to
         :param list(int) spike_ids: List to add spike ids to
+        :return: all recording indexes spikes or not
+        :rtype: list(int)
         """
         raw_data = self._read_contents(cursor, region_id)
 
@@ -542,17 +559,20 @@ class NeoBufferDatabase(BufferDatabase):
             spike_ids.append(indices)
             spike_times.append(times)
 
+            return neurons
+
     def _get_multi_spikes(self, cursor, rec_id):
         """
         Gets the spikes for this population/recording id
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
-        :return: numpy array of spike ids and spike times
-        :rtype  ~numpy.ndarray
+        :return: numpy array of spike ids and spike times, all ids recording
+        :rtype  ~numpy.ndarray, list(int)
         """
         spike_times = list()
         spike_ids = list()
+        indexes = []
         simulation_time_step_ms = self._get_simulation_time_step_ms(cursor)
         rows = list(cursor.execute(
             """
@@ -565,17 +585,17 @@ class NeoBufferDatabase(BufferDatabase):
             vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
             atoms_shape = self.string_to_array(row["atoms_shape"])
 
-            self._get_multi_spikes_by_region(
+            indexes.extend(self._get_multi_spikes_by_region(
                 cursor, row["region_id"], simulation_time_step_ms,
-                vertex_slice, atoms_shape, spike_times, spike_ids)
+                vertex_slice, atoms_shape, spike_times, spike_ids))
 
         if not spike_ids:
-            return numpy.zeros((0, 2))
+            return numpy.zeros((0, 2)), indexes
 
         spike_ids = numpy.hstack(spike_ids)
         spike_times = numpy.hstack(spike_times)
         result = numpy.dstack((spike_ids, spike_times))[0]
-        return result[numpy.lexsort((spike_times, spike_ids))]
+        return result[numpy.lexsort((spike_times, spike_ids))], indexes
 
     def write_multi_spikes_metadata(
             self, vertex, variable, region, sampling_interval_ms, population):
@@ -642,8 +662,7 @@ class NeoBufferDatabase(BufferDatabase):
 
         return neurons, times, placement_data
 
-    def _get_matrix_data(
-            self, cursor, rec_id, data_type, sampling_interval_ms):
+    def _get_matrix_data(self, cursor, rec_id, data_type):
         """
         Gets the matrix data  for this population/recording id
 
@@ -684,7 +703,7 @@ class NeoBufferDatabase(BufferDatabase):
                 raise NotImplementedError("times differ")
         indexes = numpy.array(pop_neurons)
         order = numpy.argsort(indexes)
-        return pop_data[:, order], indexes[order], sampling_interval_ms
+        return pop_data[:, order], indexes[order]
 
     def write_matrix_metadata(self, vertex, variable, region, neurons,
                               data_type, sampling_rate, population):
@@ -708,7 +727,8 @@ class NeoBufferDatabase(BufferDatabase):
         with self.transaction() as cursor:
             rec_id = self._get_recording_id(
                 cursor, vertex.app_vertex.label, variable, data_type,
-                RetrievalFunction.Matrix, sampling_interval, population)
+                RetrievalFunction.Matrix, sampling_interval, population,
+                vertex.app_vertex.get_units(variable))
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             region_id = self._get_region_id(
                 cursor, placement.x, placement.y, placement.p, region)
@@ -833,24 +853,175 @@ class NeoBufferDatabase(BufferDatabase):
         """
         with self.transaction() as cursor:
             (rec_id, data_type, function, t_start, sampling_interval_ms,
-             first_id) = self._get_recording_metadeta(
+             first_id, units) = self._get_recording_metadeta(
                 cursor, pop_label, variable)
 
             if function == RetrievalFunction.Neuron_spikes:
-                return self._get_spikes(cursor, rec_id)
+                return self._get_spikes(cursor, rec_id)[0]
             elif function == RetrievalFunction.EIEIO_spikes:
-                return self._get_eieio_spikes(cursor, rec_id)
+                return self._get_eieio_spikes(cursor, rec_id)[0]
             elif function == RetrievalFunction.Multi_spike:
-                return self._get_multi_spikes(cursor, rec_id)
+                return self._get_multi_spikes(cursor, rec_id)[0]
             elif function == RetrievalFunction.Matrix:
-                return self._get_matrix_data(
-                    cursor, rec_id, data_type, sampling_interval_ms)
+                data, indexes = self._get_matrix_data(
+                    cursor, rec_id, data_type)
+                return data, indexes, sampling_interval_ms
             elif function == RetrievalFunction.Rewires:
                 return self._get_rewires(cursor, rec_id)
             else:
                 raise NotImplementedError(function)
 
-    def get_segment(self, pop_label, variables):
+    def check_indexes(self, view_indexes, data_indexes):
+        if view_indexes is None:
+            return data_indexes
+        if set(view_indexes) == set(data_indexes):
+            return view_indexes
+
+
+
+
+    def _add_spike_data(
+            self, pop_label, view_indexes, segment, spikes, indexes, t_start, t_stop,
+            sampling_interval_ms, first_id):
+        """
+
+        :param str pop_label:
+        :param Segment segment:
+        :param ~numpy.ndarray spikes:
+        :param list(int) indexes:
+        :param floa t_start:
+        :param float t_stop:
+        :param float sampling_interval_ms:
+        :param int first_id:
+        """
+        times = defaultdict(list)
+        for neuron_id, time in spikes:
+            times[int(neuron_id)].append(time)
+
+        #t_stop = t * quantities.ms
+
+        if view_indexes is not None:
+            indexes = view_indexes
+        for index in indexes:
+            spiketrain = neo.SpikeTrain(
+                times=times[index],
+                t_start=t_start,
+                t_stop=t_stop,
+                units='ms',
+                sampling_interval=sampling_interval_ms,
+                source_population=pop_label,
+                source_id=index + first_id,
+                source_index=index)
+            segment.spiketrains.append(spiketrain)
+
+    @staticmethod
+    def __get_channel_index(ids, block):
+        for channel_index in block.channel_indexes:
+            if numpy.array_equal(channel_index.index, ids):
+                return channel_index
+        count = len(block.channel_indexes)
+        channel_index = neo.ChannelIndex(
+            name="Index {}".format(count), index=ids)
+        block.channel_indexes.append(channel_index)
+        return channel_index
+
+    def __add_matix_data(
+            self, segment, block, signal_array, data_indexes, view_indexes,
+            variable, t_start, sampling_interval_ms, units, label, first_id):
+        """ Adds a data item that is an analog signal to a neo segment
+
+        :param ~neo.core.Segment segment: Segment to add data to
+        :param ~neo.core.Block block: neo block
+        :param ~numpy.ndarray signal_array: the raw signal data
+        :param list(int) data_indexes: The indexes for the recorded data
+        :param view_indexes: The indexes for which data should be returned.
+            If ``None``, all data (view_index = data_indexes)
+        :type view_indexes: list(int) or None
+        :param str variable: the variable name
+        :param recording_start_time: when recording started
+        :type t_start: float or int
+        :param sampling_interval_ms: how often a neuron is recorded
+        :type sampling_interval_ms: float or int
+        :param units: the units of the recorded value
+        :type units: quantities.quantity.Quantity or str
+        :param str label: human readable label
+        """
+        # pylint: disable=too-many-arguments, no-member
+        t_start = t_start * quantities.ms
+        sampling_period = sampling_interval_ms * quantities.ms
+        if view_indexes is None:
+            #if len(data_indexes) != self.__population.size:
+            #    warn_once(logger, self._SELECTIVE_RECORDED_MSG)
+            indexes = numpy.array(data_indexes)
+        elif list(view_indexes) == list(data_indexes):
+            indexes = numpy.array(data_indexes)
+        else:
+            # keep just the view indexes in the data
+            indexes = [i for i in view_indexes if i in data_indexes]
+            # keep just data columns in the view
+            map_indexes = [list(data_indexes).index(i) for i in indexes]
+            signal_array = signal_array[:, map_indexes]
+
+        ids = list(map(lambda x: x+first_id, indexes))
+        data_array = neo.AnalogSignal(
+            signal_array,
+            units=units,
+            t_start=t_start,
+            sampling_period=sampling_period,
+            name=variable,
+            source_population=label,
+            source_ids=ids)
+        channel_index = self.__get_channel_index(indexes, block)
+        data_array.channel_index = channel_index
+        data_array.shape = (data_array.shape[0], data_array.shape[1])
+        segment.analogsignals.append(data_array)
+        channel_index.analogsignals.append(data_array)
+
+    def _add_deta(
+            self, pop_label, variable, view_indexes, segment, block, t_stop, cursor):
+        """
+        Gets the data as a Numpy array for one opulation and variable
+
+        :param str pop_label:
+        :param str variable:
+        :param ~neo.core.Segment segment: Segment to add data to
+        :param ~neo.core.Block block: neo block
+        :param float t_stop
+        :param ~sqlite3.Cursor cursor:
+
+        """
+        (rec_id, data_type, function, t_start, sampling_interval_ms,
+         first_id, units) = self._get_recording_metadeta(
+            cursor, pop_label, variable)
+
+        if function == RetrievalFunction.Neuron_spikes:
+            spikes, indexes = self._get_spikes(cursor, rec_id)
+            self._add_spike_data(
+                pop_label, view_indexes, segment, spikes, indexes, t_start, t_stop,
+                sampling_interval_ms, first_id)
+        elif function == RetrievalFunction.EIEIO_spikes:
+            spikes, indexes = self._get_eieio_spikes(cursor, rec_id)
+            self._add_spike_data(
+                pop_label, segment, spikes, indexes, t_start, t_stop,
+                sampling_interval_ms, first_id)
+        elif function == RetrievalFunction.Multi_spike:
+            spikes, indexes = self._get_multi_spikes(cursor, rec_id)
+            self._add_spike_data(
+                pop_label, segment, spikes, indexes, t_start, t_stop,
+                sampling_interval_ms, first_id)
+        elif function == RetrievalFunction.Matrix:
+            signal_array, data_indexes = self._get_matrix_data(
+                cursor, rec_id, data_type)
+            self.__add_matix_data(
+                segment, block, signal_array, data_indexes, view_indexes,
+                variable, t_start, sampling_interval_ms, units,
+                pop_label, first_id)
+        elif function == RetrievalFunction.Rewires:
+            data = self._get_rewires(cursor, rec_id)
+        else:
+            raise NotImplementedError(function)
+
+    def get_segment(self, pop_label, variables, view_indexes=None, block=None):
         """
 
         :param str pop_label:
@@ -858,18 +1029,27 @@ class NeoBufferDatabase(BufferDatabase):
         :type variables: str, list(str) or None
         :return: Segment with the requested data
         """
+        if block is None:
+            block = neo.Block()
+
         with self.transaction() as cursor:
-            segment_number, rec_datetime = self._get_segment_info(cursor)
+            segment_number, rec_datetime, t_stop = self._get_segment_info(cursor)
             description = self._get_population_description(cursor, pop_label)
-        segment = neo.Segment(
-            name="segment{}".format(segment_number),
-            description=description,
-            rec_datetime=rec_datetime)
+            segment = neo.Segment(
+                name="segment{}".format(segment_number),
+                description=description,
+                rec_datetime=rec_datetime)
 
         if isinstance(variables, str):
             variables = [variables]
         if 'all' in variables:
             variables = None
+        if variables is None:
+            variables = self._get_recording_variables(pop_label, cursor)
+
+        for variable in variables:
+            self._add_deta(
+                pop_label, variable, view_indexes, segment, block, t_stop, cursor)
 
         return segment
 
