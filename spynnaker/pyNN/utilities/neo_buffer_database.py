@@ -228,7 +228,7 @@ class NeoBufferDatabase(BufferDatabase):
                 LIMIT 1
                 """, (pop_label,)):
             return str(row["description"], 'utf-8')
-        raise Exception(f"No metedata for {pop_label}")
+        raise KeyError(f"No metedata for {pop_label}")
 
     def get_recording_populations(self):
         results = []
