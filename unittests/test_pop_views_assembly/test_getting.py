@@ -42,6 +42,7 @@ def copy_db(with_view):
     else:
         my_buffer = os.path.join(my_dir, "all_" + DB_FILE_NAME)
     shutil.copyfile(my_buffer, run_buffer)
+    SpynnakerDataView._mock_has_run()
 
 
 class TestGetting(BaseTestCase):
@@ -138,7 +139,7 @@ class TestGetting(BaseTestCase):
         assert numpy.array_equal(spikes, target)
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
-        assert 2 == len(spiketrains[0])
+        assert 3 == len(spiketrains[0])
         assert 2 == spiketrains[0].annotations['source_index']
         assert 0 == len(spiketrains[1])
         assert 3 == spiketrains[1].annotations['source_index']
@@ -154,7 +155,7 @@ class TestGetting(BaseTestCase):
         view = pop[1:3]
         neo = view.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
-        target = self.v_expected()[:, 1:3]
+        target = self.v_expected[:, 1:3]
         assert v.shape == target.shape
         assert numpy.array_equal(v,  target)
 
@@ -169,7 +170,7 @@ class TestGetting(BaseTestCase):
         view = pop[0:3]
         neo = view.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
-        target = self.v_expected[:, 0:3]
+        target = self.v_expected[:, 1:3]
         assert numpy.array_equal(
             [1, 2], neo.segments[0].filter(name='v')[0].channel_index.index)
         assert v.shape == target.shape
@@ -179,17 +180,17 @@ class TestGetting(BaseTestCase):
 
     def test_get_spike_counts(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="a label")
+        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
         pop.record("spikes")
         copy_db(False)
 
-        assert {0: 7, 1: 3, 2: 2, 3: 0} == pop.get_spike_counts()
+        assert {0: 3, 1: 3, 2: 3, 3: 3, 4: 3} == pop.get_spike_counts()
 
         view = pop[1:4]
-        assert {1: 3, 2: 2, 3: 0} == view.get_spike_counts()
+        assert {1: 3, 2: 3, 3: 3} == view.get_spike_counts()
 
         assert 3 == pop.meanSpikeCount()
-        assert 5/3 == view.mean_spike_count()
+        assert 3 == view.mean_spike_count()
 
         sim.end()
 
@@ -226,7 +227,6 @@ class TestGetting(BaseTestCase):
         pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
         pop.record("v")
         copy_db(False)
-        SpynnakerDataView._mock_has_run()
 
         v = pop.spinnaker_get_data("v")
         assert len(v) == 35 * 5
