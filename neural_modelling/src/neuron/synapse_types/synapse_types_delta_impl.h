@@ -91,8 +91,8 @@ static void synapse_types_save_state(synapse_types_t *state, synapse_types_param
 //! \param[in,out] parameters: the pointer to the parameters to use
 static inline void synapse_types_shape_input(
         synapse_types_t *parameters) {
-	parameters->exc = 0;
-	parameters->inh = 0;
+	parameters->exc = ZERO;
+	parameters->inh = ZERO;
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
