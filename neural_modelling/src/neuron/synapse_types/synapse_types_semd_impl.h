@@ -147,17 +147,17 @@ static inline void synapse_types_add_neuron_input(
 //! \return the excitatory input buffers for a given neuron ID.
 static inline input_t *synapse_types_get_excitatory_input(
         input_t *excitatory_response, synapse_types_t *parameters) {
-	if (parameters->exc2.synaptic_input_value >= 0.001
-	        && parameters->multiplicator == 0
-			&& parameters->exc2_old == 0) {
+	if (parameters->exc2.synaptic_input_value >= 0.001k
+	        && parameters->multiplicator == ZERO
+			&& parameters->exc2_old == ZERO) {
 		parameters->multiplicator = parameters->exc.synaptic_input_value;
-	} else if (parameters->exc2.synaptic_input_value < 0.001) {
-		parameters->multiplicator = 0;
+	} else if (parameters->exc2.synaptic_input_value < 0.001k) {
+		parameters->multiplicator = ZERO;
 	}
 
 	parameters->exc2_old = parameters->exc2.synaptic_input_value;
 
-    excitatory_response[0] = 0;
+    excitatory_response[0] = ZERO;
     excitatory_response[1] =
     		parameters->exc2.synaptic_input_value * parameters->multiplicator
     		* parameters->scaling_factor;
