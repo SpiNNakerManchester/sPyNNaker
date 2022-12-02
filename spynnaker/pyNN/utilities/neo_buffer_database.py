@@ -117,6 +117,7 @@ class NeoBufferDatabase(BufferDatabase):
             t_str = str(row["rec_datetime"], "utf-8")
             time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
             return row["segment_number"], time, t_stop
+        raise Exception("No segment data")
 
     def _get_simulation_time_step_ms(self, cursor):
         """
