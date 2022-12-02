@@ -273,19 +273,19 @@ static void neuron_impl_do_timestep_update(
             input_t *inh_input_values = input_type_get_input_value(
                     inh_syn_values, input_types, NUM_INHIBITORY_RECEPTORS);
 
-            // Sum g_syn contributions from all receptors for recording
-            REAL total_exc = ZERO;
-            REAL total_inh = ZERO;
-
-            for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
-                total_exc += exc_input_values[i];
-            }
-            for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
-                total_inh += inh_input_values[i];
-            }
-
             // Do recording if on the first step
             if (i_step == n_steps_per_timestep) {
+				// Sum g_syn contributions from all receptors for recording
+				REAL total_exc = ZERO;
+				REAL total_inh = ZERO;
+
+				for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
+					total_exc += exc_input_values[i];
+				}
+				for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
+					total_inh += inh_input_values[i];
+				}
+
                 neuron_recording_record_accum(
                         V_RECORDING_INDEX, neuron_index, soma_voltage);
                 neuron_recording_record_accum(
