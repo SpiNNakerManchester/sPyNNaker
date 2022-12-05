@@ -560,7 +560,7 @@ class NeoBufferDatabase(BufferDatabase):
             spike_ids.append(indices)
             spike_times.append(times)
 
-            return neurons
+        return neurons
 
     def _get_multi_spikes(self, cursor, rec_id):
         """
