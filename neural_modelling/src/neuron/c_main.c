@@ -161,9 +161,9 @@ static inline void process_ring_buffers(void) {
     neuron_transfer(&ring_buffers[first_index]);
 
     // Print the neuron inputs.
-    #if LOG_LEVEL >= LOG_DEBUG
-        neuron_print_inputs();
-    #endif // LOG_LEVEL >= LOG_DEBUG
+#if LOG_LEVEL >= LOG_DEBUG
+	neuron_print_inputs();
+#endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 //! \brief Background activities called from timer

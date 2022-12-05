@@ -165,7 +165,7 @@ static inline state_t neuron_model_state_update(
         }
         // Get the input in nA
         input_t input_this_timestep =
-                total_exc - total_inh + external_bias + neuron->I_offset + current_offset;
+                total_exc - total_inh - external_bias + neuron->I_offset + current_offset;
 
         lif_neuron_closed_form(
                 neuron, neuron->V_membrane, input_this_timestep);

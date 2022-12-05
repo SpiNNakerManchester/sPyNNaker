@@ -179,7 +179,7 @@ static inline state_t neuron_model_state_update(
     }
 
     input_t input_this_timestep = total_exc - total_inh
-            + external_bias + neuron->I_offset + current_offset;
+            - external_bias + neuron->I_offset + current_offset;
 
     // the best AR update so far
     rk2_kernel_midpoint(neuron->this_h, neuron, input_this_timestep);

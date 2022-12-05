@@ -252,7 +252,7 @@ static void neuron_impl_do_timestep_update(
         additional_input_t *additional_inputs = &additional_input_array[neuron_index];
         synapse_types_t *the_synapse_type = &synapse_types_array[neuron_index];
 
-        bool spike = false;
+//        bool spike = false;
 
         // Loop however many times requested; do this in reverse for efficiency,
         // and because the index doesn't actually matter
@@ -320,7 +320,7 @@ static void neuron_impl_do_timestep_update(
             // If spike occurs, communicate to relevant parts of model
             if (spike_now) {
 
-                spike = true;
+//                spike = true;
 
                 // Call relevant model-based functions
                 // Tell the neuron model
@@ -329,11 +329,11 @@ static void neuron_impl_do_timestep_update(
                 // Tell the additional input
                 additional_input_has_spiked(additional_inputs);
 
-//                // Record the spike
-//                neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
-//
-//                // Send the spike
-//                send_spike(timer_count, time, neuron_index);
+                // Record the spike
+                neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
+
+                // Send the spike
+                send_spike(timer_count, time, neuron_index);
             }
 
             // Shape the existing input according to the included rule
@@ -344,13 +344,13 @@ static void neuron_impl_do_timestep_update(
         neuron_model_print_state_variables(this_neuron);
     #endif // LOG_LEVEL >= LOG_DEBUG
 
-        if (spike) {
-            // Record the spike
-            neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
-
-            // Send the spike
-            send_spike(timer_count, time, neuron_index);
-        }
+//        if (spike) {
+//            // Record the spike
+//            neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
+//
+//            // Send the spike
+//            send_spike(timer_count, time, neuron_index);
+//        }
     }
 }
 
