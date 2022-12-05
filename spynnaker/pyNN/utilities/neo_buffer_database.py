@@ -445,7 +445,7 @@ class NeoBufferDatabase(BufferDatabase):
             offset += length + 2 * BYTES_PER_WORD
             results.append(numpy.dstack((neuron_ids, timestamps))[0])
 
-            return slice_ids
+        return slice_ids
 
     def _get_eieio_spikes(self, cursor, rec_id):
         """
@@ -1003,12 +1003,12 @@ class NeoBufferDatabase(BufferDatabase):
         elif function == RetrievalFunction.EIEIO_spikes:
             spikes, indexes = self._get_eieio_spikes(cursor, rec_id)
             self._add_spike_data(
-                pop_label, segment, spikes, indexes, t_start, t_stop,
+                pop_label, indexes, segment, spikes, indexes, t_start, t_stop,
                 sampling_interval_ms, first_id)
         elif function == RetrievalFunction.Multi_spike:
             spikes, indexes = self._get_multi_spikes(cursor, rec_id)
             self._add_spike_data(
-                pop_label, segment, spikes, indexes, t_start, t_stop,
+                pop_label, indexes, segment, spikes, indexes, t_start, t_stop,
                 sampling_interval_ms, first_id)
         elif function == RetrievalFunction.Matrix:
             signal_array, data_indexes = self._get_matrix_data(
