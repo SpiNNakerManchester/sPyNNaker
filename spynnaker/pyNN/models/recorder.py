@@ -289,7 +289,6 @@ class Recorder(object):
                 block, previous, variables, view_indexes)
 
         # add to the segments the new block
-        #self.__append_current_segment(block, variables, view_indexes, clear)
         with NeoBufferDatabase() as db:
             segment = db.get_segment(
                 self.__population.label, variables, view_indexes, block)

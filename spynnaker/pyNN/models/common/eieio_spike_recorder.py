@@ -74,7 +74,6 @@ class EIEIOSpikeRecorder(object):
             for vertex in vertices:
                 vertex._update_virtual_key()
                 db.write_eieio_spikes_metadata(
-                    vertex, "spikes", region, base_key_function(vertex),
-                    n_colour_bits,
+                    vertex, "spikes", region, population,
                     SpynnakerDataView.get_simulation_time_step_ms(),
-                    population)
+                    base_key_function(vertex), n_colour_bits)

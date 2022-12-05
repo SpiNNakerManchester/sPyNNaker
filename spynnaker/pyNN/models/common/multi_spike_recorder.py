@@ -86,6 +86,5 @@ class MultiSpikeRecorder(object):
                 vertices = application_vertex.machine_vertices
                 for vertex in vertices:
                     db.write_multi_spikes_metadata(
-                        vertex, "spikes", region,
-                        SpynnakerDataView.get_simulation_time_step_ms(),
-                        population)
+                        vertex, "spikes", region, population,
+                        SpynnakerDataView.get_simulation_time_step_ms())

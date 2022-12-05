@@ -448,8 +448,8 @@ class NeuronRecorder(object):
                 neurons = [i]
             with NeoBufferDatabase() as db:
                 db.write_matrix_metadata(
-                    vertex, variable, region, neurons, data_type,
-                    sampling_interval_ms, population)
+                    vertex, variable, region, population,
+                    sampling_interval_ms, neurons, data_type)
 
     def _write_matrix_metadata(self, application_vertex, variable, population):
         if variable in self.__per_timestep_variables:
@@ -485,8 +485,7 @@ class NeuronRecorder(object):
                 neurons = self._neurons_recording(
                     self.SPIKES, vertex.vertex_slice,
                     application_vertex.atoms_shape)
-                db.write_spikes_metadata(vertex, self.SPIKES, region, neurons,
-                                         sampling_interval_ms, population)
+                db.write_spikes_metadata(vertex, self.SPIKES, region, population, sampling_interval_ms, neurons)
 
     def __write_rewires_metadata(self, application_vertex, population):
         """
