@@ -289,10 +289,7 @@ class Recorder(object):
                 block, previous, variables, view_indexes)
 
         # add to the segments the new block
-        with NeoBufferDatabase() as db:
-            segment = db.get_segment(
-                self.__population.label, variables, view_indexes, block)
-        block.segments.append(segment)
+        self.__append_current_segment(block, variables, view_indexes, clear)
 
         # add fluff to the neo block
         block.name = self.__population.label
@@ -354,7 +351,36 @@ class Recorder(object):
         return variables
 
     def __append_current_segment(self, block, variables, view_indexes, clear):
-        # build segment for the current data to be gathered in
+        SpynnakerDataView.check_user_can_act()
+
+        if not SpynnakerDataView.is_ran_last():
+            if SpynnakerDataView.is_ran_ever():
+                logger.warning(
+                    "The simulation has been reset, therefore data "
+                    "cannot be retrieved, hence the list/last segment list "
+                    "will be empty")
+            else:
+                logger.warning(
+                    "The simulation has not yet run, therefore data "
+                    "cannot be retrieved, hence the list will be empty")
+            return self.__append_empty_segment(block, variables, view_indexes)
+
+        if get_config_bool("Machine", "virtual_board"):
+            logger.warning(
+                "The simulation is using a virtual machine and so has not "
+                "truly ran, hence the list will be empty")
+            return self.__append_empty_segment(block, variables, view_indexes)
+
+        with NeoBufferDatabase() as db:
+            segment = db.get_segment(
+                self.__population.label, variables, view_indexes, block)
+        block.segments.append(segment)
+
+        if clear:
+            self.__clear_recording(variables)
+
+    def __append_empty_segment(self, block, variables, view_indexes):
+        # build and empty segment
         segment = neo.Segment(
             name="segment{}".format(SpynnakerDataView.get_segment_counter()),
             description=self.__population.describe(),
@@ -364,7 +390,7 @@ class Recorder(object):
         variables = self.__clean_variables(variables)
 
         for variable in variables:
-            data = self.get_data(variable)
+            data = self.__get_empty_data(variable)
             s_intrval = self.__vertex.get_recording_sampling_interval(variable)
             var_type = self.__vertex.get_recording_type(variable)
             if var_type == RecordingType.BIT_FIELD:
@@ -380,9 +406,9 @@ class Recorder(object):
                     segment=segment, event_array=data, variable=variable,
                     recording_start_time=self.__recording_start_time)
             elif var_type == RecordingType.MATRIX:
-                m_data, indices, sampling_interval = data
+                indices = self.__vertex.get_recording_indices(variable)
                 self.__add_neo_analog_signals(
-                    segment=segment, block=block, signal_array=m_data,
+                    segment=segment, block=block, signal_array=data,
                     data_indexes=indices, view_indexes=view_indexes,
                     variable=variable,
                     recording_start_time=self.__recording_start_time,
@@ -393,8 +419,6 @@ class Recorder(object):
                 raise ValueError(f"Unknown recording type {var_type}")
         block.segments.append(segment)
 
-        if clear:
-            self.__clear_recording(variables)
 
     def __append_previous_segment(
             self, block, segment_number, variables, view_indexes):
