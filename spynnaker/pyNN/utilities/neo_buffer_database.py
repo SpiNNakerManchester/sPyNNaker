@@ -162,9 +162,10 @@ class NeoBufferDatabase(BufferDatabase):
         cursor.execute(
             """
             INSERT INTO population
-            (label, first_id, description)
-            VALUES (?, ?, ?)
-            """, (pop_label, population.first_id, population.describe()))
+            (label, first_id, description, pop_size)
+            VALUES (?, ?, ?, ?)
+            """, (pop_label, population.first_id, population.describe(),
+                  population.size))
         return cursor.lastrowid
 
     def _get_recording_id(
@@ -288,7 +289,7 @@ class NeoBufferDatabase(BufferDatabase):
         for row in cursor.execute(
                 """
                 SELECT rec_id,  data_type, function,  t_start,
-                       sampling_interval_ms, first_id, units
+                       sampling_interval_ms, first_id, pop_size, units
                 FROM recording_view
                 WHERE label = ? AND variable = ?
                 LIMIT 1
@@ -304,7 +305,8 @@ class NeoBufferDatabase(BufferDatabase):
                 units = None
             function = RetrievalFunction[str(row["function"], 'utf-8')]
             return (row["rec_id"], data_type, function, row["t_start"],
-                    row["sampling_interval_ms"], row["first_id"], units)
+                    row["sampling_interval_ms"], row["first_id"],
+                    row["pop_size"], units)
         raise KeyError(f"No metedata for {variable} on {pop_label}")
 
     def _get_spikes_by_region(
@@ -897,18 +899,15 @@ class NeoBufferDatabase(BufferDatabase):
         if set(view_indexes) == set(data_indexes):
             return view_indexes
 
-
-
-
     def _add_spike_data(
-            self, pop_label, view_indexes, segment, spikes, indexes, t_start, t_stop,
+            self, pop_label, view_indexes, segment, spikes, t_start, t_stop,
             sampling_interval_ms, first_id):
         """
 
         :param str pop_label:
+        :param list(int) view_indexes:
         :param Segment segment:
         :param ~numpy.ndarray spikes:
-        :param list(int) indexes:
         :param floa t_start:
         :param float t_stop:
         :param float sampling_interval_ms:
@@ -920,9 +919,7 @@ class NeoBufferDatabase(BufferDatabase):
 
         #t_stop = t * quantities.ms
 
-        if view_indexes is not None:
-            indexes = view_indexes
-        for index in indexes:
+        for index in view_indexes:
             spiketrain = neo.SpikeTrain(
                 times=times[index],
                 t_start=t_start,
@@ -1011,23 +1008,25 @@ class NeoBufferDatabase(BufferDatabase):
 
         """
         (rec_id, data_type, function, t_start, sampling_interval_ms,
-         first_id, units) = self._get_recording_metadeta(
+         first_id, pop_size, units) = self._get_recording_metadeta(
             cursor, pop_label, variable)
 
+        if view_indexes is None:
+            view_indexes = range(pop_size)
         if function == RetrievalFunction.Neuron_spikes:
             spikes, indexes = self._get_spikes(cursor, rec_id)
             self._add_spike_data(
-                pop_label, view_indexes, segment, spikes, indexes, t_start, t_stop,
+                pop_label, view_indexes, segment, spikes, t_start, t_stop,
                 sampling_interval_ms, first_id)
         elif function == RetrievalFunction.EIEIO_spikes:
             spikes, indexes = self._get_eieio_spikes(cursor, rec_id)
             self._add_spike_data(
-                pop_label, indexes, segment, spikes, indexes, t_start, t_stop,
+                pop_label, indexes, segment, spikes, t_start, t_stop,
                 sampling_interval_ms, first_id)
         elif function == RetrievalFunction.Multi_spike:
             spikes, indexes = self._get_multi_spikes(cursor, rec_id)
             self._add_spike_data(
-                pop_label, indexes, segment, spikes, indexes, t_start, t_stop,
+                pop_label, indexes, segment, spikes, t_start, t_stop,
                 sampling_interval_ms, first_id)
         elif function == RetrievalFunction.Matrix:
             signal_array, data_indexes = self._get_matrix_data(

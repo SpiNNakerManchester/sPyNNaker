@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS population (
     pop_id INTEGER PRIMARY KEY AUTOINCREMENT,
     label TEXT NOT NULL,
     first_id int NOT NULL,
+    pop_size int NOT NULL,
     description TEXT NOT NULL);
 
 CREATE TABLE IF NOT EXISTS recording (
@@ -39,7 +40,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS recording_sanity
 
 CREATE VIEW IF NOT EXISTS recording_view AS
     SELECT rec_id, variable, label, data_type, function, t_start,
-        sampling_interval_ms, first_id, units
+        sampling_interval_ms, first_id, pop_size, units
     FROM population NATURAL JOIN recording;
 
 CREATE TABLE IF NOT EXISTS segment(
