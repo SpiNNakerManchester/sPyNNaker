@@ -283,8 +283,9 @@ class NeoBufferDatabase(BufferDatabase):
         :param ~sqlite3.Cursor cursor:
         :param str pop_label:
         :param str variable:
-        :return: id, datatype, retrieval function type
-        :rtype: (int, DataType, RetrievalFunction)
+        :return: id, datatype, retrieval function type,  t_start,
+                 sampling_interval_ms, first_id, pop_size, units
+        :rtype: (int, DataType, RetrievalFunction, float, float, int, int, str)
         """
         for row in cursor.execute(
                 """
@@ -875,9 +876,8 @@ class NeoBufferDatabase(BufferDatabase):
         """
         with self.transaction() as cursor:
             (rec_id, data_type, function, t_start, sampling_interval_ms,
-             first_id, units) = self._get_recording_metadeta(
+             first_id, pop_size, units) = self._get_recording_metadeta(
                 cursor, pop_label, variable)
-
             if function == RetrievalFunction.Neuron_spikes:
                 return self._get_spikes(cursor, rec_id)[0]
             elif function == RetrievalFunction.EIEIO_spikes:
