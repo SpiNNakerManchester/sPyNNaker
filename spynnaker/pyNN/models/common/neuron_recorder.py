@@ -485,7 +485,9 @@ class NeuronRecorder(object):
                 neurons = self._neurons_recording(
                     self.SPIKES, vertex.vertex_slice,
                     application_vertex.atoms_shape)
-                db.write_spikes_metadata(vertex, self.SPIKES, region, population, sampling_interval_ms, neurons)
+                db.write_spikes_metadata(
+                    vertex, self.SPIKES, region, population,
+                    sampling_interval_ms, neurons)
 
     def __write_rewires_metadata(self, application_vertex, population):
         """

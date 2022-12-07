@@ -169,7 +169,8 @@ class NeoBufferDatabase(BufferDatabase):
         return cursor.lastrowid
 
     def _get_recording_id(
-            self, cursor, pop_label, variable, population, sampling_interval_ms, data_type, data_function, units=None):
+            self, cursor, pop_label, variable, population, sampling_interval_ms,
+            data_type, data_function, units=None):
         """
         Gets an id for this population and recording label combination.
 
@@ -933,6 +934,12 @@ class NeoBufferDatabase(BufferDatabase):
 
     @staticmethod
     def __get_channel_index(ids, block):
+        """
+
+        :param list(int) ids:
+        :param ~neo.core.Block block: neo block
+        :rtype: ~neo.core.ChannelIndex
+        """
         for channel_index in block.channel_indexes:
             if numpy.array_equal(channel_index.index, ids):
                 return channel_index
@@ -996,17 +1003,71 @@ class NeoBufferDatabase(BufferDatabase):
         segment.analogsignals.append(data_array)
         channel_index.analogsignals.append(data_array)
 
-    def _add_deta(
-            self, pop_label, variable, view_indexes, segment, block, t_stop, cursor):
+
+    def __add_neo_events(
+            self, segment, event_array, variable, recording_start_time):
+        """ Adds data that is events to a neo segment.
+
+        :param ~neo.core.Segment segment: Segment to add data to
+        :param ~numpy.ndarray signal_array: the raw "event" data
+        :param str variable: the variable name
+        :param recording_start_time: when recording started
+        :type recording_start_time: float or int
+        """
+        # pylint: disable=too-many-arguments, no-member
+        t_start = recording_start_time * quantities.ms
+
+        formation_times = []
+        formation_labels = []
+        formation_annotations = dict()
+        elimination_times = []
+        elimination_labels = []
+        elimination_annotations = dict()
+
+        for i in range(len(event_array)):
+            event_time = t_start + event_array[i][0] * quantities.ms
+            pre_id = int(event_array[i][1])
+            post_id = int(event_array[i][2])
+            if event_array[i][3] == 1:
+                formation_times.append(event_time)
+                formation_labels.append(
+                    str(pre_id) + "_" + str(post_id) + "_formation")
+            else:
+                elimination_times.append(event_time)
+                elimination_labels.append(
+                    str(pre_id) + "_" + str(post_id) + "_elimination")
+
+        formation_event_array = neo.Event(
+            times=formation_times,
+            labels=formation_labels,
+            units="ms",
+            name=variable + "_form",
+            description="Synapse formation events",
+            array_annotations=formation_annotations)
+
+        elimination_event_array = neo.Event(
+            times=elimination_times,
+            labels=elimination_labels,
+            units="ms",
+            name=variable + "_elim",
+            description="Synapse elimination events",
+            array_annotations=elimination_annotations)
+
+        segment.events.append(formation_event_array)
+
+        segment.events.append(elimination_event_array)
+
+    def _add_deta(self, cursor, pop_label, variable, view_indexes,
+                  segment, block, t_stop):
         """
         Gets the data as a Numpy array for one opulation and variable
 
+        :param ~sqlite3.Cursor cursor:
         :param str pop_label:
         :param str variable:
         :param ~neo.core.Segment segment: Segment to add data to
         :param ~neo.core.Block block: neo block
         :param float t_stop
-        :param ~sqlite3.Cursor cursor:
 
         """
         (rec_id, data_type, function, t_start, sampling_interval_ms,
@@ -1038,7 +1099,8 @@ class NeoBufferDatabase(BufferDatabase):
                 variable, t_start, sampling_interval_ms, units,
                 pop_label, first_id)
         elif function == RetrievalFunction.Rewires:
-            data = self._get_rewires(cursor, rec_id)
+            event_array = self._get_rewires(cursor, rec_id)
+            self.__add_neo_events(segment, event_array, variable, t_start)
         else:
             raise NotImplementedError(function)
 
@@ -1054,7 +1116,8 @@ class NeoBufferDatabase(BufferDatabase):
             block = neo.Block()
 
         with self.transaction() as cursor:
-            segment_number, rec_datetime, t_stop = self._get_segment_info(cursor)
+            segment_number, rec_datetime, t_stop = \
+                self._get_segment_info(cursor)
             description = self._get_population_description(cursor, pop_label)
             segment = neo.Segment(
                 name="segment{}".format(segment_number),
@@ -1069,8 +1132,8 @@ class NeoBufferDatabase(BufferDatabase):
             variables = self._get_recording_variables(pop_label, cursor)
 
         for variable in variables:
-            self._add_deta(
-                pop_label, variable, view_indexes, segment, block, t_stop, cursor)
+            self._add_deta(cursor, pop_label, variable, view_indexes,
+                           segment, block, t_stop)
 
         return segment
 
@@ -1081,7 +1144,7 @@ class NeoBufferDatabase(BufferDatabase):
 
         Works best if the list is sorted.
 
-        Ids are comman seperate except when a series of ids is seqential when
+        Ids are comma separated except when a series of ids is sequential then
         the start:end is used.
 
         :param list(int) indexes:
@@ -1114,7 +1177,7 @@ class NeoBufferDatabase(BufferDatabase):
         """
         Converts a string into a list of ints
 
-        Assumes the wtring was created by array_to_string
+        Assumes the string was created by array_to_string
 
         :param str string:
         :rtype: list(int
