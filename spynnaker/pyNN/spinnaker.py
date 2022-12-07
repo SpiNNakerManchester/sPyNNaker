@@ -497,3 +497,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         with FecTimer("SpynnakerSplitterPartitioner", TimerWork.OTHER):
             n_chips_in_graph = spynnaker_splitter_partitioner()
             self._data_writer.set_n_chips_in_graph(n_chips_in_graph)
+
+    @overrides(AbstractSpinnakerBase._execute_buffer_extractor)
+    def _execute_buffer_extractor(self):
+        super()._execute_buffer_extractor()
+        with NeoBufferDatabase() as db:
+            db.write_t_stop()

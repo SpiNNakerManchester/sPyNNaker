@@ -104,6 +104,15 @@ class NeoBufferDatabase(BufferDatabase):
                       SpynnakerDataView.get_segment_counter(),
                       datetime.now()])
 
+    def write_t_stop(self):
+        t_stop = SpynnakerDataView.get_current_run_time_ms()
+        with self.transaction() as cursor:
+            cursor.execute(
+                """
+                UPDATE segment
+                SET t_stop = ?
+                """, (t_stop, ))
+
     def _get_segment_info(self, cursor):
         for row in cursor.execute(
                 """
@@ -112,8 +121,6 @@ class NeoBufferDatabase(BufferDatabase):
                 LIMIT 1
                 """):
             t_stop = row["t_stop"]
-            if t_stop is None:
-                t_stop = SpynnakerDataView.get_current_run_time_ms()
             t_str = str(row["rec_datetime"], "utf-8")
             time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
             return row["segment_number"], time, t_stop
