@@ -980,6 +980,8 @@ class NeoBufferDatabase(BufferDatabase):
             signal_array = signal_array[:, map_indexes]
 
         ids = list(map(lambda x: x+first_id, indexes))
+        if units is None:
+            units = "dimensionless"
         data_array = neo.AnalogSignal(
             signal_array,
             units=units,
