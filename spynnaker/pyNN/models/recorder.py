@@ -23,7 +23,6 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.data_cache import DataCache
 from spynnaker.pyNN.models.common import RecordingType
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
@@ -304,29 +303,9 @@ class Recorder(object):
     def cache_data(self):
         """ Store data for later extraction
         """
-        variables = self.__vertex.get_recording_variables()
-        if variables:
-            segment_number = SpynnakerDataView.get_segment_counter()
-            logger.info("Caching data for segment {:d}", segment_number)
-
-            data_cache = DataCache(
-                label=self.__population.label,
-                description=self.__population.describe(),
-                segment_number=segment_number,
-                recording_start_time=self.__recording_start_time,
-                t=SpynnakerDataView.get_current_run_time_ms())
-
-            for variable in variables:
-                samp_interval = self.__vertex.get_recording_sampling_interval(
-                    variable)
-                indexes = self.__vertex.get_recording_indices(variable)
-                data = self.get_data(variable)
-                data_cache.save_data(
-                    variable=variable, data=data, indexes=indexes,
-                    n_neurons=self.__population.size,
-                    units=self.__vertex.get_units(variable),
-                    sampling_interval=samp_interval)
-            self.__data_cache[segment_number] = data_cache
+        segment_number = SpynnakerDataView.get_segment_counter()
+        self.__data_cache[segment_number] = \
+            NeoBufferDatabase.default_database_file()
 
     def __clean_variables(self, variables):
         """ Sorts out variables for processing usage
@@ -430,47 +409,9 @@ class Recorder(object):
             block.segments.append(segment)
             return
 
-        data_cache = self.__data_cache[segment_number]
-
-        # sort out variables
-        variables = self.__clean_variables(variables)
-
-        # build segment for the previous data to be gathered in
-        segment = neo.Segment(
-            name="segment{}".format(segment_number),
-            description=data_cache.description,
-            rec_datetime=data_cache.rec_datetime)
-
-        for variable in variables:
-            if variable not in data_cache.variables:
-                logger.warning("No Data available for Segment {} variable {}",
-                               segment_number, variable)
-                continue
-            variable_cache = data_cache.get_data(variable)
-            var_type = self.__vertex.get_recording_type(variable)
-            if var_type == RecordingType.BIT_FIELD:
-                self.__add_neo_spiketrains(
-                    segment=segment, spikes=variable_cache.data,
-                    t=data_cache.t, n_neurons=variable_cache.n_neurons,
-                    recording_start_time=data_cache.recording_start_time,
-                    sampling_interval=variable_cache.sampling_interval,
-                    indexes=view_indexes, label=data_cache.label)
-            elif var_type == RecordingType.EVENT:
-                self.__add_neo_events(
-                    segment=segment, event_array=variable_cache.data,
-                    variable=variable,
-                    recording_start_time=data_cache.recording_start_time)
-            elif var_type == RecordingType.MATRIX:
-                m_data, indices, sampling_interval = variable_cache.data
-                self.__add_neo_analog_signals(
-                    segment=segment, block=block,
-                    signal_array=m_data,
-                    data_indexes=indices,
-                    view_indexes=view_indexes, variable=variable,
-                    recording_start_time=data_cache.recording_start_time,
-                    sampling_interval=sampling_interval,
-                    units=variable_cache.units, label=data_cache.label)
-
+        with NeoBufferDatabase(self.__data_cache[segment_number]) as db:
+            segment = db.get_segment(
+                self.__population.label, variables, view_indexes, block)
         block.segments.append(segment)
 
     def __metadata(self):
