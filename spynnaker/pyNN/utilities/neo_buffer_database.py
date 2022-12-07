@@ -113,7 +113,7 @@ class NeoBufferDatabase(BufferDatabase):
                 """):
             t_stop = row["t_stop"]
             if t_stop is None:
-                tstop = SpynnakerDataView.get_current_run_time_ms()
+                t_stop = SpynnakerDataView.get_current_run_time_ms()
             t_str = str(row["rec_datetime"], "utf-8")
             time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
             return row["segment_number"], time, t_stop
@@ -169,8 +169,8 @@ class NeoBufferDatabase(BufferDatabase):
         return cursor.lastrowid
 
     def _get_recording_id(
-            self, cursor, pop_label, variable, population, sampling_interval_ms,
-            data_type, data_function, units=None):
+            self, cursor, pop_label, variable, population,
+            sampling_interval_ms, data_type, data_function, units=None):
         """
         Gets an id for this population and recording label combination.
 
@@ -267,7 +267,7 @@ class NeoBufferDatabase(BufferDatabase):
         results = []
         for row in cursor.execute(
                 """
-                SELECT variable 
+                SELECT variable
                 FROM recording_view
                 WHERE label = ?
                 GROUP BY variable
@@ -629,7 +629,8 @@ class NeoBufferDatabase(BufferDatabase):
         :param int region: local region this vertex will write to
         :param ~spynnaker.pyNN.models.populations.Population population:
             the population to record for
-        :param sampling_interval_ms: the simulation time in ms between sampling.
+        :param sampling_interval_ms:
+            The simulation time in ms between sampling.
             Typically the sampling rate * simulation_timestep_ms
         :type sampling_interval_ms: float or None
         """
@@ -918,8 +919,6 @@ class NeoBufferDatabase(BufferDatabase):
         for neuron_id, time in spikes:
             times[int(neuron_id)].append(time)
 
-        #t_stop = t * quantities.ms
-
         for index in view_indexes:
             spiketrain = neo.SpikeTrain(
                 times=times[index],
@@ -974,7 +973,7 @@ class NeoBufferDatabase(BufferDatabase):
         t_start = t_start * quantities.ms
         sampling_period = sampling_interval_ms * quantities.ms
         if view_indexes is None:
-            #if len(data_indexes) != self.__population.size:
+            # if len(data_indexes) != self.__population.size:
             #    warn_once(logger, self._SELECTIVE_RECORDED_MSG)
             indexes = numpy.array(data_indexes)
         elif list(view_indexes) == list(data_indexes):
@@ -1002,7 +1001,6 @@ class NeoBufferDatabase(BufferDatabase):
         data_array.shape = (data_array.shape[0], data_array.shape[1])
         segment.analogsignals.append(data_array)
         channel_index.analogsignals.append(data_array)
-
 
     def __add_neo_events(
             self, segment, event_array, variable, recording_start_time):

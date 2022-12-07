@@ -21,6 +21,7 @@ from spinn_front_end_common.interface.buffer_management.storage_objects.\
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.data import SpynnakerDataView
 
+
 def make_data(do_view):
     sim.setup(timestep=1.0)
     sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
@@ -63,6 +64,7 @@ def make_data(do_view):
     else:
         my_buffer = os.path.join(my_dir, "all_" + DB_FILE_NAME)
     shutil.copyfile(run_buffer, my_buffer)
+
 
 make_data(True)
 make_data(False)

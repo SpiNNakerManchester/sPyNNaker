@@ -419,7 +419,6 @@ class Recorder(object):
                 raise ValueError(f"Unknown recording type {var_type}")
         block.segments.append(segment)
 
-
     def __append_previous_segment(
             self, block, segment_number, variables, view_indexes):
         if segment_number not in self.__data_cache:

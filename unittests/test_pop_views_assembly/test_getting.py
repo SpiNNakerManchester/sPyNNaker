@@ -23,7 +23,6 @@ from spinn_front_end_common.interface.buffer_management.storage_objects.\
     sqllite_database import DB_FILE_NAME
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.recorder import Recorder
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
@@ -67,10 +66,6 @@ class TestGetting(BaseTestCase):
                 for spike in row:
                     spikes_expected.append([i, spike])
         cls.spikes_expected = numpy.array(spikes_expected)
-
-    #def tearDown(self):
-    #    """ Restore the real methods that we may have mocked out """
-    #    Recorder.get_data = self.__get_data
 
     def test_simple_spikes(self):
         sim.setup(timestep=1.0)
