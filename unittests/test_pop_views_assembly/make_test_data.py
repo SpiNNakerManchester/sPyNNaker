@@ -16,8 +16,7 @@
 import numpy
 import os
 import shutil
-from spinn_front_end_common.interface.buffer_management.storage_objects.\
-    sqllite_database import DB_FILE_NAME
+from spinn_front_end_common.utilities.base_database import BaseDatabase
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.data import SpynnakerDataView
 
@@ -56,13 +55,12 @@ def make_data(do_view):
         print(v)
     sim.end()
 
-    run_dir = SpynnakerDataView().get_run_dir_path()
-    run_buffer = os.path.join(run_dir, DB_FILE_NAME)
+    run_buffer = BaseDatabase.default_database_file()
     my_dir = os.path.dirname(os.path.abspath(__file__))
     if do_view:
-        my_buffer = os.path.join(my_dir, "view_" + DB_FILE_NAME)
+        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
     else:
-        my_buffer = os.path.join(my_dir, "all_" + DB_FILE_NAME)
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
     shutil.copyfile(run_buffer, my_buffer)
 
 

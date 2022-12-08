@@ -19,8 +19,7 @@ import pickle
 import numpy
 import pytest
 import shutil
-from spinn_front_end_common.interface.buffer_management.storage_objects.\
-    sqllite_database import DB_FILE_NAME
+from spinn_front_end_common.utilities.base_database import BaseDatabase
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 import pyNN.spiNNaker as sim
@@ -33,13 +32,12 @@ def trim_spikes(spikes, indexes):
 
 
 def copy_db(with_view):
-    run_dir = SpynnakerDataView().get_run_dir_path()
-    run_buffer = os.path.join(run_dir, DB_FILE_NAME)
+    run_buffer = BaseDatabase.default_database_file()
     my_dir = os.path.dirname(os.path.abspath(__file__))
     if with_view:
-        my_buffer = os.path.join(my_dir, "view_" + DB_FILE_NAME)
+        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
     else:
-        my_buffer = os.path.join(my_dir, "all_" + DB_FILE_NAME)
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
     shutil.copyfile(my_buffer, run_buffer)
     SpynnakerDataView._mock_has_run()
 
