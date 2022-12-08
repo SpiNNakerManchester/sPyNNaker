@@ -416,6 +416,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     @overrides(AbstractSpinnakerBase._do_write_metadata)
     def _do_write_metadata(self):
         self._execute_write_neo_metadata()
+        super()._do_write_metadata()
 
     def _execute_synapse_expander(self):
         with FecTimer("Synapse expander", TimerWork.SYNAPSE) as timer:
