@@ -57,13 +57,8 @@ class TestPopulation(BaseTestCase):
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(n_neurons, sim.IF_curr_exp(), label=label,
                                structure=RandomStructure(Sphere(5.0)))
-        try:
-            gen = pop_1.position_generator
-            print(gen(0))
-        except NotImplementedError as e:
-            msg = "Depends on https://github.com/SpiNNakerManchester" \
-                  "/sPyNNaker8/pull/73"
-            raise SkipTest(msg) from e
+        gen = pop_1.position_generator
+        print(gen(0))
         sim.end()
 
     def test_set(self):

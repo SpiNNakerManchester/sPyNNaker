@@ -75,12 +75,12 @@ jobs:
         coveralls-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Lint with flake8
-      run: flake8 spynnaker spynnaker8 unittests spynnaker_integration_tests
+      run: flake8 spynnaker unittests spynnaker_integration_tests
 
     - name: Lint with pylint
       uses: ./support/actions/pylint
       with:
-        package: spynnaker spynnaker8
+        package: spynnaker
 
     - name: Run rat copyright enforcement
       if: matrix.python-version == 3.8
