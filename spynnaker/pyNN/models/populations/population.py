@@ -284,6 +284,17 @@ class Population(PopulationBase):
                     io=self.__recorder.write_to_files_indicators[variable],
                     variables=[variable])
 
+    @staticmethod
+    def _check_params(gather, annotations=None):
+        if not gather:
+            logger.warning(
+                "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
+        if annotations is not None:
+            warn_once(
+                logger, "annotations parameter is not standard PyNN so may "
+                        "not be supported by all platforms.")
+
     @overrides(PopulationBase.get_data, extend_doc=False)
     def get_data(
             self, variables='all', gather=True, clear=False, annotations=None):
@@ -311,15 +322,7 @@ class Population(PopulationBase):
             If the variable or variables have not been previously set to
             record.
         """
-        if not gather:
-            logger.warning(
-                "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        if annotations is not None:
-            warn_once(
-                logger, "annotations parameter is not standard PyNN so may "
-                        "not be supported by all platforms.")
-
+        self._check_params(gather, annotations)
         return self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
 

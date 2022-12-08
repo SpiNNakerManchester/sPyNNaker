@@ -219,24 +219,36 @@ class NeoBufferDatabase(BufferDatabase):
                   sampling_interval_ms, units))
         return cursor.lastrowid
 
-    def _get_population_description(self, cursor, pop_label):
+    def _get_population_metadata(self, cursor, pop_label):
         """
-        Gets the description for this population.
+        Gets the metadata for the population with this label
 
         :param ~sqlite3.Cursor cursor:
         :param str pop_label:
-        :return: description
-        :rtype: str
+        :return: population size, first id and description
+        :rtype: (int, int, str)
         """
         for row in cursor.execute(
                 """
-                SELECT description
+                SELECT pop_size, first_id, description
                 FROM population
                 WHERE label = ?
                 LIMIT 1
                 """, (pop_label,)):
-            return str(row["description"], 'utf-8')
+            return (int(row["pop_size"]), int(row["first_id"]),
+                    str(row["description"], 'utf-8'))
         raise KeyError(f"No metedata for {pop_label}")
+
+    def get_population_metdadata(self, pop_label):
+        """
+        Gets the metadata for the population with this label
+
+        :param str pop_label:
+        :return: population size, first id and description
+        :rtype: (int, int, str)
+        """
+        with self.transaction() as cursor:
+            return self._get_population_metadata(cursor, pop_label)
 
     def get_recording_populations(self):
         """
@@ -256,6 +268,12 @@ class NeoBufferDatabase(BufferDatabase):
                     """):
                 results.append(str(row["label"], 'utf-8'))
         return results
+
+    def get_population(self, pop_label):
+        # delayed import due to circular dependencies
+        from .data_population import DataPopulation
+        # DataPopulation validates the pop_label so no need to do hre too
+        return DataPopulation(self._database_file, pop_label)
 
     def get_recording_variables(self, pop_label):
         """
@@ -281,6 +299,22 @@ class NeoBufferDatabase(BufferDatabase):
                 """, (pop_label,)):
             results.append(str(row["variable"], 'utf-8'))
         return results
+
+    def get_recording_metadeta(self, pop_label, variable):
+        """
+        Gets the metadata id for this population and recording label
+        combination.
+
+        :param str pop_label:
+        :param str variable:
+        :return: datatype, t_start, sampling_interval_ms, first_id, pop_size,
+            units
+        :rtype: (DataType, float, float, int, int, str)
+        """
+        with self.transaction() as cursor:
+            info = self._get_recording_metadeta(cursor, pop_label, variable)
+            (_, datatype, _, _, sampling_interval_ms, _, _, units) = info
+            return (datatype, sampling_interval_ms, units)
 
     def _get_recording_metadeta(
             self, cursor, pop_label, variable):
@@ -874,7 +908,7 @@ class NeoBufferDatabase(BufferDatabase):
                  VALUES (?, ?, ?)
                 """, (rec_id, region_id, str(vertex.vertex_slice)))
 
-    def get_deta(self, pop_label, variable):
+    def get_data(self, pop_label, variable):
         """
         Gets the data as a Numpy array for one population and variable
 
@@ -1059,7 +1093,6 @@ class NeoBufferDatabase(BufferDatabase):
             array_annotations=elimination_annotations)
 
         segment.events.append(formation_event_array)
-
         segment.events.append(elimination_event_array)
 
     def _add_deta(self, cursor, pop_label, variable, view_indexes,
@@ -1109,25 +1142,82 @@ class NeoBufferDatabase(BufferDatabase):
         else:
             raise NotImplementedError(function)
 
-    def get_segment(self, pop_label, variables, view_indexes=None, block=None):
+    def get_block(self, pop_label, variables, view_indexes=None,
+                  annotations=None):
         """
 
         :param str pop_label:
         :param variables: One or more variable names or None for all available
         :type variables: str, list(str) or None
-        :return: Segment with the requested data
+        :param view_indexes: List of neurons ids to include or None for all
+        :type view_indexes: None or list(int)
+        :param annotations: annotations to put on the neo block
+        :type annotations: None or dict(str, ...)
+        :return: The Neo block
+        :rtype: ~neo.core.Block
         """
-        if block is None:
-            block = neo.Block()
+        block = neo.Block()
 
+        block.name = pop_label
         with self.transaction() as cursor:
             segment_number, rec_datetime, t_stop = \
                 self._get_segment_info(cursor)
-            description = self._get_population_description(cursor, pop_label)
-            segment = neo.Segment(
-                name="segment{}".format(segment_number),
-                description=description,
-                rec_datetime=rec_datetime)
+            pop_size, first_id, description = \
+                self._get_population_metadata(cursor, pop_label)
+            block.description = description
+            # pylint: disable=no-member
+            block.rec_datetime = rec_datetime
+
+            metadata = {
+                'size': pop_size,
+                'first_index': 0,
+                'last_index': pop_size,
+                'first_id': first_id,
+                'last_id': first_id + pop_size,
+                'label': pop_label,
+                'simulator': SpynnakerDataView.get_sim_name()
+            }
+            metadata['dt'] = t_stop
+            metadata['mpi_processes'] = 1  # meaningless on Spinnaker
+            block.annotate(**metadata)
+            if annotations:
+                block.annotate(**annotations)
+
+        self._add_segment(
+            cursor, block, pop_label, variables, view_indexes)
+        return block
+
+
+    def add_segment(self, block, pop_label, variables, view_indexes=None):
+        """
+
+        :param str pop_label:
+        :param variables: One or more variable names or None for all available
+        :type variables: str, list(str) or None
+        :param view_indexes: List of neurons ids to include or None for all
+        :type view_indexes: None or list(int)
+        :return: Segment with the requested data
+        """
+        with self.transaction() as cursor:
+            self._add_segment(
+                cursor, block, pop_label, variables, view_indexes)
+
+    def _add_segment(self, cursor, block, pop_label, variables, view_indexes):
+        """
+
+        :param str pop_label:
+        :param variables: One or more variable names or None for all available
+        :type variables: str, list(str) or None
+        :param view_indexes: List of neurons ids to include or None for all
+        :type view_indexes: None or list(int)
+        :return: Segment with the requested data
+        """
+        segment_number, rec_datetime, t_stop = \
+            self._get_segment_info(cursor)
+        segment = neo.Segment(
+            name="segment{}".format(segment_number),
+            description=block.description,
+            rec_datetime=rec_datetime)
 
         if isinstance(variables, str):
             variables = [variables]
@@ -1139,8 +1229,7 @@ class NeoBufferDatabase(BufferDatabase):
         for variable in variables:
             self._add_deta(cursor, pop_label, variable, view_indexes,
                            segment, block, t_stop)
-
-        return segment
+        block.segments.append(segment)
 
     @staticmethod
     def array_to_string(indexes):

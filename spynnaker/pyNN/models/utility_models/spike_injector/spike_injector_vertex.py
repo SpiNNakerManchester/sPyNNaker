@@ -101,7 +101,7 @@ class SpikeInjectorVertex(
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
         with NeoBufferDatabase() as db:
-            return db.get_deta(self.label, name)
+            return db.get_data(self.label, name)
 
     @overrides(PopulationApplicationVertex.write_recording_metadata)
     def write_recording_metadata(self, population):

@@ -351,9 +351,8 @@ class Recorder(object):
             return self.__append_empty_segment(block, variables, view_indexes)
 
         with NeoBufferDatabase() as db:
-            segment = db.get_segment(
-                self.__population.label, variables, view_indexes, block)
-        block.segments.append(segment)
+            segment = db.add_segment(
+                block, self.__population.label, variables, view_indexes)
 
         if clear:
             self.__clear_recording(variables)
@@ -410,9 +409,8 @@ class Recorder(object):
             return
 
         with NeoBufferDatabase(self.__data_cache[segment_number]) as db:
-            segment = db.get_segment(
-                self.__population.label, variables, view_indexes, block)
-        block.segments.append(segment)
+            segment = db.add_segment(
+                block, self.__population.label, variables, view_indexes)
 
     def __metadata(self):
         metadata = {

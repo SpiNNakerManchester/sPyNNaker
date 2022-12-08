@@ -756,7 +756,7 @@ class AbstractPopulationVertex(
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
         with NeoBufferDatabase() as db:
-            return db.get_deta(self.label, name)
+            return db.get_data(self.label, name)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
