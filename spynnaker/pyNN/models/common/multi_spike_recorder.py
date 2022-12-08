@@ -58,20 +58,6 @@ class MultiSpikeRecorder(object):
         return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
             out_spike_bytes * spikes_per_timestep))
 
-    def get_spikes(self, label, region, application_vertex):
-        """
-        :param str label:
-        :param int region:
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :return: A numpy array of 2-element arrays of (neuron_id, time)
-            ordered by time, one element per event
-        :rtype: ~numpy.ndarray(tuple(int,int))
-        """
-        with NeoBufferDatabase() as db:
-            return db.get_deta(application_vertex.label, "spikes")
-
     def write_spike_metadata(self, application_vertex, region, population):
         """
         Write the metadata to retrieve spikes based on just the data
