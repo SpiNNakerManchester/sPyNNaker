@@ -15,7 +15,7 @@
 import time
 from unittest import SkipTest
 from spinn_utilities.config_holder import get_config_bool
-from spinn_front_end_common.interface.provenance import ProvenanceReader
+from spinn_front_end_common.interface.provenance import GlobalProvenance
 from spynnaker.pyNN.exceptions import ConfigurationException
 import pyNN.spiNNaker as sim
 from spynnaker_integration_tests.scripts import check_data
@@ -87,7 +87,8 @@ class ManyBoards(BaseTestCase):
         for pop in self._pops:
             check_data(pop, self._expected_spikes, self.simtime)
         t_after_check = time.time()
-        results = ProvenanceReader().get_run_time_of_BufferExtractor()
+        with GlobalProvenance() as db:
+            results = db.get_run_time_of_BufferExtractor()
         self.report(results, report_file)
         self.report(
             "machine run time was: {} seconds\n".format(
