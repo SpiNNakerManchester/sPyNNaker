@@ -28,27 +28,31 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
         with LogCapture() as lc:
             v = SpikeSourceArrayVertex(
                 n_neurons=5, spike_times=[], label="test",
-                max_atoms_per_core=None, model=None, splitter=None)
+                max_atoms_per_core=None, model=None, splitter=None,
+                n_colour_bits=None)
         found = False
         for record in lc.records:
             if "no spike" in record.msg.fmt:
                 found = True
         self.assertTrue(found)
-        v.spike_times = []
-        v.set_value_by_selector([1, 3], "spike_times", [1, 2, 3])
-        self.assertListEqual(
-            [[], [1, 2, 3], [], [1, 2, 3], []], v.spike_times)
+        v.set_parameter_values("spike_times", [])
+        v.set_parameter_values("spike_times", [1, 2, 3], [1, 3])
+        self.assertSequenceEqual(
+            [[], [1, 2, 3], [], [1, 2, 3], []],
+            v.get_parameter_values("spike_times"))
 
     def test_singleton_list(self):
         v = SpikeSourceArrayVertex(
             n_neurons=5, spike_times=[1, 11, 22],
-            label="test", max_atoms_per_core=None, model=None, splitter=None)
-        v.spike_times = [2, 12, 32]
+            label="test", max_atoms_per_core=None, model=None, splitter=None,
+            n_colour_bits=None)
+        v.set_parameter_values("spike_times", [2, 12, 32])
 
     def test_double_list(self):
         SpikeSourceArrayVertex(
             n_neurons=3, spike_times=[[1], [11], [22]],
-            label="test", max_atoms_per_core=None, model=None, splitter=None)
+            label="test", max_atoms_per_core=None, model=None, splitter=None,
+            n_colour_bits=None)
 
     def test_big_double_list(self):
         spike_list1 = [1, 2, 6, 8, 9]
@@ -63,7 +67,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             SpikeSourceArrayVertex(
                 n_neurons=3, spike_times=spike_list,
                 label="test", max_atoms_per_core=None, model=None,
-                splitter=None)
+                splitter=None, n_colour_bits=None)
             found = False
             for record in lc.records:
                 if "too many spikes" in record.msg.fmt:
@@ -77,8 +81,8 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             v = SpikeSourceArrayVertex(
                 n_neurons=3, spike_times=None,
                 label="test", max_atoms_per_core=None, model=None,
-                splitter=None)
-            v.spike_times = [34] * 35
+                splitter=None, n_colour_bits=None)
+            v.set_parameter_values("spike_times", [34] * 35)
             found = False
             for record in lc.records:
                 if "too many spikes" in record.msg.fmt:
@@ -91,7 +95,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             SpikeSourceArrayVertex(
                 n_neurons=1, spike_times=[37] * 109,
                 label="test", max_atoms_per_core=None, model=None,
-                splitter=None)
+                splitter=None, n_colour_bits=None)
             found = False
             for record in lc.records:
                 if "too many spikes" in record.msg.fmt:

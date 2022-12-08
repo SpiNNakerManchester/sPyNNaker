@@ -65,11 +65,13 @@ class PopulationMachineLocalOnlyCombinedVertex(
     """
 
     __slots__ = [
-        "__change_requires_neuron_parameters_reload",
         "__key",
         "__ring_buffer_shifts",
         "__weight_scales",
-        "__slice_index"]
+        "__slice_index",
+        "__neuron_data",
+        "__max_atoms_per_core",
+        "__regenerate_data"]
 
     # log_n_neurons, log_n_synapse_types, log_max_delay, input_buffer_size,
     # clear_input_buffer
@@ -88,11 +90,14 @@ class PopulationMachineLocalOnlyCombinedVertex(
         PROVENANCE_DATA = 1
         PROFILING = 2
         RECORDING = 3
-        NEURON_PARAMS = 4
-        CURRENT_SOURCE_PARAMS = 5
-        NEURON_RECORDING = 6
-        LOCAL_ONLY = 7
-        LOCAL_ONLY_PARAMS = 8
+        CORE_PARAMS = 4
+        NEURON_PARAMS = 5
+        CURRENT_SOURCE_PARAMS = 6
+        NEURON_RECORDING = 7
+        LOCAL_ONLY = 8
+        LOCAL_ONLY_PARAMS = 9
+        NEURON_BUILDER = 10
+        INITIAL_VALUES = 11
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -103,9 +108,12 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
+        core_params=REGIONS.CORE_PARAMS.value,
         neuron_params=REGIONS.NEURON_PARAMS.value,
         current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
-        neuron_recording=REGIONS.NEURON_RECORDING.value
+        neuron_recording=REGIONS.NEURON_RECORDING.value,
+        neuron_builder=REGIONS.NEURON_BUILDER.value,
+        initial_values=REGIONS.INITIAL_VALUES.value
     )
 
     _PROFILE_TAG_LABELS = {
@@ -114,8 +122,9 @@ class PopulationMachineLocalOnlyCombinedVertex(
         2: "INCOMING_SPIKE"}
 
     def __init__(
-            self, sdram, label, app_vertex,
-            vertex_slice, slice_index, ring_buffer_shifts, weight_scales):
+            self, sdram, label, app_vertex, vertex_slice, slice_index,
+            ring_buffer_shifts, weight_scales, neuron_data,
+            max_atoms_per_core):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The sdram used by the vertex
@@ -132,6 +141,10 @@ class PopulationMachineLocalOnlyCombinedVertex(
             The scaling to apply to weights to store them in the synapses
         :param int all_syn_block_sz: The maximum size of the synapses in bytes
         :param int structural_sz: The size of the structural data
+        :param NeuronData neuron_data:
+            The handler of neuron data
+        :param int max_atoms_per_core:
+            The maximum number of atoms per core
         """
         super(PopulationMachineLocalOnlyCombinedVertex, self).__init__(
             label, app_vertex, vertex_slice, sdram,
@@ -140,10 +153,12 @@ class PopulationMachineLocalOnlyCombinedVertex(
             LocalOnlyProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None
-        self.__change_requires_neuron_parameters_reload = False
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
+        self.__neuron_data = neuron_data
+        self.__max_atoms_per_core = max_atoms_per_core
+        self.__regenerate_data = False
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
@@ -163,6 +178,16 @@ class PopulationMachineLocalOnlyCombinedVertex(
     @overrides(PopulationMachineNeurons._neuron_regions)
     def _neuron_regions(self):
         return self.NEURON_REGIONS
+
+    @property
+    @overrides(PopulationMachineNeurons._neuron_data)
+    def _neuron_data(self):
+        return self.__neuron_data
+
+    @property
+    @overrides(PopulationMachineNeurons._max_atoms_per_core)
+    def _max_atoms_per_core(self):
+        return self.__max_atoms_per_core
 
     @staticmethod
     def __get_binary_file_name(app_vertex):
@@ -184,7 +209,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
         proc_offset = NeuronProvenance.N_ITEMS
         end_proc_offset = proc_offset + LocalOnlyProvenance.N_ITEMS
         self._parse_neuron_provenance(
-            label, x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
+            x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
         self._parse_local_only_provenance(
             label, x, y, p, provenance_data[proc_offset:end_proc_offset])
 
@@ -242,13 +267,13 @@ class PopulationMachineLocalOnlyCombinedVertex(
         spec.reserve_memory_region(
             self.REGIONS.LOCAL_ONLY.value, self.LOCAL_ONLY_SIZE, "local_only")
         spec.switch_write_focus(self.REGIONS.LOCAL_ONLY.value)
-        log_n_neurons = get_n_bits(self._vertex_slice.n_atoms)
+        log_n_max_atoms = get_n_bits(self._max_atoms_per_core)
         log_n_synapse_types = get_n_bits(
             self._app_vertex.neuron_impl.get_n_synapse_types())
         # Delay is always 1
         log_max_delay = 1
 
-        spec.write_value(log_n_neurons)
+        spec.write_value(log_n_max_atoms)
         spec.write_value(log_n_synapse_types)
         spec.write_value(log_max_delay)
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
@@ -259,19 +284,18 @@ class PopulationMachineLocalOnlyCombinedVertex(
     def regenerate_data_specification(self, spec, placement):
         # pylint: disable=too-many-arguments, arguments-differ
 
-        # write the neuron params into the new DSG region
-        self._write_neuron_parameters(spec, self.__ring_buffer_shifts)
+        self._rewrite_neuron_data_spec(spec)
 
         # close spec
         spec.end_specification()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
-        return self.__change_requires_neuron_parameters_reload
+        return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        self.__change_requires_neuron_parameters_reload = new_value
+        self.__regenerate_data = new_value
 
     def _parse_local_only_provenance(
             self, label, x, y, p, provenance_data):
@@ -324,3 +348,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
                         "too late to be processed in a given time step. Try "
                         "increasing the time_scale_factor located within the "
                         ".spynnaker.cfg file or in the pynn.setup() method.")
+
+    @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
+    def set_do_neuron_regeneration(self):
+        self.__regenerate_data = True

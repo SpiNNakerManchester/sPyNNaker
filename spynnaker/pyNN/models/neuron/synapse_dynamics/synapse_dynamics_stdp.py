@@ -20,9 +20,8 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from spynnaker.pyNN.exceptions import (
-    InvalidParameterType, SynapticConfigurationException)
+    SynapticConfigurationException, InvalidParameterType)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
@@ -42,7 +41,7 @@ NEUROMODULATION_TARGETS = {
 
 
 class SynapseDynamicsSTDP(
-        AbstractPlasticSynapseDynamics, AbstractSettable,
+        AbstractPlasticSynapseDynamics,
         AbstractGenerateOnMachine):
     """ The dynamics of a synapse that changes over time using a \
         Spike Timing Dependent Plasticity (STDP) rule.
@@ -159,7 +158,7 @@ class SynapseDynamicsSTDP(
         # Otherwise, it is static or neuromodulation, so return ourselves
         return self
 
-    @overrides(AbstractSettable.get_value)
+    @overrides(AbstractPlasticSynapseDynamics.get_value)
     def get_value(self, key):
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
@@ -167,7 +166,7 @@ class SynapseDynamicsSTDP(
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
-    @overrides(AbstractSettable.set_value)
+    @overrides(AbstractPlasticSynapseDynamics.set_value)
     def set_value(self, key, value):
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
@@ -341,10 +340,11 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses):
+            post_vertex_slice, n_synapse_types, max_n_synapses,
+            max_atoms_per_core):
         # pylint: disable=too-many-arguments
         n_synapse_type_bits = get_n_bits(n_synapse_types)
-        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
+        n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
         # Get the fixed data
@@ -441,12 +441,12 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
-            fp_size, fp_data):
+            fp_size, fp_data, max_atoms_per_core):
         # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
 
         n_synapse_type_bits = get_n_bits(n_synapse_types)
-        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
+        n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
         data_fixed = numpy.concatenate([
@@ -538,24 +538,40 @@ class SynapseDynamicsSTDP(
     def gen_matrix_id(self):
         return MatrixGeneratorID.STDP_MATRIX.value
 
-    @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
-    def gen_matrix_params(self):
+    def gen_matrix_params(
+            self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
+            synapse_info, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core):
+        vertex = app_edge.post_vertex
+        n_synapse_type_bits = get_n_bits(
+            vertex.neuron_impl.get_n_synapse_types())
+        n_synapse_index_bits = get_n_bits(max_post_atoms_per_core)
+        max_delay = app_edge.post_vertex.splitter.max_support_delay()
+        max_delay_bits = get_n_bits(max_delay)
         synapse_struct = self.__timing_dependence.synaptic_structure
         n_half_words = synapse_struct.get_n_half_words_per_connection()
         half_word = synapse_struct.get_weight_half_word()
         if self.__neuromodulation:
             n_half_words += 1
             half_word = 0
-        return numpy.array(
-            [self._n_header_bytes // BYTES_PER_SHORT, n_half_words, half_word],
+        return numpy.array([
+            synaptic_matrix_offset, delayed_matrix_offset,
+            max_row_info.undelayed_max_n_synapses,
+            max_row_info.delayed_max_n_synapses,
+            max_row_info.undelayed_max_words, max_row_info.delayed_max_words,
+            synapse_info.synapse_type, n_synapse_type_bits,
+            n_synapse_index_bits, app_edge.n_delay_stages + 1,
+            max_delay, max_delay_bits, app_edge.pre_vertex.n_atoms,
+            max_pre_atoms_per_core, self._n_header_bytes // BYTES_PER_SHORT,
+            n_half_words, half_word],
             dtype=numpy.uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.
                gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self):
-        return 3 * BYTES_PER_WORD
+        return 17 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)
@@ -571,6 +587,11 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.delay)
     def delay(self):
         return self.__delay
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.is_combined_core_capable)
+    def is_combined_core_capable(self):
+        return self.__neuromodulation is None
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)

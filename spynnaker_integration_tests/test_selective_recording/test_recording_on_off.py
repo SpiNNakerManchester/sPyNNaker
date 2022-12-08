@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from neo.io import PickleIO
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.utilities import neo_compare
 from spinnaker_testbase import BaseTestCase
@@ -102,13 +101,13 @@ class TestRecordingOnOff(BaseTestCase):
         neo_compare.compare_blocks(v_neo, v_saved)
         neo_compare.compare_blocks(v_neo, neo)
 
-        with self.assertRaises(ConfigurationException):
+        with self.assertRaises(KeyError):
             pop.get_data("spikes")
-        with self.assertRaises(ConfigurationException):
+        with self.assertRaises(KeyError):
             pop.get_data("gsyn_exc")
-        with self.assertRaises(ConfigurationException):
+        with self.assertRaises(KeyError):
             pop.write_data(pickle_path, "spikes")
-        with self.assertRaises(ConfigurationException):
+        with self.assertRaises(KeyError):
             pop.write_data(pickle_path, "gsyn_exc")
 
     def test_record_v(self):

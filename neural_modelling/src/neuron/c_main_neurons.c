@@ -37,7 +37,6 @@
 #include "c_main_common.h"
 #include "profile_tags.h"
 #include "dma_common.h"
-#include <tdma_processing.h>
 #include <spin1_api_params.h>
 
 //! values for the priority for each callback
@@ -48,13 +47,15 @@ typedef enum callback_priorities {
 //! Overall regions to be used by the neuron core
 enum regions {
     SYSTEM_REGION,
+    CORE_PARAMS_REGION,
     PROVENANCE_DATA_REGION,
     PROFILER_REGION,
     RECORDING_REGION,
     NEURON_PARAMS_REGION,
     CURRENT_SOURCE_PARAMS_REGION,
     NEURON_RECORDING_REGION,
-    SDRAM_PARAMS_REGION
+    SDRAM_PARAMS_REGION,
+	INITIAL_VALUES_REGION
 };
 
 //! From the regions, select those that are common
@@ -76,9 +77,11 @@ const struct common_priorities COMMON_PRIORITIES = {
  * From the regions, select those that are used for neuron-specific things
  */
 const struct neuron_regions NEURON_REGIONS = {
+    .core_params = CORE_PARAMS_REGION,
     .neuron_params = NEURON_PARAMS_REGION,
     .current_source_params = CURRENT_SOURCE_PARAMS_REGION,
-    .neuron_recording = NEURON_RECORDING_REGION
+    .neuron_recording = NEURON_RECORDING_REGION,
+	.initial_values = INITIAL_VALUES_REGION
 };
 
 //! A region of SDRAM used to transfer synapses
@@ -87,14 +90,8 @@ struct sdram_config {
     uint8_t *address;
     //! The size of the input data to be transferred per core
     uint32_t size_in_bytes;
-    //! The number of neurons
-    uint32_t n_neurons;
-    //! The number of synapse types
-    uint32_t n_synapse_types;
     //! The number of synapse cores feeding into here
     uint32_t n_synapse_cores;
-    //! The number of bits needed for the neurons
-    uint32_t synapse_index_bits;
 };
 
 //! Provenance for this specific core
@@ -154,7 +151,8 @@ void resume_callback(void) {
     recording_reset();
 
     // try resuming neuron
-    if (!neuron_resume()) {
+    // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
+    if (!neuron_resume(time + 1)) {
         log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }
@@ -271,12 +269,6 @@ static bool initialise(void) {
     struct sdram_config * sdram_config = data_specification_get_region(
             SDRAM_PARAMS_REGION, ds_regions);
     spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
-
-    log_info("Transferring ring buffers from 0x%08x for %d neurons (%d bits) "
-            "and %d synapse types from %d cores using %d bytes per core",
-            sdram_inputs.address, sdram_inputs.n_neurons,
-            sdram_inputs.synapse_index_bits, sdram_inputs.n_synapse_types,
-            sdram_inputs.n_synapse_cores, sdram_inputs.size_in_bytes);
 
     uint32_t n_words = sdram_inputs.size_in_bytes >> 2;
     for (uint32_t i = 0; i < N_SYNAPTIC_BUFFERS; i++) {

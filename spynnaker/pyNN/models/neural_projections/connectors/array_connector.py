@@ -116,13 +116,12 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         pre_neurons = []
         post_neurons = []
         n_connections = 0
-        pre_lo = pre_vertex_slice.lo_atom
-        pre_hi = pre_vertex_slice.hi_atom
+        pre_lo = 0
+        pre_hi = synapse_info.n_pre_neurons - 1
         post_lo = post_vertex_slice.lo_atom
         post_hi = post_vertex_slice.hi_atom
         for i in range(pre_lo, pre_hi+1):
@@ -138,11 +137,11 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         block["source"] = pre_neurons
         block["target"] = post_neurons
         block["weight"] = self._generate_weights(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 

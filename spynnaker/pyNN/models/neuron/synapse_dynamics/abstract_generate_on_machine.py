@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
-import numpy
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty,\
+    abstractmethod
 
 
 class MatrixGeneratorID(Enum):
@@ -45,18 +45,19 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
         :rtype: int
         """
 
-    @property
-    def gen_matrix_params(self):
+    @abstractmethod
+    def gen_matrix_params(
+            self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
+            synapse_info, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core):
         """ Any parameters required by the matrix generator.
 
         :rtype: ~numpy.ndarray(uint32)
         """
-        return numpy.zeros(0, dtype=numpy.uint32)
 
-    @property
+    @abstractproperty
     def gen_matrix_params_size_in_bytes(self):
         """ The size of the parameters of the matrix generator in bytes.
 
         :rtype: int
         """
-        return 0
