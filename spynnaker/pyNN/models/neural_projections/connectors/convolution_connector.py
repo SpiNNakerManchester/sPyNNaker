@@ -21,7 +21,6 @@ from spinn_front_end_common.utilities.constants import (
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from .abstract_connector import AbstractConnector
-from data_specification.enums.data_type import DataType
 from collections.abc import Iterable
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
