@@ -225,10 +225,12 @@ class SPIFRetinaDevice(
         commands.extend([
             set_field_mask(self.__pipe, 0, self.__input_x_mask),
             set_field_shift(self.__pipe, 0, self.__input_x_shift),
-            set_field_limit(self.__pipe, 0, self._width),
+            set_field_limit(self.__pipe, 0,
+                            (self._width - 1) << self._source_x_shift),
             set_field_mask(self.__pipe, 1, self.__input_y_mask),
             set_field_shift(self.__pipe, 1, self.__input_y_shift),
-            set_field_limit(self.__pipe, 1, self._height),
+            set_field_limit(self.__pipe, 1,
+                            (self._height - 1) << self._source_y_shift),
             # These are unused but set them to be sure
             set_field_mask(self.__pipe, 2, 0),
             set_field_shift(self.__pipe, 2, 0),
