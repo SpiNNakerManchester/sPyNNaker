@@ -77,8 +77,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     " of Convolution")
             # pylint: disable=protected-access
             app_edge = incoming._projection_edge
-            n_incoming = len(
-                app_edge.pre_vertex.splitter.get_out_going_slices())
+            n_incoming = len(s_info.connector.get_connected_vertices(
+                s_info, app_edge.pre_vertex, app_edge.post_vertex))
             n_bytes += s_info.connector.local_only_n_bytes * n_incoming
 
         return ((CONV_CONFIG_N_SHORTS * BYTES_PER_SHORT) + BYTES_PER_WORD +
