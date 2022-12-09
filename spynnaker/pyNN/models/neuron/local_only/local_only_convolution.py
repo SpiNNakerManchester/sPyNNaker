@@ -155,6 +155,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_value(len(sources_for_m_vertex), data_type=DataType.UINT32)
 
         # Write the data
+        # pylint: disable=unexpected-keyword-arg
         spec.write_array(numpy.concatenate(data, dtype="uint32"))
 
         # Write weights where they are unique
@@ -164,6 +165,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 conn.get_encoded_kernel_weights(app_edge, weight_scales))
         if next_weight_index % 2 != 0:
             kernel_data.append(numpy.array([0], dtype="int16"))
+        # pylint: disable=unexpected-keyword-arg
         spec.write_array(
             numpy.concatenate(kernel_data, dtype="int16").view("uint32"))
 
