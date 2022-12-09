@@ -87,12 +87,12 @@ class TestGetting(BaseTestCase):
         assert 4 == len(spiketrains)
 
         Recorder.get_data = mock_v_all
-        neo = pop.get_v()
+        neo = pop.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
         target = mock_v_all(None, "any")
         assert numpy.array_equal(v,  target)
 
-        neo = pop.get_gsyn()
+        neo = pop.get_data(['gsyn_exc', 'gsyn_inh'])
         exc = neo.segments[0].filter(name='gsyn_exc')[0].magnitude
         assert numpy.array_equal(exc,  target)
         inh = neo.segments[0].filter(name='gsyn_inh')[0].magnitude
@@ -224,7 +224,7 @@ class TestGetting(BaseTestCase):
         view = pop[1:4]
         assert {1: 3, 2: 2, 3: 0} == view.get_spike_counts()
 
-        assert 3 == pop.meanSpikeCount()
+        assert 3 == pop.mean_spike_count()
         assert 5/3 == view.mean_spike_count()
 
         sim.end()
@@ -252,7 +252,7 @@ class TestGetting(BaseTestCase):
                 "https://github.com/NeuralEnsemble/python-neo/issues/529"
                 ) from e
 
-        pop.printSpikes("spikes.pkl")
+        pop.write_data("spikes.pkl", 'spikes')
         try:
             with open("spikes.pkl", encoding="utf-8") as pkl:
                 neo = pickle.load(pkl)
@@ -266,14 +266,14 @@ class TestGetting(BaseTestCase):
         Recorder.get_data = mock_v_all
         (target, _, _) = mock_v_all(None, "any")
 
-        pop.print_v("v.pkl")
+        pop.write_data("v.pkl", 'v')
         with open("v.pkl", encoding="utf-8") as pkl:
             neo = pickle.load(pkl)
             v = neo.segments[0].filter(name='v')[0].magnitude
             assert v.shape == target.shape
             assert numpy.array_equal(v,  target)
 
-        pop.print_gsyn("gsyn.pkl")
+        pop.write_data("gsyn.pkl", ['gsyn_exc', 'gsyn_inh'])
         with open("gsyn.pkl", encoding="utf-8") as pkl:
             neo = pickle.load(pkl)
             exc = neo.segments[0].filter(name='gsyn_exc')[0].magnitude

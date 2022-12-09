@@ -25,7 +25,7 @@ class ImportAllModule(unittest.TestCase):
     def test_import_all(self):
         if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
             package_loader.load_module("spynnaker", remove_pyc_files=False)
-         else:
+        else:
             # Do a full stack cleanup
             package_loader.load_module(
                 "spinn_utilities", remove_pyc_files=True)
