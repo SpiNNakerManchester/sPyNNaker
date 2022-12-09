@@ -312,7 +312,7 @@ class ConvolutionConnector(AbstractConnector):
 
         return connected
 
-    def get_n_incoming_slices(self, source_vertex, target_vertex):
+    def get_max_n_incoming_slices(self, source_vertex, target_vertex):
         pre_slices = list(source_vertex.splitter.get_out_going_slices())
         pre_slices_x = [vtx_slice.get_slice(0) for vtx_slice in pre_slices]
         pre_slices_y = [vtx_slice.get_slice(1) for vtx_slice in pre_slices]
@@ -321,8 +321,8 @@ class ConvolutionConnector(AbstractConnector):
         pres_as_posts = self.__pre_as_post(pre_ranges)
         hlf_k_w, hlf_k_h = numpy.array(self.__kernel_weights.shape) // 2
 
-        n_connected = 0
-        for post_slice in target_vertex.splitter.get_out_going_slices():
+        max_connected = 0
+        for post_slice in target_vertex.splitter.get_in_coming_slices():
             post_slice_x = post_slice.get_slice(0)
             post_slice_y = post_slice.get_slice(1)
 
@@ -340,9 +340,10 @@ class ConvolutionConnector(AbstractConnector):
                 numpy.any(pres_as_posts[:, 1] < [min_x, min_y], axis=1))
             # When both things are true, we have a vertex in range
             pre_in_range = numpy.logical_and(start_in_range, end_in_range)
-            n_connected += pre_in_range.sum()
+            n_connected = pre_in_range.sum()
+            max_connected = max(max_connected, n_connected)
 
-        return n_connected
+        return max_connected
 
     def __pre_as_post(self, pre_coords):
         """ Write pre coords as post coords.
