@@ -32,8 +32,8 @@ from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 SOURCE_KEY_INFO_WORDS = 7
 
 #: The number of 16-bit shorts in the connector struct,
-#: ignoring the source_key_info struct and the weights (which are dynamic)
-CONNECTOR_CONFIG_SHORTS = 12
+#: ignoring the source_key_info struct but including the 32-bit weight index
+CONNECTOR_CONFIG_SHORTS = 14
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -361,86 +361,80 @@ class ConvolutionConnector(AbstractConnector):
         return coords
 
     @property
-    def local_only_n_bytes(self):
+    def kernel_n_bytes(self):
         n_weights = self.__kernel_weights.size
-        if n_weights % 2 != 0:
-            n_weights += 1
+        return n_weights * BYTES_PER_SHORT
 
+    @property
+    def kernel_n_weights(self):
+        return self.__kernel_weights.size
+
+    @property
+    def parameters_n_bytes(self):
         return (
             (SOURCE_KEY_INFO_WORDS * BYTES_PER_WORD) +
-            (CONNECTOR_CONFIG_SHORTS * BYTES_PER_SHORT) +
-            (n_weights * BYTES_PER_SHORT))
+            (CONNECTOR_CONFIG_SHORTS * BYTES_PER_SHORT))
 
-    def write_local_only_data(
-            self, spec, app_edge, vertex_slice, key, mask, n_colour_bits,
-            weight_scales):
+    def get_local_only_data(
+            self, app_edge, vertex_slice, key, mask, n_colour_bits,
+            weight_index):
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
         if self.__pool_stride is not None:
             ps_x, ps_y = self.__pool_stride
 
-        # Write source key info
-        spec.write_value(key, data_type=DataType.UINT32)
-        spec.write_value(mask, data_type=DataType.UINT32)
-        spec.write_value(n_colour_bits, data_type=DataType.UINT32)
+        # Start with source key info
+        values = [key, mask, n_colour_bits]
 
-        # Write the column and row mask and shifts to extract the column and
+        # Add the column and row mask and shifts to extract the column and
         # row from the incoming spike
         if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
             (c_start, _c_end, c_mask, c_shift), \
                 (r_start, _r_end, r_mask, r_shift) = \
                 app_edge.pre_vertex.get_shape_key_fields(vertex_slice)
             start = (c_start, r_start)
-            spec.write_value(c_mask, data_type=DataType.UINT32)
-            spec.write_value(c_shift, data_type=DataType.UINT32)
-            spec.write_value(r_mask, data_type=DataType.UINT32)
-            spec.write_value(r_shift, data_type=DataType.UINT32)
+            values.extend([c_mask, c_shift, r_mask, r_shift])
         else:
             start = vertex_slice.start
             n_bits_col = get_n_bits(vertex_slice.shape[0])
             col_mask = (1 << n_bits_col) - 1
             n_bits_row = get_n_bits(vertex_slice.shape[1])
             row_mask = ((1 << n_bits_row) - 1) << n_bits_col
-            spec.write_value(col_mask, data_type=DataType.UINT32)
-            spec.write_value(0, data_type=DataType.UINT32)
-            spec.write_value(row_mask, data_type=DataType.UINT32)
-            spec.write_value(n_bits_col, data_type=DataType.UINT32)
+            values.extend([col_mask, 0, row_mask, n_bits_col])
 
-        # Write remaining connector details
-        spec.write_value(start[1], data_type=DataType.INT16)
-        spec.write_value(start[0], data_type=DataType.INT16)
-        spec.write_value(kernel_shape[1], data_type=DataType.INT16)
-        spec.write_value(kernel_shape[0], data_type=DataType.INT16)
-        spec.write_value(self.__padding_shape[1], data_type=DataType.INT16)
-        spec.write_value(self.__padding_shape[0], data_type=DataType.INT16)
-        spec.write_value(self.__recip(self.__strides[1]),
-                         data_type=DataType.INT16)
-        spec.write_value(self.__recip(self.__strides[0]),
-                         data_type=DataType.INT16)
-        spec.write_value(self.__recip(ps_y), data_type=DataType.INT16)
-        spec.write_value(self.__recip(ps_x), data_type=DataType.INT16)
-
-        # Write synapse information
+        # Do a new list for remaining connector details as uint16s
         pos_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
             self.__positive_receptor_type)
         neg_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
             self.__negative_receptor_type)
-        spec.write_value(pos_synapse_type, data_type=DataType.UINT16)
-        spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
+        short_values = numpy.array([
+            start[1], start[0],
+            kernel_shape[1], kernel_shape[0],
+            self.__padding_shape[1], self.__padding_shape[0],
+            self.__recip(self.__strides[1]), self.__recip(self.__strides[0]),
+            self.__recip(ps_y), self.__recip(ps_x),
+            pos_synapse_type, neg_synapse_type], dtype="uint16")
 
+        data = [numpy.array(values, dtype="uint32"),
+                short_values.view("uint32"),
+                numpy.array([weight_index], dtype="uint32")]
+        return data
+
+    def get_encoded_kernel_weights(self, app_edge, weight_scales):
         # Encode weights with weight scaling
         encoded_kernel_weights = self.__kernel_weights.flatten()
-        if len(encoded_kernel_weights) % 2 != 0:
-            encoded_kernel_weights = numpy.concatenate(
-                (encoded_kernel_weights, [0]))
         neg_weights = encoded_kernel_weights < 0
         pos_weights = encoded_kernel_weights > 0
+        pos_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
+            self.__positive_receptor_type)
+        neg_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
+            self.__negative_receptor_type)
         encoded_kernel_weights[neg_weights] *= weight_scales[neg_synapse_type]
         encoded_kernel_weights[pos_weights] *= weight_scales[pos_synapse_type]
         kernel_weights = numpy.round(encoded_kernel_weights).astype(
             numpy.int16)
-        spec.write_array(kernel_weights.view(numpy.uint32))
+        return kernel_weights
 
     def __recip(self, v):
         """ Compute the reciprocal of a number as an signed 1-bit integer,
