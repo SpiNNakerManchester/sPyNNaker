@@ -38,14 +38,16 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     """
 
     __slots__ = [
-        "__cached_2d_overlaps"
+        "__cached_2d_overlaps",
+        "__cached_n_incoming"
     ]
 
     def __init__(self):
         # Store the overlaps between 2d vertices to avoid recalculation
         self.__cached_2d_overlaps = dict()
 
-        # Store the merged keys for sources to avoid recalculation
+        # Store the n_incoming to avoid recalcaultion
+        self.__cached_n_incoming = dict()
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
@@ -78,8 +80,12 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             # pylint: disable=protected-access
             app_edge = incoming._projection_edge
 
-            n_incoming = s_info.connector.get_max_n_incoming_slices(
-                app_edge.pre_vertex, app_edge.post_vertex)
+            if app_edge in self.__cached_n_incoming:
+                n_incoming = self.__cached_n_incoming[app_edge]
+            else:
+                n_incoming = s_info.connector.get_max_n_incoming_slices(
+                    app_edge.pre_vertex, app_edge.post_vertex)
+                self.__cached_n_incoming[app_edge] = n_incoming
             n_bytes += s_info.connector.local_only_n_bytes * n_incoming
 
         return ((CONV_CONFIG_N_SHORTS * BYTES_PER_SHORT) + BYTES_PER_WORD +
