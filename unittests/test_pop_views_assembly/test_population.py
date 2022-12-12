@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from unittest import SkipTest
 import pytest
 from pyNN.space import Sphere, RandomStructure
 import pyNN.spiNNaker as sim
