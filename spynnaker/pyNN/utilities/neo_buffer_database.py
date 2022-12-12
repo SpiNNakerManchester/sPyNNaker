@@ -1218,6 +1218,10 @@ class NeoBufferDatabase(BufferDatabase):
             name="segment{}".format(segment_number),
             description=block.description,
             rec_datetime=rec_datetime)
+        for i in range(len(block.segments), segment_number):
+            block.segments.append(neo.Segment(
+                name="segment{}".format(i),
+                description="empty"))
 
         if isinstance(variables, str):
             variables = [variables]
@@ -1229,7 +1233,10 @@ class NeoBufferDatabase(BufferDatabase):
         for variable in variables:
             self._add_deta(cursor, pop_label, variable, view_indexes,
                            segment, block, t_stop)
-        block.segments.append(segment)
+        if segment_number in block.segments:
+            block.segments[segment_number] = segment
+        else:
+            block.segments.append(segment)
 
     @staticmethod
     def array_to_string(indexes):

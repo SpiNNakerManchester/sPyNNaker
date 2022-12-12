@@ -303,9 +303,11 @@ class Recorder(object):
     def cache_data(self):
         """ Store data for later extraction
         """
-        segment_number = SpynnakerDataView.get_segment_counter()
-        self.__data_cache[segment_number] = \
-            NeoBufferDatabase.default_database_file()
+        variables = self.__vertex.get_recording_variables()
+        if variables:
+            segment_number = SpynnakerDataView.get_segment_counter()
+            self.__data_cache[segment_number] = \
+                NeoBufferDatabase.default_database_file()
 
     def __clean_variables(self, variables):
         """ Sorts out variables for processing usage
