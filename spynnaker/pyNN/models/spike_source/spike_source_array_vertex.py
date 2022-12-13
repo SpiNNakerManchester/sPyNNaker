@@ -332,18 +332,6 @@ class SpikeSourceArrayVertex(
             raise KeyError(f"Cannot record {name}")
         return RecordingType.BIT_FIELD
 
-    @overrides(PopulationApplicationVertex.clear_recording_data)
-    def clear_recording_data(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
-        for machine_vertex in self.machine_vertices:
-            placement = SpynnakerDataView.get_placement_of_vertex(
-                machine_vertex)
-            buffer_manager.clear_recorded_data(
-                placement.x, placement.y, placement.p,
-                SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID)
-
     def describe(self):
         """ Returns a human-readable description of the cell or synapse type.
 

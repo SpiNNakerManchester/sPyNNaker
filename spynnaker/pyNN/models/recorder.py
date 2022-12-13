@@ -289,7 +289,7 @@ class Recorder(object):
 
         for previous in range(0, SpynnakerDataView.get_segment_counter()):
             self.__append_previous_segment(
-                block, previous, variables, view_indexes)
+                block, previous, variables, view_indexes, clear)
 
         # add to the segments the new block
         self.__append_current_segment(block, variables, view_indexes, clear)
@@ -370,9 +370,8 @@ class Recorder(object):
         with NeoBufferDatabase() as db:
             segment = db.add_segment(
                 block, self.__population.label, variables, view_indexes)
-
-        if clear:
-            self.__clear_recording(variables)
+            if clear:
+                db.clear_data(self.__population.label, variables)
 
     def __append_empty_segment(self, block, variables, view_indexes):
         # build and empty segment
@@ -415,13 +414,14 @@ class Recorder(object):
         block.segments.append(segment)
 
     def __append_previous_segment(
-            self, block, segment_number, variables, view_indexes):
+            self, block, segment_number, variables, view_indexes, clear):
         """
 
         :param block:
         :param segment_number:
         :param variables:
         :param view_indexes:
+        :param bool clear:
         :return:
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -439,6 +439,8 @@ class Recorder(object):
         with NeoBufferDatabase(self.__data_cache[segment_number]) as db:
             segment = db.add_segment(
                 block, self.__population.label, variables, view_indexes)
+            if clear:
+                db.clear_data(self.__population.label, variables)
 
     def __metadata(self):
         metadata = {
@@ -454,10 +456,6 @@ class Recorder(object):
         metadata['dt'] = SpynnakerDataView.get_simulation_time_step_ms()
         metadata['mpi_processes'] = 1  # meaningless on Spinnaker
         return metadata
-
-    def __clear_recording(self, variables):
-        for variable in variables:
-            self.__vertex.clear_recording_data(variable)
 
     def __add_neo_spiketrains(
             self, segment, spikes, t, n_neurons, recording_start_time,

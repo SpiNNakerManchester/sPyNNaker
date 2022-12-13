@@ -782,21 +782,6 @@ class AbstractPopulationVertex(
             return self.__synapse_recorder.get_recorded_data_type(name)
         raise KeyError(f"It is not possible to record {name}")
 
-    @overrides(PopulationApplicationVertex.clear_recording_data)
-    def clear_recording_data(self, name):
-        if self.__neuron_recorder.is_recordable(name):
-            region = self.__neuron_recorder.get_region(name)
-        elif self.__synapse_recorder.is_recordable(name):
-            region = self.__synapse_recorder.get_region(name)
-        else:
-            raise KeyError(f"It is not possible to record {name}")
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
-        for machine_vertex in self.machine_vertices:
-            placement = SpynnakerDataView.get_placement_of_vertex(
-                machine_vertex)
-            buffer_manager.clear_recorded_data(
-                placement.x, placement.y, placement.p, region)
-
     @property
     def weight_scale(self):
         """

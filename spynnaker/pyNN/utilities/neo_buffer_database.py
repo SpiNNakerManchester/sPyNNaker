@@ -1140,7 +1140,6 @@ class NeoBufferDatabase(BufferDatabase):
                 Typical the Population label corrected for None or
                 duplicate values
 
->>>>>>> e21a27f550207ae2cc73530c8aafef1ad9260de8
         """
         # pylint: disable=too-many-arguments, no-member
         t_start = t_start * quantities.ms
@@ -1407,6 +1406,49 @@ class NeoBufferDatabase(BufferDatabase):
             block.segments[segment_number] = segment
         else:
             block.segments.append(segment)
+
+    def clear_data(self, pop_label, variables):
+        """
+        Gets the data as a Numpy array for one population and variable
+
+        :param str pop_label: The label for the population of interest
+
+            .. note::
+                This is actually the label of the Application Vertex
+                Typical the Population label corrected for None or
+                duplicate values
+
+        :param list(str) variables: names of variable to get data for
+        """
+        with self.transaction() as cursor:
+            for variable in variables:
+                for row in cursor.execute(
+                        """
+                        SELECT rec_id
+                        FROM recording_view
+                        WHERE label = ? AND variable = ?
+                        LIMIT 1
+                        """, (pop_label, variable)):
+                    self.__clear_data(cursor, row["rec_id"])
+
+    def __clear_data(self, cursor, rec_id):
+        for row in cursor.execute(
+                """
+                SELECT region_id, recording_neurons_st
+                FROM region_metadata
+                WHERE rec_id = ?
+                """, (rec_id, )):
+            cursor.execute(
+                """
+                UPDATE region SET
+                    content = CAST('' AS BLOB), content_len = 0,
+                    fetches = 0, append_time = NULL
+                WHERE region_id = ?
+                """, (row["region_id"],))
+            cursor.execute(
+                """
+                DELETE FROM region_extra WHERE region_id = ?
+                """, (row["region_id"],))
 
     @staticmethod
     def array_to_string(indexes):
