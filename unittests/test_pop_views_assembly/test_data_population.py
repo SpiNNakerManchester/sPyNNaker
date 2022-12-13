@@ -133,8 +133,6 @@ class TestDataPopulation(BaseTestCase):
         assert 0 == len(spiketrains[1])
         assert 3 == spiketrains[1].annotations['source_index']
 
-        sim.end()
-
     def test_get_v_view(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "all_data.sqlite3")
@@ -147,8 +145,6 @@ class TestDataPopulation(BaseTestCase):
         target = self.v_expected[:, 1:3]
         assert v.shape == target.shape
         assert numpy.array_equal(v,  target)
-
-        sim.end()
 
     def test_get_v_missing(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
@@ -164,8 +160,6 @@ class TestDataPopulation(BaseTestCase):
             [1, 2], neo.segments[0].filter(name='v')[0].channel_index.index)
         assert v.shape == target.shape
         assert numpy.array_equal(v,  target)
-
-        sim.end()
 
     def test_get_spike_counts(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
@@ -207,8 +201,6 @@ class TestDataPopulation(BaseTestCase):
             v = neo.segments[0].filter(name='v')[0].magnitude
             assert v.shape == self.v_expected.shape
             assert numpy.array_equal(v,  self.v_expected)
-
-        sim.end()
 
     def test_spinnaker_get_data(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
