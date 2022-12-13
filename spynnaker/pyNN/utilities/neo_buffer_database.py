@@ -1423,33 +1423,24 @@ class NeoBufferDatabase(BufferDatabase):
         """
         with self.transaction() as cursor:
             for variable in variables:
-                for row in cursor.execute(
-                        """
-                        SELECT rec_id
-                        FROM recording_view
-                        WHERE label = ? AND variable = ?
-                        LIMIT 1
-                        """, (pop_label, variable)):
-                    self.__clear_data(cursor, row["rec_id"])
-
-    def __clear_data(self, cursor, rec_id):
-        for row in cursor.execute(
-                """
-                SELECT region_id, recording_neurons_st
-                FROM region_metadata
-                WHERE rec_id = ?
-                """, (rec_id, )):
-            cursor.execute(
-                """
-                UPDATE region SET
-                    content = CAST('' AS BLOB), content_len = 0,
-                    fetches = 0, append_time = NULL
-                WHERE region_id = ?
-                """, (row["region_id"],))
-            cursor.execute(
-                """
-                DELETE FROM region_extra WHERE region_id = ?
-                """, (row["region_id"],))
+                cursor.execute(
+                    """
+                    UPDATE region SET
+                        content = CAST('' AS BLOB), content_len = 0,
+                        fetches = 0, append_time = NULL
+                    WHERE region_id in 
+                        (SELECT region_id
+                        FROM region_metadata NATURAL JOIN recording_view
+                        WHERE label = ? AND variable = ?)
+                    """, (pop_label, variable))
+                cursor.execute(
+                    """ 
+                    DELETE FROM region_extra 
+                    WHERE region_id in
+                        (SELECT region_id
+                        FROM region_metadata NATURAL JOIN recording_view
+                        WHERE label = ? AND variable = ?)
+                    """, (pop_label, variable))
 
     @staticmethod
     def array_to_string(indexes):
