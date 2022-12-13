@@ -16,8 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pyNN.spiNNaker as sim
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinnaker_testbase import BaseTestCase
-from spynnaker.pyNN.exceptions import DataNotRecordedException
 
 
 class ExtractingSpikesWhenVOnlySetToRecord(BaseTestCase):
@@ -25,7 +25,7 @@ class ExtractingSpikesWhenVOnlySetToRecord(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     def test_cause_error(self):
-        with self.assertRaises(DataNotRecordedException):
+        with self.assertRaises(ConfigurationException):
             sim.setup(timestep=1.0)
             sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 

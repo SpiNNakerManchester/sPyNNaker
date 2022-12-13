@@ -24,7 +24,6 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import RecordingType
-from spynnaker.pyNN.exceptions import DataNotRecordedException
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 # needed as dealing with quantities
@@ -223,7 +222,8 @@ class Recorder(object):
         :rtype: ~numpy.ndarray
         """
         if not self.__vertex.is_recording_variable(variable):
-            raise DataNotRecordedException(f"Variable {variable} is not being recorded")
+            raise ConfigurationException(
+                f"Variable {variable} is not being recorded")
         var_type = self.__vertex.get_recording_type(variable)
         if var_type == RecordingType.MATRIX:
             return numpy.zeros(0), [], 0
