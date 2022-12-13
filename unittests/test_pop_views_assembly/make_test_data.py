@@ -18,7 +18,6 @@ import os
 import shutil
 from spinn_front_end_common.utilities.base_database import BaseDatabase
 import pyNN.spiNNaker as sim
-from spynnaker.pyNN.data import SpynnakerDataView
 
 
 def make_data(do_view):

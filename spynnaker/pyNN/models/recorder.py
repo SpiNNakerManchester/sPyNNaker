@@ -368,7 +368,7 @@ class Recorder(object):
             return self.__append_empty_segment(block, variables, view_indexes)
 
         with NeoBufferDatabase() as db:
-            segment = db.add_segment(
+            db.add_segment(
                 block, self.__population.label, variables, view_indexes)
             if clear:
                 db.clear_data(self.__population.label, variables)

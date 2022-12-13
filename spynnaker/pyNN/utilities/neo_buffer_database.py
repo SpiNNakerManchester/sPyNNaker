@@ -1337,7 +1337,6 @@ class NeoBufferDatabase(BufferDatabase):
             cursor, block, pop_label, variables, view_indexes)
         return block
 
-
     def add_segment(self, block, pop_label, variables, view_indexes=None):
         """
         Adds a segment to the block

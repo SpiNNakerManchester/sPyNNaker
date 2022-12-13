@@ -74,7 +74,7 @@ class DataPopulation(object):
         if engine is not None:
             logger.warning("Ignoring engine as supported in this mode")
         with NeoBufferDatabase(self.__database_file) as db:
-            _,_, description = db.get_population_metdadata(self.label)
+            _, _, description = db.get_population_metdadata(self.label)
             return description
 
     @overrides(Population.get_data)
@@ -87,7 +87,8 @@ class DataPopulation(object):
             return db.get_block(self.__label, variables, self._indexes,
                                 annotations)
 
-    def _get_recorded_pynn7(self, variable, as_matrix=False, view_indexes=None):
+    def _get_recorded_pynn7(
+            self, variable, as_matrix=False, view_indexes=None):
         """ Get recorded data in PyNN 0.7 format. Must not be spikes.
 
         :param str variable:

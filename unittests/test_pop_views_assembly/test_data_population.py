@@ -22,10 +22,10 @@ import shutil
 from spinn_front_end_common.utilities.base_database import BaseDatabase
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
-import pyNN.spiNNaker as sim
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+
 
 def trim_spikes(spikes, indexes):
     return [[n, t] for [n, t] in spikes if n in indexes]
