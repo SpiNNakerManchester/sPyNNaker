@@ -880,6 +880,8 @@ class NeoBufferDatabase(BufferDatabase):
                 raise NotImplementedError("times differ")
         indexes = numpy.array(pop_neurons)
         order = numpy.argsort(indexes)
+        if pop_data is None:
+            return [], []
         return pop_data[:, order], indexes[order]
 
     def write_matrix_metadata(self, vertex, variable, region, population,
@@ -1014,7 +1016,7 @@ class NeoBufferDatabase(BufferDatabase):
                 cursor, placement.x, placement.y, placement.p, region)
             cursor.execute(
                 """
-                INSERT INTO regions_metadata
+                INSERT INTO region_metadata
                 (rec_id, region_id, vertex_slice)
                  VALUES (?, ?, ?)
                 """, (rec_id, region_id, str(vertex.vertex_slice)))
