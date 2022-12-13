@@ -17,6 +17,7 @@
 
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.exceptions import DataNotRecordedException
 
 
 class ExtractingSpikesWhenVOnlySetToRecord(BaseTestCase):
@@ -24,7 +25,7 @@ class ExtractingSpikesWhenVOnlySetToRecord(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     def test_cause_error(self):
-        with self.assertRaises(KeyError):
+        with self.assertRaises(DataNotRecordedException):
             sim.setup(timestep=1.0)
             sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 

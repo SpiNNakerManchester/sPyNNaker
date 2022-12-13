@@ -85,3 +85,8 @@ class SynapseRowTooBigException(SpynnakerException):
         """ The maximum size allowed.
         """
         return self._max_size
+
+class DataNotRecordedException(SpynnakerException):
+    """
+    Raise on a GetData call that fails likely due to record never being called
+    """

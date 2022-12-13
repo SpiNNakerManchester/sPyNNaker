@@ -24,6 +24,7 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import RecordingType
+from spynnaker.pyNN.exceptions import DataNotRecordedException
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 # needed as dealing with quantities
@@ -222,7 +223,7 @@ class Recorder(object):
         :rtype: ~numpy.ndarray
         """
         if not self.__vertex.is_recording_variable(variable):
-            raise KeyError(f"Variable {variable} is not being recorded")
+            raise DataNotRecordedException(f"Variable {variable} is not being recorded")
         var_type = self.__vertex.get_recording_type(variable)
         if var_type == RecordingType.MATRIX:
             return numpy.zeros(0), [], 0
@@ -280,6 +281,9 @@ class Recorder(object):
             annotations to put on the Neo block
         :return: The Neo block
         :rtype: ~neo.core.Block
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording not setup correctly
         """
         block = neo.Block()
 
@@ -332,6 +336,17 @@ class Recorder(object):
         return variables
 
     def __append_current_segment(self, block, variables, view_indexes, clear):
+        """
+
+        :param block:
+        :param variables:
+        :param view_indexes:
+        :param clear:
+        :return:
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording not setup correctly
+        """
         SpynnakerDataView.check_user_can_act()
 
         if not SpynnakerDataView.is_ran_last():
@@ -401,6 +416,17 @@ class Recorder(object):
 
     def __append_previous_segment(
             self, block, segment_number, variables, view_indexes):
+        """
+
+        :param block:
+        :param segment_number:
+        :param variables:
+        :param view_indexes:
+        :return:
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording not setup correctly
+        """
         if segment_number not in self.__data_cache:
             logger.warning("No Data available for Segment {}", segment_number)
             segment = neo.Segment(

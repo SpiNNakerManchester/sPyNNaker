@@ -31,6 +31,7 @@ from spinn_front_end_common.interface.buffer_management.storage_objects \
     import BufferDatabase
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 
 
@@ -126,6 +127,9 @@ class NeoBufferDatabase(BufferDatabase):
         :param ~sqlite3.Cursor cursor:
         :return: segment number, record time, and last run time recorded
         :rtype int, datatime, float
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
         """
         for row in cursor.execute(
                 """
@@ -136,7 +140,7 @@ class NeoBufferDatabase(BufferDatabase):
             t_str = str(row["rec_datetime"], "utf-8")
             time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
             return row["segment_number"], time, row["t_stop"]
-        raise Exception("No segment data")
+        raise ConfigurationException("No segment data")
 
     def __get_simulation_time_step_ms(self, cursor):
         """
@@ -155,6 +159,7 @@ class NeoBufferDatabase(BufferDatabase):
                 LIMIT 1
                 """):
             return row["simulation_time_step_ms"]
+        raise ConfigurationException("No segment data")
 
     def __get_population_id(
             self, cursor, pop_label, population):
@@ -257,6 +262,9 @@ class NeoBufferDatabase(BufferDatabase):
 
         :return: population size, first id and description
         :rtype: (int, int, str)
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
         """
         for row in cursor.execute(
                 """
@@ -267,7 +275,7 @@ class NeoBufferDatabase(BufferDatabase):
                 """, (pop_label,)):
             return (int(row["pop_size"]), int(row["first_id"]),
                     str(row["description"], 'utf-8'))
-        raise KeyError(f"No metedata for {pop_label}")
+        raise ConfigurationException(f"No metadata for {pop_label}")
 
     def get_population_metdadata(self, pop_label):
         """
@@ -282,6 +290,9 @@ class NeoBufferDatabase(BufferDatabase):
 
         :return: population size, first id and description
         :rtype: (int, int, str)
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
         """
         with self.transaction() as cursor:
             return self.__get_population_metadata(cursor, pop_label)
@@ -396,6 +407,9 @@ class NeoBufferDatabase(BufferDatabase):
         :return: datatype, t_start, sampling_interval_ms, first_id, pop_size,
             units
         :rtype: (DataType, float, float, int, int, str)
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
         """
         with self.transaction() as cursor:
             info = self.__get_recording_metadeta(cursor, pop_label, variable)
@@ -420,6 +434,9 @@ class NeoBufferDatabase(BufferDatabase):
         :return: id, datatype, retrieval function type,  t_start,
                  sampling_interval_ms, first_id, pop_size, units
         :rtype: (int, DataType, RetrievalFunction, float, float, int, int, str)
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
         """
         for row in cursor.execute(
                 """
@@ -442,7 +459,8 @@ class NeoBufferDatabase(BufferDatabase):
             return (row["rec_id"], data_type, function, row["t_start"],
                     row["sampling_interval_ms"], row["first_id"],
                     row["pop_size"], units)
-        raise KeyError(f"No metedata for {variable} on {pop_label}")
+        raise ConfigurationException(
+            f"No metadata for {variable} on {pop_label}")
 
     def __get_spikes_by_region(
             self, cursor, region_id, neurons, simulation_time_step_ms,
@@ -1215,7 +1233,9 @@ class NeoBufferDatabase(BufferDatabase):
         :param ~neo.core.Block block: neo block
         :param ~neo.core.Segment segment: Segment to add data to
         :param float t_stop
-
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
         """
         (rec_id, data_type, function, t_start, sampling_interval_ms,
          first_id, pop_size, units) = self.__get_recording_metadeta(
@@ -1270,6 +1290,9 @@ class NeoBufferDatabase(BufferDatabase):
         :type annotations: None or dict(str, ...)
         :return: The Neo block
         :rtype: ~neo.core.Block
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
         """
         block = neo.Block()
 
@@ -1319,6 +1342,9 @@ class NeoBufferDatabase(BufferDatabase):
         :param view_indexes: List of neurons ids to include or None for all
         :type view_indexes: None or list(int)
         :return: Segment with the requested data
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
         """
         with self.transaction() as cursor:
             self.__add_segment(
@@ -1341,6 +1367,9 @@ class NeoBufferDatabase(BufferDatabase):
         :type variables: str, list(str) or None
         :param view_indexes: List of neurons ids to include or None for all
         :type view_indexes: None or list(int)
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
         """
         segment_number, rec_datetime, t_stop = \
             self.__get_segment_info(cursor)
