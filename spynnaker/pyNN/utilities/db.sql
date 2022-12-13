@@ -50,47 +50,16 @@ CREATE TABLE IF NOT EXISTS segment(
     t_stop FLOAT,
     rec_datetime TIMESTAMP NOT NULL);
 
-CREATE TABLE IF NOT EXISTS spikes_metadata(
-    spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE IF NOT EXISTS region_metadata(
+    region_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
     rec_id INTEGER NOT NULL
 		REFERENCES recording(rec_id) ON DELETE RESTRICT,
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
-    neurons_st TEXT NOT NULL,
-    selective_recording BOOLEAN NOT NULL);
+    recording_neurons_st TEXT,
+    selective_recording BOOLEAN,
+    base_key INT,
+    vertex_slice TEXT,
+    atoms_shape TEXT,
+    n_colour_bits INT);
 
-CREATE TABLE IF NOT EXISTS eieio_spikes_metadata(
-    eieio_spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    rec_id INTEGER NOT NULL
-		REFERENCES recording(rec_id) ON DELETE RESTRICT,
-    region_id INTEGER NOT NULL
-		REFERENCES region(region_id) ON DELETE RESTRICT,
-    base_key INT NOT NULL,
-    vertex_slice TEXT NOT NULL,
-    atoms_shape TEXT NOT NULL,
-    n_colour_bits INT NOT NULL);
-
-CREATE TABLE IF NOT EXISTS multi_spikes_metadata(
-    multi_spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    rec_id INTEGER NOT NULL
-		REFERENCES recording(rec_id) ON DELETE RESTRICT,
-    region_id INTEGER NOT NULL
-		REFERENCES region(region_id) ON DELETE RESTRICT,
-    vertex_slice TEXT NOT NULL,
-    atoms_shape TEXT NOT NULL);
-
-CREATE TABLE IF NOT EXISTS matrix_metadata(
-    spikes_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    rec_id INTEGER NOT NULL
-		REFERENCES recording(rec_id) ON DELETE RESTRICT,
-    region_id INTEGER NOT NULL
-		REFERENCES region(region_id) ON DELETE RESTRICT,
-    neurons_st TEXT NOT NULL);
-
-CREATE TABLE IF NOT EXISTS rewires_metadata(
-    rewires_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    rec_id INTEGER NOT NULL
-		REFERENCES recording(rec_id) ON DELETE RESTRICT,
-    region_id INTEGER NOT NULL
-		REFERENCES region(region_id) ON DELETE RESTRICT,
-    vertex_slice TEXT NOT NULL);

@@ -522,13 +522,14 @@ class NeoBufferDatabase(BufferDatabase):
         simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
         rows = list(cursor.execute(
             """
-            SELECT region_id, neurons_st, selective_recording
-            FROM spikes_metadata
+            SELECT region_id, recording_neurons_st, selective_recording
+            FROM region_metadata
             WHERE rec_id = ?
             """, [rec_id]))
         indexes = []
         for row in rows:
-            neurons = numpy.array(self.string_to_array(row["neurons_st"]))
+            neurons = numpy.array(self.string_to_array(
+                row["recording_neurons_st"]))
             indexes.extend(neurons)
 
             self.__get_spikes_by_region(
@@ -562,14 +563,15 @@ class NeoBufferDatabase(BufferDatabase):
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             region_id = self._get_region_id(
                 cursor, placement.x, placement.y, placement.p, region)
-            neurons_st = self.array_to_string(neurons)
+            recording_neurons_st = self.array_to_string(neurons)
             selective_recording = (len(neurons) != vertex.vertex_slice.n_atoms)
             cursor.execute(
                 """
-                INSERT INTO spikes_metadata
-                (rec_id, region_id, neurons_st, selective_recording)
+                INSERT INTO region_metadata
+                (rec_id, region_id, recording_neurons_st, selective_recording)
                  VALUES (?, ?, ?, ?)
-                """, (rec_id, region_id, neurons_st, selective_recording))
+                """,
+                (rec_id, region_id, recording_neurons_st, selective_recording))
 
     def __get_eieio_spike_by_region(
             self, cursor, region_id, simulation_time_step_ms, base_key,
@@ -635,7 +637,7 @@ class NeoBufferDatabase(BufferDatabase):
             """
             SELECT region_id, base_key, vertex_slice, atoms_shape,
                    n_colour_bits
-            FROM eieio_spikes_metadata
+            FROM region_metadata
             WHERE rec_id = ?
             """, [rec_id]))
 
@@ -683,7 +685,7 @@ class NeoBufferDatabase(BufferDatabase):
 
             cursor.execute(
                 """
-                INSERT INTO eieio_spikes_metadata
+                INSERT INTO region_metadata
                 (rec_id, region_id, base_key, vertex_slice, atoms_shape,
                  n_colour_bits)
                  VALUES (?, ?, ?, ?, ?, ?)
@@ -750,7 +752,7 @@ class NeoBufferDatabase(BufferDatabase):
         rows = list(cursor.execute(
             """
             SELECT region_id, vertex_slice, atoms_shape
-            FROM multi_spikes_metadata
+            FROM region_metadata
             WHERE rec_id = ?
             """, [rec_id]))
 
@@ -796,7 +798,7 @@ class NeoBufferDatabase(BufferDatabase):
 
             cursor.execute(
                 """
-                INSERT INTO multi_spikes_metadata
+                INSERT INTO region_metadata
                 (rec_id, region_id, vertex_slice, atoms_shape)
                  VALUES (?, ?, ?, ?)
                 """,
@@ -854,13 +856,14 @@ class NeoBufferDatabase(BufferDatabase):
 
         rows = list(cursor.execute(
             """
-            SELECT region_id, neurons_st
-            FROM matrix_metadata
+            SELECT region_id, recording_neurons_st
+            FROM region_metadata
             WHERE rec_id = ?
             """, [rec_id]))
 
         for row in rows:
-            neurons = numpy.array(self.string_to_array(row["neurons_st"]))
+            neurons = numpy.array(self.string_to_array(
+                row["recording_neurons_st"]))
 
             neurons, times, data = \
                 self.__get_matrix_data_by_region(
@@ -906,13 +909,13 @@ class NeoBufferDatabase(BufferDatabase):
             placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             region_id = self._get_region_id(
                 cursor, placement.x, placement.y, placement.p, region)
-            neurons_st = self.array_to_string(neurons)
+            recording_neurons_st = self.array_to_string(neurons)
             cursor.execute(
                 """
-                INSERT INTO matrix_metadata
-                (rec_id, region_id, neurons_st)
+                INSERT INTO region_metadata
+                (rec_id, region_id, recording_neurons_st)
                  VALUES (?, ?, ?)
-                """, (rec_id, region_id, neurons_st))
+                """, (rec_id, region_id, recording_neurons_st))
 
     def __get_rewires_by_region(
             self, cursor, region_id, vertex_slice, rewire_values,
@@ -973,7 +976,7 @@ class NeoBufferDatabase(BufferDatabase):
         rows = list(cursor.execute(
             """
             SELECT region_id, vertex_slice
-            FROM rewires_metadata
+            FROM region_metadata
             WHERE rec_id = ?
             """, [rec_id]))
 
@@ -1011,7 +1014,7 @@ class NeoBufferDatabase(BufferDatabase):
                 cursor, placement.x, placement.y, placement.p, region)
             cursor.execute(
                 """
-                INSERT INTO rewires_metadata
+                INSERT INTO regions_metadata
                 (rec_id, region_id, vertex_slice)
                  VALUES (?, ?, ?)
                 """, (rec_id, region_id, str(vertex.vertex_slice)))
