@@ -190,7 +190,7 @@ class Recorder(object):
         ids = self.__vertex.get_recording_indices(variable)
         if view_indexes is None:
             if len(ids) != self.__vertex.n_atoms:
-                warn_once(logger, self._SELECTIVE_RECORDED_MSG)
+                warn_once(logger, self.SELECTIVE_RECORDED_MSG)
             indexes = ids
         elif view_indexes == list(ids):
             indexes = ids
@@ -494,7 +494,7 @@ class Recorder(object):
                 source_index=index)
             segment.spiketrains.append(spiketrain)
 
-    _SELECTIVE_RECORDED_MSG = (
+    SELECTIVE_RECORDED_MSG  = (
         "Getting data on a whole population when selective recording is "
         "active will result in only the requested neurons being returned "
         "in numerical order and without repeats.")
@@ -525,7 +525,7 @@ class Recorder(object):
         sampling_period = sampling_interval * quantities.ms
         if view_indexes is None:
             if len(data_indexes) != self.__population.size:
-                warn_once(logger, self._SELECTIVE_RECORDED_MSG)
+                warn_once(logger, self.SELECTIVE_RECORDED_MSG)
             indexes = numpy.array(data_indexes)
         elif list(view_indexes) == list(data_indexes):
             indexes = numpy.array(data_indexes)

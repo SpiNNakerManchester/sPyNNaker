@@ -33,7 +33,7 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
-
+from spynnaker.pyNN.models.recorder import Recorder
 
 class RetrievalFunction(Enum):
     """
@@ -1147,8 +1147,8 @@ class NeoBufferDatabase(BufferDatabase):
         t_start = t_start * quantities.ms
         sampling_period = sampling_interval_ms * quantities.ms
         if view_indexes is None:
-            # if len(data_indexes) != self.__population.size:
-            #    warn_once(logger, self._SELECTIVE_RECORDED_MSG)
+            if len(data_indexes) != self.__population.size:
+                warn_once(logger, Recorder.SELECTIVE_RECORDED_MSG)
             indexes = numpy.array(data_indexes)
         elif list(view_indexes) == list(data_indexes):
             indexes = numpy.array(data_indexes)
@@ -1428,14 +1428,14 @@ class NeoBufferDatabase(BufferDatabase):
                     UPDATE region SET
                         content = CAST('' AS BLOB), content_len = 0,
                         fetches = 0, append_time = NULL
-                    WHERE region_id in 
+                    WHERE region_id in
                         (SELECT region_id
                         FROM region_metadata NATURAL JOIN recording_view
                         WHERE label = ? AND variable = ?)
                     """, (pop_label, variable))
                 cursor.execute(
-                    """ 
-                    DELETE FROM region_extra 
+                    """
+                    DELETE FROM region_extra
                     WHERE region_id in
                         (SELECT region_id
                         FROM region_metadata NATURAL JOIN recording_view
