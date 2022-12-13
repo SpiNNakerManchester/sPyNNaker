@@ -1130,6 +1130,14 @@ class NeoBufferDatabase(BufferDatabase):
         :type units: quantities.quantity.Quantity or str
         :param int first_id:
         :return:
+        :param str pop_label: The label for the population of interest
+
+            .. note::
+                This is actually the label of the Application Vertex
+                Typical the Population label corrected for None or
+                duplicate values
+
+>>>>>>> e21a27f550207ae2cc73530c8aafef1ad9260de8
         """
         # pylint: disable=too-many-arguments, no-member
         t_start = t_start * quantities.ms
