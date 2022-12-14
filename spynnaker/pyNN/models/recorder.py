@@ -190,7 +190,7 @@ class Recorder(object):
         ids = self.__vertex.get_recording_indices(variable)
         if view_indexes is None:
             if len(ids) != self.__vertex.n_atoms:
-                warn_once(logger, self.SELECTIVE_RECORDED_MSG)
+                warn_once(logger, self._SELECTIVE_RECORDED_MSG)
             indexes = ids
         elif view_indexes == list(ids):
             indexes = ids
@@ -215,24 +215,6 @@ class Recorder(object):
                 numpy.tile(times, n_neurons),
                 numpy.transpose(data).reshape(column_length)))
 
-    def __get_empty_data(self, variable):
-        """ Get an empty array for the given recording type
-
-        :param str variable: the variable to get the array for
-        :rtype: ~numpy.ndarray
-        """
-        if not self.__vertex.is_recording_variable(variable):
-            raise ConfigurationException(
-                f"Variable {variable} is not being recorded")
-        var_type = self.__vertex.get_recording_type(variable)
-        if var_type == RecordingType.MATRIX:
-            return numpy.zeros(0), [], 0
-        if var_type == RecordingType.BIT_FIELD:
-            return numpy.zeros((0, 2))
-        if var_type == RecordingType.EVENT:
-            return numpy.zeros((0, 4))
-        raise ValueError(f"Unknown type {var_type}")
-
     def get_data(self, variable):
         """ Get the data for the given variable with safety checks
 
@@ -240,26 +222,6 @@ class Recorder(object):
         :rtype: ~numpy.ndarray
         """
         SpynnakerDataView.check_user_can_act()
-
-        if not SpynnakerDataView.is_ran_last():
-            if SpynnakerDataView.is_ran_ever():
-                logger.warning(
-
-                    f"The simulation has been reset, therefore {variable} "
-                    f"cannot be retrieved, hence the list/last segment list "
-                    f"will be empty")
-            else:
-                logger.warning(
-                    f"The simulation has not yet run, therefore {variable} "
-                    f"cannot be retrieved, hence the list will be empty")
-            return self.__get_empty_data(variable)
-
-        if get_config_bool("Machine", "virtual_board"):
-            logger.warning(
-                "The simulation is using a virtual machine and so has not "
-                "truly ran, hence the list will be empty")
-            return self.__get_empty_data(variable)
-
         return self.__vertex.get_recorded_data(variable)
 
     def turn_off_all_recording(self, indexes=None):
@@ -349,69 +311,11 @@ class Recorder(object):
         """
         SpynnakerDataView.check_user_can_act()
 
-        if not SpynnakerDataView.is_ran_last():
-            if SpynnakerDataView.is_ran_ever():
-                logger.warning(
-                    "The simulation has been reset, therefore data "
-                    "cannot be retrieved, hence the list/last segment list "
-                    "will be empty")
-            else:
-                logger.warning(
-                    "The simulation has not yet run, therefore data "
-                    "cannot be retrieved, hence the list will be empty")
-            return self.__append_empty_segment(block, variables, view_indexes)
-
-        if get_config_bool("Machine", "virtual_board"):
-            logger.warning(
-                "The simulation is using a virtual machine and so has not "
-                "truly ran, hence the list will be empty")
-            return self.__append_empty_segment(block, variables, view_indexes)
-
         with NeoBufferDatabase() as db:
             db.add_segment(
                 block, self.__population.label, variables, view_indexes)
             if clear:
                 db.clear_data(self.__population.label, variables)
-
-    def __append_empty_segment(self, block, variables, view_indexes):
-        # build and empty segment
-        segment = neo.Segment(
-            name="segment{}".format(SpynnakerDataView.get_segment_counter()),
-            description=self.__population.describe(),
-            rec_datetime=datetime.now())
-
-        # sort out variables for using
-        variables = self.__clean_variables(variables)
-
-        for variable in variables:
-            data = self.__get_empty_data(variable)
-            s_intrval = self.__vertex.get_recording_sampling_interval(variable)
-            var_type = self.__vertex.get_recording_type(variable)
-            if var_type == RecordingType.BIT_FIELD:
-                self.__add_neo_spiketrains(
-                    segment=segment, spikes=data,
-                    t=SpynnakerDataView.get_current_run_time_ms(),
-                    n_neurons=self.__population.size,
-                    recording_start_time=self.__recording_start_time,
-                    sampling_interval=s_intrval, indexes=view_indexes,
-                    label=self.__population.label)
-            elif var_type == RecordingType.EVENT:
-                self.__add_neo_events(
-                    segment=segment, event_array=data, variable=variable,
-                    recording_start_time=self.__recording_start_time)
-            elif var_type == RecordingType.MATRIX:
-                indices = self.__vertex.get_recording_indices(variable)
-                self.__add_neo_analog_signals(
-                    segment=segment, block=block, signal_array=data,
-                    data_indexes=indices, view_indexes=view_indexes,
-                    variable=variable,
-                    recording_start_time=self.__recording_start_time,
-                    sampling_interval=s_intrval,
-                    units=self.__vertex.get_units(variable),
-                    label=self.__population.label)
-            else:
-                raise ValueError(f"Unknown recording type {var_type}")
-        block.segments.append(segment)
 
     def __append_previous_segment(
             self, block, segment_number, variables, view_indexes, clear):
@@ -494,7 +398,7 @@ class Recorder(object):
                 source_index=index)
             segment.spiketrains.append(spiketrain)
 
-    SELECTIVE_RECORDED_MSG  = (
+    _SELECTIVE_RECORDED_MSG = (
         "Getting data on a whole population when selective recording is "
         "active will result in only the requested neurons being returned "
         "in numerical order and without repeats.")
@@ -525,7 +429,7 @@ class Recorder(object):
         sampling_period = sampling_interval * quantities.ms
         if view_indexes is None:
             if len(data_indexes) != self.__population.size:
-                warn_once(logger, self.SELECTIVE_RECORDED_MSG)
+                warn_once(logger, self._SELECTIVE_RECORDED_MSG)
             indexes = numpy.array(data_indexes)
         elif list(view_indexes) == list(data_indexes):
             indexes = numpy.array(data_indexes)

@@ -16,6 +16,7 @@
 from collections import defaultdict
 from datetime import datetime
 from enum import (auto, Enum)
+import logging
 import math
 import neo
 import numpy
@@ -23,6 +24,7 @@ import os
 import quantities
 import struct
 import re
+from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from data_specification.enums import DataType
 from pacman.model.graphs.common import Slice
@@ -33,7 +35,9 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.recorder import Recorder
+
+logger = FormatAdapter(logging.getLogger(__name__))
+
 
 class RetrievalFunction(Enum):
     """
@@ -139,8 +143,14 @@ class NeoBufferDatabase(BufferDatabase):
                 """):
             t_str = str(row["rec_datetime"], "utf-8")
             time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
+            if row["t_stop"] is None:
+                t_stop = 0
+                logger.warning("Data from a virtual run will be empty")
+            else:
+                t_stop = int(row["t_stop"])
             return row["segment_number"], time, row["t_stop"]
-        raise ConfigurationException("No segment data")
+        raise ConfigurationException(
+            "No recorded data. Did the simulation run?")
 
     def __get_simulation_time_step_ms(self, cursor):
         """
@@ -1037,6 +1047,8 @@ class NeoBufferDatabase(BufferDatabase):
         :rtype  ~numpy.ndarray
         """
         with self.transaction() as cursor:
+            # called to trigger the virtual data warning if applicable
+            self.__get_segment_info(cursor)
             (rec_id, data_type, function, t_start, sampling_interval_ms,
              first_id, pop_size, units) = self.__get_recording_metadeta(
                 cursor, pop_label, variable)
@@ -1146,11 +1158,7 @@ class NeoBufferDatabase(BufferDatabase):
         # pylint: disable=too-many-arguments, no-member
         t_start = t_start * quantities.ms
         sampling_period = sampling_interval_ms * quantities.ms
-        if view_indexes is None:
-            if len(data_indexes) != self.__population.size:
-                warn_once(logger, Recorder.SELECTIVE_RECORDED_MSG)
-            indexes = numpy.array(data_indexes)
-        elif list(view_indexes) == list(data_indexes):
+        if list(view_indexes) == list(data_indexes):
             indexes = numpy.array(data_indexes)
         else:
             # keep just the view indexes in the data
@@ -1158,6 +1166,12 @@ class NeoBufferDatabase(BufferDatabase):
             # keep just data columns in the view
             map_indexes = [list(data_indexes).index(i) for i in indexes]
             signal_array = signal_array[:, map_indexes]
+            view_set = set(view_indexes)
+            missing = view_set.difference(data_indexes)
+            if missing:
+                missing_list = list(missing)
+                missing_list.sort()
+                logger.warning(f"No data available for indexes {missing_list}")
 
         ids = list(map(lambda x: x+first_id, indexes))
         if units is None:
@@ -1428,14 +1442,14 @@ class NeoBufferDatabase(BufferDatabase):
                     UPDATE region SET
                         content = CAST('' AS BLOB), content_len = 0,
                         fetches = 0, append_time = NULL
-                    WHERE region_id in
+                    WHERE region_id in 
                         (SELECT region_id
                         FROM region_metadata NATURAL JOIN recording_view
                         WHERE label = ? AND variable = ?)
                     """, (pop_label, variable))
                 cursor.execute(
-                    """
-                    DELETE FROM region_extra
+                    """ 
+                    DELETE FROM region_extra 
                     WHERE region_id in
                         (SELECT region_id
                         FROM region_metadata NATURAL JOIN recording_view

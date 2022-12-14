@@ -502,5 +502,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     @overrides(AbstractSpinnakerBase._execute_buffer_extractor)
     def _execute_buffer_extractor(self):
         super()._execute_buffer_extractor()
-        with NeoBufferDatabase() as db:
-            db.write_t_stop()
+        if not get_config_bool("Machine", "virtual_board"):
+            with NeoBufferDatabase() as db:
+                db.write_t_stop()
