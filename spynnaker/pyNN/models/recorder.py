@@ -312,10 +312,16 @@ class Recorder(object):
         SpynnakerDataView.check_user_can_act()
 
         with NeoBufferDatabase() as db:
-            db.add_segment(
-                block, self.__population.label, variables, view_indexes)
-            if clear:
-                db.clear_data(self.__population.label, variables)
+            if SpynnakerDataView.is_reset_last():
+                logger.warning(
+                    "Due to the call directly after reset. "
+                    "The data will only contain "
+                    f"{SpynnakerDataView.get_segment_counter()-1} segments")
+            else:
+                db.add_segment(
+                    block, self.__population.label, variables, view_indexes)
+                if clear:
+                    db.clear_data(self.__population.label, variables)
 
     def __append_previous_segment(
             self, block, segment_number, variables, view_indexes, clear):
