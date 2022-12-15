@@ -149,7 +149,7 @@ class NeoBufferDatabase(BufferDatabase):
                 logger.warning("Data from a virtual run will be empty")
             else:
                 t_stop = int(row["t_stop"])
-            return row["segment_number"], time, row["t_stop"]
+            return row["segment_number"], time, t_stop
         raise ConfigurationException(
             "No recorded data. Did the simulation run?")
 
@@ -1536,14 +1536,14 @@ class NeoBufferDatabase(BufferDatabase):
                     UPDATE region SET
                         content = CAST('' AS BLOB), content_len = 0,
                         fetches = 0, append_time = NULL
-                    WHERE region_id in 
+                    WHERE region_id in
                         (SELECT region_id
                         FROM region_metadata NATURAL JOIN recording_view
                         WHERE label = ? AND variable = ?)
                     """, (pop_label, variable))
                 cursor.execute(
-                    """ 
-                    DELETE FROM region_extra 
+                    """
+                    DELETE FROM region_extra
                     WHERE region_id in
                         (SELECT region_id
                         FROM region_metadata NATURAL JOIN recording_view

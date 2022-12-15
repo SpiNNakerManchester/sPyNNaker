@@ -20,7 +20,6 @@ from spinn_utilities.ranged.abstract_sized import AbstractSized
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.populations import Population
-from spynnaker.pyNN.utilities.constants import SPIKES
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__file__))

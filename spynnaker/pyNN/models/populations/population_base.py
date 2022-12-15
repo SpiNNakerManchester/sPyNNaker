@@ -442,4 +442,3 @@ class PopulationBase(object, metaclass=AbstractBase):
             warn_once(
                 logger, "annotations parameter is not standard PyNN so may "
                         "not be supported by all platforms.")
-

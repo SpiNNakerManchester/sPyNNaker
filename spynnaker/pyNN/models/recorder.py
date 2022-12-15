@@ -17,13 +17,11 @@ import logging
 import numpy
 import neo
 import quantities
-from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import RecordingType
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 # needed as dealing with quantities
