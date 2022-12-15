@@ -222,7 +222,7 @@ static inline bool process_fixed_synapses(
         uint32_t synaptic_word = *synaptic_words++;
 
         // If the delay is too small, skip
-        if ((synaptic_word & synapse_delay_mask_shifted) < colour_delay_shifted) {
+        if ((synaptic_word & synapse_delay_mask_shifted) <= colour_delay_shifted) {
             skipped_synapses++;
             continue;
         }
