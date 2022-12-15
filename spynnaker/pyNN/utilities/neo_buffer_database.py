@@ -35,6 +35,7 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.utilities.constants import SPIKES
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -518,7 +519,7 @@ class NeoBufferDatabase(BufferDatabase):
             spike_ids.extend(indices)
             spike_times.extend(times)
 
-    def __get_spikes(self, cursor, rec_id):
+    def __get_neuron_spikes(self, cursor, rec_id):
         """
         Gets the spikes for this population/recording id
 
@@ -815,6 +816,46 @@ class NeoBufferDatabase(BufferDatabase):
                 (rec_id, region_id, str(vertex.vertex_slice),
                  str(vertex.app_vertex.atoms_shape)))
 
+    def __combine_indexes(self, view_indexes, data_indexes):
+        # keep just the view indexes in the data
+        indexes = [i for i in view_indexes if i in data_indexes]
+        # check for missing and report
+        view_set = set(view_indexes)
+        missing = view_set.difference(data_indexes)
+        if missing:
+            missing_list = list(missing)
+            missing_list.sort()
+            logger.warning(f"No data available for neurons {missing_list}")
+        return indexes
+
+    def __get_spikes(self, cursor, rec_id, view_indexes, function):
+        """
+        Gets the data as a Numpy array for one opulation and variable
+
+        :param ~sqlite3.Cursor cursor:
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
+        """
+        if function == RetrievalFunction.Neuron_spikes:
+            spikes, data_indexes = self.__get_neuron_spikes(cursor, rec_id)
+        elif function == RetrievalFunction.EIEIO_spikes:
+            spikes, data_indexes = self.__get_eieio_spikes(cursor, rec_id)
+        elif function == RetrievalFunction.Multi_spike:
+            spikes, data_indexes = self.__get_multi_spikes(cursor, rec_id)
+        else:
+            raise NotImplementedError(function)
+
+        if list(view_indexes) == list(data_indexes):
+            indexes = numpy.array(data_indexes)
+        else:
+            # keep just the view indexes in the data
+            indexes = self.__combine_indexes(view_indexes, data_indexes)
+            # keep just data columns in the view
+            spikes = spikes[numpy.isin(spikes[:, 0], indexes)]
+
+        return spikes, indexes
+
     def __get_matrix_data_by_region(
             self, cursor, region_id, neurons, data_type):
         """
@@ -850,17 +891,19 @@ class NeoBufferDatabase(BufferDatabase):
 
         return neurons, times, placement_data
 
-    def __get_matrix_data(self, cursor, rec_id, data_type):
+    def __get_matrix_data(self, cursor, rec_id, data_type, view_indexes):
         """
         Gets the matrix data  for this population/recording id
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :param DataType data_type: type of data to extract
+        :param  list(int) view_indexes:
+            The indexes for which data should be returned.
         :return: numpy array of the data, neurons
         :rtype: tuple(~numpy.ndarray, list(int))
         """
-        pop_data = None
+        signal_array = None
         pop_times = None
         pop_neurons = []
 
@@ -880,19 +923,28 @@ class NeoBufferDatabase(BufferDatabase):
                     cursor, row["region_id"], neurons, data_type)
 
             pop_neurons.extend(neurons)
-            if pop_data is None:
-                pop_data = data
+            if signal_array is None:
+                signal_array = data
                 pop_times = times
             elif numpy.array_equal(pop_times, times):
-                pop_data = numpy.append(
-                    pop_data, data, axis=1)
+                signal_array = numpy.append(
+                    signal_array, data, axis=1)
             else:
                 raise NotImplementedError("times differ")
-        indexes = numpy.array(pop_neurons)
-        order = numpy.argsort(indexes)
-        if pop_data is None:
-            return [], []
-        return pop_data[:, order], indexes[order]
+        data_indexes = numpy.array(pop_neurons)
+        if signal_array is None:
+            signal_array = []
+
+        if list(view_indexes) == list(data_indexes):
+            indexes = numpy.array(data_indexes)
+        else:
+            # keep just the view indexes in the data
+            indexes = self.__combine_indexes(view_indexes, data_indexes)
+            # keep just data columns in the view
+            map_indexes = [list(data_indexes).index(i) for i in indexes]
+            signal_array = signal_array[:, map_indexes]
+
+        return signal_array, indexes
 
     def write_matrix_metadata(self, vertex, variable, region, population,
                               sampling_interval_ms, neurons, data_type):
@@ -1031,7 +1083,7 @@ class NeoBufferDatabase(BufferDatabase):
                  VALUES (?, ?, ?)
                 """, (rec_id, region_id, str(vertex.vertex_slice)))
 
-    def get_data(self, pop_label, variable):
+    def get_data(self, pop_label, variable, view_indexes):
         """
         Gets the data as a Numpy array for one population and variable
 
@@ -1052,20 +1104,89 @@ class NeoBufferDatabase(BufferDatabase):
             (rec_id, data_type, function, t_start, sampling_interval_ms,
              first_id, pop_size, units) = self.__get_recording_metadeta(
                 cursor, pop_label, variable)
-            if function == RetrievalFunction.Neuron_spikes:
-                return self.__get_spikes(cursor, rec_id)[0]
-            elif function == RetrievalFunction.EIEIO_spikes:
-                return self.__get_eieio_spikes(cursor, rec_id)[0]
-            elif function == RetrievalFunction.Multi_spike:
-                return self.__get_multi_spikes(cursor, rec_id)[0]
-            elif function == RetrievalFunction.Matrix:
+            if view_indexes is None:
+                view_indexes = range(pop_size)
+
+            if function == RetrievalFunction.Matrix:
                 data, indexes = self.__get_matrix_data(
-                    cursor, rec_id, data_type)
+                    cursor, rec_id, data_type, view_indexes)
                 return data, indexes, sampling_interval_ms
             elif function == RetrievalFunction.Rewires:
                 return self.__get_rewires(cursor, rec_id)
             else:
-                raise NotImplementedError(function)
+                return self.__get_spikes(
+                    cursor, rec_id, view_indexes, function)[0]
+
+    def __get_recorded_pynn7(
+            self, cursor, rec_id, data_type, sampling_interval_ms,
+            as_matrix, view_indexes):
+        """ Get recorded data in PyNN 0.7 format. Must not be spikes.
+
+        :param list(int) view_indexes:
+            The indexes for which data should be returned.
+        :rtype: ~numpy.ndarray
+        """
+        data, indexes = self.__get_matrix_data(
+            cursor, rec_id, data_type, view_indexes)
+
+        if as_matrix:
+            return data
+
+        # Convert to triples as Pynn 0,7 did
+        n_machine_time_steps = len(data)
+        n_neurons = len(indexes)
+        column_length = n_machine_time_steps * n_neurons
+        times = [i * sampling_interval_ms
+                 for i in range(0, n_machine_time_steps)]
+        return numpy.column_stack((
+                numpy.repeat(indexes, n_machine_time_steps, 0),
+                numpy.tile(times, n_neurons),
+                numpy.transpose(data).reshape(column_length)))
+
+    def spinnaker_get_data(
+            self, pop_label, variable, as_matrix=False, view_indexes=None):
+        if not isinstance(variable, str):
+            if len(variable) != 1:
+                raise ConfigurationException(
+                    "Only one type of data at a time is supported")
+            variable = variable[0]
+
+        with self.transaction() as cursor:
+            # called to trigger the virtual data warning if applicable
+            self.__get_segment_info(cursor)
+            (rec_id, data_type, function, t_start, sampling_interval_ms,
+             first_id, pop_size, units) = self.__get_recording_metadeta(
+                cursor, pop_label, variable)
+            if view_indexes is None:
+                view_indexes = range(pop_size)
+
+            if function == RetrievalFunction.Matrix:
+                return self.__get_recorded_pynn7(
+                    cursor, rec_id, data_type, sampling_interval_ms,
+                    as_matrix, view_indexes)
+            # NO RetrievalFunction.Rewires get_spike will go boom
+            else:
+                if as_matrix:
+                    logger.warning(f"Ignoring as matrix for {variable}")
+                return self.__get_spikes(
+                    cursor, rec_id, view_indexes, function)[0]
+
+    def get_spike_counts(self, pop_label, view_indexes=None):
+        with self.transaction() as cursor:
+            # called to trigger the virtual data warning if applicable
+            self.__get_segment_info(cursor)
+            (rec_id, data_type, function, t_start, sampling_interval_ms,
+             first_id, pop_size, units) = self.__get_recording_metadeta(
+                cursor, pop_label, SPIKES)
+            if view_indexes is None:
+                view_indexes = range(pop_size)
+
+            # get_spike will go boom if function not spikes
+            spikes = self.__get_spikes(
+                    cursor, rec_id, view_indexes, function)[0]
+        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
+                                minlength=pop_size)
+        return {i: counts[i] for i in view_indexes}
 
     def __add_spike_data(
             self, pop_label, view_indexes, segment, spikes, t_start, t_stop,
@@ -1122,7 +1243,7 @@ class NeoBufferDatabase(BufferDatabase):
 
     def __add_matix_data(
             self, pop_label, variable, block, segment, signal_array,
-            data_indexes, view_indexes, t_start, sampling_interval_ms,
+            indexes, t_start, sampling_interval_ms,
             units, first_id):
         """ Adds a data item that is an analog signal to a neo segment
 
@@ -1136,10 +1257,7 @@ class NeoBufferDatabase(BufferDatabase):
         :param ~neo.core.Block block: Block tdata is being added to
         :param ~neo.core.Segment segment: Segment to add data to
         :param ~numpy.ndarray signal_array: the raw signal data
-        :param list(int) data_indexes: The indexes for the recorded data
-        :param view_indexes: The indexes for which data should be returned.
-            If ``None``, all data (view_index = data_indexes)
-        :type view_indexes: list(int) or None
+        :param list(int) indexes: The indexes for the data
         :type t_start: float or int
         :param sampling_interval_ms: how often a neuron is recorded
         :type sampling_interval_ms: float or int
@@ -1158,20 +1276,6 @@ class NeoBufferDatabase(BufferDatabase):
         # pylint: disable=too-many-arguments, no-member
         t_start = t_start * quantities.ms
         sampling_period = sampling_interval_ms * quantities.ms
-        if list(view_indexes) == list(data_indexes):
-            indexes = numpy.array(data_indexes)
-        else:
-            # keep just the view indexes in the data
-            indexes = [i for i in view_indexes if i in data_indexes]
-            # keep just data columns in the view
-            map_indexes = [list(data_indexes).index(i) for i in indexes]
-            signal_array = signal_array[:, map_indexes]
-            view_set = set(view_indexes)
-            missing = view_set.difference(data_indexes)
-            if missing:
-                missing_list = list(missing)
-                missing_list.sort()
-                logger.warning(f"No data available for indexes {missing_list}")
 
         ids = list(map(lambda x: x+first_id, indexes))
         if units is None:
@@ -1269,33 +1373,23 @@ class NeoBufferDatabase(BufferDatabase):
 
         if view_indexes is None:
             view_indexes = range(pop_size)
-        if function == RetrievalFunction.Neuron_spikes:
-            spikes, indexes = self.__get_spikes(cursor, rec_id)
-            self.__add_spike_data(
-                pop_label, view_indexes, segment, spikes, t_start, t_stop,
-                sampling_interval_ms, first_id)
-        elif function == RetrievalFunction.EIEIO_spikes:
-            spikes, indexes = self.__get_eieio_spikes(cursor, rec_id)
-            self.__add_spike_data(
-                pop_label, indexes, segment, spikes, t_start, t_stop,
-                sampling_interval_ms, first_id)
-        elif function == RetrievalFunction.Multi_spike:
-            spikes, indexes = self.__get_multi_spikes(cursor, rec_id)
-            self.__add_spike_data(
-                pop_label, indexes, segment, spikes, t_start, t_stop,
-                sampling_interval_ms, first_id)
-        elif function == RetrievalFunction.Matrix:
-            signal_array, data_indexes = self.__get_matrix_data(
-                cursor, rec_id, data_type)
+
+        if function == RetrievalFunction.Matrix:
+            signal_array, indexes = self.__get_matrix_data(
+                cursor, rec_id, data_type, view_indexes)
             self.__add_matix_data(
                 pop_label, variable, block, segment, signal_array,
-                data_indexes, view_indexes, t_start, sampling_interval_ms,
+                indexes, t_start, sampling_interval_ms,
                 units, first_id)
         elif function == RetrievalFunction.Rewires:
             event_array = self.__get_rewires(cursor, rec_id)
             self.__add_neo_events(segment, event_array, variable, t_start)
         else:
-            raise NotImplementedError(function)
+            spikes, indexes = self.__get_spikes(
+                cursor, rec_id, view_indexes, function)
+            self.__add_spike_data(
+                pop_label, view_indexes, segment, spikes, t_start, t_stop,
+                sampling_interval_ms, first_id)
 
     def get_block(self, pop_label, variables, view_indexes=None,
                   annotations=None):

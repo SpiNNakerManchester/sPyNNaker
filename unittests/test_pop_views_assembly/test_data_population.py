@@ -108,7 +108,7 @@ class TestDataPopulation(BaseTestCase):
             pop = db.get_population("pop_1")
 
         view = pop[1:3]
-        neo = view.get_data("spikes", gather=False)
+        neo = view.get_data("spikes")
         spikes = neo_convertor.convert_spikes(neo)
         target = trim_spikes(self.spikes_expected, [1, 2])
         assert numpy.array_equal(spikes, target)
@@ -208,8 +208,44 @@ class TestDataPopulation(BaseTestCase):
         with NeoBufferDatabase(my_buffer) as db:
             pop = db.get_population("pop_1")
 
+        spikes = pop.spinnaker_get_data("spikes")
+        assert numpy.array_equal(spikes, self.spikes_expected)
+
         v = pop.spinnaker_get_data("v")
         assert len(v) == 35 * 5
+        target = self.v_expected
+        for neuron, time, val in v:
+            self.assertEqual(val, target[int(time), int(neuron)],
+                             f"{time}{neuron}")
+
+        view = pop[4, 2]
+        spikes = view.spinnaker_get_data("spikes")
+        target = trim_spikes(self.spikes_expected, [4, 2])
+        assert numpy.array_equal(spikes, target)
+
+        spikes = pop.spinnaker_get_data("spikes", view_indexes=[4, 2])
+        assert numpy.array_equal(spikes, target)
 
         with pytest.raises(ConfigurationException):
+            # Only one type of data at a time is supported
+            pop.spinnaker_get_data(["v", "spikes"])
+
+    def test_spinnaker_get_data_view(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
+
+        spikes = pop.spinnaker_get_data("spikes")
+        target = trim_spikes(self.spikes_expected, [1, 2])
+        assert numpy.array_equal(spikes, target)
+
+        v = pop.spinnaker_get_data("v")
+        assert len(v) == 35 * 2
+        target = self.v_expected
+        for neuron, time, val in v:
+            self.assertEqual(val, target[int(time), int(neuron)],
+                             f"{time}{neuron}")
+        with pytest.raises(ConfigurationException):
+            # Only one type of data at a time is supported
             pop.spinnaker_get_data(["v", "spikes"])

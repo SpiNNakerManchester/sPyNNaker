@@ -169,60 +169,10 @@ class Recorder(object):
         # Tell the vertex to record
         self.__vertex.set_recording(variable, sampling_interval, indexes)
 
-    def get_recorded_pynn7(self, variable, as_matrix=False, view_indexes=None):
-        """ Get recorded data in PyNN 0.7 format. Must not be spikes.
-
-        :param str variable:
-            The name of the variable to get. Supported variable names are:
-            ``gsyn_exc``, ``gsyn_inh``, ``v``
-        :param bool as_matrix: If set True the data is returned as a 2d matrix
-        :param view_indexes: The indexes for which data should be returned.
-            If ``None``, all data (view_index = data_indexes)
-        :type view_indexes: list(int) or None
-        :rtype: ~numpy.ndarray
-        """
-        # Only matrix variables are currently supported through this function
-        if self.__vertex.get_recording_type(variable) != RecordingType.MATRIX:
-            raise NotImplementedError(f"{variable} not supported")
-        data, indexes, frequency = self.get_data(variable)
-        sampling_interval = self.__vertex.get_recording_sampling_interval(
-            variable)
-        ids = self.__vertex.get_recording_indices(variable)
-        if view_indexes is None:
-            if len(ids) != self.__vertex.n_atoms:
-                warn_once(logger, self._SELECTIVE_RECORDED_MSG)
-            indexes = ids
-        elif view_indexes == list(ids):
-            indexes = ids
-        else:
-            # keep just the view indexes in the data
-            indexes = [i for i in view_indexes if i in ids]
-            # keep just data columns in the view
-            map_indexes = [list(ids).index(i) for i in indexes]
-            data = data[:, map_indexes]
-
-        if as_matrix:
-            return data
-
-        # Convert to triples as Pynn 0,7 did
-        n_machine_time_steps = len(data)
-        n_neurons = len(indexes)
-        column_length = n_machine_time_steps * n_neurons
-        times = [i * sampling_interval
-                 for i in range(0, n_machine_time_steps)]
-        return numpy.column_stack((
-                numpy.repeat(indexes, n_machine_time_steps, 0),
-                numpy.tile(times, n_neurons),
-                numpy.transpose(data).reshape(column_length)))
-
-    def get_data(self, variable):
-        """ Get the data for the given variable with safety checks
-
-        :param str variable: the variable to get the data for
-        :rtype: ~numpy.ndarray
-        """
+    @property
+    def recording_label(self):
         SpynnakerDataView.check_user_can_act()
-        return self.__vertex.get_recorded_data(variable)
+        return self.__vertex.label
 
     def turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying ``.record()``

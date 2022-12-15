@@ -24,6 +24,7 @@ from spinn_utilities.ranged.abstract_sized import AbstractSized
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -369,16 +370,10 @@ class PopulationView(PopulationBase):
 
         :rtype: dict(int,int)
         """
-        if not gather:
-            logger.warning(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        logger.info("get_spike_counts is inefficient as it just counts the "
-                    "results of get_datas('spikes')")
-        spikes = self.__recorder.get_data("spikes")
-        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
-                                minlength=self.__vertex.n_atoms)
-        return {i: counts[i] for i in self.__indexes}
+        self._check_params(gather)
+        with NeoBufferDatabase() as db:
+            return db.get_spike_counts(
+                self.__recorder.recording_label, self.__indexes)
 
     @property
     def grandparent(self):

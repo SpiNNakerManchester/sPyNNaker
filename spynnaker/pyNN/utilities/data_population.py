@@ -18,9 +18,7 @@ import neo
 import numpy
 from spinn_utilities.ranged.abstract_sized import AbstractSized
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities.constants import SPIKES
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
@@ -87,76 +85,19 @@ class DataPopulation(object):
             return db.get_block(self.__label, variables, self._indexes,
                                 annotations)
 
-    def _get_recorded_pynn7(
-            self, variable, as_matrix=False, view_indexes=None):
-        """ Get recorded data in PyNN 0.7 format. Must not be spikes.
-
-        :param str variable:
-            The name of the variable to get. Supported variable names are:
-            ``gsyn_exc``, ``gsyn_inh``, ``v``
-        :param bool as_matrix: If set True the data is returned as a 2d matrix
-        :param view_indexes: The indexes for which data should be returned.
-            If ``None``, all data (view_index = data_indexes)
-        :type view_indexes: list(int) or None
-        :rtype: ~numpy.ndarray
-        """
-        with NeoBufferDatabase(self.__database_file) as db:
-            data, ids, frequency = db.get_data(self.__label, variable)
-        if view_indexes is None:
-            if len(ids) != self._size:
-                warn_once(logger, self._SELECTIVE_RECORDED_MSG)
-            indexes = ids
-        elif view_indexes == list(ids):
-            indexes = ids
-        else:
-            # keep just the view indexes in the data
-            indexes = [i for i in view_indexes if i in ids]
-            # keep just data columns in the view
-            map_indexes = [list(ids).index(i) for i in indexes]
-            data = data[:, map_indexes]
-
-        if as_matrix:
-            return data
-
-        # Convert to triples as Pynn 0,7 did
-        n_machine_time_steps = len(data)
-        n_neurons = len(indexes)
-        column_length = n_machine_time_steps * n_neurons
-        times = [i * frequency
-                 for i in range(0, n_machine_time_steps)]
-        return numpy.column_stack((
-                numpy.repeat(indexes, n_machine_time_steps, 0),
-                numpy.tile(times, n_neurons),
-                numpy.transpose(data).reshape(column_length)))
-
     @overrides(Population.spinnaker_get_data)
     def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
-        if isinstance(variable, list):
-            if len(variable) != 1:
-                raise ConfigurationException(
-                    "Only one type of data at a time is supported")
-            variable = variable[0]
-        if variable == SPIKES:
-            if as_matrix:
-                logger.warning(f"Ignoring as matrix for {SPIKES}")
-            with NeoBufferDatabase(self.__database_file) as db:
-                spikes = db.get_data(self.__label, SPIKES)
-            if view_indexes is None:
-                return spikes
-            return spikes[numpy.isin(spikes[:, 0], view_indexes)]
-        return self._get_recorded_pynn7(variable, as_matrix, view_indexes)
+        if view_indexes:
+            return self[view_indexes].spinnaker_get_data(variable, as_matrix)
+        with NeoBufferDatabase(self.__database_file) as db:
+            return db.spinnaker_get_data(
+                self.__label, variable, as_matrix, self._indexes)
 
     @overrides(Population.get_spike_counts)
     def get_spike_counts(self, gather=True):
         Population._check_params(gather)
         with NeoBufferDatabase(self.__database_file) as db:
-            spikes = db.get_data(self.__label, SPIKES)
-        n_spikes = {}
-        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
-                                minlength=self._size)
-        for i in range(self._size):
-            n_spikes[i] = counts[i]
-        return {i: counts[i] for i in self._indexes}
+            return db.get_spike_counts(self.__label, self._indexes)
 
     @overrides(Population.find_units)
     def find_units(self, variable):
