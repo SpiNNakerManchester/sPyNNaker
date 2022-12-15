@@ -1083,7 +1083,7 @@ class NeoBufferDatabase(BufferDatabase):
                  VALUES (?, ?, ?)
                 """, (rec_id, region_id, str(vertex.vertex_slice)))
 
-    def get_data(self, pop_label, variable, view_indexes):
+    def get_data(self, pop_label, variable):
         """
         Gets the data as a Numpy array for one population and variable
 
@@ -1101,11 +1101,10 @@ class NeoBufferDatabase(BufferDatabase):
         with self.transaction() as cursor:
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
-            (rec_id, data_type, function, t_start, sampling_interval_ms,
-             first_id, pop_size, units) = self.__get_recording_metadeta(
+            (rec_id, data_type, function, _, sampling_interval_ms,
+             _, pop_size, _) = self.__get_recording_metadeta(
                 cursor, pop_label, variable)
-            if view_indexes is None:
-                view_indexes = range(pop_size)
+            view_indexes = range(pop_size)
 
             if function == RetrievalFunction.Matrix:
                 data, indexes = self.__get_matrix_data(
@@ -1154,8 +1153,8 @@ class NeoBufferDatabase(BufferDatabase):
         with self.transaction() as cursor:
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
-            (rec_id, data_type, function, t_start, sampling_interval_ms,
-             first_id, pop_size, units) = self.__get_recording_metadeta(
+            (rec_id, data_type, function, _, sampling_interval_ms,
+             _, pop_size, units) = self.__get_recording_metadeta(
                 cursor, pop_label, variable)
             if view_indexes is None:
                 view_indexes = range(pop_size)
@@ -1175,8 +1174,8 @@ class NeoBufferDatabase(BufferDatabase):
         with self.transaction() as cursor:
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
-            (rec_id, data_type, function, t_start, sampling_interval_ms,
-             first_id, pop_size, units) = self.__get_recording_metadeta(
+            (rec_id, _, function, _, _,
+             _, pop_size, _) = self.__get_recording_metadeta(
                 cursor, pop_label, SPIKES)
             if view_indexes is None:
                 view_indexes = range(pop_size)
@@ -1273,7 +1272,7 @@ class NeoBufferDatabase(BufferDatabase):
                 duplicate values
 
         """
-        # pylint: disable=too-many-arguments, no-member
+        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
         t_start = t_start * quantities.ms
         sampling_period = sampling_interval_ms * quantities.ms
 
@@ -1304,7 +1303,7 @@ class NeoBufferDatabase(BufferDatabase):
         :param recording_start_time: when recording started
         :type recording_start_time: float or int
         """
-        # pylint: disable=too-many-arguments, no-member
+        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
         t_start = recording_start_time * quantities.ms
 
         formation_times = []
@@ -1418,8 +1417,7 @@ class NeoBufferDatabase(BufferDatabase):
 
         block.name = pop_label
         with self.transaction() as cursor:
-            segment_number, rec_datetime, t_stop = \
-                self.__get_segment_info(cursor)
+            _, rec_datetime, t_stop = self.__get_segment_info(cursor)
             pop_size, first_id, description = \
                 self.__get_population_metadata(cursor, pop_label)
             block.description = description

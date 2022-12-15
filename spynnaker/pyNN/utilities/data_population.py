@@ -43,7 +43,7 @@ class DataPopulation(object):
         self.__database_file = database_file
         # getting size right away also check the inputs or fails fast
         with NeoBufferDatabase(self.__database_file) as db:
-            size, first_id, description = db.get_population_metdadata(label)
+            size = db.get_population_metdadata(label)[0]
         self._size = size
         if indexes is None:
             self._indexes = range(size)
@@ -53,6 +53,7 @@ class DataPopulation(object):
     @overrides(Population.write_data)
     def write_data(self, io, variables='all', gather=True, clear=False,
                    annotations=None):
+        # pylint: disable=protected-access
         Population._check_params(gather, annotations)
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
@@ -77,6 +78,7 @@ class DataPopulation(object):
     @overrides(Population.get_data)
     def get_data(
             self, variables='all', gather=True, clear=False, annotations=None):
+        # pylint: disable=protected-access
         Population._check_params(gather, annotations)
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
@@ -94,6 +96,7 @@ class DataPopulation(object):
 
     @overrides(Population.get_spike_counts)
     def get_spike_counts(self, gather=True):
+        # pylint: disable=protected-access
         Population._check_params(gather)
         with NeoBufferDatabase(self.__database_file) as db:
             return db.get_spike_counts(self.__label, self._indexes)
@@ -120,10 +123,10 @@ class DataPopulation(object):
         return self._size
 
     @overrides(Population.id_to_index)
-    def id_to_index(self, id):
+    def id_to_index(self, id):  # @ReservedAssignment
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
-            _, first_id, _ = db.get_population_metdadata()
+            _, first_id, _ = db.get_population_metdadata(self.__label)
         last_id = self._size + first_id
         if not numpy.iterable(id):
             if not first_id <= id <= last_id:
@@ -137,7 +140,7 @@ class DataPopulation(object):
     def index_to_id(self, index):
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
-            _, first_id, _ = db.get_population_metdadata()
+            _, first_id, _ = db.get_population_metdadata(self.__label)
         if not numpy.iterable(index):
             if index >= self._size:
                 raise ValueError(
