@@ -42,6 +42,7 @@ typedef struct {
 typedef struct {
     uint32_t key;
     uint32_t mask;
+    uint32_t n_colour_bits;
     uint32_t col_mask;
     uint32_t col_shift;
     uint32_t row_mask;
@@ -227,9 +228,10 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
     for (uint32_t i = 0; i < config.n_connectors; i++) {
         connector *c = connectors[i];
         if ((spike & c->key_info.mask) == c->key_info.key) {
+        	uint32_t local_spike = (spike & ~c->key_info.mask) >> c->key_info.n_colour_bits;
             *conn = c;
-            *core_local_col = (spike & c->key_info.col_mask) >> c->key_info.col_shift;
-            *core_local_row = (spike & c->key_info.row_mask) >> c->key_info.row_shift;
+            *core_local_col = (local_spike & c->key_info.col_mask) >> c->key_info.col_shift;
+            *core_local_row = (local_spike & c->key_info.row_mask) >> c->key_info.row_shift;
             return true;
         }
     }

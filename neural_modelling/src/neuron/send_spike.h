@@ -17,11 +17,8 @@
 #ifndef __SEND_SPIKE_H__
 #define __SEND_SPIKE_H__
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <spin1_api.h>
-#include <spin1_api_params.h>
 #include "plasticity/synapse_dynamics.h"
+#include <common/send_mc.h>
 
 //! Whether to use key from neuron.c
 extern bool use_key;
@@ -35,27 +32,8 @@ extern uint32_t earliest_send_time;
 //! Latest time from neuron.c
 extern uint32_t latest_send_time;
 
-//! Mask to recognise the Comms Controller "not full" flag
-#define TX_NOT_FULL_MASK 0x10000000
-
-//! \brief Perform direct spike sending with hardware for speed
-//! \param[in] key The key to send
-static inline void send_spike_mc(uint32_t key) {
-    // Wait for there to be space to send
-    uint32_t n_loops = 0;
-    while (!(cc[CC_TCR] & TX_NOT_FULL_MASK) && (n_loops < 10000)) {
-        spin1_delay_us(1);
-        n_loops++;
-    }
-    if (!(cc[CC_TCR] & TX_NOT_FULL_MASK)) {
-        io_printf(IO_BUF, "[ERROR] Couldn't send spike; TCR=0x%08x\n", cc[CC_TCR]);
-        rt_error(RTE_SWERR);
-    }
-
-    // Do the send
-    cc[CC_TCR] = PKT_MC;
-    cc[CC_TXKEY]  = key;
-}
+//! The time step colour to account for delay
+extern uint32_t colour;
 
 //! \brief Performs the sending of a spike.  Inlined for speed.
 //! \param[in] timer_count The global timer count when the time step started
@@ -67,7 +45,7 @@ static inline void send_spike(UNUSED uint32_t timer_count, uint32_t time,
     synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
     if (use_key) {
-        send_spike_mc(neuron_keys[neuron_index]);
+        send_spike_mc(neuron_keys[neuron_index] | colour);
 
         // Keep track of provenance data
         uint32_t clocks = tc[T1_COUNT];

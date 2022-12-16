@@ -182,15 +182,13 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(AbstractSynapseDynamicsStructural.set_connections)
     def set_connections(
-            self, connections, post_vertex_slice, app_edge, synapse_info,
-            pre_index, pre_slice):
+            self, connections, post_vertex_slice, app_edge, synapse_info):
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
         collector = self.__connections.setdefault(
             (app_edge.post_vertex, post_vertex_slice.lo_atom), [])
-        collector.append(
-            (connections, app_edge, pre_index, pre_slice, synapse_info))
+        collector.append((connections, app_edge, synapse_info))
 
     @overrides(SynapseDynamicsSTDP.get_parameter_names)
     def get_parameter_names(self):
@@ -292,3 +290,8 @@ class SynapseDynamicsStructuralSTDP(
         return [(m_vertex, [source_vertex])
                 for m_vertex in target_vertex.splitter.get_in_coming_vertices(
                     SPIKE_PARTITION_ID)]
+
+    @property
+    @overrides(SynapseDynamicsSTDP.is_combined_core_capable)
+    def is_combined_core_capable(self):
+        return False

@@ -60,7 +60,7 @@ class EIEIOSpikeRecorder(object):
         self.__record = new_state
 
     def get_spikes(self, label, region,
-                   application_vertex, base_key_function):
+                   application_vertex, base_key_function, n_colour_bits):
         """ Get the recorded spikes from the object
 
         :param str label:
@@ -71,6 +71,7 @@ class EIEIOSpikeRecorder(object):
         :param base_key_function:
         :type base_key_function:
             callable(~pacman.model.graphs.machine.MachineVertex,int)
+        :param int n_colour_bits:
         :return: A numpy array of 2-element arrays of (neuron_id, time)
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))
@@ -103,7 +104,8 @@ class EIEIOSpikeRecorder(object):
                     missing.append(placement)
                 self._process_spike_data(
                     vertex_slice, application_vertex.atoms_shape,
-                    raw_spike_data, base_key_function(vertex), results)
+                    raw_spike_data, base_key_function(vertex), results,
+                    n_colour_bits)
 
         if missing:
             missing_str = recording_utils.make_missing_string(missing)
@@ -117,17 +119,21 @@ class EIEIOSpikeRecorder(object):
 
     @staticmethod
     def _process_spike_data(
-            vertex_slice, atoms_shape, spike_data, base_key, results):
+            vertex_slice, atoms_shape, spike_data, base_key, results,
+            n_colour_bits):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param bytearray spike_data:
         :param int base_key:
         :param list(~numpy.ndarray) results:
+        :param int n_colour_bits:
         """
         number_of_bytes_written = len(spike_data)
         offset = 0
-        indices = get_field_based_index(base_key, vertex_slice)
+        indices = get_field_based_index(base_key, vertex_slice, n_colour_bits)
         slice_ids = vertex_slice.get_raster_ids(atoms_shape)
+        colour_mask = (2 ** n_colour_bits) - 1
+        inv_colour_mask = ~colour_mask & 0xFFFFFFFF
         while offset < number_of_bytes_written:
             length, time = _TWO_WORDS.unpack_from(spike_data, offset)
             time *= SpynnakerDataView.get_simulation_time_step_ms()
@@ -144,6 +150,7 @@ class EIEIOSpikeRecorder(object):
             keys = numpy.frombuffer(
                 spike_data, dtype="<u{}".format(key_bytes),
                 count=eieio_header.count, offset=data_offset)
+            keys = numpy.bitwise_and(keys, inv_colour_mask)
             local_ids = numpy.array([indices[key] for key in keys])
             neuron_ids = slice_ids[local_ids]
             offset += length + 2 * BYTES_PER_WORD

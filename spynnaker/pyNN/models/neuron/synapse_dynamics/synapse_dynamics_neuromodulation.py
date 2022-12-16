@@ -18,7 +18,8 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.exceptions import (
+    SynapticConfigurationException, InvalidParameterType)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
@@ -37,7 +38,8 @@ LOOKUP_TAU_C_SHIFT = 4
 LOOKUP_TAU_D_SHIFT = 2
 
 
-class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
+class SynapseDynamicsNeuromodulation(
+        AbstractPlasticSynapseDynamics, AbstractGenerateOnMachine):
     """ Synapses that target a neuromodulation receptor
     """
 
@@ -133,6 +135,20 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         spec.write_array(self.__tau_c_data)
         spec.write_array(self.__tau_d_data)
 
+    @overrides(AbstractPlasticSynapseDynamics.get_value)
+    def get_value(self, key):
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
+
+    @overrides(AbstractPlasticSynapseDynamics.set_value)
+    def set_value(self, key, value):
+        if hasattr(self, key):
+            setattr(self, key, value)
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
+
     @overrides(AbstractPlasticSynapseDynamics
                .get_n_words_for_plastic_connections)
     def get_n_words_for_plastic_connections(self, n_connections):
@@ -145,7 +161,8 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses):
+            post_vertex_slice, n_synapse_types, max_n_synapses,
+            max_atoms_per_core):
         # pylint: disable=too-many-arguments
         weights = numpy.rint(
             numpy.abs(connections["weight"]) * STDP_FIXED_POINT_ONE)
@@ -194,7 +211,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
-            fp_size, fp_data):
+            fp_size, fp_data, max_atoms_per_core):
         data = numpy.concatenate(fp_data)
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
@@ -219,17 +236,24 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     def gen_matrix_id(self):
         return MatrixGeneratorID.NEUROMODULATION_MATRIX.value
 
-    @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
-    def gen_matrix_params(self):
-        return numpy.array([NEUROMODULATION_TARGETS["reward"]],
-                           dtype=numpy.uint32)
+    def gen_matrix_params(
+            self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
+            synapse_info, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core):
+        # pylint: disable=unused-argument
+        synapse_type = synapse_info.synapse_type
+        return numpy.array([
+            synaptic_matrix_offset, max_row_info.undelayed_max_words,
+            max_row_info.undelayed_max_n_synapses, app_edge.pre_vertex.n_atoms,
+            synapse_type is NEUROMODULATION_TARGETS["reward"], synapse_type],
+            dtype=numpy.uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.
                gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self):
-        return 1 * BYTES_PER_WORD
+        return 6 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)
@@ -255,3 +279,8 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @overrides(AbstractPlasticSynapseDynamics.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target):
         return NEUROMODULATION_TARGETS.get(target, None)
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.is_combined_core_capable)
+    def is_combined_core_capable(self):
+        return False

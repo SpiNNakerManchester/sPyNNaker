@@ -24,6 +24,9 @@
 #include <stdint.h>
 #include <common-typedefs.h>
 
+#include "param_generator.h"
+#include "matrix_generator.h"
+
 /**
  * \brief Connection generator "object"
  */
@@ -38,7 +41,7 @@ typedef struct connection_generator *connection_generator_t;
  *         functions, or NULL if it couldn't be initialised for any reason
  */
 connection_generator_t connection_generator_init(
-        uint32_t hash, address_t *region);
+        uint32_t hash, void **region);
 
 /**
  * \brief Finish with a connection generator
@@ -65,8 +68,10 @@ void connection_generator_free(connection_generator_t generator);
  *                         max_row_length in size
  * \return The number of connections generated
  */
-uint32_t connection_generator_generate(
-        connection_generator_t generator, uint32_t pre_slice_start,
-        uint32_t pre_slice_count, uint32_t pre_neuron_index,
+bool connection_generator_generate(
+        connection_generator_t generator, uint32_t pre_lo, uint32_t pre_hi,
+        uint32_t post_lo, uint32_t post_hi, uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
-        uint32_t max_row_length, uint16_t *indices);
+        unsigned long accum weight_scale, accum timestep_per_delay,
+        param_generator_t weight_generator, param_generator_t delay_generator,
+        matrix_generator_t matrix_generator);

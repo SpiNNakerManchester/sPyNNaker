@@ -24,11 +24,28 @@
 
 #include <common/neuron-typedefs.h>
 
-// Forward declaration of the additional input pointer
+// Forward declaration of the additional input parameters
+struct additional_input_params_t;
+typedef struct additional_input_params_t additional_input_params_t;
+
+// Forward declaration of the additional input structure
 struct additional_input_t;
 typedef struct additional_input_t additional_input_t;
-//! Pointer to additional_input_t
-typedef additional_input_t *additional_input_pointer_t;
+
+//! \brief initialise the structure from the parameters
+//! \param[out] state: Pointer to the state to be set up
+//! \param[in] params: Pointer to the parameters passed in from host
+//! \param[in] n_steps_per_timestep: The number of steps to run each update
+static void additional_input_initialise(
+		additional_input_t *state, additional_input_params_t *params,
+		uint32_t n_steps_per_timestep);
+
+//! \brief save parameters and state back to SDRAM for reading by host and recovery
+//!        on restart
+//! \param[in] state: The current state
+//! \param[out] params: Pointer to structure into which parameter can be written
+static void additional_input_save_state(additional_input_t *state,
+		additional_input_params_t *params);
 
 //! \brief Gets the value of current provided by the additional input this
 //!     timestep

@@ -80,8 +80,21 @@ uint32_t synapse_delay_mask;
 //! Count of the number of times the ring buffers have saturated
 uint32_t synapses_saturation_count = 0;
 
+//! Count of the synapses that have been skipped because the delay wasn't
+//! big enough given how long the spike took to arrive
+uint32_t skipped_synapses = 0;
+
+//! Count of the spikes that are received late
+uint32_t late_spikes = 0;
+
+//! The maximum lateness of a spike
+uint32_t max_late_spike = 0;
+
 //! Number of neurons
 static uint32_t n_neurons_peak;
+
+//! The mask of the delay shifted into position i.e. pre-shift
+static uint32_t synapse_delay_mask_shifted = 0;
 
 
 /* PRIVATE FUNCTIONS */
@@ -126,10 +139,10 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
                 synapse, i, synapse_row_sparse_weight(synapse));
         synapses_print_weight(synapse_row_sparse_weight(synapse),
                 ring_buffer_to_input_left_shifts[synapse_type]);
-        io_printf(IO_BUF, "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
+        io_printf(IO_BUF, "nA) d: %2u, %d, n = %3u)] - {%08x %08x}\n",
                 synapse_row_sparse_delay(synapse, synapse_type_index_bits,
                         synapse_delay_mask),
-                get_type_char(synapse_type),
+                synapse_type,
                 synapse_row_sparse_index(synapse, synapse_index_mask),
                 synapse_delay_mask, synapse_type_index_bits);
     }
@@ -192,19 +205,27 @@ static inline void print_ring_buffers(uint32_t time) {
 //! \param[in] time: The current simulation time
 //! \return Always true
 static inline bool process_fixed_synapses(
-        synapse_row_fixed_part_t *fixed_region, uint32_t time) {
+        synapse_row_fixed_part_t *fixed_region, uint32_t time,
+        uint32_t colour_delay) {
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
     uint32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
-    // Pre-mask the time
-    uint32_t masked_time = (time & synapse_delay_mask) << synapse_type_index_bits;
+    // Pre-mask the time and account for colour delay
+    uint32_t colour_delay_shifted = colour_delay << synapse_type_index_bits;
+    uint32_t masked_time = ((time - colour_delay) & synapse_delay_mask) << synapse_type_index_bits;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row
         // (should auto increment pointer in single instruction)
         uint32_t synaptic_word = *synaptic_words++;
+
+        // If the delay is too small, skip
+        if ((synaptic_word & synapse_delay_mask_shifted) < colour_delay_shifted) {
+            skipped_synapses++;
+            continue;
+        }
 
         // The ring buffer index can be found by adding on the time to the delay
         // in the synaptic word directly, and then masking off the whole index.
@@ -287,6 +308,7 @@ bool synapses_initialise(
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
     synapse_delay_bits = log_max_delay;
     synapse_delay_mask = (1 << synapse_delay_bits) - 1;
+    synapse_delay_mask_shifted = synapse_delay_mask << synapse_type_index_bits;
 
     n_neurons_peak = 1 << log_n_neurons;
 
@@ -328,7 +350,25 @@ void synapses_flush_ring_buffers(timer_t time) {
 }
 
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, bool *write_back) {
+        uint32_t time, uint32_t spike_colour, uint32_t colour_mask,
+		synaptic_row_t row, bool *write_back) {
+
+    // Work out how much delay takes off or adds on to the actual delay because
+    // of a delayed spike arrival time, or delayed change of time step in the
+    // current core.  Spikes can be as late as the bits in colour_mask dictates.
+	// Masked difference is used to calculate this, which will always be
+	// positive because the mask removes the negative bit.
+	// Example: time colour 8, spike colour 13, colour mask 0xF means time
+	// colour has gone up to 15 and then wrapped since spike was sent.
+    // 8 - 13 = -5; -5 & 0xF = 11, so spike was sent 11 steps ago.
+    uint32_t time_colour = time & colour_mask;
+    int32_t colour_diff = time_colour - spike_colour;
+    uint32_t colour_delay = colour_diff & colour_mask;
+
+    late_spikes += colour_delay & 0x1;
+    if (colour_delay > max_late_spike) {
+        max_late_spike = colour_delay;
+    }
 
     // By default don't write back
     *write_back = false;
@@ -348,7 +388,7 @@ bool synapses_process_synaptic_row(
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
         if (!synapse_dynamics_process_plastic_synapses(plastic_data,
-                fixed_region, ring_buffers, time, write_back)) {
+                fixed_region, ring_buffers, time, colour_delay, write_back)) {
             return false;
         }
         profiler_write_entry_disable_fiq(
@@ -359,7 +399,7 @@ bool synapses_process_synaptic_row(
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
-    return process_fixed_synapses(fixed_region, time);
+    return process_fixed_synapses(fixed_region, time, colour_delay);
     //}
 }
 
