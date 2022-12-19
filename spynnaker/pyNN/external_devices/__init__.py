@@ -66,6 +66,7 @@ add_database_socket_address = Plugins.add_database_socket_address
 activate_live_output_to = Plugins.activate_live_output_to
 activate_live_output_for = Plugins.activate_live_output_for
 add_poisson_live_rate_control = Plugins.add_poisson_live_rate_control
+add_convolution_multiplier_control = Plugins.add_convolution_multiplier_control
 
 SpynnakerDataView.register_binary_search_path(
     os.path.dirname(model_binaries.__file__))
@@ -106,7 +107,8 @@ __all__ = [
     "SpikeInjector",
     "register_database_notification_request",
     "run_forever",
-    "add_poisson_live_rate_control"
+    "add_poisson_live_rate_control",
+    "add_convolution_multiplier_control"
 ]
 # Cache of the simulator provided by pyNN/__init__py
 __simulator = None

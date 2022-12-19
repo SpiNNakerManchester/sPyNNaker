@@ -23,7 +23,8 @@ from spinn_front_end_common.utilities.utility_objs import (
     LivePacketGatherParameters)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import (
-    LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID)
+    LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID,
+    CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID)
 from spynnaker.pyNN.models.populations import Population
 
 
@@ -244,6 +245,51 @@ class SpynnakerExternalDevicePluginManager(object):
         edge = SpynnakerExternalDevicePluginManager.add_edge(
             controller, vertex, LIVE_POISSON_CONTROL_PARTITION_ID)
         vertex.set_live_poisson_control_edge(edge)
+        if notify:
+            SpynnakerExternalDevicePluginManager.add_database_socket_address(
+                database_notify_host, database_notify_port_num,
+                database_ack_port_num)
+
+    @staticmethod
+    def add_convolution_multiplier_control(
+            convolution_population, control_label_extension="_control",
+            receive_port=None, database_notify_host=None,
+            database_notify_port_num=None,
+            database_ack_port_num=None, notify=True,
+            reserve_reverse_ip_tag=False):
+        """ Add a live rate controller to a Poisson population.
+
+        :param convolution_population: The population to control
+        :type convolution_population:
+            ~spynnaker.pyNN.models.populations.Population
+        :param str control_label_extension:
+            An extension to add to the label of the target. Must match
+            up with the equivalent in the SpynnakerConvolutionControlConnection
+        :param int receive_port:
+            The port that the SpiNNaker board should listen on
+        :param str database_notify_host: the hostname for the device which is
+            listening to the database notification.
+        :param int database_ack_port_num: the port number to which a external
+            device will acknowledge that they have finished reading the
+            database and are ready for it to start execution
+        :param int database_notify_port_num: The port number to which an
+            external device will receive the database is ready command
+        :param bool notify: adds to the notification protocol if set.
+        :param bool reserve_reverse_ip_tag: True if a reverse IP tag is to be
+            used, False if SDP is to be used (default)
+        """
+        # pylint: disable=too-many-arguments, protected-access
+        vertex = convolution_population._vertex
+        control_label = "{}{}".format(vertex.label, control_label_extension)
+        controller = ReverseIpTagMultiCastSource(
+            n_keys=vertex.n_atoms, label=control_label,
+            receive_port=receive_port,
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag,
+            injection_partition_id=CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID)
+        SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
+        edge = SpynnakerExternalDevicePluginManager.add_edge(
+            controller, vertex, CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID)
+        vertex.synapse_dynamics.set_multiplier_control(edge)
         if notify:
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
                 database_notify_host, database_notify_port_num,

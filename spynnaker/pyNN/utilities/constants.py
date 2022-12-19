@@ -70,6 +70,9 @@ REWIRING = "rewiring"
 #: The partition ID used for Poisson live control data
 LIVE_POISSON_CONTROL_PARTITION_ID = "CONTROL"
 
+#: The partition ID used for convolution multiplier control
+CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID = "CONTROL"
+
 #: The maximum row length of the master population table
 POP_TABLE_MAX_ROW_LENGTH = 256
 

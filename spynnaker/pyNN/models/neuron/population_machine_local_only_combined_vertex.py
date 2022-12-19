@@ -74,8 +74,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
         "__regenerate_data"]
 
     # log_n_neurons, log_n_synapse_types, log_max_delay, input_buffer_size,
-    # clear_input_buffer
-    LOCAL_ONLY_SIZE = 5 * BYTES_PER_WORD
+    # clear_input_buffer, update key, update mask
+    LOCAL_ONLY_SIZE = 7 * BYTES_PER_WORD
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
     N_LATE_SPIKES_NAME = "Number_of_late_spikes"
@@ -278,6 +278,13 @@ class PopulationMachineLocalOnlyCombinedVertex(
         spec.write_value(log_max_delay)
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
         spec.write_value(int(self._app_vertex.drop_late_spikes))
+
+        key, mask = self._app_vertex.synapse_dynamics.control_key_and_mask
+        if key is None:
+            key = 0xFFFFFFFF
+            mask = 0
+        spec.write_value(key)
+        spec.write_value(mask)
 
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)

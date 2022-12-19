@@ -24,7 +24,8 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.utilities.constants import (SPIKE_PARTITION_ID,
+    CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID)
 from .abstract_local_only import AbstractLocalOnly
 
 Source = namedtuple("Source", ["projection", "vertex_slice", "key", "mask"])
@@ -42,7 +43,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     __slots__ = [
         "__cached_2d_overlaps",
-        "__cached_n_incoming"
+        "__cached_n_incoming",
+        "__multiplier_control_edge"
     ]
 
     def __init__(self):
@@ -51,6 +53,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Store the n_incoming to avoid recalcaultion
         self.__cached_n_incoming = dict()
+
+        self.__multiplier_control_edge = None
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
@@ -314,3 +318,17 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         if not len(neg_weights):
             return 0
         return numpy.var(neg_weights)
+
+    def set_multiplier_control(self, edge):
+        self.__multiplier_control_edge = edge
+
+    @property
+    @overrides(AbstractLocalOnly.control_key_and_mask)
+    def control_key_and_mask(self):
+        if self.__multiplier_control_edge is None:
+            return None, None
+        r_infos = SpynnakerDataView.get_routing_infos()
+        r_info = r_infos.get_routing_info_from_pre_vertex(
+            self.__multiplier_control_edge.pre_vertex,
+            CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID)
+        return r_info.key, r_info.mask

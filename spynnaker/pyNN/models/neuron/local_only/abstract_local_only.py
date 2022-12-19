@@ -55,3 +55,12 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     @overrides(AbstractSynapseDynamics.is_combined_core_capable)
     def is_combined_core_capable(self):
         return True
+
+    @property
+    def control_key_and_mask(self):
+        """ The control key and mask of the local-only implementation,
+            or None, None if none to provide
+
+        :rtype: (int, int) or (None, None)
+        """
+        return None, None
