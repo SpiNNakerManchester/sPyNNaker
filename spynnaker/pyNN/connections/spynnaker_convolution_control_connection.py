@@ -1,0 +1,136 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
+from spinn_front_end_common.utilities.connections import LiveEventConnection
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.constants import NOTIFY_PORT
+import functools
+
+
+class SpynnakerConvolutionControlConnection(LiveEventConnection):
+    __slots__ = [
+        "__control_label_extension",
+        "__control_label_to_label",
+        "__label_to_control_label"]
+
+    def __init__(
+            self, pop_labels=None, local_host=None, local_port=NOTIFY_PORT,
+            control_label_extension="_control"):
+        """
+        :param iterable(str) pop_labels:
+            Labels of Convolution populations to be controlled
+        :param str local_host: Optional specification of the local hostname or
+            IP address of the interface to listen on
+        :param int local_port:
+            Optional specification of the local port to listen on. Must match
+            the port that the toolchain will send the notification on (19999
+            by default)
+        :param str control_label_extension:
+            The extra name added to the label of each Poisson source
+        """
+        self.__control_label_extension = control_label_extension
+
+        control_labels = None
+        self.__control_label_to_label = dict()
+        self.__label_to_control_label = dict()
+        if pop_labels is not None:
+            control_labels = [
+                self.__convert_to_control_label(label)
+                for label in pop_labels
+            ]
+            self.__control_label_to_label.update(
+                {control: label
+                 for control, label in zip(control_labels, pop_labels)})
+            self.__label_to_control_label.update(
+                {label: control
+                 for label, control in zip(pop_labels, control_labels)})
+
+        super().__init__(
+            live_packet_gather_label=None, send_labels=control_labels,
+            local_host=local_host, local_port=local_port)
+
+    def add_pop_label(self, label):
+        """
+        :param str label: The label of the population.
+        """
+        control = self.__convert_to_control_label(label)
+        self.__control_label_to_label[control] = label
+        self.__label_to_control_label[label] = control
+        self.add_send_label(control)
+
+    def __convert_to_control_label(self, label):
+        return "{}{}".format(label, self.__control_label_extension)
+
+    def __control_label(self, label):
+        # Try to get a control label, but if not just use the label
+        return self.__label_to_control_label.get(label, label)
+
+    def __label(self, control_label):
+        # Try to get a label, but if not just use the control label
+        return self.__control_label_to_label.get(control_label, control_label)
+
+    def _start_callback_wrapper(self, callback, label, connection):
+        callback(self.__label(label), connection)
+
+    def _init_callback_wrapper(self, callback, label, vertex_size, run_time_ms,
+                               machine_timestep_ms):
+        callback(self.__label(label), vertex_size, run_time_ms,
+                 machine_timestep_ms)
+
+    def _stop_callback_wrapper(self, callback, label, connection):
+        callback(self.__label(label), connection)
+
+    @overrides(LiveEventConnection.add_start_callback)
+    def add_start_callback(self, label, start_callback):
+        super().add_start_callback(
+            self.__control_label(label), functools.partial(
+                self._start_callback_wrapper, start_callback))
+
+    @overrides(LiveEventConnection.add_start_resume_callback)
+    def add_start_resume_callback(self, label, start_resume_callback):
+        super().add_start_resume_callback(
+            self.__control_label(label), functools.partial(
+                self._start_callback_wrapper, start_resume_callback))
+
+    @overrides(LiveEventConnection.add_init_callback)
+    def add_init_callback(self, label, init_callback):
+        super().add_init_callback(
+            self.__control_label(label), functools.partial(
+                self._init_callback_wrapper, init_callback))
+
+    @overrides(LiveEventConnection.add_receive_callback)
+    def add_receive_callback(self, label, live_event_callback,
+                             translate_key=False):
+        raise ConfigurationException(
+            "SpynnakerConvolutionControlPopulation can't receive data")
+
+    @overrides(LiveEventConnection.add_pause_stop_callback)
+    def add_pause_stop_callback(self, label, pause_stop_callback):
+        super().add_pause_stop_callback(
+            self.__control_label(label), functools.partial(
+                self._stop_callback_wrapper, pause_stop_callback))
+
+    def set_multiplier(self, label, multiplier):
+        """ Set the multiplier of a convolution
+
+        :param str label: The label of the Population to set the multiplier of
+        :param float multiplier: The multiplier to set
+        """
+        control = self.__control_label(label)
+        datatype = DataType.S1615
+        self.send_event_with_payload(
+            control, 0, datatype.encode_as_int(multiplier))

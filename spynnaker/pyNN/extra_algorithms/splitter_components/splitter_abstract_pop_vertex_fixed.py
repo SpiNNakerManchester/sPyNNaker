@@ -38,6 +38,8 @@ from collections import defaultdict
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from spynnaker.pyNN.utilities.constants import (
+    CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID)
 
 
 class SplitterAbstractPopulationVertexFixed(
@@ -125,6 +127,9 @@ class SplitterAbstractPopulationVertexFixed(
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex, partition_id):
+        if partition_id == CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID:
+            return super().get_source_specific_in_coming_vertices(
+                source_vertex, partition_id)
 
         # Determine the real pre-vertex
         pre_vertex = source_vertex

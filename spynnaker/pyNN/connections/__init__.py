@@ -19,9 +19,11 @@ from .spynnaker_live_spikes_connection import SpynnakerLiveSpikesConnection
 from .spynnaker_poisson_control_connection import (
     SpynnakerPoissonControlConnection)
 from .spif_live_spikes_connection import SPIFLiveSpikesConnection
+from .spynnaker_convolution_control_connection import (
+    SpynnakerConvolutionControlConnection)
 
 __all__ = [
     "EthernetCommandConnection", "EthernetControlConnection",
     "SpynnakerLiveSpikesConnection", "SpynnakerPoissonControlConnection",
-    "SPIFLiveSpikesConnection"
+    "SPIFLiveSpikesConnection", "SpynnakerConvolutionControlConnection"
 ]

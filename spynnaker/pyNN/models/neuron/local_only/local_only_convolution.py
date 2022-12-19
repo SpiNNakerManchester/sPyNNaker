@@ -24,8 +24,8 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
-from spynnaker.pyNN.utilities.constants import (SPIKE_PARTITION_ID,
-    CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID)
+from spynnaker.pyNN.utilities.constants import (
+    SPIKE_PARTITION_ID, CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID)
 from .abstract_local_only import AbstractLocalOnly
 
 Source = namedtuple("Source", ["projection", "vertex_slice", "key", "mask"])

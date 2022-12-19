@@ -273,4 +273,5 @@ void local_only_impl_process_spike(
 
 void local_only_impl_update(UNUSED uint32_t key, uint32_t payload) {
 	multiplier = kbits(payload);
+	log_info("Setting multiplier to %k", multiplier);
 }
