@@ -236,3 +236,7 @@ void local_only_impl_process_spike(
         ring_buffers[rb_index] = accumulation;
     }
 }
+
+void local_only_impl_update(UNUSED uint32_t key, UNUSED uint32_t payload) {
+	// Does Nothing
+}

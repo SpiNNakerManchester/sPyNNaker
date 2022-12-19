@@ -38,6 +38,10 @@ struct local_only_config {
     uint32_t input_buffer_size;
     //! Whether to clear the input buffer
     uint32_t clear_input_buffer;
+    //! Special key for update, or 0xFFFFFFFF if not used
+    uint32_t update_key;
+    //! Special mask for update, or 0 if not used
+    uint32_t update_mask;
 };
 
 //! A local copy of the configuration
@@ -123,6 +127,12 @@ void mc_rcv_callback(uint key, UNUSED uint unused) {
 //! \param[in] key The key received
 //! \param[in] n_spikes The payload; the number of times to repeat the key
 void mc_rcv_payload_callback(uint key, uint n_spikes) {
+
+	if ((key & config.update_mask) == config.update_key) {
+		local_only_impl_update(key, n_spikes);
+		return;
+	}
+
     n_spikes_received += 1;
 
     // Check of any one spike can be added to the circular buffer

@@ -82,6 +82,8 @@ static conv_config *config;
 
 static lc_weight_t *weights;
 
+static accum multiplier = 1.0k;
+
 //! \brief Load the required data into DTCM.
 bool local_only_impl_initialise(void *address){
     log_info("+++++++++++++++++ CONV init ++++++++++++++++++++");
@@ -209,6 +211,7 @@ static inline void do_convolution_operation(
                     synapse_delay_mask);
                 weight = -weight;
             }
+            weight = (lc_weight_t) (weight * multiplier);
             log_debug("Updating ring_buffers[%u] for post neuron %u = %u, %u, with weight %u",
                     rb_index, post_index, tmp_col, tmp_row, weight);
 
@@ -266,4 +269,8 @@ void local_only_impl_process_spike(
 
     // Compute the convolution
     do_convolution_operation(time, pre_coord, connector, ring_buffers);
+}
+
+void local_only_impl_update(UNUSED uint32_t key, uint32_t payload) {
+	multiplier = kbits(payload);
 }

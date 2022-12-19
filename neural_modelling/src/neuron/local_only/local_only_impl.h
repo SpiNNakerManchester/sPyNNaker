@@ -35,4 +35,7 @@ bool local_only_impl_initialise(void *address);
 void local_only_impl_process_spike(uint32_t time, uint32_t spike,
         uint16_t* ring_buffers);
 
+//! \brief Process an update key received
+void local_only_impl_update(uint32_t key, uint32_t payload);
+
 #endif
