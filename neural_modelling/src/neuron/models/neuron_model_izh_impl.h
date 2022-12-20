@@ -168,8 +168,8 @@ static inline state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
         uint16_t num_inhibitory_inputs, const input_t *inh_input,
         input_t external_bias, REAL current_offset, neuron_t *restrict neuron) {
-    REAL total_exc = 0;
-    REAL total_inh = 0;
+    REAL total_exc = ZERO;
+    REAL total_inh = ZERO;
 
     for (int i =0; i<num_excitatory_inputs; i++) {
         total_exc += exc_input[i];
