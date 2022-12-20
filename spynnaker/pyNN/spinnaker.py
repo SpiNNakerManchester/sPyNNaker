@@ -29,7 +29,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.interface.provenance import (
-    FecTimer, ProvenanceWriter, TimerCategory, TimerWork)
+    FecTimer, GlobalProvenance, TimerCategory, TimerWork)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -116,7 +116,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
 
-        with ProvenanceWriter() as db:
+        with GlobalProvenance() as db:
             db.insert_version("sPyNNaker_version", _version.__version__)
             db.insert_version("pyNN_version", pynn_version)
             db.insert_version("quantities_version", quantities_version)
