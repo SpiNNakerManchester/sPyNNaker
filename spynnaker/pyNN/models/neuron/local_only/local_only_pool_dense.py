@@ -68,7 +68,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return (2 * BYTES_PER_WORD) + n_bytes
 
     @overrides(AbstractLocalOnly.write_parameters)
-    def write_parameters(self, spec, region, machine_vertex, weight_scales):
+    def write_parameters(self, spec, region, machine_vertex, weight_scales,
+                         reference):
 
         # Get all the incoming vertices and keys so we can sort
         routing_info = SpynnakerDataView.get_routing_infos()
@@ -111,7 +112,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         size = self.get_parameters_usage_in_bytes(
             machine_vertex.vertex_slice.n_atoms,
             machine_vertex.app_vertex.incoming_projections)
-        spec.reserve_memory_region(region, size, label="LocalOnlyConvolution")
+        spec.reserve_memory_region(region, size, label="LocalOnlyConvolution",
+                                   reference=reference)
         spec.switch_write_focus(region)
 
         # Write the common spec

@@ -105,7 +105,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 kernel_bytes)
 
     @overrides(AbstractLocalOnly.write_parameters)
-    def write_parameters(self, spec, region, machine_vertex, weight_scales):
+    def write_parameters(self, spec, region, machine_vertex, weight_scales,
+                         reference):
 
         # Get incoming sources for this machine vertex, and sort by key
         app_vertex = machine_vertex.app_vertex
@@ -115,7 +116,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         size = self.get_parameters_usage_in_bytes(
             machine_vertex.vertex_slice, app_vertex.incoming_projections)
-        spec.reserve_memory_region(region, size, label="LocalOnlyConvolution")
+        spec.reserve_memory_region(region, size, label="LocalOnlyConvolution",
+                                   reference=reference)
         spec.switch_write_focus(region)
 
         # Get spec for each incoming source

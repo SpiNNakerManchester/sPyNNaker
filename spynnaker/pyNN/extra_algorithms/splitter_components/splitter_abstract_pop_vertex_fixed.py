@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
@@ -28,18 +29,17 @@ from spynnaker.pyNN.models.neuron.population_machine_vertex import (
     SpikeProcessingProvenance)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
-from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
-from collections import defaultdict
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.utilities.constants import (
     CONVOLUTION_MULTIPLIER_CONTROL_PARTITION_ID)
+from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 
 class SplitterAbstractPopulationVertexFixed(
