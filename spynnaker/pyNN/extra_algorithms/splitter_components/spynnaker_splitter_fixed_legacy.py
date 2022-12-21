@@ -19,4 +19,4 @@ from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 class SpynnakerSplitterFixedLegacy(
         SplitterFixedLegacy, AbstractSpynnakerSplitterDelay):
-        pass
+    pass
