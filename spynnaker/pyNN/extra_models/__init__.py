@@ -30,6 +30,10 @@ from spynnaker.pyNN.models.neuron.builds import (
     IzkCondExpBase as Izhikevich_cond,
     IFCurrExpSEMDBase as IF_curr_exp_sEMD)
 
+# Splitter
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SplitterAbstractPopulationVertexNeuronsSynapses)
+
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
 
@@ -46,6 +50,9 @@ __all__ = [
     'PfisterSpikeTriplet',
     'SpikeNearestPairRule',
     'RecurrentRule', 'Vogels2011Rule',
+
+    # Splitter
+    'SplitterAbstractPopulationVertexNeuronsSynapses',
 
     # Variable rate Poisson
     'SpikeSourcePoissonVariable']
