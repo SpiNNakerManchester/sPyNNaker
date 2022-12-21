@@ -349,7 +349,9 @@ class PopulationMachineLocalOnlyCombinedVertex(
                         "too late to be processed in a given time step. Try "
                         "increasing the time_scale_factor located within the "
                         ".spynnaker.cfg file or in the pynn.setup() method.")
-                else:
+                elif not self._app_vertex.is_device_input:
+                    # Only report if not a device input (as devices will likely
+                    # result in "late" spikes
                     db.insert_report(
                         f"On {label}, {prov.n_spikes_dropped} packets arrived "
                         "too late to be processed in a given time step. Try "

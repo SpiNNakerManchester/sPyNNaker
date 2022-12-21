@@ -320,7 +320,9 @@ class PopulationSynapsesMachineVertexCommon(
                     "be processed in a given time step. Try increasing the "
                     "time_scale_factor located within the .spynnaker.cfg file "
                     "or in the pynn.setup() method.")
-            else:
+            elif not self._app_vertex.is_device_input:
+                # Only report if not a device input (as devices will likely
+                # result in "late" spikes
                 db.insert_report(
                     f"On {label}, {prov.n_late_packets} packets (maximum of "
                     f" {prov.max_spikes_overflow} per time step) arrived too "

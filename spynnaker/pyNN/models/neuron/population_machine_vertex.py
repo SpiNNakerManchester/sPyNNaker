@@ -377,7 +377,9 @@ class PopulationMachineVertex(
                         f"step. Try increasing the time_scale_factor located "
                         f"within the .spynnaker.cfg file or in the "
                         f"pynn.setup() method.")
-                else:
+                elif not self._app_vertex.is_device_input:
+                    # Only report if not a device input (as devices will likely
+                    # result in "late" spikes
                     db.insert_report(
                         f"On {label}, {prov.n_late_packets} packets arrived "
                         f"too late to be processed in a given time step. "

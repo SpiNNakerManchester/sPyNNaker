@@ -27,6 +27,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ranged import RangeDictionary
+from pacman.model.graphs.application import ApplicationVirtualVertex
 from data_specification.enums.data_type import DataType
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
@@ -141,7 +142,8 @@ class AbstractPopulationVertex(
         "__read_initial_values",
         "__have_read_initial_values",
         "__last_parameter_read_time",
-        "__n_colour_bits"]
+        "__n_colour_bits",
+        "__device_input"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -279,6 +281,7 @@ class AbstractPopulationVertex(
         self.__read_initial_values = False
         self.__have_read_initial_values = False
         self.__last_parameter_read_time = None
+        self.__device_input = False
 
     @overrides(PopulationApplicationVertex.get_max_atoms_per_core)
     def get_max_atoms_per_core(self):
@@ -400,6 +403,16 @@ class AbstractPopulationVertex(
             self.__self_projection = projection
         if isinstance(pre_vertex, SpikeSourcePoissonVertex):
             self.__incoming_poisson_projections.append(projection)
+        if isinstance(pre_vertex, ApplicationVirtualVertex):
+            self.__device_input = True
+
+    @property
+    def is_device_input(self):
+        """ If there is a device input into this vertex
+
+        :rtype: bool
+        """
+        return self.__device_input
 
     @property
     def self_projection(self):
@@ -499,6 +512,11 @@ class AbstractPopulationVertex(
 
         :rtype: bool
         """
+        # If we don't know whether to drop late spikes, decide based on input
+        # devices (as devices aren't timed so dropping late spikes is a bad
+        # idea there)
+        if self.__drop_late_spikes is None:
+            return not self.__device_input
         return self.__drop_late_spikes
 
     def get_sdram_usage_for_core_neuron_params(self, n_atoms):
