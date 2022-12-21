@@ -64,7 +64,8 @@ class Population(PopulationBase):
 
     def __init__(
             self, size, cellclass, cellparams=None, structure=None,
-            initial_values=None, label=None, additional_parameters=None):
+            initial_values=None, label=None, additional_parameters=None,
+            **pop_parameters):
         """
         :param int size: The number of neurons in the population
         :param cellclass: The implementation of the individual neurons.
@@ -80,6 +81,8 @@ class Population(PopulationBase):
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
         :type additional_parameters: dict(str, ...)
+        :param pop_parameters:
+            An even easier way to pass population parameters
         """
         # pylint: disable=too-many-arguments
 
@@ -769,7 +772,7 @@ class Population(PopulationBase):
         return model
 
     def __create_vertex(
-            self, model, size, label, additional_parameters):
+            self, model, size, label, additional_parameters, pop_parameters):
         """
         :param model: The implementation of the individual neurons.
         :type model: ApplicationVertex or AbstractPyNNModel
@@ -793,6 +796,9 @@ class Population(PopulationBase):
                 # and ignore
                 population_parameters = self.__process_additional_params(
                     additional_parameters, population_parameters)
+            if pop_parameters is not None:
+                population_parameters = self.__process_additional_params(
+                    pop_parameters, population_parameters)
             self.__vertex = model.create_vertex(
                 size, label, **population_parameters)
 
