@@ -286,7 +286,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 for i in range(1, self.__n_synapse_vertices):
                     self.__add_shared_local_only_core(
                         syn_label, i, vertex_slice, synapse_references,
-                        shared_synapse_sdram, synapse_vertices)
+                        shared_synapse_core_sdram, synapse_vertices)
                     chip_counter.add_core(shared_synapse_core_sdram)
             else:
 
