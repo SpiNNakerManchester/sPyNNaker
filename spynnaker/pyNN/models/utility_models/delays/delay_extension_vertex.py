@@ -15,7 +15,8 @@
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_bool
-from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.application import (
+    ApplicationVertex, ApplicationVirtualVertex)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.models.abstract_models import AbstractHasDelayStages
@@ -69,6 +70,9 @@ class DelayExtensionVertex(
 
         self.__drop_late_spikes = get_config_bool(
             "Simulation", "drop_late_spikes")
+        if self.__drop_late_spikes is None:
+            self.__drop_late_spikes = isinstance(
+                self.__partition.pre_vertex, ApplicationVirtualVertex)
 
         self.__outgoing_edges = list()
 
