@@ -796,9 +796,12 @@ class Population(PopulationBase):
                 # and ignore
                 population_parameters = self.__process_additional_params(
                     additional_parameters, population_parameters)
+                logger.warning(
+                    "Parameter additional_parameters is not standard PyNN, so "
+                    "this script may not work with other simulators")
             if pop_parameters is not None:
                 population_parameters = self.__process_additional_params(
-                    pop_parameters, population_parameters)
+                    pop_parameters, population_parameters, warn=True)
             self.__vertex = model.create_vertex(
                 size, label, **population_parameters)
 
@@ -840,7 +843,7 @@ class Population(PopulationBase):
 
     @staticmethod
     def __process_additional_params(
-            additional_parameters, population_parameters):
+            additional_parameters, population_parameters, warn=False):
         """ essential method for allowing things like splitter objects at\
             pop level
 
@@ -853,6 +856,10 @@ class Population(PopulationBase):
         for key in additional_parameters.keys():
             if key in population_parameters:
                 population_parameters[key] = additional_parameters[key]
+                if warn:
+                    logger.warning(
+                        f"Parameter {key} in Population is not standard PyNN,"
+                        " so this script might not work with other simulators")
             else:
                 logger.warning(
                     "additional_parameter {} will be ignored".format(key))
