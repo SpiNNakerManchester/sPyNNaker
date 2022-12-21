@@ -90,7 +90,7 @@ class Population(PopulationBase):
         model = self.__create_model(cellclass, cellparams)
         size = self.__roundsize(size, label)
         self.__create_vertex(
-            model, size, label, additional_parameters)
+            model, size, label, additional_parameters, pop_parameters)
         self.__recorder = Recorder(population=self, vertex=self.__vertex)
 
         # Internal structure now supported 23 November 2014 ADR
@@ -799,7 +799,7 @@ class Population(PopulationBase):
                 logger.warning(
                     "Parameter additional_parameters is not standard PyNN, so "
                     "this script may not work with other simulators")
-            if pop_parameters is not None:
+            if pop_parameters:
                 population_parameters = self.__process_additional_params(
                     pop_parameters, population_parameters, warn=True)
             self.__vertex = model.create_vertex(
