@@ -19,6 +19,3 @@ from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 class SpynnakerSplitterFixedLegacy(
         SplitterFixedLegacy, AbstractSpynnakerSplitterDelay):
-
-    def __init__(self):
-        super().__init__()
