@@ -122,7 +122,7 @@ static uint32_t recording_flags = 0;
 static struct sdram_config sdram_inputs;
 
 //! The inputs from the various synapse cores
-static weight_t *synaptic_contributions[N_SYNAPTIC_BUFFERS];
+static weight_t **synaptic_contributions;
 
 //! The timer overruns
 static uint32_t timer_overruns = 0;
@@ -271,6 +271,7 @@ static bool initialise(void) {
     spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
 
     uint32_t n_words = sdram_inputs.size_in_bytes >> 2;
+    synaptic_contributions = spin1_malloc(N_SYNAPTIC_BUFFERS * sizeof(uint32_t*));
     for (uint32_t i = 0; i < N_SYNAPTIC_BUFFERS; i++) {
         synaptic_contributions[i] = spin1_malloc(sdram_inputs.size_in_bytes);
         if (synaptic_contributions == NULL) {
