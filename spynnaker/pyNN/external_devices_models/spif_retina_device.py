@@ -12,16 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import math
 from spinn_utilities.overrides import overrides
+from spinn_machine import MulticastRoutingEntry
 from pacman.model.graphs.application import (
     Application2DFPGAVertex, FPGAConnection)
-from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.routing_info import BaseKeyAndMask, AppVertexRoutingInfo
+from pacman.model.routing_info.mergable_app_vertex_routing_info import (
+    n_sequential_entries, all_entries_defaultable)
 from pacman.utilities.constants import BITS_IN_KEY
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SPIF_INPUT_FPGA_LINKS,
     N_PIPES, N_FILTERS, SpiNNFPGARegister, SPIFRegister,
@@ -289,3 +294,135 @@ class SPIFRetinaDevice(
     @overrides(HasShapeKeyFields.get_shape_key_fields)
     def get_shape_key_fields(self, vertex_slice):
         return self._key_fields
+
+    def get_routing_info(
+            self, key_and_mask, partition_id, machine_mask, n_bits_atoms):
+        return _SPIFMergableRoutingInfo(
+            key_and_mask, partition_id, self, machine_mask, n_bits_atoms,
+            self.X_MASK << self._source_x_shift, self._source_x_shift,
+            self.Y_MASK << self._source_y_shift, self._source_y_shift,
+            self.X_PER_ROW)
+
+
+class _SPIFMergableRoutingInfo(AppVertexRoutingInfo):
+    """ Simple merging of retina entries using the source FPGA x and y masks
+        for machine vertices with the same vertex slice.
+    """
+
+    __slots__ = [
+        # The mask to get the FPGA x bits
+        "__x_mask",
+        # The shift to get the FPGA x bits
+        "__x_shift",
+        # The mask to get the FGPA y bits
+        "__y_mask",
+        # The shift to get the FGPA y bits
+        "__y_shift",
+        # The number of FPGA x values per row
+        "__x_per_row",
+        # The number of bits for the number of x values per row
+        "__x_per_row_bits"
+        ]
+
+    def __init__(
+            self, keys_and_masks, partition_id, app_vertex, machine_mask,
+            n_bits_atoms, x_mask, x_shift, y_mask, y_shift, x_per_row):
+        super(_SPIFMergableRoutingInfo, self).__init__(
+            keys_and_masks, partition_id, app_vertex, machine_mask,
+            n_bits_atoms)
+        self.__x_mask = x_mask
+        self.__y_mask = y_mask
+        self.__x_shift = x_shift
+        self.__y_shift = y_shift
+        self.__x_per_row = x_per_row
+        self.__x_per_row_bits = get_n_bits(x_per_row)
+
+    @overrides(AppVertexRoutingInfo.get_entries)
+    def get_entries(self, part_id, entries, routing_info):
+        if len(entries) == 1:
+            yield from super(_SPIFMergableRoutingInfo, self).get_entries(
+                part_id, entries, routing_info)
+            return
+
+        # Try to merge all things from the same area
+        i = 0
+        while i < len(entries):
+            m_vertex, entry_to_match = entries[i]
+            r_info_to_match = routing_info.get_routing_info_from_pre_vertex(
+                m_vertex, part_id)
+            matching_entries = list([(entry_to_match, r_info_to_match)])
+            while i + 1 < len(entries):
+                next_m_vertex, next_entry = entries[i + 1]
+                if not _matches(m_vertex, entry_to_match, next_m_vertex,
+                                next_entry):
+                    break
+                next_r_info = routing_info.get_routing_info_from_pre_vertex(
+                    next_m_vertex, part_id)
+                matching_entries.append((next_entry, next_r_info))
+                i += 1
+            yield from self.__merge_entries(matching_entries)
+            i += 1
+
+    def __merge_entries(self, entries):
+        i = 0
+        n_entries = len(entries)
+        while i < n_entries:
+            entry, r_info = entries[i]
+            index = self.__get_index(r_info)
+            next_n_entries = n_sequential_entries(index, n_entries)
+            if next_n_entries <= (n_entries - i):
+                mask = self.__group_mask(r_info, next_n_entries)
+                defaultable = all_entries_defaultable(
+                    entries, i, next_n_entries)
+                yield MulticastRoutingEntry(
+                    r_info.key, mask, defaultable=defaultable,
+                    spinnaker_route=entry.spinnaker_route)
+                i += next_n_entries
+
+            # Otherwise, we have to break down into powers of two
+            else:
+                entries_to_go = n_entries - i
+                while entries_to_go > 0:
+                    next_entries = 2 ** int(math.log2(entries_to_go))
+                    entry, r_info = entries[i]
+                    mask = self.__group_mask(r_info, next_entries)
+                    defaultable = all_entries_defaultable(
+                        entries, i, next_entries)
+                    yield MulticastRoutingEntry(
+                        r_info.key, mask, defaultable=defaultable,
+                        spinnaker_route=entry.spinnaker_route)
+                    entries_to_go -= next_entries
+                    i += next_entries
+
+    def __get_index(self, r_info):
+        key = r_info.key
+        x = (key & self.__x_mask) >> self.__x_shift
+        y = (key & self.__y_mask) >> self.__y_shift
+        return (y << self.__x_per_row_bits) | x
+
+    def __group_mask(self, r_info, n_entries):
+        if n_entries == 1:
+            return r_info.mask
+
+        # Split n_entries into x and y parts.  We can use divmod, but if
+        # there are 0 x entries, we can mask all the x-parts instead, so we
+        # move one of the y entries to x_per_row x entries.
+        n_y, n_x = divmod(n_entries - 1, self.__x_per_row)
+        if n_x == 0:
+            n_y -= 1
+            n_x += self.__x_per_row
+
+        # Work out how the bits to zero in the mask
+        y_bits = ((2 ** get_n_bits(n_y)) - 1) << self.__y_shift
+        x_bits = ((2 ** get_n_bits(n_x)) - 1) << self.__x_shift
+
+        # Zero the bits
+        mask = r_info.mask
+        mask &= ~y_bits
+        mask &= ~x_bits
+        return mask
+
+
+def _matches(m_vertex, entry, next_m_vertex, next_entry):
+    return (next_m_vertex.vertex_slice == m_vertex.vertex_slice and
+            entry.spinnaker_route == next_entry.spinnaker_route)

@@ -258,7 +258,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
         self._app_vertex.synapse_dynamics.write_parameters(
             spec, self.REGIONS.LOCAL_ONLY_PARAMS.value, self,
-            self.__weight_scales)
+            self.__weight_scales, reference=None)
 
         # End the writing of this specification:
         spec.end_specification()
