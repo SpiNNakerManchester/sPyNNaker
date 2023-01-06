@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import math
+from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from spinn_machine import MulticastRoutingEntry
 from pacman.model.graphs.application import (
@@ -344,24 +345,30 @@ class _SPIFMergableRoutingInfo(AppVertexRoutingInfo):
                 part_id, entries, routing_info)
             return
 
-        # Try to merge all things from the same area
-        i = 0
-        while i < len(entries):
-            m_vertex, entry_to_match = entries[i]
-            r_info_to_match = routing_info.get_routing_info_from_pre_vertex(
-                m_vertex, part_id)
-            matching_entries = list([(entry_to_match, r_info_to_match)])
-            while i + 1 < len(entries):
-                next_m_vertex, next_entry = entries[i + 1]
-                if not _matches(m_vertex, entry_to_match, next_m_vertex,
-                                next_entry):
-                    break
-                next_r_info = routing_info.get_routing_info_from_pre_vertex(
-                    next_m_vertex, part_id)
-                matching_entries.append((next_entry, next_r_info))
+        # Group entries by vertex slice
+        entries_by_slice = defaultdict(list)
+        for m_vertex, entry in entries:
+            entries_by_slice[m_vertex.vertex_slice].append((m_vertex, entry))
+
+        # Try to merge all things from the same slice
+        for slice_entries in entries_by_slice.values():
+            i = 0
+            while i < len(slice_entries):
+                m_vertex, entry_to_match = slice_entries[i]
+                rinfo_to_match = routing_info.get_routing_info_from_pre_vertex(
+                    m_vertex, part_id)
+                matching_entries = list([(entry_to_match, rinfo_to_match)])
+                while i + 1 < len(slice_entries):
+                    next_m_vertex, next_entry = slice_entries[i + 1]
+                    if not _matches(m_vertex, entry_to_match, next_m_vertex,
+                                    next_entry):
+                        break
+                    next_rinfo = routing_info.get_routing_info_from_pre_vertex(
+                        next_m_vertex, part_id)
+                    matching_entries.append((next_entry, next_rinfo))
+                    i += 1
+                yield from self.__merge_entries(matching_entries)
                 i += 1
-            yield from self.__merge_entries(matching_entries)
-            i += 1
 
     def __merge_entries(self, entries):
         i = 0
