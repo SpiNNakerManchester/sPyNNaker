@@ -689,8 +689,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # vertices
         sources = source_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
-        sources_per_vertex = max(1, int(2 ** math.ceil(math.log2(
-            n_sources / self.__n_synapse_vertices))))
+        sources_per_vertex = math.ceil(n_sources / self.__n_synapse_vertices)
 
         # Start on a different index each time to "even things out"
         index = self.__next_synapse_index
