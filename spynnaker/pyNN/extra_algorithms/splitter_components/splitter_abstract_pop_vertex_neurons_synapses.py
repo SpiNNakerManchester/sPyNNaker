@@ -701,10 +701,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             end = min(start + sources_per_vertex, n_sources)
             source_range = sources[start:end]
             for s_vertex in self.__incoming_vertices[index]:
-                targets_filtered = targets[s_vertex]
+                sources_filtered = targets[s_vertex]
                 filtered = [s for s in source_range
-                            if (s in targets_filtered or
-                                s.app_vertex in targets_filtered)]
+                            if (s in sources_filtered or
+                                s.app_vertex in sources_filtered)]
                 result.append((s_vertex, filtered))
             index = (index + 1) % self.__n_synapse_vertices
 
