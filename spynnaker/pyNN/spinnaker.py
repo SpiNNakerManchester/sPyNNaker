@@ -33,7 +33,6 @@ from spinn_front_end_common.interface.provenance import (
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
@@ -52,6 +51,7 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_partitioner, spynnaker_splitter_selector)
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import (
     moved_in_v7_warning)
 
@@ -405,6 +405,19 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return AbstractSpinnakerBase._do_delayed_compression(
             self, name, compressed)
 
+    def _execute_write_neo_metadata(self):
+        with FecTimer("Write Neo Metadata", TimerWork.OTHER):
+            with NeoBufferDatabase() as db:
+                db.write_segment_metadata()
+            for population in SpynnakerDataView.iterate_populations():
+                population._Population__vertex.write_recording_metadata(
+                    population)
+
+    @overrides(AbstractSpinnakerBase._do_write_metadata)
+    def _do_write_metadata(self):
+        self._execute_write_neo_metadata()
+        super()._do_write_metadata()
+
     def _execute_synapse_expander(self):
         with FecTimer("Synapse expander", TimerWork.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
@@ -485,3 +498,10 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         with FecTimer("SpynnakerSplitterPartitioner", TimerWork.OTHER):
             n_chips_in_graph = spynnaker_splitter_partitioner()
             self._data_writer.set_n_chips_in_graph(n_chips_in_graph)
+
+    @overrides(AbstractSpinnakerBase._execute_buffer_extractor)
+    def _execute_buffer_extractor(self):
+        super()._execute_buffer_extractor()
+        if not get_config_bool("Machine", "virtual_board"):
+            with NeoBufferDatabase() as db:
+                db.write_t_stop()

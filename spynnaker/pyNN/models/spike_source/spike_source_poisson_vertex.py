@@ -36,6 +36,7 @@ from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import (
     PopulationApplicationVertex, RecordingType)
 from spynnaker.pyNN.models.common import ParameterHolder
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes, get_expander_rates_bytes, get_params_bytes)
@@ -401,12 +402,8 @@ class SpikeSourcePoissonVertex(
 
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self.__spike_recorder.get_spikes(
-            self.label,
-            SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            self)
+        with NeoBufferDatabase() as db:
+            return db.get_data(self.label, name)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
@@ -425,18 +422,6 @@ class SpikeSourcePoissonVertex(
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return RecordingType.BIT_FIELD
-
-    @overrides(PopulationApplicationVertex.clear_recording_data)
-    def clear_recording_data(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
-        for machine_vertex in self.machine_vertices:
-            placement = SpynnakerDataView.get_placement_of_vertex(
-                machine_vertex)
-            buffer_manager.clear_recorded_data(
-                placement.x, placement.y, placement.p,
-                SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 
     def max_spikes_per_ts(self):
         ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
@@ -535,6 +520,21 @@ class SpikeSourcePoissonVertex(
         :rtype: None
         """
         self.__kiss_seed[vertex_slice] = seed
+
+    def clear_spike_recording(self):
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
+        for machine_vertex in self.machine_vertices:
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
+            buffer_manager.clear_recorded_data(
+                placement.x, placement.y, placement.p,
+                SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
+
+    @overrides(PopulationApplicationVertex.write_recording_metadata)
+    def write_recording_metadata(self, population):
+        self.__spike_recorder.write_spike_metadata(
+            self, SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
+            population)
 
     def describe(self):
         """ Return a human-readable description of the cell or synapse type.

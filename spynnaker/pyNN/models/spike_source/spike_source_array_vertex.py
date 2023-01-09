@@ -27,6 +27,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common import (
     PopulationApplicationVertex, RecordingType)
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.models.common import ParameterHolder
 from .spike_source_array_machine_vertex import SpikeSourceArrayMachineVertex
@@ -301,15 +302,17 @@ class SpikeSourceArrayVertex(
 
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self.__spike_recorder.get_spikes(
-            self.label, 0, self,
-            lambda vertex:
+        with NeoBufferDatabase() as db:
+            return db.get_data(self.label, name)
+
+    @overrides(PopulationApplicationVertex.write_recording_metadata)
+    def write_recording_metadata(self, population):
+        self.__spike_recorder.write_spike_metadata(
+            0, self, lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0,
-            self.__n_colour_bits)
+            self.n_colour_bits, population)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
@@ -328,18 +331,6 @@ class SpikeSourceArrayVertex(
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return RecordingType.BIT_FIELD
-
-    @overrides(PopulationApplicationVertex.clear_recording_data)
-    def clear_recording_data(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
-        for machine_vertex in self.machine_vertices:
-            placement = SpynnakerDataView.get_placement_of_vertex(
-                machine_vertex)
-            buffer_manager.clear_recorded_data(
-                placement.x, placement.y, placement.p,
-                SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID)
 
     def describe(self):
         """ Returns a human-readable description of the cell or synapse type.

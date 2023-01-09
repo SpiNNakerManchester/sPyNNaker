@@ -17,14 +17,12 @@ import logging
 import numpy
 import neo
 import quantities
-from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.data_cache import DataCache
-from spynnaker.pyNN.models.common import RecordingType
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 # needed as dealing with quantities
 # pylint: disable=c-extension-no-member
@@ -169,96 +167,10 @@ class Recorder(object):
         # Tell the vertex to record
         self.__vertex.set_recording(variable, sampling_interval, indexes)
 
-    def get_recorded_pynn7(self, variable, as_matrix=False, view_indexes=None):
-        """ Get recorded data in PyNN 0.7 format. Must not be spikes.
-
-        :param str variable:
-            The name of the variable to get. Supported variable names are:
-            ``gsyn_exc``, ``gsyn_inh``, ``v``
-        :param bool as_matrix: If set True the data is returned as a 2d matrix
-        :param view_indexes: The indexes for which data should be returned.
-            If ``None``, all data (view_index = data_indexes)
-        :type view_indexes: list(int) or None
-        :rtype: ~numpy.ndarray
-        """
-        # Only matrix variables are currently supported through this function
-        if self.__vertex.get_recording_type(variable) != RecordingType.MATRIX:
-            raise NotImplementedError(f"{variable} not supported")
-        data = self.get_data(variable)
-        sampling_interval = self.__vertex.get_recording_sampling_interval(
-            variable)
-        ids = self.__vertex.get_recording_indices(variable)
-        if view_indexes is None:
-            if len(ids) != self.__vertex.n_atoms:
-                warn_once(logger, self._SELECTIVE_RECORDED_MSG)
-            indexes = ids
-        elif view_indexes == list(ids):
-            indexes = ids
-        else:
-            # keep just the view indexes in the data
-            indexes = [i for i in view_indexes if i in ids]
-            # keep just data columns in the view
-            map_indexes = [list(ids).index(i) for i in indexes]
-            data = data[:, map_indexes]
-
-        if as_matrix:
-            return data
-
-        # Convert to triples as Pynn 0,7 did
-        n_machine_time_steps = len(data)
-        n_neurons = len(indexes)
-        column_length = n_machine_time_steps * n_neurons
-        times = [i * sampling_interval
-                 for i in range(0, n_machine_time_steps)]
-        return numpy.column_stack((
-                numpy.repeat(indexes, n_machine_time_steps, 0),
-                numpy.tile(times, n_neurons),
-                numpy.transpose(data).reshape(column_length)))
-
-    def __get_empty_data(self, variable):
-        """ Get an empty array for the given recording type
-
-        :param str variable: the variable to get the array for
-        :rtype: ~numpy.ndarray
-        """
-        if not self.__vertex.is_recording_variable(variable):
-            raise KeyError(f"Variable {variable} is not being recorded")
-        var_type = self.__vertex.get_recording_type(variable)
-        if var_type == RecordingType.MATRIX:
-            return numpy.zeros((0, 3))
-        if var_type == RecordingType.BIT_FIELD:
-            return numpy.zeros((0, 2))
-        if var_type == RecordingType.EVENT:
-            return numpy.zeros((0, 4))
-        raise ValueError(f"Unknown type {var_type}")
-
-    def get_data(self, variable):
-        """ Get the data for the given variable with safety checks
-
-        :param str variable: the variable to get the data for
-        :rtype: ~numpy.ndarray
-        """
+    @property
+    def recording_label(self):
         SpynnakerDataView.check_user_can_act()
-
-        if not SpynnakerDataView.is_ran_last():
-            if SpynnakerDataView.is_ran_ever():
-                logger.warning(
-                    f"The simulation has been reset, therefore {variable} "
-                    f"cannot be retrieved, hence the list/last segment list "
-                    f"will be empty")
-            else:
-                logger.warning(
-                    f"The simulation has not yet run, therefore {variable} "
-                    f"cannot be retrieved, hence the list will be empty")
-            return self.__get_empty_data(variable)
-
-        if get_config_bool("Machine", "virtual_board"):
-            logger.warning(
-                "The simulation is using a virtual machine and so has not "
-                "truly ran, hence the list will be empty")
-            return self.__get_empty_data(variable)
-
-        return self.__vertex.get_recorded_data(variable)
+        return self.__vertex.label
 
     def turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying ``.record()``
@@ -279,12 +191,15 @@ class Recorder(object):
             annotations to put on the Neo block
         :return: The Neo block
         :rtype: ~neo.core.Block
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording not setup correctly
         """
         block = neo.Block()
 
         for previous in range(0, SpynnakerDataView.get_segment_counter()):
             self.__append_previous_segment(
-                block, previous, variables, view_indexes)
+                block, previous, variables, view_indexes, clear)
 
         # add to the segments the new block
         self.__append_current_segment(block, variables, view_indexes, clear)
@@ -305,26 +220,8 @@ class Recorder(object):
         variables = self.__vertex.get_recording_variables()
         if variables:
             segment_number = SpynnakerDataView.get_segment_counter()
-            logger.info("Caching data for segment {:d}", segment_number)
-
-            data_cache = DataCache(
-                label=self.__population.label,
-                description=self.__population.describe(),
-                segment_number=segment_number,
-                recording_start_time=self.__recording_start_time,
-                t=SpynnakerDataView.get_current_run_time_ms())
-
-            for variable in variables:
-                samp_interval = self.__vertex.get_recording_sampling_interval(
-                    variable)
-                indexes = self.__vertex.get_recording_indices(variable)
-                data = self.get_data(variable)
-                data_cache.save_data(
-                    variable=variable, data=data, indexes=indexes,
-                    n_neurons=self.__population.size,
-                    units=self.__vertex.get_units(variable),
-                    sampling_interval=samp_interval)
-            self.__data_cache[segment_number] = data_cache
+            self.__data_cache[segment_number] = \
+                NeoBufferDatabase.default_database_file()
 
     def __clean_variables(self, variables):
         """ Sorts out variables for processing usage
@@ -349,50 +246,45 @@ class Recorder(object):
         return variables
 
     def __append_current_segment(self, block, variables, view_indexes, clear):
-        # build segment for the current data to be gathered in
-        segment = neo.Segment(
-            name="segment{}".format(SpynnakerDataView.get_segment_counter()),
-            description=self.__population.describe(),
-            rec_datetime=datetime.now())
+        """
 
-        # sort out variables for using
-        variables = self.__clean_variables(variables)
+        :param block:
+        :param variables:
+        :param view_indexes:
+        :param clear:
+        :return:
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording not setup correctly
+        """
+        SpynnakerDataView.check_user_can_act()
 
-        for variable in variables:
-            data = self.get_data(variable)
-            s_intrval = self.__vertex.get_recording_sampling_interval(variable)
-            var_type = self.__vertex.get_recording_type(variable)
-            if var_type == RecordingType.BIT_FIELD:
-                self.__add_neo_spiketrains(
-                    segment=segment, spikes=data,
-                    t=SpynnakerDataView.get_current_run_time_ms(),
-                    n_neurons=self.__population.size,
-                    recording_start_time=self.__recording_start_time,
-                    sampling_interval=s_intrval, indexes=view_indexes,
-                    label=self.__population.label)
-            elif var_type == RecordingType.EVENT:
-                self.__add_neo_events(
-                    segment=segment, event_array=data, variable=variable,
-                    recording_start_time=self.__recording_start_time)
-            elif var_type == RecordingType.MATRIX:
-                indices = self.__vertex.get_recording_indices(variable)
-                self.__add_neo_analog_signals(
-                    segment=segment, block=block, signal_array=data,
-                    data_indexes=indices, view_indexes=view_indexes,
-                    variable=variable,
-                    recording_start_time=self.__recording_start_time,
-                    sampling_interval=s_intrval,
-                    units=self.__vertex.get_units(variable),
-                    label=self.__population.label)
+        with NeoBufferDatabase() as db:
+            if SpynnakerDataView.is_reset_last():
+                logger.warning(
+                    "Due to the call directly after reset. "
+                    "The data will only contain "
+                    f"{SpynnakerDataView.get_segment_counter()-1} segments")
             else:
-                raise ValueError(f"Unknown recording type {var_type}")
-        block.segments.append(segment)
-
-        if clear:
-            self.__clear_recording(variables)
+                db.add_segment(
+                    block, self.__population.label, variables, view_indexes)
+                if clear:
+                    db.clear_data(self.__population.label, variables)
 
     def __append_previous_segment(
-            self, block, segment_number, variables, view_indexes):
+            self, block, segment_number, variables, view_indexes, clear):
+        """
+
+        :param block:
+        :param segment_number:
+        :param variables:
+        :param view_indexes:
+        :param bool clear:
+        :return:
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording not setup correctly
+        """
         if segment_number not in self.__data_cache:
             logger.warning("No Data available for Segment {}", segment_number)
             segment = neo.Segment(
@@ -402,47 +294,11 @@ class Recorder(object):
             block.segments.append(segment)
             return
 
-        data_cache = self.__data_cache[segment_number]
-
-        # sort out variables
-        variables = self.__clean_variables(variables)
-
-        # build segment for the previous data to be gathered in
-        segment = neo.Segment(
-            name="segment{}".format(segment_number),
-            description=data_cache.description,
-            rec_datetime=data_cache.rec_datetime)
-
-        for variable in variables:
-            if variable not in data_cache.variables:
-                logger.warning("No Data available for Segment {} variable {}",
-                               segment_number, variable)
-                continue
-            variable_cache = data_cache.get_data(variable)
-            var_type = self.__vertex.get_recording_type(variable)
-            if var_type == RecordingType.BIT_FIELD:
-                self.__add_neo_spiketrains(
-                    segment=segment, spikes=variable_cache.data,
-                    t=data_cache.t, n_neurons=variable_cache.n_neurons,
-                    recording_start_time=data_cache.recording_start_time,
-                    sampling_interval=variable_cache.sampling_interval,
-                    indexes=view_indexes, label=data_cache.label)
-            elif var_type == RecordingType.EVENT:
-                self.__add_neo_events(
-                    segment=segment, event_array=variable_cache.data,
-                    variable=variable,
-                    recording_start_time=data_cache.recording_start_time)
-            elif var_type == RecordingType.MATRIX:
-                self.__add_neo_analog_signals(
-                    segment=segment, block=block,
-                    signal_array=variable_cache.data,
-                    data_indexes=variable_cache.indexes,
-                    view_indexes=view_indexes, variable=variable,
-                    recording_start_time=data_cache.recording_start_time,
-                    sampling_interval=variable_cache.sampling_interval,
-                    units=variable_cache.units, label=data_cache.label)
-
-        block.segments.append(segment)
+        with NeoBufferDatabase(self.__data_cache[segment_number]) as db:
+            db.add_segment(
+                block, self.__population.label, variables, view_indexes)
+            if clear:
+                db.clear_data(self.__population.label, variables)
 
     def __metadata(self):
         metadata = {
@@ -458,10 +314,6 @@ class Recorder(object):
         metadata['dt'] = SpynnakerDataView.get_simulation_time_step_ms()
         metadata['mpi_processes'] = 1  # meaningless on Spinnaker
         return metadata
-
-    def __clear_recording(self, variables):
-        for variable in variables:
-            self.__vertex.clear_recording_data(variable)
 
     def __add_neo_spiketrains(
             self, segment, spikes, t, n_neurons, recording_start_time,
@@ -620,3 +472,17 @@ class Recorder(object):
             name="Index {}".format(count), index=ids)
         block.channel_indexes.append(channel_index)
         return channel_index
+
+
+def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
+    """ Converts data between sPyNNaker format and Neo format
+
+    :param ~numpy.ndarray signal_array: Draw data in sPyNNaker format
+    :param list(int) indexes:
+    :rtype: ~numpy.ndarray
+    """
+    processed_data = [
+        signal_array[:, 2][signal_array[:, 0] == index]
+        for index in indexes]
+    processed_data = numpy.vstack(processed_data).T
+    return processed_data

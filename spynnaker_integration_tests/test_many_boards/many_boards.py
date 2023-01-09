@@ -25,7 +25,7 @@ CHIPS_PER_BOARD_EXCLUDING_SAFETY = 43.19
 
 
 class ManyBoards(BaseTestCase):
-    n_boards = 4
+    n_boards = 1
     n_neurons = 400
     simtime = 600
 

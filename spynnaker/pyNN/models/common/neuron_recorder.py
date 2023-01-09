@@ -24,6 +24,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from .population_application_vertex import RecordingType
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -125,15 +126,6 @@ class NeuronRecorder(object):
 
     #: max_rewires
     MAX_REWIRES = "max_rewires"
-
-    #: number of words per rewiring entry
-    REWIRING_N_WORDS = 2
-
-    #: rewiring: shift values to decode recorded value
-    _PRE_ID_SHIFT = 9
-    _POST_ID_SHIFT = 1
-    _POST_ID_FACTOR = 2 ** 8
-    _FIRST_BIT = 1
 
     _MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -417,27 +409,6 @@ class NeuronRecorder(object):
         order = numpy.argsort(indexes)
         return pop_level_data[:, order]
 
-    def get_recorded_data(self, label, application_vertex, variable):
-        """ Get recorded data based on type
-
-        :param str label: vertex label
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
-        :rtype: ~numpy.ndarray
-        """
-        if not self.is_recording(variable):
-            raise KeyError(f"Variable {variable} was not recorded")
-        if variable in self.__bitfield_variables:
-            return self.get_spikes(label, application_vertex, variable)
-        if variable in self.__events_per_core_variables:
-            return self.get_events(label, application_vertex, variable)
-        if (variable in self.__sampling_rates or
-                variable in self.__per_timestep_variables):
-            return self.get_matrix_data(label, application_vertex, variable)
-        raise KeyError(f"This vertex cannot record {variable}")
-
     def get_recorded_data_type(self, variable):
         if variable in self.__bitfield_variables:
             return RecordingType.BIT_FIELD
@@ -448,222 +419,115 @@ class NeuronRecorder(object):
             return RecordingType.MATRIX
         raise KeyError(f"This vertex cannot record {variable}")
 
-    def get_matrix_data(self, label, application_vertex, variable):
-        """ Read a data mapped to time and neuron IDs from the SpiNNaker\
-            machine and converts to required data types with scaling if needed.
-
-        :param str label: vertex label
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
-        :rtype: ~numpy.ndarray
+    def __write_matrix_metadata(
+            self, application_vertex,
+            sampling_interval_ms, data_type, variable, population):
         """
-        if variable in self.__bitfield_variables:
-            msg = ("Variable {} is not supported by get_matrix_data, use "
-                   "get_spikes(...)").format(variable)
-            raise ConfigurationException(msg)
-        if variable in self.__events_per_core_variables:
-            msg = ("Variable {} is not supported by get_matrix_data, use "
-                   "get_events(...)").format(variable)
-            raise ConfigurationException(msg)
+        Write the metadata to retrieve matrix data based on just the database
+
+        :param ApplicationVertex application_vertex:
+        :param float sampling_interval:
+            The simulation time in ms between sampling.
+            Typically the sampling rate * simulation_timestep_ms
+        :param DataType data_type: type of data being recorded
+        :param str variable: name of the variable.
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
+        """
+        vertices = (
+            application_vertex.splitter.machine_vertices_for_recording(
+                variable))
+        region = self.__region_ids[variable]
+
+        for i, vertex in enumerate(vertices):
+            if variable in self.__sampling_rates:
+                neurons = self._neurons_recording(
+                    variable, vertex.vertex_slice,
+                    application_vertex.atoms_shape)
+            else:
+                neurons = [i]
+            with NeoBufferDatabase() as db:
+                db.write_matrix_metadata(
+                    vertex, variable, region, population,
+                    sampling_interval_ms, neurons, data_type)
+
+    def _write_matrix_metadata(self, application_vertex, variable, population):
         if variable in self.__per_timestep_variables:
             sampling_rate = 1
             data_type = self.__per_timestep_datatypes[variable]
         else:
             sampling_rate = self.__sampling_rates[variable]
             data_type = self.__data_types[variable]
-        return self.__read_data(
-            label, application_vertex, sampling_rate, data_type, variable)
+        sampling_interval_ms = sampling_rate * \
+            SpynnakerDataView.get_simulation_time_step_ms()
+        self.__write_matrix_metadata(
+            application_vertex, sampling_interval_ms, data_type, variable,
+            population)
 
-    def get_spikes(self, label, application_vertex, variable):
-        """ Read spikes mapped to time and neuron IDs from the SpiNNaker\
-            machine.
-
-        :param str label: vertex label
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str variable:
-        :return:
-        :rtype: ~numpy.ndarray(tuple(int,int))
+    def _write_spike_metadata(self, application_vertex, population):
         """
-        if variable not in self.__bitfield_variables:
-            msg = "Variable {} is not supported, use get_matrix_data".format(
-                variable)
-            raise ConfigurationException(msg)
+        Write the metadata to retreive spikes based on just the database
 
-        spike_times = list()
-        spike_ids = list()
-
+        :param ApplicationVertex application_vertex:
+            vertex which will supply the data
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
+        """
+        sampling_interval_ms = self.__sampling_rates[self.SPIKES] * \
+            SpynnakerDataView.get_simulation_time_step_ms()
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
-                variable))
-        missing_str = ""
-        progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
-        for vertex in progress.over(vertices):
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            vertex_slice = vertex.vertex_slice
+                self.SPIKES))
+        region = self.__region_ids[self.SPIKES]
 
-            neurons = numpy.array(self._neurons_recording(
-                variable, vertex_slice, application_vertex.atoms_shape))
-            neurons_recording = len(neurons)
-            if neurons_recording == 0:
-                continue
+        with NeoBufferDatabase() as db:
+            for vertex in vertices:
+                neurons = self._neurons_recording(
+                    self.SPIKES, vertex.vertex_slice,
+                    application_vertex.atoms_shape)
+                db.write_spikes_metadata(
+                    vertex, self.SPIKES, region, population,
+                    sampling_interval_ms, neurons)
 
-            # Read the spikes
-            n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
-            n_bytes = n_words * BYTES_PER_WORD
-            n_words_with_timestamp = n_words + 1
-
-            # for buffering output info is taken form the buffer manager
-            region = self.__region_ids[variable]
-            buffer_manager = SpynnakerDataView.get_buffer_manager()
-            record_raw, data_missing = buffer_manager.get_data_by_placement(
-                    placement, region)
-            if data_missing:
-                missing_str += "({}, {}, {}); ".format(
-                    placement.x, placement.y, placement.p)
-            if len(record_raw) > 0:
-                raw_data = (
-                    numpy.asarray(record_raw, dtype="uint8").view(
-                        dtype="<i4")).reshape([-1, n_words_with_timestamp])
-            else:
-                raw_data = record_raw
-            if len(raw_data) > 0:
-                record_time = (raw_data[:, 0] *
-                               SpynnakerDataView.get_simulation_time_step_ms())
-                spikes = raw_data[:, 1:].byteswap().view("uint8")
-                bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
-                    (-1, 32))).reshape((-1, n_bytes * 8))
-                time_indices, local_indices = numpy.where(bits == 1)
-                if self.__indexes[variable] is None:
-                    indices = neurons[local_indices]
-                    times = record_time[time_indices].reshape((-1))
-                    spike_ids.extend(indices)
-                    spike_times.extend(times)
-                else:
-                    for time_indice, local in zip(time_indices, local_indices):
-                        if local < neurons_recording:
-                            spike_ids.append(neurons[local])
-                            spike_times.append(record_time[time_indice])
-
-        if len(missing_str) > 0:
-            logger.warning(
-                "Population {} is missing spike data in region {} from the"
-                " following cores: {}", label, region, missing_str)
-
-        if len(spike_ids) == 0:
-            return numpy.zeros((0, 2), dtype="float")
-
-        result = numpy.column_stack((spike_ids, spike_times))
-        return result[numpy.lexsort((spike_times, spike_ids))]
-
-    def get_events(self, label, application_vertex, variable):
-        """ Read events mapped to time and neuron IDs from the SpiNNaker\
-            machine.
-
-        :param str label: vertex label
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str variable:
-        :return:
-        :rtype: ~numpy.ndarray(tuple(int,int,int,int))
+    def __write_rewires_metadata(self, application_vertex, population):
         """
-        if variable == self.REWIRING:
-            return self._get_rewires(
-                label, application_vertex, variable)
-        else:
-            # Unspecified event variable
-            msg = (
-                "Variable {} is not supported. Supported event variables are: "
-                "{}".format(variable, self.get_event_recordable_variables()))
-            raise ConfigurationException(msg)
+        Write the metadata to retrieve rewires data based on just the database
 
-    def _get_rewires(
-            self, label, application_vertex, variable):
-        """ Read rewires mapped to time and neuron IDs from the SpiNNaker\
-            machine.
-
-        :param str label: vertex label
-        :param application_vertex:
-        :type application_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param str variable:
-        :return:
-        :rtype: ~numpy.ndarray(tuple(int,int,int,int))
+        :param ApplicationVeretx application_vertex:
+        :param str variable: name of the variable.
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
         """
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
-        rewire_times = list()
-        rewire_values = list()
-        rewire_postids = list()
-        rewire_preids = list()
-
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
-                variable))
-        missing_str = ""
-        progress = ProgressBar(
-            vertices, "Getting rewires for {}".format(label))
-        for vertex in progress.over(vertices):
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            vertex_slice = vertex.vertex_slice
+                self.REWIRING))
+        region = self.__region_ids[self.REWIRING]
 
-            neurons = list(
-                range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
-            neurons_recording = len(neurons)
-            if neurons_recording == 0:
-                continue
+        for i, vertex in enumerate(vertices):
+            with NeoBufferDatabase() as db:
+                db.write_rewires_metadata(
+                    vertex, self.REWIRING, region, population)
 
-            # for buffering output info is taken form the buffer manager
-            region = self.__region_ids[variable]
-            record_raw, data_missing = buffer_manager.get_data_by_placement(
-                    placement, region)
-            if data_missing:
-                missing_str += "({}, {}, {}); ".format(
-                    placement.x, placement.y, placement.p)
-            if len(record_raw) > 0:
-                raw_data = (
-                    numpy.asarray(record_raw, dtype="uint8").view(
-                        dtype="<i4")).reshape([-1, self.REWIRING_N_WORDS])
+    def write_recording_metadata(self, application_vertex, population):
+        """
+        Write the metdatabase to the database so it can be used standalone
+
+        :param application_vertex:
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
+        :return:
+        """
+        for variable in self.recording_variables:
+            if variable == self.SPIKES:
+                self._write_spike_metadata(application_vertex, population)
+            elif variable == self.REWIRING:
+                self.__write_rewires_metadata(application_vertex, population)
+            elif variable in self.__events_per_core_variables:
+                raise NotImplementedError(
+                    f"Unexpected Event variable: {variable}")
             else:
-                raw_data = record_raw
-
-            if len(raw_data) > 0:
-                record_time = (
-                        raw_data[:, 0] *
-                        SpynnakerDataView.get_simulation_time_step_ms())
-                rewires_raw = raw_data[:, 1:]
-                rew_length = len(rewires_raw)
-                # rewires is 0 (elimination) or 1 (formation) in the first bit
-                rewires = [rewires_raw[i][0] & self._FIRST_BIT
-                           for i in range(rew_length)]
-                # the post-neuron ID is stored in the next 8 bytes
-                post_ids = [((int(rewires_raw[i]) >> self._POST_ID_SHIFT) %
-                            self._POST_ID_FACTOR) + vertex_slice.lo_atom
-                            for i in range(rew_length)]
-                # the pre-neuron ID is stored in the remaining 23 bytes
-                pre_ids = [int(rewires_raw[i]) >> self._PRE_ID_SHIFT
-                           for i in range(rew_length)]
-
-                rewire_values.extend(rewires)
-                rewire_postids.extend(post_ids)
-                rewire_preids.extend(pre_ids)
-                rewire_times.extend(record_time)
-
-        if len(missing_str) > 0:
-            logger.warning(
-                "Population {} is missing rewiring data in region {} from the"
-                " following cores: {}", label, region, missing_str)
-
-        if len(rewire_values) == 0:
-            return numpy.zeros((0, 4), dtype="float")
-
-        result = numpy.column_stack(
-            (rewire_times, rewire_preids, rewire_postids, rewire_values))
-        return result[numpy.lexsort(
-            (rewire_values, rewire_postids, rewire_preids, rewire_times))]
+                self._write_matrix_metadata(
+                    application_vertex, variable, population)
 
     def get_recordable_variables(self):
         """

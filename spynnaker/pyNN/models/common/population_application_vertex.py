@@ -273,6 +273,20 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         raise KeyError("This Population does not support recording")
 
+    def write_recording_metadata(self, population):
+        """
+        Writes the metatdata to get_recorded_data from NeoBufferedDatabase
+
+        If the get_recorded_data method uses NeoBufferDatabase thios method
+        must be implemented
+
+        If the data comes from the BufferExtractor than it can be skipped
+
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            the population to record for
+        """
+        pass
+
     def get_recorded_data(self, name):
         """ Get the data recorded for a given variable
 
@@ -303,14 +317,6 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
         :param str name: The name of the variable to get the type of
         :rtype: RecordingType
-        :raise KeyError: If the variable isn't recordable
-        """
-        raise KeyError("This Population does not support recording")
-
-    def clear_recording_data(self, name):
-        """ Clear the data for the given recording
-
-        :param str name: The name of the variable to clear the data from
         :raise KeyError: If the variable isn't recordable
         """
         raise KeyError("This Population does not support recording")

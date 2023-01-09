@@ -63,6 +63,7 @@ from spynnaker.pyNN.models.common import (
 from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 from .population_machine_neurons import PopulationMachineNeurons
 from .synapse_io import get_max_row_info
@@ -747,18 +748,15 @@ class AbstractPopulationVertex(
             self.__neuron_recorder.is_recording(name) or
             self.__synapse_recorder.is_recording(name))
 
+    @overrides(PopulationApplicationVertex.write_recording_metadata)
+    def write_recording_metadata(self, population):
+        self.__neuron_recorder.write_recording_metadata(self, population)
+        self.__synapse_recorder.write_recording_metadata(self, population)
+
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
-        if self.__neuron_recorder.is_recording(name):
-            return self.__neuron_recorder.get_recorded_data(
-                self.label, self, name)
-        if self.__synapse_recorder.is_recording(name):
-            return self.__synapse_recorder.get_recorded_data(
-                self.label, self, name)
-        if (not self.__neuron_recorder.is_recordable(name) and
-                not self.__synapse_recorder.is_recordable(name)):
-            raise KeyError(f"{name} is not a supported variable")
-        raise KeyError(f"{name} has not been set to record")
+        with NeoBufferDatabase() as db:
+            return db.get_data(self.label, name)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
@@ -783,21 +781,6 @@ class AbstractPopulationVertex(
         if self.__synapse_recorder.is_recordable(name):
             return self.__synapse_recorder.get_recorded_data_type(name)
         raise KeyError(f"It is not possible to record {name}")
-
-    @overrides(PopulationApplicationVertex.clear_recording_data)
-    def clear_recording_data(self, name):
-        if self.__neuron_recorder.is_recordable(name):
-            region = self.__neuron_recorder.get_region(name)
-        elif self.__synapse_recorder.is_recordable(name):
-            region = self.__synapse_recorder.get_region(name)
-        else:
-            raise KeyError(f"It is not possible to record {name}")
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
-        for machine_vertex in self.machine_vertices:
-            placement = SpynnakerDataView.get_placement_of_vertex(
-                machine_vertex)
-            buffer_manager.clear_recorded_data(
-                placement.x, placement.y, placement.p, region)
 
     @property
     def weight_scale(self):

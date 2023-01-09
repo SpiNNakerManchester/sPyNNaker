@@ -27,12 +27,12 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.utilities.constants import SPIKES
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 from .population_view import PopulationView
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__file__))
 
@@ -227,10 +227,7 @@ class Population(PopulationBase):
             record.
         """
         # pylint: disable=too-many-arguments
-        if not gather:
-            logger.warning(
-                "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
+        self._check_params(gather, annotations)
 
         if isinstance(io, str):
             io = neo.get_io(io)
@@ -311,15 +308,7 @@ class Population(PopulationBase):
             If the variable or variables have not been previously set to
             record.
         """
-        if not gather:
-            logger.warning(
-                "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        if annotations is not None:
-            warn_once(
-                logger, "annotations parameter is not standard PyNN so may "
-                        "not be supported by all platforms.")
-
+        self._check_params(gather, annotations)
         return self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
 
@@ -338,20 +327,9 @@ class Population(PopulationBase):
         warn_once(
             logger, "spinnaker_get_data is non-standard PyNN and therefore "
             "will not be portable to other simulators.")
-        if isinstance(variable, list):
-            if len(variable) != 1:
-                raise ConfigurationException(
-                    "Only one type of data at a time is supported")
-            variable = variable[0]
-        if variable == SPIKES:
-            if as_matrix:
-                logger.warning(f"Ignoring as matrix for {SPIKES}")
-            spikes = self.__recorder.get_data("spikes")
-            if view_indexes is None:
-                return spikes
-            return spikes[numpy.isin(spikes[:, 0], view_indexes)]
-        return self.__recorder.get_recorded_pynn7(
-            variable, as_matrix, view_indexes)
+        with NeoBufferDatabase() as db:
+            return db.spinnaker_get_data(self.__recorder.recording_label,
+                                         variable, as_matrix, view_indexes)
 
     @overrides(PopulationBase.get_spike_counts, extend_doc=False)
     def get_spike_counts(self, gather=True):
@@ -359,29 +337,9 @@ class Population(PopulationBase):
 
         :rtype: ~numpy.ndarray
         """
-        spikes = self.__recorder.get_data("spikes")
-        return self._get_spike_counts(spikes, gather)
-
-    def _get_spike_counts(self, spikes, gather=True):
-        """ Return the number of spikes for each neuron.
-
-        Defined by
-        http://neuralensemble.org/docs/PyNN/reference/populations.html
-
-        :param ~numpy.ndarray spikes:
-        :param gather: pointless on sPyNNaker
-        :rtype: dict(int,int)
-        """
-        if not gather:
-            warn_once(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        n_spikes = {}
-        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
-                                minlength=self.__vertex.n_atoms)
-        for i in range(self.__vertex.n_atoms):
-            n_spikes[i] = counts[i]
-        return n_spikes
+        self._check_params(gather)
+        with NeoBufferDatabase() as db:
+            return db.get_spike_counts(self.__recorder.recording_label)
 
     def find_units(self, variable):
         """ Get the units of a variable
@@ -591,10 +549,7 @@ class Population(PopulationBase):
             is a list.
         :rtype: ParameterHolder
         """
-        if not gather:
-            warn_once(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
+        self._check_params(gather)
         if simplify is not True:
             warn_once(
                 logger, "The simplify value is ignored if not set to true")
@@ -795,6 +750,7 @@ class Population(PopulationBase):
                     additional_parameters, population_parameters)
             self.__vertex = model.create_vertex(
                 size, label, **population_parameters)
+            assert isinstance(self.__vertex, PopulationApplicationVertex)
 
         # Use a provided application vertex directly
         elif isinstance(model, PopulationApplicationVertex):
