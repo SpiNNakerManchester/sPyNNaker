@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -75,7 +72,7 @@
 
 
 <span class="k">class</span> <span class="nc">LocalOnlyConvolution</span><span class="p">(</span><span class="n">AbstractLocalOnly</span><span class="p">,</span> <span class="n">AbstractSupportsSignedWeights</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A convolution synapse dynamics that can process spikes with only DTCM</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A convolution synapse dynamics that can process spikes with only DTCM</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -169,7 +166,7 @@
         <span class="k">return</span> <span class="n">key</span><span class="p">,</span> <span class="n">mask</span>
 
     <span class="k">def</span> <span class="nf">__get_sources_for_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get all the machine vertex sources that will hit the given</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get all the machine vertex sources that will hit the given</span>
 <span class="sd">            application vertex</span>
 
 <span class="sd">        :param AbstractPopulationVertex app_vertex:</span>
@@ -197,7 +194,7 @@
         <span class="k">return</span> <span class="n">sources_for_target</span>
 
     <span class="k">def</span> <span class="nf">__get_rinfo_for_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_cache</span><span class="p">,</span> <span class="n">srcs</span><span class="p">,</span> <span class="n">incoming</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the routing information for sources, merging sources that have</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the routing information for sources, merging sources that have</span>
 <span class="sd">            the same vertex slice (note this happens in retinas from FPGAs).</span>
 
 <span class="sd">        :rtype: list(Source)</span>
@@ -346,7 +343,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

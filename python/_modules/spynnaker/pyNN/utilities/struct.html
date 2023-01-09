@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -68,7 +65,7 @@
 
 
 <div class="viewcode-block" id="StructRepeat"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.StructRepeat">[docs]</a><span class="k">class</span> <span class="nc">StructRepeat</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; How a struct repeats, or not, in memory</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; How a struct repeats, or not, in memory</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#: Indicates a single global struct</span>
     <span class="n">GLOBAL</span> <span class="o">=</span> <span class="mi">0</span>
@@ -78,7 +75,7 @@
 
 
 <div class="viewcode-block" id="Struct"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct">[docs]</a><span class="k">class</span> <span class="nc">Struct</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Represents a C code structure.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Represents a C code structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -89,7 +86,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">repeat_type</span><span class="o">=</span><span class="n">StructRepeat</span><span class="o">.</span><span class="n">PER_NEURON</span><span class="p">,</span>
                  <span class="n">default_values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param fields:</span>
 <span class="sd">            The types and names of the fields, ordered as they appear in the</span>
 <span class="sd">            struct.</span>
@@ -106,7 +103,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The types and names of the fields, ordered as they appear in the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The types and names of the fields, ordered as they appear in the</span>
 <span class="sd">            struct.</span>
 
 <span class="sd">        :rtype: list(~data_specification.enums.DataType, str)</span>
@@ -115,7 +112,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">repeat_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; How the structure repeats</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; How the structure repeats</span>
 
 <span class="sd">        :rtype: StructRepeat</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -123,7 +120,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">numpy_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The numpy data type of the struct</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The numpy data type of the struct</span>
 
 <span class="sd">        :rtype: ~numpy.dtype</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -133,7 +130,7 @@
             <span class="n">align</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Struct.get_size_in_whole_words"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct.get_size_in_whole_words">[docs]</a>    <span class="k">def</span> <span class="nf">get_size_in_whole_words</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the size of the struct in whole words in an array of given\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the size of the struct in whole words in an array of given\</span>
 <span class="sd">            size (default 1 item)</span>
 
 <span class="sd">        :param int array_size: The number of elements in an array of structs</span>
@@ -144,7 +141,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">size_in_bytes</span> <span class="o">+</span> <span class="p">(</span><span class="n">BYTES_PER_WORD</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">//</span> <span class="n">BYTES_PER_WORD</span></div>
 
 <div class="viewcode-block" id="Struct.get_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a numpy array of uint32 of data for the given values</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a numpy array of uint32 of data for the given values</span>
 
 <span class="sd">        :param values: The values to fill in the data with</span>
 <span class="sd">        :type values: dict(str-&gt;one of int, float or AbstractList)</span>
@@ -212,7 +209,7 @@
 
     <span class="k">def</span> <span class="nf">__get_data_for_slice</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">all_vals</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the data for a single value from a vertex slice</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the data for a single value from a vertex slice</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If there is a list of values, convert it</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">get_raster_ids</span><span class="p">(</span><span class="n">atoms_shape</span><span class="p">)</span>
@@ -231,7 +228,7 @@
             <span class="n">data_pos</span> <span class="o">+=</span> <span class="n">n_values</span>
 
 <div class="viewcode-block" id="Struct.get_generator_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct.get_generator_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_generator_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a numpy array of uint32 of data to generate the given values</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a numpy array of uint32 of data to generate the given values</span>
 
 <span class="sd">        :param ~dict-like values:</span>
 <span class="sd">            The values to fill in the data with</span>
@@ -296,7 +293,7 @@
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_data</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__gen_data_one_for_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">gen_data</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Generate data with a single value for all neurons</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Generate data with a single value for all neurons</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># How many sub-sets of repeats there are (1 in this case as</span>
@@ -324,7 +321,7 @@
 
     <span class="k">def</span> <span class="nf">__gen_data_for_slice</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">gen_data</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Generate data with different values for each neuron</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Generate data with different values for each neuron</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># If we have a range list for the value, generate for the range</span>
@@ -366,7 +363,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_generatable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determine if the data inside could be generated on machine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if the data inside could be generated on machine</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -376,7 +373,7 @@
 <div class="viewcode-block" id="Struct.read_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct.read_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">data_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">atoms_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Read a bytearray of data and write to values</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Read a bytearray of data and write to values</span>
 
 <span class="sd">        :param data: The data to be read</span>
 <span class="sd">        :type data: bytes or bytearray</span>
@@ -461,7 +458,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -65,7 +62,7 @@
 
 
 <div class="viewcode-block" id="AbstractPyNNModel"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">[docs]</a><span class="k">class</span> <span class="nc">AbstractPyNNModel</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A Model that can be passed in to a Population object in PyNN</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A Model that can be passed in to a Population object in PyNN</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
@@ -73,7 +70,7 @@
 
 <div class="viewcode-block" id="AbstractPyNNModel.set_model_max_atoms_per_dimension_per_core"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.set_model_max_atoms_per_dimension_per_core">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">set_model_max_atoms_per_dimension_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">n_atoms</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set the default maximum number of atoms per dimension per core for</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the default maximum number of atoms per dimension per core for</span>
 <span class="sd">            this model.  This can be overridden by the individual Population.</span>
 <span class="sd">            The new value can be None, meaning that the maximum is the same as</span>
 <span class="sd">            the number of atoms, an int, meaning all Populations of this model</span>
@@ -95,7 +92,7 @@
 
 <div class="viewcode-block" id="AbstractPyNNModel.get_model_max_atoms_per_dimension_per_core"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_model_max_atoms_per_dimension_per_core">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_model_max_atoms_per_dimension_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the maximum number of atoms per dimension per core for this</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the maximum number of atoms per dimension per core for this</span>
 <span class="sd">            model</span>
 
 <span class="sd">        :rtype: int or tuple or None</span>
@@ -110,7 +107,7 @@
 
     <span class="nd">@classproperty</span>
     <span class="k">def</span> <span class="nf">absolute_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-self-argument</span>
-        <span class="sd">&quot;&quot;&quot; The absolute maximum number of atoms per core.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The absolute maximum number of atoms per core.</span>
 <span class="sd">            This is an integer regardless of the number of dimensions</span>
 <span class="sd">            in any vertex.</span>
 
@@ -133,7 +130,7 @@
 
     <span class="nd">@classproperty</span>
     <span class="k">def</span> <span class="nf">default_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-self-argument</span>
-        <span class="sd">&quot;&quot;&quot; Get the default values for the parameters of the model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the default values for the parameters of the model.</span>
 
 <span class="sd">        :rtype: dict(str, Any)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -142,7 +139,7 @@
 
     <span class="nd">@classproperty</span>
     <span class="k">def</span> <span class="nf">default_initial_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-self-argument</span>
-        <span class="sd">&quot;&quot;&quot; Get the default initial values for the state variables of the model</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the default initial values for the state variables of the model</span>
 
 <span class="sd">        :rtype: dict(str, Any)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -153,7 +150,7 @@
 
 <div class="viewcode-block" id="AbstractPyNNModel.get_parameter_names"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_parameter_names">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the names of the parameters of the model</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the names of the parameters of the model</span>
 
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -161,7 +158,7 @@
 
 <div class="viewcode-block" id="AbstractPyNNModel.has_parameter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.has_parameter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">has_parameter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determine if the model has a parameter with the given name</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if the model has a parameter with the given name</span>
 
 <span class="sd">        :param str name: The name of the parameter to check for</span>
 <span class="sd">        :rtype: bool</span>
@@ -170,7 +167,7 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">default_population_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the default values for the parameters at the population level</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the default values for the parameters at the population level</span>
 <span class="sd">            These are parameters that can be passed in to the Population\</span>
 <span class="sd">            constructor in addition to the standard PyNN options</span>
 
@@ -179,7 +176,7 @@
 
 <div class="viewcode-block" id="AbstractPyNNModel.create_vertex"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Create a vertex for a population of the model</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Create a vertex for a population of the model</span>
 
 <span class="sd">        :param int n_neurons: The number of neurons in the population</span>
 <span class="sd">        :param str label: The label to give to the vertex</span>
@@ -225,7 +222,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

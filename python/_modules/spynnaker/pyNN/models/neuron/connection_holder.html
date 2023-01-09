@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -59,7 +56,7 @@
 
 
 <span class="k">class</span> <span class="nc">ConnectionHolder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Holds a set of connections to be returned in a PyNN-specific format</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Holds a set of connections to be returned in a PyNN-specific format</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span>
@@ -94,7 +91,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data_items_to_return</span><span class="p">,</span> <span class="n">as_list</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span>
             <span class="n">connections</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fixed_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param data_items_to_return: A list of data fields to be returned</span>
 <span class="sd">        :type data_items_to_return: list(int) or tuple(int) or None</span>
 <span class="sd">        :param bool as_list:</span>
@@ -131,7 +128,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_values</span> <span class="o">=</span> <span class="n">fixed_values</span>
 
 <div class="viewcode-block" id="ConnectionHolder.add_connections"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder.add_connections">[docs]</a>    <span class="k">def</span> <span class="nf">add_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add connections to the holder to be returned</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add connections to the holder to be returned</span>
 
 <span class="sd">        :param ~numpy.ndarray connections:</span>
 <span class="sd">            The connection to add, as a numpy structured array of</span>
@@ -143,20 +140,20 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The connections stored</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The connections stored</span>
 
 <span class="sd">        :rtype: list(~numpy.ndarray)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span>
 
 <div class="viewcode-block" id="ConnectionHolder.finish"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder.finish">[docs]</a>    <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Finish adding connections</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Finish adding connections</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__notify</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__notify</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_data_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Merges the connections into the result data format</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Merges the connections into the result data format</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If there are already merged connections cached, return those</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_items</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -321,7 +318,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

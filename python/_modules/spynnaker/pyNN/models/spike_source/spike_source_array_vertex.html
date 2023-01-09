@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -97,7 +94,7 @@
 <span class="k">class</span> <span class="nc">SpikeSourceArrayVertex</span><span class="p">(</span>
         <span class="n">ReverseIpTagMultiCastSource</span><span class="p">,</span> <span class="n">PopulationApplicationVertex</span><span class="p">,</span>
         <span class="n">SupportsStructure</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Model for play back of spikes</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Model for play back of spikes</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__model_name&quot;</span><span class="p">,</span>
@@ -189,7 +186,7 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="s2">&quot;Danger of SpikeSourceArray sending too many spikes &quot;</span>
                     <span class="s2">&quot;at the same time. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;For example at time </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">count</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;For example at time </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">count</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="si">}</span><span class="s2"> &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;spikes will be sent&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_check_density_double_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
@@ -216,7 +213,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ReverseIpTagMultiCastSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">atoms_shape</span>
 
     <span class="k">def</span> <span class="nf">_to_early_spikes_single_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks if there is one or more spike_times before the current time</span>
 
 <span class="sd">        Logs a warning for the first oen found</span>
@@ -234,7 +231,7 @@
                 <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">_check_spikes_double_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks if there is one or more spike_times before the current time</span>
 
 <span class="sd">        Logs a warning for the first oen found</span>
@@ -254,7 +251,7 @@
                     <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">__set_spike_buffer_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set the spike source array&#39;s buffer spike times</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the spike source array&#39;s buffer spike times</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">time_step</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_us</span><span class="p">()</span>
@@ -383,7 +380,7 @@
                 <span class="n">SpikeSourceArrayVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpikeSourceArrayVertex.describe"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns a human-readable description of the cell or synapse type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns a human-readable description of the cell or synapse type.</span>
 
 <span class="sd">        The output may be customised by specifying a different template\</span>
 <span class="sd">        together with an associated template engine\</span>
@@ -446,7 +443,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

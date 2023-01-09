@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -62,7 +59,7 @@
 
 
 <span class="k">class</span> <span class="nc">SmallWorldConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A connector that uses connection statistics based on the Small World\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A connector that uses connection statistics based on the Small World\</span>
 <span class="sd">        network connectivity model.</span>
 
 <span class="sd">    .. note::</span>
@@ -79,7 +76,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">rewiring</span><span class="p">,</span> <span class="n">allow_self_connections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">n_connections</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param float degree:</span>
 <span class="sd">            the region length where nodes will be connected locally</span>
 <span class="sd">        :param float rewiring: the probability of rewiring each edge</span>
@@ -127,7 +124,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_n_connections</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_set_n_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Get the probabilities up-front for now</span>
@@ -268,7 +265,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

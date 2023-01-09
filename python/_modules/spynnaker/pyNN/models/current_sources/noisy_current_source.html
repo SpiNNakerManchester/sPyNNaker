@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -66,7 +63,7 @@
 
 
 <span class="k">class</span> <span class="nc">NoisyCurrentSource</span><span class="p">(</span><span class="n">AbstractCurrentSource</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A noisy current source beginning at &quot;start&quot; and ending at &quot;stop&quot;, with</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A noisy current source beginning at &quot;start&quot; and ending at &quot;stop&quot;, with</span>
 <span class="sd">        noise simulated based on the given mean and stdev, and updating every</span>
 <span class="sd">        dt (dt should default to the machine time step)</span>
 
@@ -122,7 +119,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
 <div class="viewcode-block" id="NoisyCurrentSource.set_parameters"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.NoisyCurrentSource.set_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">set_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set the current source parameters</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the current source parameters</span>
 
 <span class="sd">        :param parameters: the parameters to set</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -143,7 +140,7 @@
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractCurrentSource</span><span class="o">.</span><span class="n">get_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the parameters of the current source</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the parameters of the current source</span>
 
 <span class="sd">        :rtype dict(str, Any)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -152,7 +149,7 @@
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractCurrentSource</span><span class="o">.</span><span class="n">get_parameter_types</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_parameter_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the parameters of the current source</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the parameters of the current source</span>
 
 <span class="sd">        :rtype dict(str, Any)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -161,7 +158,7 @@
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractCurrentSource</span><span class="o">.</span><span class="n">current_source_id</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">current_source_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The ID of the current source.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The ID of the current source.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -169,7 +166,7 @@
 
 <div class="viewcode-block" id="NoisyCurrentSource.get_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.NoisyCurrentSource.get_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractCurrentSource</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The sdram usage of the current source.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The sdram usage of the current source.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -214,7 +211,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -66,7 +63,7 @@
 
 
 <span class="k">class</span> <span class="nc">SplitterDelayVertexSlice</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; handles the splitting of the DelayExtensionVertex via slice logic.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; handles the splitting of the DelayExtensionVertex via slice logic.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -90,7 +87,7 @@
         <span class="s2">&quot;asking for them is deemed an error.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; splitter for delay extensions</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; splitter for delay extensions</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -144,7 +141,7 @@
 
 <div class="viewcode-block" id="SplitterDelayVertexSlice.create_machine_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_machine_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">source_app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; creates a delay extension machine vertex and adds to the tracker.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; creates a delay extension machine vertex and adds to the tracker.</span>
 
 <span class="sd">        :param MachineVertex source_vertex: The source of the delay</span>
 <span class="sd">        :return: machine vertex</span>
@@ -160,7 +157,7 @@
         <span class="k">return</span> <span class="n">machine_vertex</span></div>
 
 <div class="viewcode-block" id="SplitterDelayVertexSlice.get_sdram_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_sdram_used_by_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; returns the sdram used by the delay extension</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; returns the sdram used by the delay extension</span>
 
 <span class="sd">        :rtype: ConstantSDRAM</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -180,7 +177,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_machine_vertex_by_slice</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SplitterDelayVertexSlice.get_machine_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.get_machine_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">get_machine_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a delay extension machine vertex for a given vertex slice</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a delay extension machine vertex for a given vertex slice</span>
 
 <span class="sd">        :param Slice vertex_slice: The slice to get the data for</span>
 <span class="sd">        :rtype: DelayExtensionMachineVertex</span>
@@ -225,7 +222,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

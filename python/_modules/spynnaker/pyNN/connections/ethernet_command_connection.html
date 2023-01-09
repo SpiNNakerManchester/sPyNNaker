@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -61,7 +58,7 @@
 
 
 <span class="k">class</span> <span class="nc">EthernetCommandConnection</span><span class="p">(</span><span class="n">DatabaseConnection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A connection that can send commands to a device at the start and end\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A connection that can send commands to a device at the start and end\</span>
 <span class="sd">        of a simulation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -71,7 +68,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">translator</span><span class="p">,</span> <span class="n">command_containers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">local_port</span><span class="o">=</span><span class="n">NOTIFY_PORT</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractEthernetTranslator translator:</span>
 <span class="sd">            A translator of multicast commands to device commands</span>
 <span class="sd">        :param command_containers:</span>
@@ -97,7 +94,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__translator</span> <span class="o">=</span> <span class="n">translator</span>
 
 <div class="viewcode-block" id="EthernetCommandConnection.add_command_container"><a class="viewcode-back" href="../../../../spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.EthernetCommandConnection.add_command_container">[docs]</a>    <span class="k">def</span> <span class="nf">add_command_container</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_container</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a command container.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add a command container.</span>
 
 <span class="sd">        :param command_container:</span>
 <span class="sd">            A vertex that has commands to be sent at the start and end of \</span>
@@ -164,7 +161,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

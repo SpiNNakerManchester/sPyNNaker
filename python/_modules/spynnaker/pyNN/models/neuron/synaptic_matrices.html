@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -102,7 +99,7 @@
 
 
 <div class="viewcode-block" id="SynapticMatrices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices">[docs]</a><span class="k">class</span> <span class="nc">SynapticMatrices</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Handler of synaptic matrices for a core of a population vertex</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Handler of synaptic matrices for a core of a population vertex</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -151,7 +148,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">regions</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
             <span class="n">all_syn_block_sz</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param SynapseRegions regions: The synapse regions to use</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span> <span class="o">=</span> <span class="n">app_vertex</span>
@@ -182,7 +179,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_gen_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;  The maximum amount of data to be generated for the synapses.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  The maximum amount of data to be generated for the synapses.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -190,7 +187,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">bit_field_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The size of the bit field data</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size of the bit field data</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -198,7 +195,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">host_generated_block_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The address within the synaptic region after the last block</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The address within the synaptic region after the last block</span>
 <span class="sd">            written by the on-host synaptic generation i.e. the start of</span>
 <span class="sd">            the space that can be overwritten provided the synapse expander</span>
 <span class="sd">            is run again</span>
@@ -209,7 +206,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">on_chip_generated_matrix_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The size of the space used by the generated matrix i.e. the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size of the space used by the generated matrix i.e. the</span>
 <span class="sd">            space that can be overwritten provided the synapse expander</span>
 <span class="sd">            is run again</span>
 
@@ -308,7 +305,7 @@
 
 <div class="viewcode-block" id="SynapticMatrices.write_synaptic_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.write_synaptic_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">references</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write the synaptic data for all incoming projections</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the synaptic data for all incoming projections</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The spec to write to</span>
@@ -344,7 +341,7 @@
 
     <span class="k">def</span> <span class="nf">__write_synapse_expander_data_spec</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">connection_builder_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write the data spec for the synapse expander</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the data spec for the synapse expander</span>
 
 <span class="sd">        :param ~.DataSpecificationGenerator spec:</span>
 <span class="sd">            The specification to write to</span>
@@ -398,7 +395,7 @@
 
     <span class="k">def</span> <span class="nf">__get_app_key_and_mask</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">r_info</span><span class="p">,</span> <span class="n">n_stages</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a key and mask for an incoming application vertex as a whole</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a key and mask for an incoming application vertex as a whole</span>
 
 <span class="sd">        :param list(tuple(int, Slice)) keys:</span>
 <span class="sd">            The key and slice of each relevant machine vertex in the incoming</span>
@@ -419,7 +416,7 @@
                            <span class="n">mask_size</span><span class="p">,</span> <span class="n">n_atoms</span> <span class="o">*</span> <span class="n">n_stages</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a key and mask for an incoming application vertex as a whole</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a key and mask for an incoming application vertex as a whole</span>
 
 <span class="sd">        :param PopulationApplicationEdge app_edge:</span>
 <span class="sd">            The application edge to get the key and mask of</span>
@@ -435,7 +432,7 @@
             <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__delay_app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a key and mask for a whole incoming delayed application\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a key and mask for a whole incoming delayed application\</span>
 <span class="sd">            vertex, or return None if no delay edge exists</span>
 
 <span class="sd">        :param PopulationApplicationEdge app_edge:</span>
@@ -457,7 +454,7 @@
             <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SynapticMatrices.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.get_connections_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the synaptic connections from the machine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the synaptic connections from the machine</span>
 
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            Where the vertices are on the machine</span>
@@ -473,7 +470,7 @@
         <span class="k">return</span> <span class="n">matrix</span><span class="o">.</span><span class="n">get_connections</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SynapticMatrices.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Fill in any pre-run connection holders for data which is generated</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Fill in any pre-run connection holders for data which is generated</span>
 <span class="sd">            on the machine, after it has been generated</span>
 
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
@@ -484,14 +481,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Whether any matrices need to be generated on the machine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Whether any matrices need to be generated on the machine</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gen_on_machine</span>
 
 <div class="viewcode-block" id="SynapticMatrices.get_index"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.get_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the index of an incoming projection in the population table</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the index of an incoming projection in the population table</span>
 
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">            The application edge of the projection</span>
@@ -503,7 +500,7 @@
 
 
 <span class="k">class</span> <span class="nc">_AppKeyInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An object which holds an application key and mask along with the other</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An object which holds an application key and mask along with the other</span>
 <span class="sd">        details</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -512,7 +509,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_key</span><span class="p">,</span> <span class="n">app_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span>
                  <span class="n">n_colour_bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param int app_key: The application-level key</span>
 <span class="sd">        :param int app_mask: The application-level mask</span>
@@ -531,7 +528,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Convenience method to get the key and mask as an object</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Convenience method to get the key and mask as an object</span>
 
 <span class="sd">        :rtype: BaseKeyAndMask</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -575,7 +572,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

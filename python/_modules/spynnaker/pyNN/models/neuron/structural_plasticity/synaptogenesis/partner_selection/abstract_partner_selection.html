@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../../../" id="documentation_options" src="../../../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
@@ -59,35 +56,35 @@
 
 
 <span class="k">class</span> <span class="nc">AbstractPartnerSelection</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A partner selection rule</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A partner selection rule</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The suffix to be appended to the vertex executable for this rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The suffix to be appended to the vertex executable for this rule</span>
 
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractPartnerSelection.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.AbstractPartnerSelection.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the amount of SDRAM used by the parameters of this rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the amount of SDRAM used by the parameters of this rule</span>
 
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractPartnerSelection.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.AbstractPartnerSelection.write_parameters">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write the parameters of the rule to the spec</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the parameters of the rule to the spec</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractPartnerSelection.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.AbstractPartnerSelection.get_parameter_names">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return the names of the parameters supported by this rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the names of the parameters supported by this rule</span>
 
 <span class="sd">        :rtype: iterable(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
@@ -130,7 +127,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

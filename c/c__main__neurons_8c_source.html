@@ -294,7 +294,7 @@ $(function() {
 <div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    uint32_t n_words = <a class="code" href="c__main__neurons_8c.html#a9f249060c5bd10f51d18ac31811e335a">sdram_inputs</a>.<a class="code" href="spike__source__poisson_8c.html#a12258fe85743f525833bd124d9e1fb05">size_in_bytes</a> &gt;&gt; 2;</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keywordflow">for</span> (uint32_t i = 0; i &lt; <a class="code" href="c__main__neurons_8c.html#a6f2bb64a1d2e6a72f6f5a7fd2133bd37">N_SYNAPTIC_BUFFERS</a>; i++) {</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        <a class="code" href="c__main__neurons_8c.html#a7ec04742355ddb6ef2646f8fe73537f3">synaptic_contributions</a>[i] = spin1_malloc(<a class="code" href="c__main__neurons_8c.html#a9f249060c5bd10f51d18ac31811e335a">sdram_inputs</a>.<a class="code" href="spike__source__poisson_8c.html#a12258fe85743f525833bd124d9e1fb05">size_in_bytes</a>);</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="c__main__neurons_8c.html#a7ec04742355ddb6ef2646f8fe73537f3">synaptic_contributions</a> == <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>) {</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="c__main__neurons_8c.html#a7ec04742355ddb6ef2646f8fe73537f3">synaptic_contributions</a>[i] == <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>) {</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Could not allocate %d bytes for synaptic contributions %d&quot;</span>,</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;                    <a class="code" href="c__main__neurons_8c.html#a9f249060c5bd10f51d18ac31811e335a">sdram_inputs</a>.<a class="code" href="spike__source__poisson_8c.html#a12258fe85743f525833bd124d9e1fb05">size_in_bytes</a>, i);</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -407,7 +407,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Dec 2 2022 08:53:31 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Jan 9 2023 11:42:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

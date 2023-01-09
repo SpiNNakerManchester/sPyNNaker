@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -94,7 +91,7 @@
 
 
 <span class="k">class</span> <span class="nc">SPIFLiveSpikesConnection</span><span class="p">(</span><span class="n">DatabaseConnection</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A connection for receiving live spikes from spif</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A connection for receiving live spikes from spif</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;_atom_id_to_key&quot;</span><span class="p">,</span>
@@ -116,7 +113,7 @@
                  <span class="n">events_per_packet</span><span class="o">=</span><span class="n">_EVENTS_PER_PACKET</span><span class="p">,</span>
                  <span class="n">time_per_packet</span><span class="o">=</span><span class="n">_US_PER_PACKET</span><span class="p">,</span>
                  <span class="n">local_host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param iterable(str) receive_labels:</span>
 <span class="sd">            Labels of vertices from which live events will be received.</span>
 <span class="sd">        :param str spif_host: The location of the SPIF board receiving packets</span>
@@ -179,7 +176,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__init_callbacks</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SPIFLiveSpikesConnection.add_init_callback"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_init_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_init_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">init_callback</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a callback to be called to initialise a vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add a callback to be called to initialise a vertex</span>
 
 <span class="sd">        :param str label:</span>
 <span class="sd">            The label of the vertex to be notified about. Must be one of the</span>
@@ -195,7 +192,7 @@
 
 <div class="viewcode-block" id="SPIFLiveSpikesConnection.add_receive_callback"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_receive_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_receive_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">live_event_callback</span><span class="p">,</span>
                              <span class="n">translate_key</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a callback for the reception of live events from a vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add a callback for the reception of live events from a vertex</span>
 
 <span class="sd">        :param str label: The label of the vertex to be notified about.</span>
 <span class="sd">            Must be one of the vertices listed in the constructor</span>
@@ -214,7 +211,7 @@
             <span class="p">(</span><span class="n">live_event_callback</span><span class="p">,</span> <span class="n">translate_key</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="SPIFLiveSpikesConnection.add_start_resume_callback"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_start_resume_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_start_resume_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">start_resume_callback</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a callback for the start and resume state of the simulation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add a callback for the start and resume state of the simulation</span>
 
 <span class="sd">        :param str label: the label of the function to be sent</span>
 <span class="sd">        :param start_resume_callback: A function to be called when the start</span>
@@ -227,7 +224,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__start_resume_callbacks</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_resume_callback</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SPIFLiveSpikesConnection.add_pause_stop_callback"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SPIFLiveSpikesConnection.add_pause_stop_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_pause_stop_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">pause_stop_callback</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a callback for the pause and stop state of the simulation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add a callback for the pause and stop state of the simulation</span>
 
 <span class="sd">        :param str label: the label of the function to be sent</span>
 <span class="sd">        :param pause_stop_callback: A function to be called when the pause</span>
@@ -240,7 +237,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__pause_stop_callbacks</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pause_stop_callback</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__read_database_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_reader</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param DatabaseReader db_reader:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__handle_possible_rerun_state</span><span class="p">()</span>
@@ -260,7 +257,7 @@
                     <span class="n">label</span><span class="p">,</span> <span class="n">vertex_size</span><span class="p">,</span> <span class="n">run_time_ms</span><span class="p">,</span> <span class="n">machine_timestep_ms</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init_receivers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">vertex_sizes</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param DatabaseReader db:</span>
 <span class="sd">        :param dict(str,int) vertex_sizes:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -392,7 +389,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

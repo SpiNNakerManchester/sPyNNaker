@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -58,7 +55,7 @@
 
 
 <div class="viewcode-block" id="compare_spiketrain"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_spiketrain">[docs]</a><span class="k">def</span> <span class="nf">compare_spiketrain</span><span class="p">(</span><span class="n">spiketrain1</span><span class="p">,</span> <span class="n">spiketrain2</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Checks two Spiketrains have the exact same data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Checks two Spiketrains have the exact same data</span>
 
 <span class="sd">    :param ~neo.core.SpikeTrain spiketrain1: first spiketrain</span>
 <span class="sd">    :param ~neo.core.SpikeTrain spiketrain2: second spiketrain</span>
@@ -89,7 +86,7 @@
 
 <div class="viewcode-block" id="compare_spiketrains"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_spiketrains">[docs]</a><span class="k">def</span> <span class="nf">compare_spiketrains</span><span class="p">(</span>
         <span class="n">spiketrains1</span><span class="p">,</span> <span class="n">spiketrains2</span><span class="p">,</span> <span class="n">same_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Check two Lists of SpikeTrains have the exact same data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Check two Lists of SpikeTrains have the exact same data</span>
 
 <span class="sd">    :param list(~neo.core.SpikeTrain) spiketrains1:</span>
 <span class="sd">        First list SpikeTrains to compare</span>
@@ -117,7 +114,7 @@
 
 
 <div class="viewcode-block" id="compare_analogsignal"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_analogsignal">[docs]</a><span class="k">def</span> <span class="nf">compare_analogsignal</span><span class="p">(</span><span class="n">as1</span><span class="p">,</span> <span class="n">as2</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Compares two analogsignal Objects to see if they are the same</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Compares two analogsignal Objects to see if they are the same</span>
 
 <span class="sd">    :param ~neo.core.AnalogSignal as1:</span>
 <span class="sd">        first analogsignal holding list of individual analogsignal Objects</span>
@@ -178,7 +175,7 @@
 
 
 <div class="viewcode-block" id="compare_segments"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_segments">[docs]</a><span class="k">def</span> <span class="nf">compare_segments</span><span class="p">(</span><span class="n">seg1</span><span class="p">,</span> <span class="n">seg2</span><span class="p">,</span> <span class="n">same_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param ~neo.core.Segment seg1: First Segment to check</span>
 <span class="sd">    :param ~neo.core.Segment seg2: Second Segment to check</span>
 <span class="sd">    :param bool same_data: Flag to indicate if the same type of data is held,</span>
@@ -216,7 +213,7 @@
 
 <div class="viewcode-block" id="compare_blocks"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_blocks">[docs]</a><span class="k">def</span> <span class="nf">compare_blocks</span><span class="p">(</span>
         <span class="n">neo1</span><span class="p">,</span> <span class="n">neo2</span><span class="p">,</span> <span class="n">same_runs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">same_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Compares two neo Blocks to see if they hold the same data.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Compares two neo Blocks to see if they hold the same data.</span>
 
 <span class="sd">    :param ~neo.core.Block neo1: First block to check</span>
 <span class="sd">    :param ~neo.core.Block neo2: Second block to check</span>
@@ -276,7 +273,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

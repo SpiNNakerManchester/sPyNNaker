@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -60,7 +57,7 @@
 
 <span class="k">class</span> <span class="nc">AbstractStaticSynapseDynamics</span><span class="p">(</span>
         <span class="n">AbstractSDRAMSynapseDynamics</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Dynamics which don&#39;t change over time.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Dynamics which don&#39;t change over time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
 
@@ -68,7 +65,7 @@
 
 <div class="viewcode-block" id="AbstractStaticSynapseDynamics.get_n_words_for_static_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.get_n_words_for_static_connections">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_n_words_for_static_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the number of 32-bit words for `n_connections` in a single row.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the number of 32-bit words for `n_connections` in a single row.</span>
 
 <span class="sd">        :param int n_connections:</span>
 <span class="sd">        :rtype: int</span>
@@ -79,7 +76,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span>
             <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">,</span>
             <span class="n">max_atoms_per_core</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the fixed-fixed data for each row, and lengths for the\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the fixed-fixed data for each row, and lengths for the\</span>
 <span class="sd">            fixed-fixed parts of each row.</span>
 
 <span class="sd">        Data is returned as an array made up of an array of 32-bit words for\</span>
@@ -105,7 +102,7 @@
 
 <div class="viewcode-block" id="AbstractStaticSynapseDynamics.get_n_static_words_per_row"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.get_n_static_words_per_row">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_n_static_words_per_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ff_size</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the number of bytes to be read per row for the static data\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the number of bytes to be read per row for the static data\</span>
 <span class="sd">            given the size that was written to each row.</span>
 
 <span class="sd">        :param ~numpy.ndarray ff_size:</span>
@@ -114,7 +111,7 @@
 
 <div class="viewcode-block" id="AbstractStaticSynapseDynamics.get_n_synapses_in_rows"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics.get_n_synapses_in_rows">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_n_synapses_in_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ff_size</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the number of synapses in the rows with sizes `ff_size`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the number of synapses in the rows with sizes `ff_size`.</span>
 
 <span class="sd">        :param ~numpy.ndarray ff_size:</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
@@ -124,7 +121,7 @@
     <span class="k">def</span> <span class="nf">read_static_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">ff_size</span><span class="p">,</span> <span class="n">ff_data</span><span class="p">,</span>
             <span class="n">max_atoms_per_core</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Read the connections from the words of data in `ff_data`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Read the connections from the words of data in `ff_data`.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        :param int n_synapse_types:</span>
@@ -171,7 +168,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -71,7 +68,7 @@
 
 
 <span class="k">class</span> <span class="nc">PushBotRetinaViewer</span><span class="p">(</span><span class="n">Thread</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A viewer for the pushbot&#39;s retina. This is a thread that can be \</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A viewer for the pushbot&#39;s retina. This is a thread that can be \</span>
 <span class="sd">        launched in parallel with the control code.</span>
 
 <span class="sd">    Based on matplotlib</span>
@@ -81,7 +78,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">display_max</span><span class="o">=</span><span class="n">_DISPLAY_MAX</span><span class="p">,</span>
             <span class="n">frame_time_ms</span><span class="o">=</span><span class="n">_FRAME_TIME_MS</span><span class="p">,</span>
             <span class="n">decay_time_constant_ms</span><span class="o">=</span><span class="n">_DECAY_TIME_CONSTANT_MS</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param PushBotRetinaResolution resolution:</span>
 <span class="sd">        :param int port:</span>
 <span class="sd">        :param float display_max: Value of brightest pixel to show</span>
@@ -122,7 +119,7 @@
             <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__frame_time_ms</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">decay_time_constant_ms</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_init_socket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Open socket to receive UDP.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Open socket to receive UDP.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_socket</span> <span class="o">=</span> <span class="n">get_udp_socket</span><span class="p">()</span>
         <span class="n">bind_socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__spike_socket</span><span class="p">,</span> <span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
@@ -170,7 +167,7 @@
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__image</span><span class="p">]</span>
 
 <div class="viewcode-block" id="PushBotRetinaViewer.run"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices.PushBotRetinaViewer.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; How the viewer works when the thread is running.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; How the viewer works when the thread is running.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Create image plot of retina output</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pyplot</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
@@ -222,7 +219,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

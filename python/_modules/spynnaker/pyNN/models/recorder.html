@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -74,7 +71,7 @@
 
 
 <div class="viewcode-block" id="Recorder"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder">[docs]</a><span class="k">class</span> <span class="nc">Recorder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Object to hold recording behaviour, used by populations.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Object to hold recording behaviour, used by populations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -85,7 +82,7 @@
         <span class="s2">&quot;__write_to_files_indicators&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~spynnaker.pyNN.models.populations.Population population:</span>
 <span class="sd">            the population to record for</span>
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex vertex:</span>
@@ -106,7 +103,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">write_to_files_indicators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; What variables should be written to files, and where should they\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; What variables should be written to files, and where should they\</span>
 <span class="sd">            be written.</span>
 
 <span class="sd">        :rtype: dict(str, neo.io.baseio.BaseIO or str or None)</span>
@@ -114,7 +111,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_to_files_indicators</span>
 
 <div class="viewcode-block" id="Recorder.record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Same as record but without non-standard PyNN warning</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Same as record but without non-standard PyNN warning</span>
 
 <span class="sd">        This method is non-standard PyNN and is intended only to be called by</span>
 <span class="sd">        record in a Population, View or Assembly</span>
@@ -175,7 +172,7 @@
 
 <div class="viewcode-block" id="Recorder.turn_on_record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.turn_on_record">[docs]</a>    <span class="k">def</span> <span class="nf">turn_on_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Tell the vertex to record data.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Tell the vertex to record data.</span>
 
 <span class="sd">        :param str variable: The variable to record, supported variables to</span>
 <span class="sd">            record are: ``gsyn_exc``, ``gsyn_inh``, ``v``, ``spikes``.</span>
@@ -211,7 +208,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.get_recorded_pynn7"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_recorded_pynn7">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_pynn7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">as_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get recorded data in PyNN 0.7 format. Must not be spikes.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get recorded data in PyNN 0.7 format. Must not be spikes.</span>
 
 <span class="sd">        :param str variable:</span>
 <span class="sd">            The name of the variable to get. Supported variable names are:</span>
@@ -257,7 +254,7 @@
                 <span class="n">numpy</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">column_length</span><span class="p">)))</span></div>
 
     <span class="k">def</span> <span class="nf">__get_empty_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get an empty array for the given recording type</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get an empty array for the given recording type</span>
 
 <span class="sd">        :param str variable: the variable to get the array for</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
@@ -274,7 +271,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown type </span><span class="si">{</span><span class="n">var_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Recorder.get_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the data for the given variable with safety checks</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the data for the given variable with safety checks</span>
 
 <span class="sd">        :param str variable: the variable to get the data for</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
@@ -302,7 +299,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recorded_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.turn_off_all_recording"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.turn_off_all_recording">[docs]</a>    <span class="k">def</span> <span class="nf">turn_off_all_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Turns off recording, is used by a pop saying ``.record()``</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Turns off recording, is used by a pop saying ``.record()``</span>
 
 <span class="sd">        :param indexes:</span>
 <span class="sd">        :type indexes: list or None</span>
@@ -311,7 +308,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_not_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.extract_neo_block"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.extract_neo_block">[docs]</a>    <span class="k">def</span> <span class="nf">extract_neo_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Extracts block from the vertices and puts them into a Neo block</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Extracts block from the vertices and puts them into a Neo block</span>
 
 <span class="sd">        :param list(str) variables: the variables to extract</span>
 <span class="sd">        :param slice view_indexes: the indexes to be included in the view</span>
@@ -341,7 +338,7 @@
         <span class="k">return</span> <span class="n">block</span></div>
 
 <div class="viewcode-block" id="Recorder.cache_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.cache_data">[docs]</a>    <span class="k">def</span> <span class="nf">cache_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Store data for later extraction</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Store data for later extraction</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_variables</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">variables</span><span class="p">:</span>
@@ -368,7 +365,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">[</span><span class="n">segment_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_cache</span></div>
 
     <span class="k">def</span> <span class="nf">__clean_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Sorts out variables for processing usage</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Sorts out variables for processing usage</span>
 
 <span class="sd">        :param variables: list of variables names, or &#39;all&#39;, or single.</span>
 <span class="sd">        :type variables: str or list(str)</span>
@@ -507,7 +504,7 @@
     <span class="k">def</span> <span class="nf">__add_neo_spiketrains</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">recording_start_time</span><span class="p">,</span>
             <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Adds data that is spike-train-like to a neo segment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Adds data that is spike-train-like to a neo segment.</span>
 
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add spikes to</span>
 <span class="sd">        :param ~numpy.ndarray spikes: Spike data in raw sPyNNaker format</span>
@@ -549,7 +546,7 @@
     <span class="k">def</span> <span class="nf">__add_neo_analog_signals</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">signal_array</span><span class="p">,</span> <span class="n">data_indexes</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span>
             <span class="n">variable</span><span class="p">,</span> <span class="n">recording_start_time</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Adds a data item that is an analog signal to a neo segment</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Adds a data item that is an analog signal to a neo segment</span>
 
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
 <span class="sd">        :param ~neo.core.Block block: neo block</span>
@@ -600,7 +597,7 @@
 
     <span class="k">def</span> <span class="nf">__add_neo_events</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">event_array</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">recording_start_time</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Adds data that is events to a neo segment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Adds data that is events to a neo segment.</span>
 
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
 <span class="sd">        :param ~numpy.ndarray signal_array: the raw &quot;event&quot; data</span>
@@ -700,7 +697,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

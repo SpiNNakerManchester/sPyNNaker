@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../../../" id="documentation_options" src="../../../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
@@ -66,7 +63,7 @@
 
 
 <span class="k">class</span> <span class="nc">TimingDependencePfisterSpikeTriplet</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A timing dependence STDP rule based on spike triplets.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A timing dependence STDP rule based on spike triplets.</span>
 
 <span class="sd">    Jean-Pascal Pfister, Wulfram Gerstner. Triplets of Spikes in a Model of</span>
 <span class="sd">    Spike Timing-Dependent Plasticity. *Journal of Neuroscience*,</span>
@@ -88,7 +85,7 @@
 
     <span class="c1"># noinspection PyPep8Naming</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_plus</span><span class="p">,</span> <span class="n">tau_minus</span><span class="p">,</span> <span class="n">tau_x</span><span class="p">,</span> <span class="n">tau_y</span><span class="p">,</span> <span class="n">A_plus</span><span class="p">,</span> <span class="n">A_minus</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param float tau_plus: :math:`\tau_+`</span>
 <span class="sd">        :param float tau_minus: :math:`\tau_-`</span>
 <span class="sd">        :param float tau_x: :math:`\tau_x`</span>
@@ -113,7 +110,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_plus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`\tau_+`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`\tau_+`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -121,7 +118,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_minus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`\tau_-`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`\tau_-`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -129,7 +126,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`\tau_x`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`\tau_x`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -137,7 +134,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`\tau_y`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`\tau_y`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -145,7 +142,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">A_plus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`A^+`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`A^+`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -157,7 +154,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">A_minus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`A^-`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`A^-`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -180,7 +177,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The suffix to be appended to the vertex executable for this rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The suffix to be appended to the vertex executable for this rule</span>
 
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -188,7 +185,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pre_trace_n_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The number of bytes used by the pre-trace of the rule per neuron</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The number of bytes used by the pre-trace of the rule per neuron</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -205,7 +202,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_weight_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The number of weight terms expected by this timing rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The number of weight terms expected by this timing rule</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -223,7 +220,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synaptic_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the synaptic structure of the plastic part of the rows</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the synaptic structure of the plastic part of the rows</span>
 
 <span class="sd">        :rtype: AbstractSynapseStructure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -271,7 +268,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

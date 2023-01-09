@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -89,7 +86,7 @@
 
 
 <div class="viewcode-block" id="Projection"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection">[docs]</a><span class="k">class</span> <span class="nc">Projection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A container for all the connections of a given type (same synapse type and</span>
 <span class="sd">    plasticity mechanisms) between two populations, together with methods to</span>
 <span class="sd">    set parameters of those connections, including of plasticity mechanisms.</span>
@@ -106,7 +103,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_synaptic_population</span><span class="p">,</span> <span class="n">post_synaptic_population</span><span class="p">,</span>
             <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">receptor_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~spynnaker.pyNN.models.populations.PopulationBase \</span>
 <span class="sd">                pre_synaptic_population:</span>
 <span class="sd">        :param ~spynnaker.pyNN.models.populations.PopulationBase \</span>
@@ -239,7 +236,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__check_population</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~spynnaker.pyNN.models.populations.PopulationBase param:</span>
 <span class="sd">        :return: Whether the parameter is a view</span>
 <span class="sd">        :rtype: bool</span>
@@ -262,7 +259,7 @@
 
 <div class="viewcode-block" id="Projection.get"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute_names</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
             <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_address</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multiple_synapses</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a parameter/attribute of the projection.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a parameter/attribute of the projection.</span>
 
 <span class="sd">        .. note::</span>
 <span class="sd">            SpiNNaker always gathers.</span>
@@ -292,7 +289,7 @@
 <div class="viewcode-block" id="Projection.save"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">attribute_names</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
             <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_address</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Print synaptic attributes (weights, delays, etc.) to file. In the\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Print synaptic attributes (weights, delays, etc.) to file. In the\</span>
 <span class="sd">            array format, zeros are printed for non-existent connections.\</span>
 <span class="sd">            Values will be expressed in the standard PyNN units (i.e., \</span>
 <span class="sd">            millivolts, nanoamps, milliseconds, microsiemens, nanofarads, \</span>
@@ -330,7 +327,7 @@
     <span class="k">def</span> <span class="nf">__get_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">attribute_names</span><span class="p">,</span> <span class="nb">format</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
             <span class="n">with_address</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Internal data getter to add notify option</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Internal data getter to add notify option</span>
 
 <span class="sd">        :param attribute_names: list of attributes to gather</span>
 <span class="sd">        :type attribute_names: str or iterable(str)</span>
@@ -373,7 +370,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__save_callback</span><span class="p">(</span><span class="n">save_file</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param save_file:</span>
 <span class="sd">        :type save_file: str or pyNN.recording.files.BaseFile</span>
 <span class="sd">        :param dict(str,object) metadata:</span>
@@ -396,7 +393,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pre</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The pre-population or population view.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The pre-population or population view.</span>
 
 <span class="sd">        :rtype: ~spynnaker.pyNN.models.populations.PopulationBase</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -404,7 +401,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The post-population or population view.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The post-population or population view.</span>
 
 <span class="sd">        :rtype: ~spynnaker.pyNN.models.populations.PopulationBase</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -412,7 +409,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span>
@@ -424,20 +421,20 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_synapse_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: SynapseInformation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_projection_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: ProjectionApplicationEdge</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span>
 
     <span class="k">def</span> <span class="nf">_find_existing_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_synaptic_vertex</span><span class="p">,</span> <span class="n">post_synaptic_vertex</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Searches though the graph&#39;s edges to locate any\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Searches though the graph&#39;s edges to locate any\</span>
 <span class="sd">            edge which has the same post and pre vertex</span>
 
 <span class="sd">        :param pre_synaptic_vertex: the source vertex of the multapse</span>
@@ -464,7 +461,7 @@
 
     <span class="k">def</span> <span class="nf">_get_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">as_list</span><span class="p">,</span> <span class="n">data_to_get</span><span class="p">,</span> <span class="n">fixed_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param bool as_list:</span>
 <span class="sd">        :param list(int) data_to_get:</span>
 <span class="sd">        :param list(tuple(str,int)) fixed_values:</span>
@@ -515,7 +512,7 @@
 
 <div class="viewcode-block" id="Projection.set"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">attributes</span><span class="p">):</span>  <span class="c1"># @UnusedVariable</span>
         <span class="c1"># pylint: disable=unused-argument</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. warning::</span>
 <span class="sd">            Not implemented.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -523,7 +520,7 @@
 
 <div class="viewcode-block" id="Projection.getWeights"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.getWeights">[docs]</a>    <span class="k">def</span> <span class="nf">getWeights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
                    <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``get(&#39;weight&#39;)`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -532,7 +529,7 @@
 
 <div class="viewcode-block" id="Projection.getDelays"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.getDelays">[docs]</a>    <span class="k">def</span> <span class="nf">getDelays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
                   <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``get(&#39;delay&#39;)`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -542,7 +539,7 @@
 <div class="viewcode-block" id="Projection.getSynapseDynamics"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.getSynapseDynamics">[docs]</a>    <span class="k">def</span> <span class="nf">getSynapseDynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">,</span>
                            <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
                            <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``get(parameter_name)`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -553,7 +550,7 @@
 
 <div class="viewcode-block" id="Projection.saveConnections"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.saveConnections">[docs]</a>    <span class="k">def</span> <span class="nf">saveConnections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
                         <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compatible_output</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``save(&#39;all&#39;)`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -565,7 +562,7 @@
 
 <div class="viewcode-block" id="Projection.printWeights"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.printWeights">[docs]</a>    <span class="k">def</span> <span class="nf">printWeights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
                      <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``save(&#39;weight&#39;)`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -575,7 +572,7 @@
 
 <div class="viewcode-block" id="Projection.printDelays"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.printDelays">[docs]</a>    <span class="k">def</span> <span class="nf">printDelays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
                     <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``save(&#39;delay&#39;)`` instead.</span>
 
@@ -587,7 +584,7 @@
 
 <div class="viewcode-block" id="Projection.weightHistogram"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.weightHistogram">[docs]</a>    <span class="k">def</span> <span class="nf">weightHistogram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
                         <span class="n">nbins</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``numpy.histogram`` on the weights instead.</span>
 
@@ -603,7 +600,7 @@
 
 <div class="viewcode-block" id="Projection.size"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.size">[docs]</a>    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>  <span class="c1"># @UnusedVariable</span>
         <span class="c1"># pylint: disable=unused-argument</span>
-        <span class="sd">&quot;&quot;&quot; Return the total number of connections.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the total number of connections.</span>
 
 <span class="sd">        .. note::</span>
 <span class="sd">            SpiNNaker always gathers.</span>
@@ -654,7 +651,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

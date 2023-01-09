@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -72,14 +69,14 @@
 
 
 <span class="k">class</span> <span class="nc">NeuronModelIzh</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Model of neuron due to Eugene M. Izhikevich et al</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Model of neuron due to Eugene M. Izhikevich et al</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__a&quot;</span><span class="p">,</span> <span class="s2">&quot;__b&quot;</span><span class="p">,</span> <span class="s2">&quot;__c&quot;</span><span class="p">,</span> <span class="s2">&quot;__d&quot;</span><span class="p">,</span> <span class="s2">&quot;__v_init&quot;</span><span class="p">,</span> <span class="s2">&quot;__u_init&quot;</span><span class="p">,</span> <span class="s2">&quot;__i_offset&quot;</span>
     <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">v_init</span><span class="p">,</span> <span class="n">u_init</span><span class="p">,</span> <span class="n">i_offset</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param a: :math:`a`</span>
 <span class="sd">        :type a: float, iterable(float), ~pyNN.random.RandomDistribution or</span>
 <span class="sd">            (mapping) function</span>
@@ -144,7 +141,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`a`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`a`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -152,7 +149,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`b`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`b`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -160,7 +157,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`c`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`c`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -168,7 +165,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">d</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`d`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`d`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -176,7 +173,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">i_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`I_{offset}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`I_{offset}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -184,7 +181,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">v_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`v_{init}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`v_{init}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -192,7 +189,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`u_{init}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`u_{init}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -236,7 +233,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -73,7 +70,7 @@
 
 
 <span class="k">class</span> <span class="nc">NeuronModelLeakyIntegrateAndFire</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Classic leaky integrate and fire neuron model.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Classic leaky integrate and fire neuron model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__v_init&quot;</span><span class="p">,</span>
@@ -86,7 +83,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">v_init</span><span class="p">,</span> <span class="n">v_rest</span><span class="p">,</span> <span class="n">tau_m</span><span class="p">,</span> <span class="n">cm</span><span class="p">,</span> <span class="n">i_offset</span><span class="p">,</span> <span class="n">v_reset</span><span class="p">,</span> <span class="n">tau_refrac</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param v_init: :math:`V_{init}`</span>
 <span class="sd">        :type v_init:</span>
 <span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or</span>
@@ -156,7 +153,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">v_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`V_{init}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`V_{init}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -164,7 +161,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">v_rest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`V_{rest}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`V_{rest}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -172,7 +169,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`\tau_{m}`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`\tau_{m}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -180,7 +177,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`C_m`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`C_m`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -188,7 +185,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">i_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`I_{offset}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`I_{offset}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -196,7 +193,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">v_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`V_{reset}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`V_{reset}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -204,7 +201,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_refrac</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`\tau_{refrac}`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`\tau_{refrac}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -248,7 +245,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -84,7 +81,7 @@
 <span class="k">class</span> <span class="nc">SynapseDynamicsSTDP</span><span class="p">(</span>
         <span class="n">AbstractPlasticSynapseDynamics</span><span class="p">,</span>
         <span class="n">AbstractGenerateOnMachine</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; The dynamics of a synapse that changes over time using a \</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The dynamics of a synapse that changes over time using a \</span>
 <span class="sd">        Spike Timing Dependent Plasticity (STDP) rule.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -111,7 +108,7 @@
             <span class="n">voltage_dependence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dendritic_delay_fraction</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
             <span class="n">weight</span><span class="o">=</span><span class="n">StaticSynapse</span><span class="o">.</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">],</span>
             <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pad_to_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backprop_delay</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractTimingDependence timing_dependence:</span>
 <span class="sd">        :param AbstractWeightDependence weight_dependence:</span>
 <span class="sd">        :param None voltage_dependence: not supported</span>
@@ -219,21 +216,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">weight_dependence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: AbstractTimingDependence</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">timing_dependence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: AbstractTimingDependence</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dendritic_delay_fraction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable.</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -245,7 +242,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">backprop_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable.</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -257,7 +254,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">neuromodulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: SynapseDynamicsNeuromodulation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span>
@@ -275,7 +272,7 @@
              <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">dendritic_delay_fraction</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsSTDP.get_vertex_executable_suffix"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_vertex_executable_suffix">[docs]</a>    <span class="k">def</span> <span class="nf">get_vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Get the suffix values for timing and weight dependence</span>
@@ -292,7 +289,7 @@
         <span class="k">return</span> <span class="n">name</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsSTDP.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">        :param int n_synapse_types:</span>
 <span class="sd">        :rtype: int</span>
@@ -333,7 +330,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_n_header_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># The header contains a single timestamp and pre-trace</span>
@@ -345,7 +342,7 @@
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">n_bytes</span><span class="p">)</span> <span class="o">/</span> <span class="n">BYTES_PER_WORD</span><span class="p">))</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
     <span class="k">def</span> <span class="nf">__get_n_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">check_length_padded</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_connections:</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        :param bool check_length_padded:</span>
@@ -372,7 +369,7 @@
         <span class="k">return</span> <span class="n">fp_size_words</span> <span class="o">+</span> <span class="n">pp_size_words</span>
 
 <div class="viewcode-block" id="SynapseDynamicsSTDP.get_n_words_for_plastic_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_n_words_for_plastic_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_words_for_plastic_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_connections:</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -445,7 +442,7 @@
         <span class="k">return</span> <span class="n">fp_data</span><span class="p">,</span> <span class="n">pp_data</span><span class="p">,</span> <span class="n">fp_size</span><span class="p">,</span> <span class="n">pp_size</span></div>
 
     <span class="k">def</span> <span class="nf">_pad_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">no_bytes_per_connection</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list(~numpy.ndarray) rows:</span>
 <span class="sd">        :param int no_bytes_per_connection:</span>
 <span class="sd">        :rtype: list(~numpy.ndarray)</span>
@@ -677,7 +674,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

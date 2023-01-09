@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -62,7 +59,7 @@
 
 
 <div class="viewcode-block" id="convert_analog_signal"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_analog_signal">[docs]</a><span class="k">def</span> <span class="nf">convert_analog_signal</span><span class="p">(</span><span class="n">signal_array</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="n">quantities</span><span class="o">.</span><span class="n">ms</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts part of a NEO object into told spynnaker7 format</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Converts part of a NEO object into told spynnaker7 format</span>
 
 <span class="sd">    :param ~neo.core.AnalogSignal signal_array: Extended Quantities object</span>
 <span class="sd">    :param quantities.unitquantity.UnitTime time_unit:</span>
@@ -82,7 +79,7 @@
 
 
 <div class="viewcode-block" id="convert_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_data">[docs]</a><span class="k">def</span> <span class="nf">convert_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">run</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts the data into a numpy array in the format ID, time, value</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Converts the data into a numpy array in the format ID, time, value</span>
 
 <span class="sd">    :param ~neo.core.Block data: Data as returned by a getData() call</span>
 <span class="sd">    :param str name: Name of the data to be extracted.</span>
@@ -104,7 +101,7 @@
 
 
 <div class="viewcode-block" id="convert_data_list"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_data_list">[docs]</a><span class="k">def</span> <span class="nf">convert_data_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">runs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts the data into a list of numpy arrays in the format ID, time,\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Converts the data into a list of numpy arrays in the format ID, time,\</span>
 <span class="sd">        value</span>
 
 <span class="sd">    :param ~neo.core.Block data: Data as returned by a getData() call</span>
@@ -124,7 +121,7 @@
 
 
 <div class="viewcode-block" id="convert_v_list"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_v_list">[docs]</a><span class="k">def</span> <span class="nf">convert_v_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">runs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts the voltage into a list numpy array one per segment (all\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Converts the voltage into a list numpy array one per segment (all\</span>
 <span class="sd">        runs) in the format ID, time, value</span>
 
 <span class="sd">    :param ~neo.core.Block data: The data to convert; it must have V data in it</span>
@@ -137,7 +134,7 @@
 
 
 <div class="viewcode-block" id="convert_gsyn_exc_list"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_gsyn_exc_list">[docs]</a><span class="k">def</span> <span class="nf">convert_gsyn_exc_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">runs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts the gsyn_exc into a list numpy array one per segment (all\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Converts the gsyn_exc into a list numpy array one per segment (all\</span>
 <span class="sd">        runs) in the format ID, time, value</span>
 
 <span class="sd">    :param ~neo.core.Block data:</span>
@@ -151,7 +148,7 @@
 
 
 <div class="viewcode-block" id="convert_gsyn_inh_list"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_gsyn_inh_list">[docs]</a><span class="k">def</span> <span class="nf">convert_gsyn_inh_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">runs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts the gsyn_inh into a list numpy array one per segment (all\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Converts the gsyn_inh into a list numpy array one per segment (all\</span>
 <span class="sd">        runs) in the format ID, time, value</span>
 
 <span class="sd">    :param ~neo.core.Block data:</span>
@@ -165,7 +162,7 @@
 
 
 <div class="viewcode-block" id="convert_gsyn"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_gsyn">[docs]</a><span class="k">def</span> <span class="nf">convert_gsyn</span><span class="p">(</span><span class="n">gsyn_exc</span><span class="p">,</span> <span class="n">gsyn_inh</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts two neo objects into the spynnaker7 format</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Converts two neo objects into the spynnaker7 format</span>
 
 <span class="sd">    .. note::</span>
 <span class="sd">        It is acceptable for both neo parameters to be the same object</span>
@@ -201,7 +198,7 @@
 
 
 <div class="viewcode-block" id="convert_spiketrains"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_spiketrains">[docs]</a><span class="k">def</span> <span class="nf">convert_spiketrains</span><span class="p">(</span><span class="n">spiketrains</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Converts a list of spiketrains into spynnaker7 format</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Converts a list of spiketrains into spynnaker7 format</span>
 
 <span class="sd">    :param list(~neo.core.SpikeTrain) spiketrains: List of SpikeTrains</span>
 <span class="sd">    :rtype: ~numpy.ndarray</span>
@@ -217,7 +214,7 @@
 
 
 <div class="viewcode-block" id="convert_spikes"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_spikes">[docs]</a><span class="k">def</span> <span class="nf">convert_spikes</span><span class="p">(</span><span class="n">neo</span><span class="p">,</span> <span class="n">run</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Extracts the spikes for run one from a Neo Object</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Extracts the spikes for run one from a Neo Object</span>
 
 <span class="sd">    :param ~neo.core.Block neo: neo Object including Spike Data</span>
 <span class="sd">    :param int run: Zero based index of the run to extract data for</span>
@@ -231,7 +228,7 @@
 
 
 <div class="viewcode-block" id="count_spiketrains"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.count_spiketrains">[docs]</a><span class="k">def</span> <span class="nf">count_spiketrains</span><span class="p">(</span><span class="n">spiketrains</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Help function to count the number of spikes in a list of spiketrains</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Help function to count the number of spikes in a list of spiketrains</span>
 
 <span class="sd">    :param list(~neo.core.SpikeTrain) spiketrains: List of SpikeTrains</span>
 <span class="sd">    :return: Total number of spikes in all the spiketrains</span>
@@ -241,7 +238,7 @@
 
 
 <div class="viewcode-block" id="count_spikes"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.count_spikes">[docs]</a><span class="k">def</span> <span class="nf">count_spikes</span><span class="p">(</span><span class="n">neo</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Help function to count the number of spikes in a list of spiketrains</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Help function to count the number of spikes in a list of spiketrains</span>
 
 <span class="sd">    Only counts run 0</span>
 
@@ -288,7 +285,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

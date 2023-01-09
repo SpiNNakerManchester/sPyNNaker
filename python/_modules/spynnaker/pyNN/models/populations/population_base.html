@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -74,7 +71,7 @@
 
 
 <span class="k">class</span> <span class="nc">PopulationBase</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Shared methods between :py:class:`Population`\ s and</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Shared methods between :py:class:`Population`\ s and</span>
 <span class="sd">    :py:class:`PopulationView`\ s.</span>
 
 <span class="sd">    Mainly pass through and not implemented.</span>
@@ -83,7 +80,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">local_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; An array containing the cell IDs of those neurons in the\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; An array containing the cell IDs of those neurons in the\</span>
 <span class="sd">            Population that exist on the local MPI node.</span>
 
 <span class="sd">        :rtype: list(int)</span>
@@ -94,14 +91,14 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">all_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; An array containing the cell IDs of all neurons in the\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; An array containing the cell IDs of all neurons in the\</span>
 <span class="sd">            Population (all MPI nodes).</span>
 
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; A Population / PopulationView can be added to another\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; A Population / PopulationView can be added to another\</span>
 <span class="sd">            Population, PopulationView or Assembly, returning an Assembly.</span>
 
 <span class="sd">        .. warning::</span>
@@ -114,7 +111,7 @@
         <span class="n">_we_dont_do_this_now</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
 
 <div class="viewcode-block" id="PopulationBase.getSpikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.getSpikes">[docs]</a>    <span class="k">def</span> <span class="nf">getSpikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``get_data(&#39;spikes&#39;)`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -126,7 +123,7 @@
 <div class="viewcode-block" id="PopulationBase.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.get_data">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return a Neo Block containing the data(spikes, state variables)\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return a Neo Block containing the data(spikes, state variables)\</span>
 <span class="sd">            recorded from the Population.</span>
 
 <span class="sd">        :param variables:</span>
@@ -150,7 +147,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="PopulationBase.get_gsyn"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.get_gsyn">[docs]</a>    <span class="k">def</span> <span class="nf">get_gsyn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``get_data([&#39;gsyn_exc&#39;, &#39;gsyn_inh&#39;])`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -162,7 +159,7 @@
 
 <div class="viewcode-block" id="PopulationBase.get_spike_counts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.get_spike_counts">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_spike_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns a dict containing the number of spikes for each neuron.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns a dict containing the number of spikes for each neuron.</span>
 
 <span class="sd">        The dict keys are neuron IDs, not indices.</span>
 
@@ -179,7 +176,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="PopulationBase.get_v"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.get_v">[docs]</a>    <span class="k">def</span> <span class="nf">get_v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``get_data(&#39;v&#39;)`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -190,7 +187,7 @@
 
 <div class="viewcode-block" id="PopulationBase.inject"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.inject">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">inject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_source</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Connect a current source to all cells in the Population.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Connect a current source to all cells in the Population.</span>
 
 <span class="sd">        :param current_source:</span>
 <span class="sd">        :type current_source:</span>
@@ -199,7 +196,7 @@
 
 <div class="viewcode-block" id="PopulationBase.is_local"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.is_local">[docs]</a>    <span class="k">def</span> <span class="nf">is_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="nb">id</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument, redefined-builtin</span>
-        <span class="sd">&quot;&quot;&quot; Indicates whether the cell with the given ID exists on the\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Indicates whether the cell with the given ID exists on the\</span>
 <span class="sd">            local MPI node.</span>
 
 <span class="sd">        :rtype: bool</span>
@@ -210,7 +207,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">local_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return the number of cells in the population on the local MPI node.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the number of cells in the population on the local MPI node.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -219,7 +216,7 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PopulationBase.meanSpikeCount"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.meanSpikeCount">[docs]</a>    <span class="k">def</span> <span class="nf">meanSpikeCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``mean_spike_count()`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -229,7 +226,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_spike_count</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationBase.mean_spike_count"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.mean_spike_count">[docs]</a>    <span class="k">def</span> <span class="nf">mean_spike_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns the mean number of spikes per neuron.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the mean number of spikes per neuron.</span>
 
 <span class="sd">        :param bool gather:</span>
 <span class="sd">            For parallel simulators, if this is True, all data will be gathered</span>
@@ -250,7 +247,7 @@
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationBase.nearest"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.nearest">[docs]</a>    <span class="k">def</span> <span class="nf">nearest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return the neuron closest to the specified position.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the neuron closest to the specified position.</span>
 
 <span class="sd">        .. warning::</span>
 <span class="sd">            Currently unimplemented.</span>
@@ -260,7 +257,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">position_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. note::</span>
 <span class="sd">            NO PyNN description of this method.</span>
 
@@ -272,7 +269,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. note::</span>
 <span class="sd">            NO PyNN description of this method.</span>
 
@@ -287,7 +284,7 @@
 <div class="viewcode-block" id="PopulationBase.write_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.write_data">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">write_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                    <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write recorded data to file, using one of the file formats\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write recorded data to file, using one of the file formats\</span>
 <span class="sd">            supported by Neo.</span>
 
 <span class="sd">        :param io:</span>
@@ -315,7 +312,7 @@
         <span class="c1"># pylint: disable=too-many-arguments</span>
 
 <div class="viewcode-block" id="PopulationBase.printSpikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.printSpikes">[docs]</a>    <span class="k">def</span> <span class="nf">printSpikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``write_data(file, &#39;spikes&#39;)`` instead.</span>
 
@@ -332,7 +329,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;spikes&#39;</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationBase.print_gsyn"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.print_gsyn">[docs]</a>    <span class="k">def</span> <span class="nf">print_gsyn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``write_data(file, [&#39;gsyn_exc&#39;, &#39;gsyn_inh&#39;])`` instead.</span>
 
@@ -349,7 +346,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;gsyn_exc&#39;</span><span class="p">,</span> <span class="s1">&#39;gsyn_inh&#39;</span><span class="p">],</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationBase.print_v"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.print_v">[docs]</a>    <span class="k">def</span> <span class="nf">print_v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``write_data(file, &#39;v&#39;)`` instead.</span>
 
@@ -366,7 +363,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationBase.receptor_types"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.receptor_types">[docs]</a>    <span class="k">def</span> <span class="nf">receptor_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. note::</span>
 <span class="sd">            NO PyNN description of this method.</span>
 
@@ -377,7 +374,7 @@
 
 <div class="viewcode-block" id="PopulationBase.record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.record">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Record the specified variable or variables for all cells in the\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Record the specified variable or variables for all cells in the\</span>
 <span class="sd">            Population or view.</span>
 
 <span class="sd">        :param variables: either a single variable name or a list of variable</span>
@@ -392,7 +389,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="PopulationBase.record_gsyn"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.record_gsyn">[docs]</a>    <span class="k">def</span> <span class="nf">record_gsyn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``record([&#39;gsyn_exc&#39;, &#39;gsyn_inh&#39;])`` instead.</span>
 
@@ -408,7 +405,7 @@
             <span class="n">sampling_interval</span><span class="o">=</span><span class="n">sampling_interval</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationBase.record_v"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.record_v">[docs]</a>    <span class="k">def</span> <span class="nf">record_v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``record(&#39;v&#39;)`` instead.</span>
 
@@ -423,7 +420,7 @@
             <span class="n">sampling_interval</span><span class="o">=</span><span class="n">sampling_interval</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationBase.rset"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.rset">[docs]</a>    <span class="k">def</span> <span class="nf">rset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``set(parametername=rand_distr)`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -431,7 +428,7 @@
             <span class="s2">&quot; Use set(parametername=rand_distr) instead.&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationBase.save_positions"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.save_positions">[docs]</a>    <span class="k">def</span> <span class="nf">save_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>  <span class="c1"># pylint: disable=redefined-builtin</span>
-        <span class="sd">&quot;&quot;&quot; Save positions to file. The output format is index x y z</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Save positions to file. The output format is index x y z</span>
 
 <span class="sd">        .. warning::</span>
 <span class="sd">            Currently unimplemented.</span>
@@ -441,7 +438,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The spatial structure of the parent Population.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The spatial structure of the parent Population.</span>
 
 <span class="sd">        .. warning::</span>
 <span class="sd">            Currently unimplemented.</span>
@@ -452,7 +449,7 @@
         <span class="n">_we_dont_do_this_now</span><span class="p">()</span>  <span class="c1"># pragma: no cover</span>
 
 <div class="viewcode-block" id="PopulationBase.tset"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.tset">[docs]</a>    <span class="k">def</span> <span class="nf">tset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. deprecated:: 5.0</span>
 <span class="sd">            Use ``set(parametername=value_array)`` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -461,14 +458,14 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The underlying application vertex.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The underlying application vertex.</span>
 
 <span class="sd">        :rtype: ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">_recorder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The recorder of the population</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The recorder of the population</span>
 
 <span class="sd">        :rtype: ~Recorder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -511,7 +508,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

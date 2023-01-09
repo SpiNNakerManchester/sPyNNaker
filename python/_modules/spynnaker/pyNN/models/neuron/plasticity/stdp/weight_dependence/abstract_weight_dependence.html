@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../../../" id="documentation_options" src="../../../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
@@ -63,14 +60,14 @@
 
 <div class="viewcode-block" id="AbstractWeightDependence.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_parameter_names">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns the parameter names</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the parameter names</span>
 
 <span class="sd">        :rtype: iterable(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractWeightDependence.is_same_as"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.is_same_as">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight_dependence</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determine if this weight dependence is the same as another</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if this weight dependence is the same as another</span>
 
 <span class="sd">        :param AbstractWeightDependence weight_dependence:</span>
 <span class="sd">        :rtype: bool</span>
@@ -78,7 +75,7 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The suffix to be appended to the vertex executable for this rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The suffix to be appended to the vertex executable for this rule</span>
 
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -86,7 +83,7 @@
 <div class="viewcode-block" id="AbstractWeightDependence.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">n_weight_terms</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the amount of SDRAM used by the parameters of this rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the amount of SDRAM used by the parameters of this rule</span>
 
 <span class="sd">        :param int n_synapse_types:</span>
 <span class="sd">        :param int n_weight_terms:</span>
@@ -97,7 +94,7 @@
     <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span> <span class="n">synapse_weight_scales</span><span class="p">,</span>
             <span class="n">n_weight_terms</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write the parameters of the rule to the spec</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the parameters of the rule to the spec</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The specification to write to</span>
@@ -110,7 +107,7 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum weight that will ever be set in a synapse as a result\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum weight that will ever be set in a synapse as a result\</span>
 <span class="sd">            of this rule</span>
 
 <span class="sd">        :rtype: float</span>
@@ -154,7 +151,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

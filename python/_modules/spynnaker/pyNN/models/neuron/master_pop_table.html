@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -77,7 +74,7 @@
 
 
 <span class="k">def</span> <span class="nf">_n_bits</span><span class="p">(</span><span class="n">field</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Get the number of bits in a field (ctypes doesn&#39;t do this)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the number of bits in a field (ctypes doesn&#39;t do this)</span>
 
 <span class="sd">    :param _ctypes.CField field: a ctype field from a structure</span>
 <span class="sd">    :return: the number of bits</span>
@@ -95,7 +92,7 @@
 
 
 <span class="k">def</span> <span class="nf">_make_array</span><span class="p">(</span><span class="n">ctype</span><span class="p">,</span> <span class="n">n_items</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Make an array of ctype items; done separately as the syntax is a</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Make an array of ctype items; done separately as the syntax is a</span>
 <span class="sd">        little odd!</span>
 
 <span class="sd">    :param _ctypes.PyCSimpleType ctype: A ctype</span>
@@ -108,7 +105,7 @@
 
 
 <span class="k">class</span> <span class="nc">_MasterPopEntryCType</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A Master Population Table Entry; matches the C struct</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A Master Population Table Entry; matches the C struct</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># The key to match against the incoming message</span>
@@ -144,7 +141,7 @@
 
 
 <span class="k">class</span> <span class="nc">_AddressListEntryCType</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">LittleEndianStructure</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An Address and Row Length structure; matches the C struct</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An Address and Row Length structure; matches the C struct</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># the length of the row</span>
@@ -174,7 +171,7 @@
 
 
 <span class="k">def</span> <span class="nf">_to_numpy</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Convert a ctypes array to a numpy array of uint32</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Convert a ctypes array to a numpy array of uint32</span>
 
 <span class="sd">    Note: no data copying is done; it is pure type conversion.  Editing</span>
 <span class="sd">    the returned array will result in changes to the original.</span>
@@ -192,7 +189,7 @@
 
 
 <span class="k">class</span> <span class="nc">_MasterPopEntry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Internal class that contains a master population table entry</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Internal class that contains a master population table entry</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__addresses_and_row_lengths&quot;</span><span class="p">,</span>
@@ -212,7 +209,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span>
                  <span class="n">n_colour_bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int routing_key: The key to match for this entry</span>
 <span class="sd">        :param int mask: The mask to match for this entry</span>
 <span class="sd">        :param int core_mask:</span>
@@ -230,7 +227,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a synaptic matrix pointer to the entry</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add a synaptic matrix pointer to the entry</span>
 
 <span class="sd">        :param int address: The address of the synaptic matrix</span>
 <span class="sd">        :param int row_length: The length of each row in the matrix</span>
@@ -247,7 +244,7 @@
         <span class="k">return</span> <span class="n">index</span>
 
     <span class="k">def</span> <span class="nf">append_invalid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an invalid marker to the entry; used to ensure index alignment</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add an invalid marker to the entry; used to ensure index alignment</span>
 <span class="sd">            between multiple entries when necessary</span>
 
 <span class="sd">        :return: The index of the marker within the entry</span>
@@ -259,7 +256,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">routing_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: the key combo of this entry</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -267,7 +264,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: the mask of the key for this entry</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -275,7 +272,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">core_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: the mask of the key once shifted to get the source core ID</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -283,7 +280,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">core_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: the shift of the key to get the source core ID</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -291,7 +288,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_neurons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: the number of neurons per source core</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -299,7 +296,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">addresses_and_row_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: the memory address that this master pop entry points at</span>
 <span class="sd">            (synaptic matrix)</span>
 <span class="sd">        :rtype: list(tuple(int,int,bool,bool))</span>
@@ -307,7 +304,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span>
 
     <span class="k">def</span> <span class="nf">write_to_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">address_list</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write entries to the master population table</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write entries to the master population table</span>
 
 <span class="sd">        :param _MasterPopEntryCType entry: The entry to write to</span>
 <span class="sd">        :param _AddressListEntryCType_Array address_list:</span>
@@ -347,7 +344,7 @@
 
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch">[docs]</a><span class="k">class</span> <span class="nc">MasterPopTableAsBinarySearch</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Master population table, implemented as binary search master.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Master population table, implemented as binary search master.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__entries&quot;</span><span class="p">,</span>
@@ -359,7 +356,7 @@
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_master_population_table_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_master_population_table_size</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the size of the master population table in SDRAM.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the size of the master population table in SDRAM.</span>
 
 <span class="sd">        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
 <span class="sd">            The projections arriving at the vertex that are to be handled by</span>
@@ -395,7 +392,7 @@
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_allowed_row_length"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_allowed_row_length">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_allowed_row_length</span><span class="p">(</span><span class="n">row_length</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the next allowed row length</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the next allowed row length</span>
 
 <span class="sd">        :param int row_length: the row length being considered</span>
 <span class="sd">        :return: the row length available</span>
@@ -412,7 +409,7 @@
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_next_allowed_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_next_allowed_address">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_next_allowed_address</span><span class="p">(</span><span class="n">next_address</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the next allowed address.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the next allowed address.</span>
 
 <span class="sd">        :param int next_address: The next address that would be used</span>
 <span class="sd">        :return: The next address that can be used following next_address</span>
@@ -428,7 +425,7 @@
         <span class="k">return</span> <span class="n">addr_scaled</span> <span class="o">*</span> <span class="n">_ADDRESS_SCALE</span></div>
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.initialise_table"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.initialise_table">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Initialise the master pop data structure.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Initialise the master pop data structure.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">=</span> <span class="mi">0</span></div>
@@ -436,7 +433,7 @@
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.add_application_entry"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_application_entry">[docs]</a>    <span class="k">def</span> <span class="nf">add_application_entry</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span>
             <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an entry for an application-edge to the population table.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add an entry for an application-edge to the population table.</span>
 
 <span class="sd">        :param int block_start_addr: where the synaptic matrix block starts</span>
 <span class="sd">        :param int row_length: how long in words each row is</span>
@@ -473,7 +470,7 @@
     <span class="k">def</span> <span class="nf">__update_master_population_table</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span>
             <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an entry in the binary search to deal with the synaptic matrix</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add an entry in the binary search to deal with the synaptic matrix</span>
 
 <span class="sd">        :param int block_start_addr: where the synaptic matrix block starts</span>
 <span class="sd">        :param int row_length: how long in words each row is</span>
@@ -511,7 +508,7 @@
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.add_invalid_application_entry"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.add_invalid_application_entry">[docs]</a>    <span class="k">def</span> <span class="nf">add_invalid_application_entry</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span>
             <span class="n">n_colour_bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an entry to the table from an application vertex that doesn&#39;t</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add an entry to the table from an application vertex that doesn&#39;t</span>
 <span class="sd">            point to anywhere.  Used to keep indices in synchronisation between</span>
 <span class="sd">            e.g. normal and delay entries and between entries on different</span>
 <span class="sd">            cores.</span>
@@ -548,7 +545,7 @@
     <span class="k">def</span> <span class="nf">__add_invalid_entry</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">core_shift</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span>
             <span class="n">n_colour_bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an entry to the table that doesn&#39;t point to anywhere.  Used</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add an entry to the table that doesn&#39;t point to anywhere.  Used</span>
 <span class="sd">            to keep indices in synchronisation between e.g. normal and delay</span>
 <span class="sd">            entries and between entries on different cores.</span>
 
@@ -603,7 +600,7 @@
         <span class="k">return</span> <span class="n">entry</span>
 
 <div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_pop_table_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_pop_table_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_pop_table_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the master pop table data as a numpy array</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the master pop table data as a numpy array</span>
 
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -627,7 +624,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_n_neurons_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum number of neurons per core supported when a core-mask\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum number of neurons per core supported when a core-mask\</span>
 <span class="sd">            is &gt; 0.</span>
 
 <span class="sd">        :rtype: int</span>
@@ -636,7 +633,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_core_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum core mask supported when n_neurons is &gt; 0; this is the\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum core mask supported when n_neurons is &gt; 0; this is the\</span>
 <span class="sd">            maximum number of cores that can be supported in a joined mask.</span>
 
 <span class="sd">        :rtype: int</span>
@@ -645,7 +642,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum index of a synaptic connection</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum index of a synaptic connection</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -689,7 +686,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

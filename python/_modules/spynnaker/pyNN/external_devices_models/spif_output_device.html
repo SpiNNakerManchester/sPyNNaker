@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -71,7 +68,7 @@
 <span class="k">class</span> <span class="nc">SPIFOutputDevice</span><span class="p">(</span>
         <span class="n">ApplicationFPGAVertex</span><span class="p">,</span> <span class="n">PopulationApplicationVertex</span><span class="p">,</span>
         <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Output (only) to a SPIF device</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Output (only) to a SPIF device</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__incoming_partition&quot;</span><span class="p">,</span> <span class="s2">&quot;__create_database&quot;</span><span class="p">]</span>
@@ -110,7 +107,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_partition</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_set_key_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the payload for the command to set the router key</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the payload for the command to set the router key</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">r_infos</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">r_infos</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
@@ -118,7 +115,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_partition</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_set_mask_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the payload for the command to set the router mask</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the payload for the command to set the router mask</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">r_infos</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">r_infos</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
@@ -182,7 +179,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

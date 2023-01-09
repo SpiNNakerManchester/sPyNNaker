@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -78,7 +75,7 @@
 
 
 <span class="k">class</span> <span class="nc">ConvolutionConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Where the pre- and post-synaptic populations are considered as a 2D\</span>
 <span class="sd">    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\</span>
 <span class="sd">    through a (kernel) set of weights and/or delays.</span>
@@ -99,7 +96,7 @@
                  <span class="n">positive_receptor_type</span><span class="o">=</span><span class="s2">&quot;excitatory&quot;</span><span class="p">,</span>
                  <span class="n">negative_receptor_type</span><span class="o">=</span><span class="s2">&quot;inhibitory&quot;</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param kernel_weights:</span>
 <span class="sd">            The synaptic strengths, shared by neurons in the post population.</span>
 <span class="sd">            Can be:</span>
@@ -248,7 +245,7 @@
                 <span class="sa">f</span><span class="s2">&quot;Unrecognized padding </span><span class="si">{</span><span class="n">padding</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ConvolutionConnector.get_post_shape"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_post_shape">[docs]</a>    <span class="k">def</span> <span class="nf">get_post_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the shape of the post image given the pre-image shape</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the shape of the post image given the pre-image shape</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -354,7 +351,7 @@
         <span class="k">return</span> <span class="n">connected</span></div>
 
     <span class="k">def</span> <span class="nf">__pre_as_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_coords</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write pre coords as post coords.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write pre coords as post coords.</span>
 
 <span class="sd">        :param Iterable pre_coords: An iterable of (x, y) coordinates</span>
 <span class="sd">        :rtype: numpy.ndarray</span>
@@ -450,7 +447,7 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">kernel_weights</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">__recip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Compute the reciprocal of a number as an signed 1-bit integer,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Compute the reciprocal of a number as an signed 1-bit integer,</span>
 <span class="sd">            14-bit fractional fixed point number, encoded in an integer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">14</span><span class="p">)))</span>
@@ -493,7 +490,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

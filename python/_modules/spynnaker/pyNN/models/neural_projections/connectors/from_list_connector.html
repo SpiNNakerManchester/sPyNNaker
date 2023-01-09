@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -70,7 +67,7 @@
 
 
 <span class="k">class</span> <span class="nc">FromListConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Make connections according to a list.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Make connections according to a list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__conn_list&quot;</span><span class="p">,</span>
@@ -86,7 +83,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn_list</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param conn_list:</span>
 <span class="sd">            A numpy array or a list of tuples, one tuple for each connection.</span>
 <span class="sd">            Each tuple should contain::</span>
@@ -156,7 +153,7 @@
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__delays</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_split_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list(~pacman.model.graphs.commmon.Slice) post_slices:</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -341,7 +338,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">conn_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The connection list.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The connection list.</span>
 
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -437,7 +434,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The names of the columns in the array after the first two. \</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The names of the columns in the array after the first two. \</span>
 <span class="sd">        Of particular interest is whether ``weight`` and ``delay`` columns\</span>
 <span class="sd">        are present.</span>
 
@@ -450,7 +447,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__column_names</span> <span class="o">=</span> <span class="n">column_names</span>
 
 <div class="viewcode-block" id="FromListConnector.get_extra_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromListConnector.get_extra_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_extra_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Getter for the extra parameters. Excludes ``weight`` and\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Getter for the extra parameters. Excludes ``weight`` and\</span>
 <span class="sd">        ``delay`` columns.</span>
 
 <span class="sd">        :return: The extra parameters</span>
@@ -459,7 +456,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extra_parameters</span></div>
 
 <div class="viewcode-block" id="FromListConnector.get_extra_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromListConnector.get_extra_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_extra_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Getter for the names of the extra parameters.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Getter for the names of the extra parameters.</span>
 
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -510,7 +507,7 @@
         <span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">_apply_parameters_to_synapse_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractStaticSynapseDynamics synapse_type:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extra_parameter_names</span><span class="p">:</span>
@@ -555,7 +552,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

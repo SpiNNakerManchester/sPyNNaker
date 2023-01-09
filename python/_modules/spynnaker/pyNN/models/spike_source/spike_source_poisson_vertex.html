@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -105,7 +102,7 @@
 <span class="k">class</span> <span class="nc">SpikeSourcePoissonVertex</span><span class="p">(</span>
         <span class="n">PopulationApplicationVertex</span><span class="p">,</span>
         <span class="n">LegacyPartitionerAPI</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A Poisson Spike source object</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A Poisson Spike source object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -134,7 +131,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
             <span class="n">rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rates</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">starts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">durations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">        :param str label:</span>
 <span class="sd">        :param float seed:</span>
@@ -303,14 +300,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the rates</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the rates</span>
 
 <span class="sd">        :rtype: RangedList</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.add_outgoing_projection"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.add_outgoing_projection">[docs]</a>    <span class="k">def</span> <span class="nf">add_outgoing_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an outgoing projection from this vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add an outgoing projection from this vertex</span>
 
 <span class="sd">        :param PyNNProjectionCommon projection: The projection to add</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -318,7 +315,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">outgoing_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The projections outgoing from this vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The projections outgoing from this vertex</span>
 
 <span class="sd">        :rtype: list(PyNNProjectionCommon)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -493,7 +490,7 @@
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">max_spikes_per_ts</span><span class="p">))</span> <span class="o">+</span> <span class="mf">1.0</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_sdram_usage"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recording_sdram_usage">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_sdram_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">variable_sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span>
@@ -504,7 +501,7 @@
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_sdram_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_sdram_used_by_atoms">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LegacyPartitionerAPI</span><span class="o">.</span><span class="n">get_sdram_used_by_atoms</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_sdram_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">poisson_params_sz</span> <span class="o">=</span> <span class="n">get_params_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
@@ -569,7 +566,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.update_kiss_seed"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.update_kiss_seed">[docs]</a>    <span class="k">def</span> <span class="nf">update_kiss_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; updates a kiss seed from the machine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; updates a kiss seed from the machine</span>
 
 <span class="sd">        :param vertex_slice: the vertex slice to update seed of</span>
 <span class="sd">        :param seed: the seed</span>
@@ -578,7 +575,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.describe"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return a human-readable description of the cell or synapse type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return a human-readable description of the cell or synapse type.</span>
 
 <span class="sd">        The output may be customised by specifying a different template\</span>
 <span class="sd">        together with an associated template engine\</span>
@@ -655,7 +652,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

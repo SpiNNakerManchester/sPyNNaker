@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -61,14 +58,14 @@
 
 
 <span class="k">class</span> <span class="nc">FromFileConnector</span><span class="p">(</span><span class="n">FromListConnector</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Make connections according to a list read from a file.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Make connections according to a list read from a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_file&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span>  <span class="c1"># @ReservedAssignment</span>
             <span class="n">distributed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str file:</span>
 <span class="sd">            Either an open file object or the filename of a file containing a</span>
 <span class="sd">            list of connections, in the format required by</span>
@@ -143,7 +140,7 @@
         <span class="k">return</span> <span class="s2">&quot;FromFileConnector(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FromFileConnector.get_reader"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromFileConnector.get_reader">[docs]</a>    <span class="k">def</span> <span class="nf">get_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>  <span class="c1"># @ReservedAssignment</span>
-        <span class="sd">&quot;&quot;&quot; Get a file reader object using the PyNN methods.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a file reader object using the PyNN methods.</span>
 
 <span class="sd">        :return: A pynn StandardTextFile or similar</span>
 <span class="sd">        :rtype: ~pynn.recording.files.StandardTextFile</span>
@@ -188,7 +185,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

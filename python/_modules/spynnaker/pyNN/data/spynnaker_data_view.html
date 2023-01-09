@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -65,7 +62,7 @@
 
 
 <span class="k">class</span> <span class="nc">_SpynnakerDataModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Singleton data model</span>
 
 <span class="sd">    This class should not be accessed directly please use the DataView and</span>
@@ -101,7 +98,7 @@
         <span class="k">return</span> <span class="n">obj</span>
 
     <span class="k">def</span> <span class="nf">_clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clears out all data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id_counter</span> <span class="o">=</span> <span class="mi">0</span>
@@ -113,14 +110,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_segment_counter</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span> <span class="nf">_hard_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Puts all data back into the state expected at graph changed and</span>
 <span class="sd">            sim.reset</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_soft_reset</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_soft_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Puts all data back into the state expected at sim.reset but not</span>
 <span class="sd">        graph changed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -128,7 +125,7 @@
 
 
 <span class="k">class</span> <span class="nc">SpynnakerDataView</span><span class="p">(</span><span class="n">FecDataView</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds the extra Methods to the View for PyNN level.</span>
 
 <span class="sd">    See UtilsDataView for a more detailed description.</span>
@@ -144,7 +141,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.get_min_delay"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_min_delay">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_min_delay</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The minimum supported delay, in milliseconds if available</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The minimum supported delay, in milliseconds if available</span>
 
 <span class="sd">        Typically simulation_time_step_per_ms but may be a positive multiple</span>
 
@@ -158,7 +155,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.has_min_delay"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.has_min_delay">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">has_min_delay</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        report if the minimum supported delay, in milliseconds if available</span>
 
 <span class="sd">        :rtype: bool</span>
@@ -169,7 +166,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.iterate_projections"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.iterate_projections">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">iterate_projections</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        An iteration of the projections previously added</span>
 
 <span class="sd">        The iteration will be empty if no projections added.</span>
@@ -180,7 +177,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.get_n_projections"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_n_projections">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_n_projections</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The number of projections previously added</span>
 
 <span class="sd">        rtype: int</span>
@@ -189,7 +186,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.add_projection"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.add_projection">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">add_projection</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">projection</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Called by each projection to add itself to the list.</span>
 
 <span class="sd">        Usage other than from Projection.__init__ is not supported and likely</span>
@@ -212,7 +209,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.iterate_populations"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.iterate_populations">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">iterate_populations</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        An iteration of the populations previously added</span>
 
 <span class="sd">        The iteration will be empty if no populations added.</span>
@@ -223,7 +220,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.get_n_populations"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_n_populations">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_n_populations</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The number of populations previously added</span>
 
 <span class="sd">        :rtpye: int</span>
@@ -232,7 +229,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.add_population"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.add_population">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">add_population</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Called by each population to add itself to the list.</span>
 
 <span class="sd">        Usage other than from Population.__init__ is not supported and likely</span>
@@ -264,7 +261,7 @@
 <div class="viewcode-block" id="SpynnakerDataView.set_number_of_neurons_per_dimension_per_core"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.set_number_of_neurons_per_dimension_per_core">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">set_number_of_neurons_per_dimension_per_core</span><span class="p">(</span>
             <span class="bp">cls</span><span class="p">,</span> <span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets a ceiling on the number of neurons of a given type that can be\</span>
 <span class="sd">        placed on a single core for each dimension.</span>
 
@@ -282,7 +279,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.get_segment_counter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_segment_counter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_segment_counter</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The number of the current recording segment being generated.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The number of the current recording segment being generated.</span>
 
 <span class="sd">        :return: the segment counter</span>
 <span class="sd">        :rtype: int</span>
@@ -291,7 +288,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.get_sim_name"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_sim_name">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_sim_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the name to be returned by pyNN.spiNNaker.name</span>
 
 <span class="sd">        :rtype str</span>
@@ -337,7 +334,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

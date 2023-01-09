@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -64,7 +61,7 @@
 
 <span class="nd">@require_subclass</span><span class="p">(</span><span class="n">MachineVertex</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">AbstractSynapseExpandable</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Indicates a class (a \</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Indicates a class (a \</span>
 <span class="sd">        :py:class:`~pacman.model.graphs.machine.MachineVertex`) \</span>
 <span class="sd">        that has may need to run the SYNAPSE_EXPANDER aplx</span>
 
@@ -78,7 +75,7 @@
 
 <div class="viewcode-block" id="AbstractSynapseExpandable.gen_on_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; True if the synapses of a the slice of this vertex should be \</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; True if the synapses of a the slice of this vertex should be \</span>
 <span class="sd">            generated on the machine.</span>
 
 <span class="sd">        .. note::</span>
@@ -90,7 +87,7 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">connection_generator_region</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The region containing the parameters of synaptic expansion</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The region containing the parameters of synaptic expansion</span>
 
 <span class="sd">        :rtype: int</span>
 
@@ -99,7 +96,7 @@
 
 <div class="viewcode-block" id="AbstractSynapseExpandable.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Fill in the connection holders</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Fill in the connection holders</span>
 
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            Where the data is on the machine</span>
@@ -107,7 +104,7 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">max_gen_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum amount of synaptic data to be generated.  This</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum amount of synaptic data to be generated.  This</span>
 <span class="sd">            is used to calculate the timeout of the execution.</span>
 
 <span class="sd">        :rtype: int</span>
@@ -115,7 +112,7 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">bit_field_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The amount of bit field data to be generated.  This is used to</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The amount of bit field data to be generated.  This is used to</span>
 <span class="sd">            calculate the timeout of the execution.</span>
 
 <span class="sd">        :rtype: int</span>
@@ -159,7 +156,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

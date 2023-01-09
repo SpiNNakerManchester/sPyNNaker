@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -100,7 +97,7 @@
 
 <span class="k">class</span> <span class="nc">ProjectionApplicationEdge</span><span class="p">(</span>
         <span class="n">ApplicationEdge</span><span class="p">,</span> <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An edge which terminates on an :py:class:`AbstractPopulationVertex`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An edge which terminates on an :py:class:`AbstractPopulationVertex`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__delay_edge&quot;</span><span class="p">,</span>
@@ -110,7 +107,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractPopulationVertex pre_vertex:</span>
 <span class="sd">        :param AbstractPopulationVertex post_vertex:</span>
 <span class="sd">        :param SynapseInformation synapse_information:</span>
@@ -130,7 +127,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="ProjectionApplicationEdge.add_synapse_information"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.add_synapse_information">[docs]</a>    <span class="k">def</span> <span class="nf">add_synapse_information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param SynapseInformation synapse_information:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dynamics</span> <span class="o">=</span> <span class="n">synapse_information</span><span class="o">.</span><span class="n">synapse_dynamics</span>
@@ -144,14 +141,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: list(SynapseInformation)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delay_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Settable.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable.</span>
 
 <span class="sd">        :rtype: DelayedApplicationEdge or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -163,7 +160,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_neuromodulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Check if this edge is providing neuromodulation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check if this edge is providing neuromodulation</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -171,7 +168,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_delay_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -221,7 +218,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

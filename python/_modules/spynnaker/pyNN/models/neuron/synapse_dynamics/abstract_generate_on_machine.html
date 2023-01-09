@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -66,12 +63,12 @@
 
 
 <span class="k">class</span> <span class="nc">AbstractGenerateOnMachine</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A synapse dynamics that can be generated on the machine.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A synapse dynamics that can be generated on the machine.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="AbstractGenerateOnMachine.generate_on_machine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine.generate_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">generate_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determines if this instance should be generated on the machine.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determines if this instance should be generated on the machine.</span>
 
 <span class="sd">        Default implementation returns True</span>
 
@@ -81,7 +78,7 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">gen_matrix_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The ID of the on-machine matrix generator.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The ID of the on-machine matrix generator.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -91,14 +88,14 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">synaptic_matrix_offset</span><span class="p">,</span> <span class="n">delayed_matrix_offset</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span> <span class="n">max_pre_atoms_per_core</span><span class="p">,</span>
             <span class="n">max_post_atoms_per_core</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Any parameters required by the matrix generator.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Any parameters required by the matrix generator.</span>
 
 <span class="sd">        :rtype: ~numpy.ndarray(uint32)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">gen_matrix_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The size of the parameters of the matrix generator in bytes.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size of the parameters of the matrix generator in bytes.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -141,7 +138,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

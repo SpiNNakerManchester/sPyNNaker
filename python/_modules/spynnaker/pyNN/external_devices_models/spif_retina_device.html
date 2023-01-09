@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -74,7 +71,7 @@
 <span class="k">class</span> <span class="nc">SPIFRetinaDevice</span><span class="p">(</span>
         <span class="n">Application2DFPGAVertex</span><span class="p">,</span> <span class="n">PopulationApplicationVertex</span><span class="p">,</span>
         <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">,</span> <span class="n">HasShapeKeyFields</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A retina device connected to SpiNNaker using a SPIF board.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A retina device connected to SpiNNaker using a SPIF board.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1">#: SPIF outputs to 8 FPGA output links, so we split into (2 x 4), meaning</span>
@@ -103,7 +100,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipe</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">sub_width</span><span class="p">,</span> <span class="n">sub_height</span><span class="p">,</span>
                  <span class="n">base_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_x_shift</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">input_y_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">board_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chip_coords</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param int pipe: Which pipe on SPIF the retina is connected to</span>
 <span class="sd">        :param int width: The width of the retina in pixels</span>
@@ -195,7 +192,7 @@
         <span class="k">return</span> <span class="n">n</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
 
     <span class="k">def</span> <span class="nf">__incoming_fpgas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the incoming FPGA connections</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the incoming FPGA connections</span>
 
 <span class="sd">        :rtype: list(FPGAConnection)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -204,7 +201,7 @@
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">SPIF_INPUT_FPGA_LINKS</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__outgoing_fpga</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the outgoing FPGA connection (for commands)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the outgoing FPGA connection (for commands)</span>
 
 <span class="sd">        :rtype: FGPA_Connection</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -369,7 +366,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

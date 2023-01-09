@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -69,14 +66,14 @@
 
 
 <span class="k">class</span> <span class="nc">AbstractSynapseDynamics</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; How do the dynamics of a synapse interact with the rest of the model.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; How do the dynamics of a synapse interact with the rest of the model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.merge">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Merge with the given synapse_dynamics and return the result, or\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Merge with the given synapse_dynamics and return the result, or\</span>
 <span class="sd">            error if merge is not possible</span>
 
 <span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
@@ -85,25 +82,25 @@
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_vertex_executable_suffix"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_vertex_executable_suffix">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the executable suffix for a vertex for this dynamics</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the executable suffix for a vertex for this dynamics</span>
 
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">changes_during_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determine if the synapses change during a run</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if the synapses change during a run</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The weight of connections</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The weight of connections</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_round_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        round the delays to multiples of full timesteps</span>
 
 <span class="sd">        (otherwise SDRAM estimation calculations can go wrong)</span>
@@ -126,19 +123,19 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The delay of connections</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The delay of connections</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">is_combined_core_capable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determine if the synapse dynamics can run on a core combined with</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if the synapse dynamics can run on a core combined with</span>
 <span class="sd">            the neuron, or if a separate core is needed.</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_value"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a property</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a property</span>
 
 <span class="sd">        :param str key: the name of the property</span>
 <span class="sd">        :rtype: Any or float or int or list(float) or list(int)</span>
@@ -149,7 +146,7 @@
             <span class="sa">f</span><span class="s2">&quot;Type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not have parameter </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.set_value"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set a property</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set a property</span>
 
 <span class="sd">        :param str key: the name of the parameter to change</span>
 <span class="sd">        :param value: the new value of the parameter to assign</span>
@@ -163,7 +160,7 @@
                 <span class="sa">f</span><span class="s2">&quot;Type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not have parameter </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_delay_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the maximum delay for the synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the maximum delay for the synapses</span>
 
 <span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">        :param ~numpy.ndarray delays:</span>
@@ -171,7 +168,7 @@
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_delay_minimum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the minimum delay for the synapses. \</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the minimum delay for the synapses. \</span>
 <span class="sd">            This will support the filtering of the undelayed edge\</span>
 <span class="sd">            from the graph, but requires fixes in the synaptic manager to \</span>
 <span class="sd">            happen first before this can be utilised fully.</span>
@@ -182,7 +179,7 @@
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_delay_variance"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_delay_variance">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the variance in delay for the synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the variance in delay for the synapses</span>
 
 <span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">        :param ~numpy.ndarray delays:</span>
@@ -190,7 +187,7 @@
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_delay_variance</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_weight_mean"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_weight_mean">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the mean weight for the synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the mean weight for the synapses</span>
 
 <span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">        :param ~numpy.ndarray weights:</span>
@@ -198,7 +195,7 @@
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_weight_mean</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_weight_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the maximum weight for the synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the maximum weight for the synapses</span>
 
 <span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">        :param ~numpy.ndarray weights:</span>
@@ -206,7 +203,7 @@
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_weight_variance"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_weight_variance">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the variance in weight for the synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the variance in weight for the synapses</span>
 
 <span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">        :param ~numpy.ndarray weights:</span>
@@ -214,7 +211,7 @@
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_weight_variance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_provenance_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_provenance_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_population_label</span><span class="p">,</span> <span class="n">post_population_label</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the provenance data from this synapse dynamics object</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the provenance data from this synapse dynamics object</span>
 
 <span class="sd">        :param str pre_population_label:</span>
 <span class="sd">        :param str post_population_label:</span>
@@ -225,7 +222,7 @@
         <span class="k">return</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_synapse_id_by_target">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the index of the synapse type based on the name, or None</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the index of the synapse type based on the name, or None</span>
 <span class="sd">            if the name is not found.</span>
 
 <span class="sd">        :param str target: The name of the synapse</span>
@@ -235,7 +232,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_connected_vertices"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_connected_vertices">[docs]</a>    <span class="k">def</span> <span class="nf">get_connected_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_info</span><span class="p">,</span> <span class="n">source_vertex</span><span class="p">,</span> <span class="n">target_vertex</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the machine vertices that are connected to each other with</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the machine vertices that are connected to each other with</span>
 <span class="sd">            this connector</span>
 
 <span class="sd">        :param SynapseInformation s_info:</span>
@@ -251,7 +248,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">absolute_max_atoms_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The absolute maximum number of atoms per core supported by this</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The absolute maximum number of atoms per core supported by this</span>
 <span class="sd">            synapse dynamics object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># By default, we can only support the maximum row length per core</span>
@@ -295,7 +292,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

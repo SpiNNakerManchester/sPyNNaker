@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -68,7 +65,7 @@
 
 <span class="k">class</span> <span class="nc">DelayExtensionVertex</span><span class="p">(</span>
         <span class="n">ApplicationVertex</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Provide delays to incoming spikes in multiples of the maximum delays\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Provide delays to incoming spikes in multiples of the maximum delays\</span>
 <span class="sd">        of a neuron (typically 16 or 32)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -92,7 +89,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;DelayExtension&quot;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param partition: The parition this Delay is supporting</span>
 <span class="sd">        :type partition:</span>
 <span class="sd">            ~pacman.mode.graph.application.ApplicationEdgePartition</span>
@@ -130,7 +127,7 @@
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasDelayStages</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">n_delay_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum number of delay stages required by any connection\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum number of delay stages required by any connection\</span>
 <span class="sd">            out of this delay extension vertex</span>
 
 <span class="sd">        :rtype: int</span>
@@ -153,13 +150,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">source_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partition</span><span class="o">.</span><span class="n">pre_vertex</span>
 
 <div class="viewcode-block" id="DelayExtensionVertex.delay_params_size"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_params_size">[docs]</a>    <span class="k">def</span> <span class="nf">delay_params_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The size of the delay parameters</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size of the delay parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="n">_DELAY_PARAM_HEADER_WORDS</span></div>
 
@@ -168,7 +165,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partition</span>
 
 <div class="viewcode-block" id="DelayExtensionVertex.add_outgoing_edge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_outgoing_edge">[docs]</a>    <span class="k">def</span> <span class="nf">add_outgoing_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an outgoing edge to the delay extension</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add an outgoing edge to the delay extension</span>
 
 <span class="sd">        :param DelayedApplicationEdge delay_edge: The edge to add</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -176,7 +173,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">outgoing_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the outgoing edges from this vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the outgoing edges from this vertex</span>
 
 <span class="sd">        :rtype: list(DelayApplicationEdge)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -224,7 +221,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -65,7 +62,7 @@
 
 
 <div class="viewcode-block" id="SynapticMatrixApp"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp">[docs]</a><span class="k">class</span> <span class="nc">SynapticMatrixApp</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; The synaptic matrix (and delay matrix if applicable) for an incoming</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The synaptic matrix (and delay matrix if applicable) for an incoming</span>
 <span class="sd">        app edge</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -111,7 +108,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
             <span class="n">synaptic_matrix_region</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span>
             <span class="n">app_key_info</span><span class="p">,</span> <span class="n">delay_app_key_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">            The projection synapse information</span>
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
@@ -166,7 +163,7 @@
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
 
 <div class="viewcode-block" id="SynapticMatrixApp.reserve_matrices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.reserve_matrices">[docs]</a>    <span class="k">def</span> <span class="nf">reserve_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">poptable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Allocate the master pop table entries for the blocks</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Allocate the master pop table entries for the blocks</span>
 
 <span class="sd">        :param int block_addr: Where the allocation can start from</span>
 <span class="sd">        :param MasterPopTableAsBinarySearch poptable:</span>
@@ -179,7 +176,7 @@
         <span class="k">return</span> <span class="n">block_addr</span></div>
 
     <span class="k">def</span> <span class="nf">__reserve_app_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">poptable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Reserve space for the matrix in the master pop table</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Reserve space for the matrix in the master pop table</span>
 
 <span class="sd">        :param int block_addr:</span>
 <span class="sd">            The address in the synaptic matrix region to start writing at</span>
@@ -213,7 +210,7 @@
         <span class="k">return</span> <span class="n">block_addr</span>
 
     <span class="k">def</span> <span class="nf">__reserve_delay_app_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">poptable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Reserve space in the master pop table for a delayed matrix</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Reserve space in the master pop table for a delayed matrix</span>
 
 <span class="sd">        :param int block_addr:</span>
 <span class="sd">            The address in the synaptic matrix region to start writing at</span>
@@ -250,7 +247,7 @@
         <span class="k">return</span> <span class="n">block_addr</span>
 
     <span class="k">def</span> <span class="nf">__next_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the next address after a block, checking it is in range</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the next address after a block, checking it is in range</span>
 
 <span class="sd">        :param int block_addr: The address of the start of the block</span>
 <span class="sd">        :param int size: The size of the block in bytes</span>
@@ -267,7 +264,7 @@
         <span class="k">return</span> <span class="n">next_addr</span>
 
 <div class="viewcode-block" id="SynapticMatrixApp.write_matrix"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">write_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write a synaptic matrix from host</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write a synaptic matrix from host</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The specification to write to</span>
@@ -285,7 +282,7 @@
             <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">delay_row_data</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__get_row_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Generate the row data for a synaptic matrix from the description</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Generate the row data for a synaptic matrix from the description</span>
 
 <span class="sd">        :return: The data and the delayed data</span>
 <span class="sd">        :rtype: tuple(~numpy.ndarray or None, ~numpy.ndarray or None)</span>
@@ -323,7 +320,7 @@
 
     <span class="k">def</span> <span class="nf">__update_connection_holders</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">delayed_data</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Fill in connections in the connection holders as they are created</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Fill in connections in the connection holders as they are created</span>
 
 <span class="sd">        :param ~numpy.ndarray data: The row data created</span>
 <span class="sd">        :param ~numpy.ndarray delayed_data: The delayed row data created</span>
@@ -342,7 +339,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_atoms_per_core</span><span class="p">))</span>
 
 <div class="viewcode-block" id="SynapticMatrixApp.get_generator_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.get_generator_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_generator_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Prepare to write a matrix using an on-chip generator</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Prepare to write a matrix using an on-chip generator</span>
 
 <span class="sd">        :return: The data to generate with</span>
 <span class="sd">        :rtype: GeneratorData</span>
@@ -356,7 +353,7 @@
             <span class="n">max_pre_atoms_per_core</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_atoms_per_core</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SynapticMatrixApp.get_connections"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.get_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the connections for this matrix from the machine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the connections for this matrix from the machine</span>
 
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            Where the matrix is on the machine</span>
@@ -369,7 +366,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_connections</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SynapticMatrixApp.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Read any pre-run connection holders after data has been generated</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Read any pre-run connection holders after data has been generated</span>
 
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            Where the matrix is on the machine</span>
@@ -382,7 +379,7 @@
                     <span class="n">holder</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__read_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Read connections from an address on the machine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Read connections from an address on the machine</span>
 
 <span class="sd">        :param Placement placement: Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
@@ -417,7 +414,7 @@
         <span class="k">return</span> <span class="n">connections</span>
 
     <span class="k">def</span> <span class="nf">__get_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a block of data for undelayed synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a block of data for undelayed synapses</span>
 
 <span class="sd">        :param Placement placement: Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
@@ -430,7 +427,7 @@
         <span class="k">return</span> <span class="n">block</span>
 
     <span class="k">def</span> <span class="nf">__get_delayed_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a block of data for delayed synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a block of data for delayed synapses</span>
 
 <span class="sd">        :param Placement placement: Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
@@ -443,7 +440,7 @@
         <span class="k">return</span> <span class="n">block</span>
 
 <div class="viewcode-block" id="SynapticMatrixApp.get_index"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.get_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the index in the master population table of the matrix</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the index in the master population table of the matrix</span>
 
 <span class="sd">        :param ~pacman.model.graph.machine.MachineVertex m_vertex:</span>
 <span class="sd">            The source machine vertex</span>
@@ -489,7 +486,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

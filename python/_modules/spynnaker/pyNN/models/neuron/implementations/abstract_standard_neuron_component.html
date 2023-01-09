@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -58,13 +55,13 @@
 
 
 <span class="k">class</span> <span class="nc">AbstractStandardNeuronComponent</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Represents a component of a standard neural model.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Represents a component of a standard neural model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__structs&quot;</span><span class="p">,</span> <span class="s2">&quot;__units&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structs</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list(Struct) structs: The structs of the component</span>
 <span class="sd">        :param dict units: The units to use for each parameter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -73,7 +70,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">structs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The structures of the component.  If there are multiple structs,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The structures of the component.  If there are multiple structs,</span>
 <span class="sd">            the order is how they will appear in memory; where there are</span>
 <span class="sd">            structs that repeat per neuron the repeats will appear adjacent</span>
 <span class="sd">            e.g. for non-repeating struct g, followed by repeating structs s1</span>
@@ -86,7 +83,7 @@
 
 <div class="viewcode-block" id="AbstractStandardNeuronComponent.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_parameters">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add the initial values of the parameters to the parameter holder</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add the initial values of the parameters to the parameter holder</span>
 
 <span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary parameters:</span>
 <span class="sd">            A holder of the parameters</span>
@@ -94,7 +91,7 @@
 
 <div class="viewcode-block" id="AbstractStandardNeuronComponent.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_state_variables">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add the initial values of the state variables to the state\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add the initial values of the state variables to the state\</span>
 <span class="sd">            variables holder</span>
 
 <span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary state_variables:</span>
@@ -102,7 +99,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractStandardNeuronComponent.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.has_variable">[docs]</a>    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determine if this component has a variable by the given name</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if this component has a variable by the given name</span>
 
 <span class="sd">        :param str variable: The name of the variable</span>
 <span class="sd">        :rtype: bool</span>
@@ -110,7 +107,7 @@
         <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__units</span></div>
 
 <div class="viewcode-block" id="AbstractStandardNeuronComponent.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the units of the given variable</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the units of the given variable</span>
 
 <span class="sd">        :param str variable: The name of the variable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -154,7 +151,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

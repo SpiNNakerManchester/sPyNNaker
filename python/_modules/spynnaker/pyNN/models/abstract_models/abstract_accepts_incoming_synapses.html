@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -62,7 +59,7 @@
 
 <span class="nd">@require_subclass</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">AbstractAcceptsIncomingSynapses</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Indicates an application vertex that can be a post-vertex in a PyNN\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Indicates an application vertex that can be a post-vertex in a PyNN\</span>
 <span class="sd">        projection.</span>
 
 <span class="sd">    .. note::</span>
@@ -72,7 +69,7 @@
 
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the ID of a synapse given the name.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the ID of a synapse given the name.</span>
 
 <span class="sd">        :param str target: The name of the synapse</span>
 <span class="sd">        :rtype: int</span>
@@ -80,7 +77,7 @@
 
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.set_synapse_dynamics"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.set_synapse_dynamics">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">set_synapse_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set the synapse dynamics of this vertex.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the synapse dynamics of this vertex.</span>
 
 <span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
@@ -88,7 +85,7 @@
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="sd">&quot;&quot;&quot; Get the connections from the machine post-run.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the connections from the machine post-run.</span>
 
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">            The edge for which the data is being read</span>
@@ -98,11 +95,11 @@
 
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.clear_connection_cache"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">clear_connection_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Clear the connection data stored in the vertex so far.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Clear the connection data stored in the vertex so far.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.verify_splitter"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.verify_splitter">[docs]</a>    <span class="k">def</span> <span class="nf">verify_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check that the splitter implements the API(s) expected by the\</span>
 <span class="sd">        SynapticMatrices</span>
 
@@ -161,7 +158,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

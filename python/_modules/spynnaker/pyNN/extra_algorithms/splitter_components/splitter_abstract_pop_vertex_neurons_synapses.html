@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -116,7 +113,7 @@
 <span class="k">class</span> <span class="nc">SplitterAbstractPopulationVertexNeuronsSynapses</span><span class="p">(</span>
         <span class="n">AbstractSplitterCommon</span><span class="p">,</span> <span class="n">AbstractSpynnakerSplitterDelay</span><span class="p">,</span>
         <span class="n">AbstractSupportsOneToOneSDRAMInput</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Splits an AbstractPopulationVertex so that there are separate neuron</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Splits an AbstractPopulationVertex so that there are separate neuron</span>
 <span class="sd">        cores each being fed by one or more synapse cores.  Incoming one-to-one</span>
 <span class="sd">        Poisson cores are also added here if they meet the criteria.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -166,7 +163,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_synapse_vertices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                  <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">allow_delay_extension</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param int n_synapse_vertices:</span>
 <span class="sd">            The number of synapse cores per neuron core</span>
@@ -187,7 +184,7 @@
 
         <span class="k">if</span> <span class="n">n_synapse_vertices</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="n">_MAX_CORES</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;At most, there can be </span><span class="si">{</span><span class="n">_MAX_CORES</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2"> synaptic vertices&quot;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;At most, there can be </span><span class="si">{</span><span class="n">_MAX_CORES</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> synaptic vertices&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_vertices</span> <span class="o">=</span> <span class="n">n_synapse_vertices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="n">max_delay</span>
@@ -364,7 +361,7 @@
     <span class="k">def</span> <span class="nf">__add_neuron_core</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">rb_shifts</span><span class="p">,</span>
             <span class="n">weight_scales</span><span class="p">,</span> <span class="n">neuron_data</span><span class="p">,</span> <span class="n">atoms_per_core</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a neuron core for for a slice of neurons</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add a neuron core for for a slice of neurons</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of neurons to put on the core</span>
@@ -395,7 +392,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">structural_sz</span><span class="p">,</span> <span class="n">lead_synapse_core_sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span>
             <span class="n">rb_shifts</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synapse_vertices</span><span class="p">,</span> <span class="n">neuron_vertex</span><span class="p">,</span>
             <span class="n">atoms_per_core</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add the first synapse core for a neuron core.  This core will</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add the first synapse core for a neuron core.  This core will</span>
 <span class="sd">            generate all the synaptic data required.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -443,7 +440,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">syn_label</span><span class="p">,</span> <span class="n">s_index</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">synapse_references</span><span class="p">,</span>
             <span class="n">shared_synapse_sdram</span><span class="p">,</span> <span class="n">feedback_partition</span><span class="p">,</span> <span class="n">synapse_vertices</span><span class="p">,</span>
             <span class="n">neuron_vertex</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add a second or subsequent synapse core.  This will reference the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add a second or subsequent synapse core.  This will reference the</span>
 <span class="sd">            synaptic data generated by the lead synapse core.</span>
 
 <span class="sd">        :param str syn_label: The basic synapse core label to be extended</span>
@@ -476,7 +473,7 @@
                 <span class="n">neuron_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__add_plastic_feedback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuron_vertex</span><span class="p">,</span> <span class="n">synapse_vertex</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Add an edge if needed from the neuron core back to the synapse core</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add an edge if needed from the neuron core back to the synapse core</span>
 <span class="sd">            to allow the synapse core to process plastic synapses</span>
 
 <span class="sd">        :param PopulationNeuronsMachineVertex neuron_vertex:</span>
@@ -512,7 +509,7 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">incoming</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_vertices</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="n">_MAX_CORES</span>
 
     <span class="k">def</span> <span class="nf">__handle_poisson_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Go through the incoming projections and find Poisson sources with</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Go through the incoming projections and find Poisson sources with</span>
 <span class="sd">            splitters that work with us, and one-to-one connections that will</span>
 <span class="sd">            then work with SDRAM</span>
 
@@ -560,7 +557,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_direct_poisson_source</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.is_direct_poisson_source">[docs]</a>    <span class="k">def</span> <span class="nf">is_direct_poisson_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determine if a given Poisson source can be created by this splitter</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if a given Poisson source can be created by this splitter</span>
 
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:</span>
 <span class="sd">            The vertex sending into the Projection</span>
@@ -579,7 +576,7 @@
                 <span class="nb">isinstance</span><span class="p">(</span><span class="n">dynamics</span><span class="p">,</span> <span class="n">SynapseDynamicsStatic</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">__get_fixed_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a list of fixed slices from the Application vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a list of fixed slices from the Application vertex</span>
 
 <span class="sd">        :rtype: list(~pacman.model.graphs.common.Slice)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -686,7 +683,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_synapse_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return the number of synapse vertices per neuron vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the number of synapse vertices per neuron vertex</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -694,7 +691,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">__synapse_references</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get reference identifiers for the shared synapse regions</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get reference identifiers for the shared synapse regions</span>
 
 <span class="sd">        :rtype: SynapseRegions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -705,7 +702,7 @@
         <span class="k">return</span> <span class="n">SynapseRegions</span><span class="p">(</span><span class="o">*</span><span class="n">references</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_neuron_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">sdram_edge_sdram</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;  Gets the resources of the neurons of a slice of atoms from a given</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  Gets the resources of the neurons of a slice of atoms from a given</span>
 <span class="sd">             app vertex.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice: the slice</span>
@@ -734,7 +731,7 @@
     <span class="k">def</span> <span class="nf">__shared_synapse_sdram</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">independent_synapse_sdram</span><span class="p">,</span> <span class="n">proj_dependent_sdram</span><span class="p">,</span>
             <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">structural_sz</span><span class="p">,</span> <span class="n">dynamics_sz</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the SDRAM shared between synapse cores</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the SDRAM shared between synapse cores</span>
 
 <span class="sd">        :rtype: ~pacman.model.resources.MultiRegionSDRAM</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -759,7 +756,7 @@
             <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">structural_sz</span><span class="p">,</span> <span class="n">dynamics_sz</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_synapse_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">shared_sdram</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;  Get the resources of the synapses of a slice of atoms from a</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  Get the resources of the synapses of a slice of atoms from a</span>
 <span class="sd">             given app vertex.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice: the slice</span>
@@ -793,7 +790,7 @@
         <span class="k">return</span> <span class="n">sdram</span>
 
     <span class="k">def</span> <span class="nf">__independent_synapse_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the SDRAM used by all synapse cores independent of projections</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the SDRAM used by all synapse cores independent of projections</span>
 
 <span class="sd">        :rtype: ~pacman.model.resources.MultiRegionSDRAM</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -806,7 +803,7 @@
         <span class="k">return</span> <span class="n">sdram</span>
 
     <span class="k">def</span> <span class="nf">__proj_dependent_synapse_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the SDRAM used by synapse cores dependent on the projections</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the SDRAM used by synapse cores dependent on the projections</span>
 
 <span class="sd">        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
 <span class="sd">            The projections to consider in the calculations</span>
@@ -933,7 +930,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

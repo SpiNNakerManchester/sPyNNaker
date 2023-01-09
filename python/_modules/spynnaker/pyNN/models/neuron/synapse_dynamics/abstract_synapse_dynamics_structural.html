@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -63,7 +60,7 @@
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the size of the structural parameters</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the size of the structural parameters</span>
 
 <span class="sd">        Note: At the Application level this will be an estimate.</span>
 
@@ -79,7 +76,7 @@
     <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span>
             <span class="n">synaptic_matrices</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The data specification to write to</span>
@@ -96,7 +93,7 @@
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.set_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.set_connections">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">set_connections</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set connections for structural plasticity</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set connections for structural plasticity</span>
 
 <span class="sd">        :param ~numpy.ndarray connections:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
@@ -106,68 +103,68 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">f_rew</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The frequency of rewiring</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The frequency of rewiring</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">s_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The maximum number of synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum number of synapses</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">with_replacement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Whether to allow replacement when creating synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Whether to allow replacement when creating synapses</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The seed to control the randomness</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The seed to control the randomness</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">initial_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The weight of a formed connection</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The weight of a formed connection</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">initial_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The delay of a formed connection</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The delay of a formed connection</span>
 
 <span class="sd">        :rtype: float or (float, float)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">partner_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The partner selection rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The partner selection rule</span>
 
 <span class="sd">        :rtype: AbstractPartnerSelection</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">formation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The formation rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The formation rule</span>
 
 <span class="sd">        :rtype: AbstractFormation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">elimination</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The elimination rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The elimination rule</span>
 
 <span class="sd">        :rtype: AbstractElimination</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.check_initial_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.check_initial_delay">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">check_initial_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Check that delays can be done without delay extensions</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check that delays can be done without delay extensions</span>
 
 <span class="sd">        :param int max_delay_ms: The maximum delay supported, in milliseconds</span>
 <span class="sd">        :raises Exception: if the delay is out of range</span>
@@ -175,7 +172,7 @@
 
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.get_max_rewires_per_ts"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.get_max_rewires_per_ts">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_max_rewires_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the max number of rewires per timestep</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the max number of rewires per timestep</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
@@ -218,7 +215,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

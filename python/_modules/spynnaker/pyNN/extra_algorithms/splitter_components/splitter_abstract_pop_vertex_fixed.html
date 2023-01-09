@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -83,7 +80,7 @@
 
 <span class="k">class</span> <span class="nc">SplitterAbstractPopulationVertexFixed</span><span class="p">(</span>
         <span class="n">AbstractSplitterCommon</span><span class="p">,</span> <span class="n">AbstractSpynnakerSplitterDelay</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; handles the splitting of the AbstractPopulationVertex using fixed</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; handles the splitting of the AbstractPopulationVertex using fixed</span>
 <span class="sd">        slices</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -92,7 +89,7 @@
         <span class="s2">&quot;__slices&quot;</span>
     <span class="p">]</span>
 
-    <span class="sd">&quot;&quot;&quot; The message to use when the Population is invalid &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The message to use when the Population is invalid &quot;&quot;&quot;</span>
     <span class="n">INVALID_POP_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;The vertex </span><span class="si">{}</span><span class="s2"> cannot be supported by the &quot;</span>
         <span class="s2">&quot;SplitterAbstractPopulationVertexFixed as&quot;</span>
@@ -211,7 +208,7 @@
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_used_by_atoms</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">structural_sz</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;  Gets the resources of a slice of atoms</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;  Gets the resources of a slice of atoms</span>
 
 <span class="sd">        :param int n_atoms</span>
 <span class="sd">        :rtype: ~pacman.model.resources.MultiRegionSDRAM</span>
@@ -228,7 +225,7 @@
         <span class="k">return</span> <span class="n">sdram</span></div>
 
     <span class="k">def</span> <span class="nf">__get_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; returns the variable sdram from the recorders</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; returns the variable sdram from the recorders</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms to account for</span>
 <span class="sd">        :return: the variable sdram used by the neuron recorder</span>
@@ -245,7 +242,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_max_synapse_variable_sdram</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__get_constant_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">structural_sz</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; returns the constant sdram used by the atoms</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; returns the constant sdram used by the atoms</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms to account for</span>
 <span class="sd">        :rtype: ~pacman.model.resources.MultiRegionSDRAM</span>
@@ -298,7 +295,7 @@
     <span class="k">def</span> <span class="nf">__get_synapse_constant_sdram</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">structural_sz</span><span class="p">):</span>
 
-        <span class="sd">&quot;&quot;&quot; Get the amount of fixed SDRAM used by synapse parts</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the amount of fixed SDRAM used by synapse parts</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms to account for</span>
 
@@ -330,7 +327,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__slices</span> <span class="o">=</span> <span class="kc">None</span></div>
 
     <span class="k">def</span> <span class="nf">__create_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Create slices if not already done</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Create slices if not already done</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
@@ -374,7 +371,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

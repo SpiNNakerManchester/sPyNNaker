@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -154,7 +151,7 @@
 
 
 <div class="viewcode-block" id="run_forever"><a class="viewcode-back" href="../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.run_forever">[docs]</a><span class="k">def</span> <span class="nf">run_forever</span><span class="p">(</span><span class="n">sync_time</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Supports running forever in PyNN 0.8/0.9 format</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Supports running forever in PyNN 0.8/0.9 format</span>
 
 <span class="sd">    :param sync_time:</span>
 <span class="sd">        The time in milliseconds after which to pause before the host must</span>
@@ -166,7 +163,7 @@
 
 
 <span class="k">def</span> <span class="nf">run_sync</span><span class="p">(</span><span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Run in steps of the given number of milliseconds pausing between\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Run in steps of the given number of milliseconds pausing between\</span>
 <span class="sd">        for a signal to be sent from the host</span>
 
 <span class="sd">    :param float run_time: The time in milliseconds to run the simulation for</span>
@@ -177,14 +174,14 @@
 
 
 <span class="k">def</span> <span class="nf">continue_simulation</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot; Continue a synchronised simulation</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Continue a synchronised simulation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_valid_simulator</span><span class="p">()</span>
     <span class="n">__simulator</span><span class="o">.</span><span class="n">continue_simulation</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">request_stop</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot; Request a stop in the simulation without a complete stop.  Will stop\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Request a stop in the simulation without a complete stop.  Will stop\</span>
 <span class="sd">        after the next auto-pause-and-resume cycle</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_valid_simulator</span><span class="p">()</span>
@@ -192,7 +189,7 @@
 
 
 <div class="viewcode-block" id="register_database_notification_request"><a class="viewcode-back" href="../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.register_database_notification_request">[docs]</a><span class="k">def</span> <span class="nf">register_database_notification_request</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">notify_port</span><span class="p">,</span> <span class="n">ack_port</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Adds a socket system which is registered with the notification protocol</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Adds a socket system which is registered with the notification protocol</span>
 
 <span class="sd">    :param str hostname: hostname to connect to</span>
 <span class="sd">    :param int notify_port: port num for the notify command</span>
@@ -209,7 +206,7 @@
 <span class="k">def</span> <span class="nf">EthernetControlPopulation</span><span class="p">(</span>
         <span class="n">n_neurons</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">database_notify_port_num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">database_ack_port_num</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Create a PyNN population that can be included in a network to\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Create a PyNN population that can be included in a network to\</span>
 <span class="sd">        control an external device which is connected to the host</span>
 
 <span class="sd">    :param int n_neurons: The number of neurons in the control population</span>
@@ -281,7 +278,7 @@
 <span class="k">def</span> <span class="nf">EthernetSensorPopulation</span><span class="p">(</span>
         <span class="n">device</span><span class="p">,</span> <span class="n">local_host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">database_notify_port_num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">database_ack_port_num</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Create a pyNN population which can be included in a network to\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Create a pyNN population which can be included in a network to\</span>
 <span class="sd">        receive spikes from a device connected to the host</span>
 
 <span class="sd">    :param AbstractEthernetSensor device: The sensor model</span>
@@ -328,7 +325,7 @@
 <div class="viewcode-block" id="SpikeInjector"><a class="viewcode-back" href="../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.SpikeInjector">[docs]</a><span class="k">def</span> <span class="nf">SpikeInjector</span><span class="p">(</span>
         <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">database_notify_host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">database_notify_port_num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">database_ack_port_num</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Supports creating a spike injector that can be added to the\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Supports creating a spike injector that can be added to the\</span>
 <span class="sd">        application graph.</span>
 
 <span class="sd">    :param bool notify: Whether to register for notifications</span>
@@ -355,7 +352,7 @@
 
 
 <span class="k">def</span> <span class="nf">_set_simulator</span><span class="p">(</span><span class="n">simulator</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Should only be called by pyNN/__init__py setup method.</span>
 
 <span class="sd">    Any other uses is not supported.</span>
@@ -403,7 +400,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

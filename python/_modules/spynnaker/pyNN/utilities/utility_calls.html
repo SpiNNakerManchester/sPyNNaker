@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/jquery.js"></script>
-    <script src="../../../../_static/underscore.js"></script>
-    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
     <script src="../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -102,7 +99,7 @@
 
 
 <div class="viewcode-block" id="check_directory_exists_and_create_if_not"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not">[docs]</a><span class="k">def</span> <span class="nf">check_directory_exists_and_create_if_not</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Create a parent directory for a file if it doesn&#39;t exist</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Create a parent directory for a file if it doesn&#39;t exist</span>
 
 <span class="sd">    :param str filename: The file whose parent directory is to be created</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -112,7 +109,7 @@
 
 
 <div class="viewcode-block" id="convert_param_to_numpy"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.convert_param_to_numpy">[docs]</a><span class="k">def</span> <span class="nf">convert_param_to_numpy</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">no_atoms</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Convert parameters into numpy arrays.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Convert parameters into numpy arrays.</span>
 
 <span class="sd">    :param param: the param to convert</span>
 <span class="sd">    :type param: ~pyNN.random.NumpyRNG or int or float or list(int) or</span>
@@ -147,7 +144,7 @@
 
 
 <div class="viewcode-block" id="convert_to"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.convert_to">[docs]</a><span class="k">def</span> <span class="nf">convert_to</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">data_type</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Convert a value to a given data type</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Convert a value to a given data type</span>
 
 <span class="sd">    :param value: The value to convert</span>
 <span class="sd">    :param ~data_specification.enums.DataType data_type:</span>
@@ -161,7 +158,7 @@
 
 <div class="viewcode-block" id="read_in_data_from_file"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.read_in_data_from_file">[docs]</a><span class="k">def</span> <span class="nf">read_in_data_from_file</span><span class="p">(</span>
         <span class="n">file_path</span><span class="p">,</span> <span class="n">min_atom</span><span class="p">,</span> <span class="n">max_atom</span><span class="p">,</span> <span class="n">min_time</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Read in a file of data values where the values are in a format of:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Read in a file of data values where the values are in a format of:</span>
 <span class="sd">        &lt;time&gt;\t&lt;atom ID&gt;\t&lt;data value&gt;</span>
 
 <span class="sd">    :param str file_path: absolute path to a file containing the data</span>
@@ -204,7 +201,7 @@
 
 <div class="viewcode-block" id="read_spikes_from_file"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.read_spikes_from_file">[docs]</a><span class="k">def</span> <span class="nf">read_spikes_from_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">min_atom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_atom</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span>
                           <span class="n">min_time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_time</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span> <span class="n">split_value</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Read spikes from a file formatted as:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Read spikes from a file formatted as:</span>
 <span class="sd">        &lt;time&gt;\t&lt;neuron ID&gt;</span>
 
 <span class="sd">    :param str file_path: absolute path to a file containing spike values</span>
@@ -255,7 +252,7 @@
 
 <div class="viewcode-block" id="get_probable_maximum_selected"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_probable_maximum_selected">[docs]</a><span class="k">def</span> <span class="nf">get_probable_maximum_selected</span><span class="p">(</span>
         <span class="n">n_total_trials</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
-    <span class="sd">&quot;&quot;&quot; Get the likely maximum number of items that will be selected from a\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the likely maximum number of items that will be selected from a\</span>
 <span class="sd">        set of n_trials from a total set of n_total_trials\</span>
 <span class="sd">        with a probability of selection of selection_prob</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -271,7 +268,7 @@
 
 <div class="viewcode-block" id="get_probable_minimum_selected"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_probable_minimum_selected">[docs]</a><span class="k">def</span> <span class="nf">get_probable_minimum_selected</span><span class="p">(</span>
         <span class="n">n_total_trials</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
-    <span class="sd">&quot;&quot;&quot; Get the likely minimum number of items that will be selected from a\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the likely minimum number of items that will be selected from a\</span>
 <span class="sd">        set of n_trials from a total set of n_total_trials\</span>
 <span class="sd">        with a probability of selection of selection_prob</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -280,7 +277,7 @@
 
 
 <div class="viewcode-block" id="get_probability_within_range"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_probability_within_range">[docs]</a><span class="k">def</span> <span class="nf">get_probability_within_range</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Get the probability that a value will fall within the given range for\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the probability that a value will fall within the given range for\</span>
 <span class="sd">        a given RandomDistribution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
@@ -288,7 +285,7 @@
 
 
 <div class="viewcode-block" id="get_maximum_probable_value"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_maximum_probable_value">[docs]</a><span class="k">def</span> <span class="nf">get_maximum_probable_value</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">n_items</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
-    <span class="sd">&quot;&quot;&quot; Get the likely maximum value of a RandomDistribution given a\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the likely maximum value of a RandomDistribution given a\</span>
 <span class="sd">        number of draws</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
@@ -297,7 +294,7 @@
 
 
 <div class="viewcode-block" id="get_minimum_probable_value"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_minimum_probable_value">[docs]</a><span class="k">def</span> <span class="nf">get_minimum_probable_value</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">n_items</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
-    <span class="sd">&quot;&quot;&quot; Get the likely minimum value of a RandomDistribution given a\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the likely minimum value of a RandomDistribution given a\</span>
 <span class="sd">        number of draws</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
@@ -306,28 +303,28 @@
 
 
 <div class="viewcode-block" id="get_mean"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_mean">[docs]</a><span class="k">def</span> <span class="nf">get_mean</span><span class="p">(</span><span class="n">dist</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Get the mean of a RandomDistribution</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the mean of a RandomDistribution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_standard_deviation"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_standard_deviation">[docs]</a><span class="k">def</span> <span class="nf">get_standard_deviation</span><span class="p">(</span><span class="n">dist</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Get the standard deviation of a RandomDistribution</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the standard deviation of a RandomDistribution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_variance"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_variance">[docs]</a><span class="k">def</span> <span class="nf">get_variance</span><span class="p">(</span><span class="n">dist</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Get the variance of a RandomDistribution</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the variance of a RandomDistribution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="high"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.high">[docs]</a><span class="k">def</span> <span class="nf">high</span><span class="p">(</span><span class="n">dist</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Gets the high or max boundary value for this distribution</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Gets the high or max boundary value for this distribution</span>
 
 <span class="sd">    Could return None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -336,7 +333,7 @@
 
 
 <div class="viewcode-block" id="low"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.low">[docs]</a><span class="k">def</span> <span class="nf">low</span><span class="p">(</span><span class="n">dist</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Gets the high or min boundary value for this distribution</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Gets the high or min boundary value for this distribution</span>
 
 <span class="sd">    Could return None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -345,7 +342,7 @@
 
 
 <span class="k">def</span> <span class="nf">_validate_mars_kiss_64_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Update the seed to make it compatible with the RNG algorithm</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Update the seed to make it compatible with the RNG algorithm</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">seed</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># y (&lt;- seed[1]) can&#39;t be zero so set to arbitrary non-zero if so</span>
@@ -357,7 +354,7 @@
 
 
 <div class="viewcode-block" id="create_mars_kiss_seeds"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.create_mars_kiss_seeds">[docs]</a><span class="k">def</span> <span class="nf">create_mars_kiss_seeds</span><span class="p">(</span><span class="n">rng</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; generates and checks that the seed values generated by the given\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; generates and checks that the seed values generated by the given\</span>
 <span class="sd">        random number generator or seed to a random number generator are\</span>
 <span class="sd">        suitable for use as a mars 64 kiss seed.</span>
 
@@ -377,7 +374,7 @@
 
 
 <div class="viewcode-block" id="get_n_bits"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_n_bits">[docs]</a><span class="k">def</span> <span class="nf">get_n_bits</span><span class="p">(</span><span class="n">n_values</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Determine how many bits are required for the given number of values</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Determine how many bits are required for the given number of values</span>
 
 <span class="sd">    :param int n_values: the number of values (starting at 0)</span>
 <span class="sd">    :return: the number of bits required to express that many values</span>
@@ -391,7 +388,7 @@
 
 
 <div class="viewcode-block" id="moved_in_v6"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.moved_in_v6">[docs]</a><span class="k">def</span> <span class="nf">moved_in_v6</span><span class="p">(</span><span class="n">old_location</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Tells the users that old code is no lonfger implemented</span>
 
 <span class="sd">    :param str old_location: old import</span>
@@ -401,7 +398,7 @@
 
 
 <div class="viewcode-block" id="moved_in_v7"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.moved_in_v7">[docs]</a><span class="k">def</span> <span class="nf">moved_in_v7</span><span class="p">(</span><span class="n">old_location</span><span class="p">,</span> <span class="n">new_location</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Warns the users that they are using an old import.</span>
 
 <span class="sd">    In version 8 this will be upgraded to a exception and then later removed</span>
@@ -418,7 +415,7 @@
 
 
 <div class="viewcode-block" id="moved_in_v7_warning"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.moved_in_v7_warning">[docs]</a><span class="k">def</span> <span class="nf">moved_in_v7_warning</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Warns the user that they are using old code</span>
 
 <span class="sd">    In version 8 this will be upgraded to a exception and then later removed</span>
@@ -431,7 +428,7 @@
 
 
 <div class="viewcode-block" id="get_time_to_write_us"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_time_to_write_us">[docs]</a><span class="k">def</span> <span class="nf">get_time_to_write_us</span><span class="p">(</span><span class="n">n_bytes</span><span class="p">,</span> <span class="n">n_cores</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Determine how long a write of a given number of bytes will take in us</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Determine how long a write of a given number of bytes will take in us</span>
 
 <span class="sd">    :param int n_bytes: The number of bytes to transfer</span>
 <span class="sd">    :param int n_cores: How many cores will be writing at the same time</span>
@@ -478,7 +475,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

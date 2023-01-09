@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../../_static/jquery.js"></script>
-    <script src="../../../../../../_static/underscore.js"></script>
-    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../../_static/doctools.js"></script>
     <script src="../../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
@@ -106,7 +103,7 @@
         <span class="s2">&quot;structural plasticity&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;initial_weight&#39;</span><span class="p">,</span> <span class="s1">&#39;initial_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;f_rew&#39;</span><span class="p">,</span> <span class="s1">&#39;p_rew&#39;</span><span class="p">,</span> <span class="s1">&#39;s_max&#39;</span><span class="p">,</span>
@@ -119,7 +116,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">p_rew</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The period of rewiring.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The period of rewiring.</span>
 
 <span class="sd">        :return: The period of rewiring</span>
 <span class="sd">        :rtype: float</span>
@@ -170,7 +167,7 @@
                 <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">[</span><span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">])</span></div>
 
     <span class="k">def</span> <span class="nf">__get_structural_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list(Projection) incoming_projections:</span>
 <span class="sd">            Projections to filter to structural only</span>
 <span class="sd">        :rtype: list(Projection)</span>
@@ -193,7 +190,7 @@
 
     <span class="k">def</span> <span class="nf">__write_common_rewiring_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">n_pre_pops</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write the non-sub-population synapse parameters to the spec.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the non-sub-population synapse parameters to the spec.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            the data spec</span>
@@ -245,7 +242,7 @@
     <span class="k">def</span> <span class="nf">__write_prepopulation_info</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">structural_projections</span><span class="p">,</span>
             <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:</span>
 <span class="sd">            the vertex for which data specs are being prepared</span>
@@ -325,7 +322,7 @@
     <span class="k">def</span> <span class="nf">__write_post_to_pre_table</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">subpop_index</span><span class="p">,</span> <span class="n">lo_atom_index</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span>
             <span class="n">vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Post to pre table is basically the transpose of the synaptic\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Post to pre table is basically the transpose of the synaptic\</span>
 <span class="sd">            matrix.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
@@ -419,7 +416,7 @@
             <span class="n">param_sizes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_vertex_executable_suffix"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_vertex_executable_suffix">[docs]</a>    <span class="k">def</span> <span class="nf">get_vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;_structural&quot;</span>
@@ -430,7 +427,7 @@
         <span class="k">return</span> <span class="n">name</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.is_same_as"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param SynapseDynamicsStructuralCommon synapse_dynamics:</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -449,14 +446,14 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; initial connectivity as defined via connector</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; initial connectivity as defined via connector</span>
 
 <span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_seeds"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_seeds">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_seeds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Generate a seed for the RNG on chip that is the same for all\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Generate a seed for the RNG on chip that is the same for all\</span>
 <span class="sd">            of the cores that have perform structural updates.</span>
 
 <span class="sd">        It should be different between application vertices</span>
@@ -470,7 +467,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.check_initial_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.check_initial_delay">[docs]</a>    <span class="k">def</span> <span class="nf">check_initial_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Check that delays can be done without delay extensions</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check that delays can be done without delay extensions</span>
 
 <span class="sd">        :param float max_delay_ms: The maximum delay supported, in milliseconds</span>
 <span class="sd">        :raises Exception: if the delay is out of range</span>
@@ -539,7 +536,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>

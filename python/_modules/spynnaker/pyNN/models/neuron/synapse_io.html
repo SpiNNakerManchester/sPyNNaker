@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
-    <script src="../../../../../_static/jquery.js"></script>
-    <script src="../../../../../_static/underscore.js"></script>
-    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <script src="../../../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
@@ -71,7 +68,7 @@
 
 
 <div class="viewcode-block" id="MaxRowInfo"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo">[docs]</a><span class="k">class</span> <span class="nc">MaxRowInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Information about the maximums for rows in a synaptic matrix.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Information about the maximums for rows in a synaptic matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -87,7 +84,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">undelayed_max_n_synapses</span><span class="p">,</span> <span class="n">delayed_max_n_synapses</span><span class="p">,</span>
             <span class="n">undelayed_max_bytes</span><span class="p">,</span> <span class="n">delayed_max_bytes</span><span class="p">,</span>
             <span class="n">undelayed_max_words</span><span class="p">,</span> <span class="n">delayed_max_words</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int undelayed_max_n_synapses:</span>
 <span class="sd">            Maximum number of synapses in a row of the undelayed matrix</span>
 <span class="sd">        :param int delayed_max_n_synapses:</span>
@@ -114,7 +111,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">undelayed_max_n_synapses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Maximum number of synapses in a row of the undelayed matrix</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Maximum number of synapses in a row of the undelayed matrix</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -122,7 +119,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delayed_max_n_synapses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Maximum number of synapses in a row of the delayed matrix</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Maximum number of synapses in a row of the delayed matrix</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -130,7 +127,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">undelayed_max_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Maximum number of bytes, including headers, in a row of the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Maximum number of bytes, including headers, in a row of the</span>
 <span class="sd">            undelayed matrix</span>
 
 <span class="sd">        :rtype: int</span>
@@ -139,7 +136,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delayed_max_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Maximum number of bytes, including headers, in a row of the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Maximum number of bytes, including headers, in a row of the</span>
 <span class="sd">            delayed matrix</span>
 
 <span class="sd">        :rtype: int</span>
@@ -148,7 +145,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">undelayed_max_words</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Maximum number of words, excluding headers, in a row of the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Maximum number of words, excluding headers, in a row of the</span>
 <span class="sd">            undelayed matrix</span>
 
 <span class="sd">        :rtype: int</span>
@@ -157,7 +154,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delayed_max_words</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Maximum number of words, excluding headers, in a row of the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Maximum number of words, excluding headers, in a row of the</span>
 <span class="sd">            undelayed matrix</span>
 
 <span class="sd">        :rtype: int</span>
@@ -166,7 +163,7 @@
 
 
 <div class="viewcode-block" id="get_maximum_delay_supported_in_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.get_maximum_delay_supported_in_ms">[docs]</a><span class="k">def</span> <span class="nf">get_maximum_delay_supported_in_ms</span><span class="p">(</span><span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Get the maximum delay supported by the synapse representation \</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the maximum delay supported by the synapse representation \</span>
 <span class="sd">        before extensions are required, or None if any delay is supported</span>
 
 <span class="sd">    :param int post_vertex_max_delay_ticks: post vertex max delay</span>
@@ -178,7 +175,7 @@
 
 <div class="viewcode-block" id="get_max_row_info"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.get_max_row_info">[docs]</a><span class="k">def</span> <span class="nf">get_max_row_info</span><span class="p">(</span>
         <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">in_edge</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Get the information about the maximum lengths of delayed and\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the information about the maximum lengths of delayed and\</span>
 <span class="sd">        undelayed rows in bytes (including header), words (without header)\</span>
 <span class="sd">        and number of synapses</span>
 
@@ -259,7 +256,7 @@
 
 
 <span class="k">def</span> <span class="nf">_get_allowed_row_length</span><span class="p">(</span><span class="n">n_words</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">,</span> <span class="n">in_edge</span><span class="p">,</span> <span class="n">n_synapses</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Get the allowed row length in words in the population table for a</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the allowed row length in words in the population table for a</span>
 <span class="sd">        desired row length in words</span>
 
 <span class="sd">    :param int n_words: The number of words in the row</span>
@@ -293,7 +290,7 @@
         <span class="n">connections</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
         <span class="n">weight_scales</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span>
         <span class="n">gen_undelayed</span><span class="p">,</span> <span class="n">gen_delayed</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Get the synapses as an array of words for non-delayed synapses and\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the synapses as an array of words for non-delayed synapses and\</span>
 <span class="sd">        an array of words for delayed synapses. This is used to prepare\</span>
 <span class="sd">        information for *deployment to SpiNNaker*.</span>
 
@@ -404,7 +401,7 @@
         <span class="n">connections</span><span class="p">,</span> <span class="n">row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
         <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">max_row_n_synapses</span><span class="p">,</span>
         <span class="n">max_row_n_words</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param ~numpy.ndarray connections:</span>
 <span class="sd">        The connections to convert; the dtype is</span>
 <span class="sd">        AbstractConnector.NUMPY_SYNAPSES_DTYPE</span>
@@ -472,7 +469,7 @@
         <span class="n">synapse_info</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span>
         <span class="n">max_row_length</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
         <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Read the synapses for a given projection synapse information\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Read the synapses for a given projection synapse information\</span>
 <span class="sd">        object out of the given data and convert to connection data</span>
 
 <span class="sd">    :param SynapseInformation synapse_info:</span>
@@ -536,7 +533,7 @@
         <span class="n">data</span><span class="p">,</span> <span class="n">delayed_data</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
         <span class="n">weight_scales</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span>
         <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Read the synapses for a given projection synapse information\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Read the synapses for a given projection synapse information\</span>
 <span class="sd">        object out of the given delayed and undelayed data.</span>
 
 <span class="sd">    :param bytearray data:</span>
@@ -579,7 +576,7 @@
 
 
 <span class="k">def</span> <span class="nf">_parse_static_data</span><span class="p">(</span><span class="n">row_data</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Parse static synaptic data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Parse static synaptic data</span>
 
 <span class="sd">    :param ~numpy.ndarray row_data: The raw row data</span>
 <span class="sd">    :param AbstractStaticSynapseDynamics dynamics:</span>
@@ -602,7 +599,7 @@
         <span class="n">dynamics</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span>
         <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span>
         <span class="n">max_atoms_per_core</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Read static data from row data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Read static data from row data</span>
 
 <span class="sd">    :param AbstractStaticSynapseDynamics dynamics:</span>
 <span class="sd">        The synapse dynamics that generated the data</span>
@@ -636,7 +633,7 @@
 
 
 <span class="k">def</span> <span class="nf">_parse_plastic_data</span><span class="p">(</span><span class="n">row_data</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Parse plastic synapses from raw row data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Parse plastic synapses from raw row data</span>
 
 <span class="sd">    :param ~numpy.ndarray row_data: The raw data to parse</span>
 <span class="sd">    :param AbstractPlasticSynapseDynamics dynamics:</span>
@@ -667,7 +664,7 @@
         <span class="n">dynamics</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span>
         <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">,</span>
         <span class="n">max_atoms_per_core</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Read plastic data from raw data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Read plastic data from raw data</span>
 
 <span class="sd">    :param AbstractStaticSynapseDynamics dynamics:</span>
 <span class="sd">        The synapse dynamics that generated the data</span>
@@ -704,7 +701,7 @@
 
 <span class="k">def</span> <span class="nf">_rescale_connections</span><span class="p">(</span>
         <span class="n">connections</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Scale the connection data into machine values</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Scale the connection data into machine values</span>
 
 <span class="sd">    :param ~numpy.ndarray connections: The connections to be rescaled</span>
 <span class="sd">    :param list(float) weight_scales: The weight scale of each synapse type</span>
@@ -722,7 +719,7 @@
 <span class="k">def</span> <span class="nf">__convert_delayed_data</span><span class="p">(</span>
             <span class="n">n_synapses</span><span class="p">,</span> <span class="n">n_pre_atoms</span><span class="p">,</span> <span class="n">delayed_connections</span><span class="p">,</span>
             <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Take the delayed_connections and convert the source ids and delay\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Take the delayed_connections and convert the source ids and delay\</span>
 <span class="sd">        values back to global values</span>
 
 <span class="sd">    :param ~numpy.ndarray n_synapses: The number of synapses in each row</span>
@@ -796,7 +793,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.2.
     </div>
   </body>
 </html>
