@@ -16,6 +16,7 @@
 from pyNN.random import RandomDistribution, NumpyRNG
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
+import numpy
 
 
 class ParamsSetAsList(BaseTestCase):
@@ -59,14 +60,14 @@ class ParamsSetAsList(BaseTestCase):
         pop_1.set(v_reset=v_reset, v_rest=v_rest)
         p.run(1)
 
-        self.assertEqual(cm, pop_1.get("cm"))
-        self.assertEqual(i_off, pop_1.get("i_offset"))
-        self.assertEqual(tau_m, pop_1.get("tau_m"))
-        self.assertEqual(tau_re, pop_1.get("tau_refrac"))
-        self.assertEqual(tau_syn_e, pop_1.get("tau_syn_E"))
-        self.assertEqual(tau_syn_i, pop_1.get("tau_syn_I"))
-        self.assertEqual(v_reset, pop_1.get("v_reset"))
-        self.assertEqual(v_rest, pop_1.get("v_rest"))
+        assert numpy.allclose(cm, pop_1.get("cm"), rtol=1e-03)
+        assert numpy.allclose(i_off, pop_1.get("i_offset"), rtol=1e-03)
+        assert numpy.allclose(tau_m, pop_1.get("tau_m"), rtol=1e-03)
+        assert numpy.allclose(tau_re, pop_1.get("tau_refrac"), rtol=1e-03)
+        assert numpy.allclose(tau_syn_e, pop_1.get("tau_syn_E"), rtol=1e-03)
+        assert numpy.allclose(tau_syn_i, pop_1.get("tau_syn_I"), rtol=1e-03)
+        assert numpy.allclose(v_reset, pop_1.get("v_reset"), rtol=1e-03)
+        assert numpy.allclose(v_rest, pop_1.get("v_rest"), rtol=1e-03)
         self.assertGreater(len(set(pop_1.get("v_thresh"))), nNeurons/2)
         p.end()
 

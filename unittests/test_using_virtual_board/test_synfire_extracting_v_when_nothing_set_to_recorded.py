@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pyNN.spiNNaker as sim
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinnaker_testbase import BaseTestCase
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 
 class SynfireExtractingSpikesWhenNothingSetToRecorded(BaseTestCase):

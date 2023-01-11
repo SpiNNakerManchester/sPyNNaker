@@ -38,4 +38,4 @@ class ExtractingSpikesWhenVOnlySetToRecord(BaseTestCase):
             simtime = 10
             sim.run(simtime)
 
-            pop_1.get_data(variables=["spikes"])
+            print(pop_1.get_data(variables=["spikes"]).segments[0].spiketrains)

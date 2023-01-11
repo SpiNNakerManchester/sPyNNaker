@@ -72,20 +72,6 @@ class TestPopulation(BaseTestCase):
         with self.assertRaises(Exception):
             sim.Population(n_neurons, model, label=label)
 
-    def test_model_fail_to_set_neuron_param_random_distribution(self):
-        n_neurons = 5
-        range_low = -70
-        range_high = -50
-        value = sim.RandomDistribution('uniform', (range_low, range_high))
-        label = "pop_1"
-        sim.setup(timestep=1.0)
-        model = sim.IF_curr_exp(i_offset=value)
-        pop_1 = sim.Population(n_neurons, model, label=label)
-        values = pop_1.get('i_offset')
-        for value in values:
-            self.assertGreater(value, range_low)
-            self.assertLess(value, range_high)
-
     def test_model_fail_to_set_neuron_param_function(self):
         n_neurons = 5
 

@@ -96,6 +96,13 @@ static inline u016 decay_u016(u016 x, decay_t decay) {
     return urbits((uint_ur_t) ((s * u) >> 32));
 }
 
+static inline u032 decay_s1615_to_u032(s1615 x, decay_t decay) {
+	uint64_t s = (uint64_t) bitsk(x);
+	uint64_t u = (uint64_t) bitsulr(decay);
+
+	return ulrbits((uint_ulr_t) ((s * u) >> 15));
+}
+
 // The following permits us to do a type-generic macro for decay manipulation
 /*----------------------------------
  * This method is currently assumed to be faulty. Please do not use it yet.

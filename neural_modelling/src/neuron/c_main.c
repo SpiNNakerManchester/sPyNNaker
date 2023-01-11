@@ -73,15 +73,16 @@ const struct common_priorities COMMON_PRIORITIES = {
 
 //! From the regions, extract those that are neuron-specific
 const struct neuron_regions NEURON_REGIONS = {
+    .core_params = CORE_PARAMS_REGION,
     .neuron_params = NEURON_PARAMS_REGION,
     .current_source_params = CURRENT_SOURCE_PARAMS_REGION,
-    .neuron_recording = NEURON_RECORDING_REGION
+    .neuron_recording = NEURON_RECORDING_REGION,
+	.initial_values = INITIAL_VALUES_REGION
 };
 
 //! From the regions, extract those that are synapse-specific
 const struct synapse_regions SYNAPSE_REGIONS = {
     .synapse_params = SYNAPSE_PARAMS_REGION,
-    .direct_matrix = DIRECT_MATRIX_REGION,
     .synaptic_matrix = SYNAPTIC_MATRIX_REGION,
     .pop_table = POPULATION_TABLE_REGION,
     .synapse_dynamics = SYNAPSE_DYNAMICS_REGION,
@@ -135,7 +136,8 @@ void resume_callback(void) {
     recording_reset();
 
     // try resuming neuron
-    if (!neuron_resume()) {
+    // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
+    if (!neuron_resume(time + 1)) {
         log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }
@@ -163,8 +165,6 @@ static inline void process_ring_buffers(void) {
 //! \param[in] local_time: The time step being executed
 void background_callback(uint timer_count, uint local_time) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
-
-    log_debug("Timer tick %u \n", local_time);
 
     spike_processing_do_rewiring(synaptogenesis_n_updates());
 
@@ -276,7 +276,6 @@ static bool initialise(void) {
     }
 
     // Set timer tick (in microseconds)
-    log_debug("setting timer tick callback for %d microseconds", timer_period);
     spin1_set_timer_tick(timer_period);
 
     return true;

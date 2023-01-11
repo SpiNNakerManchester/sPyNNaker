@@ -148,15 +148,13 @@ class IndexBasedProbabilityConnector(AbstractConnector,
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # setup probs here
         self._update_probs_from_index_expression(synapse_info)
 
-        probs = self.__probs[
-            pre_vertex_slice.as_slice, post_vertex_slice.as_slice].reshape(-1)
+        probs = self.__probs[:, post_vertex_slice.as_slice].reshape(-1)
 
-        n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
+        n_items = synapse_info.n_pre_neurons * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
 
         # If self connections are not allowed, remove the possibility of self
@@ -170,16 +168,15 @@ class IndexBasedProbabilityConnector(AbstractConnector,
 
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = (
-            (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
+        block["source"] = ids / post_vertex_slice.n_atoms
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 

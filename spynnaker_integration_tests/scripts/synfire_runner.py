@@ -444,12 +444,13 @@ class SynfireRunner(object):
             run_count += 1
 
             if extract_between_runs:
-                self._get_data(populations[0], populations[1],
-                               get_spikes, record_7, get_v, record_v_7,
-                               get_gsyn_exc, record_gsyn_exc_7,
-                               get_gsyn_inh, record_gsyn_inh_7,
-                               record_input_spikes, record_input_spikes_7,
-                               get_all)
+                if runtime > 0:
+                    self._get_data(populations[0], populations[1],
+                                   get_spikes, record_7, get_v, record_v_7,
+                                   get_gsyn_exc, record_gsyn_exc_7,
+                                   get_gsyn_inh, record_gsyn_inh_7,
+                                   record_input_spikes, record_input_spikes_7,
+                                   get_all)
                 self._get_weight_delay(projections[0], get_weights, get_delays)
 
             if new_pop:

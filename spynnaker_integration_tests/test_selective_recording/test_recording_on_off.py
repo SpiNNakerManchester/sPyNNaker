@@ -14,10 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from neo.io import PickleIO
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import pyNN.spiNNaker as sim
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities import neo_compare
 from spinnaker_testbase import BaseTestCase
+
 
 pickle_path = "data.pickle"
 

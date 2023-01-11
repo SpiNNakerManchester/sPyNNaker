@@ -17,10 +17,6 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.exceptions import PacmanConfigurationException
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
@@ -47,19 +43,15 @@ class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
         # If there is only one outgoing projection, and it is one-to-one
         # connected to the target, and the target knows what to do, leave
         # it to the target
-        if len(self._governed_app_vertex.outgoing_projections) == 1:
-            proj = self._governed_app_vertex.outgoing_projections[0]
-            # pylint: disable=protected-access
-            post_vertex = proj._projection_edge.post_vertex
-            connector = proj._synapse_information.connector
-            dynamics = proj._synapse_information.synapse_dynamics
-            if (isinstance(post_vertex, AbstractPopulationVertex) and
-                    isinstance(post_vertex.splitter,
-                               AbstractSupportsOneToOneSDRAMInput) and
-                    isinstance(connector, OneToOneConnector) and
-                    isinstance(dynamics, SynapseDynamicsStatic)):
-                return True
-        return False
+        if len(self._governed_app_vertex.outgoing_projections) != 1:
+            return False
+        proj = self._governed_app_vertex.outgoing_projections[0]
+        # pylint: disable=protected-access
+        post_vertex = proj._projection_edge.post_vertex
+        if not isinstance(post_vertex.splitter,
+                          AbstractSupportsOneToOneSDRAMInput):
+            return False
+        return post_vertex.splitter.handles_source_vertex(proj)
 
     @overrides(SpynnakerSplitterFixedLegacy.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
