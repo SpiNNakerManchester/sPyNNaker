@@ -1028,15 +1028,13 @@ class NeuronRecorder(object):
         return values
 
     def write_neuron_recording_region(
-            self, spec, neuron_recording_region, vertex_slice, atoms_shape):
+            self, spec, neuron_recording_region, vertex_slice):
         """ recording data specification
 
         :param ~data_specification.DataSpecificationGenerator spec: dsg spec
         :param int neuron_recording_region: the recording region
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the vertex slice
-        :param tuple(int) atoms_shape:
-            the shape of the atoms in the application vertex
         :rtype: None
         """
         spec.switch_write_focus(neuron_recording_region)
@@ -1047,7 +1045,7 @@ class NeuronRecorder(object):
         spec.write_value(data=len(self.__bitfield_variables))
 
         # Write the recording data
-        recording_data = self._get_data(vertex_slice, atoms_shape)
+        recording_data = self._get_data(vertex_slice)
         spec.write_array(recording_data)
 
     def _get_buffered_sdram_per_record(self, variable, n_neurons):
@@ -1333,7 +1331,7 @@ class NeuronRecorder(object):
             data.append(
                 numpy.array(local_indexes, dtype="uint16").view("uint32"))
 
-    def _get_data(self, vertex_slice, atoms_shape):
+    def _get_data(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: ~numpy.ndarray
