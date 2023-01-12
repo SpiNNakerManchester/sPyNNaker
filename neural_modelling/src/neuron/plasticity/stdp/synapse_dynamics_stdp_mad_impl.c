@@ -28,6 +28,8 @@ struct synapse_row_plastic_data_t {
     plastic_synapse_t synapses[];
 };
 
+extern uint32_t skipped_synapses;
+
 //---------------------------------------
 //! \brief Synapse update loop core
 //! \param[in] time: The current time
@@ -212,10 +214,12 @@ static inline plastic_synapse_t process_plastic_synapse(
 			&post_event_history[s.index]);
 
 	// Add weight to ring-buffer entry, but only if not too late
-	if (s.delay_axonal + s.delay_dendritic >= colour_delay) {
+	if (s.delay_axonal + s.delay_dendritic > colour_delay) {
 	    int32_t weight = synapse_structure_get_final_weight(final_state);
 	    synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s, weight);
-	}
+    } else {
+        skipped_synapses++;
+    }
 
 	return synapse_structure_get_final_synaptic_word(final_state);
 }

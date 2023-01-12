@@ -222,8 +222,9 @@ static inline bool process_fixed_synapses(
         // (should auto increment pointer in single instruction)
         uint32_t synaptic_word = *synaptic_words++;
 
-        // If the delay is too small, skip
-        if ((synaptic_word & synapse_delay_mask_shifted) < colour_delay_shifted) {
+        // If the (shifted) delay is non zero and too small, skip
+        if (((synaptic_word & synapse_delay_mask_shifted) != 0) &&
+        		((synaptic_word & synapse_delay_mask_shifted) <= colour_delay_shifted)) {
             skipped_synapses++;
             continue;
         }
