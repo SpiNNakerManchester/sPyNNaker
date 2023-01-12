@@ -356,59 +356,6 @@ class NeuronRecorder(object):
 
         return get_sampling_interval(self.__sampling_rates[variable])
 
-    def __read_data(
-            self, label, application_vertex,
-            sampling_rate, data_type, variable):
-        n_machine_time_steps = SpynnakerDataView.get_current_run_timesteps()
-        vertices = (
-            application_vertex.splitter.machine_vertices_for_recording(
-                variable))
-        region = self.__region_ids[variable]
-        missing_str = ""
-        pop_level_data = None
-
-        progress = ProgressBar(
-            vertices, "Getting {} for {}".format(variable, label))
-
-        indexes = []
-        for i, vertex in enumerate(progress.over(vertices)):
-            expected_rows = int(
-                math.ceil(n_machine_time_steps / sampling_rate))
-
-            n_items_per_timestep = 1
-            if variable in self.__sampling_rates:
-                neurons = self._neurons_recording(
-                    variable, vertex.vertex_slice,
-                    application_vertex.atoms_shape)
-                n_items_per_timestep = len(neurons)
-                indexes.extend(neurons)
-            else:
-                indexes.append(i)
-            placement_data = self._get_placement_matrix_data(
-                vertex, region, expected_rows,
-                missing_str, sampling_rate, label, data_type,
-                n_items_per_timestep)
-
-            if placement_data is not None:
-                # append to the population data
-                if pop_level_data is None:
-                    pop_level_data = placement_data
-                else:
-                    # Add the slice fragment on axis 1
-                    # which is IDs/channel_index
-                    pop_level_data = numpy.append(
-                        pop_level_data, placement_data, axis=1)
-
-        # warn user of missing data
-        if len(missing_str) > 0:
-            logger.warning(
-                "Population {} is missing recorded data in region {} from the"
-                " following cores: {}", label, region, missing_str)
-
-        indexes = numpy.array(indexes)
-        order = numpy.argsort(indexes)
-        return pop_level_data[:, order]
-
     def get_recorded_data_type(self, variable):
         if variable in self.__bitfield_variables:
             return RecordingType.BIT_FIELD
@@ -503,7 +450,7 @@ class NeuronRecorder(object):
                 self.REWIRING))
         region = self.__region_ids[self.REWIRING]
 
-        for i, vertex in enumerate(vertices):
+        for vertex in vertices:
             with NeoBufferDatabase() as db:
                 db.write_rewires_metadata(
                     vertex, self.REWIRING, region, population)
