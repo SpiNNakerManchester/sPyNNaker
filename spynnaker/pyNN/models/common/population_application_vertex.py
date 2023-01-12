@@ -312,7 +312,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :rtype: ~spynnaker.pyNN.utilities.neo_buffer_database.BufferDatabase
         :raises KeyError: if the variable isn't being recorded
         """
-        raise KeyError("This Population does not support recording")
+        raise NotImplementedError(f"Unexpected call on {type(self)}")
 
     def get_recording_sampling_interval(self, name):
         """ Get the sampling interval of the recording for the given variable
@@ -347,10 +347,13 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :rtype: RecordingType
         :raise KeyError: If the variable isn't recordable
         """
-        raise NotImplementedError(f"Unepcted call on {type(self)}")
+        raise NotImplementedError(f"Unexpected call on {type(self)}")
 
     def get_recording_region(self, name):
-        raise NotImplementedError(f"Unepcted call on {type(self)}")
+        raise NotImplementedError(f"Unexpected call on {type(self)}")
+
+    def get_neurons_recording(self, variable, index, vertex_slice):
+        raise NotImplementedError(f"Unexpected call on {type(self)}")
 
     def inject(self, current_source, selector=None):
         """ Inject a current source into this population

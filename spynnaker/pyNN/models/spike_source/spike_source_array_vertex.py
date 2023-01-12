@@ -267,12 +267,13 @@ class SpikeSourceArrayVertex(
     def can_record(self, name):
         return name == "spikes"
 
-    #@overrides(PopulationApplicationVertex.get_buffer_data_type)
+    @overrides(PopulationApplicationVertex.get_buffer_data_type)
     def get_buffer_data_type(self, name):
         if name == "spikes":
             return BufferDataType.EIEIO_spikes
         raise KeyError(f"Cannot record {name}")
 
+    @overrides(PopulationApplicationVertex.get_neurons_recording)
     def get_neurons_recording(self, variable, index, vertex_slice):
         return vertex_slice.get_raster_ids(self.atoms_shape)
 

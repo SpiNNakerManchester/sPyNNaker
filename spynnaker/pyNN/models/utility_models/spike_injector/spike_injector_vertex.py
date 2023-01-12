@@ -19,6 +19,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.models.common import (
@@ -129,6 +130,34 @@ class SpikeInjectorVertex(
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return RecordingType.BIT_FIELD
+
+    @overrides(PopulationApplicationVertex.get_data_type)
+    def get_data_type(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return None
+
+    @overrides(PopulationApplicationVertex.get_buffer_data_type)
+    def get_buffer_data_type(self, name):
+        if name == "spikes":
+            return BufferDataType.EIEIO_spikes
+        raise KeyError(f"Cannot record {name}")
+
+    @overrides(PopulationApplicationVertex.get_units)
+    def get_units(self, name):
+        if name == "spikes":
+            return ""
+        raise KeyError(f"Cannot record {name}")
+
+    @overrides(PopulationApplicationVertex.get_recording_region)
+    def get_recording_region(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return 0
+
+    @overrides(PopulationApplicationVertex.get_neurons_recording)
+    def get_neurons_recording(self, variable, index, vertex_slice):
+        return vertex_slice.get_raster_ids(self.atoms_shape)
 
     def describe(self):
         """
