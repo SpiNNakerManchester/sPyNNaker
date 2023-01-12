@@ -273,7 +273,7 @@ static bool initialise(void) {
     uint32_t n_words = sdram_inputs.size_in_bytes >> 2;
     for (uint32_t i = 0; i < N_SYNAPTIC_BUFFERS; i++) {
         synaptic_contributions[i] = spin1_malloc(sdram_inputs.size_in_bytes);
-        if (synaptic_contributions == NULL) {
+        if (synaptic_contributions[i] == NULL) {
             log_error("Could not allocate %d bytes for synaptic contributions %d",
                     sdram_inputs.size_in_bytes, i);
             return false;

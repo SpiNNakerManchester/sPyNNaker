@@ -421,7 +421,7 @@ static inline neuromodulated_synapse_t process_plastic_synapse(
             &post_event_history[s.index]);
 
 	// Add weight to ring-buffer entry, but only if not too late
-    if (s.delay_dendritic + s.delay_axonal >= colour_delay) {
+    if (s.delay_dendritic + s.delay_axonal > colour_delay) {
         synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s,
                 final_state.weight);
     } else {
