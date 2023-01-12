@@ -202,8 +202,7 @@ class NeuronData(object):
             neuron_data = self.__get_neuron_param_data(vertex_slice)
             spec.write_array(neuron_data)
             neuron_recorder.write_neuron_recording_region(
-                spec, neuron_regions.neuron_recording,
-                vertex_slice, self.__app_vertex.atoms_shape)
+                spec, neuron_regions.neuron_recording, vertex_slice)
         spec.reserve_memory_region(
             region=neuron_regions.initial_values,
             size=self.__app_vertex.get_sdram_usage_for_neuron_params(
