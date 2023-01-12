@@ -30,7 +30,6 @@ _SELECTIVE_RECORDED_MSG = (
 
 
 class DataPopulation(object):
-    # Included here to due to circular init calls
 
     __slots__ = [
         "__database_file",
@@ -124,6 +123,7 @@ class DataPopulation(object):
 
     @overrides(Population.id_to_index)
     def id_to_index(self, id):  # @ReservedAssignment
+        # pylint: disable=redefined-builtin
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
             _, first_id, _ = db.get_population_metdadata(self.__label)
@@ -178,6 +178,6 @@ class DataPopulation(object):
 
     @overrides(Population.mean_spike_count)
     def mean_spike_count(self, gather=True):
-        Population._check_params(gather)
+        Population._check_params(gather)  # pylint: disable=protected-access
         counts = self.get_spike_counts()
         return sum(counts.values()) / len(counts)

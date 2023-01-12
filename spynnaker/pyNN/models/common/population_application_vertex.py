@@ -294,7 +294,6 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :param ~spynnaker.pyNN.models.populations.Population population:
             the population to record for
         """
-        pass
 
     # NO LONGER USED
     def get_recorded_data(self, name):

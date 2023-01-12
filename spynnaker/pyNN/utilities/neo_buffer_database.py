@@ -1155,7 +1155,7 @@ class NeoBufferDatabase(BufferDatabase):
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
             (rec_id, data_type, function, _, sampling_interval_ms,
-             _, pop_size, units) = self.__get_recording_metadeta(
+             _, pop_size, _) = self.__get_recording_metadeta(
                 cursor, pop_label, variable)
             if view_indexes is None:
                 view_indexes = range(pop_size)

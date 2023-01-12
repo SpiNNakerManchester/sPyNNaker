@@ -410,9 +410,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             with NeoBufferDatabase() as db:
                 db.write_segment_metadata()
                 db.write_metadata()
-            #for population in SpynnakerDataView.iterate_populations():
-            #    population._Population__vertex.write_recording_metadata(
-            #        population)
 
     @overrides(AbstractSpinnakerBase._do_write_metadata)
     def _do_write_metadata(self):
