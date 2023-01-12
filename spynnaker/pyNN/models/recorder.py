@@ -285,6 +285,7 @@ class Recorder(object):
         metadata['mpi_processes'] = 1  # meaningless on Spinnaker
         return metadata
 
+
 def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
     """ Converts data between sPyNNaker format and Neo format
 
