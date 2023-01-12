@@ -172,11 +172,10 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_weight_variance(weights, synapse_info)
 
-    def get_provenance_data(self, pre_population_label, post_population_label):
+    def get_provenance_data(self, synapse_info):
         """ Get the provenance data from this synapse dynamics object
 
-        :param str pre_population_label:
-        :param str post_population_label:
+        :param SynapseInformation synapse_info:
         :rtype:
             iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """

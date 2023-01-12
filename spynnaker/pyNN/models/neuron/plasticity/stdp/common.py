@@ -54,8 +54,7 @@ def get_exp_lut_array(time_step, time_constant, shift=0):
 
 
 def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
-                   fixed_point_one=STDP_FIXED_POINT_ONE, kernel_scaling=1.0,
-                   plot=False):
+                   kernel_scaling=1.0):
     sin_pwr = 20
 
     # Calculate required time constant
@@ -128,7 +127,7 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
 
 
 def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
-                   fixed_point_one=STDP_FIXED_POINT_ONE, kernel_scaling=1.0):
+                   kernel_scaling=1.0):
     cos_pwr = 2
 
     # Calculate required time constant
