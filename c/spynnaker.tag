@@ -4226,6 +4226,13 @@
       <anchor>ac877b6394f131f1944a720c387af6ac1</anchor>
       <arglist>(uint32_t id, synaptic_row_t row, weight_t weight, uint32_t delay, uint32_t type)</arglist>
     </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>skipped_synapses</name>
+      <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
+      <anchor>af61f61aa805ba87019bb5f3f8e44bf0f</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>synapse_structure.h</name>
