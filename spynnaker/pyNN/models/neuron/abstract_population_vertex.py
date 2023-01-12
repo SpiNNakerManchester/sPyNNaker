@@ -1047,6 +1047,7 @@ class AbstractPopulationVertex(
 
         # Now check that the maximum weight isn't too big
         for proj in self.incoming_projections:
+            # pylint: disable-next=protected-access
             synapse_info = proj._synapse_information
             synapse_type = synapse_info.synapse_type
             connector = synapse_info.connector
@@ -1074,6 +1075,7 @@ class AbstractPopulationVertex(
         :param float weight_scale: The weight_scale from the synapse input_type
         """
         for proj in self.incoming_projections:
+            # pylint: disable-next=protected-access
             synapse_info = proj._synapse_information
             weights = synapse_info.weights
             synapse_type = synapse_info.synapse_type
@@ -1520,13 +1522,11 @@ class AbstractPopulationVertex(
         with ProvenanceWriter() as db:
             for i, weight in enumerate(self.__min_weights):
                 db.insert_app_vertex(
-                    self.label,
-                    synapse_names[i], "min_weight",
-                    weight),
+                    self.label, synapse_names[i], "min_weight", weight)
 
             for (weight, r_weight) in self.__weight_provenance:
                 proj_info = self.__weight_provenance[weight, r_weight]
-                for i, (proj, s_info) in enumerate(proj_info):
+                for i, (_proj, s_info) in enumerate(proj_info):
                     db.insert_connector(
                         s_info.pre_population.label,
                         s_info.post_population.label,

@@ -362,6 +362,7 @@ def float_gcd(a, b):
     :rtype: float
     """
     if (a < b):
+        # pylint: disable-next=arguments-out-of-order
         return float_gcd(b, a)
 
     # base case
@@ -371,7 +372,7 @@ def float_gcd(a, b):
         return (float_gcd(b, a - math.floor(a / b) * b))
 
 
-def float_gcd_of_array(input):
+def float_gcd_of_array(input_array):
     """
     Work out the floating point gcd of an array of numbers
 
@@ -379,13 +380,13 @@ def float_gcd_of_array(input):
     :return: the floating point gcd of the array
     :rtype: float
     """
-    if len(input) == 1:
-        return input[0]
+    if len(input_array) == 1:
+        return input_array[0]
 
-    gcd = float_gcd(input[0], input[1])
+    gcd = float_gcd(input_array[0], input_array[1])
 
-    for i in range(2, len(input)):
-        gcd = float_gcd(gcd, input[i])
+    for i in range(2, len(input_array)):
+        gcd = float_gcd(gcd, input_array[i])
 
     return gcd
 

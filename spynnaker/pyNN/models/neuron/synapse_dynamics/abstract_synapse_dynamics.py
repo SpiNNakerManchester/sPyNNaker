@@ -217,6 +217,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param int synapse_type: the synapse ID for which to calculate the min
         :rtype: list
         """
+        # pylint: disable=unused-argument
         # By default no further calculation is required
         return min_weights
 
