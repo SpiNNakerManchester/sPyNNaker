@@ -16,16 +16,11 @@ from datetime import datetime
 import logging
 import numpy
 import neo
-import quantities
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
-from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-
-# needed as dealing with quantities
-# pylint: disable=c-extension-no-member
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -300,6 +295,7 @@ class Recorder(object):
             name="Index {}".format(count), index=ids)
         block.channel_indexes.append(channel_index)
         return channel_index
+
 
 def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
     """ Converts data between sPyNNaker format and Neo format
