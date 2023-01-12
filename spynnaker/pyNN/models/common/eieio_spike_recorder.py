@@ -72,7 +72,7 @@ class EIEIOSpikeRecorder(object):
         with NeoBufferDatabase() as db:
             vertices = application_vertex.machine_vertices
             for vertex in vertices:
-                vertex._update_virtual_key()
+                vertex.update_virtual_key()
                 db.write_eieio_spikes_metadata(
                     vertex, "spikes", region, population,
                     SpynnakerDataView.get_simulation_time_step_ms(),

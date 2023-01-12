@@ -124,6 +124,7 @@ class DataPopulation(object):
 
     @overrides(Population.id_to_index)
     def id_to_index(self, id):  # @ReservedAssignment
+        # pylint: disable=redefined-builtin
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
             _, first_id, _ = db.get_population_metdadata(self.__label)

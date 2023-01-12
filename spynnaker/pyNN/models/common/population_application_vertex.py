@@ -285,7 +285,6 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :param ~spynnaker.pyNN.models.populations.Population population:
             the population to record for
         """
-        pass
 
     def get_recorded_data(self, name):
         """ Get the data recorded for a given variable

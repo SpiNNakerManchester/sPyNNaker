@@ -410,6 +410,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             with NeoBufferDatabase() as db:
                 db.write_segment_metadata()
             for population in SpynnakerDataView.iterate_populations():
+                # pylint: disable=protected-access
                 population._Population__vertex.write_recording_metadata(
                     population)
 
