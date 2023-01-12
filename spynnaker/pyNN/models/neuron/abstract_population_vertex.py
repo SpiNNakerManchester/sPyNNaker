@@ -64,7 +64,6 @@ from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-
 from .population_machine_neurons import PopulationMachineNeurons
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
@@ -709,6 +708,20 @@ class AbstractPopulationVertex(
         variables.extend(self.__synapse_recorder.get_recordable_variables())
         return variables
 
+    def get_sampling_interval_ms(self, name):
+        if self.__neuron_recorder.is_recordable(name):
+            return self.__neuron_recorder.get_sampling_interval(name)
+        if self.__synapse_recorder.is_recordable(name):
+            return self.__synapse_recorder.get_sampling_interval(name)
+        raise KeyError(f"It is not possible to record {name}")
+
+    def get_buffer_data_type(self, name):
+        if self.__neuron_recorder.is_recordable(name):
+            return self.__neuron_recorder.get_buffer_data_type(name)
+        if self.__synapse_recorder.is_recordable(name):
+            return self.__synapse_recorder.get_buffer_data_type(name)
+        raise KeyError(f"It is not possible to record {name}")
+
     @overrides(PopulationApplicationVertex.can_record)
     def can_record(self, name):
         return (self.__neuron_recorder.is_recordable(name) or
@@ -773,7 +786,6 @@ class AbstractPopulationVertex(
         if self.__synapse_recorder.is_recordable(name):
             return self.__synapse_recorder.get_recorded_indices(self, name)
         raise KeyError(f"It is not possible to record {name}")
-
     @overrides(PopulationApplicationVertex.get_recording_type)
     def get_recording_type(self, name):
         if self.__neuron_recorder.is_recordable(name):
@@ -781,6 +793,30 @@ class AbstractPopulationVertex(
         if self.__synapse_recorder.is_recordable(name):
             return self.__synapse_recorder.get_recorded_data_type(name)
         raise KeyError(f"It is not possible to record {name}")
+
+    @overrides(PopulationApplicationVertex.get_data_type)
+    def get_data_type(self, name):
+        if self.__neuron_recorder.is_recordable(name):
+            return self.__neuron_recorder.get_data_type(name)
+        if self.__synapse_recorder.is_recordable(name):
+            return self.__synapse_recorder.get_data_type(name)
+        raise KeyError(f"It is not possible to record {name}")
+
+    def get_recording_region(self, name):
+        if self.__neuron_recorder.is_recordable(name):
+            return self.__neuron_recorder.get_region(name)
+        if self.__synapse_recorder.is_recordable(name):
+            return self.__synapse_recorder.get_region(name)
+        raise KeyError(f"It is not possible to record {name}")
+
+    def get_neurons_recording(self, variable, index, vertex_slice):
+        if self.__neuron_recorder.is_recordable(variable):
+            return self.__neuron_recorder.neurons_recording(
+                variable, index, vertex_slice, self.atoms_shape)
+        if self.__synapse_recorder.is_recordable(variable):
+            return self.__synapse_recorder.neurons_recording(
+                variable, index, vertex_slice, self.atoms_shape)
+        raise KeyError(f"It is not possible to record {variable}")
 
     @property
     def weight_scale(self):

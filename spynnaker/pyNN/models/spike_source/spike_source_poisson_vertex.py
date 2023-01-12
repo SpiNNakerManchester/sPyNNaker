@@ -36,6 +36,7 @@ from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import (
     PopulationApplicationVertex, RecordingType)
 from spynnaker.pyNN.models.common import ParameterHolder
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
@@ -365,6 +366,16 @@ class SpikeSourcePoissonVertex(
     def can_record(self, name):
         return name == "spikes"
 
+    def get_buffer_data_type(self, name):
+        if name == "spikes":
+            return BufferDataType.Multi_spike
+        raise KeyError(f"Cannot record {name}")
+
+    def get_recording_region(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return 0
+
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(self, name, sampling_interval=None, indices=None):
         if name != "spikes":
@@ -422,6 +433,15 @@ class SpikeSourcePoissonVertex(
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return RecordingType.BIT_FIELD
+
+    @overrides(PopulationApplicationVertex.get_data_type)
+    def get_data_type(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return None
+
+    def get_neurons_recording(self, variable, index, vertex_slice):
+        return vertex_slice.get_raster_ids(self.atoms_shape)
 
     def max_spikes_per_ts(self):
         ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
@@ -532,6 +552,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(PopulationApplicationVertex.write_recording_metadata)
     def write_recording_metadata(self, population):
+        return
         self.__spike_recorder.write_spike_metadata(
             self, SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
             population)

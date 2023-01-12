@@ -24,6 +24,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from .population_application_vertex import RecordingType
 
@@ -223,13 +224,15 @@ class NeuronRecorder(object):
         split_array = numpy.array_split(existence, splits)
         return max([numpy.sum(s) for s in split_array])
 
-    def _neurons_recording(self, variable, vertex_slice, atoms_shape):
+    def neurons_recording(self, variable, index, vertex_slice, atoms_shape):
         """
         :param str variable:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param tuple(int) atoms_shape:
         :rtype: iterable(int)
         """
+        if variable not in self.__sampling_rates:
+            return [index]
         if self.__sampling_rates[variable] == 0:
             return []
         if self.__indexes[variable] is None:
@@ -356,6 +359,17 @@ class NeuronRecorder(object):
 
         return get_sampling_interval(self.__sampling_rates[variable])
 
+    def get_buffer_data_type(self, variable):
+        if variable == self.SPIKES:
+            return BufferDataType.Neuron_spikes
+        elif variable == self.REWIRING:
+            return BufferDataType.Rewires
+        elif variable in self.__events_per_core_variables:
+            raise NotImplementedError(
+                f"Unexpected Event variable: {variable}")
+        else:
+            return BufferDataType.Matrix
+
     def __read_data(
             self, label, application_vertex,
             sampling_rate, data_type, variable):
@@ -375,15 +389,10 @@ class NeuronRecorder(object):
             expected_rows = int(
                 math.ceil(n_machine_time_steps / sampling_rate))
 
-            n_items_per_timestep = 1
-            if variable in self.__sampling_rates:
-                neurons = self._neurons_recording(
-                    variable, vertex.vertex_slice,
-                    application_vertex.atoms_shape)
-                n_items_per_timestep = len(neurons)
-                indexes.extend(neurons)
-            else:
-                indexes.append(i)
+            neurons = self.neurons_recording(
+                variable, i, vertex.vertex_slice,
+                application_vertex.atoms_shape)
+            n_items_per_timestep = len(neurons)
             placement_data = self._get_placement_matrix_data(
                 vertex, region, expected_rows,
                 missing_str, sampling_rate, label, data_type,
@@ -419,6 +428,13 @@ class NeuronRecorder(object):
             return RecordingType.MATRIX
         raise KeyError(f"This vertex cannot record {variable}")
 
+    def get_data_type(self, variable):
+        if variable in self.__per_timestep_variables:
+            return self.__per_timestep_datatypes[variable]
+        if variable in self.__data_types:
+                return self.__data_types[variable]
+        return None
+
     def __write_matrix_metadata(
             self, application_vertex,
             sampling_interval_ms, data_type, variable, population):
@@ -440,12 +456,9 @@ class NeuronRecorder(object):
         region = self.__region_ids[variable]
 
         for i, vertex in enumerate(vertices):
-            if variable in self.__sampling_rates:
-                neurons = self._neurons_recording(
-                    variable, vertex.vertex_slice,
-                    application_vertex.atoms_shape)
-            else:
-                neurons = [i]
+            neurons = self.neurons_recording(
+                variable, i, vertex.vertex_slice,
+                application_vertex.atoms_shape)
             with NeoBufferDatabase() as db:
                 db.write_matrix_metadata(
                     vertex, variable, region, population,
@@ -482,8 +495,8 @@ class NeuronRecorder(object):
 
         with NeoBufferDatabase() as db:
             for vertex in vertices:
-                neurons = self._neurons_recording(
-                    self.SPIKES, vertex.vertex_slice,
+                neurons = self.neurons_recording(
+                    self.SPIKES, None, vertex.vertex_slice,
                     application_vertex.atoms_shape)
                 db.write_spikes_metadata(
                     vertex, self.SPIKES, region, population,
@@ -519,15 +532,16 @@ class NeuronRecorder(object):
         """
         for variable in self.recording_variables:
             if variable == self.SPIKES:
-                self._write_spike_metadata(application_vertex, population)
+                pass
+                #self._write_spike_metadata(application_vertex, population)
             elif variable == self.REWIRING:
                 self.__write_rewires_metadata(application_vertex, population)
             elif variable in self.__events_per_core_variables:
                 raise NotImplementedError(
                     f"Unexpected Event variable: {variable}")
-            else:
-                self._write_matrix_metadata(
-                    application_vertex, variable, population)
+            #else:
+                #self._write_matrix_metadata(
+                #    application_vertex, variable, population)
 
     def get_recordable_variables(self):
         """

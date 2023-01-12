@@ -27,6 +27,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common import (
     PopulationApplicationVertex, RecordingType)
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.models.common import ParameterHolder
@@ -266,6 +267,15 @@ class SpikeSourceArrayVertex(
     def can_record(self, name):
         return name == "spikes"
 
+    #@overrides(PopulationApplicationVertex.get_buffer_data_type)
+    def get_buffer_data_type(self, name):
+        if name == "spikes":
+            return BufferDataType.EIEIO_spikes
+        raise KeyError(f"Cannot record {name}")
+
+    def get_neurons_recording(self, variable, index, vertex_slice):
+        return vertex_slice.get_raster_ids(self.atoms_shape)
+
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(self, name, sampling_interval=None, indices=None):
         if name != "spikes":
@@ -307,6 +317,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(PopulationApplicationVertex.write_recording_metadata)
     def write_recording_metadata(self, population):
+        return
         self.__spike_recorder.write_spike_metadata(
             0, self, lambda vertex:
                 vertex.virtual_key
@@ -331,6 +342,18 @@ class SpikeSourceArrayVertex(
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return RecordingType.BIT_FIELD
+
+    @overrides(PopulationApplicationVertex.get_recording_region)
+    def get_recording_region(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return 0
+
+    @overrides(PopulationApplicationVertex.get_data_type)
+    def get_data_type(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return None
 
     def describe(self):
         """ Returns a human-readable description of the cell or synapse type.

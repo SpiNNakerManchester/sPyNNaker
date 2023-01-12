@@ -229,7 +229,11 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :rtype: bool
         """
         # pylint: disable=unused-argument
-        return False
+        if self.get_recordable_variables == []:
+            return False
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"can_record")
 
     def set_recording(self, name, sampling_interval=None, indices=None):
         """ Set a variable recording
@@ -262,7 +266,11 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
         :rtype: list(str)
         """
-        return []
+        if self.get_recordable_variables() == []:
+            return []
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"get_recording_variables")
 
     def is_recording_variable(self, name):
         """ Indicate whether the given variable is being recorded
@@ -273,6 +281,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         raise KeyError("This Population does not support recording")
 
+    # NO LONGER USED
     def write_recording_metadata(self, population):
         """
         Writes the metatdata to get_recorded_data from NeoBufferedDatabase
@@ -287,11 +296,21 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         pass
 
+    # NO LONGER USED
     def get_recorded_data(self, name):
         """ Get the data recorded for a given variable
 
         :param str name: The name of the variable recorded
         :rtype: ndarray
+        :raises KeyError: if the variable isn't being recorded
+        """
+        raise KeyError("This Population does not support recording")
+
+    def get_buffer_data_type(self, name):
+        """ Get the data recorded for a given variable
+
+        :param str name: The name of the variable recorded
+        :rtype: ~spynnaker.pyNN.utilities.neo_buffer_database.BufferDatabase
         :raises KeyError: if the variable isn't being recorded
         """
         raise KeyError("This Population does not support recording")
@@ -312,6 +331,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         raise KeyError("This Population does not support recording")
 
+    # NO LONGER USED
     def get_recording_type(self, name):
         """ Get the type of recording of the variable
 
@@ -320,6 +340,18 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :raise KeyError: If the variable isn't recordable
         """
         raise KeyError("This Population does not support recording")
+
+    def get_data_type(self, name):
+        """ Get the type data returned by a recording of the variable
+
+        :param str name: The name of the variable to get the type of
+        :rtype: RecordingType
+        :raise KeyError: If the variable isn't recordable
+        """
+        raise NotImplementedError(f"Unepcted call on {type(self)}")
+
+    def get_recording_region(self, name):
+        raise NotImplementedError(f"Unepcted call on {type(self)}")
 
     def inject(self, current_source, selector=None):
         """ Inject a current source into this population

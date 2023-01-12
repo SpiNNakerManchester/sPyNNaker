@@ -36,6 +36,7 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKES
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -1547,6 +1548,60 @@ class NeoBufferDatabase(BufferDatabase):
                         FROM region_metadata NATURAL JOIN recording_view
                         WHERE label = ? AND variable = ?)
                     """, (pop_label, variable))
+
+    def write_metadata(self):
+        with self.transaction() as cursor:
+            for population in SpynnakerDataView.iterate_populations():
+                for variable in population._vertex.get_recording_variables():
+                    self.__write_metadata(cursor, population, variable)
+
+    def __write_metadata(self, cursor, population, variable):
+        app_vertex = population._vertex
+        data_type = app_vertex.get_data_type(variable)
+        sampling_interval_ms = \
+            app_vertex.get_recording_sampling_interval(variable)
+        buffered_data_type = \
+            app_vertex.get_buffer_data_type(variable)
+        units = app_vertex.get_units(variable)
+        rec_id = self.__get_recording_id(
+            cursor, app_vertex.label, variable,
+            population, sampling_interval_ms, data_type,
+            buffered_data_type, units)
+        region = app_vertex.get_recording_region(variable)
+        machine_vertices = (
+            app_vertex.splitter.machine_vertices_for_recording(
+                variable))
+        atoms_shape = app_vertex.atoms_shape
+        n_colour_bits = app_vertex.n_colour_bits
+        for index, vertex in enumerate(machine_vertices):
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                vertex)
+            region_id = self._get_region_id(
+                cursor, placement.x, placement.y, placement.p,
+                region)
+            vertex_slice = vertex.vertex_slice
+            neurons = app_vertex.get_neurons_recording(
+                variable, index, vertex_slice)
+            if buffered_data_type == BufferDataType.EIEIO_spikes:
+                base_key = vertex.virtual_key
+                if base_key is None:
+                    base_key = 0
+            else:
+                base_key = None
+            recording_neurons_st = self.array_to_string(
+                neurons)
+            selective_recording = (
+                    len(neurons) != vertex_slice.n_atoms)
+            cursor.execute(
+                """
+                INSERT INTO region_metadata
+                (rec_id, region_id, recording_neurons_st, selective_recording,
+                 base_key, vertex_slice, atoms_shape, n_colour_bits)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (rec_id, region_id, recording_neurons_st, selective_recording,
+                 base_key, str(vertex.vertex_slice),
+                 str(vertex.app_vertex.atoms_shape), n_colour_bits))
 
     @staticmethod
     def array_to_string(indexes):
