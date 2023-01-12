@@ -30,7 +30,6 @@ _SELECTIVE_RECORDED_MSG = (
 
 
 class DataPopulation(object):
-    # Included here to due to circular init calls
 
     __slots__ = [
         "__database_file",
@@ -179,6 +178,6 @@ class DataPopulation(object):
 
     @overrides(Population.mean_spike_count)
     def mean_spike_count(self, gather=True):
-        Population._check_params(gather)
+        Population._check_params(gather)  # pylint: disable=protected-access
         counts = self.get_spike_counts()
         return sum(counts.values()) / len(counts)

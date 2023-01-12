@@ -285,18 +285,6 @@ class Recorder(object):
         metadata['mpi_processes'] = 1  # meaningless on Spinnaker
         return metadata
 
-    @staticmethod
-    def __get_channel_index(ids, block):
-        for channel_index in block.channel_indexes:
-            if numpy.array_equal(channel_index.index, ids):
-                return channel_index
-        count = len(block.channel_indexes)
-        channel_index = neo.ChannelIndex(
-            name="Index {}".format(count), index=ids)
-        block.channel_indexes.append(channel_index)
-        return channel_index
-
-
 def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
     """ Converts data between sPyNNaker format and Neo format
 
