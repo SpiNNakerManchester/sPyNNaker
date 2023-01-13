@@ -216,7 +216,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         return False
 
     # recording methods
-
+    # If get_recordable_variables all other recording methods must be too
 
     def get_recordable_variables(self):
         """ Get a list of the names and types of things that can be recorded
@@ -250,7 +250,11 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :type indices: list(int) or None
         :raises KeyError: if the variable cannot be recorded
         """
-        raise KeyError("This Population does not support recording")
+        if self.get_recordable_variables == []:
+            raise KeyError("This Population does not support recording")
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"set_recording")
 
     def set_not_recording(self, name, indices=None):
         """ Set a variable not recording
@@ -261,8 +265,11 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :type indices: list(int) or None
         :raises KeyError: if the variable cannot be stopped from recording
         """
-        raise KeyError(
-            "This Population does not support the stopping of recording")
+        if self.get_recordable_variables == []:
+            raise KeyError("This Population does not support recording")
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"set_not_recording")
 
     def get_recording_variables(self):
         """ Get a list of variables that are currently being recorded
@@ -282,7 +289,11 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :rtype: bool
         :raises KeyError: if the variable is not supported
         """
-        raise KeyError("This Population does not support recording")
+        if self.get_recordable_variables() == []:
+            return []
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"get_recording_variables")
 
     # NO LONGER USED
     def get_recorded_data(self, name):
@@ -301,7 +312,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :rtype: ~spynnaker.pyNN.utilities.neo_buffer_database.BufferDatabase
         :raises KeyError: if the variable isn't being recorded
         """
-        raise NotImplementedError(f"Unexpected call on {type(self)}")
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"get_recording_variables")
 
     def get_recording_sampling_interval(self, name):
         """ Get the sampling interval of the recording for the given variable
@@ -309,7 +322,11 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :rtype: float
         :raises KeyError: If the variable isn't being recorded
         """
-        raise KeyError("This Population does not support recording")
+        if self.get_recordable_variables() == []:
+            return []
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"get_recording_variables")
 
     def get_recording_indices(self, name):
         """ Get the indices of the given variable that are being recorded
@@ -317,7 +334,11 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :rtype: list(int)
         :raises KeyError: If the variable isn't being recorded
         """
-        raise KeyError("This Population does not support recording")
+        if self.get_recordable_variables() == []:
+            return []
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"get_recording_indice")
 
     # NO LONGER USED
     def get_recording_type(self, name):
@@ -336,15 +357,27 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :rtype: RecordingType
         :raise KeyError: If the variable isn't recordable
         """
-        raise NotImplementedError(f"Unexpected call on {type(self)}")
+        if self.get_recordable_variables() == []:
+            return []
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"get_data_type")
 
     def get_recording_region(self, name):
-        raise NotImplementedError(f"Unexpected call on {type(self)}")
+        if self.get_recordable_variables() == []:
+            return []
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"get_recording_region")
 
     def get_neurons_recording(self, variable, index, vertex_slice):
-        raise NotImplementedError(f"Unexpected call on {type(self)}")
+        if self.get_recordable_variables() == []:
+            return []
+        raise NotImplementedError(
+            f"{type(self)} has recording variables so should implement "
+            f"get_neurons_recording")
 
-
+    # end of recording methods
 
     def inject(self, current_source, selector=None):
         """ Inject a current source into this population
