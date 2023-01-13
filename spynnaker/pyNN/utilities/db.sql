@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS recording (
 		REFERENCES population(pop_id) ON DELETE RESTRICT,
     variable TEXT NOT NULL,
     data_type TEXT,
-    function TEXT NOT NULL,
+    buffered_type TEXT NOT NULL,
     t_start float NOT NULL,
     sampling_interval_ms float,
     units TEXT);
@@ -39,7 +39,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS recording_sanity
     ON recording(pop_id ASC, variable ASC);
 
 CREATE VIEW IF NOT EXISTS recording_view AS
-    SELECT rec_id, variable, label, data_type, function, t_start,
+    SELECT rec_id, variable, label, data_type, buffered_type, t_start,
         sampling_interval_ms, first_id, pop_size, units
     FROM population NATURAL JOIN recording;
 

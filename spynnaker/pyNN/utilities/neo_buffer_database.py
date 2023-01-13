@@ -35,26 +35,10 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.constants import SPIKES
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
+from spynnaker.pyNN.utilities.constants import SPIKES
 
 logger = FormatAdapter(logging.getLogger(__name__))
-
-
-class RetrievalFunction(Enum):
-    """
-    Different functions to retrieve the data.
-
-    This class is designed to used internally by NeoBufferDatabase
-    """
-    Neuron_spikes = (auto())
-    EIEIO_spikes = (auto())
-    Multi_spike = (auto())
-    Matrix = (auto())
-    Rewires = (auto())
-
-    def __str__(self):
-        return self.name
 
 
 class NeoBufferDatabase(BufferDatabase):
@@ -212,7 +196,7 @@ class NeoBufferDatabase(BufferDatabase):
 
     def __get_recording_id(
             self, cursor, pop_label, variable, population,
-            sampling_interval_ms, data_type, data_function, units=None):
+            sampling_interval_ms, data_type, buffered_type, units=None):
         """
         Gets an id for this population and recording label combination.
 
@@ -233,7 +217,7 @@ class NeoBufferDatabase(BufferDatabase):
         :param ~spynnaker.pyNN.models.populations.Population population:
             the population to record for
         :type data_type: DataType or None
-        :param RetrievalFunction data_function:
+        :param BufferDataType buffered_type:
         :param sampling_interval: the simulation time in ms between sampling.
             Typically the sampling rate * simulation_timestep_ms
         :type sampling_interval_ms: float or None
@@ -253,10 +237,10 @@ class NeoBufferDatabase(BufferDatabase):
         cursor.execute(
             """
             INSERT INTO recording
-            (pop_id, variable, data_type, function, t_start,
+            (pop_id, variable, data_type, buffered_type, t_start,
             sampling_interval_ms, units)
             VALUES (?, ?, ?, ?, 0, ?, ?)
-            """, (pop_id, variable, data_type_name, str(data_function),
+            """, (pop_id, variable, data_type_name, str(buffered_type),
                   sampling_interval_ms, units))
         return cursor.lastrowid
 
@@ -443,16 +427,16 @@ class NeoBufferDatabase(BufferDatabase):
                 duplicate values
 
         :param str variable:
-        :return: id, datatype, retrieval function type,  t_start,
+        :return: id, datatype, buffered_type,  t_start,
                  sampling_interval_ms, first_id, pop_size, units
-        :rtype: (int, DataType, RetrievalFunction, float, float, int, int, str)
+        :rtype: (int, DataType, BufferedDataType, float, float, int, int, str)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
         for row in cursor.execute(
                 """
-                SELECT rec_id,  data_type, function,  t_start,
+                SELECT rec_id,  data_type, buffered_type,  t_start,
                        sampling_interval_ms, first_id, pop_size, units
                 FROM recording_view
                 WHERE label = ? AND variable = ?
@@ -467,8 +451,8 @@ class NeoBufferDatabase(BufferDatabase):
                 units = str(row["units"], 'utf-8')
             else:
                 units = None
-            function = RetrievalFunction[str(row["function"], 'utf-8')]
-            return (row["rec_id"], data_type, function, row["t_start"],
+            buffered_type = BufferDataType[str(row["buffered_type"], 'utf-8')]
+            return (row["rec_id"], data_type, buffered_type, row["t_start"],
                     row["sampling_interval_ms"], row["first_id"],
                     row["pop_size"], units)
         raise ConfigurationException(
@@ -723,7 +707,7 @@ class NeoBufferDatabase(BufferDatabase):
             logger.warning(f"No data available for neurons {missing_list}")
         return indexes
 
-    def __get_spikes(self, cursor, rec_id, view_indexes, function):
+    def __get_spikes(self, cursor, rec_id, view_indexes, buffer_type):
         """
         Gets the data as a Numpy array for one opulation and variable
 
@@ -732,14 +716,14 @@ class NeoBufferDatabase(BufferDatabase):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        if function == RetrievalFunction.Neuron_spikes:
+        if buffer_type == BufferDataType.Neuron_spikes:
             spikes, data_indexes = self.__get_neuron_spikes(cursor, rec_id)
-        elif function == RetrievalFunction.EIEIO_spikes:
+        elif buffer_type == BufferDataType.EIEIO_spikes:
             spikes, data_indexes = self.__get_eieio_spikes(cursor, rec_id)
-        elif function == RetrievalFunction.Multi_spike:
+        elif buffer_type == BufferDataType.Multi_spike:
             spikes, data_indexes = self.__get_multi_spikes(cursor, rec_id)
         else:
-            raise NotImplementedError(function)
+            raise NotImplementedError(buffer_type)
 
         if list(view_indexes) == list(data_indexes):
             indexes = numpy.array(data_indexes)
@@ -938,20 +922,20 @@ class NeoBufferDatabase(BufferDatabase):
         with self.transaction() as cursor:
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
-            (rec_id, data_type, function, _, sampling_interval_ms,
+            (rec_id, data_type, buffered_type, _, sampling_interval_ms,
              _, pop_size, _) = self.__get_recording_metadeta(
                 cursor, pop_label, variable)
             view_indexes = range(pop_size)
 
-            if function == RetrievalFunction.Matrix:
+            if buffered_type == BufferDataType.Matrix:
                 data, indexes = self.__get_matrix_data(
                     cursor, rec_id, data_type, view_indexes)
                 return data, indexes, sampling_interval_ms
-            elif function == RetrievalFunction.Rewires:
+            elif buffered_type == BufferDataType.Rewires:
                 return self.__get_rewires(cursor, rec_id)
             else:
                 return self.__get_spikes(
-                    cursor, rec_id, view_indexes, function)[0]
+                    cursor, rec_id, view_indexes, buffered_type)[0]
 
     def __get_recorded_pynn7(
             self, cursor, rec_id, data_type, sampling_interval_ms,
@@ -990,36 +974,36 @@ class NeoBufferDatabase(BufferDatabase):
         with self.transaction() as cursor:
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
-            (rec_id, data_type, function, _, sampling_interval_ms,
+            (rec_id, data_type, buffered_type, _, sampling_interval_ms,
              _, pop_size, _) = self.__get_recording_metadeta(
                 cursor, pop_label, variable)
             if view_indexes is None:
                 view_indexes = range(pop_size)
 
-            if function == RetrievalFunction.Matrix:
+            if buffered_type == BufferDataType.Matrix:
                 return self.__get_recorded_pynn7(
                     cursor, rec_id, data_type, sampling_interval_ms,
                     as_matrix, view_indexes)
-            # NO RetrievalFunction.Rewires get_spike will go boom
+            # NO BufferedDataType.REWIRES get_spike will go boom
             else:
                 if as_matrix:
                     logger.warning(f"Ignoring as matrix for {variable}")
                 return self.__get_spikes(
-                    cursor, rec_id, view_indexes, function)[0]
+                    cursor, rec_id, view_indexes, buffered_type)[0]
 
     def get_spike_counts(self, pop_label, view_indexes=None):
         with self.transaction() as cursor:
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
-            (rec_id, _, function, _, _,
+            (rec_id, _, buffered_type, _, _,
              _, pop_size, _) = self.__get_recording_metadeta(
                 cursor, pop_label, SPIKES)
             if view_indexes is None:
                 view_indexes = range(pop_size)
 
-            # get_spike will go boom if function not spikes
+            # get_spike will go boom if buffered_type not spikes
             spikes = self.__get_spikes(
-                    cursor, rec_id, view_indexes, function)[0]
+                    cursor, rec_id, view_indexes, buffered_type)[0]
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=pop_size)
         return {i: counts[i] for i in view_indexes}
@@ -1203,26 +1187,26 @@ class NeoBufferDatabase(BufferDatabase):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        (rec_id, data_type, function, t_start, sampling_interval_ms,
+        (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          first_id, pop_size, units) = self.__get_recording_metadeta(
             cursor, pop_label, variable)
 
         if view_indexes is None:
             view_indexes = range(pop_size)
 
-        if function == RetrievalFunction.Matrix:
+        if buffer_type == BufferDataType.Matrix:
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes)
             self.__add_matix_data(
                 pop_label, variable, block, segment, signal_array,
                 indexes, t_start, sampling_interval_ms,
                 units, first_id)
-        elif function == RetrievalFunction.Rewires:
+        elif buffer_type == BufferDataType.Rewires:
             event_array = self.__get_rewires(cursor, rec_id)
             self.__add_neo_events(segment, event_array, variable, t_start)
         else:
             spikes, indexes = self.__get_spikes(
-                cursor, rec_id, view_indexes, function)
+                cursor, rec_id, view_indexes, buffer_type)
             self.__add_spike_data(
                 pop_label, view_indexes, segment, spikes, t_start, t_stop,
                 sampling_interval_ms, first_id)
