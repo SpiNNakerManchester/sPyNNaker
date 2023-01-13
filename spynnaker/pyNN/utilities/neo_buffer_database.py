@@ -721,11 +721,11 @@ class NeoBufferDatabase(BufferDatabase):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        if buffer_type == BufferDataType.Neuron_spikes:
+        if buffer_type == BufferDataType.NEURON_SPIKES:
             spikes, data_indexes = self.__get_neuron_spikes(cursor, rec_id)
-        elif buffer_type == BufferDataType.EIEIO_spikes:
+        elif buffer_type == BufferDataType.EIEIO_SPIKES:
             spikes, data_indexes = self.__get_eieio_spikes(cursor, rec_id)
-        elif buffer_type == BufferDataType.Multi_spike:
+        elif buffer_type == BufferDataType.MULTI_SPIKES:
             spikes, data_indexes = self.__get_multi_spikes(cursor, rec_id)
         else:
             raise NotImplementedError(buffer_type)
@@ -932,11 +932,11 @@ class NeoBufferDatabase(BufferDatabase):
                 cursor, pop_label, variable)
             view_indexes = range(pop_size)
 
-            if buffered_type == BufferDataType.Matrix:
+            if buffered_type == BufferDataType.MATRIX:
                 data, indexes = self.__get_matrix_data(
                     cursor, rec_id, data_type, view_indexes)
                 return data, indexes, sampling_interval_ms
-            elif buffered_type == BufferDataType.Rewires:
+            elif buffered_type == BufferDataType.REWIRES:
                 return self.__get_rewires(cursor, rec_id)
             else:
                 return self.__get_spikes(
@@ -985,7 +985,7 @@ class NeoBufferDatabase(BufferDatabase):
             if view_indexes is None:
                 view_indexes = range(pop_size)
 
-            if buffered_type == BufferDataType.Matrix:
+            if buffered_type == BufferDataType.MATRIX:
                 return self.__get_recorded_pynn7(
                     cursor, rec_id, data_type, sampling_interval_ms,
                     as_matrix, view_indexes)
@@ -1199,14 +1199,14 @@ class NeoBufferDatabase(BufferDatabase):
         if view_indexes is None:
             view_indexes = range(pop_size)
 
-        if buffer_type == BufferDataType.Matrix:
+        if buffer_type == BufferDataType.MATRIX:
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes)
             self.__add_matix_data(
                 pop_label, variable, block, segment, signal_array,
                 indexes, t_start, sampling_interval_ms,
                 units, first_id)
-        elif buffer_type == BufferDataType.Rewires:
+        elif buffer_type == BufferDataType.REWIRES:
             event_array = self.__get_rewires(cursor, rec_id)
             self.__add_neo_events(segment, event_array, variable, t_start)
         else:
@@ -1382,11 +1382,15 @@ class NeoBufferDatabase(BufferDatabase):
 
     def __write_metadata(self, cursor, population, variable):
         app_vertex = population._vertex
+        buffered_data_type = \
+            app_vertex.get_buffer_data_type(variable)
+        if buffered_data_type == BufferDataType.NOT_NEO:
+            return
+
         data_type = app_vertex.get_data_type(variable)
         sampling_interval_ms = \
             app_vertex.get_recording_sampling_interval(variable)
-        buffered_data_type = \
-            app_vertex.get_buffer_data_type(variable)
+
         units = app_vertex.get_units(variable)
         atoms_shape = app_vertex.atoms_shape
         n_colour_bits = app_vertex.n_colour_bits
@@ -1409,7 +1413,7 @@ class NeoBufferDatabase(BufferDatabase):
                 variable, vertex_slice)
             if neurons is None:
                 neurons = [index]
-            if buffered_data_type == BufferDataType.EIEIO_spikes:
+            if buffered_data_type == BufferDataType.EIEIO_SPIKES:
                 base_key = vertex.get_virtual_key()
             else:
                 base_key = None

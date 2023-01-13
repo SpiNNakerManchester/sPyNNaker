@@ -366,7 +366,7 @@ class SpikeSourcePoissonVertex(
 
     def get_buffer_data_type(self, name):
         if name == "spikes":
-            return BufferDataType.Multi_spike
+            return BufferDataType.MULTI_SPIKES
         raise KeyError(f"Cannot record {name}")
 
     def get_recording_region(self, name):

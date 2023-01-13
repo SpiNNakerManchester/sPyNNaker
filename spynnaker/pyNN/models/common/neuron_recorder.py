@@ -358,14 +358,14 @@ class NeuronRecorder(object):
 
     def get_buffer_data_type(self, variable):
         if variable == self.SPIKES:
-            return BufferDataType.Neuron_spikes
+            return BufferDataType.NEURON_SPIKES
         elif variable == self.REWIRING:
-            return BufferDataType.Rewires
+            return BufferDataType.REWIRES
         elif variable in self.__events_per_core_variables:
             raise NotImplementedError(
                 f"Unexpected Event variable: {variable}")
         else:
-            return BufferDataType.Matrix
+            return BufferDataType.MATRIX
 
     def __read_data(
             self, label, application_vertex,

@@ -22,11 +22,12 @@ class BufferDataType(Enum):
 
     This class is designed to used internally by NeoBufferDatabase
     """
-    Neuron_spikes = (auto())
-    EIEIO_spikes = (auto())
-    Multi_spike = (auto())
-    Matrix = (auto())
-    Rewires = (auto())
+    NEURON_SPIKES = (auto())
+    EIEIO_SPIKES = (auto())
+    MULTI_SPIKES = (auto())
+    MATRIX = (auto())
+    REWIRES = (auto())
+    NOT_NEO = (auto())
 
     def __str__(self):
         return self.name
