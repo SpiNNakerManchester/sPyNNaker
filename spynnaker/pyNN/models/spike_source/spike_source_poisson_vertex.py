@@ -33,8 +33,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import MultiSpikeRecorder
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
-from spynnaker.pyNN.models.common import (
-    PopulationApplicationVertex, RecordingType)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.common import ParameterHolder
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
@@ -421,18 +420,6 @@ class SpikeSourcePoissonVertex(
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return SpynnakerDataView.get_simulation_time_step_us()
-
-    @overrides(PopulationApplicationVertex.get_recording_indices)
-    def get_recording_indices(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return range(self.n_atoms)
-
-    @overrides(PopulationApplicationVertex.get_recording_type)
-    def get_recording_type(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return RecordingType.BIT_FIELD
 
     @overrides(PopulationApplicationVertex.get_data_type)
     def get_data_type(self, name):

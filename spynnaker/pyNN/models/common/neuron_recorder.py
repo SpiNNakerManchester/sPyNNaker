@@ -24,8 +24,6 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-from .population_application_vertex import RecordingType
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -416,16 +414,6 @@ class NeuronRecorder(object):
         indexes = numpy.array(indexes)
         order = numpy.argsort(indexes)
         return pop_level_data[:, order]
-
-    def get_recorded_data_type(self, variable):
-        if variable in self.__bitfield_variables:
-            return RecordingType.BIT_FIELD
-        if variable in self.__events_per_core_variables:
-            return RecordingType.EVENT
-        if (variable in self.__sampling_rates or
-                variable in self.__per_timestep_variables):
-            return RecordingType.MATRIX
-        raise KeyError(f"This vertex cannot record {variable}")
 
     def get_data_type(self, variable):
         if variable in self.__per_timestep_variables:

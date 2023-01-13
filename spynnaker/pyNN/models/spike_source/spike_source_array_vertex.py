@@ -24,8 +24,7 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.common import (
-    PopulationApplicationVertex, RecordingType)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
@@ -321,18 +320,6 @@ class SpikeSourceArrayVertex(
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return SpynnakerDataView.get_simulation_time_step_us()
-
-    @overrides(PopulationApplicationVertex.get_recording_indices)
-    def get_recording_indices(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return range(self.n_atoms)
-
-    @overrides(PopulationApplicationVertex.get_recording_type)
-    def get_recording_type(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return RecordingType.BIT_FIELD
 
     @overrides(PopulationApplicationVertex.get_recording_region)
     def get_recording_region(self, name):

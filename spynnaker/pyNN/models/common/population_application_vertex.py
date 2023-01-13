@@ -21,14 +21,6 @@ from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
 from pacman.utilities.utility_calls import get_field_based_keys
 
 
-class RecordingType(Enum):
-    """ The type of data being recorded
-    """
-    BIT_FIELD = 0
-    MATRIX = 1
-    EVENT = 2
-
-
 class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     """ A vertex that can be used in a Population.
 
@@ -327,28 +319,6 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
             f"get_recording_variables")
-
-    def get_recording_indices(self, name):
-        """ Get the indices of the given variable that are being recorded
-
-        :rtype: list(int)
-        :raises KeyError: If the variable isn't being recorded
-        """
-        if self.get_recordable_variables() == []:
-            return []
-        raise NotImplementedError(
-            f"{type(self)} has recording variables so should implement "
-            f"get_recording_indice")
-
-    # NO LONGER USED
-    def get_recording_type(self, name):
-        """ Get the type of recording of the variable
-
-        :param str name: The name of the variable to get the type of
-        :rtype: RecordingType
-        :raise KeyError: If the variable isn't recordable
-        """
-        raise KeyError("This Population does not support recording")
 
     def get_data_type(self, name):
         """ Get the type data returned by a recording of the variable

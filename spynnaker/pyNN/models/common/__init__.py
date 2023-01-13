@@ -17,8 +17,7 @@ from .eieio_spike_recorder import EIEIOSpikeRecorder
 from .neuron_recorder import NeuronRecorder
 from .multi_spike_recorder import MultiSpikeRecorder
 from .parameter_holder import ParameterHolder
-from .population_application_vertex import (
-    PopulationApplicationVertex, RecordingType)
+from .population_application_vertex import PopulationApplicationVertex
 
 __all__ = ["EIEIOSpikeRecorder", "NeuronRecorder", "MultiSpikeRecorder",
-           "ParameterHolder", "PopulationApplicationVertex", "RecordingType"]
+           "ParameterHolder", "PopulationApplicationVertex"]

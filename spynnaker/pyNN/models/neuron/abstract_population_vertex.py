@@ -774,22 +774,6 @@ class AbstractPopulationVertex(
             return self.__synapse_recorder.get_sampling_interval(name)
         raise KeyError(f"It is not possible to record {name}")
 
-    @overrides(PopulationApplicationVertex.get_recording_indices)
-    def get_recording_indices(self, name):
-        if self.__neuron_recorder.is_recordable(name):
-            return self.__neuron_recorder.get_recorded_indices(self, name)
-        if self.__synapse_recorder.is_recordable(name):
-            return self.__synapse_recorder.get_recorded_indices(self, name)
-        raise KeyError(f"It is not possible to record {name}")
-
-    @overrides(PopulationApplicationVertex.get_recording_type)
-    def get_recording_type(self, name):
-        if self.__neuron_recorder.is_recordable(name):
-            return self.__neuron_recorder.get_recorded_data_type(name)
-        if self.__synapse_recorder.is_recordable(name):
-            return self.__synapse_recorder.get_recorded_data_type(name)
-        raise KeyError(f"It is not possible to record {name}")
-
     @overrides(PopulationApplicationVertex.get_data_type)
     def get_data_type(self, name):
         if self.__neuron_recorder.is_recordable(name):

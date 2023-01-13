@@ -22,8 +22,7 @@ from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-from spynnaker.pyNN.models.common import (
-    PopulationApplicationVertex, RecordingType)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -109,18 +108,6 @@ class SpikeInjectorVertex(
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return SpynnakerDataView.get_simulation_time_step_us()
-
-    @overrides(PopulationApplicationVertex.get_recording_indices)
-    def get_recording_indices(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return range(self.n_atoms)
-
-    @overrides(PopulationApplicationVertex.get_recording_type)
-    def get_recording_type(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return RecordingType.BIT_FIELD
 
     @overrides(PopulationApplicationVertex.get_data_type)
     def get_data_type(self, name):
