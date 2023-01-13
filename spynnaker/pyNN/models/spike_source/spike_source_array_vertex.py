@@ -22,7 +22,6 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
@@ -63,7 +62,6 @@ class SpikeSourceArrayVertex(
                  "__model",
                  "__structure",
                  "_spike_times",
-                 "__spike_recorder",
                  "__n_colour_bits"]
 
     SPIKE_RECORDING_REGION_ID = 0
@@ -93,8 +91,6 @@ class SpikeSourceArrayVertex(
             splitter=splitter)
 
         self._check_spike_density(spike_times)
-        # handle recording
-        self.__spike_recorder = EIEIOSpikeRecorder()
         # Do colouring
         self.__n_colour_bits = n_colour_bits
         if self.__n_colour_bits is None:

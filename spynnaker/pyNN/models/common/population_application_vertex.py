@@ -231,6 +231,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :type indices: list(int) or None
         :raises KeyError: if the variable cannot be recorded
         """
+        # pylint: disable=unused-argument
         if self.get_recordable_variables() == []:
             raise KeyError("This Population does not support recording")
         raise NotImplementedError(
@@ -246,6 +247,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :type indices: list(int) or None
         :raises KeyError: if the variable cannot be stopped from recording
         """
+        # pylint: disable=unused-argument
         if self.get_recordable_variables() == []:
             raise KeyError("This Population does not support recording")
         raise NotImplementedError(
@@ -336,6 +338,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :return: A list of the global raster IDs of the atoms in recording
             named variable within this slice
         """
+        # pylint: disable=unused-argument
         if name not in self.get_recordable_variables():
             raise KeyError(f"{name} is not being recorded")
         raise NotImplementedError(

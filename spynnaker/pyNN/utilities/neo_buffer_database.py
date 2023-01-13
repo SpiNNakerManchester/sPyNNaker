@@ -1375,10 +1375,12 @@ class NeoBufferDatabase(BufferDatabase):
     def write_metadata(self):
         with self.transaction() as cursor:
             for population in SpynnakerDataView.iterate_populations():
+                # pylint: disable=protected-access
                 for variable in population._vertex.get_recording_variables():
                     self.__write_metadata(cursor, population, variable)
 
     def __write_metadata(self, cursor, population, variable):
+        # pylint: disable=protected-access
         app_vertex = population._vertex
         buffered_data_type = \
             app_vertex.get_buffer_data_type(variable)
