@@ -33,7 +33,9 @@ CREATE TABLE IF NOT EXISTS recording (
     buffered_type TEXT NOT NULL,
     t_start float NOT NULL,
     sampling_interval_ms float,
-    units TEXT);
+    units TEXT,
+    atoms_shape TEXT,
+    n_colour_bits INT);
 
 CREATE UNIQUE INDEX IF NOT EXISTS recording_sanity
     ON recording(pop_id ASC, variable ASC);
@@ -59,7 +61,5 @@ CREATE TABLE IF NOT EXISTS region_metadata(
     recording_neurons_st TEXT,
     selective_recording BOOLEAN,
     base_key INT,
-    vertex_slice TEXT,
-    atoms_shape TEXT,
-    n_colour_bits INT);
+    vertex_slice TEXT);
 

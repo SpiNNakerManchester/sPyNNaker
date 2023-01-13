@@ -69,8 +69,11 @@ class NeoBufferDatabase(BufferDatabase):
         """
         if database_file is None:
             database_file = self.default_database_file()
+            read_only = False
+        else:
+            read_only = True
 
-        super().__init__(database_file)
+        super().__init__(database_file, read_only=read_only)
         with open(self.__NEO_DDL_FILE, encoding="utf-8") as f:
             sql = f.read()
 
@@ -196,7 +199,8 @@ class NeoBufferDatabase(BufferDatabase):
 
     def __get_recording_id(
             self, cursor, pop_label, variable, population,
-            sampling_interval_ms, data_type, buffered_type, units=None):
+            sampling_interval_ms, data_type, buffered_type, units,
+            atoms_shape, n_colour_bits):
         """
         Gets an id for this population and recording label combination.
 
@@ -238,10 +242,11 @@ class NeoBufferDatabase(BufferDatabase):
             """
             INSERT INTO recording
             (pop_id, variable, data_type, buffered_type, t_start,
-            sampling_interval_ms, units)
-            VALUES (?, ?, ?, ?, 0, ?, ?)
+            sampling_interval_ms, units, atoms_shape, n_colour_bits)
+            VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)
             """, (pop_id, variable, data_type_name, str(buffered_type),
-                  sampling_interval_ms, units))
+                  sampling_interval_ms, units, str(atoms_shape),
+                  n_colour_bits))
         return cursor.lastrowid
 
     def __get_population_metadata(self, cursor, pop_label):
@@ -1383,16 +1388,16 @@ class NeoBufferDatabase(BufferDatabase):
         buffered_data_type = \
             app_vertex.get_buffer_data_type(variable)
         units = app_vertex.get_units(variable)
+        atoms_shape = app_vertex.atoms_shape
+        n_colour_bits = app_vertex.n_colour_bits
         rec_id = self.__get_recording_id(
             cursor, app_vertex.label, variable,
             population, sampling_interval_ms, data_type,
-            buffered_data_type, units)
+            buffered_data_type, units, atoms_shape, n_colour_bits)
         region = app_vertex.get_recording_region(variable)
         machine_vertices = (
             app_vertex.splitter.machine_vertices_for_recording(
                 variable))
-        atoms_shape = app_vertex.atoms_shape
-        n_colour_bits = app_vertex.n_colour_bits
         for index, vertex in enumerate(machine_vertices):
             placement = SpynnakerDataView.get_placement_of_vertex(
                 vertex)
@@ -1416,12 +1421,11 @@ class NeoBufferDatabase(BufferDatabase):
                 """
                 INSERT INTO region_metadata
                 (rec_id, region_id, recording_neurons_st, selective_recording,
-                 base_key, vertex_slice, atoms_shape, n_colour_bits)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                 base_key, vertex_slice)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (rec_id, region_id, recording_neurons_st, selective_recording,
-                 base_key, str(vertex.vertex_slice),
-                 str(vertex.app_vertex.atoms_shape), n_colour_bits))
+                 base_key, str(vertex.vertex_slice)))
 
     @staticmethod
     def array_to_string(indexes):
