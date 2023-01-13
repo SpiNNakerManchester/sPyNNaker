@@ -761,11 +761,6 @@ class AbstractPopulationVertex(
             self.__neuron_recorder.is_recording(name) or
             self.__synapse_recorder.is_recording(name))
 
-    @overrides(PopulationApplicationVertex.write_recording_metadata)
-    def write_recording_metadata(self, population):
-        self.__neuron_recorder.write_recording_metadata(self, population)
-        self.__synapse_recorder.write_recording_metadata(self, population)
-
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
         with NeoBufferDatabase() as db:

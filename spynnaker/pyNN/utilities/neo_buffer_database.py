@@ -551,40 +551,6 @@ class NeoBufferDatabase(BufferDatabase):
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))], indexes
 
-    def write_spikes_metadata(self, vertex, variable, region, population,
-                              sampling_interval_ms, neurons):
-        """
-        Write the metadata to retrieve spikes based on just the data
-
-        :param MachineVertex vertex: vertex which will supply the data
-        :param str variable: name of the variable. typically "spikes"
-        :param int region: local region this vertex will write to
-        :param ~spynnaker.pyNN.models.populations.Population population:
-            the population to record for
-        :param float sampling_interval_ms:
-            The simulation time in ms between sampling.
-            Typically the sampling rate * simulation_timestep_ms
-        :param list(int) neurons: mapping of global neuron ids to local one
-            based on position in the list
-        """
-        with self.transaction() as cursor:
-            rec_id = self.__get_recording_id(
-                cursor, vertex.app_vertex.label, variable, population,
-                sampling_interval_ms, DataType.INT32,
-                RetrievalFunction.Neuron_spikes)
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            region_id = self._get_region_id(
-                cursor, placement.x, placement.y, placement.p, region)
-            recording_neurons_st = self.array_to_string(neurons)
-            selective_recording = (len(neurons) != vertex.vertex_slice.n_atoms)
-            cursor.execute(
-                """
-                INSERT INTO region_metadata
-                (rec_id, region_id, recording_neurons_st, selective_recording)
-                 VALUES (?, ?, ?, ?)
-                """,
-                (rec_id, region_id, recording_neurons_st, selective_recording))
-
     def __get_eieio_spike_by_region(
             self, cursor, region_id, simulation_time_step_ms, base_key,
             vertex_slice, atoms_shape, n_colour_bits, results):
@@ -666,45 +632,6 @@ class NeoBufferDatabase(BufferDatabase):
         result = numpy.vstack(results)
         return result[numpy.lexsort((result[:, 1], result[:, 0]))], indexes
 
-    def write_eieio_spikes_metadata(
-            self, vertex, variable, region, population, sampling_interval_ms,
-            base_key, n_colour_bits):
-        """
-
-         Write the metadata to retrieve spikes based on just the data
-
-        :param MachineVertex vertex: vertex which will supply the data
-        :param str variable: name of the variable. typically "spikes"
-        :param int region: local region this vertex will write to
-        :param ~spynnaker.pyNN.models.populations.Population population:
-            the population to record for
-        :param sampling_interval_ms:
-            the simulation time in ms between sampling.
-            Typically the sampling rate * simulation_timestep_ms
-        :type sampling_interval_ms: float or None
-        :param int base_key:base key to add to each spike index
-        :param int n_colour_bits:
-            The number of colour bits sent by this vertex.
-         """
-        with self.transaction() as cursor:
-            rec_id = self.__get_recording_id(
-                cursor, vertex.app_vertex.label, variable, population,
-                sampling_interval_ms, DataType.INT32,
-                RetrievalFunction.EIEIO_spikes)
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            region_id = self._get_region_id(
-                cursor, placement.x, placement.y, placement.p, region)
-
-            cursor.execute(
-                """
-                INSERT INTO region_metadata
-                (rec_id, region_id, base_key, vertex_slice, atoms_shape,
-                 n_colour_bits)
-                 VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (rec_id, region_id, base_key, str(vertex.vertex_slice),
-                 str(vertex.app_vertex.atoms_shape), n_colour_bits))
-
     def __get_multi_spikes_by_region(
             self, cursor, region_id, simulation_time_step_ms, vertex_slice,
             atoms_shape, spike_times, spike_ids):
@@ -783,39 +710,6 @@ class NeoBufferDatabase(BufferDatabase):
         spike_times = numpy.hstack(spike_times)
         result = numpy.dstack((spike_ids, spike_times))[0]
         return result[numpy.lexsort((spike_times, spike_ids))], indexes
-
-    def write_multi_spikes_metadata(
-            self, vertex, variable, region, population, sampling_interval_ms):
-        """
-        Write the metadata to retrieve spikes based on just the data
-
-        :param MachineVertex vertex: vertex which will supply the data
-        :param str variable: name of the variable. typically "spikes"
-        :param int region: local region this vertex will write to
-        :param ~spynnaker.pyNN.models.populations.Population population:
-            the population to record for
-        :param sampling_interval_ms:
-            The simulation time in ms between sampling.
-            Typically the sampling rate * simulation_timestep_ms
-        :type sampling_interval_ms: float or None
-        """
-        with self.transaction() as cursor:
-            rec_id = self.__get_recording_id(
-                cursor, vertex.app_vertex.label, variable, population,
-                sampling_interval_ms, DataType.INT32,
-                RetrievalFunction.Multi_spike)
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            region_id = self._get_region_id(
-                cursor, placement.x, placement.y, placement.p, region)
-
-            cursor.execute(
-                """
-                INSERT INTO region_metadata
-                (rec_id, region_id, vertex_slice, atoms_shape)
-                 VALUES (?, ?, ?, ?)
-                """,
-                (rec_id, region_id, str(vertex.vertex_slice),
-                 str(vertex.app_vertex.atoms_shape)))
 
     def __combine_indexes(self, view_indexes, data_indexes):
         # keep just the view indexes in the data
@@ -947,41 +841,6 @@ class NeoBufferDatabase(BufferDatabase):
 
         return signal_array, indexes
 
-    def write_matrix_metadata(self, vertex, variable, region, population,
-                              sampling_interval_ms, neurons, data_type):
-        """
-        Write the metadata to retrieve matrix data based on just the database
-
-        :param MachineVertex vertex: vertex which will supply the data
-        :param str variable: name of the variable.
-        :param int region: local region this vertex will write to
-        :param ~spynnaker.pyNN.models.populations.Population population:
-            the population to record for
-        :param sampling_interval_ms:
-            The simulation time in ms between sampling.
-            Typically the sampling rate * simulation_timestep_ms
-        :param list(int) neurons: mapping of global neuron ids to local one
-            based on position in the list
-        :param DataType data_type: type of data being recorded
-        """
-        if len(neurons) == 0:
-            return
-        with self.transaction() as cursor:
-            rec_id = self.__get_recording_id(
-                cursor, vertex.app_vertex.label, variable, population,
-                sampling_interval_ms, data_type, RetrievalFunction.Matrix,
-                vertex.app_vertex.get_units(variable))
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            region_id = self._get_region_id(
-                cursor, placement.x, placement.y, placement.p, region)
-            recording_neurons_st = self.array_to_string(neurons)
-            cursor.execute(
-                """
-                INSERT INTO region_metadata
-                (rec_id, region_id, recording_neurons_st)
-                 VALUES (?, ?, ?)
-                """, (rec_id, region_id, recording_neurons_st))
-
     def __get_rewires_by_region(
             self, cursor, region_id, vertex_slice, rewire_values,
             rewire_postids, rewire_preids, rewire_times):
@@ -1060,29 +919,6 @@ class NeoBufferDatabase(BufferDatabase):
             return result[numpy.lexsort(
                 (rewire_values, rewire_postids, rewire_preids, rewire_times))]
 
-    def write_rewires_metadata(self, vertex, variable, region, population):
-        """
-        Write the metadata to retrieve rewires data based on just the database
-
-        :param MachineVertex vertex: vertex which will supply the data
-        :param str variable: name of the variable.
-        :param int region: local region this vertex will write to
-        :param ~spynnaker.pyNN.models.populations.Population population:
-            the population to record for
-        """
-        with self.transaction() as cursor:
-            rec_id = self.__get_recording_id(
-                cursor, vertex.app_vertex.label, variable, population, None,
-                None, RetrievalFunction.Rewires)
-            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
-            region_id = self._get_region_id(
-                cursor, placement.x, placement.y, placement.p, region)
-            cursor.execute(
-                """
-                INSERT INTO region_metadata
-                (rec_id, region_id, vertex_slice)
-                 VALUES (?, ?, ?)
-                """, (rec_id, region_id, str(vertex.vertex_slice)))
 
     def get_data(self, pop_label, variable):
         """
@@ -1583,10 +1419,7 @@ class NeoBufferDatabase(BufferDatabase):
             neurons = app_vertex.get_neurons_recording(
                 variable, index, vertex_slice)
             if buffered_data_type == BufferDataType.EIEIO_spikes:
-                vertex.update_virtual_key()
-                base_key = vertex.virtual_key
-                if base_key is None:
-                    base_key = 0
+                base_key = vertex.get_virtual_key()
             else:
                 base_key = None
             recording_neurons_st = self.array_to_string(

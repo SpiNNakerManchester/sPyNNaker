@@ -215,6 +215,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         return False
 
+    # recording methods
+
+
     def get_recordable_variables(self):
         """ Get a list of the names and types of things that can be recorded
 
@@ -282,20 +285,6 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         raise KeyError("This Population does not support recording")
 
     # NO LONGER USED
-    def write_recording_metadata(self, population):
-        """
-        Writes the metatdata to get_recorded_data from NeoBufferedDatabase
-
-        If the get_recorded_data method uses NeoBufferDatabase thios method
-        must be implemented
-
-        If the data comes from the BufferExtractor than it can be skipped
-
-        :param ~spynnaker.pyNN.models.populations.Population population:
-            the population to record for
-        """
-
-    # NO LONGER USED
     def get_recorded_data(self, name):
         """ Get the data recorded for a given variable
 
@@ -354,6 +343,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     def get_neurons_recording(self, variable, index, vertex_slice):
         raise NotImplementedError(f"Unexpected call on {type(self)}")
+
+
 
     def inject(self, current_source, selector=None):
         """ Inject a current source into this population
