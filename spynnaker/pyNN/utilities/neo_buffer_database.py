@@ -1583,6 +1583,7 @@ class NeoBufferDatabase(BufferDatabase):
             neurons = app_vertex.get_neurons_recording(
                 variable, index, vertex_slice)
             if buffered_data_type == BufferDataType.EIEIO_spikes:
+                vertex.update_virtual_key()
                 base_key = vertex.virtual_key
                 if base_key is None:
                     base_key = 0
