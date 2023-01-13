@@ -221,15 +221,15 @@ class NeuronRecorder(object):
         split_array = numpy.array_split(existence, splits)
         return max([numpy.sum(s) for s in split_array])
 
-    def neurons_recording(self, variable, index, vertex_slice, atoms_shape):
+    def neurons_recording(self, variable, vertex_slice, atoms_shape):
         """
         :param str variable:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param tuple(int) atoms_shape:
-        :rtype: iterable(int)
+        :rtype: None or iterable(int)
         """
         if variable not in self.__sampling_rates:
-            return [index]
+            return None
         if self.__sampling_rates[variable] == 0:
             return []
         if self.__indexes[variable] is None:

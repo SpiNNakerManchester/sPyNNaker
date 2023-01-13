@@ -330,9 +330,13 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"get_recording_region")
 
-    def get_neurons_recording(self, variable, index, vertex_slice):
-        if self.get_recordable_variables() == []:
-            return []
+    def get_neurons_recording(self, name, vertex_slice):
+        """
+
+        :param variable:
+        :param vertex_slice:
+        :return:
+        """
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
             f"get_neurons_recording")

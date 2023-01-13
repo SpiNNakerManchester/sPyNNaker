@@ -776,6 +776,7 @@ class AbstractPopulationVertex(
             return self.__synapse_recorder.get_data_type(name)
         raise KeyError(f"It is not possible to record {name}")
 
+    @overrides(PopulationApplicationVertex.get_recording_region)
     def get_recording_region(self, name):
         if self.__neuron_recorder.is_recordable(name):
             return self.__neuron_recorder.get_region(name)
@@ -783,14 +784,15 @@ class AbstractPopulationVertex(
             return self.__synapse_recorder.get_region(name)
         raise KeyError(f"It is not possible to record {name}")
 
-    def get_neurons_recording(self, variable, index, vertex_slice):
-        if self.__neuron_recorder.is_recordable(variable):
+    @overrides(PopulationApplicationVertex.get_neurons_recording)
+    def get_neurons_recording(self, name, vertex_slice):
+        if self.__neuron_recorder.is_recordable(name):
             return self.__neuron_recorder.neurons_recording(
-                variable, index, vertex_slice, self.atoms_shape)
-        if self.__synapse_recorder.is_recordable(variable):
+                name, vertex_slice, self.atoms_shape)
+        if self.__synapse_recorder.is_recordable(name):
             return self.__synapse_recorder.neurons_recording(
-                variable, index, vertex_slice, self.atoms_shape)
-        raise KeyError(f"It is not possible to record {variable}")
+                name, vertex_slice, self.atoms_shape)
+        raise KeyError(f"It is not possible to record {name}")
 
     @property
     def weight_scale(self):

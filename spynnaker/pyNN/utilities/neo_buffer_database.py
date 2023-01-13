@@ -1417,7 +1417,9 @@ class NeoBufferDatabase(BufferDatabase):
                 region)
             vertex_slice = vertex.vertex_slice
             neurons = app_vertex.get_neurons_recording(
-                variable, index, vertex_slice)
+                variable, vertex_slice)
+            if neurons is None:
+                neurons = [index]
             if buffered_data_type == BufferDataType.EIEIO_spikes:
                 base_key = vertex.get_virtual_key()
             else:
