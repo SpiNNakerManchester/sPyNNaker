@@ -287,16 +287,6 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"get_recording_variables")
 
-    # NO LONGER USED
-    def get_recorded_data(self, name):
-        """ Get the data recorded for a given variable
-
-        :param str name: The name of the variable recorded
-        :rtype: ndarray
-        :raises KeyError: if the variable isn't being recorded
-        """
-        raise KeyError("This Population does not support recording")
-
     def get_buffer_data_type(self, name):
         """ Get the data recorded for a given variable
 

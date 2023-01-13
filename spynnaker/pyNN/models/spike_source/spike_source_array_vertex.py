@@ -27,7 +27,6 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.models.common import ParameterHolder
 from .spike_source_array_machine_vertex import SpikeSourceArrayMachineVertex
@@ -309,11 +308,6 @@ class SpikeSourceArrayVertex(
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return self._is_recording
-
-    @overrides(PopulationApplicationVertex.get_recorded_data)
-    def get_recorded_data(self, name):
-        with NeoBufferDatabase() as db:
-            return db.get_data(self.label, name)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):

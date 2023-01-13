@@ -63,7 +63,6 @@ from spynnaker.pyNN.models.common import (
 from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from .population_machine_neurons import PopulationMachineNeurons
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
@@ -760,11 +759,6 @@ class AbstractPopulationVertex(
         return (
             self.__neuron_recorder.is_recording(name) or
             self.__synapse_recorder.is_recording(name))
-
-    @overrides(PopulationApplicationVertex.get_recorded_data)
-    def get_recorded_data(self, name):
-        with NeoBufferDatabase() as db:
-            return db.get_data(self.label, name)
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):

@@ -21,7 +21,6 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -98,12 +97,6 @@ class SpikeInjectorVertex(
         self.enable_recording(False)
         self.__spike_recorder.record = False
 
-    @overrides(PopulationApplicationVertex.get_recorded_data)
-    def get_recorded_data(self, name):
-        with NeoBufferDatabase() as db:
-            return db.get_data(self.label, name)
-
-    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
