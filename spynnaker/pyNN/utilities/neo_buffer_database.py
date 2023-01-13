@@ -907,7 +907,6 @@ class NeoBufferDatabase(BufferDatabase):
             return result[numpy.lexsort(
                 (rewire_values, rewire_postids, rewire_preids, rewire_times))]
 
-
     def get_data(self, pop_label, variable):
         """
         Gets the data as a Numpy array for one population and variable

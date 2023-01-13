@@ -18,7 +18,6 @@ from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
 from pacman.utilities.utility_calls import get_field_based_keys
-from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 
 
 class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):

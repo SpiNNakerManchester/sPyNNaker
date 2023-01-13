@@ -17,6 +17,7 @@ import logging
 import math
 import numpy
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
