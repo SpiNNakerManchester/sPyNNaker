@@ -16,8 +16,6 @@
 import logging
 import struct
 from spinn_utilities.log import FormatAdapter
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")

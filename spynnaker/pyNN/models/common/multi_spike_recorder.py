@@ -21,8 +21,6 @@ from spinn_utilities.log import FormatAdapter
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
