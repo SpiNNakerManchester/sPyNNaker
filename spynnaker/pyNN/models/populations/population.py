@@ -160,7 +160,7 @@ class Population(PopulationBase):
         :param str variable: The variable to answer the question about
         :rtype: bool
         """
-        return self.__vertex.can_record(variable)
+        return variable in self.__vertex.get_recordable_variables(variable)
 
     @overrides(PopulationBase.record, extend_doc=False)
     def record(self, variables, to_file=None, sampling_interval=None):

@@ -12,13 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from enum import Enum
 from spinn_utilities.overrides import overrides
 from spinn_utilities.helpful_functions import is_singleton
 from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
 from pacman.utilities.utility_calls import get_field_based_keys
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 
 
 class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
@@ -208,27 +208,17 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         return False
 
     # recording methods
-    # If get_recordable_variables all other recording methods must be too
+    # If get_recordable_variables implemented other recording methods must
+    # be too
 
     def get_recordable_variables(self):
         """ Get a list of the names and types of things that can be recorded
 
+        This methods list the variable recorded via the Population
+
         :rtype: list(str)
         """
         return []
-
-    def can_record(self, name):
-        """ Determine if the given variable can be recorded.
-
-        :param str name: The name of the variable to test
-        :rtype: bool
-        """
-        # pylint: disable=unused-argument
-        if self.get_recordable_variables == []:
-            return False
-        raise NotImplementedError(
-            f"{type(self)} has recording variables so should implement "
-            f"can_record")
 
     def set_recording(self, name, sampling_interval=None, indices=None):
         """ Set a variable recording
@@ -242,7 +232,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :type indices: list(int) or None
         :raises KeyError: if the variable cannot be recorded
         """
-        if self.get_recordable_variables == []:
+        if self.get_recordable_variables() == []:
             raise KeyError("This Population does not support recording")
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
@@ -257,7 +247,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         :type indices: list(int) or None
         :raises KeyError: if the variable cannot be stopped from recording
         """
-        if self.get_recordable_variables == []:
+        if self.get_recordable_variables() == []:
             raise KeyError("This Population does not support recording")
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
@@ -274,38 +264,33 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"{type(self)} has recording variables so should implement "
             f"get_recording_variables")
 
-    def is_recording_variable(self, name):
-        """ Indicate whether the given variable is being recorded
-
-        :param str name: The name of the variable to check the status of
-        :rtype: bool
-        :raises KeyError: if the variable is not supported
-        """
-        if self.get_recordable_variables() == []:
-            return []
-        raise NotImplementedError(
-            f"{type(self)} has recording variables so should implement "
-            f"get_recording_variables")
-
     def get_buffer_data_type(self, name):
-        """ Get the data recorded for a given variable
+        """ Get the type of data recorded by the buffer manager
+
+        The BufferDatabase value controls how data returned by the cores is
+        handled in NeoBufferDatabase
 
         :param str name: The name of the variable recorded
         :rtype: ~spynnaker.pyNN.utilities.neo_buffer_database.BufferDatabase
         :raises KeyError: if the variable isn't being recorded
         """
+        if name not in self.get_recordable_variables():
+            raise KeyError(f"{name} is not being recorded")
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
             f"get_recording_variables")
 
-    def get_recording_sampling_interval(self, name):
+    def get_sampling_interval_ms(self, name):
         """ Get the sampling interval of the recording for the given variable
+
+        The values is in ms and unless selective recording is used will be
+        SpynnakerDataView.get_simulation_time_step_us()
 
         :rtype: float
         :raises KeyError: If the variable isn't being recorded
         """
-        if self.get_recordable_variables() == []:
-            return []
+        if name not in self.get_recordable_variables():
+            raise KeyError(f"{name} is not being recorded")
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
             f"get_recording_variables")
@@ -313,30 +298,47 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     def get_data_type(self, name):
         """ Get the type data returned by a recording of the variable
 
+        This is the type of data the C code is returning.
+        For instance dta such as spikes this will be None
+
         :param str name: The name of the variable to get the type of
-        :rtype: RecordingType
+        :rtype: ~data_specification.enums.DataType or None
         :raise KeyError: If the variable isn't recordable
         """
-        if self.get_recordable_variables() == []:
-            return []
+        if name not in self.get_recordable_variables():
+            raise KeyError(f"{name} is not being recorded")
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
             f"get_data_type")
 
     def get_recording_region(self, name):
-        if self.get_recordable_variables() == []:
-            return []
+        """
+        Gets the recording region for the named variable
+
+        :param str name: The name of the variable to get the region of
+        :rtype: int
+        :raises KeyError: If the variable isn't being recorded
+        """
+        if name not in self.get_recordable_variables():
+            raise KeyError(f"{name} is not being recorded")
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
             f"get_recording_region")
 
     def get_neurons_recording(self, name, vertex_slice):
         """
+        Gets the neurons being recorded on the core with this slice
 
-        :param variable:
+        Typically vertex_slice.get_raster_ids(atoms_shape)
+        But may be a sublist if doing selective recording
+
+        :param str name: The name of the variable to get the region of
         :param vertex_slice:
-        :return:
+        :return: A list of the global raster IDs of the atoms in recording
+            named variable within this slice
         """
+        if name not in self.get_recordable_variables():
+            raise KeyError(f"{name} is not being recorded")
         raise NotImplementedError(
             f"{type(self)} has recording variables so should implement "
             f"get_neurons_recording")

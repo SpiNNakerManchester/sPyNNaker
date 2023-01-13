@@ -217,7 +217,7 @@ class PopulationView(PopulationBase):
 
         :rtype: bool
         """
-        return self.__vertex.can_record(variable)
+        return variable in self.__vertex.get_recordable_variables()
 
     @property
     def conductance_based(self):

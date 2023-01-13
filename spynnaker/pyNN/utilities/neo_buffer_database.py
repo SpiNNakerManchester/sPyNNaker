@@ -15,7 +15,6 @@
 
 from collections import defaultdict
 from datetime import datetime
-from enum import (auto, Enum)
 import logging
 import math
 import neo
@@ -1384,12 +1383,10 @@ class NeoBufferDatabase(BufferDatabase):
         app_vertex = population._vertex
         buffered_data_type = \
             app_vertex.get_buffer_data_type(variable)
-        if buffered_data_type == BufferDataType.NOT_NEO:
-            return
 
         data_type = app_vertex.get_data_type(variable)
         sampling_interval_ms = \
-            app_vertex.get_recording_sampling_interval(variable)
+            app_vertex.get_sampling_interval_ms(variable)
 
         units = app_vertex.get_units(variable)
         atoms_shape = app_vertex.atoms_shape

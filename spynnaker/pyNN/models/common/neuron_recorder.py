@@ -344,7 +344,7 @@ class NeuronRecorder(object):
             return range(application_vertex.n_atoms)
         return self.__indexes[variable]
 
-    def get_sampling_interval(self, variable):
+    def get_sampling_interval_ms(self, variable):
         """ Get the sampling interval of a variable
 
         :param str variable: The variable to get the sampling interval of
@@ -419,7 +419,7 @@ class NeuronRecorder(object):
         if variable in self.__per_timestep_variables:
             return self.__per_timestep_datatypes[variable]
         if variable in self.__data_types:
-                return self.__data_types[variable]
+            return self.__data_types[variable]
         return None
 
     def get_recordable_variables(self):

@@ -707,24 +707,13 @@ class AbstractPopulationVertex(
         variables.extend(self.__synapse_recorder.get_recordable_variables())
         return variables
 
-    def get_sampling_interval_ms(self, name):
-        if self.__neuron_recorder.is_recordable(name):
-            return self.__neuron_recorder.get_sampling_interval(name)
-        if self.__synapse_recorder.is_recordable(name):
-            return self.__synapse_recorder.get_sampling_interval(name)
-        raise KeyError(f"It is not possible to record {name}")
-
+    @overrides(PopulationApplicationVertex.get_buffer_data_type)
     def get_buffer_data_type(self, name):
         if self.__neuron_recorder.is_recordable(name):
             return self.__neuron_recorder.get_buffer_data_type(name)
         if self.__synapse_recorder.is_recordable(name):
             return self.__synapse_recorder.get_buffer_data_type(name)
         raise KeyError(f"It is not possible to record {name}")
-
-    @overrides(PopulationApplicationVertex.can_record)
-    def can_record(self, name):
-        return (self.__neuron_recorder.is_recordable(name) or
-                self.__synapse_recorder.is_recordable(name))
 
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(self, name, sampling_interval=None, indices=None):
@@ -754,18 +743,12 @@ class AbstractPopulationVertex(
         recording.extend(self.__synapse_recorder.recording_variables)
         return recording
 
-    @overrides(PopulationApplicationVertex.is_recording_variable)
-    def is_recording_variable(self, name):
-        return (
-            self.__neuron_recorder.is_recording(name) or
-            self.__synapse_recorder.is_recording(name))
-
-    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
-    def get_recording_sampling_interval(self, name):
+    @overrides(PopulationApplicationVertex.get_sampling_interval_ms)
+    def get_sampling_interval_ms(self, name):
         if self.__neuron_recorder.is_recordable(name):
-            return self.__neuron_recorder.get_sampling_interval(name)
+            return self.__neuron_recorder.get_sampling_interval_ms(name)
         if self.__synapse_recorder.is_recordable(name):
-            return self.__synapse_recorder.get_sampling_interval(name)
+            return self.__synapse_recorder.get_sampling_interval_ms(name)
         raise KeyError(f"It is not possible to record {name}")
 
     @overrides(PopulationApplicationVertex.get_data_type)

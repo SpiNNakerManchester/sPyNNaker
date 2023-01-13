@@ -58,10 +58,6 @@ class SpikeInjectorVertex(
     def get_recordable_variables(self):
         return ["spikes"]
 
-    @overrides(PopulationApplicationVertex.can_record)
-    def can_record(self, name):
-        return name == "spikes"
-
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(self, name, sampling_interval=None, indices=None):
         if name != "spikes":
@@ -81,12 +77,6 @@ class SpikeInjectorVertex(
             return ["spikes"]
         return []
 
-    @overrides(PopulationApplicationVertex.is_recording_variable)
-    def is_recording_variable(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self.__spike_recorder.record
-
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name, indices=None):
         if name != "spikes":
@@ -97,7 +87,8 @@ class SpikeInjectorVertex(
         self.enable_recording(False)
         self.__spike_recorder.record = False
 
-    def get_recording_sampling_interval(self, name):
+    @overrides(PopulationApplicationVertex.get_sampling_interval_ms)
+    def get_sampling_interval_ms(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return SpynnakerDataView.get_simulation_time_step_us()

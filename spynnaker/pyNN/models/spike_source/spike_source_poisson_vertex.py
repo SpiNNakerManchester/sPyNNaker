@@ -360,10 +360,6 @@ class SpikeSourcePoissonVertex(
     def get_recordable_variables(self):
         return ["spikes"]
 
-    @overrides(PopulationApplicationVertex.can_record)
-    def can_record(self, name):
-        return name == "spikes"
-
     def get_buffer_data_type(self, name):
         if name == "spikes":
             return BufferDataType.MULTI_SPIKES
@@ -394,12 +390,6 @@ class SpikeSourcePoissonVertex(
             return ["spikes"]
         return []
 
-    @overrides(PopulationApplicationVertex.is_recording_variable)
-    def is_recording_variable(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self.__spike_recorder.record
-
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name, indices=None):
         if name != "spikes":
@@ -409,8 +399,8 @@ class SpikeSourcePoissonVertex(
                            "SpikeSourceArray so being ignored")
         self.__spike_recorder.record = False
 
-    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
-    def get_recording_sampling_interval(self, name):
+    @overrides(PopulationApplicationVertex.get_sampling_interval_ms)
+    def get_sampling_interval_ms(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return SpynnakerDataView.get_simulation_time_step_us()
