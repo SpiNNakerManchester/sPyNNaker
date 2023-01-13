@@ -441,7 +441,8 @@ class NeoBufferDatabase(BufferDatabase):
         for row in cursor.execute(
                 """
                 SELECT rec_id,  data_type, buffered_type,  t_start,
-                       sampling_interval_ms, first_id, pop_size, units
+                       sampling_interval_ms, first_id, pop_size, units, 
+                       atoms_shape, n_colour_bits
                 FROM recording_view
                 WHERE label = ? AND variable = ?
                 LIMIT 1
@@ -456,9 +457,10 @@ class NeoBufferDatabase(BufferDatabase):
             else:
                 units = None
             buffered_type = BufferDataType[str(row["buffered_type"], 'utf-8')]
+            atoms_shape = self.string_to_array(row["atoms_shape"])
             return (row["rec_id"], data_type, buffered_type, row["t_start"],
                     row["sampling_interval_ms"], row["first_id"],
-                    row["pop_size"], units)
+                    row["pop_size"], units, atoms_shape, row["n_colour_bits"])
         raise ConfigurationException(
             f"No metadata for {variable} on {pop_label}")
 
@@ -551,6 +553,7 @@ class NeoBufferDatabase(BufferDatabase):
         :param int base_key:
         :param Slice vertex_slice:
         :param tuple(int) atoms_shape:
+        :param int n_colour_bits
         :return: all recording indexes spikes or not
         :rtype: list(int)
         """
@@ -586,12 +589,14 @@ class NeoBufferDatabase(BufferDatabase):
 
         return slice_ids
 
-    def __get_eieio_spikes(self, cursor, rec_id):
+    def __get_eieio_spikes(self, cursor, rec_id, atoms_shape, n_colour_bits):
         """
         Gets the spikes for this population/recording id
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
+        :param tuple(int) atoms_shape:
+        :param int n_colour_bits
         :return: numpy array of spike ids and spike times, all ids recording
         :rtype  ~numpy.ndarray, lis(int)
         """
@@ -601,19 +606,17 @@ class NeoBufferDatabase(BufferDatabase):
 
         rows = list(cursor.execute(
             """
-            SELECT region_id, base_key, vertex_slice, atoms_shape,
-                   n_colour_bits
+            SELECT region_id, base_key, vertex_slice
             FROM region_metadata
             WHERE rec_id = ?
             """, [rec_id]))
 
         for row in rows:
             vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
-            atoms_shape = self.string_to_array(row["atoms_shape"])
             indexes.extend(self.__get_eieio_spike_by_region(
                 cursor, row["region_id"], simulation_time_step_ms,
                 row["base_key"], vertex_slice, atoms_shape,
-                row["n_colour_bits"], results))
+                n_colour_bits, results))
 
         if not results:
             return numpy.empty(shape=(0, 2)), indexes
@@ -711,11 +714,17 @@ class NeoBufferDatabase(BufferDatabase):
             logger.warning(f"No data available for neurons {missing_list}")
         return indexes
 
-    def __get_spikes(self, cursor, rec_id, view_indexes, buffer_type):
+    def __get_spikes(self, cursor, rec_id, view_indexes, buffer_type,
+                     atoms_shape, n_colour_bits):
         """
         Gets the data as a Numpy array for one opulation and variable
 
         :param ~sqlite3.Cursor cursor:
+        :param int rec_id:
+        :param list(int) view_indexes:
+        :param buffer_type:
+        :param tuple(int) atoms_shape:
+        :param int n_colour_bits
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
@@ -723,7 +732,8 @@ class NeoBufferDatabase(BufferDatabase):
         if buffer_type == BufferDataType.NEURON_SPIKES:
             spikes, data_indexes = self.__get_neuron_spikes(cursor, rec_id)
         elif buffer_type == BufferDataType.EIEIO_SPIKES:
-            spikes, data_indexes = self.__get_eieio_spikes(cursor, rec_id)
+            spikes, data_indexes = self.__get_eieio_spikes(
+                cursor, rec_id, atoms_shape, n_colour_bits)
         elif buffer_type == BufferDataType.MULTI_SPIKES:
             spikes, data_indexes = self.__get_multi_spikes(cursor, rec_id)
         else:
@@ -926,8 +936,8 @@ class NeoBufferDatabase(BufferDatabase):
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
             (rec_id, data_type, buffered_type, _, sampling_interval_ms,
-             _, pop_size, _) = self.__get_recording_metadeta(
-                cursor, pop_label, variable)
+             _, pop_size, _, atoms_shape, n_colour_bits) = \
+                self.__get_recording_metadeta(cursor, pop_label, variable)
             view_indexes = range(pop_size)
 
             if buffered_type == BufferDataType.MATRIX:
@@ -938,7 +948,8 @@ class NeoBufferDatabase(BufferDatabase):
                 return self.__get_rewires(cursor, rec_id)
             else:
                 return self.__get_spikes(
-                    cursor, rec_id, view_indexes, buffered_type)[0]
+                    cursor, rec_id, view_indexes, buffered_type,
+                    atoms_shape, n_colour_bits)[0]
 
     def __get_recorded_pynn7(
             self, cursor, rec_id, data_type, sampling_interval_ms,
@@ -978,8 +989,8 @@ class NeoBufferDatabase(BufferDatabase):
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
             (rec_id, data_type, buffered_type, _, sampling_interval_ms,
-             _, pop_size, _) = self.__get_recording_metadeta(
-                cursor, pop_label, variable)
+             _, pop_size, _, atoms_shape, n_colour_bits) = \
+                self.__get_recording_metadeta(cursor, pop_label, variable)
             if view_indexes is None:
                 view_indexes = range(pop_size)
 
@@ -992,21 +1003,23 @@ class NeoBufferDatabase(BufferDatabase):
                 if as_matrix:
                     logger.warning(f"Ignoring as matrix for {variable}")
                 return self.__get_spikes(
-                    cursor, rec_id, view_indexes, buffered_type)[0]
+                    cursor, rec_id, view_indexes, buffered_type, atoms_shape,
+                    n_colour_bits)[0]
 
     def get_spike_counts(self, pop_label, view_indexes=None):
         with self.transaction() as cursor:
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
             (rec_id, _, buffered_type, _, _,
-             _, pop_size, _) = self.__get_recording_metadeta(
-                cursor, pop_label, SPIKES)
+             _, pop_size, _, atoms_shape, n_colour_bits) = \
+                self.__get_recording_metadeta(cursor, pop_label, SPIKES)
             if view_indexes is None:
                 view_indexes = range(pop_size)
 
             # get_spike will go boom if buffered_type not spikes
             spikes = self.__get_spikes(
-                    cursor, rec_id, view_indexes, buffered_type)[0]
+                cursor, rec_id, view_indexes, buffered_type, atoms_shape,
+                n_colour_bits)[0]
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=pop_size)
         return {i: counts[i] for i in view_indexes}
@@ -1191,8 +1204,8 @@ class NeoBufferDatabase(BufferDatabase):
             If the recording metadata not setup correctly
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
-         first_id, pop_size, units) = self.__get_recording_metadeta(
-            cursor, pop_label, variable)
+         first_id, pop_size, units, atoms_shape, n_colour_bits) = \
+            self.__get_recording_metadeta(cursor, pop_label, variable)
 
         if view_indexes is None:
             view_indexes = range(pop_size)
@@ -1209,7 +1222,8 @@ class NeoBufferDatabase(BufferDatabase):
             self.__add_neo_events(segment, event_array, variable, t_start)
         else:
             spikes, indexes = self.__get_spikes(
-                cursor, rec_id, view_indexes, buffer_type)
+                cursor, rec_id, view_indexes, buffer_type, atoms_shape,
+                n_colour_bits)
             self.__add_spike_data(
                 pop_label, view_indexes, segment, spikes, t_start, t_stop,
                 sampling_interval_ms, first_id)
