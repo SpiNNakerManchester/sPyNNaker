@@ -34,6 +34,7 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKES
 
@@ -796,15 +797,18 @@ class NeoBufferDatabase(BufferDatabase):
 
         return times, placement_data
 
-    def __get_matrix_data(self, cursor, rec_id, data_type, view_indexes):
+    def __get_matrix_data(
+            self, cursor, rec_id, data_type, view_indexes, pop_size):
         """
         Gets the matrix data  for this population/recording id
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :param DataType data_type: type of data to extract
-        :param  list(int) view_indexes:
-            The indexes for which data should be returned.
+        :param view_indexes:
+            The indexes for which data should be returned. Or None for all
+        :type view_indexes: list(int) or None
+        :param int pop_size:
         :return: numpy array of the data, neurons
         :rtype: tuple(~numpy.ndarray, list(int))
         """
@@ -830,13 +834,20 @@ class NeoBufferDatabase(BufferDatabase):
                     signal_array, data, axis=1)
             else:
                 raise NotImplementedError("times differ")
-        data_indexes = numpy.array(pop_neurons)
         if signal_array is None:
             signal_array = []
 
         if len(indexes) > 0:
             assert(len(pop_neurons) == 0)
-        elif list(view_indexes) == list(data_indexes):
+            if view_indexes is not None:
+                raise SpynnakerException(
+                    "data can not be extracted using a view")
+            return signal_array, indexes
+
+        data_indexes = numpy.array(pop_neurons)
+        if view_indexes is None:
+            view_indexes = range(pop_size)
+        if list(view_indexes) == list(data_indexes):
             indexes = numpy.array(data_indexes)
         else:
             # keep just the view indexes in the data
@@ -919,51 +930,24 @@ class NeoBufferDatabase(BufferDatabase):
             return result[numpy.lexsort(
                 (rewire_values, rewire_postids, rewire_preids, rewire_times))]
 
-    def get_data(self, pop_label, variable):
-        """
-        Gets the data as a Numpy array for one population and variable
-
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
-                duplicate values
-
-        :param str variable: name of variable to get data for
-        :return: a numpy array with data or this variable
-        :rtype  ~numpy.ndarray
-        """
-        with self.transaction() as cursor:
-            # called to trigger the virtual data warning if applicable
-            self.__get_segment_info(cursor)
-            (rec_id, data_type, buffered_type, _, sampling_interval_ms,
-             _, pop_size, _, atoms_shape, n_colour_bits) = \
-                self.__get_recording_metadeta(cursor, pop_label, variable)
-            view_indexes = range(pop_size)
-
-            if buffered_type == BufferDataType.MATRIX:
-                data, indexes = self.__get_matrix_data(
-                    cursor, rec_id, data_type, view_indexes)
-                return data, indexes, sampling_interval_ms
-            elif buffered_type == BufferDataType.REWIRES:
-                return self.__get_rewires(cursor, rec_id)
-            else:
-                return self.__get_spikes(
-                    cursor, rec_id, view_indexes, buffered_type,
-                    atoms_shape, n_colour_bits)[0]
-
     def __get_recorded_pynn7(
             self, cursor, rec_id, data_type, sampling_interval_ms,
-            as_matrix, view_indexes):
+            as_matrix, view_indexes, pop_size):
         """ Get recorded data in PyNN 0.7 format. Must not be spikes.
 
-        :param list(int) view_indexes:
-            The indexes for which data should be returned.
+        :param ~sqlite3.Cursor cursor:
+        :param int rec_id:
+        :param DataType data_type: type of data to extract
+        :param float sampling_interval_ms:
+        :param bool as_matrix:
+        :param view_indexes:
+            The indexes for which data should be returned. Or None for all
+        :type view_indexes: list(int) or None
+        :param int pop_size:
         :rtype: ~numpy.ndarray
         """
         data, indexes = self.__get_matrix_data(
-            cursor, rec_id, data_type, view_indexes)
+            cursor, rec_id, data_type, view_indexes, pop_size)
 
         if as_matrix:
             return data
@@ -993,13 +977,10 @@ class NeoBufferDatabase(BufferDatabase):
             (rec_id, data_type, buffered_type, _, sampling_interval_ms,
              _, pop_size, _, atoms_shape, n_colour_bits) = \
                 self.__get_recording_metadeta(cursor, pop_label, variable)
-            if view_indexes is None:
-                view_indexes = range(pop_size)
-
             if buffered_type == BufferDataType.MATRIX:
                 return self.__get_recorded_pynn7(
                     cursor, rec_id, data_type, sampling_interval_ms,
-                    as_matrix, view_indexes)
+                    as_matrix, view_indexes, pop_size)
             # NO BufferedDataType.REWIRES get_spike will go boom
             else:
                 if as_matrix:
@@ -1209,22 +1190,24 @@ class NeoBufferDatabase(BufferDatabase):
          first_id, pop_size, units, atoms_shape, n_colour_bits) = \
             self.__get_recording_metadeta(cursor, pop_label, variable)
 
-        if view_indexes is None:
-            view_indexes = range(pop_size)
-
         if buffer_type == BufferDataType.MATRIX:
             signal_array, indexes = self.__get_matrix_data(
-                cursor, rec_id, data_type, view_indexes)
+                cursor, rec_id, data_type, view_indexes, pop_size)
             self.__add_matix_data(
                 pop_label, variable, block, segment, signal_array,
                 indexes, t_start, sampling_interval_ms,
                 units, first_id)
         elif buffer_type == BufferDataType.REWIRES:
+            if view_indexes is not None:
+                raise SpynnakerException(
+                    f"{variable} can not be extracted using a view")
             event_array = self.__get_rewires(cursor, rec_id)
             self.__add_neo_events(segment, event_array, variable, t_start)
         else:
+            if view_indexes is None:
+                view_indexes = range(pop_size)
             spikes, indexes = self.__get_spikes(
-                cursor, rec_id, view_indexes, buffer_type, atoms_shape,
+            cursor, rec_id, view_indexes, buffer_type, atoms_shape,
                 n_colour_bits)
             self.__add_spike_data(
                 pop_label, view_indexes, segment, spikes, t_start, t_stop,
