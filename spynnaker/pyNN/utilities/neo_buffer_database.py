@@ -478,14 +478,22 @@ class NeoBufferDatabase(BufferDatabase):
             SELECT region_id, recording_neurons_st, vertex_slice, base_key
             FROM region_metadata
             WHERE rec_id = ?
+            ORDER BY region_metadata_id
             """, [rec_id]))
+        index = 0
         for row in rows:
-            neurons = numpy.array(self.string_to_array(
-                row["recording_neurons_st"]))
             vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
-            selective_recording = len(neurons) != vertex_slice.n_atoms
+            recording_neurons_st = row["recording_neurons_st"]
+            if recording_neurons_st:
+                neurons = numpy.array(self.string_to_array(
+                    recording_neurons_st))
+                selective_recording = len(neurons) != vertex_slice.n_atoms
+            else:
+                selective_recording = None
+                neurons = None
             yield (row["region_id"], neurons, vertex_slice,
-                   selective_recording, row["base_key"])
+                   selective_recording, row["base_key"], index)
+            index += 1
 
     def __get_spikes_by_region(
             self, cursor, region_id, neurons, simulation_time_step_ms,
@@ -546,7 +554,7 @@ class NeoBufferDatabase(BufferDatabase):
         spike_ids = list()
         simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
         indexes = []
-        for region_id, neurons, _, selective_recording, _ in \
+        for region_id, neurons, _, selective_recording, _, _ in \
                 self.__get_region_metadata(cursor, rec_id):
             indexes.extend(neurons)
             self.__get_spikes_by_region(
@@ -619,7 +627,7 @@ class NeoBufferDatabase(BufferDatabase):
         results = []
         indexes = []
 
-        for region_id, _, vertex_slice, selective_recording, base_key in \
+        for region_id, _, vertex_slice, selective_recording, base_key, _ in \
                 self.__get_region_metadata(cursor, rec_id):
             if selective_recording:
                 raise NotImplementedError(
@@ -686,7 +694,7 @@ class NeoBufferDatabase(BufferDatabase):
         spike_ids = list()
         indexes = []
         simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
-        for region_id, neurons, vertex_slice, selective_recording, _ in \
+        for region_id, neurons, vertex_slice, selective_recording, _, _ in \
                 self.__get_region_metadata(cursor, rec_id):
             if selective_recording:
                 raise NotImplementedError(
@@ -803,13 +811,17 @@ class NeoBufferDatabase(BufferDatabase):
         signal_array = None
         pop_times = None
         pop_neurons = []
+        indexes = []
 
-        for region_id, neurons, _, _, __ in \
+        for region_id, neurons, _, _, _, index in \
                 self.__get_region_metadata(cursor, rec_id):
+            if neurons is not None:
+                pop_neurons.extend(neurons)
+            else:
+                indexes.append(index)
+                neurons = [index]
             times, data = self.__get_matrix_data_by_region(
                 cursor, region_id, neurons, data_type)
-
-            pop_neurons.extend(neurons)
             if signal_array is None:
                 signal_array = data
                 pop_times = times
@@ -822,7 +834,9 @@ class NeoBufferDatabase(BufferDatabase):
         if signal_array is None:
             signal_array = []
 
-        if list(view_indexes) == list(data_indexes):
+        if len(indexes) > 0:
+            assert(len(pop_neurons) == 0)
+        elif list(view_indexes) == list(data_indexes):
             indexes = numpy.array(data_indexes)
         else:
             # keep just the view indexes in the data
@@ -889,7 +903,7 @@ class NeoBufferDatabase(BufferDatabase):
         rewire_postids = list()
         rewire_preids = list()
 
-        for region_id, _, vertex_slice, _, _ in \
+        for region_id, _, vertex_slice, _, _, _ in \
                 self.__get_region_metadata(cursor, rec_id):
             # as no neurons for "rewires" selective_recording will be true
 
@@ -1402,7 +1416,7 @@ class NeoBufferDatabase(BufferDatabase):
         machine_vertices = (
             app_vertex.splitter.machine_vertices_for_recording(
                 variable))
-        for index, vertex in enumerate(machine_vertices):
+        for vertex in machine_vertices:
             placement = SpynnakerDataView.get_placement_of_vertex(
                 vertex)
             region_id = self._get_region_id(
@@ -1412,13 +1426,14 @@ class NeoBufferDatabase(BufferDatabase):
             neurons = app_vertex.get_neurons_recording(
                 variable, vertex_slice)
             if neurons is None:
-                neurons = [index]
+                recording_neurons_st = None
+            else:
+                recording_neurons_st = self.array_to_string(
+                    neurons)
             if buffered_data_type == BufferDataType.EIEIO_SPIKES:
                 base_key = vertex.get_virtual_key()
             else:
                 base_key = None
-            recording_neurons_st = self.array_to_string(
-                neurons)
             cursor.execute(
                 """
                 INSERT INTO region_metadata
