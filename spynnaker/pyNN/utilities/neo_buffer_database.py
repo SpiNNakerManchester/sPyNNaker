@@ -666,7 +666,7 @@ class NeoBufferDatabase(BufferDatabase):
 
         return neurons
 
-    def __get_multi_spikes(self, cursor, rec_id):
+    def __get_multi_spikes(self, cursor, rec_id, atoms_shape):
         """
         Gets the spikes for this population/recording id
 
@@ -681,14 +681,13 @@ class NeoBufferDatabase(BufferDatabase):
         simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
         rows = list(cursor.execute(
             """
-            SELECT region_id, vertex_slice, atoms_shape
+            SELECT region_id, vertex_slice
             FROM region_metadata
             WHERE rec_id = ?
             """, [rec_id]))
 
         for row in rows:
             vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
-            atoms_shape = self.string_to_array(row["atoms_shape"])
 
             indexes.extend(self.__get_multi_spikes_by_region(
                 cursor, row["region_id"], simulation_time_step_ms,
@@ -735,7 +734,8 @@ class NeoBufferDatabase(BufferDatabase):
             spikes, data_indexes = self.__get_eieio_spikes(
                 cursor, rec_id, atoms_shape, n_colour_bits)
         elif buffer_type == BufferDataType.MULTI_SPIKES:
-            spikes, data_indexes = self.__get_multi_spikes(cursor, rec_id)
+            spikes, data_indexes = self.__get_multi_spikes(
+                cursor, rec_id, atoms_shape)
         else:
             raise NotImplementedError(buffer_type)
 
