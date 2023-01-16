@@ -889,11 +889,9 @@ class NeoBufferDatabase(BufferDatabase):
         rewire_postids = list()
         rewire_preids = list()
 
-        for region_id, _, vertex_slice, selective_recording, _ in \
+        for region_id, _, vertex_slice, _, _ in \
                 self.__get_region_metadata(cursor, rec_id):
-            if selective_recording:
-                raise NotImplementedError(
-                    "Unable to handle selective recording")
+            # as no neurons for "rewires" selective_recording will be true
 
             self.__get_rewires_by_region(
                 cursor, region_id, vertex_slice, rewire_values,
