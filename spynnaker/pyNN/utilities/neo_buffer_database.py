@@ -464,6 +464,29 @@ class NeoBufferDatabase(BufferDatabase):
         raise ConfigurationException(
             f"No metadata for {variable} on {pop_label}")
 
+    def __get_region_metadata(self, cursor, rec_id):
+        """
+
+        :param ~sqlite3.Cursor cursor:
+        :param int rec_id:
+        :return: region_id, neurons, vertex_slice, selective_recording,
+            base_key
+        :rtype: int, ~numpy.ndarray, Slice, bool, int
+        """
+        rows = list(cursor.execute(
+            """
+            SELECT region_id, recording_neurons_st, vertex_slice, base_key
+            FROM region_metadata
+            WHERE rec_id = ?
+            """, [rec_id]))
+        for row in rows:
+            neurons = numpy.array(self.string_to_array(
+                row["recording_neurons_st"]))
+            vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
+            selective_recording = len(neurons) != vertex_slice.n_atoms
+            yield (row["region_id"], neurons, vertex_slice,
+                   selective_recording, row["base_key"])
+
     def __get_spikes_by_region(
             self, cursor, region_id, neurons, simulation_time_step_ms,
             selective_recording, spike_times, spike_ids):
@@ -510,7 +533,7 @@ class NeoBufferDatabase(BufferDatabase):
             spike_ids.extend(indices)
             spike_times.extend(times)
 
-    def __get_neuron_spikes(self, cursor, rec_id):
+    def __get_neuron_spikes(self, cursor, rec_id, atoms_shape):
         """
         Gets the spikes for this population/recording id
 
@@ -522,21 +545,13 @@ class NeoBufferDatabase(BufferDatabase):
         spike_times = list()
         spike_ids = list()
         simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
-        rows = list(cursor.execute(
-            """
-            SELECT region_id, recording_neurons_st, selective_recording
-            FROM region_metadata
-            WHERE rec_id = ?
-            """, [rec_id]))
         indexes = []
-        for row in rows:
-            neurons = numpy.array(self.string_to_array(
-                row["recording_neurons_st"]))
+        for region_id, neurons, _, selective_recording, _ in \
+                self.__get_region_metadata(cursor, rec_id):
             indexes.extend(neurons)
-
             self.__get_spikes_by_region(
-                cursor, row["region_id"], neurons, simulation_time_step_ms,
-                row["selective_recording"], spike_times, spike_ids)
+                cursor, region_id, neurons, simulation_time_step_ms,
+                selective_recording, spike_times, spike_ids)
 
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))], indexes
@@ -604,18 +619,14 @@ class NeoBufferDatabase(BufferDatabase):
         results = []
         indexes = []
 
-        rows = list(cursor.execute(
-            """
-            SELECT region_id, base_key, vertex_slice
-            FROM region_metadata
-            WHERE rec_id = ?
-            """, [rec_id]))
-
-        for row in rows:
-            vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
+        for region_id, _, vertex_slice, selective_recording, base_key in \
+                self.__get_region_metadata(cursor, rec_id):
+            if selective_recording:
+                raise NotImplementedError(
+                    "Unable to handle selective recording")
             indexes.extend(self.__get_eieio_spike_by_region(
-                cursor, row["region_id"], simulation_time_step_ms,
-                row["base_key"], vertex_slice, atoms_shape,
+                cursor, region_id, simulation_time_step_ms,
+                base_key, vertex_slice, atoms_shape,
                 n_colour_bits, results))
 
         if not results:
@@ -624,16 +635,15 @@ class NeoBufferDatabase(BufferDatabase):
         return result[numpy.lexsort((result[:, 1], result[:, 0]))], indexes
 
     def __get_multi_spikes_by_region(
-            self, cursor, region_id, simulation_time_step_ms, vertex_slice,
-            atoms_shape, spike_times, spike_ids):
+            self, cursor, region_id, neurons, simulation_time_step_ms,
+            spike_times, spike_ids):
         """
         Adds spike data for this region to the lists
 
         :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
+        :param ~numpy.ndarray neurons:
         :param float simulation_time_step_ms:
-        :param Slice vertex_slice:
-        :param tuple(int, int) atoms_shape:
         :param list(float) spike_times: List to add spike times to
         :param list(int) spike_ids: List to add spike ids to
         :return: all recording indexes spikes or not
@@ -641,10 +651,9 @@ class NeoBufferDatabase(BufferDatabase):
         """
         raw_data = self._read_contents(cursor, region_id)
 
-        n_words = int(math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
+        n_words = int(math.ceil(len(neurons) / BITS_PER_WORD))
         n_bytes_per_block = n_words * BYTES_PER_WORD
         offset = 0
-        neurons = vertex_slice.get_raster_ids(atoms_shape)
         while offset < len(raw_data):
             time, n_blocks = self.__TWO_WORDS.unpack_from(raw_data, offset)
             offset += self.__TWO_WORDS.size
@@ -664,8 +673,6 @@ class NeoBufferDatabase(BufferDatabase):
             spike_ids.append(indices)
             spike_times.append(times)
 
-        return neurons
-
     def __get_multi_spikes(self, cursor, rec_id, atoms_shape):
         """
         Gets the spikes for this population/recording id
@@ -679,19 +686,15 @@ class NeoBufferDatabase(BufferDatabase):
         spike_ids = list()
         indexes = []
         simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
-        rows = list(cursor.execute(
-            """
-            SELECT region_id, vertex_slice
-            FROM region_metadata
-            WHERE rec_id = ?
-            """, [rec_id]))
-
-        for row in rows:
-            vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
-
-            indexes.extend(self.__get_multi_spikes_by_region(
-                cursor, row["region_id"], simulation_time_step_ms,
-                vertex_slice, atoms_shape, spike_times, spike_ids))
+        for region_id, neurons, vertex_slice, selective_recording, _ in \
+                self.__get_region_metadata(cursor, rec_id):
+            if selective_recording:
+                raise NotImplementedError(
+                    "Unable to handle selective recording")
+            indexes.extend(neurons)
+            self.__get_multi_spikes_by_region(
+                cursor, region_id, neurons, simulation_time_step_ms,
+                spike_times, spike_ids)
 
         if not spike_ids:
             return numpy.zeros((0, 2)), indexes
@@ -729,7 +732,8 @@ class NeoBufferDatabase(BufferDatabase):
             If the recording metadata not setup correctly
         """
         if buffer_type == BufferDataType.NEURON_SPIKES:
-            spikes, data_indexes = self.__get_neuron_spikes(cursor, rec_id)
+            spikes, data_indexes = self.__get_neuron_spikes(
+                cursor, rec_id, atoms_shape)
         elif buffer_type == BufferDataType.EIEIO_SPIKES:
             spikes, data_indexes = self.__get_eieio_spikes(
                 cursor, rec_id, atoms_shape, n_colour_bits)
@@ -782,7 +786,7 @@ class NeoBufferDatabase(BufferDatabase):
         placement_data = data_type.decode_array(var_data).reshape(
             n_rows, len(neurons))
 
-        return neurons, times, placement_data
+        return times, placement_data
 
     def __get_matrix_data(self, cursor, rec_id, data_type, view_indexes):
         """
@@ -800,20 +804,10 @@ class NeoBufferDatabase(BufferDatabase):
         pop_times = None
         pop_neurons = []
 
-        rows = list(cursor.execute(
-            """
-            SELECT region_id, recording_neurons_st
-            FROM region_metadata
-            WHERE rec_id = ?
-            """, [rec_id]))
-
-        for row in rows:
-            neurons = numpy.array(self.string_to_array(
-                row["recording_neurons_st"]))
-
-            neurons, times, data = \
-                self.__get_matrix_data_by_region(
-                    cursor, row["region_id"], neurons, data_type)
+        for region_id, neurons, _, _, __ in \
+                self.__get_region_metadata(cursor, rec_id):
+            times, data = self.__get_matrix_data_by_region(
+                cursor, region_id, neurons, data_type)
 
             pop_neurons.extend(neurons)
             if signal_array is None:
@@ -895,18 +889,14 @@ class NeoBufferDatabase(BufferDatabase):
         rewire_postids = list()
         rewire_preids = list()
 
-        rows = list(cursor.execute(
-            """
-            SELECT region_id, vertex_slice
-            FROM region_metadata
-            WHERE rec_id = ?
-            """, [rec_id]))
-
-        for row in rows:
-            vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
+        for region_id, _, vertex_slice, selective_recording, _ in \
+                self.__get_region_metadata(cursor, rec_id):
+            if selective_recording:
+                raise NotImplementedError(
+                    "Unable to handle selective recording")
 
             self.__get_rewires_by_region(
-                cursor, row["region_id"], vertex_slice, rewire_values,
+                cursor, region_id, vertex_slice, rewire_values,
                 rewire_postids, rewire_preids, rewire_times)
 
             if len(rewire_values) == 0:
@@ -1431,16 +1421,14 @@ class NeoBufferDatabase(BufferDatabase):
                 base_key = None
             recording_neurons_st = self.array_to_string(
                 neurons)
-            selective_recording = (
-                    len(neurons) != vertex_slice.n_atoms)
             cursor.execute(
                 """
                 INSERT INTO region_metadata
-                (rec_id, region_id, recording_neurons_st, selective_recording,
+                (rec_id, region_id, recording_neurons_st,
                  base_key, vertex_slice)
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?)
                 """,
-                (rec_id, region_id, recording_neurons_st, selective_recording,
+                (rec_id, region_id, recording_neurons_st,
                  base_key, str(vertex.vertex_slice)))
 
     @staticmethod

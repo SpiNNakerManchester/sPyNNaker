@@ -60,7 +60,6 @@ CREATE TABLE IF NOT EXISTS region_metadata(
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     recording_neurons_st TEXT,
-    selective_recording BOOLEAN,
-    base_key INT,
-    vertex_slice TEXT);
+    vertex_slice TEXT,
+    base_key INT);
 
