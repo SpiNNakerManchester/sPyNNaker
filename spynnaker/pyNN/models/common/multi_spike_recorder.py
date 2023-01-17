@@ -21,8 +21,6 @@ from spinn_utilities.log import FormatAdapter
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -57,20 +55,3 @@ class MultiSpikeRecorder(object):
             int(math.ceil(n_neurons / BITS_PER_WORD)) * BYTES_PER_WORD)
         return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
             out_spike_bytes * spikes_per_timestep))
-
-    def write_spike_metadata(self, application_vertex, region, population):
-        """
-        Write the metadata to retrieve spikes based on just the data
-
-        :param ApplicatioNvertex application_vertex:
-        :param int region: local region this vertex will write to
-        :param ~spynnaker.pyNN.models.populations.Population population:
-            the population to record for
-        """
-        if self.record:
-            with NeoBufferDatabase() as db:
-                vertices = application_vertex.machine_vertices
-                for vertex in vertices:
-                    db.write_multi_spikes_metadata(
-                        vertex, "spikes", region, population,
-                        SpynnakerDataView.get_simulation_time_step_ms())

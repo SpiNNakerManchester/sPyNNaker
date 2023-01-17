@@ -30,17 +30,20 @@ CREATE TABLE IF NOT EXISTS recording (
 		REFERENCES population(pop_id) ON DELETE RESTRICT,
     variable TEXT NOT NULL,
     data_type TEXT,
-    function TEXT NOT NULL,
+    buffered_type TEXT NOT NULL,
     t_start float NOT NULL,
     sampling_interval_ms float,
-    units TEXT);
+    units TEXT,
+    atoms_shape TEXT,
+    n_colour_bits INT);
 
 CREATE UNIQUE INDEX IF NOT EXISTS recording_sanity
     ON recording(pop_id ASC, variable ASC);
 
 CREATE VIEW IF NOT EXISTS recording_view AS
-    SELECT rec_id, variable, label, data_type, function, t_start,
-        sampling_interval_ms, first_id, pop_size, units
+    SELECT rec_id, variable, label, data_type, buffered_type, t_start,
+        sampling_interval_ms, first_id, pop_size, units, atoms_shape,
+        n_colour_bits
     FROM population NATURAL JOIN recording;
 
 CREATE TABLE IF NOT EXISTS segment(
@@ -57,9 +60,6 @@ CREATE TABLE IF NOT EXISTS region_metadata(
     region_id INTEGER NOT NULL
 		REFERENCES region(region_id) ON DELETE RESTRICT,
     recording_neurons_st TEXT,
-    selective_recording BOOLEAN,
-    base_key INT,
     vertex_slice TEXT,
-    atoms_shape TEXT,
-    n_colour_bits INT);
+    base_key INT);
 

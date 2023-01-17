@@ -44,10 +44,7 @@ class DataPopulation(object):
         with NeoBufferDatabase(self.__database_file) as db:
             size = db.get_population_metdadata(label)[0]
         self._size = size
-        if indexes is None:
-            self._indexes = range(size)
-        else:
-            self._indexes = indexes
+        self._indexes = indexes
 
     @overrides(Population.write_data)
     def write_data(self, io, variables='all', gather=True, clear=False,
@@ -173,7 +170,10 @@ class DataPopulation(object):
         """
         sized = AbstractSized(self._size)
         ids = sized.selector_to_ids(index_or_slice, warn=True)
-        indexes = [self._indexes[index] for index in ids]
+        if self._indexes:
+            indexes = [self._indexes[index] for index in ids]
+        else:
+            indexes = [range(self._size)[index] for index in ids]
         return DataPopulation(self.__database_file, self.__label, indexes)
 
     @overrides(Population.mean_spike_count)

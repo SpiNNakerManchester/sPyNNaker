@@ -73,7 +73,6 @@ class Test_IDMixin(BaseTestCase):
         with pytest.raises(StopIteration):
             next(iterator)
 
-        self.assertEqual(view.can_record("v"), pop_1.can_record("v"))
         self.assertEqual(view.conductance_based, pop_1.conductance_based)
 
         describe = view.describe()

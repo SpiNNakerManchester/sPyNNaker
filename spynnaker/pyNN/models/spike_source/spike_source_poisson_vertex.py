@@ -33,10 +33,9 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import MultiSpikeRecorder
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
-from spynnaker.pyNN.models.common import (
-    PopulationApplicationVertex, RecordingType)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.common import ParameterHolder
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes, get_expander_rates_bytes, get_params_bytes)
@@ -361,9 +360,15 @@ class SpikeSourcePoissonVertex(
     def get_recordable_variables(self):
         return ["spikes"]
 
-    @overrides(PopulationApplicationVertex.can_record)
-    def can_record(self, name):
-        return name == "spikes"
+    def get_buffer_data_type(self, name):
+        if name == "spikes":
+            return BufferDataType.MULTI_SPIKES
+        raise KeyError(f"Cannot record {name}")
+
+    def get_recording_region(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return 0
 
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(self, name, sampling_interval=None, indices=None):
@@ -385,12 +390,6 @@ class SpikeSourcePoissonVertex(
             return ["spikes"]
         return []
 
-    @overrides(PopulationApplicationVertex.is_recording_variable)
-    def is_recording_variable(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self.__spike_recorder.record
-
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name, indices=None):
         if name != "spikes":
@@ -400,28 +399,22 @@ class SpikeSourcePoissonVertex(
                            "SpikeSourceArray so being ignored")
         self.__spike_recorder.record = False
 
-    @overrides(PopulationApplicationVertex.get_recorded_data)
-    def get_recorded_data(self, name):
-        with NeoBufferDatabase() as db:
-            return db.get_data(self.label, name)
-
-    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
-    def get_recording_sampling_interval(self, name):
+    @overrides(PopulationApplicationVertex.get_sampling_interval_ms)
+    def get_sampling_interval_ms(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return SpynnakerDataView.get_simulation_time_step_us()
 
-    @overrides(PopulationApplicationVertex.get_recording_indices)
-    def get_recording_indices(self, name):
+    @overrides(PopulationApplicationVertex.get_data_type)
+    def get_data_type(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return range(self.n_atoms)
+        return None
 
-    @overrides(PopulationApplicationVertex.get_recording_type)
-    def get_recording_type(self, name):
+    def get_neurons_recording(self, name, vertex_slice):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return RecordingType.BIT_FIELD
+        return vertex_slice.get_raster_ids(self.atoms_shape)
 
     def max_spikes_per_ts(self):
         ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
@@ -529,12 +522,6 @@ class SpikeSourcePoissonVertex(
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
-
-    @overrides(PopulationApplicationVertex.write_recording_metadata)
-    def write_recording_metadata(self, population):
-        self.__spike_recorder.write_spike_metadata(
-            self, SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            population)
 
     def describe(self):
         """ Return a human-readable description of the cell or synapse type.

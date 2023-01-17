@@ -19,10 +19,9 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-from spynnaker.pyNN.models.common import (
-    PopulationApplicationVertex, RecordingType)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -59,10 +58,6 @@ class SpikeInjectorVertex(
     def get_recordable_variables(self):
         return ["spikes"]
 
-    @overrides(PopulationApplicationVertex.can_record)
-    def can_record(self, name):
-        return name == "spikes"
-
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(self, name, sampling_interval=None, indices=None):
         if name != "spikes":
@@ -82,12 +77,6 @@ class SpikeInjectorVertex(
             return ["spikes"]
         return []
 
-    @overrides(PopulationApplicationVertex.is_recording_variable)
-    def is_recording_variable(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self.__spike_recorder.record
-
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name, indices=None):
         if name != "spikes":
@@ -98,37 +87,41 @@ class SpikeInjectorVertex(
         self.enable_recording(False)
         self.__spike_recorder.record = False
 
-    @overrides(PopulationApplicationVertex.get_recorded_data)
-    def get_recorded_data(self, name):
-        with NeoBufferDatabase() as db:
-            return db.get_data(self.label, name)
-
-    @overrides(PopulationApplicationVertex.write_recording_metadata)
-    def write_recording_metadata(self, population):
-        self.__spike_recorder.write_spike_metadata(
-            0, self, lambda vertex:
-                vertex.virtual_key
-                if vertex.virtual_key is not None
-                else 0,
-            self.n_colour_bits, population)
-
-    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
-    def get_recording_sampling_interval(self, name):
+    @overrides(PopulationApplicationVertex.get_sampling_interval_ms)
+    def get_sampling_interval_ms(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return SpynnakerDataView.get_simulation_time_step_us()
 
-    @overrides(PopulationApplicationVertex.get_recording_indices)
-    def get_recording_indices(self, name):
+    @overrides(PopulationApplicationVertex.get_data_type)
+    def get_data_type(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return range(self.n_atoms)
+        return None
 
-    @overrides(PopulationApplicationVertex.get_recording_type)
-    def get_recording_type(self, name):
+    @overrides(PopulationApplicationVertex.get_buffer_data_type)
+    def get_buffer_data_type(self, name):
+        if name == "spikes":
+            return BufferDataType.EIEIO_SPIKES
+        raise KeyError(f"Cannot record {name}")
+
+    @overrides(PopulationApplicationVertex.get_units)
+    def get_units(self, name):
+        if name == "spikes":
+            return ""
+        raise KeyError(f"Cannot record {name}")
+
+    @overrides(PopulationApplicationVertex.get_recording_region)
+    def get_recording_region(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return RecordingType.BIT_FIELD
+        return 0
+
+    @overrides(PopulationApplicationVertex.get_neurons_recording)
+    def get_neurons_recording(self, name, vertex_slice):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return vertex_slice.get_raster_ids(self.atoms_shape)
 
     def describe(self):
         """

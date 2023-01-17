@@ -409,10 +409,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         with FecTimer("Write Neo Metadata", TimerWork.OTHER):
             with NeoBufferDatabase() as db:
                 db.write_segment_metadata()
-            for population in SpynnakerDataView.iterate_populations():
-                # pylint: disable=protected-access
-                population._Population__vertex.write_recording_metadata(
-                    population)
+                db.write_metadata()
 
     @overrides(AbstractSpinnakerBase._do_write_metadata)
     def _do_write_metadata(self):
