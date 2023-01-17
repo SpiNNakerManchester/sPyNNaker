@@ -300,7 +300,7 @@ class TestDataPopulation(BaseTestCase):
             pop = db.get_population("pop_1")
 
         # Like normal slices/ views out of range is ignored
-        view = pop[1:10]
+        pop[1:10]
 
         # Like index selections/ views and indexes raise an exception
         with self.assertRaises(TypeError):
