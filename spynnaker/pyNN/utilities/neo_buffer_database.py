@@ -542,7 +542,7 @@ class NeoBufferDatabase(BufferDatabase):
             spike_ids.extend(indices)
             spike_times.extend(times)
 
-    def __get_neuron_spikes(self, cursor, rec_id, atoms_shape):
+    def __get_neuron_spikes(self, cursor, rec_id):
         """
         Gets the spikes for this population/recording id
 
@@ -682,7 +682,7 @@ class NeoBufferDatabase(BufferDatabase):
             spike_ids.append(indices)
             spike_times.append(times)
 
-    def __get_multi_spikes(self, cursor, rec_id, atoms_shape):
+    def __get_multi_spikes(self, cursor, rec_id):
         """
         Gets the spikes for this population/recording id
 
@@ -695,7 +695,7 @@ class NeoBufferDatabase(BufferDatabase):
         spike_ids = list()
         indexes = []
         simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
-        for region_id, neurons, vertex_slice, selective_recording, _, _ in \
+        for region_id, neurons, _, selective_recording, _, _ in \
                 self.__get_region_metadata(cursor, rec_id):
             if selective_recording:
                 raise NotImplementedError(
@@ -750,14 +750,12 @@ class NeoBufferDatabase(BufferDatabase):
             If the recording metadata not setup correctly
         """
         if buffer_type == BufferDataType.NEURON_SPIKES:
-            spikes, data_indexes = self.__get_neuron_spikes(
-                cursor, rec_id, atoms_shape)
+            spikes, data_indexes = self.__get_neuron_spikes(cursor, rec_id)
         elif buffer_type == BufferDataType.EIEIO_SPIKES:
             spikes, data_indexes = self.__get_eieio_spikes(
                 cursor, rec_id, atoms_shape, n_colour_bits)
         elif buffer_type == BufferDataType.MULTI_SPIKES:
-            spikes, data_indexes = self.__get_multi_spikes(
-                cursor, rec_id, atoms_shape)
+            spikes, data_indexes = self.__get_multi_spikes(cursor, rec_id)
         else:
             raise NotImplementedError(buffer_type)
 
