@@ -17,41 +17,54 @@ import numpy
 import os
 import shutil
 from spinn_front_end_common.utilities.base_database import BaseDatabase
+from spynnaker.pyNN.utilities import neo_convertor
 import pyNN.spiNNaker as sim
+
+N_NEURONS = 9
 
 
 def make_data(do_view):
     sim.setup(timestep=1.0)
-    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
 
-    pop_1 = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
-    input = sim.Population(5, sim.SpikeSourceArray(
+    pop_1 = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
+    input = sim.Population(N_NEURONS, sim.SpikeSourceArray(
         spike_times=[[0, 10, 20],
-                     [1, 11, 21],
+                     [1, 21],
                      [2, 12, 22],
                      [3, 13, 23],
-                     [4, 14, 24]]),
+                     [14],
+                     [5, 15, 25],
+                     [],
+                     [17, 27],
+                     [8, 18, 28]]),
         label="input")
     sim.Projection(input, pop_1, sim.OneToOneConnector(),
                    synapse_type=sim.StaticSynapse(weight=5, delay=1))
     if do_view:
+        # packets-per-timestep not allowed on a view
         pop_1[1, 2].record(["spikes", "v"])
     else:
-        pop_1.record(["spikes", "v"])
+        pop_1.record(["spikes", "v", "packets-per-timestep"])
     simtime = 35
     sim.run(simtime)
 
     if not do_view:
         my_dir = os.path.dirname(os.path.abspath(__file__))
-        neo = pop_1.get_data(variables=["spikes", "v"])
-        spikes = neo.segments[0].spiketrains
+        neo = pop_1.get_data(
+            variables=["spikes", "v",  "packets-per-timestep"])
+        spikes = neo_convertor.convert_spikes(neo)
+        print(spikes)
         my_spikes = os.path.join(my_dir, "spikes.csv")
         numpy.savetxt(my_spikes, spikes, delimiter=",")
-        print(spikes)
         v = neo.segments[0].filter(name='v')[0]
+        print(v)
         my_v = os.path.join(my_dir, "v.csv")
         numpy.savetxt(my_v, v, delimiter=",")
-        print(v)
+        packets = neo.segments[0].filter(name='packets-per-timestep')[0]
+        print(packets)
+        my_packets = os.path.join(my_dir, "packets-per-timestep.csv")
+        numpy.savetxt(my_packets, packets, delimiter=",")
     sim.end()
 
     run_buffer = BaseDatabase.default_database_file()
@@ -107,6 +120,6 @@ def make_rewires():
     shutil.copyfile(run_buffer, my_buffer)
 
 
-make_data(True)
-make_data(False)
-make_rewires()
+make_data(do_view=True)
+make_data(do_view=False)
+#make_rewires()

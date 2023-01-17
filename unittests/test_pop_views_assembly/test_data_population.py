@@ -18,13 +18,12 @@ import os
 import pickle
 import numpy
 import pytest
-import shutil
-from spinn_front_end_common.utilities.base_database import BaseDatabase
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
+from .make_test_data import N_NEURONS
 
 
 def trim_spikes(spikes, indexes):
@@ -48,10 +47,9 @@ class TestDataPopulation(BaseTestCase):
         spikes_expected = []
         with open(my_spikes) as csvfile:
             reader = csv.reader(csvfile)
-            for i, row in enumerate(reader):
+            for row in reader:
                 row = list(map(lambda x: float(x), row))
-                for spike in row:
-                    spikes_expected.append([i, spike])
+                spikes_expected.append((row[0], row[1]))
         cls.spikes_expected = numpy.array(spikes_expected)
 
     def test_simple_spikes(self):
@@ -64,14 +62,14 @@ class TestDataPopulation(BaseTestCase):
         spikes = neo_convertor.convert_spikes(neo)
         assert numpy.array_equal(spikes, self.spikes_expected)
         spiketrains = neo.segments[0].spiketrains
-        assert 5 == len(spiketrains)
+        assert N_NEURONS == len(spiketrains)
 
         #  gather False has not effect testing that here
         neo = pop.get_data("spikes", gather=False)
         spikes = neo_convertor.convert_spikes(neo)
         assert numpy.array_equal(spikes, self.spikes_expected)
         spiketrains = neo.segments[0].spiketrains
-        assert 5 == len(spiketrains)
+        assert N_NEURONS == len(spiketrains)
 
         neo = pop.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
@@ -148,6 +146,10 @@ class TestDataPopulation(BaseTestCase):
         assert numpy.array_equal(
             [1, 2], neo.segments[0].filter(name='v')[0].channel_index.index)
         assert v.shape == target.shape
+        for i in range(35):
+            print(i)
+            print(v[1])
+            print(target[i])
         assert numpy.array_equal(v,  target)
 
     def test_get_spike_counts(self):
@@ -156,14 +158,15 @@ class TestDataPopulation(BaseTestCase):
         with NeoBufferDatabase(my_buffer) as db:
             pop = db.get_population("pop_1")
 
-        self.assertEqual({0: 3, 1: 3, 2: 3, 3: 3, 4: 3},
-                         pop.get_spike_counts())
+        self.assertEqual(
+            pop.get_spike_counts(),
+            {0: 3, 1: 2, 2: 3, 3: 3, 4: 1, 5: 3, 6: 0, 7: 2, 8: 3})
 
         view = pop[1:4]
-        self.assertEqual({1: 3, 2: 3, 3: 3}, view.get_spike_counts())
+        self.assertEqual({1: 2, 2: 3, 3: 3}, view.get_spike_counts())
 
-        assert 3 == pop.mean_spike_count()
-        assert 3 == view.mean_spike_count()
+        assert 2.2222222222222223 == pop.mean_spike_count()
+        assert 2.6666666666666665 == view.mean_spike_count()
 
     def test_write(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
@@ -201,7 +204,7 @@ class TestDataPopulation(BaseTestCase):
         assert numpy.array_equal(spikes, self.spikes_expected)
 
         v = pop.spinnaker_get_data("v")
-        assert len(v) == 35 * 5
+        assert len(v) == 35 * N_NEURONS
         target = self.v_expected
         for neuron, time, val in v:
             self.assertEqual(val, target[int(time), int(neuron)],
@@ -264,3 +267,42 @@ class TestDataPopulation(BaseTestCase):
                 for i, line in enumerate(label_f.readlines()):
                     self.assertEqual(
                         line.strip(), elimination_events.labels[i])
+
+            pop = db.get_population("pop_1")
+            view = pop[2:4]
+            #  rewiring can not be extracted using a view
+            with self.assertRaises(SpynnakerException):
+                neo = view.get_data("rewiring")
+
+    def test_packets(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
+
+        neo = pop.get_data("packets-per-timestep")
+        packets = neo.segments[0].filter(name='packets-per-timestep')[0]
+
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_packets = os.path.join(my_dir, "packets-per-timestep.csv")
+        packets_expected = []
+        with open(my_packets) as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                row = list(map(lambda x: float(x), row))
+                packets_expected.append(row)
+
+        assert numpy.array_equal(packets,  packets_expected)
+
+    def test_bad_view(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
+
+        # Like normal slices/ views out of range is ignored
+        view = pop[1:10]
+
+        # Like index selections/ views and indexes raise an exception
+        with self.assertRaises(TypeError):
+            view = pop[1, 10]

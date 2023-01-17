@@ -713,7 +713,14 @@ class NeoBufferDatabase(BufferDatabase):
         result = numpy.dstack((spike_ids, spike_times))[0]
         return result[numpy.lexsort((spike_times, spike_ids))], indexes
 
-    def __combine_indexes(self, view_indexes, data_indexes):
+    def __combine_indexes(self, view_indexes, data_indexes, variable):
+        """
+
+        :param view_indexes:
+        :param data_indexes:
+        :param str variable:
+        :return:
+        """
         # keep just the view indexes in the data
         indexes = [i for i in view_indexes if i in data_indexes]
         # check for missing and report
@@ -722,11 +729,12 @@ class NeoBufferDatabase(BufferDatabase):
         if missing:
             missing_list = list(missing)
             missing_list.sort()
-            logger.warning(f"No data available for neurons {missing_list}")
+            logger.warning(
+                f"No {variable} available for neurons {missing_list}")
         return indexes
 
     def __get_spikes(self, cursor, rec_id, view_indexes, buffer_type,
-                     atoms_shape, n_colour_bits):
+                     atoms_shape, n_colour_bits, variable):
         """
         Gets the data as a Numpy array for one opulation and variable
 
@@ -736,6 +744,7 @@ class NeoBufferDatabase(BufferDatabase):
         :param buffer_type:
         :param tuple(int) atoms_shape:
         :param int n_colour_bits
+        :param str variable:
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
@@ -752,11 +761,12 @@ class NeoBufferDatabase(BufferDatabase):
         else:
             raise NotImplementedError(buffer_type)
 
-        if list(view_indexes) == list(data_indexes):
+        if view_indexes is None or list(view_indexes) == list(data_indexes):
             indexes = numpy.array(data_indexes)
         else:
             # keep just the view indexes in the data
-            indexes = self.__combine_indexes(view_indexes, data_indexes)
+            indexes = self.__combine_indexes(
+                view_indexes, data_indexes, variable)
             # keep just data columns in the view
             spikes = spikes[numpy.isin(spikes[:, 0], indexes)]
 
@@ -798,7 +808,7 @@ class NeoBufferDatabase(BufferDatabase):
         return times, placement_data
 
     def __get_matrix_data(
-            self, cursor, rec_id, data_type, view_indexes, pop_size):
+            self, cursor, rec_id, data_type, view_indexes, pop_size, variable):
         """
         Gets the matrix data  for this population/recording id
 
@@ -809,6 +819,7 @@ class NeoBufferDatabase(BufferDatabase):
             The indexes for which data should be returned. Or None for all
         :type view_indexes: list(int) or None
         :param int pop_size:
+        :param str variable:
         :return: numpy array of the data, neurons
         :rtype: tuple(~numpy.ndarray, list(int))
         """
@@ -851,7 +862,8 @@ class NeoBufferDatabase(BufferDatabase):
             indexes = numpy.array(data_indexes)
         else:
             # keep just the view indexes in the data
-            indexes = self.__combine_indexes(view_indexes, data_indexes)
+            indexes = self.__combine_indexes(
+                view_indexes, data_indexes, variable)
             # keep just data columns in the view
             map_indexes = [list(data_indexes).index(i) for i in indexes]
             signal_array = signal_array[:, map_indexes]
@@ -932,7 +944,7 @@ class NeoBufferDatabase(BufferDatabase):
 
     def __get_recorded_pynn7(
             self, cursor, rec_id, data_type, sampling_interval_ms,
-            as_matrix, view_indexes, pop_size):
+            as_matrix, view_indexes, pop_size, variable):
         """ Get recorded data in PyNN 0.7 format. Must not be spikes.
 
         :param ~sqlite3.Cursor cursor:
@@ -944,10 +956,11 @@ class NeoBufferDatabase(BufferDatabase):
             The indexes for which data should be returned. Or None for all
         :type view_indexes: list(int) or None
         :param int pop_size:
+        :param str variable:
         :rtype: ~numpy.ndarray
         """
         data, indexes = self.__get_matrix_data(
-            cursor, rec_id, data_type, view_indexes, pop_size)
+            cursor, rec_id, data_type, view_indexes, pop_size, variable)
 
         if as_matrix:
             return data
@@ -980,14 +993,14 @@ class NeoBufferDatabase(BufferDatabase):
             if buffered_type == BufferDataType.MATRIX:
                 return self.__get_recorded_pynn7(
                     cursor, rec_id, data_type, sampling_interval_ms,
-                    as_matrix, view_indexes, pop_size)
+                    as_matrix, view_indexes, pop_size, variable)
             # NO BufferedDataType.REWIRES get_spike will go boom
             else:
                 if as_matrix:
                     logger.warning(f"Ignoring as matrix for {variable}")
                 return self.__get_spikes(
                     cursor, rec_id, view_indexes, buffered_type, atoms_shape,
-                    n_colour_bits)[0]
+                    n_colour_bits, variable)[0]
 
     def get_spike_counts(self, pop_label, view_indexes=None):
         with self.transaction() as cursor:
@@ -1002,7 +1015,7 @@ class NeoBufferDatabase(BufferDatabase):
             # get_spike will go boom if buffered_type not spikes
             spikes = self.__get_spikes(
                 cursor, rec_id, view_indexes, buffered_type, atoms_shape,
-                n_colour_bits)[0]
+                n_colour_bits, SPIKES)[0]
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=pop_size)
         return {i: counts[i] for i in view_indexes}
@@ -1192,7 +1205,7 @@ class NeoBufferDatabase(BufferDatabase):
 
         if buffer_type == BufferDataType.MATRIX:
             signal_array, indexes = self.__get_matrix_data(
-                cursor, rec_id, data_type, view_indexes, pop_size)
+                cursor, rec_id, data_type, view_indexes, pop_size, variable)
             self.__add_matix_data(
                 pop_label, variable, block, segment, signal_array,
                 indexes, t_start, sampling_interval_ms,
@@ -1208,8 +1221,8 @@ class NeoBufferDatabase(BufferDatabase):
             if view_indexes is None:
                 view_indexes = range(pop_size)
             spikes, indexes = self.__get_spikes(
-            cursor, rec_id, view_indexes, buffer_type, atoms_shape,
-                n_colour_bits)
+                cursor, rec_id, view_indexes, buffer_type, atoms_shape,
+                n_colour_bits, variable)
             self.__add_spike_data(
                 pop_label, view_indexes, segment, spikes, t_start, t_stop,
                 sampling_interval_ms, first_id)
@@ -1411,6 +1424,8 @@ class NeoBufferDatabase(BufferDatabase):
                 variable, vertex_slice)
             if neurons is None:
                 recording_neurons_st = None
+            elif len(neurons) == 0:
+                continue
             else:
                 recording_neurons_st = self.array_to_string(
                     neurons)
