@@ -321,6 +321,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :raises ConfigurationException: if both ``n_chips_required`` and
         ``n_boards_required`` are used.
     """
+    # pylint: disable=global-statement
     global __simulator
     # Check for "auto" values
     if timestep == "auto":
@@ -351,6 +352,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         min_delay=min_delay,
         n_chips_required=n_chips_required,
         n_boards_required=n_boards_required)
+    # pylint: disable=protected-access
     external_devices._set_simulator(__simulator)
 
     # warn about kwargs arguments
