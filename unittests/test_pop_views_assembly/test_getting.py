@@ -23,21 +23,24 @@ from spinn_front_end_common.utilities.base_database import BaseDatabase
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 import pyNN.spiNNaker as sim
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
+from .make_test_data import N_NEURONS
 
 
 def trim_spikes(spikes, indexes):
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 
-def copy_db(with_view):
+_VIEW_DATA = "view_data.sqlite3"
+_ALL_DATA = "all_data.sqlite3"
+
+
+def copy_db(data_file):
     run_buffer = BaseDatabase.default_database_file()
     my_dir = os.path.dirname(os.path.abspath(__file__))
-    if with_view:
-        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
-    else:
-        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+    my_buffer = os.path.join(my_dir, data_file)
     shutil.copyfile(my_buffer, run_buffer)
     SpynnakerDataView._mock_has_run()
 
@@ -59,29 +62,28 @@ class TestGetting(BaseTestCase):
         spikes_expected = []
         with open(my_spikes) as csvfile:
             reader = csv.reader(csvfile)
-            for i, row in enumerate(reader):
+            for row in reader:
                 row = list(map(lambda x: float(x), row))
-                for spike in row:
-                    spikes_expected.append([i, spike])
+                spikes_expected.append((row[0], row[1]))
         cls.spikes_expected = numpy.array(spikes_expected)
 
     def test_simple_spikes(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
-        copy_db(False)
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
+        copy_db(_ALL_DATA)
 
         neo = pop.get_data("spikes")
         spikes = neo_convertor.convert_spikes(neo)
         assert numpy.array_equal(spikes, self.spikes_expected)
         spiketrains = neo.segments[0].spiketrains
-        assert 5 == len(spiketrains)
+        assert N_NEURONS == len(spiketrains)
 
         #  gather False has not effect testing that here
         neo = pop.get_data("spikes", gather=False)
         spikes = neo_convertor.convert_spikes(neo)
         assert numpy.array_equal(spikes, self.spikes_expected)
         spiketrains = neo.segments[0].spiketrains
-        assert 5 == len(spiketrains)
+        assert N_NEURONS == len(spiketrains)
 
         neo = pop.get_v()
         v = neo.segments[0].filter(name='v')[0].magnitude
@@ -91,9 +93,9 @@ class TestGetting(BaseTestCase):
 
     def test_get_spikes_by_index(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record("spikes")
-        copy_db(False)
+        copy_db(_ALL_DATA)
 
         neo = pop[1, 2].get_data("spikes")
         spikes = neo_convertor.convert_spikes(neo)
@@ -106,8 +108,8 @@ class TestGetting(BaseTestCase):
 
     def test_get_spikes_by_view(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
-        copy_db(False)
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
+        copy_db(_ALL_DATA)
 
         view = pop[1:3]
         view.record("spikes")
@@ -122,8 +124,8 @@ class TestGetting(BaseTestCase):
 
     def test_get_spikes_view_missing(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
-        copy_db(True)
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
+        copy_db(_VIEW_DATA)
 
         view = pop[2:4]
         neo = view.get_data("spikes")
@@ -141,9 +143,9 @@ class TestGetting(BaseTestCase):
 
     def test_get_v_view(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record("spikes")
-        copy_db(False)
+        copy_db(_ALL_DATA)
 
         view = pop[1:3]
         neo = view.get_data("v")
@@ -156,9 +158,9 @@ class TestGetting(BaseTestCase):
 
     def test_get_v_missing(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop[1:3].record("v")
-        copy_db(True)
+        copy_db(_VIEW_DATA)
 
         view = pop[0:3]
         neo = view.get_data("v")
@@ -173,25 +175,26 @@ class TestGetting(BaseTestCase):
 
     def test_get_spike_counts(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record("spikes")
-        copy_db(False)
+        copy_db(_ALL_DATA)
 
-        assert {0: 3, 1: 3, 2: 3, 3: 3, 4: 3} == pop.get_spike_counts()
+        assert {0: 3, 1: 2, 2: 3, 3: 3, 4: 1, 5: 3, 6: 0, 7: 2, 8: 3} == \
+               pop.get_spike_counts()
 
         view = pop[1:4]
-        assert {1: 3, 2: 3, 3: 3} == view.get_spike_counts()
+        assert {1: 2, 2: 3, 3: 3} == view.get_spike_counts()
 
-        assert 3 == pop.meanSpikeCount()
-        assert 3 == view.mean_spike_count()
+        assert 2.2222222222222223 == pop.meanSpikeCount()
+        assert 2.6666666666666665 == view.mean_spike_count()
 
         sim.end()
 
     def test_write(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record(["spikes", "v"])
-        copy_db(False)
+        copy_db(_ALL_DATA)
 
         # Note gather=False will be ignored just testing it can be
         pop.write_data("spikes.pkl", "spikes", gather=False)
@@ -217,13 +220,64 @@ class TestGetting(BaseTestCase):
 
     def test_spinnaker_get_data(self):
         sim.setup(timestep=1.0)
-        pop = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         pop.record("v")
-        copy_db(False)
+        copy_db(_ALL_DATA)
 
         v = pop.spinnaker_get_data("v")
-        assert len(v) == 35 * 5
+        assert len(v) == 35 * 9
 
         with pytest.raises(ConfigurationException):
             pop.spinnaker_get_data(["v", "spikes"])
         sim.end()
+
+    def test_rewiring(self):
+        sim.setup(timestep=1.0)
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
+        pop.record("rewiring")
+        copy_db("rewiring_data.sqlite3")
+
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_labels = os.path.join(my_dir, "rewiring_labels.txt")
+
+        neo = pop.get_data("rewiring")
+        formation_events = neo.segments[0].events[0]
+        elimination_events = neo.segments[0].events[1]
+
+        num_forms = len(formation_events.times)
+        self.assertEqual(0, len(formation_events))
+        num_elims = len(elimination_events.times)
+        self.assertEqual(10, len(elimination_events))
+
+        self.assertEqual(0, num_forms)
+        self.assertEqual(10, num_elims)
+
+        with open(my_labels, "r", encoding="UTF-8") as label_f:
+            for i, line in enumerate(label_f.readlines()):
+                self.assertEqual(
+                    line.strip(), elimination_events.labels[i])
+
+        view = pop[2:4]
+        #  rewiring can not be extracted using a view
+        with self.assertRaises(SpynnakerException):
+            neo = view.get_data("rewiring")
+
+    def test_packets(self):
+        sim.setup(timestep=1.0)
+        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
+        pop.record("packets-per-timestep")
+        copy_db(_ALL_DATA)
+
+        neo = pop.get_data("packets-per-timestep")
+        packets = neo.segments[0].filter(name='packets-per-timestep')[0]
+
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_packets = os.path.join(my_dir, "packets-per-timestep.csv")
+        packets_expected = []
+        with open(my_packets) as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                row = list(map(lambda x: float(x), row))
+                packets_expected.append(row)
+
+        assert numpy.array_equal(packets,  packets_expected)

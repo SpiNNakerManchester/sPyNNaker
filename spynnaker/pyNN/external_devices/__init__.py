@@ -321,5 +321,5 @@ def _set_simulator(simulator):
 
     :param spynnaker.pyNN.spinnaker.SpiNNaker simulator:
     """
-    global __simulator
+    global __simulator  # pylint: disable=global-statement
     __simulator = simulator
