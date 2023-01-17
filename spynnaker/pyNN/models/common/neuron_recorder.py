@@ -188,21 +188,18 @@ class NeuronRecorder(object):
         """
         return self.__region_ids[variable]
 
-    def _count_recording_per_slice(
-            self, variable, vertex_slice):
-        """
-        :param str variable:
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: int or None
-        """
+    def _rate_and_count_per_slice(self, variable, vertex_slice):
         if variable not in self.__sampling_rates:
-            return None
+            return None, None
         if self.__sampling_rates[variable] == 0:
-            return 0
+            return 0, 0
         if self.__indexes[variable] is None:
-            return vertex_slice.n_atoms
-        return sum(vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
-                   for index in self.__indexes[variable])
+            return self.__sampling_rates[variable], vertex_slice.n_atoms
+        count = sum(vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
+                    for index in self.__indexes[variable])
+        if count:
+            return self.__sampling_rates[variable], count
+        return 0, 0
 
     def _max_recording_per_slice(self, variable, n_atoms):
         """
@@ -796,7 +793,7 @@ class NeuronRecorder(object):
         :return:
         :rtype: int
         """
-        n_neurons = self._count_recording_per_slice(variable, vertex_slice)
+        _, n_neurons = self._rate_and_count_per_slice(variable, vertex_slice)
         return self._get_buffered_sdram_per_record(variable, n_neurons)
 
     def get_max_buffered_sdram_per_record(self, variable, n_atoms):
@@ -1048,22 +1045,14 @@ class NeuronRecorder(object):
         # There is no data here for per-timestep variables by design
         data = list()
         for variable in self.__sampling_rates:
-            # Do bitfields afterwards
+            rate, n_recording = self._rate_and_count_per_slice(
+                variable, vertex_slice)
             if variable in self.__bitfield_variables:
-                continue
-            rate = self.__sampling_rates[variable]
-            n_recording = self._count_recording_per_slice(
-                variable, vertex_slice)
-            dtype = self.__data_types[variable]
-            data.append(numpy.array(
-                [rate, n_recording, dtype.size], dtype="uint32"))
-            self.__add_indices(data, variable, rate, n_recording, vertex_slice)
-
-        for variable in self.__bitfield_variables:
-            rate = self.__sampling_rates[variable]
-            n_recording = self._count_recording_per_slice(
-                variable, vertex_slice)
-            data.append(numpy.array([rate, n_recording], dtype="uint32"))
+                data.append(numpy.array([rate, n_recording], dtype="uint32"))
+            else:
+                dtype = self.__data_types[variable]
+                data.append(numpy.array(
+                    [rate, n_recording, dtype.size], dtype="uint32"))
             self.__add_indices(data, variable, rate, n_recording, vertex_slice)
 
         return numpy.concatenate(data)
@@ -1105,18 +1094,12 @@ class NeuronRecorder(object):
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
         data = [n_vars, len(self.__bitfield_variables)]
         for variable in self.__sampling_rates:
+            rate, _ = self._rate_and_count_per_slice(
+                variable, vertex_slice)
             if variable in self.__bitfield_variables:
-                continue
-            rate = self.__sampling_rates[variable]
-            data.extend([rate, self.__data_types[variable].size])
-            if rate == 0:
-                data.extend([0, 0])
+                data.append(rate)
             else:
-                data.extend(self.__get_generator_indices(
-                    variable, vertex_slice, atoms_shape))
-        for variable in self.__bitfield_variables:
-            rate = self.__sampling_rates[variable]
-            data.append(rate)
+                data.extend([rate, self.__data_types[variable].size])
             if rate == 0:
                 data.extend([0, 0])
             else:
