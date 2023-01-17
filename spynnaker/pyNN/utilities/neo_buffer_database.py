@@ -885,7 +885,7 @@ class NeoBufferDatabase(BufferDatabase):
         rew_length = len(rewires_raw)
         # rewires is 0 (elimination) or 1 (formation) in the first bit
         rewires = [rewires_raw[i][0] & self.__FIRST_BIT
-                   for i in range(rew_length)]
+            for i in range(rew_length)]
         # the post-neuron ID is stored in the next 8 bytes
         post_ids = [((int(rewires_raw[i]) >> self.__POST_ID_SHIFT) %
                      self.__POST_ID_FACTOR) + vertex_slice.lo_atom
