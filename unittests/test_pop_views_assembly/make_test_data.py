@@ -120,6 +120,7 @@ def make_rewires():
     shutil.copyfile(run_buffer, my_buffer)
 
 
-make_data(do_view=True)
-make_data(do_view=False)
-#make_rewires()
+if __name__ == '__main__':
+    make_data(do_view=True)
+    make_data(do_view=False)
+    make_rewires()
