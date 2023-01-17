@@ -242,7 +242,6 @@ class TestDataPopulation(BaseTestCase):
             # Only one type of data at a time is supported
             pop.spinnaker_get_data(["v", "spikes"])
 
-
     def test_rewiring(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "rewiring_data.sqlite3")
@@ -305,4 +304,4 @@ class TestDataPopulation(BaseTestCase):
 
         # Like index selections/ views and indexes raise an exception
         with self.assertRaises(TypeError):
-            view = pop[1, 10]
+            pop[1, 10]

@@ -442,7 +442,7 @@ class NeoBufferDatabase(BufferDatabase):
         for row in cursor.execute(
                 """
                 SELECT rec_id,  data_type, buffered_type,  t_start,
-                       sampling_interval_ms, first_id, pop_size, units, 
+                       sampling_interval_ms, first_id, pop_size, units,
                        atoms_shape, n_colour_bits
                 FROM recording_view
                 WHERE label = ? AND variable = ?
@@ -849,7 +849,7 @@ class NeoBufferDatabase(BufferDatabase):
             signal_array = []
 
         if len(indexes) > 0:
-            assert(len(pop_neurons) == 0)
+            assert (len(pop_neurons) == 0)
             if view_indexes is not None:
                 raise SpynnakerException(
                     "data can not be extracted using a view")
@@ -897,7 +897,7 @@ class NeoBufferDatabase(BufferDatabase):
         rew_length = len(rewires_raw)
         # rewires is 0 (elimination) or 1 (formation) in the first bit
         rewires = [rewires_raw[i][0] & self.__FIRST_BIT
-            for i in range(rew_length)]
+                   for i in range(rew_length)]
         # the post-neuron ID is stored in the next 8 bytes
         post_ids = [((int(rewires_raw[i]) >> self.__POST_ID_SHIFT) %
                      self.__POST_ID_FACTOR) + vertex_slice.lo_atom

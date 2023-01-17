@@ -85,7 +85,7 @@ def make_rewires():
     pop = sim.Population(9, sim.IF_curr_exp(), label="pop_1")
 
     # Elimination with random selection (0 probability formation)
-    proj = sim.Projection(
+    sim.Projection(
         stim, pop, sim.AllToAllConnector(),
         sim.StructuralMechanismStatic(
             partner_selection=sim.RandomSelection(),
@@ -99,10 +99,8 @@ def make_rewires():
     sim.run(10)
 
     neo = pop.get_data("rewiring")
-    formation_events = neo.segments[0].events[0]
     elimination_events = neo.segments[0].events[1]
 
-    num_forms = len(formation_events.times)
     num_elims = len(elimination_events.times)
 
     run_buffer = BaseDatabase.default_database_file()
