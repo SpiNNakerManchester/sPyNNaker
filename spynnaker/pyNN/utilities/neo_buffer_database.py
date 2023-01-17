@@ -860,7 +860,7 @@ class NeoBufferDatabase(BufferDatabase):
 
     def __get_rewires_by_region(
             self, cursor, region_id, vertex_slice, rewire_values,
-            rewire_postids, rewire_preids, rewire_times):
+            rewire_postids, rewire_preids, rewire_times, sampling_interval_ms):
         """
         Extracts rewires data for this region and adds it to the lists
 
@@ -880,8 +880,7 @@ class NeoBufferDatabase(BufferDatabase):
         else:
             return
 
-        record_time = (raw_data[:, 0] *
-                       SpynnakerDataView.get_simulation_time_step_ms())
+        record_time = (raw_data[:, 0] * sampling_interval_ms)
         rewires_raw = raw_data[:, 1:]
         rew_length = len(rewires_raw)
         # rewires is 0 (elimination) or 1 (formation) in the first bit
@@ -900,7 +899,7 @@ class NeoBufferDatabase(BufferDatabase):
         rewire_preids.extend(pre_ids)
         rewire_times.extend(record_time)
 
-    def __get_rewires(self, cursor, rec_id):
+    def __get_rewires(self, cursor, rec_id, sampling_interval_ms):
         """
         Extracts rewires data for this region a
 
@@ -920,15 +919,16 @@ class NeoBufferDatabase(BufferDatabase):
 
             self.__get_rewires_by_region(
                 cursor, region_id, vertex_slice, rewire_values,
-                rewire_postids, rewire_preids, rewire_times)
+                rewire_postids, rewire_preids, rewire_times,
+                sampling_interval_ms)
 
             if len(rewire_values) == 0:
                 return numpy.zeros((0, 4), dtype="float")
 
-            result = numpy.column_stack(
-                (rewire_times, rewire_preids, rewire_postids, rewire_values))
-            return result[numpy.lexsort(
-                (rewire_values, rewire_postids, rewire_preids, rewire_times))]
+        result = numpy.column_stack(
+            (rewire_times, rewire_preids, rewire_postids, rewire_values))
+        return result[numpy.lexsort(
+            (rewire_values, rewire_postids, rewire_preids, rewire_times))]
 
     def __get_recorded_pynn7(
             self, cursor, rec_id, data_type, sampling_interval_ms,
@@ -1168,7 +1168,7 @@ class NeoBufferDatabase(BufferDatabase):
     def __add_deta(self, cursor, pop_label, variable, block, segment,
                    view_indexes, t_stop):
         """
-        Gets the data as a Numpy array for one opulation and variable
+        Gets the data as a Numpy array for one population and variable
 
         :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
@@ -1201,7 +1201,8 @@ class NeoBufferDatabase(BufferDatabase):
             if view_indexes is not None:
                 raise SpynnakerException(
                     f"{variable} can not be extracted using a view")
-            event_array = self.__get_rewires(cursor, rec_id)
+            event_array = self.__get_rewires(
+                cursor, rec_id, sampling_interval_ms)
             self.__add_neo_events(segment, event_array, variable, t_start)
         else:
             if view_indexes is None:

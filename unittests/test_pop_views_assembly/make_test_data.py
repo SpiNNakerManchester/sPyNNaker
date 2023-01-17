@@ -63,5 +63,50 @@ def make_data(do_view):
     shutil.copyfile(run_buffer, my_buffer)
 
 
+def make_rewires():
+    sim.setup(1.0)
+    sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
+    stim = sim.Population(9, sim.SpikeSourceArray(range(10)), label="stim")
+
+    # These populations should experience elimination
+    pop = sim.Population(9, sim.IF_curr_exp(), label="pop_1")
+
+    # Elimination with random selection (0 probability formation)
+    proj = sim.Projection(
+        stim, pop, sim.AllToAllConnector(),
+        sim.StructuralMechanismStatic(
+            partner_selection=sim.RandomSelection(),
+            formation=sim.DistanceDependentFormation([3, 3], 0.0),
+            elimination=sim.RandomByWeightElimination(4.0, 1.0, 1.0),
+            f_rew=1000, initial_weight=4.0, initial_delay=3.0,
+            s_max=9, seed=0, weight=0.0, delay=1.0))
+
+    pop.record("rewiring")
+
+    sim.run(10)
+
+    neo = pop.get_data("rewiring")
+    formation_events = neo.segments[0].events[0]
+    elimination_events = neo.segments[0].events[1]
+
+    num_forms = len(formation_events.times)
+    num_elims = len(elimination_events.times)
+
+    run_buffer = BaseDatabase.default_database_file()
+    my_dir = os.path.dirname(os.path.abspath(__file__))
+    my_labels = os.path.join(my_dir, "rewiring_labels.txt")
+
+    with open(my_labels, "w", encoding="UTF-8") as label_f:
+        for i in range(num_elims):
+            label_f.write(elimination_events.labels[i])
+            label_f.write("\n")
+
+    sim.end()
+
+    my_buffer = os.path.join(my_dir, "rewiring_data.sqlite3")
+    shutil.copyfile(run_buffer, my_buffer)
+
+
 make_data(True)
 make_data(False)
+make_rewires()

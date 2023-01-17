@@ -44,10 +44,7 @@ class DataPopulation(object):
         with NeoBufferDatabase(self.__database_file) as db:
             size = db.get_population_metdadata(label)[0]
         self._size = size
-        if indexes is None:
-            self._indexes = range(size)
-        else:
-            self._indexes = indexes
+        self._indexes = indexes
 
     @overrides(Population.write_data)
     def write_data(self, io, variables='all', gather=True, clear=False,

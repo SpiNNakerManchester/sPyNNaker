@@ -31,17 +31,6 @@ def trim_spikes(spikes, indexes):
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 
-def copy_db(with_view):
-    run_buffer = BaseDatabase.default_database_file()
-    my_dir = os.path.dirname(os.path.abspath(__file__))
-    if with_view:
-        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
-    else:
-        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
-    shutil.copyfile(my_buffer, run_buffer)
-    SpynnakerDataView._mock_has_run()
-
-
 class TestDataPopulation(BaseTestCase):
 
     @classmethod
@@ -249,3 +238,29 @@ class TestDataPopulation(BaseTestCase):
         with pytest.raises(ConfigurationException):
             # Only one type of data at a time is supported
             pop.spinnaker_get_data(["v", "spikes"])
+
+
+    def test_rewiring(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "rewiring_data.sqlite3")
+        my_labels = os.path.join(my_dir, "rewiring_labels.txt")
+
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
+
+            neo = pop.get_data("rewiring")
+            formation_events = neo.segments[0].events[0]
+            elimination_events = neo.segments[0].events[1]
+
+            num_forms = len(formation_events.times)
+            self.assertEqual(0, len(formation_events))
+            num_elims = len(elimination_events.times)
+            self.assertEqual(10, len(elimination_events))
+
+            self.assertEqual(0, num_forms)
+            self.assertEqual(10, num_elims)
+
+            with open(my_labels, "r", encoding="UTF-8") as label_f:
+                for i, line in enumerate(label_f.readlines()):
+                    self.assertEqual(
+                        line.strip(), elimination_events.labels[i])
