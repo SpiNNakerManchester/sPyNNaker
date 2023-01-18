@@ -231,7 +231,7 @@ class Population(PopulationBase):
             record.
         """
         # pylint: disable=too-many-arguments
-        FecTimer.start_category(TimerCategory.POP_GET_DATA_DATA)
+        FecTimer.start_category(TimerCategory.POP_GET_DATA)
         self._check_params(gather, annotations)
 
         if isinstance(io, str):
@@ -239,7 +239,7 @@ class Population(PopulationBase):
 
         data = self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
-        FecTimer.end_category(TimerCategory.POP_GET_DATA_DATA)
+        FecTimer.end_category(TimerCategory.POP_GET_DATA)
         FecTimer.start_category(TimerCategory.POP_WRITE_DATA)
         # write the neo block to the file
         io.write(data)
