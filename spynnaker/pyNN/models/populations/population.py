@@ -22,6 +22,8 @@ from pyNN.random import NumpyRNG
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.interface.provenance import (
+    FecTimer, TimerCategory)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
@@ -178,8 +180,10 @@ class Population(PopulationBase):
         :param int sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
         """
+        FecTimer.start_category(TimerCategory.POP_RECORD)
         self.__recorder.record(
             variables, to_file, sampling_interval, indexes=None)
+        FecTimer.end_category(TimerCategory.POP_RECORD)
 
     def sample(self, n, rng=None):
         """ Randomly sample `n` cells from the Population, and return a\
@@ -227,6 +231,7 @@ class Population(PopulationBase):
             record.
         """
         # pylint: disable=too-many-arguments
+        FecTimer.start_category(TimerCategory.POP_GET_DATA_DATA)
         self._check_params(gather, annotations)
 
         if isinstance(io, str):
@@ -234,8 +239,11 @@ class Population(PopulationBase):
 
         data = self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
+        FecTimer.end_category(TimerCategory.POP_GET_DATA_DATA)
+        FecTimer.start_category(TimerCategory.POP_WRITE_DATA)
         # write the neo block to the file
         io.write(data)
+        FecTimer.end_category(TimerCategory.POP_WRITE_DATA)
 
     def describe(self, template='population_default.txt', engine='default'):
         """ Returns a human-readable description of the population.
@@ -308,9 +316,11 @@ class Population(PopulationBase):
             If the variable or variables have not been previously set to
             record.
         """
+        FecTimer.start_category(TimerCategory.POP_GET_DATA)
         self._check_params(gather, annotations)
         return self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
+        FecTimer.end_category(TimerCategory.POP_GET_DATA)
 
     def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
         """ Public accessor for getting data as a numpy array, instead of\
@@ -324,12 +334,14 @@ class Population(PopulationBase):
         :return: array of the data
         :rtype: ~numpy.ndarray
         """
+        FecTimer.start_category(TimerCategory.POP_GET_DATA)
         warn_once(
             logger, "spinnaker_get_data is non-standard PyNN and therefore "
             "will not be portable to other simulators.")
         with NeoBufferDatabase() as db:
             return db.spinnaker_get_data(self.__recorder.recording_label,
                                          variable, as_matrix, view_indexes)
+        FecTimer.end_category(TimerCategory.POP_GET_DATA)
 
     @overrides(PopulationBase.get_spike_counts, extend_doc=False)
     def get_spike_counts(self, gather=True):
@@ -337,9 +349,11 @@ class Population(PopulationBase):
 
         :rtype: ~numpy.ndarray
         """
+        FecTimer.start_category(TimerCategory.POP_GET_DATA)
         self._check_params(gather)
         with NeoBufferDatabase() as db:
             return db.get_spike_counts(self.__recorder.recording_label)
+        FecTimer.end_category(TimerCategory.POP_GET_DATA)
 
     def find_units(self, variable):
         """ Get the units of a variable
