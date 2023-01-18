@@ -24,6 +24,8 @@ from spinn_utilities.ranged.abstract_sized import AbstractSized
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.interface.provenance import (
+    FecTimer, TimerCategory)
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -324,6 +326,7 @@ class PopulationView(PopulationBase):
             If the variable or variables have not been previously set to
             record.
         """
+        FecTimer.start_category(TimerCategory.POP_GET_DATA)
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
                            "as if gather was set to True.")
@@ -331,6 +334,7 @@ class PopulationView(PopulationBase):
             warn_once(
                 logger, "Annotations parameter is not standard PyNN so may "
                 "not be supported by all platforms.")
+        FecTimer.end_category(TimerCategory.POP_GET_DATA)
 
         return self.__recorder.extract_neo_block(
             variables, self.__indexes, clear, annotations)
@@ -480,8 +484,10 @@ class PopulationView(PopulationBase):
             should be a value in milliseconds, and an integer multiple of the
             simulation timestep.
         """
+        FecTimer.start_category(TimerCategory.POP_RECORD)
         self.__recorder.record(
             variables, to_file, sampling_interval, self.__indexes)
+        FecTimer.end_category(TimerCategory.POP_RECORD)
 
     def sample(self, n, rng=None):
         """ Randomly sample `n` cells from the Population view, and return a\
@@ -556,17 +562,21 @@ class PopulationView(PopulationBase):
             If the variable or variables have not been previously set to
             record.
         """
+        FecTimer.start_category(TimerCategory.POP_GET_DATA)
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
                            "as if gather was set to True.")
         data = self.__recorder.extract_neo_block(
             variables, self.__indexes, clear, annotations)
+        FecTimer.end_category(TimerCategory.POP_GET_DATA)
 
+        FecTimer.start_category(TimerCategory.POP_WRITE_DATA)
         if isinstance(io, str):
             io = neo.get_io(io)
 
         # write the neo block to the file
         io.write(data)
+        FecTimer.end_category(TimerCategory.POP_WRITE_DATA)
 
     @property
     @overrides(PopulationBase._vertex)
