@@ -231,10 +231,11 @@ class NeuronRecorder(object):
             return []
         if self.__indexes[variable] is None:
             return vertex_slice.get_raster_ids(atoms_shape)
-        indexes = self.__indexes[variable]
-        return [
-            i for i in vertex_slice.get_raster_ids(atoms_shape)
-            if i in indexes]
+        all_set = set(self.__indexes[variable])
+        slice_set = set(vertex_slice.get_raster_ids(atoms_shape))
+        local_list = list(all_set.intersection(slice_set))
+        local_list.sort()
+        return local_list
 
     def _convert_placement_matrix_data(
             self, row_data, n_rows, data_row_length, n_neurons, data_type):
