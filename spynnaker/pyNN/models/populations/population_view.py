@@ -596,8 +596,8 @@ class PopulationView(PopulationBase):
     def __eq__(self, other):
         if not isinstance(other, PopulationView):
             return False
-        return self.__vertex == other._vertex and \
-               self._indexes == other._indexes
+        return (self.__vertex == other._vertex and
+                self._indexes == other._indexes)
 
     def __ne__(self, other):
         if not isinstance(other, PopulationView):
