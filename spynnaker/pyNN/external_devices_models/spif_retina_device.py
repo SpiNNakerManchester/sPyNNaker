@@ -289,3 +289,22 @@ class SPIFRetinaDevice(
     @overrides(HasShapeKeyFields.get_shape_key_fields)
     def get_shape_key_fields(self, vertex_slice):
         return self._key_fields
+
+    @overrides(PopulationApplicationVertex.get_atom_key_map)
+    def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
+        # Work out which machine vertex
+        x_start, y_start = pre_vertex.vertex_slice.start
+        key_and_mask = self.get_machine_fixed_key_and_mask(
+            pre_vertex, partition_id)
+        x_end = x_start + self._sub_width
+        y_end = y_start + self._sub_height
+        key_x = (key_and_mask.key >> self._source_x_shift) & self.X_MASK
+        key_y = (key_and_mask.key >> self._source_y_shift) & self.Y_MASK
+        neuron_id = (pre_vertex.vertex_slice.lo_atom +
+                     (key_y * self.X_PER_ROW) + key_x)
+        for x in range(x_start, x_end, self.X_MASK + 1):
+            for y in range(y_start, y_end, self.Y_MASK + 1):
+                key = (key_and_mask.key | (x << self._source_x_shift) |
+                       (y << self._source_y_shift))
+                yield (neuron_id, key)
+                neuron_id += self.X_PER_ROW
