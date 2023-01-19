@@ -28,9 +28,8 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.utilities.constants import SPIKES
-from .idmixin import IDMixin
 from .population_base import PopulationBase
-from .population_view import PopulationView
+from .population_view import PopulationView, IDMixin
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
