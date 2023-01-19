@@ -722,7 +722,8 @@ class NeoBufferDatabase(BufferDatabase):
         :return:
         """
         # keep just the view indexes in the data
-        indexes = [i for i in view_indexes if i in data_indexes]
+        data_set = set(data_indexes)
+        indexes = [i for i in view_indexes if i in data_set]
         # check for missing and report
         view_set = set(view_indexes)
         missing = view_set.difference(data_indexes)
