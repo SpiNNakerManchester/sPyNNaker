@@ -53,8 +53,6 @@ class PopulationView(PopulationBase):
 
     __realslots__ = tuple("_PopulationView" + item for item in __slots__)
 
-    #__realslots__ = tuple("_IDMixin" + item for item in __slots__)
-
     def __init__(self, parent, selector, label=None):
         """
         :param parent: the population or view to make the view from
@@ -598,14 +596,6 @@ class PopulationView(PopulationBase):
     def __eq__(self, other):
         if not isinstance(other, PopulationView):
             return False
-        a = self.__vertex
-        b = other._vertex
-        c = a == b
-        d = self._indexes
-        e = other._indexes
-        f = d == e
-        g = type(self)
-        h = type(other)
         return self.__vertex == other._vertex and \
                self._indexes == other._indexes
 
@@ -632,7 +622,6 @@ class IDMixin(PopulationView):
         """
         return self._vertex.get_parameter_values(
             self._vertex.get_parameters(), self.id)
-
 
     # NON-PYNN API CALLS
     @property
@@ -695,4 +684,3 @@ class IDMixin(PopulationView):
         """
         # There are no MPI nodes!
         return True
-
