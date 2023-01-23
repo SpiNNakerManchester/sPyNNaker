@@ -63,6 +63,7 @@ typedef struct {
     lc_coord_t recip_pool_strides;
     uint16_t positive_synapse_type;
     uint16_t negative_synapse_type;
+    uint32_t delay;
     lc_weight_t weights[]; // n_weights = next_even(kernel.width * kernel.height)
 } connector;
 
@@ -198,12 +199,12 @@ static inline void do_convolution_operation(
             }
             uint32_t rb_index = 0;
             if (weight > 0) {
-                rb_index = synapse_row_get_ring_buffer_index(time + 1,
+                rb_index = synapse_row_get_ring_buffer_index(time + connector->delay,
                     connector->positive_synapse_type, post_index,
                     synapse_type_index_bits, synapse_index_bits,
                     synapse_delay_mask);
             } else {
-                rb_index = synapse_row_get_ring_buffer_index(time + 1,
+                rb_index = synapse_row_get_ring_buffer_index(time + connector->delay,
                     connector->negative_synapse_type, post_index,
                     synapse_type_index_bits, synapse_index_bits,
                     synapse_delay_mask);

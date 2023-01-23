@@ -68,6 +68,7 @@ typedef struct {
     uint32_t n_weights;
     uint16_t positive_synapse_type;
     uint16_t negative_synapse_type;
+    uint32_t delay;
     dimension dimensions[];
     // Also follows:
     // lc_weight_t weights[];
@@ -213,12 +214,12 @@ void local_only_impl_process_spike(
         }
         uint32_t rb_index = 0;
         if (weight > 0) {
-            rb_index = synapse_row_get_ring_buffer_index(time + 1,
+            rb_index = synapse_row_get_ring_buffer_index(time + connector->delay,
                 connector->positive_synapse_type, post_index,
                 synapse_type_index_bits, synapse_index_bits,
                 synapse_delay_mask);
         } else {
-            rb_index = synapse_row_get_ring_buffer_index(time + 1,
+            rb_index = synapse_row_get_ring_buffer_index(time + connector->delay,
                 connector->negative_synapse_type, post_index,
                 synapse_type_index_bits, synapse_index_bits,
                 synapse_delay_mask);

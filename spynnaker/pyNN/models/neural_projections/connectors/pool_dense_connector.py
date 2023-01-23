@@ -29,7 +29,7 @@ from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 
 _DIMENSION_SIZE = (2 * BYTES_PER_WORD) + (6 * BYTES_PER_SHORT)
 _KEY_INFO_SIZE = 3 * BYTES_PER_WORD
-_CONN_SIZE = _KEY_INFO_SIZE + (2 * BYTES_PER_WORD) + (2 * BYTES_PER_SHORT)
+_CONN_SIZE = _KEY_INFO_SIZE + (3 * BYTES_PER_WORD) + (2 * BYTES_PER_SHORT)
 _DIM_DTYPE = [("mask", "uint32"), ("shift", "uint32"), ("pre_start", "uint16"),
               ("pre_in_post_start", "uint16"), ("pre_in_post_end", "uint16"),
               ("pre_in_post_shape", "uint16"), ("recip_pool_stride", "uint16"),
@@ -282,6 +282,9 @@ class PoolDenseConnector(AbstractConnector):
             self.__negative_receptor_type)
         spec.write_value(pos_synapse_type, data_type=DataType.UINT16)
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
+
+        # Write delay
+        spec.write_value(app_edge.post_vertex.synapse_dynamics.delay)
 
         # Generate the dimension information
         dim_info = numpy.zeros(n_dims, dtype=_DIM_DTYPE)

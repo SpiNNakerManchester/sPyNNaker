@@ -33,7 +33,7 @@ SOURCE_KEY_INFO_WORDS = 7
 
 #: The number of 16-bit shorts in the connector struct,
 #: ignoring the source_key_info struct and the weights (which are dynamic)
-CONNECTOR_CONFIG_SHORTS = 12
+CONNECTOR_CONFIG_SHORTS = 14
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -394,6 +394,9 @@ class ConvolutionConnector(AbstractConnector):
             self.__negative_receptor_type)
         spec.write_value(pos_synapse_type, data_type=DataType.UINT16)
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
+
+        # Write delay
+        spec.write_value(app_edge.post_vertex.synapse_dynamics.delay)
 
         # Encode weights with weight scaling
         encoded_kernel_weights = self.__kernel_weights.flatten()
