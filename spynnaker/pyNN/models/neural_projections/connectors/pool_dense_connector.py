@@ -25,6 +25,7 @@ from data_specification.enums.data_type import DataType
 from collections.abc import Iterable
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 
 _DIMENSION_SIZE = (2 * BYTES_PER_WORD) + (6 * BYTES_PER_SHORT)
@@ -284,7 +285,8 @@ class PoolDenseConnector(AbstractConnector):
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
 
         # Write delay
-        spec.write_value(app_edge.post_vertex.synapse_dynamics.delay)
+        spec.write_value(app_edge.post_vertex.synapse_dynamics.delay *
+                         SpynnakerDataView.get_simulation_time_step_per_ms())
 
         # Generate the dimension information
         dim_info = numpy.zeros(n_dims, dtype=_DIM_DTYPE)
