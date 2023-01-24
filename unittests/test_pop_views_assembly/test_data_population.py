@@ -18,14 +18,11 @@ import os
 import pickle
 import numpy
 import pytest
-import shutil
-from spinn_front_end_common.utilities.base_database import BaseDatabase
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.data import SpynnakerDataView
-import pyNN.spiNNaker as sim
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from .make_test_data import N_NEURONS
 
 
@@ -33,19 +30,7 @@ def trim_spikes(spikes, indexes):
     return [[n, t] for [n, t] in spikes if n in indexes]
 
 
-_VIEW_DATA = "view_data.sqlite3"
-_ALL_DATA = "all_data.sqlite3"
-
-
-def copy_db(data_file):
-    run_buffer = BaseDatabase.default_database_file()
-    my_dir = os.path.dirname(os.path.abspath(__file__))
-    my_buffer = os.path.join(my_dir, data_file)
-    shutil.copyfile(my_buffer, run_buffer)
-    SpynnakerDataView._mock_has_run()
-
-
-class TestGetting(BaseTestCase):
+class TestDataPopulation(BaseTestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -68,9 +53,10 @@ class TestGetting(BaseTestCase):
         cls.spikes_expected = numpy.array(spikes_expected)
 
     def test_simple_spikes(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        copy_db(_ALL_DATA)
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
 
         neo = pop.get_data("spikes")
         spikes = neo_convertor.convert_spikes(neo)
@@ -85,17 +71,15 @@ class TestGetting(BaseTestCase):
         spiketrains = neo.segments[0].spiketrains
         assert N_NEURONS == len(spiketrains)
 
-        neo = pop.get_v()
+        neo = pop.get_data("v")
         v = neo.segments[0].filter(name='v')[0].magnitude
         assert numpy.array_equal(v,  self.v_expected)
 
-        sim.end()
-
     def test_get_spikes_by_index(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        pop.record("spikes")
-        copy_db(_ALL_DATA)
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
 
         neo = pop[1, 2].get_data("spikes")
         spikes = neo_convertor.convert_spikes(neo)
@@ -104,28 +88,25 @@ class TestGetting(BaseTestCase):
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
 
-        sim.end()
-
     def test_get_spikes_by_view(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        copy_db(_ALL_DATA)
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
 
         view = pop[1:3]
-        view.record("spikes")
-        neo = view.get_data("spikes", gather=False)
+        neo = view.get_data("spikes")
         spikes = neo_convertor.convert_spikes(neo)
         target = trim_spikes(self.spikes_expected, [1, 2])
         assert numpy.array_equal(spikes, target)
         spiketrains = neo.segments[0].spiketrains
         assert 2 == len(spiketrains)
 
-        sim.end()
-
     def test_get_spikes_view_missing(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        copy_db(_VIEW_DATA)
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
 
         view = pop[2:4]
         neo = view.get_data("spikes")
@@ -139,13 +120,11 @@ class TestGetting(BaseTestCase):
         assert 0 == len(spiketrains[1])
         assert 3 == spiketrains[1].annotations['source_index']
 
-        sim.end()
-
     def test_get_v_view(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        pop.record("spikes")
-        copy_db(_ALL_DATA)
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
 
         view = pop[1:3]
         neo = view.get_data("v")
@@ -154,13 +133,11 @@ class TestGetting(BaseTestCase):
         assert v.shape == target.shape
         assert numpy.array_equal(v,  target)
 
-        sim.end()
-
     def test_get_v_missing(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        pop[1:3].record("v")
-        copy_db(_VIEW_DATA)
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
 
         view = pop[0:3]
         neo = view.get_data("v")
@@ -169,32 +146,33 @@ class TestGetting(BaseTestCase):
         assert numpy.array_equal(
             [1, 2], neo.segments[0].filter(name='v')[0].channel_index.index)
         assert v.shape == target.shape
+        for i in range(35):
+            print(i)
+            print(v[1])
+            print(target[i])
         assert numpy.array_equal(v,  target)
 
-        sim.end()
-
     def test_get_spike_counts(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        pop.record("spikes")
-        copy_db(_ALL_DATA)
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
 
-        assert {0: 3, 1: 2, 2: 3, 3: 3, 4: 1, 5: 3, 6: 0, 7: 2, 8: 3} == \
-               pop.get_spike_counts()
+        self.assertEqual(
+            pop.get_spike_counts(),
+            {0: 3, 1: 2, 2: 3, 3: 3, 4: 1, 5: 3, 6: 0, 7: 2, 8: 3})
 
         view = pop[1:4]
-        assert {1: 2, 2: 3, 3: 3} == view.get_spike_counts()
+        self.assertEqual({1: 2, 2: 3, 3: 3}, view.get_spike_counts())
 
-        assert 2.2222222222222223 == pop.meanSpikeCount()
+        assert 2.2222222222222223 == pop.mean_spike_count()
         assert 2.6666666666666665 == view.mean_spike_count()
 
-        sim.end()
-
     def test_write(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        pop.record(["spikes", "v"])
-        copy_db(_ALL_DATA)
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
 
         # Note gather=False will be ignored just testing it can be
         pop.write_data("spikes.pkl", "spikes", gather=False)
@@ -203,70 +181,103 @@ class TestGetting(BaseTestCase):
             spikes = neo_convertor.convert_spikes(neo)
             assert numpy.array_equal(spikes, self.spikes_expected)
 
-        pop.printSpikes("spikes.pkl")
+        pop.write_data("spikes.pkl", 'spikes')
         with open("spikes.pkl", "rb") as pkl:
             neo = pickle.load(pkl)
             spikes = neo_convertor.convert_spikes(neo)
             assert numpy.array_equal(spikes, self.spikes_expected)
 
-        pop.print_v("v.pkl")
+        pop.write_data("v.pkl", "v")
         with open("v.pkl", "rb") as pkl:
             neo = pickle.load(pkl)
             v = neo.segments[0].filter(name='v')[0].magnitude
             assert v.shape == self.v_expected.shape
             assert numpy.array_equal(v,  self.v_expected)
 
-        sim.end()
-
     def test_spinnaker_get_data(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        pop.record("v")
-        copy_db(_ALL_DATA)
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
+
+        spikes = pop.spinnaker_get_data("spikes")
+        assert numpy.array_equal(spikes, self.spikes_expected)
 
         v = pop.spinnaker_get_data("v")
-        assert len(v) == 35 * 9
+        assert len(v) == 35 * N_NEURONS
+        target = self.v_expected
+        for neuron, time, val in v:
+            self.assertEqual(val, target[int(time), int(neuron)],
+                             f"{time}{neuron}")
+
+        view = pop[4, 2]
+        spikes = view.spinnaker_get_data("spikes")
+        target = trim_spikes(self.spikes_expected, [4, 2])
+        assert numpy.array_equal(spikes, target)
+
+        spikes = pop.spinnaker_get_data("spikes", view_indexes=[4, 2])
+        assert numpy.array_equal(spikes, target)
 
         with pytest.raises(ConfigurationException):
+            # Only one type of data at a time is supported
             pop.spinnaker_get_data(["v", "spikes"])
-        sim.end()
+
+    def test_spinnaker_get_data_view(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
+
+        spikes = pop.spinnaker_get_data("spikes")
+        target = trim_spikes(self.spikes_expected, [1, 2])
+        assert numpy.array_equal(spikes, target)
+
+        v = pop.spinnaker_get_data("v")
+        assert len(v) == 35 * 2
+        target = self.v_expected
+        for neuron, time, val in v:
+            self.assertEqual(val, target[int(time), int(neuron)],
+                             f"{time}{neuron}")
+        with pytest.raises(ConfigurationException):
+            # Only one type of data at a time is supported
+            pop.spinnaker_get_data(["v", "spikes"])
 
     def test_rewiring(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        pop.record("rewiring")
-        copy_db("rewiring_data.sqlite3")
-
         my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "rewiring_data.sqlite3")
         my_labels = os.path.join(my_dir, "rewiring_labels.txt")
 
-        neo = pop.get_data("rewiring")
-        formation_events = neo.segments[0].events[0]
-        elimination_events = neo.segments[0].events[1]
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
 
-        num_forms = len(formation_events.times)
-        self.assertEqual(0, len(formation_events))
-        num_elims = len(elimination_events.times)
-        self.assertEqual(10, len(elimination_events))
+            neo = pop.get_data("rewiring")
+            formation_events = neo.segments[0].events[0]
+            elimination_events = neo.segments[0].events[1]
 
-        self.assertEqual(0, num_forms)
-        self.assertEqual(10, num_elims)
+            num_forms = len(formation_events.times)
+            self.assertEqual(0, len(formation_events))
+            num_elims = len(elimination_events.times)
+            self.assertEqual(10, len(elimination_events))
 
-        with open(my_labels, "r", encoding="UTF-8") as label_f:
-            for i, line in enumerate(label_f.readlines()):
-                self.assertEqual(
-                    line.strip(), elimination_events.labels[i])
+            self.assertEqual(0, num_forms)
+            self.assertEqual(10, num_elims)
 
-        view = pop[2:4]
-        #  rewiring can not be extracted using a view
-        with self.assertRaises(SpynnakerException):
-            neo = view.get_data("rewiring")
+            with open(my_labels, "r", encoding="UTF-8") as label_f:
+                for i, line in enumerate(label_f.readlines()):
+                    self.assertEqual(
+                        line.strip(), elimination_events.labels[i])
+
+            pop = db.get_population("pop_1")
+            view = pop[2:4]
+            #  rewiring can not be extracted using a view
+            with self.assertRaises(SpynnakerException):
+                neo = view.get_data("rewiring")
 
     def test_packets(self):
-        sim.setup(timestep=1.0)
-        pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
-        pop.record("packets-per-timestep")
-        copy_db(_ALL_DATA)
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
 
         neo = pop.get_data("packets-per-timestep")
         packets = neo.segments[0].filter(name='packets-per-timestep')[0]
@@ -281,3 +292,16 @@ class TestGetting(BaseTestCase):
                 packets_expected.append(row)
 
         assert numpy.array_equal(packets,  packets_expected)
+
+    def test_bad_view(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        with NeoBufferDatabase(my_buffer) as db:
+            pop = db.get_population("pop_1")
+
+        # Like normal slices/ views out of range is ignored
+        pop[1:10]
+
+        # Like index selections/ views and indexes raise an exception
+        with self.assertRaises(TypeError):
+            pop[1, 10]
