@@ -18,6 +18,7 @@ import pyNN.spiNNaker as p
 
 def structural_eliminate_to_empty():
     p.setup(1.0)
+    p.set_number_of_neurons_per_core(p.IF_curr_exp, 5)
     stim = p.Population(9, p.SpikeSourceArray(range(10)), label="stim")
 
     # These populations should experience elimination
@@ -57,7 +58,8 @@ def structural_eliminate_to_empty():
     assert len(conns) == 0
     assert num_elims == 81
     assert num_forms == 0
-    assert first_elim == "7_5_elimination"
+    assert first_elim == "8_5_elimination"
+    assert "7_5_elimination" in elimination_events.labels
 
 
 class TestStructuralEliminateToEmpty(BaseTestCase):

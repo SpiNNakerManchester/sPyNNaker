@@ -431,3 +431,14 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         :rtype: ~Recorder
         """
+
+    @staticmethod
+    def _check_params(gather, annotations=None):
+        if not gather:
+            logger.warning(
+                "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
+        if annotations is not None:
+            warn_once(
+                logger, "annotations parameter is not standard PyNN so may "
+                        "not be supported by all platforms.")

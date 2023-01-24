@@ -15,8 +15,10 @@
 
 from neo.io import PickleIO
 import pyNN.spiNNaker as sim
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities import neo_compare
 from spinnaker_testbase import BaseTestCase
+
 
 pickle_path = "data.pickle"
 
@@ -101,13 +103,13 @@ class TestRecordingOnOff(BaseTestCase):
         neo_compare.compare_blocks(v_neo, v_saved)
         neo_compare.compare_blocks(v_neo, neo)
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(ConfigurationException):
             pop.get_data("spikes")
-        with self.assertRaises(KeyError):
+        with self.assertRaises(ConfigurationException):
             pop.get_data("gsyn_exc")
-        with self.assertRaises(KeyError):
+        with self.assertRaises(ConfigurationException):
             pop.write_data(pickle_path, "spikes")
-        with self.assertRaises(KeyError):
+        with self.assertRaises(ConfigurationException):
             pop.write_data(pickle_path, "gsyn_exc")
 
     def test_record_v(self):
