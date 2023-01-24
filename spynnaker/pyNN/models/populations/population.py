@@ -252,24 +252,24 @@ class Population(PopulationBase):
         :type engine: str or ~pyNN.descriptions.TemplateEngine or None
         :rtype: str or dict
         """
-        vertex_context = self.__vertex.describe()
-
         context = {
             "label": self.label,
-            "celltype": vertex_context,
+            "celltype": self.celltype.describe(template=None),
             "structure": None,
             "size": self.size,
             "size_local": self.size,
             "first_id": self.first_id,
             "last_id": self.last_id,
         }
-        context.update(self.__annotations)
+        context.update(self.annotations)
         if self.size > 0:
             context.update({
-                "local_first_id": self.first_id,
-                "cell_parameters": {}})
-        if self.__structure:
-            context["structure"] = self.__structure.describe(template=None)
+                "local_first_id": 0,
+                "cell_parameters": self.__vertex.get_parameter_values(
+                    self.__vertex.get_parameters(), 0)
+            })
+        if self.structure:
+            context["structure"] = self.structure.describe(template=None)
         return descriptions.render(engine, template, context)
 
     def _end(self):

@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pyNN import descriptions
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
@@ -56,3 +57,27 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             n_neurons, label, max_atoms, spikes_per_second, ring_buffer_sigma,
             incoming_spike_buffer_size, self.__model, self, drop_late_spikes,
             splitter, seed, n_colour_bits)
+
+    @property
+    def name(self):
+        return self.__model.model_name
+
+    def describe(self, template='modeltype_default.txt', engine='default'):
+        """ Returns a human-readable description of the population.
+
+        The output may be customized by specifying a different template
+        together with an associated template engine (see
+        :mod:`pyNN.descriptions`).
+
+        If ``template`` is ``None``, then a dictionary containing the template
+        context will be returned.
+
+        :param str template: Template filename
+        :param engine: Template substitution engine
+        :type engine: str or ~pyNN.descriptions.TemplateEngine or None
+        :rtype: str or dict
+        """
+        context = {
+            "name": self.name
+        }
+        return descriptions.render(engine, template, context)
