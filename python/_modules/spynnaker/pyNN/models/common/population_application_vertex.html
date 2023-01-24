@@ -50,21 +50,12 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.helpful_functions</span> <span class="kn">import</span> <span class="n">is_singleton</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">HasCustomAtomKeyMap</span>
 <span class="kn">from</span> <span class="nn">pacman.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_field_based_keys</span>
-
-
-<span class="k">class</span> <span class="nc">RecordingType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The type of data being recorded</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">BIT_FIELD</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">MATRIX</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">EVENT</span> <span class="o">=</span> <span class="mi">2</span>
 
 
 <span class="k">class</span> <span class="nc">PopulationApplicationVertex</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">,</span> <span class="n">HasCustomAtomKeyMap</span><span class="p">):</span>
@@ -253,21 +244,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">False</span>
 
+    <span class="c1"># recording methods</span>
+    <span class="c1"># If get_recordable_variables implemented other recording methods must</span>
+    <span class="c1"># be too</span>
+
 <div class="viewcode-block" id="PopulationApplicationVertex.get_recordable_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recordable_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a list of the names and types of things that can be recorded</span>
+
+<span class="sd">        This methods list the variable recorded via the Population</span>
 
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[]</span></div>
-
-<div class="viewcode-block" id="PopulationApplicationVertex.can_record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.can_record">[docs]</a>    <span class="k">def</span> <span class="nf">can_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if the given variable can be recorded.</span>
-
-<span class="sd">        :param str name: The name of the variable to test</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=unused-argument</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="PopulationApplicationVertex.set_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_recording">[docs]</a>    <span class="k">def</span> <span class="nf">set_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Set a variable recording</span>
@@ -281,7 +269,12 @@
 <span class="sd">        :type indices: list(int) or None</span>
 <span class="sd">        :raises KeyError: if the variable cannot be recorded</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+        <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">()</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> has recording variables so should implement &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;set_recording&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationApplicationVertex.set_not_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_not_recording">[docs]</a>    <span class="k">def</span> <span class="nf">set_not_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Set a variable not recording</span>
@@ -292,66 +285,105 @@
 <span class="sd">        :type indices: list(int) or None</span>
 <span class="sd">        :raises KeyError: if the variable cannot be stopped from recording</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-            <span class="s2">&quot;This Population does not support the stopping of recording&quot;</span><span class="p">)</span></div>
+        <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">()</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> has recording variables so should implement &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;set_not_recording&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationApplicationVertex.get_recording_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a list of variables that are currently being recorded</span>
 
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[]</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">()</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> has recording variables so should implement &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;get_recording_variables&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationApplicationVertex.is_recording_variable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.is_recording_variable">[docs]</a>    <span class="k">def</span> <span class="nf">is_recording_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Indicate whether the given variable is being recorded</span>
+<div class="viewcode-block" id="PopulationApplicationVertex.get_buffer_data_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_buffer_data_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_buffer_data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the type of data recorded by the buffer manager</span>
 
-<span class="sd">        :param str name: The name of the variable to check the status of</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        :raises KeyError: if the variable is not supported</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="PopulationApplicationVertex.get_recorded_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recorded_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the data recorded for a given variable</span>
+<span class="sd">        The BufferDatabase value controls how data returned by the cores is</span>
+<span class="sd">        handled in NeoBufferDatabase</span>
 
 <span class="sd">        :param str name: The name of the variable recorded</span>
-<span class="sd">        :rtype: ndarray</span>
+<span class="sd">        :rtype: ~spynnaker.pyNN.utilities.neo_buffer_database.BufferDatabase</span>
 <span class="sd">        :raises KeyError: if the variable isn&#39;t being recorded</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not being recorded&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> has recording variables so should implement &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;get_recording_variables&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationApplicationVertex.get_recording_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_sampling_interval">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationApplicationVertex.get_sampling_interval_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_sampling_interval_ms">[docs]</a>    <span class="k">def</span> <span class="nf">get_sampling_interval_ms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the sampling interval of the recording for the given variable</span>
+
+<span class="sd">        The values is in ms and unless selective recording is used will be</span>
+<span class="sd">        SpynnakerDataView.get_simulation_time_step_us()</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        :raises KeyError: If the variable isn&#39;t being recorded</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not being recorded&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> has recording variables so should implement &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;get_recording_variables&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationApplicationVertex.get_recording_indices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the indices of the given variable that are being recorded</span>
+<div class="viewcode-block" id="PopulationApplicationVertex.get_data_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_data_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the type data returned by a recording of the variable</span>
 
-<span class="sd">        :rtype: list(int)</span>
-<span class="sd">        :raises KeyError: If the variable isn&#39;t being recorded</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="PopulationApplicationVertex.get_recording_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the type of recording of the variable</span>
+<span class="sd">        This is the type of data the C code is returning.</span>
+<span class="sd">        For instance dta such as spikes this will be None</span>
 
 <span class="sd">        :param str name: The name of the variable to get the type of</span>
-<span class="sd">        :rtype: RecordingType</span>
+<span class="sd">        :rtype: ~data_specification.enums.DataType or None</span>
 <span class="sd">        :raise KeyError: If the variable isn&#39;t recordable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not being recorded&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> has recording variables so should implement &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;get_data_type&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationApplicationVertex.clear_recording_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.clear_recording_data">[docs]</a>    <span class="k">def</span> <span class="nf">clear_recording_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Clear the data for the given recording</span>
+<div class="viewcode-block" id="PopulationApplicationVertex.get_recording_region"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_region">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the recording region for the named variable</span>
 
-<span class="sd">        :param str name: The name of the variable to clear the data from</span>
-<span class="sd">        :raise KeyError: If the variable isn&#39;t recordable</span>
+<span class="sd">        :param str name: The name of the variable to get the region of</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        :raises KeyError: If the variable isn&#39;t being recorded</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;This Population does not support recording&quot;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not being recorded&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> has recording variables so should implement &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;get_recording_region&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationApplicationVertex.get_neurons_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_neurons_recording">[docs]</a>    <span class="k">def</span> <span class="nf">get_neurons_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the neurons being recorded on the core with this slice</span>
+
+<span class="sd">        Typically vertex_slice.get_raster_ids(atoms_shape)</span>
+<span class="sd">        But may be a sublist if doing selective recording</span>
+
+<span class="sd">        :param str name: The name of the variable to get the region of</span>
+<span class="sd">        :param vertex_slice:</span>
+<span class="sd">        :return: A list of the global raster IDs of the atoms in recording</span>
+<span class="sd">            named variable within this slice</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not being recorded&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> has recording variables so should implement &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;get_neurons_recording&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># end of recording methods</span>
 
 <div class="viewcode-block" id="PopulationApplicationVertex.inject"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex.inject">[docs]</a>    <span class="k">def</span> <span class="nf">inject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_source</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Inject a current source into this population</span>

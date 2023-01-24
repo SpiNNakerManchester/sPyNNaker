@@ -29,14 +29,6 @@ spynnaker.pyNN.utilities.constants module
    :undoc-members:
    :show-inheritance:
 
-spynnaker.pyNN.utilities.data\_cache module
--------------------------------------------
-
-.. automodule:: spynnaker.pyNN.utilities.data_cache
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 spynnaker.pyNN.utilities.extracted\_data module
 -----------------------------------------------
 
@@ -89,14 +81,6 @@ spynnaker.pyNN.utilities.utility\_calls module
 ----------------------------------------------
 
 .. automodule:: spynnaker.pyNN.utilities.utility_calls
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-spynnaker.pyNN.utilities.variable\_cache module
------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.utilities.variable_cache
    :members:
    :undoc-members:
    :show-inheritance:

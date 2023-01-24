@@ -71,9 +71,9 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">MultiSpikeRecorder</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">create_mars_kiss_seeds</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">SupportsStructure</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">PopulationApplicationVertex</span><span class="p">,</span> <span class="n">RecordingType</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">PopulationApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">ParameterHolder</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.buffer_data_type</span> <span class="kn">import</span> <span class="n">BufferDataType</span>
 <span class="kn">from</span> <span class="nn">.spike_source_poisson_machine_vertex</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SpikeSourcePoissonMachineVertex</span><span class="p">,</span> <span class="n">_flatten</span><span class="p">,</span> <span class="n">get_rates_bytes</span><span class="p">,</span>
     <span class="n">get_sdram_edge_params_bytes</span><span class="p">,</span> <span class="n">get_expander_rates_bytes</span><span class="p">,</span> <span class="n">get_params_bytes</span><span class="p">)</span>
@@ -398,9 +398,15 @@
     <span class="k">def</span> <span class="nf">get_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;spikes&quot;</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.can_record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.can_record">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">can_record</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">can_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;spikes&quot;</span></div>
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_buffer_data_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_buffer_data_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_buffer_data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">BufferDataType</span><span class="o">.</span><span class="n">MULTI_SPIKES</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_region"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recording_region">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.set_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">set_recording</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -422,12 +428,6 @@
             <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;spikes&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">[]</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.is_recording_variable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.is_recording_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">is_recording_variable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">is_recording_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span></div>
-
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.set_not_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_not_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">set_not_recording</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_not_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
@@ -437,44 +437,22 @@
                            <span class="s2">&quot;SpikeSourceArray so being ignored&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recorded_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recorded_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_recorded_data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_recorded_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="n">SpikeSourcePoissonVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">,</span>
-            <span class="bp">self</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recording_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_recording_sampling_interval</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_recording_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_sampling_interval_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_sampling_interval_ms">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_sampling_interval_ms</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_sampling_interval_ms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_us</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_indices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recording_indices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_recording_indices</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_recording_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_data_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_data_type">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_data_type</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_recording_type">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">get_recording_type</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_recording_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_neurons_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_neurons_recording">[docs]</a>    <span class="k">def</span> <span class="nf">get_neurons_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">RecordingType</span><span class="o">.</span><span class="n">BIT_FIELD</span></div>
-
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.clear_recording_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.clear_recording_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">clear_recording_data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">clear_recording_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot record </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">buffer_manager</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_buffer_manager</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
-            <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
-                <span class="n">machine_vertex</span><span class="p">)</span>
-            <span class="n">buffer_manager</span><span class="o">.</span><span class="n">clear_recorded_data</span><span class="p">(</span>
-                <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
-                <span class="n">SpikeSourcePoissonVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">get_raster_ids</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.max_spikes_per_ts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.max_spikes_per_ts">[docs]</a>    <span class="k">def</span> <span class="nf">max_spikes_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ts_per_second</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_s</span><span class="p">()</span>
@@ -573,6 +551,15 @@
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.clear_spike_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.clear_spike_recording">[docs]</a>    <span class="k">def</span> <span class="nf">clear_spike_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">buffer_manager</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_buffer_manager</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
+                <span class="n">machine_vertex</span><span class="p">)</span>
+            <span class="n">buffer_manager</span><span class="o">.</span><span class="n">clear_recorded_data</span><span class="p">(</span>
+                <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                <span class="n">SpikeSourcePoissonVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.describe"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Return a human-readable description of the cell or synapse type.</span>

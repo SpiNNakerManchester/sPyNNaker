@@ -1455,37 +1455,9 @@ overridden by a vertex that supports multiple dimensions.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.can_record">
-<span class="sig-name descname"><span class="pre">can_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.can_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.can_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the given variable can be recorded.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to test</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_connection_cache">
 <span class="sig-name descname"><span class="pre">clear_connection_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.clear_connection_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_connection_cache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flush the cache of connection information; needed for a second run</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_recording_data">
-<span class="sig-name descname"><span class="pre">clear_recording_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.clear_recording_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_recording_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clear the data for the given recording</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to clear the data from</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If the variable isn’t recordable</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -1591,6 +1563,25 @@ will be returned.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_buffer_data_type">
+<span class="sig-name descname"><span class="pre">get_buffer_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_buffer_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_buffer_data_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the type of data recorded by the buffer manager</p>
+<p>The BufferDatabase value controls how data returned by the cores is
+handled in NeoBufferDatabase</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable recorded</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>BufferDatabase</em></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – if the variable isn’t being recorded</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_common_constant_sdram">
 <span class="sig-name descname"><span class="pre">get_common_constant_sdram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_provenance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_regions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_common_constant_sdram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_common_constant_sdram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the amount of SDRAM used by common parts</p>
@@ -1643,6 +1634,25 @@ for all. See:
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – if the variable is not something that can be read</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_data_type">
+<span class="sig-name descname"><span class="pre">get_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_data_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the type data returned by a recording of the variable</p>
+<p>This is the type of data the C code is returning.
+For instance dta such as spikes this will be None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the type of</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a> or None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If the variable isn’t recordable</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1780,6 +1790,26 @@ which might be one if this is a single-dimension vertex</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neurons_recording">
+<span class="sig-name descname"><span class="pre">get_neurons_recording</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_neurons_recording"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neurons_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the neurons being recorded on the core with this slice</p>
+<p>Typically vertex_slice.get_raster_ids(atoms_shape)
+But may be a sublist if doing selective recording</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the region of</p></li>
+<li><p><strong>vertex_slice</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of the global raster IDs of the atoms in recording
+named variable within this slice</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_parameter_values">
 <span class="sig-name descname"><span class="pre">get_parameter_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_parameter_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_parameter_values" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
@@ -1819,6 +1849,7 @@ for all. See:
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recordable_variables">
 <span class="sig-name descname"><span class="pre">get_recordable_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_recordable_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a list of the names and types of things that can be recorded</p>
+<p>This methods list the variable recorded via the Population</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -1827,63 +1858,18 @@ for all. See:
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recorded_data">
-<span class="sig-name descname"><span class="pre">get_recorded_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_recorded_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recorded_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the data recorded for a given variable</p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_region">
+<span class="sig-name descname"><span class="pre">get_recording_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_recording_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the recording region for the named variable</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable recorded</p>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the region of</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>ndarray</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – if the variable isn’t being recorded</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_indices">
-<span class="sig-name descname"><span class="pre">get_recording_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_recording_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_indices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the indices of the given variable that are being recorded</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If the variable isn’t being recorded</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_sampling_interval">
-<span class="sig-name descname"><span class="pre">get_recording_sampling_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_recording_sampling_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_sampling_interval" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the sampling interval of the recording for the given variable</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If the variable isn’t being recorded</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_type">
-<span class="sig-name descname"><span class="pre">get_recording_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_recording_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the type of recording of the variable</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the type of</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.RecordingType" title="spynnaker.pyNN.models.common.RecordingType">RecordingType</a></p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If the variable isn’t recordable</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If the variable isn’t being recorded</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1912,6 +1898,22 @@ for all. See:
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sampling_interval_ms">
+<span class="sig-name descname"><span class="pre">get_sampling_interval_ms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_sampling_interval_ms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sampling_interval_ms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the sampling interval of the recording for the given variable</p>
+<p>The values is in ms and unless selective recording is used will be
+SpynnakerDataView.get_simulation_time_step_us()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If the variable isn’t being recorded</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2156,23 +2158,6 @@ for all. See:
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ConfigurationException</strong> – if the population doesn’t support injection</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.is_recording_variable">
-<span class="sig-name descname"><span class="pre">is_recording_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.is_recording_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.is_recording_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicate whether the given variable is being recorded</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to check the status of</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – if the variable is not supported</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2570,7 +2555,7 @@ time step, in milliseconds</p></li>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><em>ApplicationVertex</em></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="spynnaker.pyNN.models.common.PopulationApplicationVertex"><em>PopulationApplicationVertex</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2615,7 +2600,7 @@ time step, in milliseconds</p></li>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><em>ApplicationVertex</em></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="spynnaker.pyNN.models.common.PopulationApplicationVertex"><em>PopulationApplicationVertex</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -4239,9 +4224,7 @@ buffering</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.CORE_PARAMS_BASE_SIZE"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.CORE_PARAMS_BASE_SIZE</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.add_incoming_projection"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.add_incoming_projection()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.atoms_shape"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.atoms_shape</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.can_record"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.can_record()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_connection_cache"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.clear_connection_cache()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_recording_data"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.clear_recording_data()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.combined_core_capable"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.combined_core_capable</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.conductance_based"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.conductance_based</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.copy_initial_state_variables"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.copy_initial_state_variables()</span></code></a></li>
@@ -4250,9 +4233,11 @@ buffering</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.current_sources"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.current_sources</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.describe"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.describe()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.drop_late_spikes"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.drop_late_spikes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_buffer_data_type"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_buffer_data_type()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_common_constant_sdram"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_common_constant_sdram()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_connections_from_machine"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_connections_from_machine()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_current_state_values"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_current_state_values()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_data_type"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_data_type()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_incoming_projections_from"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_incoming_projections_from()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_initial_state_values"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_initial_state_values()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_atoms_per_core"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_max_atoms_per_core()</span></code></a></li>
@@ -4262,15 +4247,14 @@ buffering</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_synapse_variable_sdram"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_max_synapse_variable_sdram()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_constant_sdram"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_neuron_constant_sdram()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_variable_sdram"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_neuron_variable_sdram()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neurons_recording"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_neurons_recording()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_parameter_values"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_parameter_values()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_parameters"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recordable_variables"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_recordable_variables()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recorded_data"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_recorded_data()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_indices"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_recording_indices()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_sampling_interval"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_recording_sampling_interval()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_type"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_recording_type()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_region"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_recording_region()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recording_variables"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_recording_variables()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_ring_buffer_shifts"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_ring_buffer_shifts()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sampling_interval_ms"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_sampling_interval_ms()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_core_neuron_params"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_sdram_usage_for_core_neuron_params()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_current_source_params"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_sdram_usage_for_current_source_params()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_neuron_generation"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_sdram_usage_for_neuron_generation()</span></code></a></li>
@@ -4290,7 +4274,6 @@ buffering</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.incoming_spike_buffer_size"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.incoming_spike_buffer_size</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.initial_state_variables"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.initial_state_variables</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.inject"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.inject()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.is_recording_variable"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.is_recording_variable()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.n_atoms"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.n_atoms</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.n_colour_bits"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.n_colour_bits</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.n_profile_samples"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.n_profile_samples</span></code></a></li>

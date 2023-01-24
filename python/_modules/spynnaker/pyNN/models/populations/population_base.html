@@ -469,6 +469,17 @@
 
 <span class="sd">        :rtype: ~Recorder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_params</span><span class="p">(</span><span class="n">gather</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">gather</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;sPyNNaker only supports gather=True. We will run &quot;</span>
+                <span class="s2">&quot;as if gather was set to True.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">annotations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warn_once</span><span class="p">(</span>
+                <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;annotations parameter is not standard PyNN so may &quot;</span>
+                        <span class="s2">&quot;not be supported by all platforms.&quot;</span><span class="p">)</span>
 </pre></div>
 
             <div class="clearer"></div>

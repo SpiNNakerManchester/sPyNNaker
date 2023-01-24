@@ -65,12 +65,12 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_pynn_model</span> <span class="kn">import</span> <span class="n">AbstractPyNNModel</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.recorder</span> <span class="kn">import</span> <span class="n">Recorder</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKES</span>
 <span class="kn">from</span> <span class="nn">.idmixin</span> <span class="kn">import</span> <span class="n">IDMixin</span>
 <span class="kn">from</span> <span class="nn">.population_base</span> <span class="kn">import</span> <span class="n">PopulationBase</span>
 <span class="kn">from</span> <span class="nn">.population_view</span> <span class="kn">import</span> <span class="n">PopulationView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">SupportsStructure</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">PopulationApplicationVertex</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.neo_buffer_database</span> <span class="kn">import</span> <span class="n">NeoBufferDatabase</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
 
@@ -198,7 +198,7 @@
 <span class="sd">        :param str variable: The variable to answer the question about</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">can_record</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.record">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationBase</span><span class="o">.</span><span class="n">record</span><span class="p">,</span> <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -265,10 +265,7 @@
 <span class="sd">            record.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">gather</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;sPyNNaker only supports gather=True. We will run &quot;</span>
-                <span class="s2">&quot;as if gather was set to True.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_params</span><span class="p">(</span><span class="n">gather</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">io</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">get_io</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
@@ -349,15 +346,7 @@
 <span class="sd">            If the variable or variables have not been previously set to</span>
 <span class="sd">            record.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">gather</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;sPyNNaker only supports gather=True. We will run &quot;</span>
-                <span class="s2">&quot;as if gather was set to True.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">annotations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warn_once</span><span class="p">(</span>
-                <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;annotations parameter is not standard PyNN so may &quot;</span>
-                        <span class="s2">&quot;not be supported by all platforms.&quot;</span><span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_params</span><span class="p">(</span><span class="n">gather</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">extract_neo_block</span><span class="p">(</span>
             <span class="n">variables</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">clear</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span></div>
 
@@ -376,20 +365,9 @@
         <span class="n">warn_once</span><span class="p">(</span>
             <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;spinnaker_get_data is non-standard PyNN and therefore &quot;</span>
             <span class="s2">&quot;will not be portable to other simulators.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                    <span class="s2">&quot;Only one type of data at a time is supported&quot;</span><span class="p">)</span>
-            <span class="n">variable</span> <span class="o">=</span> <span class="n">variable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">SPIKES</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">as_matrix</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ignoring as matrix for </span><span class="si">{</span><span class="n">SPIKES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">spikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;spikes&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">view_indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">spikes</span>
-            <span class="k">return</span> <span class="n">spikes</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">spikes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">view_indexes</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">get_recorded_pynn7</span><span class="p">(</span>
-            <span class="n">variable</span><span class="p">,</span> <span class="n">as_matrix</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span></div>
+        <span class="k">with</span> <span class="n">NeoBufferDatabase</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">spinnaker_get_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">recording_label</span><span class="p">,</span>
+                                         <span class="n">variable</span><span class="p">,</span> <span class="n">as_matrix</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.get_spike_counts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.get_spike_counts">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationBase</span><span class="o">.</span><span class="n">get_spike_counts</span><span class="p">,</span> <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_spike_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -397,29 +375,9 @@
 
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">spikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;spikes&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_spike_counts</span><span class="p">(</span><span class="n">spikes</span><span class="p">,</span> <span class="n">gather</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">_get_spike_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the number of spikes for each neuron.</span>
-
-<span class="sd">        Defined by</span>
-<span class="sd">        http://neuralensemble.org/docs/PyNN/reference/populations.html</span>
-
-<span class="sd">        :param ~numpy.ndarray spikes:</span>
-<span class="sd">        :param gather: pointless on sPyNNaker</span>
-<span class="sd">        :rtype: dict(int,int)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">gather</span><span class="p">:</span>
-            <span class="n">warn_once</span><span class="p">(</span>
-                <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;sPyNNaker only supports gather=True. We will run &quot;</span>
-                <span class="s2">&quot;as if gather was set to True.&quot;</span><span class="p">)</span>
-        <span class="n">n_spikes</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">counts</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">spikes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-                                <span class="n">minlength</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">):</span>
-            <span class="n">n_spikes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">n_spikes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_params</span><span class="p">(</span><span class="n">gather</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">NeoBufferDatabase</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">get_spike_counts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">recording_label</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.find_units"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.find_units">[docs]</a>    <span class="k">def</span> <span class="nf">find_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the units of a variable</span>
@@ -629,10 +587,7 @@
 <span class="sd">            is a list.</span>
 <span class="sd">        :rtype: ParameterHolder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">gather</span><span class="p">:</span>
-            <span class="n">warn_once</span><span class="p">(</span>
-                <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;sPyNNaker only supports gather=True. We will run &quot;</span>
-                <span class="s2">&quot;as if gather was set to True.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_params</span><span class="p">(</span><span class="n">gather</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">simplify</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">warn_once</span><span class="p">(</span>
                 <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;The simplify value is ignored if not set to true&quot;</span><span class="p">)</span>
@@ -833,6 +788,7 @@
                     <span class="n">additional_parameters</span><span class="p">,</span> <span class="n">population_parameters</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">(</span>
                 <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">population_parameters</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">PopulationApplicationVertex</span><span class="p">)</span>
 
         <span class="c1"># Use a provided application vertex directly</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PopulationApplicationVertex</span><span class="p">):</span>
