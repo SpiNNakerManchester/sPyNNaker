@@ -25,3 +25,4 @@
 **/modified_src/**
 **/neural_modelling/builds/**/*.txt
 **/reports/**
+**/test_pop_views_assembly/*.txt

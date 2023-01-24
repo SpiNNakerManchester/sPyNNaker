@@ -1,0 +1,10 @@
+8_5_elimination
+8_8_elimination
+7_1_elimination
+0_0_elimination
+2_6_elimination
+7_6_elimination
+0_1_elimination
+6_6_elimination
+6_1_elimination
+0_2_elimination
