@@ -1363,6 +1363,13 @@ class NeoBufferDatabase(BufferDatabase):
         :param list(str) variables: names of variable to get data for
         """
         with self.transaction() as cursor:
+            if isinstance(variables, str):
+               variables = [variables]
+            if 'all' in variables:
+                variables = None
+            if variables is None:
+                variables = self.__get_recording_variables(pop_label, cursor)
+
             for variable in variables:
                 cursor.execute(
                     """
