@@ -1124,19 +1124,14 @@ class NeoBufferDatabase(BufferDatabase):
         segment.analogsignals.append(data_array)
         channel_index.analogsignals.append(data_array)
 
-    def __add_neo_events(
-            self, segment, event_array, variable, recording_start_time):
+    def __add_neo_events(self, segment, event_array, variable):
         """ Adds data that is events to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
         :param ~numpy.ndarray event_array: the raw "event" data
         :param str variable: the variable name
-        :param recording_start_time: when recording started
-        :type recording_start_time: float or int
         """
         # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-        t_start = recording_start_time * quantities.ms
-
         formation_times = []
         formation_labels = []
         formation_annotations = dict()
@@ -1145,7 +1140,7 @@ class NeoBufferDatabase(BufferDatabase):
         elimination_annotations = dict()
 
         for i in range(len(event_array)):
-            event_time = t_start + event_array[i][0] * quantities.ms
+            event_time = event_array[i][0] * quantities.ms
             pre_id = int(event_array[i][1])
             post_id = int(event_array[i][2])
             if event_array[i][3] == 1:
@@ -1214,7 +1209,7 @@ class NeoBufferDatabase(BufferDatabase):
                     f"{variable} can not be extracted using a view")
             event_array = self.__get_rewires(
                 cursor, rec_id, sampling_interval_ms)
-            self.__add_neo_events(segment, event_array, variable, t_start)
+            self.__add_neo_events(segment, event_array, variable)
         else:
             if view_indexes is None:
                 view_indexes = range(pop_size)
@@ -1369,8 +1364,19 @@ class NeoBufferDatabase(BufferDatabase):
                 variables = None
             if variables is None:
                 variables = self.__get_recording_variables(pop_label, cursor)
+            t_start = SpynnakerDataView.get_current_run_time_ms()
 
             for variable in variables:
+                cursor.execute(
+                    """
+                    UPDATE recording SET
+                        t_start = ?
+                    WHERE rec_id in
+                        (SELECT rec_id
+                        FROM recording_view
+                        WHERE label = ? AND variable = ?)
+                    """, (t_start, pop_label, variable))
+
                 cursor.execute(
                     """
                     UPDATE region SET
@@ -1389,6 +1395,7 @@ class NeoBufferDatabase(BufferDatabase):
                         FROM region_metadata NATURAL JOIN recording_view
                         WHERE label = ? AND variable = ?)
                     """, (pop_label, variable))
+
 
     def write_metadata(self):
         with self.transaction() as cursor:
