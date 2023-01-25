@@ -95,23 +95,23 @@ def _create_views():
 
 
 def _write_report(output):
-    reader = ProvenanceReader()
-    for data in reader.run_query("select * from redundancy_by_core"):
-        (_, _, _, source, _, filtered, invalid, _,
-         redundant, total, percent) = data
-        output.write(f"\ncore {source} \n")
-        output.write(f"    {total} packets received. \n")
-        output.write(f"    {redundant} were detected as "
-                     "redundant packets by the bitfield filter. \n")
-        output.write(
-            f"    {filtered} were detected as having no targets "
-            f"after the DMA stage. \n")
-        output.write(
-            f"    {invalid} were detected as packets which "
-            f"we should not have received in the first place. \n")
-        output.write(f"    Overall this makes a redundant percentage of "
-                     f"{percent}\n")
-    data = reader.run_query("select * from redundancy_summary")
+    with ProvenanceReader() as db:
+        for data in db.run_query("select * from redundancy_by_core"):
+            (_, _, _, source, _, filtered, invalid, _,
+             redundant, total, percent) = data
+            output.write(f"\ncore {source} \n")
+            output.write(f"    {total} packets received. \n")
+            output.write(f"    {redundant} were detected as "
+                         "redundant packets by the bitfield filter. \n")
+            output.write(
+                f"    {filtered} were detected as having no targets "
+                f"after the DMA stage. \n")
+            output.write(
+                f"    {invalid} were detected as packets which "
+                f"we should not have received in the first place. \n")
+            output.write(f"    Overall this makes a redundant percentage of "
+                         f"{percent}\n")
+        data = db.run_query("select * from redundancy_summary")
     (sum_total, max_total, min_total, avg_total,
         sum_reduant, max_redundant, min_redundant, avg_redundant,
         max_percent, min_percent, avg_percent, global_percent) = data[0]

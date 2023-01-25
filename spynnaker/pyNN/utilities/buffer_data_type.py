@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,11 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .eieio_spike_recorder import EIEIOSpikeRecorder
-from .neuron_recorder import NeuronRecorder
-from .multi_spike_recorder import MultiSpikeRecorder
-from .parameter_holder import ParameterHolder
-from .population_application_vertex import PopulationApplicationVertex
+from enum import (auto, Enum)
 
-__all__ = ["EIEIOSpikeRecorder", "NeuronRecorder", "MultiSpikeRecorder",
-           "ParameterHolder", "PopulationApplicationVertex"]
+
+class BufferDataType(Enum):
+    """
+    Different functions to retrieve the data.
+
+    This class is designed to used internally by NeoBufferDatabase
+    """
+    NEURON_SPIKES = (auto())
+    EIEIO_SPIKES = (auto())
+    MULTI_SPIKES = (auto())
+    MATRIX = (auto())
+    REWIRES = (auto())
+    NOT_NEO = (auto())
+
+    def __str__(self):
+        return self.name
