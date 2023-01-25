@@ -1359,7 +1359,7 @@ class NeoBufferDatabase(BufferDatabase):
         """
         with self.transaction() as cursor:
             if isinstance(variables, str):
-               variables = [variables]
+                variables = [variables]
             if 'all' in variables:
                 variables = None
             if variables is None:
@@ -1395,7 +1395,6 @@ class NeoBufferDatabase(BufferDatabase):
                         FROM region_metadata NATURAL JOIN recording_view
                         WHERE label = ? AND variable = ?)
                     """, (pop_label, variable))
-
 
     def write_metadata(self):
         with self.transaction() as cursor:

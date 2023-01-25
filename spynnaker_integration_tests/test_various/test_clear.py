@@ -20,7 +20,6 @@ from spinnaker_testbase import BaseTestCase
 
 class TestClearData(BaseTestCase):
 
-
     def make_rewires(self):
         sim.setup(1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
