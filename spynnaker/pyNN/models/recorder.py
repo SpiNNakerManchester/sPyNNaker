@@ -187,7 +187,14 @@ class Recorder(object):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
-        block = neo.Block()
+        block = NeoBufferDatabase.setup_block(
+            pop_label=self.__population._vertex.label,
+            description=self.__population.describe(),
+            pop_size=self.__population.size,
+            first_id=int(self.__population.first_id),
+            t_stop=SpynnakerDataView.get_simulation_time_step_ms(),
+            annotations=annotations
+        )
 
         for previous in range(0, SpynnakerDataView.get_segment_counter()):
             self.__append_previous_segment(
@@ -196,14 +203,6 @@ class Recorder(object):
         # add to the segments the new block
         self.__append_current_segment(block, variables, view_indexes, clear)
 
-        # add fluff to the neo block
-        block.name = self.__population.label
-        block.description = self.__population.describe()
-        # pylint: disable=no-member
-        block.rec_datetime = block.segments[0].rec_datetime
-        block.annotate(**self.__metadata())
-        if annotations:
-            block.annotate(**annotations)
         return block
 
     def cache_data(self):
@@ -269,22 +268,6 @@ class Recorder(object):
                 block, self.__population.label, variables, view_indexes)
             if clear:
                 db.clear_data(self.__population.label, variables)
-
-    def __metadata(self):
-        metadata = {
-            'size': self.__population.size,
-            'first_index': 0,
-            'last_index': self.__population.size,
-            'first_id': int(self.__population.first_id),
-            'last_id': int(self.__population.last_id),
-            'label': self.__population.label,
-            'simulator': SpynnakerDataView.get_sim_name()
-        }
-        metadata.update(self.__population.annotations)
-        metadata['dt'] = SpynnakerDataView.get_simulation_time_step_ms()
-        metadata['mpi_processes'] = 1  # meaningless on Spinnaker
-        return metadata
-
 
 def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
     """ Converts data between sPyNNaker format and Neo format

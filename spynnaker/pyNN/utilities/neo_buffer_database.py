@@ -1019,8 +1019,9 @@ class NeoBufferDatabase(BufferDatabase):
                                 minlength=pop_size)
         return {i: counts[i] for i in view_indexes}
 
-    def __add_spike_data(
-            self, pop_label, view_indexes, segment, spikes, t_start, t_stop,
+    @staticmethod
+    def add_spike_data(
+            pop_label, view_indexes, segment, spikes, t_start, t_stop,
             sampling_interval_ms, first_id):
         """
 
@@ -1093,8 +1094,9 @@ class NeoBufferDatabase(BufferDatabase):
         block.channel_indexes.append(channel_index)
         return channel_index
 
-    def __add_matix_data(
-            self, pop_label, variable, block, segment, signal_array,
+    @staticmethod
+    def add_matix_data(
+            pop_label, variable, block, segment, signal_array,
             indexes, t_start, sampling_interval_ms,
             units, first_id):
         """ Adds a data item that is an analog signal to a neo segment
@@ -1140,7 +1142,7 @@ class NeoBufferDatabase(BufferDatabase):
             name=variable,
             source_population=pop_label,
             source_ids=ids)
-        channel_index = self.__get_channel_index(indexes, block)
+        channel_index = NeoBufferDatabase.__get_channel_index(indexes, block)
         data_array.channel_index = channel_index
         data_array.shape = (data_array.shape[0], data_array.shape[1])
         segment.analogsignals.append(data_array)
@@ -1179,8 +1181,9 @@ class NeoBufferDatabase(BufferDatabase):
         csv_writer.writerow(indexes)
         csv_writer.writerows(signal_array)
 
-    def __add_neo_events(
-            self, segment, event_array, variable, recording_start_time):
+    @staticmethod
+    def add_neo_events(
+            segment, event_array, variable, recording_start_time):
         """ Adds data that is events to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
@@ -1293,7 +1296,7 @@ class NeoBufferDatabase(BufferDatabase):
         if buffer_type == BufferDataType.MATRIX:
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
-            self.__add_matix_data(
+            self.add_matix_data(
                 pop_label, variable, block, segment, signal_array,
                 indexes, t_start, sampling_interval_ms,
                 units, first_id)
@@ -1303,14 +1306,14 @@ class NeoBufferDatabase(BufferDatabase):
                     f"{variable} can not be extracted using a view")
             event_array = self.__get_rewires(
                 cursor, rec_id, sampling_interval_ms)
-            self.__add_neo_events(segment, event_array, variable, t_start)
+            self.add_neo_events(segment, event_array, variable, t_start)
         else:
             if view_indexes is None:
                 view_indexes = range(pop_size)
             spikes, indexes = self.__get_spikes(
                 cursor, rec_id, view_indexes, buffer_type, atoms_shape,
                 n_colour_bits, variable)
-            self.__add_spike_data(
+            self.add_spike_data(
                 pop_label, view_indexes, segment, spikes, t_start, t_stop,
                 sampling_interval_ms, first_id)
 
@@ -1369,6 +1372,28 @@ class NeoBufferDatabase(BufferDatabase):
                 n_colour_bits, variable)
             self.__csv_spike_data(csv_writer, spikes)
 
+    @staticmethod
+    def setup_block(pop_label, description, pop_size, first_id, t_stop,
+                    annotations=None):
+        block = neo.Block()
+        block.name = pop_label
+        block.description = description
+        # pylint: disable=no-member
+        metadata = {}
+        metadata['size'] = pop_size
+        metadata['first_index'] = 0
+        metadata['last_index'] = pop_size,
+        metadata['first_id'] = first_id
+        metadata['last_id'] = first_id + pop_size,
+        metadata['label'] = pop_label
+        metadata['simulator'] = SpynnakerDataView.get_sim_name()
+        metadata['dt'] = t_stop
+        metadata['mpi_processes'] = 1  # meaningless on Spinnaker
+        block.annotate(**metadata)
+        if annotations:
+            block.annotate(**annotations)
+        return block
+
     def get_block(self, pop_label, variables, view_indexes=None,
                   annotations=None):
         """
@@ -1392,34 +1417,15 @@ class NeoBufferDatabase(BufferDatabase):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        block = neo.Block()
-
-        block.name = pop_label
         with self.transaction() as cursor:
             _, rec_datetime, t_stop = self.__get_segment_info(cursor)
             pop_size, first_id, description = \
                 self.__get_population_metadata(cursor, pop_label)
-            block.description = description
-            # pylint: disable=no-member
-            block.rec_datetime = rec_datetime
+            block = self.setup_block(
+                pop_label, description, pop_size, first_id, t_stop)
 
-            metadata = {
-                'size': pop_size,
-                'first_index': 0,
-                'last_index': pop_size,
-                'first_id': first_id,
-                'last_id': first_id + pop_size,
-                'label': pop_label,
-                'simulator': SpynnakerDataView.get_sim_name()
-            }
-            metadata['dt'] = t_stop
-            metadata['mpi_processes'] = 1  # meaningless on Spinnaker
-            block.annotate(**metadata)
-            if annotations:
-                block.annotate(**annotations)
-
-        self.__add_segment(
-            cursor, block, pop_label, variables, view_indexes)
+            self.__add_segment(
+                cursor, block, pop_label, variables, view_indexes)
         return block
 
     def write_csv(self, csv_file, pop_label, variables, view_indexes=None):
@@ -1495,6 +1501,24 @@ class NeoBufferDatabase(BufferDatabase):
             self.__add_segment(
                 cursor, block, pop_label, variables, view_indexes)
 
+    @staticmethod
+    def setup_segment(block, segment_number, rec_datetime):
+        segment = neo.Segment(
+            name="segment{}".format(segment_number),
+            description=block.description,
+            rec_datetime=rec_datetime)
+        for i in range(len(block.segments), segment_number):
+            block.segments.append(neo.Segment(
+                name="segment{}".format(i),
+                description="empty"))
+        if segment_number in block.segments:
+            block.segments[segment_number] = segment
+        else:
+            block.segments.append(segment)
+        if block.rec_datetime is None:
+            block.rec_datetime = rec_datetime
+        return segment
+
     def __add_segment(self, cursor, block, pop_label, variables, view_indexes):
         """
         Adds a segment to the block
@@ -1518,14 +1542,7 @@ class NeoBufferDatabase(BufferDatabase):
         """
         segment_number, rec_datetime, t_stop = \
             self.__get_segment_info(cursor)
-        segment = neo.Segment(
-            name="segment{}".format(segment_number),
-            description=block.description,
-            rec_datetime=rec_datetime)
-        for i in range(len(block.segments), segment_number):
-            block.segments.append(neo.Segment(
-                name="segment{}".format(i),
-                description="empty"))
+        segment = self.setup_segment(block, segment_number, rec_datetime)
 
         if isinstance(variables, str):
             variables = [variables]
@@ -1537,10 +1554,6 @@ class NeoBufferDatabase(BufferDatabase):
         for variable in variables:
             self.__add_data(cursor, pop_label, variable, block, segment,
                             view_indexes, t_stop)
-        if segment_number in block.segments:
-            block.segments[segment_number] = segment
-        else:
-            block.segments.append(segment)
 
     def __csv_segment(self, cursor, csv_writer, pop_label, variables, view_indexes):
         """
