@@ -16,6 +16,7 @@
 import logging
 import neo
 import numpy
+import os
 from spinn_utilities.log import FormatAdapter
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
@@ -559,11 +560,17 @@ class PopulationView(PopulationBase):
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
                            "as if gather was set to True.")
+        if isinstance(io, str):
+            extension = os.path.splitext(io)[1][1:]
+            if extension == "csv":
+                with NeoBufferDatabase() as db:
+                    db.write_csv(io, self._vertex.label, variables,
+                                 view_indexes=self.__indexes)
+                    return
+            io = neo.get_io(io)
+
         data = self.__recorder.extract_neo_block(
             variables, self.__indexes, clear, annotations)
-
-        if isinstance(io, str):
-            io = neo.get_io(io)
 
         # write the neo block to the file
         io.write(data)

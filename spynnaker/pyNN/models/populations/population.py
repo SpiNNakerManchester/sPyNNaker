@@ -16,6 +16,7 @@
 import logging
 import numpy
 import neo
+import os
 import inspect
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
@@ -230,6 +231,11 @@ class Population(PopulationBase):
         self._check_params(gather, annotations)
 
         if isinstance(io, str):
+            extension = os.path.splitext(io)[1][1:]
+            if extension == "csv":
+                with NeoBufferDatabase() as db:
+                    db.write_csv(io, self._vertex.label, variables)
+                    return
             io = neo.get_io(io)
 
         data = self.__recorder.extract_neo_block(

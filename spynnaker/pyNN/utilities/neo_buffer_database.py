@@ -1463,6 +1463,9 @@ class NeoBufferDatabase(BufferDatabase):
                     ['simulator', SpynnakerDataView.get_sim_name()])
                 csv_writer.writerow(['dt', t_stop])
                 csv_writer.writerow(['mpi_processes', 1])
+                if view_indexes is not None:
+                    csv_writer.writerow(["Indexes"])
+                    csv_writer.writerow(view_indexes)
             # block.annotate(**annotations)
 
                 self.__csv_segment(
