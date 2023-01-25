@@ -851,7 +851,7 @@ class NeoBufferDatabase(BufferDatabase):
             assert (len(pop_neurons) == 0)
             if view_indexes is not None:
                 raise SpynnakerException(
-                    "data can not be extracted using a view")
+                    f"{variable} data can not be extracted using a view")
             return signal_array, indexes
 
         data_indexes = numpy.array(pop_neurons)
