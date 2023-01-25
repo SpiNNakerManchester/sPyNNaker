@@ -55,6 +55,22 @@ class TestCSV(BaseTestCase):
         with NeoBufferDatabase(my_buffer) as db:
             db.write_csv(my_csv, "pop_1", variables="all")
 
+    def test_view(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        my_csv = os.path.join(my_dir, "test.csv")
+        with NeoBufferDatabase(my_buffer) as db:
+            #  packets-per-timestep data can not be extracted using a view
+            db.write_csv(my_csv, "pop_1", variables=["spikes", "v"],
+                         view_indexes=[2, 4, 7, 8])
+
+    def test_spikes(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
+        my_csv = os.path.join(my_dir, "test.csv")
+        with NeoBufferDatabase(my_buffer) as db:
+            db.write_csv(my_csv, "pop_1", variables="spikes")
+
     def test_rewiring(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "rewiring_data.sqlite3")
