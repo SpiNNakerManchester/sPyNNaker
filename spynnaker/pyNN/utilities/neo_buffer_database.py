@@ -1095,22 +1095,15 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
          first_id, pop_size, units, atoms_shape, n_colour_bits) = \
             self.__get_recording_metadeta(cursor, pop_label, variable)
 
-        csv_writer.writerow([])
-        csv_writer.writerow(["variable", variable])
-        t_start = t_start * quantities.ms
-        csv_writer.writerow(["t_start", t_start])
-        sampling_period = sampling_interval_ms * quantities.ms
-        csv_writer.writerow(["sampling_period", sampling_period])
-        if units is None:
-            units = "dimensionless"
-        csv_writer.writerow(["units", units])
-        csv_writer.writerow([])
-
         if buffer_type == BufferDataType.MATRIX:
+            self._csv_variable_metdata(csv_writer, self._MATRIX, variable,
+                                       t_start, sampling_interval_ms, units)
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
             self._csv_matix_data(csv_writer, signal_array, indexes)
         elif buffer_type == BufferDataType.REWIRES:
+            self._csv_variable_metdata(csv_writer, self._EVENT, variable,
+                                       t_start, sampling_interval_ms, units)
             if view_indexes is not None:
                 raise SpynnakerException(
                     f"{variable} can not be extracted using a view")
@@ -1120,6 +1113,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         else:
             if view_indexes is None:
                 view_indexes = range(pop_size)
+            self._csv_variable_metdata(csv_writer, self._SPIKES, variable,
+                                       t_start, sampling_interval_ms, units)
             spikes, indexes = self.__get_spikes(
                 cursor, rec_id, view_indexes, buffer_type, atoms_shape,
                 n_colour_bits, variable)
@@ -1190,14 +1185,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 pop_size, first_id, description = \
                     self.__get_population_metadata(cursor, pop_label)
                 # block.annotate(**annotations)
-                self._csv_block(csv_writer, pop_label, rec_datetime, t_stop,
+                self._csv_block(csv_writer, pop_label, t_stop,
                            pop_size, first_id, description)
 
                 self._csv_indexes(csv_writer, view_indexes)
 
                 segment_number, rec_datetime, t_stop = \
                     self.__get_segment_info(cursor)
-                csv_writer.writerow(['segment', segment_number])
+                self._csv_segment(csv_writer, segment_number, rec_datetime)
 
                 variables = self.__clean_variables(
                     variables, pop_label, cursor)

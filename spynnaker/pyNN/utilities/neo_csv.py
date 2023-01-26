@@ -43,6 +43,43 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NeoCsv(object):
+    _POPULATION = "Population"
+    _DESCRIPTION = "description"
+    _SIZE = "size"
+    _FIRST_ID = "first_id"
+    _LAST_ID = "last_id"
+    _SIMULATOR = "simulator"
+    _DT = "dt"  # t_stop
+    _MPI_PROCESSES = "mpi_processes"
+
+    _INDEXES = "Indexes"
+
+    _SEGMENT = 'segment'
+    _REC_DATETIME = "rec_datetime"
+
+    _T_START = "t_start"
+    _SAMPLINFG_PERIOD = "sampling_period"
+    _UNITS = "units"
+
+    _MATRIX = "matrix"
+
+    _EVENT = "event"
+    _ELMINATION = "elimination"
+    _FORMATION = "formation"
+
+    _SPIKES = "spikes"
+
+    def _csv_variable_metdata(self, csv_writer, variable_type, variable,
+                              t_start, sampling_interval_ms, units):
+        csv_writer.writerow([variable_type, variable])
+        t_start = t_start * quantities.ms
+        csv_writer.writerow([self._T_START, t_start])
+        sampling_period = sampling_interval_ms * quantities.ms
+        csv_writer.writerow([self._SAMPLINFG_PERIOD, sampling_period])
+        if units is None:
+            units = "dimensionless"
+        csv_writer.writerow([self._UNITS, units])
+        csv_writer.writerow([])
 
     def _insert_spike_data(
             self, pop_label, view_indexes, segment, spikes, t_start, t_stop,
@@ -99,6 +136,7 @@ class NeoCsv(object):
         :param int first_id:
         """
         csv_writer.writerows(spikes)
+        csv_writer.writerow([])
 
     def __get_channel_index(self, ids, block):
         """
@@ -201,6 +239,7 @@ class NeoCsv(object):
         # pylint: disable=too-many-arguments, no-member, c-extension-no-member
         csv_writer.writerow(indexes)
         csv_writer.writerows(signal_array)
+        csv_writer.writerow([])
 
     def _insert_neo_events(
             self, segment, event_array, variable, recording_start_time):
@@ -282,11 +321,12 @@ class NeoCsv(object):
                     [event_time,
                      str(pre_id) + "_" + str(post_id) + "_elimination"])
 
-        csv_writer.writerow(["formation"])
+        csv_writer.writerow([self._FORMATION])
         csv_writer.writerows(formation)
         csv_writer.writerow([])
-        csv_writer.writerow(["elimination"])
+        csv_writer.writerow([self._ELMINATION])
         csv_writer.writerows(elimination)
+        csv_writer.writerow([])
 
     def _insert_segment(self, block, segment_number, rec_datetime):
         segment = neo.Segment(
@@ -301,13 +341,19 @@ class NeoCsv(object):
             block.segments[segment_number] = segment
         else:
             block.segments.append(segment)
+        segment.block = block
         if block.rec_datetime is None:
             block.rec_datetime = rec_datetime
+
         return segment
+
+    def _csv_segment(self, csv_writer, segment_number, rec_datetime):
+        csv_writer.writerow([self._SEGMENT, segment_number])
+        csv_writer.writerow([self._REC_DATETIME, rec_datetime])
 
     def _csv_indexes(self, csv_writer, view_indexes):
         if view_indexes is not None:
-            csv_writer.writerow(["Indexes"])
+            csv_writer.writerow([self._INDEXES])
             csv_writer.writerow(view_indexes)
             csv_writer.writerow([])
 
@@ -333,7 +379,7 @@ class NeoCsv(object):
             block.annotate(**annotations)
         return block
 
-    def _csv_block(self, csv_writer, pop_label, rec_datetime, t_stop,
+    def _csv_block(self, csv_writer, pop_label, t_stop,
                    pop_size, first_id, description):
         """
 
@@ -356,15 +402,14 @@ class NeoCsv(object):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        csv_writer.writerow(["Population", pop_label])
-        csv_writer.writerow(["description", f"\"{description}\""])
-        # pylint: disable=no-member
-        csv_writer.writerow(["rec_datetime", rec_datetime])
+        csv_writer.writerow([self._POPULATION, pop_label])
+        csv_writer.writerow([self._DESCRIPTION, f"\"{description}\""])
 
-        csv_writer.writerow(['size', pop_size])
-        csv_writer.writerow(['first_id', first_id])
-        csv_writer.writerow(['last_id', first_id + pop_size])
+        csv_writer.writerow([self._SIZE, pop_size])
+        csv_writer.writerow([self._FIRST_ID, first_id])
+        csv_writer.writerow([self._LAST_ID, first_id + pop_size])
         csv_writer.writerow(
-            ['simulator', SpynnakerDataView.get_sim_name()])
-        csv_writer.writerow(['dt', t_stop])
-        csv_writer.writerow(['mpi_processes', 1])
+            [self._SIMULATOR, SpynnakerDataView.get_sim_name()])
+        csv_writer.writerow([self._DT, t_stop])
+        # does not make sense on Spinnaker but oh well
+        csv_writer.writerow([self._MPI_PROCESSES, 1])
