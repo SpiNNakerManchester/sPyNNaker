@@ -38,11 +38,12 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKES
+from spynnaker.pyNN.utilities.neo_csv import NeoCsv
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class NeoBufferDatabase(BufferDatabase):
+class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     __N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     __TWO_WORDS = struct.Struct("<II")
@@ -74,7 +75,8 @@ class NeoBufferDatabase(BufferDatabase):
         else:
             read_only = True
 
-        super().__init__(database_file, read_only=read_only)
+        super().__init__(
+            database_file, read_only=read_only)
         with open(self.__NEO_DDL_FILE, encoding="utf-8") as f:
             sql = f.read()
 
@@ -1019,255 +1021,6 @@ class NeoBufferDatabase(BufferDatabase):
                                 minlength=pop_size)
         return {i: counts[i] for i in view_indexes}
 
-    @staticmethod
-    def add_spike_data(
-            pop_label, view_indexes, segment, spikes, t_start, t_stop,
-            sampling_interval_ms, first_id):
-        """
-
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
-                duplicate values
-
-        :param list(int) view_indexes:
-        :param Segment segment:
-        :param ~numpy.ndarray spikes:
-        :param float t_start:
-        :param float t_stop:
-        :param float sampling_interval_ms:
-        :param int first_id:
-        """
-        times = defaultdict(list)
-        for neuron_id, time in spikes:
-            times[int(neuron_id)].append(time)
-
-        for index in view_indexes:
-            spiketrain = neo.SpikeTrain(
-                times=times[index],
-                t_start=t_start,
-                t_stop=t_stop,
-                units='ms',
-                sampling_interval=sampling_interval_ms,
-                source_population=pop_label,
-                source_id=index + first_id,
-                source_index=index)
-            segment.spiketrains.append(spiketrain)
-
-    def __csv_spike_data(self, csv_writer, spikes):
-        """
-
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
-                duplicate values
-
-        :param list(int) view_indexes:
-        :param Segment segment:
-        :param ~numpy.ndarray spikes:
-        :param float t_start:
-        :param float t_stop:
-        :param float sampling_interval_ms:
-        :param int first_id:
-        """
-        csv_writer.writerows(spikes)
-
-
-    @staticmethod
-    def __get_channel_index(ids, block):
-        """
-
-        :param list(int) ids:
-        :param ~neo.core.Block block: neo block
-        :rtype: ~neo.core.ChannelIndex
-        """
-        for channel_index in block.channel_indexes:
-            if numpy.array_equal(channel_index.index, ids):
-                return channel_index
-        count = len(block.channel_indexes)
-        channel_index = neo.ChannelIndex(
-            name="Index {}".format(count), index=ids)
-        block.channel_indexes.append(channel_index)
-        return channel_index
-
-    @staticmethod
-    def add_matix_data(
-            pop_label, variable, block, segment, signal_array,
-            indexes, t_start, sampling_interval_ms,
-            units, first_id):
-        """ Adds a data item that is an analog signal to a neo segment
-
-         :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
-                duplicate values
-        :param str variable: the variable name
-        :param ~neo.core.Block block: Block tdata is being added to
-        :param ~neo.core.Segment segment: Segment to add data to
-        :param ~numpy.ndarray signal_array: the raw signal data
-        :param list(int) indexes: The indexes for the data
-        :type t_start: float or int
-        :param sampling_interval_ms: how often a neuron is recorded
-        :type sampling_interval_ms: float or int
-        :param units: the units of the recorded value
-        :type units: quantities.quantity.Quantity or str
-        :param int first_id:
-        :return:
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
-                duplicate values
-
-        """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-        t_start = t_start * quantities.ms
-        sampling_period = sampling_interval_ms * quantities.ms
-
-        ids = list(map(lambda x: x+first_id, indexes))
-        if units is None:
-            units = "dimensionless"
-        data_array = neo.AnalogSignal(
-            signal_array,
-            units=units,
-            t_start=t_start,
-            sampling_period=sampling_period,
-            name=variable,
-            source_population=pop_label,
-            source_ids=ids)
-        channel_index = NeoBufferDatabase.__get_channel_index(indexes, block)
-        data_array.channel_index = channel_index
-        data_array.shape = (data_array.shape[0], data_array.shape[1])
-        segment.analogsignals.append(data_array)
-        channel_index.analogsignals.append(data_array)
-
-    def __csv_matix_data(self, csv_writer, signal_array, indexes):
-        """ Adds a data item that is an analog signal to a neo segment
-
-         :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
-                duplicate values
-        :param str variable: the variable name
-        :param ~neo.core.Block block: Block tdata is being added to
-        :param ~neo.core.Segment segment: Segment to add data to
-        :param ~numpy.ndarray signal_array: the raw signal data
-        :param list(int) indexes: The indexes for the data
-        :type t_start: float or int
-        :param sampling_interval_ms: how often a neuron is recorded
-        :type sampling_interval_ms: float or int
-        :param units: the units of the recorded value
-        :type units: quantities.quantity.Quantity or str
-        :param int first_id:
-        :return:
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
-                duplicate values
-
-        """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-        csv_writer.writerow(indexes)
-        csv_writer.writerows(signal_array)
-
-    @staticmethod
-    def add_neo_events(
-            segment, event_array, variable, recording_start_time):
-        """ Adds data that is events to a neo segment.
-
-        :param ~neo.core.Segment segment: Segment to add data to
-        :param ~numpy.ndarray event_array: the raw "event" data
-        :param str variable: the variable name
-        :param recording_start_time: when recording started
-        :type recording_start_time: float or int
-        """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-        t_start = recording_start_time * quantities.ms
-
-        formation_times = []
-        formation_labels = []
-        formation_annotations = dict()
-        elimination_times = []
-        elimination_labels = []
-        elimination_annotations = dict()
-
-        for i in range(len(event_array)):
-            event_time = t_start + event_array[i][0] * quantities.ms
-            pre_id = int(event_array[i][1])
-            post_id = int(event_array[i][2])
-            if event_array[i][3] == 1:
-                formation_times.append(event_time)
-                formation_labels.append(
-                    str(pre_id) + "_" + str(post_id) + "_formation")
-            else:
-                elimination_times.append(event_time)
-                elimination_labels.append(
-                    str(pre_id) + "_" + str(post_id) + "_elimination")
-
-        formation_event_array = neo.Event(
-            times=formation_times,
-            labels=formation_labels,
-            units="ms",
-            name=variable + "_form",
-            description="Synapse formation events",
-            array_annotations=formation_annotations)
-
-        elimination_event_array = neo.Event(
-            times=elimination_times,
-            labels=elimination_labels,
-            units="ms",
-            name=variable + "_elim",
-            description="Synapse elimination events",
-            array_annotations=elimination_annotations)
-
-        segment.events.append(formation_event_array)
-        segment.events.append(elimination_event_array)
-
-    def __csv_neo_events(
-            self, csv_writer, event_array, variable, recording_start_time):
-        """ Adds data that is events to a neo segment.
-
-        :param ~neo.core.Segment segment: Segment to add data to
-        :param ~numpy.ndarray event_array: the raw "event" data
-        :param str variable: the variable name
-        :param recording_start_time: when recording started
-        :type recording_start_time: float or int
-        """
-        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-
-        formation = []
-        elimination = []
-
-        for i in range(len(event_array)):
-            event_time = event_array[i][0] * quantities.ms
-            pre_id = int(event_array[i][1])
-            post_id = int(event_array[i][2])
-            if event_array[i][3] == 1:
-                formation.append(
-                    [event_time,
-                     str(pre_id) + "_" + str(post_id) + "_formation"])
-            else:
-                elimination.append(
-                    [event_time,
-                     str(pre_id) + "_" + str(post_id) + "_elimination"])
-
-        csv_writer.writerow(["formation"])
-        csv_writer.writerows(formation)
-        csv_writer.writerow([])
-        csv_writer.writerow(["elimination"])
-        csv_writer.writerows(elimination)
-
     def __add_data(self, cursor, pop_label, variable, block, segment,
                    view_indexes, t_stop):
         """
@@ -1296,7 +1049,7 @@ class NeoBufferDatabase(BufferDatabase):
         if buffer_type == BufferDataType.MATRIX:
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
-            self.add_matix_data(
+            self._add_matix_data(
                 pop_label, variable, block, segment, signal_array,
                 indexes, t_start, sampling_interval_ms,
                 units, first_id)
@@ -1306,14 +1059,14 @@ class NeoBufferDatabase(BufferDatabase):
                     f"{variable} can not be extracted using a view")
             event_array = self.__get_rewires(
                 cursor, rec_id, sampling_interval_ms)
-            self.add_neo_events(segment, event_array, variable, t_start)
+            self._add_neo_events(segment, event_array, variable, t_start)
         else:
             if view_indexes is None:
                 view_indexes = range(pop_size)
             spikes, indexes = self.__get_spikes(
                 cursor, rec_id, view_indexes, buffer_type, atoms_shape,
                 n_colour_bits, variable)
-            self.add_spike_data(
+            self._add_spike_data(
                 pop_label, view_indexes, segment, spikes, t_start, t_stop,
                 sampling_interval_ms, first_id)
 
@@ -1356,43 +1109,21 @@ class NeoBufferDatabase(BufferDatabase):
         if buffer_type == BufferDataType.MATRIX:
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
-            self.__csv_matix_data(csv_writer, signal_array, indexes)
+            self._csv_matix_data(csv_writer, signal_array, indexes)
         elif buffer_type == BufferDataType.REWIRES:
             if view_indexes is not None:
                 raise SpynnakerException(
                     f"{variable} can not be extracted using a view")
             event_array = self.__get_rewires(
                 cursor, rec_id, sampling_interval_ms)
-            self.__csv_neo_events(csv_writer, event_array, variable, t_start)
+            self._csv_neo_events(csv_writer, event_array, variable, t_start)
         else:
             if view_indexes is None:
                 view_indexes = range(pop_size)
             spikes, indexes = self.__get_spikes(
                 cursor, rec_id, view_indexes, buffer_type, atoms_shape,
                 n_colour_bits, variable)
-            self.__csv_spike_data(csv_writer, spikes)
-
-    @staticmethod
-    def setup_block(pop_label, description, pop_size, first_id, t_stop,
-                    annotations=None):
-        block = neo.Block()
-        block.name = pop_label
-        block.description = description
-        # pylint: disable=no-member
-        metadata = {}
-        metadata['size'] = pop_size
-        metadata['first_index'] = 0
-        metadata['last_index'] = pop_size,
-        metadata['first_id'] = first_id
-        metadata['last_id'] = first_id + pop_size,
-        metadata['label'] = pop_label
-        metadata['simulator'] = SpynnakerDataView.get_sim_name()
-        metadata['dt'] = t_stop
-        metadata['mpi_processes'] = 1  # meaningless on Spinnaker
-        block.annotate(**metadata)
-        if annotations:
-            block.annotate(**annotations)
-        return block
+            self._csv_spike_data(csv_writer, spikes)
 
     def get_block(self, pop_label, variables, view_indexes=None,
                   annotations=None):
@@ -1421,7 +1152,7 @@ class NeoBufferDatabase(BufferDatabase):
             _, rec_datetime, t_stop = self.__get_segment_info(cursor)
             pop_size, first_id, description = \
                 self.__get_population_metadata(cursor, pop_label)
-            block = self.setup_block(
+            block = self._setup_block(
                 pop_label, description, pop_size, first_id, t_stop)
 
             self.__add_segment(
