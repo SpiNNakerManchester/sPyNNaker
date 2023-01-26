@@ -1070,8 +1070,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 pop_label, view_indexes, segment, spikes, t_start, t_stop,
                 sampling_interval_ms, first_id)
 
-    def __csv_data(self, cursor, pop_label, variable, csv_writer,
-                   view_indexes, t_stop):
+    def __read_and_csv_data(self, cursor, pop_label, variable, csv_writer,
+                            view_indexes, t_stop):
         """
         Gets the data as a Numpy array for one population and variable
 
@@ -1182,31 +1182,29 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         with open(csv_file, 'w', newline='') as csvfile:
-            csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            csv_writer.writerow(["Population", pop_label])
+            csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"',
+                                    quoting=csv.QUOTE_MINIMAL)
 
             with self.transaction() as cursor:
                 _, rec_datetime, t_stop = self.__get_segment_info(cursor)
                 pop_size, first_id, description = \
                     self.__get_population_metadata(cursor, pop_label)
-                csv_writer.writerow(["description", f"\"{description}\""])
-                # pylint: disable=no-member
-                csv_writer.writerow(["rec_datetime", rec_datetime])
+                # block.annotate(**annotations)
+                self._csv_block(csv_writer, pop_label, rec_datetime, t_stop,
+                           pop_size, first_id, description)
 
-                csv_writer.writerow(['size', pop_size])
-                csv_writer.writerow(['first_id', first_id])
-                csv_writer.writerow(['last_id', first_id + pop_size])
-                csv_writer.writerow(
-                    ['simulator', SpynnakerDataView.get_sim_name()])
-                csv_writer.writerow(['dt', t_stop])
-                csv_writer.writerow(['mpi_processes', 1])
-                if view_indexes is not None:
-                    csv_writer.writerow(["Indexes"])
-                    csv_writer.writerow(view_indexes)
-            # block.annotate(**annotations)
+                self._csv_indexes(csv_writer, view_indexes)
 
-                self.__csv_segment(
-                    cursor, csv_writer, pop_label, variables, view_indexes)
+                segment_number, rec_datetime, t_stop = \
+                    self.__get_segment_info(cursor)
+                csv_writer.writerow(['segment', segment_number])
+
+                variables = self.__clean_variables(
+                    variables, pop_label, cursor)
+                for variable in variables:
+                    self.__read_and_csv_data(
+                        cursor, pop_label, variable, csv_writer,
+                        view_indexes, t_stop)
 
     def add_segment(self, block, pop_label, variables, view_indexes=None):
         """
@@ -1250,6 +1248,15 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             block.rec_datetime = rec_datetime
         return segment
 
+    def __clean_variables(self, variables, pop_label, cursor):
+        if isinstance(variables, str):
+            variables = [variables]
+        if 'all' in variables:
+            variables = None
+        if variables is None:
+            variables = self.__get_recording_variables(pop_label, cursor)
+        return variables
+
     def __add_segment(self, cursor, block, pop_label, variables, view_indexes):
         """
         Adds a segment to the block
@@ -1275,51 +1282,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self.__get_segment_info(cursor)
         segment = self.setup_segment(block, segment_number, rec_datetime)
 
-        if isinstance(variables, str):
-            variables = [variables]
-        if 'all' in variables:
-            variables = None
-        if variables is None:
-            variables = self.__get_recording_variables(pop_label, cursor)
-
+        variables = self.__clean_variables(variables, pop_label, cursor)
         for variable in variables:
             self.__add_data(cursor, pop_label, variable, block, segment,
-                            view_indexes, t_stop)
-
-    def __csv_segment(self, cursor, csv_writer, pop_label, variables, view_indexes):
-        """
-        Adds a segment to the block
-
-        :param ~sqlite3.Cursor cursor:
-        :param  ~csv.writer csv_writer:
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
-                duplicate values
-
-        :param variables: One or more variable names or None for all available
-        :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or None for all
-        :type view_indexes: None or list(int)
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the recording metadata not setup correctly
-        """
-        segment_number, rec_datetime, t_stop = \
-            self.__get_segment_info(cursor)
-        csv_writer.writerow(['segment', segment_number])
-
-        if isinstance(variables, str):
-            variables = [variables]
-        if 'all' in variables:
-            variables = None
-        if variables is None:
-            variables = self.__get_recording_variables(pop_label, cursor)
-
-        for variable in variables:
-            self.__csv_data(cursor, pop_label, variable, csv_writer,
                             view_indexes, t_stop)
 
     def clear_data(self, pop_label, variables):

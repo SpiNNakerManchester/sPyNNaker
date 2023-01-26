@@ -288,6 +288,29 @@ class NeoCsv(object):
         csv_writer.writerow(["elimination"])
         csv_writer.writerows(elimination)
 
+    def _insert_segment(self, block, segment_number, rec_datetime):
+        segment = neo.Segment(
+            name="segment{}".format(segment_number),
+            description=block.description,
+            rec_datetime=rec_datetime)
+        for i in range(len(block.segments), segment_number):
+            block.segments.append(neo.Segment(
+                name="segment{}".format(i),
+                description="empty"))
+        if segment_number in block.segments:
+            block.segments[segment_number] = segment
+        else:
+            block.segments.append(segment)
+        if block.rec_datetime is None:
+            block.rec_datetime = rec_datetime
+        return segment
+
+    def _csv_indexes(self, csv_writer, view_indexes):
+        if view_indexes is not None:
+            csv_writer.writerow(["Indexes"])
+            csv_writer.writerow(view_indexes)
+            csv_writer.writerow([])
+
     @staticmethod
     def setup_block(pop_label, description, pop_size, first_id, t_stop,
                     annotations=None):
@@ -310,19 +333,38 @@ class NeoCsv(object):
             block.annotate(**annotations)
         return block
 
-    def _insert_segment(self, block, segment_number, rec_datetime):
-        segment = neo.Segment(
-            name="segment{}".format(segment_number),
-            description=block.description,
-            rec_datetime=rec_datetime)
-        for i in range(len(block.segments), segment_number):
-            block.segments.append(neo.Segment(
-                name="segment{}".format(i),
-                description="empty"))
-        if segment_number in block.segments:
-            block.segments[segment_number] = segment
-        else:
-            block.segments.append(segment)
-        if block.rec_datetime is None:
-            block.rec_datetime = rec_datetime
-        return segment
+    def _csv_block(self, csv_writer, pop_label, rec_datetime, t_stop,
+                   pop_size, first_id, description):
+        """
+
+        :param str pop_label: The label for the population of interest
+
+            .. note::
+                This is actually the label of the Application Vertex
+                Typical the Population label corrected for None or
+                duplicate values
+
+        :param variables: One or more variable names or None for all available
+        :type variables: str, list(str) or None
+        :param view_indexes: List of neurons ids to include or None for all
+        :type view_indexes: None or list(int)
+        :param annotations: annotations to put on the neo block
+        :type annotations: None or dict(str, ...)
+        :return: The Neo block
+        :rtype: ~neo.core.Block
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
+        """
+        csv_writer.writerow(["Population", pop_label])
+        csv_writer.writerow(["description", f"\"{description}\""])
+        # pylint: disable=no-member
+        csv_writer.writerow(["rec_datetime", rec_datetime])
+
+        csv_writer.writerow(['size', pop_size])
+        csv_writer.writerow(['first_id', first_id])
+        csv_writer.writerow(['last_id', first_id + pop_size])
+        csv_writer.writerow(
+            ['simulator', SpynnakerDataView.get_sim_name()])
+        csv_writer.writerow(['dt', t_stop])
+        csv_writer.writerow(['mpi_processes', 1])
