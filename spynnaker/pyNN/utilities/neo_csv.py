@@ -44,7 +44,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class NeoCsv(object):
 
-    def _add_spike_data(
+    def _insert_spike_data(
             self, pop_label, view_indexes, segment, spikes, t_start, t_stop,
             sampling_interval_ms, first_id):
         """
@@ -116,7 +116,7 @@ class NeoCsv(object):
         block.channel_indexes.append(channel_index)
         return channel_index
 
-    def _add_matix_data(
+    def _insert_matix_data(
             self, pop_label, variable, block, segment, signal_array,
             indexes, t_start, sampling_interval_ms,
             units, first_id):
@@ -163,7 +163,7 @@ class NeoCsv(object):
             name=variable,
             source_population=pop_label,
             source_ids=ids)
-        channel_index = NeoBufferDatabase.__get_channel_index(indexes, block)
+        channel_index = self.__get_channel_index(indexes, block)
         data_array.channel_index = channel_index
         data_array.shape = (data_array.shape[0], data_array.shape[1])
         segment.analogsignals.append(data_array)
@@ -202,7 +202,7 @@ class NeoCsv(object):
         csv_writer.writerow(indexes)
         csv_writer.writerows(signal_array)
 
-    def add_neo_events(
+    def _insert_neo_events(
             self, segment, event_array, variable, recording_start_time):
         """ Adds data that is events to a neo segment.
 
@@ -288,8 +288,9 @@ class NeoCsv(object):
         csv_writer.writerow(["elimination"])
         csv_writer.writerows(elimination)
 
-    def _setup_block(self, pop_label, description, pop_size, first_id, t_stop,
-                     annotations=None):
+    @staticmethod
+    def setup_block(pop_label, description, pop_size, first_id, t_stop,
+                    annotations=None):
         block = neo.Block()
         block.name = pop_label
         block.description = description
@@ -309,31 +310,7 @@ class NeoCsv(object):
             block.annotate(**annotations)
         return block
 
-    def _add_segment(self, block, pop_label, variables, view_indexes=None):
-        """
-        Adds a segment to the block
-
-        :param str pop_label: The label for the population of interest
-
-            .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
-                duplicate values
-
-        :param variables: One or more variable names or None for all available
-        :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or None for all
-        :type view_indexes: None or list(int)
-        :return: Segment with the requested data
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the recording metadata not setup correctly
-        """
-        with self.transaction() as cursor:
-            self.__add_segment(
-                cursor, block, pop_label, variables, view_indexes)
-
-    def _setup_segment(self, block, segment_number, rec_datetime):
+    def _insert_segment(self, block, segment_number, rec_datetime):
         segment = neo.Segment(
             name="segment{}".format(segment_number),
             description=block.description,

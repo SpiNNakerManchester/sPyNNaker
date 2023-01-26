@@ -1049,7 +1049,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         if buffer_type == BufferDataType.MATRIX:
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
-            self._add_matix_data(
+            self._insert_matix_data(
                 pop_label, variable, block, segment, signal_array,
                 indexes, t_start, sampling_interval_ms,
                 units, first_id)
@@ -1059,14 +1059,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     f"{variable} can not be extracted using a view")
             event_array = self.__get_rewires(
                 cursor, rec_id, sampling_interval_ms)
-            self._add_neo_events(segment, event_array, variable, t_start)
+            self._insert_neo_events(segment, event_array, variable, t_start)
         else:
             if view_indexes is None:
                 view_indexes = range(pop_size)
             spikes, indexes = self.__get_spikes(
                 cursor, rec_id, view_indexes, buffer_type, atoms_shape,
                 n_colour_bits, variable)
-            self._add_spike_data(
+            self._insert_spike_data(
                 pop_label, view_indexes, segment, spikes, t_start, t_stop,
                 sampling_interval_ms, first_id)
 
@@ -1152,7 +1152,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             _, rec_datetime, t_stop = self.__get_segment_info(cursor)
             pop_size, first_id, description = \
                 self.__get_population_metadata(cursor, pop_label)
-            block = self._setup_block(
+            block = self.setup_block(
                 pop_label, description, pop_size, first_id, t_stop)
 
             self.__add_segment(
