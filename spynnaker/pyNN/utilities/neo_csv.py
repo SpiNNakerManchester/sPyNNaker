@@ -17,45 +17,28 @@ from collections import defaultdict
 import csv
 from datetime import datetime
 import logging
-import math
 import neo
 import numpy
-import os
 import quantities
-import struct
-import re
 from spinn_utilities.log import FormatAdapter
-from spinnman.messages.eieio.data_messages import EIEIODataHeader
-from data_specification.enums import DataType
-from pacman.model.graphs.common import Slice
-from pacman.utilities.utility_calls import get_field_based_index
-from spinn_front_end_common.interface.buffer_management.storage_objects \
-    import BufferDatabase
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BITS_PER_WORD)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
-from spynnaker.pyNN.utilities.constants import SPIKES
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NeoCsv(object):
-    _POPULATION = "Population"
+    _POPULATION = "population"
     _DESCRIPTION = "description"
     _SIZE = "size"
     _FIRST_ID = "first_id"
-    _LAST_ID = "last_id"
     _SIMULATOR = "simulator"
     _DT = "dt"  # t_stop
-    _MPI_PROCESSES = "mpi_processes"
 
-    _INDEXES = "Indexes"
+    _INDEXES = "indexes"
 
-    _SEGMENT = 'segment'
+    _SEGMENT_NUMBER = 'segment_number'
     _REC_DATETIME = "rec_datetime"
+    _T_STOP = "t_stop"
 
     _T_START = "t_start"
     _SAMPLINFG_PERIOD = "sampling_period"
@@ -155,9 +138,9 @@ class NeoCsv(object):
         return channel_index
 
     def _insert_matix_data(
-            self, pop_label, variable, block, segment, signal_array,
+            self, pop_label, variable, segment, signal_array,
             indexes, t_start, sampling_interval_ms,
-            units, first_id):
+            units):
         """ Adds a data item that is an analog signal to a neo segment
 
          :param str pop_label: The label for the population of interest
@@ -187,6 +170,8 @@ class NeoCsv(object):
 
         """
         # pylint: disable=too-many-arguments, no-member, c-extension-no-member
+        block = segment.block
+        first_id = block.annotations[self._FIRST_ID]
         t_start = t_start * quantities.ms
         sampling_period = sampling_interval_ms * quantities.ms
 
@@ -201,7 +186,7 @@ class NeoCsv(object):
             name=variable,
             source_population=pop_label,
             source_ids=ids)
-        channel_index = self.__get_channel_index(indexes, block)
+        channel_index = self.__get_channel_index(indexes, segment.block)
         data_array.channel_index = channel_index
         data_array.shape = (data_array.shape[0], data_array.shape[1])
         segment.analogsignals.append(data_array)
@@ -240,6 +225,13 @@ class NeoCsv(object):
         csv_writer.writerow(indexes)
         csv_writer.writerows(signal_array)
         csv_writer.writerow([])
+
+    def __read_matix_data(self, csv_reader):
+        metadata = self.__read_metadata(csv_reader)
+        #_insert_matix_data(
+        #    self, pop_label, variable, block, segment, signal_array,
+        #    indexes, t_start, sampling_interval_ms,
+        #    units, first_id
 
     def _insert_neo_events(
             self, segment, event_array, variable, recording_start_time):
@@ -348,8 +340,18 @@ class NeoCsv(object):
         return segment
 
     def _csv_segment(self, csv_writer, segment_number, rec_datetime):
-        csv_writer.writerow([self._SEGMENT, segment_number])
+        csv_writer.writerow([self._SEGMENT_NUMBER, segment_number])
         csv_writer.writerow([self._REC_DATETIME, rec_datetime])
+        csv_writer.writerow([])
+
+    def __read_segment(self, csv_reader, block, segment_number_st):
+        row = next(csv_reader)
+        assert (row[0] == self._REC_DATETIME)
+        rec_datetime = datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S.%f')
+        # consume the empty line
+        next(csv_reader)
+        return self._insert_segment(
+            block, int(segment_number_st), rec_datetime)
 
     def _csv_indexes(self, csv_writer, view_indexes):
         if view_indexes is not None:
@@ -357,23 +359,21 @@ class NeoCsv(object):
             csv_writer.writerow(view_indexes)
             csv_writer.writerow([])
 
-    @staticmethod
-    def setup_block(pop_label, description, pop_size, first_id, t_stop,
-                    annotations=None):
+    def _insert_block(self, pop_label, description, size, first_id, dt,
+                      simulator, annotations=None):
         block = neo.Block()
         block.name = pop_label
         block.description = description
         # pylint: disable=no-member
         metadata = {}
-        metadata['size'] = pop_size
-        metadata['first_index'] = 0
-        metadata['last_index'] = pop_size,
-        metadata['first_id'] = first_id
-        metadata['last_id'] = first_id + pop_size,
+        metadata[self._SIZE] = size
+        metadata["first_index"] = 0
+        metadata['last_index'] = size,
+        metadata[self._FIRST_ID] = first_id
+        metadata['last_id'] = first_id + size,
         metadata['label'] = pop_label
-        metadata['simulator'] = SpynnakerDataView.get_sim_name()
-        metadata['dt'] = t_stop
-        metadata['mpi_processes'] = 1  # meaningless on Spinnaker
+        metadata[self._SIMULATOR] = simulator
+        metadata[self._DT] = dt
         block.annotate(**metadata)
         if annotations:
             block.annotate(**annotations)
@@ -407,9 +407,60 @@ class NeoCsv(object):
 
         csv_writer.writerow([self._SIZE, pop_size])
         csv_writer.writerow([self._FIRST_ID, first_id])
-        csv_writer.writerow([self._LAST_ID, first_id + pop_size])
         csv_writer.writerow(
             [self._SIMULATOR, SpynnakerDataView.get_sim_name()])
         csv_writer.writerow([self._DT, t_stop])
         # does not make sense on Spinnaker but oh well
-        csv_writer.writerow([self._MPI_PROCESSES, 1])
+        csv_writer.writerow([])
+
+    def __read_block(self, metadata):
+        return self._insert_block(
+            pop_label=metadata[self._POPULATION],
+            description=metadata[self._DESCRIPTION],
+            size=metadata[self._SIZE],
+            first_id=metadata[self._FIRST_ID],
+            dt=metadata[self._DT],
+            simulator=metadata[self._SIMULATOR])
+
+    def __read_metadata(self, csv_reader):
+        metadata = {}
+        row = next(csv_reader)
+        while len(row) > 0:
+            assert len(row) == 2
+            metadata[row[0]] = row[1]
+            row = next(csv_reader)
+        return metadata
+
+    def read_csv(self, csv_file):
+        with open(csv_file, newline='') as csvfile:
+            csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+            metadata = self.__read_metadata(csv_reader)
+            block = self.__read_block(metadata)
+            category = block
+            while True:
+                try:
+                    try:
+                        row = next(csv_reader)
+                        category = row[0]
+                    except IndexError:
+                        logger.warning(
+                            f"Ignoring extra blank line after {category}")
+                        row = next(csv_reader)
+                        while len(row) == 0:
+                            row = next(csv_reader)
+                        category = row[0]
+
+                    if row[0] == self._SEGMENT_NUMBER:
+                        segment = self.__read_segment(
+                            csv_reader, block, row[1])
+                    else:
+                        logger.error(
+                            f"ignoring csv block starting with {row[0]}")
+                        # ignore a block
+                        row = next(csv_reader)
+                        while len(row) > 0:
+                            row = next(csv_reader)
+                except StopIteration:
+                    return block
+
+

@@ -15,15 +15,10 @@
 
 import csv
 import os
-import pickle
 import numpy
-import pytest
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
-from .make_test_data import N_NEURONS
+from spynnaker.pyNN.utilities.neo_csv import NeoCsv
 
 
 class TestCSV(BaseTestCase):
@@ -54,6 +49,9 @@ class TestCSV(BaseTestCase):
         my_csv = os.path.join(my_dir, "test.csv")
         with NeoBufferDatabase(my_buffer) as db:
             db.write_csv(my_csv, "pop_1", variables="all")
+            pop = db.get_population("pop_1")
+            neo = pop.get_data("all")
+            neo = NeoCsv().read_csv(my_csv)
 
     def test_view(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))

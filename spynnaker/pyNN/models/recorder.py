@@ -187,14 +187,8 @@ class Recorder(object):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
-        block = NeoBufferDatabase.setup_block(
-            pop_label=self.__population._vertex.label,
-            description=self.__population.describe(),
-            pop_size=self.__population.size,
-            first_id=int(self.__population.first_id),
-            t_stop=SpynnakerDataView.get_simulation_time_step_ms(),
-            annotations=annotations
-        )
+        with NeoBufferDatabase() as db:
+            block = db.get_block(self.__population.label)
 
         for previous in range(0, SpynnakerDataView.get_segment_counter()):
             self.__append_previous_segment(

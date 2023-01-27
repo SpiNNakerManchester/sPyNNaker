@@ -13,15 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict
 import csv
 from datetime import datetime
 import logging
 import math
-import neo
 import numpy
 import os
-import quantities
 import struct
 import re
 from spinn_utilities.log import FormatAdapter
@@ -92,14 +89,18 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         """
         with self.transaction() as cursor:
+            # t_stop intentionally left None to show no run data
             cursor.execute(
                 """
                 INSERT INTO segment
-                (simulation_time_step_ms, segment_number, rec_datetime)
-                 VALUES (?, ?, ?)
+                    (simulation_time_step_ms, segment_number, rec_datetime,
+                     dt, simulator)
+                 VALUES (?, ?, ?, ?, ?)
                 """, [SpynnakerDataView.get_simulation_time_step_ms(),
                       SpynnakerDataView.get_segment_counter(),
-                      datetime.now()])
+                      datetime.now(),
+                      SpynnakerDataView.get_simulation_time_step_ms(),
+                      SpynnakerDataView.get_sim_name()])
 
     def write_t_stop(self):
         """
@@ -121,26 +122,28 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         Gets the data for the whole segment
 
         :param ~sqlite3.Cursor cursor:
-        :return: segment number, record time, and last run time recorded
-        :rtype int, datatime, float
+        :return: segment number, record time, last run time recorded,
+            simulator timesteup in ms, simulator name
+        :rtype int, datatime, float, float, str
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
         for row in cursor.execute(
                 """
-                SELECT segment_number, rec_datetime, t_stop
+                SELECT segment_number, rec_datetime, t_stop, dt, simulator
                 FROM segment
                 LIMIT 1
                 """):
-            t_str = str(row["rec_datetime"], "utf-8")
+            t_str = str(row[self._REC_DATETIME], "utf-8")
             time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
             if row["t_stop"] is None:
-                t_stop = 0
+                t_stop = 0.0
                 logger.warning("Data from a virtual run will be empty")
             else:
-                t_stop = int(row["t_stop"])
-            return row["segment_number"], time, t_stop
+                t_stop = row[self._T_STOP]
+            return (row[self._SEGMENT_NUMBER], time, t_stop, row[self._DT],
+                    str(row[self._SIMULATOR], 'utf-8'))
         raise ConfigurationException(
             "No recorded data. Did the simulation run?")
 
@@ -1050,9 +1053,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
             self._insert_matix_data(
-                pop_label, variable, block, segment, signal_array,
+                pop_label, variable, segment, signal_array,
                 indexes, t_start, sampling_interval_ms,
-                units, first_id)
+                units)
         elif buffer_type == BufferDataType.REWIRES:
             if view_indexes is not None:
                 raise SpynnakerException(
@@ -1120,8 +1123,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 n_colour_bits, variable)
             self._csv_spike_data(csv_writer, spikes)
 
-    def get_block(self, pop_label, variables, view_indexes=None,
-                  annotations=None):
+    def get_block(self, pop_label):
         """
 
         :param str pop_label: The label for the population of interest
@@ -1144,15 +1146,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         with self.transaction() as cursor:
-            _, rec_datetime, t_stop = self.__get_segment_info(cursor)
+            _, rec_datetime, _, dt, simulator = self.__get_segment_info(cursor)
             pop_size, first_id, description = \
                 self.__get_population_metadata(cursor, pop_label)
-            block = self.setup_block(
-                pop_label, description, pop_size, first_id, t_stop)
-
-            self.__add_segment(
-                cursor, block, pop_label, variables, view_indexes)
-        return block
+            return self._insert_block(
+                pop_label, description, pop_size, first_id, dt, simulator)
 
     def write_csv(self, csv_file, pop_label, variables, view_indexes=None):
         """
@@ -1181,7 +1179,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                                     quoting=csv.QUOTE_MINIMAL)
 
             with self.transaction() as cursor:
-                _, rec_datetime, t_stop = self.__get_segment_info(cursor)
+                _, rec_datetime, t_stop, _, _ = self.__get_segment_info(cursor)
                 pop_size, first_id, description = \
                     self.__get_population_metadata(cursor, pop_label)
                 # block.annotate(**annotations)
@@ -1190,7 +1188,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
                 self._csv_indexes(csv_writer, view_indexes)
 
-                segment_number, rec_datetime, t_stop = \
+                segment_number, rec_datetime, t_stop, _, _ = \
                     self.__get_segment_info(cursor)
                 self._csv_segment(csv_writer, segment_number, rec_datetime)
 
@@ -1225,24 +1223,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self.__add_segment(
                 cursor, block, pop_label, variables, view_indexes)
 
-    @staticmethod
-    def setup_segment(block, segment_number, rec_datetime):
-        segment = neo.Segment(
-            name="segment{}".format(segment_number),
-            description=block.description,
-            rec_datetime=rec_datetime)
-        for i in range(len(block.segments), segment_number):
-            block.segments.append(neo.Segment(
-                name="segment{}".format(i),
-                description="empty"))
-        if segment_number in block.segments:
-            block.segments[segment_number] = segment
-        else:
-            block.segments.append(segment)
-        if block.rec_datetime is None:
-            block.rec_datetime = rec_datetime
-        return segment
-
     def __clean_variables(self, variables, pop_label, cursor):
         if isinstance(variables, str):
             variables = [variables]
@@ -1273,9 +1253,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        segment_number, rec_datetime, t_stop = \
+        segment_number, rec_datetime, t_stop, _, _ = \
             self.__get_segment_info(cursor)
-        segment = self.setup_segment(block, segment_number, rec_datetime)
+        segment = self._insert_segment(block, segment_number, rec_datetime)
 
         variables = self.__clean_variables(variables, pop_label, cursor)
         for variable in variables:

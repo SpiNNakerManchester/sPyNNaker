@@ -56,8 +56,7 @@ class DataPopulation(object):
         if isinstance(io, str):
             io = neo.get_io(io)
 
-        with NeoBufferDatabase(self.__database_file) as db:
-            data = db.get_block(self.__label, variables, self._indexes)
+        data = self.get_data(variables)
         # write the neo block to the file
         io.write(data)
 
@@ -79,8 +78,9 @@ class DataPopulation(object):
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
         with NeoBufferDatabase(self.__database_file) as db:
-            return db.get_block(self.__label, variables, self._indexes,
-                                annotations)
+            block = db.get_block(self.__label)
+            db.add_segment(block, self.__label, variables, self._indexes)
+            return block
 
     @overrides(Population.spinnaker_get_data)
     def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
