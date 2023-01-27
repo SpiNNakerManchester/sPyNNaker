@@ -87,25 +87,35 @@ where all the neurons are of the same type.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></span><span class="sig-name descname"><span class="pre">IDMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Instead of storing IDs as integers, we store them as ID objects,
-which allows a syntax like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">tau_m</span> <span class="o">=</span> <span class="mf">20.0</span>
-</pre></div>
-</div>
-<p>where <code class="docutils literal notranslate"><span class="pre">p</span></code> is a Population object.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.populations.</span></span><span class="sig-name descname"><span class="pre">IDMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.populations.PopulationView" title="spynnaker.pyNN.models.populations.PopulationView"><code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationView</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>population</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – </p></li>
-<li><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>parent</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a><em> or
+</em><a class="reference internal" href="#spynnaker.pyNN.models.populations.PopulationView" title="spynnaker.pyNN.models.populations.PopulationView"><em>PopulationView</em></a>) – the population or view to make the view from</p></li>
+<li><p><strong>vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="spynnaker.pyNN.models.common.PopulationApplicationVertex"><em>PopulationApplicationVertex</em></a>) – The actual underlying vertex</p></li>
+<li><p><strong>recorder</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder" title="spynnaker.pyNN.models.recorder.Recorder"><em>Recorder</em></a>) – The recorder of the Population</p></li>
+<li><p><strong>selector</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#slice" title="(in Python v3.8)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or
+</em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – <p>a slice or numpy mask array.
+The mask array should either be a boolean array (ideally) of the
+same size as the parent,
+or an integer array containing cell indices,
+i.e. if <cite>p.size == 5</cite> then:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PopulationView</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">array</span><span class="p">([</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]))</span>
+<span class="n">PopulationView</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))</span>
+<span class="n">PopulationView</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>will all create the same view.</p>
+</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A label for the view</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.as_view">
-<span class="sig-name descname"><span class="pre">as_view</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.as_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.as_view" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">as_view</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#IDMixin.as_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.as_view" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a PopulationView containing just this cell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -114,38 +124,9 @@ which allows a syntax like:</p>
 </dl>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.celltype">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">celltype</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.celltype" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">AbstractPyNNModel</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.current_values">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_values</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.current_values" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.get_current_value">
-<span class="sig-name descname"><span class="pre">get_current_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.get_current_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.get_current_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the current value of a state variable of the cell.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.get_initial_value">
-<span class="sig-name descname"><span class="pre">get_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.get_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.get_initial_value" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#IDMixin.get_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.get_initial_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the initial value of a state variable of the cell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -159,7 +140,7 @@ which allows a syntax like:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.get_parameters">
-<span class="sig-name descname"><span class="pre">get_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.get_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.get_parameters" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#IDMixin.get_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.get_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dict of all cell parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -181,31 +162,10 @@ which allows a syntax like:</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.initial_values">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initial_values</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.initial_values" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.initialize">
-<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initial_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.initialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the initial value of a state variable of the cell.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.inject">
-<span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.inject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inject current from a current source object into the cell.</p>
+<dd><p>A dict containing the initial values of the state variables.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>current_source</strong> (<em>NeuronCurrentSource</em>) – </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.is_standard_cell">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_standard_cell</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.is_standard_cell" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p>InitialValuesHolder</p>
 </dd>
 </dl>
 </dd></dl>
@@ -221,53 +181,9 @@ which allows a syntax like:</p>
 </dl>
 </dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.position">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">position</span></span><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.position" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cell position in 3D space.            Cell positions are stored in an array in the parent Population,            if any, or within the ID object otherwise. Positions are generated            the first time they are requested and then cached.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.record">
-<span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Record the given variable(s) of this cell.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – either a single variable name or a list of variable
-names. For a given celltype class, celltype.recordable contains a
-list of variables that can be recorded for that celltype.</p></li>
-<li><p><strong>to_file</strong> (<em>neo.io.baseio.BaseIO</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – If specified, should be a Neo IO instance and write_data()
-will be automatically called when end() is called.</p></li>
-<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – should be a value in milliseconds, and an integer multiple of the
-simulation timestep.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.set_current_value">
-<span class="sig-name descname"><span class="pre">set_current_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.set_current_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.set_current_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the current value of a state variable of the cell.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p></li>
-<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The value of the variable</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.set_initial_value">
-<span class="sig-name descname"><span class="pre">set_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.set_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.set_initial_value" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#IDMixin.set_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.set_initial_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the initial value of a state variable of the cell.
 :param str variable: The name of the variable
 :param float value: The value of the variable</p>
@@ -275,14 +191,8 @@ simulation timestep.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.set_parameters">
-<span class="sig-name descname"><span class="pre">set_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.set_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.set_parameters" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#IDMixin.set_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.set_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set cell parameters, given as a sequence of parameter=value            arguments.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.IDMixin.set_state">
-<span class="sig-name descname"><span class="pre">set_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">initial_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/idmixin.html#IDMixin.set_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.IDMixin.set_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the current value of a state variable of the cell.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1775,23 +1685,13 @@ record.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.Assembly"><code class="docutils literal notranslate"><span class="pre">Assembly</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin"><code class="docutils literal notranslate"><span class="pre">IDMixin</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.as_view"><code class="docutils literal notranslate"><span class="pre">IDMixin.as_view()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.celltype"><code class="docutils literal notranslate"><span class="pre">IDMixin.celltype</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.current_values"><code class="docutils literal notranslate"><span class="pre">IDMixin.current_values</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.get_current_value"><code class="docutils literal notranslate"><span class="pre">IDMixin.get_current_value()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.get_initial_value"><code class="docutils literal notranslate"><span class="pre">IDMixin.get_initial_value()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.get_parameters"><code class="docutils literal notranslate"><span class="pre">IDMixin.get_parameters()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.id"><code class="docutils literal notranslate"><span class="pre">IDMixin.id</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.initial_values"><code class="docutils literal notranslate"><span class="pre">IDMixin.initial_values</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.initialize"><code class="docutils literal notranslate"><span class="pre">IDMixin.initialize()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.inject"><code class="docutils literal notranslate"><span class="pre">IDMixin.inject()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.is_standard_cell"><code class="docutils literal notranslate"><span class="pre">IDMixin.is_standard_cell</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.local"><code class="docutils literal notranslate"><span class="pre">IDMixin.local</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.position"><code class="docutils literal notranslate"><span class="pre">IDMixin.position</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.record"><code class="docutils literal notranslate"><span class="pre">IDMixin.record()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.set_current_value"><code class="docutils literal notranslate"><span class="pre">IDMixin.set_current_value()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.set_initial_value"><code class="docutils literal notranslate"><span class="pre">IDMixin.set_initial_value()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.set_parameters"><code class="docutils literal notranslate"><span class="pre">IDMixin.set_parameters()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.populations.IDMixin.set_state"><code class="docutils literal notranslate"><span class="pre">IDMixin.set_state()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.populations.Population"><code class="docutils literal notranslate"><span class="pre">Population</span></code></a><ul>
