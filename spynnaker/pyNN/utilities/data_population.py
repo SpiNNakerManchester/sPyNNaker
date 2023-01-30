@@ -78,9 +78,7 @@ class DataPopulation(object):
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
         with NeoBufferDatabase(self.__database_file) as db:
-            block = db.get_block(self.__label)
-            db.add_segment(block, self.__label, variables, self._indexes)
-            return block
+            return db.get_full_block(self.__label, variables, self._indexes)
 
     @overrides(Population.spinnaker_get_data)
     def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):

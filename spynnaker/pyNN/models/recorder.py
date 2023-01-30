@@ -188,7 +188,7 @@ class Recorder(object):
             If the recording not setup correctly
         """
         with NeoBufferDatabase() as db:
-            block = db.get_block(self.__population.label)
+            block = db.get_empty_block(self.__population.label)
 
         for previous in range(0, SpynnakerDataView.get_segment_counter()):
             self.__append_previous_segment(
@@ -262,16 +262,3 @@ class Recorder(object):
                 block, self.__population.label, variables, view_indexes)
             if clear:
                 db.clear_data(self.__population.label, variables)
-
-def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
-    """ Converts data between sPyNNaker format and Neo format
-
-    :param ~numpy.ndarray signal_array: Draw data in sPyNNaker format
-    :param list(int) indexes:
-    :rtype: ~numpy.ndarray
-    """
-    processed_data = [
-        signal_array[:, 2][signal_array[:, 0] == index]
-        for index in indexes]
-    processed_data = numpy.vstack(processed_data).T
-    return processed_data

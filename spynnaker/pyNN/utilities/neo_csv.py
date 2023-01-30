@@ -78,14 +78,11 @@ class NeoCsv(object):
         return metadata
 
     def __read_signal_array(self, csv_reader):
-        arrays = []
         rows = []
         row = next(csv_reader)
         while len(row) > 0:
-            #arrays.append(numpy.genfromtxt(row))
             rows.append(row)
             row = next(csv_reader)
-        #return numpy.vstack(arrays)
         return numpy.asarray(rows, dtype=numpy.float64)
 
     def _insert_spike_data(
@@ -328,10 +325,8 @@ class NeoCsv(object):
 
         formation_times = []
         formation_labels = []
-        formation_annotations = dict()
         elimination_times = []
         elimination_labels = []
-        elimination_annotations = dict()
 
         for i in range(len(event_array)):
             event_time = t_start + event_array[i][0] * quantities.ms
@@ -566,5 +561,3 @@ class NeoCsv(object):
                             row = next(csv_reader)
                 except StopIteration:
                     return block
-
-

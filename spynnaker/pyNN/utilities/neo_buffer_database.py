@@ -1126,7 +1126,35 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 n_colour_bits, variable)
             self._csv_spike_data(csv_writer, spikes)
 
-    def get_block(self, pop_label):
+    def __get_empty_block(self, cursor, pop_label):
+        """
+
+        :param str pop_label: The label for the population of interest
+
+            .. note::
+                This is actually the label of the Application Vertex
+                Typical the Population label corrected for None or
+                duplicate values
+
+        :param variables: One or more variable names or None for all available
+        :type variables: str, list(str) or None
+        :param view_indexes: List of neurons ids to include or None for all
+        :type view_indexes: None or list(int)
+        :param annotations: annotations to put on the neo block
+        :type annotations: None or dict(str, ...)
+        :return: The Neo block
+        :rtype: ~neo.core.Block
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
+        """
+        _, rec_datetime, _, dt, simulator = self.__get_segment_info(cursor)
+        pop_size, first_id, description = \
+            self.__get_population_metadata(cursor, pop_label)
+        return self._insert_block(
+            pop_label, description, pop_size, first_id, dt, simulator)
+
+    def get_empty_block(self, pop_label):
         """
 
         :param str pop_label: The label for the population of interest
@@ -1149,14 +1177,18 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         with self.transaction() as cursor:
-            _, rec_datetime, _, dt, simulator = self.__get_segment_info(cursor)
-            pop_size, first_id, description = \
-                self.__get_population_metadata(cursor, pop_label)
-            return self._insert_block(
-                pop_label, description, pop_size, first_id, dt, simulator)
+            return self.__get_empty_block(cursor, pop_label)
+
+    def get_full_block(self, pop_label, variables, view_indexes):
+        with self.transaction() as cursor:
+            block = self.__get_empty_block(cursor, pop_label)
+            self.__add_segment(
+                cursor, block, pop_label, variables, view_indexes)
+            return block
 
     def write_csv(self, csv_file, pop_label, variables, view_indexes=None):
         """
+        Writes the data including metadata to a csv file
 
         :param str pop_label: The label for the population of interest
 
