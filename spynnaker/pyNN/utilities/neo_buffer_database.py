@@ -19,6 +19,7 @@ import logging
 import math
 import numpy
 import os
+import quantities
 import struct
 import re
 from spinn_utilities.log import FormatAdapter
@@ -1052,10 +1053,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         if buffer_type == BufferDataType.MATRIX:
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
+            sampling_rate = 1000/sampling_interval_ms * quantities.Hz
             self._insert_matix_data(
                 variable, segment, signal_array,
-                indexes, t_start, sampling_interval_ms,
-                units)
+                indexes, t_start, sampling_rate, units)
         elif buffer_type == BufferDataType.REWIRES:
             if view_indexes is not None:
                 raise SpynnakerException(
@@ -1069,9 +1070,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             spikes, indexes = self.__get_spikes(
                 cursor, rec_id, view_indexes, buffer_type, atoms_shape,
                 n_colour_bits, variable)
+            sampling_rate = 1000 / sampling_interval_ms * quantities.Hz
             self._insert_spike_data(
                 view_indexes, segment, spikes, t_start, t_stop,
-                sampling_interval_ms)
+                sampling_rate)
 
     def __read_and_csv_data(self, cursor, pop_label, variable, csv_writer,
                             view_indexes, t_stop):

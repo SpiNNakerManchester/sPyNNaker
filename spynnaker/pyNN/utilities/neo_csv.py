@@ -117,7 +117,7 @@ class NeoCsv(object):
 
     def _insert_spike_data(
             self, view_indexes, segment, spikes, t_start, t_stop,
-            sampling_interval_ms):
+            sampling_rate):
         """
 
         :param str pop_label: The label for the population of interest
@@ -132,7 +132,7 @@ class NeoCsv(object):
         :param ~numpy.ndarray spikes:
         :param float t_start:
         :param float t_stop:
-        :param float sampling_interval_ms:
+        :param ~quantities.Quantity sampling_rate: Arte a neuron is recorded
         :param int first_id:
         """
         block = segment.block
@@ -147,7 +147,7 @@ class NeoCsv(object):
                 t_start=t_start,
                 t_stop=t_stop,
                 units='ms',
-                sampling_interval=sampling_interval_ms,
+                sampling_rate=sampling_rate,
                 source_population=block.name,
                 source_id=index + first_id,
                 source_index=index)
@@ -179,8 +179,9 @@ class NeoCsv(object):
             t_start, t_stop, sampling_period, units = \
                 self.__read_variable_metadata(csv_reader)
             spikes = self.__read_signal_array(csv_reader)
+            sampling_rate = 1000 / sampling_period
             self._insert_spike_data(
-                view_indexes, segment, spikes, t_start, t_stop, sampling_period)
+                view_indexes, segment, spikes, t_start, t_stop, sampling_rate)
         except KeyError as ex:
             logger.exception(f"Metadata for {variable} is missing {ex}. "
                              f"So this data will be skipped")
@@ -204,8 +205,7 @@ class NeoCsv(object):
 
     def _insert_matix_data(
             self, variable, segment, signal_array,
-            indexes, t_start, sampling_period,
-            units):
+            indexes, t_start, sampling_rate, units):
         """ Adds a data item that is an analog signal to a neo segment
 
          :param str pop_label: The label for the population of interest
@@ -220,8 +220,7 @@ class NeoCsv(object):
         :param ~numpy.ndarray signal_array: the raw signal data
         :param list(int) indexes: The indexes for the data
         :type t_start: float or int
-        :param sampling_period: how often a neuron is recorded
-        :type TODO
+        :param ~quantities.Quantity sampling_rate: Arte a neuron is recorded
         :param units: the units of the recorded value
         :type units: quantities.quantity.Quantity or str
         :param int first_id:
@@ -246,7 +245,7 @@ class NeoCsv(object):
             signal_array,
             units=units,
             t_start=t_start,
-            sampling_period=sampling_period,
+            sampling_rate=sampling_rate,
             name=variable,
             source_population=block.name,
             source_ids=ids)
@@ -297,9 +296,10 @@ class NeoCsv(object):
         assert len(row) > 0
         indexes = numpy.asarray(row, dtype=int)
         signal_array = self.__read_signal_array(csv_reader)
+        sampling_rate = 1000 / sampling_period
         self._insert_matix_data(
             variable, segment, signal_array, indexes,
-            t_start, sampling_period, units)
+            t_start, sampling_rate, units)
 
     def _insert_formation_events(
             self, segment, variable, formation_times, formation_labels):
