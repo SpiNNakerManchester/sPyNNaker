@@ -54,6 +54,17 @@ class NeoCsv(object):
 
     def _csv_variable_metdata(self, csv_writer, variable_type, variable,
                               t_start, t_stop, sampling_interval_ms, units):
+        """
+        Writes the metadata for a variable to csv
+
+        :param ~csv.writer csv_writer: Open csv writer to write to
+        :param str variable_type:
+        :param str variable:
+        :param float t_start:
+        :param float t_stop:
+        :param float sampling_interval_ms:
+        :param str units:
+        """
         csv_writer.writerow([variable_type, variable])
         csv_writer.writerow([self._T_START, t_start * quantities.ms])
         csv_writer.writerow([self._T_STOP, t_stop * quantities.ms])
@@ -65,17 +76,36 @@ class NeoCsv(object):
         csv_writer.writerow([])
 
     def __quantify(self, as_str):
+        """
+        Converts a String into a quantities.Quantity
+
+        The String should be a float, a space and a Quantities label
+
+        :param str as_str: String representation of a quantity.
+        :return: A Quantities object
+        :rtype ~quantities.Quantity
+        """
         parts = as_str.split(" ")
-        assert len(parts) == 2
         return quantities.Quantity(float(parts[0]), units=parts[1])
 
-    def __read_variable_metdata(self, csv_reader):
+    def __read_variable_metadata(self, csv_reader):
+        """
+        Reads a block of metadata, formats it and returns it as a dict
+
+        A block is a number of rows each of exactly 2 values followed by an
+        empty row
+
+        :param ~csv.writer csv_writer: Open csv writer to read from
+        :return: t_start, t_stop, sampling_period, units
+        :rtype (~quantities.Quantity, ~quantities.Quantity,
+            ~quantities.Quantity, str)
+        """
         metadata = self.__read_metadata(csv_reader)
-        metadata[self._T_START] = self.__quantify(metadata[self._T_START])
-        metadata[self._T_STOP] = self.__quantify(metadata[self._T_STOP])
-        metadata[self._SAMPLING_PERIOD] = self.__quantify(
-            metadata[self._SAMPLING_PERIOD])
-        return metadata
+        return(
+            self.__quantify(metadata[self._T_START]),
+            self.__quantify(metadata[self._T_STOP]),
+            self.__quantify(metadata[self._SAMPLING_PERIOD]),
+            metadata[self._UNITS])
 
     def __read_signal_array(self, csv_reader):
         rows = []
@@ -144,14 +174,17 @@ class NeoCsv(object):
         csv_writer.writerows(spikes)
         csv_writer.writerow([])
 
-    def __read_spike_data(self, csv_reader, segment, view_indexes):
-        metadata = self.__read_variable_metdata(csv_reader)
-        spikes = self.__read_signal_array(csv_reader)
-        self._insert_spike_data(
-            view_indexes, segment, spikes,
-            t_start=metadata[self._T_START],
-            t_stop=metadata[self._T_STOP],
-            sampling_interval_ms=metadata[self._SAMPLING_PERIOD])
+    def __read_spike_data(self, csv_reader, segment, view_indexes, variable):
+        try:
+            t_start, t_stop, sampling_period, units = \
+                self.__read_variable_metadata(csv_reader)
+            spikes = self.__read_signal_array(csv_reader)
+            self._insert_spike_data(
+                view_indexes, segment, spikes, t_start, t_stop, sampling_period)
+        except KeyError as ex:
+            logger.exception(f"Metadata for {variable} is missing {ex}. "
+                             f"So this data will be skipped")
+            return
 
     def __get_channel_index(self, ids, block):
         """
@@ -171,7 +204,7 @@ class NeoCsv(object):
 
     def _insert_matix_data(
             self, variable, segment, signal_array,
-            indexes, t_start, sampling_interval_ms,
+            indexes, t_start, sampling_period,
             units):
         """ Adds a data item that is an analog signal to a neo segment
 
@@ -187,8 +220,8 @@ class NeoCsv(object):
         :param ~numpy.ndarray signal_array: the raw signal data
         :param list(int) indexes: The indexes for the data
         :type t_start: float or int
-        :param sampling_interval_ms: how often a neuron is recorded
-        :type sampling_interval_ms: float or int
+        :param sampling_period: how often a neuron is recorded
+        :type TODO
         :param units: the units of the recorded value
         :type units: quantities.quantity.Quantity or str
         :param int first_id:
@@ -204,8 +237,7 @@ class NeoCsv(object):
         # pylint: disable=too-many-arguments, no-member, c-extension-no-member
         block = segment.block
         first_id = block.annotations[self._FIRST_ID]
-        t_start = t_start * quantities.ms
-        sampling_period = sampling_interval_ms * quantities.ms
+
 
         ids = list(map(lambda x: x+first_id, indexes))
         if units is None:
@@ -259,16 +291,15 @@ class NeoCsv(object):
         csv_writer.writerow([])
 
     def __read_matix_data(self, csv_reader, segment, variable):
-        metadata = self.__read_variable_metdata(csv_reader)
+        t_start, t_stop, sampling_period, units = \
+            self.__read_variable_metadata(csv_reader)
         row = next(csv_reader)
         assert len(row) > 0
         indexes = numpy.asarray(row, dtype=int)
         signal_array = self.__read_signal_array(csv_reader)
         self._insert_matix_data(
             variable, segment, signal_array, indexes,
-            t_start=metadata[self._T_START],
-            sampling_interval_ms=metadata[self._SAMPLING_PERIOD],
-            units=metadata[self._UNITS])
+            t_start, sampling_period, units)
 
     def _insert_formation_events(
             self, segment, variable, formation_times, formation_labels):
@@ -543,7 +574,7 @@ class NeoCsv(object):
                             csv_reader, segment, row[1])
                     elif row[0] == self._SPIKES:
                         self.__read_spike_data(
-                            csv_reader, segment, indexes)
+                            csv_reader, segment, indexes, row[1])
                     elif row[0] == self._EVENT:
                         self.__read_rewirings(
                             csv_reader, segment, row[1])
