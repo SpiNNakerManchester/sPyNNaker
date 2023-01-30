@@ -146,3 +146,4 @@ if __name__ == '__main__':
     ps.check(pop, simtime,
              spike_rate=spike_rate, spike_rec_indexes=spike_rec_indexes,
              v_rate=v_rate, v_rec_indexes=v_rec_indexes, is_view=False)
+    sim.end()
