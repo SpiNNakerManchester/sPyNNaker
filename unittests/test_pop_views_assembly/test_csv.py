@@ -96,6 +96,60 @@ class TestCSV(BaseTestCase):
         assert v.shape == target.shape
         assert numpy.array_equal(v,  target)
 
+    def test_over_view(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
+        my_csv = os.path.join(my_dir, "test.csv")
+        with NeoBufferDatabase(my_buffer) as db:
+            db.write_csv(my_csv, "pop_1", variables="all")
+
+        neo = NeoCsv().read_csv(my_csv)
+        spikes = neo_convertor.convert_spikes(neo)
+        target = trim_spikes(self.spikes_expected, [1, 2])
+        assert numpy.array_equal(spikes, target)
+        spiketrains = neo.segments[0].spiketrains
+        assert 2 == len(spiketrains)
+
+        v = neo.segments[0].filter(name='v')[0].magnitude
+        target = self.v_expected[:, [1, 2]]
+        assert v.shape == target.shape
+        assert numpy.array_equal(v, target)
+
+    def test_over_sub_view(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
+        my_csv = os.path.join(my_dir, "test.csv")
+        with NeoBufferDatabase(my_buffer) as db:
+            db.write_csv(my_csv, "pop_1", variables="all", view_indexes=[2, 4])
+
+        neo = NeoCsv().read_csv(my_csv)
+        spikes = neo_convertor.convert_spikes(neo)
+        target = trim_spikes(self.spikes_expected, [2])
+        assert numpy.array_equal(spikes, target)
+        spiketrains = neo.segments[0].spiketrains
+        assert 1 == len(spiketrains)
+
+        v = neo.segments[0].filter(name='v')[0].magnitude
+        target = self.v_expected[:, [2]]
+        assert v.shape == target.shape
+        assert numpy.array_equal(v, target)
+
+    def test_no_intersection(self):
+        my_dir = os.path.dirname(os.path.abspath(__file__))
+        my_buffer = os.path.join(my_dir, "view_data.sqlite3")
+        my_csv = os.path.join(my_dir, "test.csv")
+        with NeoBufferDatabase(my_buffer) as db:
+            db.write_csv(my_csv, "pop_1", variables="all", view_indexes=[4, 6])
+
+        neo = NeoCsv().read_csv(my_csv)
+        spikes = neo_convertor.convert_spikes(neo)
+        self.assertEqual(0, len(spikes))
+        spiketrains = neo.segments[0].spiketrains
+        self.assertEqual(0, len(spiketrains))
+
+        v = neo.segments[0].filter(name='v')[0].magnitude
+        self.assertEqual(0, len(v))
+
     def test_rewiring(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "rewiring_data.sqlite3")

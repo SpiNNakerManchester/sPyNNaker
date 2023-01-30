@@ -120,7 +120,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __get_segment_info(self, cursor):
         """
-        Gets the data for the whole segment
+        Gets the metadata for the segment
 
         :param ~sqlite3.Cursor cursor:
         :return: segment number, record time, last run time recorded,
@@ -227,11 +227,16 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str variable:
         :param ~spynnaker.pyNN.models.populations.Population population:
             the population to record for
-        :type data_type: DataType or None
-        :param BufferDataType buffered_type:
+        :param Population population:
         :param sampling_interval: the simulation time in ms between sampling.
             Typically the sampling rate * simulation_timestep_ms
         :type sampling_interval_ms: float or None
+        :type data_type: DataType or None
+        :param BufferDataType buffered_type:
+        :param str units:
+        :param tuple atoms_shape:
+        :param int n_colour_bits:
+        :return:
         """
         for row in cursor.execute(
                 """
@@ -1054,7 +1059,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
             sampling_rate = 1000/sampling_interval_ms * quantities.Hz
-            self._insert_matix_data(
+            self._insert_matrix_data(
                 variable, segment, signal_array,
                 indexes, t_start, sampling_rate, units)
         elif buffer_type == BufferDataType.REWIRES:
@@ -1078,7 +1083,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def __read_and_csv_data(self, cursor, pop_label, variable, csv_writer,
                             view_indexes, t_stop):
         """
-        Gets the data as a Numpy array for one population and variable
+        Reads the data for one variable and adds it to the csv file
 
         :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
@@ -1089,12 +1094,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 duplicate values
 
         :param str variable:
-        :param ~neo.core.Block block: neo block
-        :param ~neo.core.Segment segment: Segment to add data to
+        :param ~csv.writer csv_writer: Open csv writer to write to
+        :param view_indexes:
+        :type view_indexes: None, ~numpy.array or list(int)
         :param float t_stop
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the recording metadata not setup correctly
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          first_id, pop_size, units, atoms_shape, n_colour_bits) = \
@@ -1106,7 +1109,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 sampling_interval_ms, units)
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
-            self._csv_matix_data(csv_writer, signal_array, indexes)
+            self._csv_matrix_data(csv_writer, signal_array, indexes)
         elif buffer_type == BufferDataType.REWIRES:
             self._csv_variable_metdata(
                 csv_writer, self._EVENT, variable, t_start, t_stop,
@@ -1118,15 +1121,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 cursor, rec_id, sampling_interval_ms)
             self._csv_rewirings(csv_writer, event_array)
         else:
-            if view_indexes is None:
-                view_indexes = range(pop_size)
             self._csv_variable_metdata(
                 csv_writer, self._SPIKES, variable, t_start, t_stop,
                 sampling_interval_ms, units)
             spikes, indexes = self.__get_spikes(
                 cursor, rec_id, view_indexes, buffer_type, atoms_shape,
                 n_colour_bits, variable)
-            self._csv_spike_data(csv_writer, spikes)
+            self._csv_spike_data(csv_writer, spikes, indexes)
 
     def __get_empty_block(self, cursor, pop_label):
         """
@@ -1153,7 +1154,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         _, rec_datetime, _, dt, simulator = self.__get_segment_info(cursor)
         pop_size, first_id, description = \
             self.__get_population_metadata(cursor, pop_label)
-        return self._insert_block(
+        return self._insert_empty_block(
             pop_label, description, pop_size, first_id, dt, simulator)
 
     def get_empty_block(self, pop_label):
@@ -1203,10 +1204,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :type variables: str, list(str) or None
         :param view_indexes: List of neurons ids to include or None for all
         :type view_indexes: None or list(int)
-        :param annotations: annotations to put on the neo block
-        :type annotations: None or dict(str, ...)
-        :return: The Neo block
-        :rtype: ~neo.core.Block
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
@@ -1216,18 +1213,16 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                                     quoting=csv.QUOTE_MINIMAL)
 
             with self.transaction() as cursor:
-                _, rec_datetime, t_stop, _, _ = self.__get_segment_info(cursor)
+                segment_number, rec_datetime, t_stop, dt, _ = \
+                    self.__get_segment_info(cursor)
                 pop_size, first_id, description = \
                     self.__get_population_metadata(cursor, pop_label)
                 # block.annotate(**annotations)
-                self._csv_block(csv_writer, pop_label, t_stop,
-                           pop_size, first_id, description)
+                self._csv_block_metadat(csv_writer, pop_label, dt,
+                                        pop_size, first_id, description)
 
-                self._csv_indexes(csv_writer, view_indexes)
-
-                segment_number, rec_datetime, t_stop, _, _ = \
-                    self.__get_segment_info(cursor)
-                self._csv_segment(csv_writer, segment_number, rec_datetime)
+                self._csv_segment_metadata(
+                    csv_writer, segment_number, rec_datetime)
 
                 variables = self.__clean_variables(
                     variables, pop_label, cursor)
@@ -1292,7 +1287,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         segment_number, rec_datetime, t_stop, _, _ = \
             self.__get_segment_info(cursor)
-        segment = self._insert_segment(block, segment_number, rec_datetime)
+        segment = self._insert_empty_segment(
+            block, segment_number, rec_datetime)
 
         variables = self.__clean_variables(variables, pop_label, cursor)
         for variable in variables:
