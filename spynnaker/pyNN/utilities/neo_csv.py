@@ -108,6 +108,17 @@ class NeoCsv(object):
             metadata[self._UNITS])
 
     def __read_signal_array(self, csv_reader):
+        """
+        Reads a block of data nad converts it in a numpy array
+
+        A block is a number of rows followed by an empty row
+        All rows must have the same length
+        The assumption is that all values in the block represent floats
+
+        :param ~csv.writer csv_writer: Open csv writer to read from
+        :return: Numpy signal array of floats
+        :rtype: ~numpy.array
+        """
         rows = []
         row = next(csv_reader)
         while len(row) > 0:
@@ -146,7 +157,8 @@ class NeoCsv(object):
                 times=times[index],
                 t_start=t_start,
                 t_stop=t_stop,
-                units='ms',
+                units=quantities.ms,
+                dtype=numpy.float64,
                 sampling_rate=sampling_rate,
                 source_population=block.name,
                 source_id=index + first_id,
