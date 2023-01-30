@@ -38,10 +38,10 @@ class NeoCsv(object):
 
     _SEGMENT_NUMBER = 'segment_number'
     _REC_DATETIME = "rec_datetime"
-    _T_STOP = "t_stop"
 
     _T_START = "t_start"
-    _SAMPLINFG_PERIOD = "sampling_period"
+    _T_STOP = "t_stop"
+    _SAMPLING_PERIOD = "sampling_period"
     _UNITS = "units"
 
     _MATRIX = "matrix"
@@ -53,20 +53,44 @@ class NeoCsv(object):
     _SPIKES = "spikes"
 
     def _csv_variable_metdata(self, csv_writer, variable_type, variable,
-                              t_start, sampling_interval_ms, units):
+                              t_start, t_stop, sampling_interval_ms, units):
         csv_writer.writerow([variable_type, variable])
-        t_start = t_start * quantities.ms
-        csv_writer.writerow([self._T_START, t_start])
+        csv_writer.writerow([self._T_START, t_start * quantities.ms])
+        csv_writer.writerow([self._T_STOP, t_stop * quantities.ms])
         sampling_period = sampling_interval_ms * quantities.ms
-        csv_writer.writerow([self._SAMPLINFG_PERIOD, sampling_period])
+        csv_writer.writerow([self._SAMPLING_PERIOD, sampling_period])
         if units is None:
             units = "dimensionless"
         csv_writer.writerow([self._UNITS, units])
         csv_writer.writerow([])
 
+    def __quantify(self, as_str):
+        parts = as_str.split(" ")
+        assert len(parts) == 2
+        return quantities.Quantity(float(parts[0]), units=parts[1])
+
+    def __read_variable_metdata(self, csv_reader):
+        metadata = self.__read_metadata(csv_reader)
+        metadata[self._T_START] = self.__quantify(metadata[self._T_START])
+        metadata[self._T_STOP] = self.__quantify(metadata[self._T_STOP])
+        metadata[self._SAMPLING_PERIOD] = self.__quantify(
+            metadata[self._SAMPLING_PERIOD])
+        return metadata
+
+    def __read_signal_array(self, csv_reader):
+        arrays = []
+        rows = []
+        row = next(csv_reader)
+        while len(row) > 0:
+            #arrays.append(numpy.genfromtxt(row))
+            rows.append(row)
+            row = next(csv_reader)
+        #return numpy.vstack(arrays)
+        return numpy.asarray(rows, dtype=numpy.float64)
+
     def _insert_spike_data(
-            self, pop_label, view_indexes, segment, spikes, t_start, t_stop,
-            sampling_interval_ms, first_id):
+            self, view_indexes, segment, spikes, t_start, t_stop,
+            sampling_interval_ms):
         """
 
         :param str pop_label: The label for the population of interest
@@ -84,6 +108,8 @@ class NeoCsv(object):
         :param float sampling_interval_ms:
         :param int first_id:
         """
+        block = segment.block
+        first_id = block.annotations[self._FIRST_ID]
         times = defaultdict(list)
         for neuron_id, time in spikes:
             times[int(neuron_id)].append(time)
@@ -95,7 +121,7 @@ class NeoCsv(object):
                 t_stop=t_stop,
                 units='ms',
                 sampling_interval=sampling_interval_ms,
-                source_population=pop_label,
+                source_population=block.name,
                 source_id=index + first_id,
                 source_index=index)
             segment.spiketrains.append(spiketrain)
@@ -121,6 +147,15 @@ class NeoCsv(object):
         csv_writer.writerows(spikes)
         csv_writer.writerow([])
 
+    def __read_spike_data(self, csv_reader, segment, view_indexes):
+        metadata = self.__read_variable_metdata(csv_reader)
+        spikes = self.__read_signal_array(csv_reader)
+        self._insert_spike_data(
+            view_indexes, segment, spikes,
+            t_start=metadata[self._T_START],
+            t_stop=metadata[self._T_STOP],
+            sampling_interval_ms=metadata[self._SAMPLING_PERIOD])
+
     def __get_channel_index(self, ids, block):
         """
 
@@ -138,7 +173,7 @@ class NeoCsv(object):
         return channel_index
 
     def _insert_matix_data(
-            self, pop_label, variable, segment, signal_array,
+            self, variable, segment, signal_array,
             indexes, t_start, sampling_interval_ms,
             units):
         """ Adds a data item that is an analog signal to a neo segment
@@ -184,7 +219,7 @@ class NeoCsv(object):
             t_start=t_start,
             sampling_period=sampling_period,
             name=variable,
-            source_population=pop_label,
+            source_population=block.name,
             source_ids=ids)
         channel_index = self.__get_channel_index(indexes, segment.block)
         data_array.channel_index = channel_index
@@ -226,14 +261,59 @@ class NeoCsv(object):
         csv_writer.writerows(signal_array)
         csv_writer.writerow([])
 
-    def __read_matix_data(self, csv_reader):
-        metadata = self.__read_metadata(csv_reader)
-        #_insert_matix_data(
-        #    self, pop_label, variable, block, segment, signal_array,
-        #    indexes, t_start, sampling_interval_ms,
-        #    units, first_id
+    def __read_matix_data(self, csv_reader, segment, variable):
+        metadata = self.__read_variable_metdata(csv_reader)
+        row = next(csv_reader)
+        assert len(row) > 0
+        indexes = numpy.asarray(row, dtype=int)
+        signal_array = self.__read_signal_array(csv_reader)
+        self._insert_matix_data(
+            variable, segment, signal_array, indexes,
+            t_start=metadata[self._T_START],
+            sampling_interval_ms=metadata[self._SAMPLING_PERIOD],
+            units=metadata[self._UNITS])
 
-    def _insert_neo_events(
+    def _insert_formation_events(
+            self, segment, variable, formation_times, formation_labels):
+        """ Adds data that is events to a neo segment.
+
+        :param ~neo.core.Segment segment: Segment to add data to
+        :param ~numpy.ndarray event_array: the raw "event" data
+        :param str variable: the variable name
+        :param recording_start_time: when recording started
+        :type recording_start_time: float or int
+        """
+        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
+        formation_event_array = neo.Event(
+            times=formation_times,
+            labels=formation_labels,
+            units="ms",
+            name=variable + "_form",
+            description="Synapse formation events",
+            array_annotations={})
+        segment.events.append(formation_event_array)
+
+    def _insert_elimination_events(
+            self, segment, variable, elimination_times, elimination_labels):
+        """ Adds data that is events to a neo segment.
+
+        :param ~neo.core.Segment segment: Segment to add data to
+        :param ~numpy.ndarray event_array: the raw "event" data
+        :param str variable: the variable name
+        :param recording_start_time: when recording started
+        :type recording_start_time: float or int
+        """
+        # pylint: disable=too-many-arguments, no-member, c-extension-no-member
+        elimination_event_array = neo.Event(
+            times=elimination_times,
+            labels=elimination_labels,
+            units="ms",
+            name=variable + "_elim",
+            description="Synapse elimination events",
+            array_annotations={})
+        segment.events.append(elimination_event_array)
+
+    def _insert_neo_rewirings(
             self, segment, event_array, variable, recording_start_time):
         """ Adds data that is events to a neo segment.
 
@@ -266,27 +346,12 @@ class NeoCsv(object):
                 elimination_labels.append(
                     str(pre_id) + "_" + str(post_id) + "_elimination")
 
-        formation_event_array = neo.Event(
-            times=formation_times,
-            labels=formation_labels,
-            units="ms",
-            name=variable + "_form",
-            description="Synapse formation events",
-            array_annotations=formation_annotations)
+        self._insert_formation_events(
+            segment, variable, formation_times, formation_labels)
+        self._insert_elimination_events(
+            segment, variable, elimination_times, elimination_labels)
 
-        elimination_event_array = neo.Event(
-            times=elimination_times,
-            labels=elimination_labels,
-            units="ms",
-            name=variable + "_elim",
-            description="Synapse elimination events",
-            array_annotations=elimination_annotations)
-
-        segment.events.append(formation_event_array)
-        segment.events.append(elimination_event_array)
-
-    def _csv_neo_events(
-            self, csv_writer, event_array, variable, recording_start_time):
+    def _csv_rewirings(self, csv_writer, event_array):
         """ Adds data that is events to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
@@ -319,6 +384,30 @@ class NeoCsv(object):
         csv_writer.writerow([self._ELMINATION])
         csv_writer.writerows(elimination)
         csv_writer.writerow([])
+
+    def __read_times_and_labels(self, csv_reader):
+        times = []
+        labels = []
+        row = next(csv_reader)
+        while len(row) > 0:
+            assert len(row) == 2
+            times.append(self.__quantify(row[0]))
+            labels.append(row[1])
+            row = next(csv_reader)
+        return times, labels
+
+    def __read_rewirings(self, csv_reader, segment, variable):
+        self.__read_metadata(csv_reader)
+        row = next(csv_reader)
+        assert row == ["formation"]
+        times, labels = self.__read_times_and_labels(csv_reader)
+        self._insert_formation_events(
+            segment, variable, times, labels)
+        row = next(csv_reader)
+        assert row == ["elimination"]
+        times, labels = self.__read_times_and_labels(csv_reader)
+        self._insert_elimination_events(
+            segment, variable, times, labels)
 
     def _insert_segment(self, block, segment_number, rec_datetime):
         segment = neo.Segment(
@@ -417,9 +506,9 @@ class NeoCsv(object):
         return self._insert_block(
             pop_label=metadata[self._POPULATION],
             description=metadata[self._DESCRIPTION],
-            size=metadata[self._SIZE],
-            first_id=metadata[self._FIRST_ID],
-            dt=metadata[self._DT],
+            size=int(metadata[self._SIZE]),
+            first_id=int(metadata[self._FIRST_ID]),
+            dt=float(metadata[self._DT]),
             simulator=metadata[self._SIMULATOR])
 
     def __read_metadata(self, csv_reader):
@@ -437,6 +526,7 @@ class NeoCsv(object):
             metadata = self.__read_metadata(csv_reader)
             block = self.__read_block(metadata)
             category = block
+            indexes = range(block.annotations[self._SIZE])
             while True:
                 try:
                     try:
@@ -453,6 +543,20 @@ class NeoCsv(object):
                     if row[0] == self._SEGMENT_NUMBER:
                         segment = self.__read_segment(
                             csv_reader, block, row[1])
+                    elif row[0] == self._MATRIX:
+                        self.__read_matix_data(
+                            csv_reader, segment, row[1])
+                    elif row[0] == self._SPIKES:
+                        self.__read_spike_data(
+                            csv_reader, segment, indexes)
+                    elif row[0] == self._EVENT:
+                        self.__read_rewirings(
+                            csv_reader, segment, row[1])
+                    elif row[0] == self._INDEXES:
+                        row = next(csv_reader)
+                        assert len(row) > 0
+                        indexes = numpy.genfromtxt(row)
+                        row = next(csv_reader)
                     else:
                         logger.error(
                             f"ignoring csv block starting with {row[0]}")

@@ -17,8 +17,13 @@ import csv
 import os
 import numpy
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.utilities import neo_convertor
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.neo_csv import NeoCsv
+
+
+def trim_spikes(spikes, indexes):
+    return [[n, t] for [n, t] in spikes if n in indexes]
 
 
 class TestCSV(BaseTestCase):
@@ -47,11 +52,27 @@ class TestCSV(BaseTestCase):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "all_data.sqlite3")
         my_csv = os.path.join(my_dir, "test.csv")
+        my_packets = os.path.join(my_dir, "packets-per-timestep.csv")
+        packets_expected = []
+        with open(my_packets) as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                row = list(map(lambda x: float(x), row))
+                packets_expected.append(row)
+
         with NeoBufferDatabase(my_buffer) as db:
             db.write_csv(my_csv, "pop_1", variables="all")
-            pop = db.get_population("pop_1")
-            neo = pop.get_data("all")
-            neo = NeoCsv().read_csv(my_csv)
+
+        neo = NeoCsv().read_csv(my_csv)
+        spikes = neo_convertor.convert_spikes(neo)
+        assert numpy.array_equal(spikes, self.spikes_expected)
+
+        v = neo.segments[0].filter(name='v')[0].magnitude
+        assert v.shape == self.v_expected.shape
+        assert numpy.array_equal(v,  self.v_expected)
+
+        packets = neo.segments[0].filter(name='packets-per-timestep')[0]
+        assert numpy.array_equal(packets,  packets_expected)
 
     def test_view(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
@@ -62,16 +83,40 @@ class TestCSV(BaseTestCase):
             db.write_csv(my_csv, "pop_1", variables=["spikes", "v"],
                          view_indexes=[2, 4, 7, 8])
 
-    def test_spikes(self):
-        my_dir = os.path.dirname(os.path.abspath(__file__))
-        my_buffer = os.path.join(my_dir, "all_data.sqlite3")
-        my_csv = os.path.join(my_dir, "test.csv")
-        with NeoBufferDatabase(my_buffer) as db:
-            db.write_csv(my_csv, "pop_1", variables="spikes")
+        neo = NeoCsv().read_csv(my_csv)
+
+        spikes = neo_convertor.convert_spikes(neo)
+        target = trim_spikes(self.spikes_expected, [2, 4, 7, 8])
+        assert numpy.array_equal(spikes, target)
+        spiketrains = neo.segments[0].spiketrains
+        assert 4 == len(spiketrains)
+
+        v = neo.segments[0].filter(name='v')[0].magnitude
+        target = self.v_expected[:, [2, 4, 7, 8]]
+        assert v.shape == target.shape
+        assert numpy.array_equal(v,  target)
 
     def test_rewiring(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "rewiring_data.sqlite3")
+        my_labels = os.path.join(my_dir, "rewiring_labels.txt")
+
         my_csv = os.path.join(my_dir, "test.csv")
         with NeoBufferDatabase(my_buffer) as db:
             db.write_csv(my_csv, "pop_1", variables="all")
+        neo = NeoCsv().read_csv(my_csv)
+        formation_events = neo.segments[0].events[0]
+        elimination_events = neo.segments[0].events[1]
+
+        num_forms = len(formation_events.times)
+        self.assertEqual(0, len(formation_events))
+        num_elims = len(elimination_events.times)
+        self.assertEqual(10, len(elimination_events))
+
+        self.assertEqual(0, num_forms)
+        self.assertEqual(10, num_elims)
+
+        with open(my_labels, "r", encoding="UTF-8") as label_f:
+            for i, line in enumerate(label_f.readlines()):
+                self.assertEqual(
+                    line.strip(), elimination_events.labels[i])

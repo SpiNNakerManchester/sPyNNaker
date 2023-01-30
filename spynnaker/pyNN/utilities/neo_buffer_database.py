@@ -137,7 +137,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 """):
             t_str = str(row[self._REC_DATETIME], "utf-8")
             time = datetime.strptime(t_str, "%Y-%m-%d %H:%M:%S.%f")
-            if row["t_stop"] is None:
+            if row[self._T_STOP] is None:
                 t_stop = 0.0
                 logger.warning("Data from a virtual run will be empty")
             else:
@@ -1024,8 +1024,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                                 minlength=pop_size)
         return {i: counts[i] for i in view_indexes}
 
-    def __add_data(self, cursor, pop_label, variable, block, segment,
-                   view_indexes, t_stop):
+    def __add_data(
+            self, cursor, pop_label, variable, segment, view_indexes, t_stop):
         """
         Gets the data as a Numpy array for one population and variable
 
@@ -1053,7 +1053,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
             self._insert_matix_data(
-                pop_label, variable, segment, signal_array,
+                variable, segment, signal_array,
                 indexes, t_start, sampling_interval_ms,
                 units)
         elif buffer_type == BufferDataType.REWIRES:
@@ -1062,7 +1062,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     f"{variable} can not be extracted using a view")
             event_array = self.__get_rewires(
                 cursor, rec_id, sampling_interval_ms)
-            self._insert_neo_events(segment, event_array, variable, t_start)
+            self._insert_neo_rewirings(segment, event_array, variable, t_start)
         else:
             if view_indexes is None:
                 view_indexes = range(pop_size)
@@ -1070,8 +1070,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 cursor, rec_id, view_indexes, buffer_type, atoms_shape,
                 n_colour_bits, variable)
             self._insert_spike_data(
-                pop_label, view_indexes, segment, spikes, t_start, t_stop,
-                sampling_interval_ms, first_id)
+                view_indexes, segment, spikes, t_start, t_stop,
+                sampling_interval_ms)
 
     def __read_and_csv_data(self, cursor, pop_label, variable, csv_writer,
                             view_indexes, t_stop):
@@ -1099,25 +1099,28 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self.__get_recording_metadeta(cursor, pop_label, variable)
 
         if buffer_type == BufferDataType.MATRIX:
-            self._csv_variable_metdata(csv_writer, self._MATRIX, variable,
-                                       t_start, sampling_interval_ms, units)
+            self._csv_variable_metdata(
+                csv_writer, self._MATRIX, variable, t_start, t_stop,
+                sampling_interval_ms, units)
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
             self._csv_matix_data(csv_writer, signal_array, indexes)
         elif buffer_type == BufferDataType.REWIRES:
-            self._csv_variable_metdata(csv_writer, self._EVENT, variable,
-                                       t_start, sampling_interval_ms, units)
+            self._csv_variable_metdata(
+                csv_writer, self._EVENT, variable, t_start, t_stop,
+                sampling_interval_ms, units)
             if view_indexes is not None:
                 raise SpynnakerException(
                     f"{variable} can not be extracted using a view")
             event_array = self.__get_rewires(
                 cursor, rec_id, sampling_interval_ms)
-            self._csv_neo_events(csv_writer, event_array, variable, t_start)
+            self._csv_rewirings(csv_writer, event_array)
         else:
             if view_indexes is None:
                 view_indexes = range(pop_size)
-            self._csv_variable_metdata(csv_writer, self._SPIKES, variable,
-                                       t_start, sampling_interval_ms, units)
+            self._csv_variable_metdata(
+                csv_writer, self._SPIKES, variable, t_start, t_stop,
+                sampling_interval_ms, units)
             spikes, indexes = self.__get_spikes(
                 cursor, rec_id, view_indexes, buffer_type, atoms_shape,
                 n_colour_bits, variable)
@@ -1259,8 +1262,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         variables = self.__clean_variables(variables, pop_label, cursor)
         for variable in variables:
-            self.__add_data(cursor, pop_label, variable, block, segment,
-                            view_indexes, t_stop)
+            self.__add_data(
+                cursor, pop_label, variable, segment, view_indexes, t_stop)
 
     def clear_data(self, pop_label, variables):
         """
