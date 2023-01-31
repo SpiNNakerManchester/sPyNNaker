@@ -1154,7 +1154,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        _, rec_datetime, _, dt, simulator = self.__get_segment_info(cursor)
+        _, _, _, dt, simulator = self.__get_segment_info(cursor)
         pop_size, first_id, description = \
             self.__get_population_metadata(cursor, pop_label)
         return self._insert_empty_block(
