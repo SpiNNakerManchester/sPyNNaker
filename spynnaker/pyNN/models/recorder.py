@@ -187,7 +187,7 @@ class Recorder(object):
             If the recording not setup correctly
         """
         with NeoBufferDatabase() as db:
-            block = db.get_empty_block(self.__population.label)
+            block = db.get_empty_block(self.__population.label, annotations)
 
         for previous in range(0, SpynnakerDataView.get_segment_counter()):
             self.__append_previous_segment(

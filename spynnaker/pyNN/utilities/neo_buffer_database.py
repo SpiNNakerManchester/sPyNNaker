@@ -1131,7 +1131,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 n_colour_bits, variable)
             self._csv_spike_data(csv_writer, spikes, indexes)
 
-    def __get_empty_block(self, cursor, pop_label):
+    def __get_empty_block(self, cursor, pop_label, annotations):
         """
 
         :param str pop_label: The label for the population of interest
@@ -1157,10 +1157,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         pop_size, first_id, description = \
             self.__get_population_metadata(cursor, pop_label)
         return self._insert_empty_block(
-            pop_label, description, pop_size, first_id, dt, simulator)
+            pop_label, description, pop_size, first_id, dt, simulator,
+            annotations)
 
-    def get_empty_block(self, pop_label):
+    def get_empty_block(self, pop_label, annotations):
         """
+        Creates a block with just metadata but not data segments
 
         :param str pop_label: The label for the population of interest
 
@@ -1182,11 +1184,32 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         with self.transaction() as cursor:
-            return self.__get_empty_block(cursor, pop_label)
+            return self.__get_empty_block(cursor, pop_label, annotations)
 
-    def get_full_block(self, pop_label, variables, view_indexes):
+    def get_full_block(self, pop_label, variables, view_indexes, annotations):
+        """
+         Creates a block with metadata and data for this segment
+
+         Any previous segments will be empty
+
+         :param str pop_label: The label for the population of interest
+
+            .. note::
+                This is actually the label of the Application Vertex
+                Typical the Population label corrected for None or
+                duplicate values
+        :param variables: One or more variable names or None for all available
+        :type variables: str, list(str) or None
+        :param view_indexes: List of neurons ids to include or None for all
+        :type view_indexes: None or list(int)
+        :param annotations: annotations to put on the neo block
+        :type annotations: None or dict(str, ...)
+        :return: The Neo block
+        :rtype: ~neo.core.Block
+        :return:
+        """
         with self.transaction() as cursor:
-            block = self.__get_empty_block(cursor, pop_label)
+            block = self.__get_empty_block(cursor, pop_label, annotations)
             self.__add_segment(
                 cursor, block, pop_label, variables, view_indexes)
             return block
@@ -1244,6 +1267,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 This is actually the label of the Application Vertex
                 Typical the Population label corrected for None or
                 duplicate values
+        :param annotations: annotations to put on the neo block
+        :type annotations: None or dict(str, ...)
 
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -1257,9 +1282,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 _, _, _, dt, _ = self.__get_segment_info(cursor)
                 pop_size, first_id, description = \
                     self.__get_population_metadata(cursor, pop_label)
-                # block.annotate(**annotations)
-                self._csv_block_metadat(csv_writer, pop_label, dt,
-                                        pop_size, first_id, description)
+                self._csv_block_metadat(
+                    csv_writer, pop_label, dt, pop_size, first_id, description,
+                    annotations)
 
     def add_segment(self, block, pop_label, variables, view_indexes=None):
         """

@@ -560,7 +560,7 @@ class NeoCsv(object):
         return block
 
     def _csv_block_metadat(self, csv_writer, pop_label, t_stop,
-                           pop_size, first_id, description):
+                           pop_size, first_id, description, annotations):
         """
 
         :param ~csv.writer csv_writer: Open csv writer to write to
@@ -569,6 +569,8 @@ class NeoCsv(object):
         :param int pop_size:
         :param int first_id:
         :param str description:
+        :param annotations: annotations to put on the neo block
+        :type annotations: None or dict(str, ...)
         """
         csv_writer.writerow([self._POPULATION, pop_label])
         csv_writer.writerow([self._DESCRIPTION, f"\"{description}\""])
@@ -579,6 +581,9 @@ class NeoCsv(object):
             [self._SIMULATOR, SpynnakerDataView.get_sim_name()])
         csv_writer.writerow([self._DT, t_stop])
         # does not make sense on Spinnaker but oh well
+        if annotations:
+            for key, value in annotations.items():
+                csv_writer.writerow([str(key), str(value)])
         csv_writer.writerow([])
 
     def __read_empty_block(self, csv_reader):
@@ -591,12 +596,13 @@ class NeoCsv(object):
         """
         metadata = self.__read_metadata(csv_reader)
         return self._insert_empty_block(
-            pop_label=metadata[self._POPULATION],
-            description=metadata[self._DESCRIPTION],
-            size=int(metadata[self._SIZE]),
-            first_id=int(metadata[self._FIRST_ID]),
-            dt=float(metadata[self._DT]),
-            simulator=metadata[self._SIMULATOR])
+            pop_label=metadata.pop(self._POPULATION),
+            description=metadata.pop(self._DESCRIPTION),
+            size=int(metadata.pop(self._SIZE)),
+            first_id=int(metadata.pop(self._FIRST_ID)),
+            dt=float(metadata.pop(self._DT)),
+            simulator=metadata.pop(self._SIMULATOR),
+            annotations=metadata)
 
     def __read_metadata(self, csv_reader):
         """

@@ -61,10 +61,14 @@ class TestCSV(BaseTestCase):
                 packets_expected.append(row)
 
         with NeoBufferDatabase(my_buffer) as db:
-            db.csv_block_metadata(my_csv, "pop_1", annotations=None)
+            db.csv_block_metadata(
+                my_csv, "pop_1", annotations={"foo": 12, "bar": 34})
             db.csv_segment(my_csv, "pop_1", variables="all")
 
         neo = NeoCsv().read_csv(my_csv)
+        # All annotations converted to String and not back
+        self.assertEqual(neo.annotations["foo"], "12")
+        self.assertEqual(neo.annotations["bar"], "34")
         spikes = neo_convertor.convert_spikes(neo)
         assert numpy.array_equal(spikes, self.spikes_expected)
 
