@@ -27,7 +27,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NeoCsv(object):
-     # pylint: disable=c-extension-no-member
+    # pylint: disable=c-extension-no-member
 
     _POPULATION = "population"
     _DESCRIPTION = "description"
