@@ -61,15 +61,17 @@ class TestCSV(BaseTestCase):
                 packets_expected.append(row)
 
         with NeoBufferDatabase(my_buffer) as db:
-            db.write_csv(my_csv, "pop_1", variables="all")
+            db.csv_block_metadata(my_csv, "pop_1", annotations=None)
+            db.csv_segment(my_csv, "pop_1", variables="all")
 
         neo = NeoCsv().read_csv(my_csv)
         spikes = neo_convertor.convert_spikes(neo)
         assert numpy.array_equal(spikes, self.spikes_expected)
 
-        v = neo.segments[0].filter(name='v')[0].magnitude
+        v = neo.segments[0].filter(name='v')[0]
         assert v.shape == self.v_expected.shape
         assert numpy.array_equal(v,  self.v_expected)
+        self.assertEqual(35, len(v.times))
 
         packets = neo.segments[0].filter(name='packets-per-timestep')[0]
         assert numpy.array_equal(packets,  packets_expected)
@@ -80,8 +82,10 @@ class TestCSV(BaseTestCase):
         my_csv = os.path.join(my_dir, "test.csv")
         with NeoBufferDatabase(my_buffer) as db:
             #  packets-per-timestep data can not be extracted using a view
-            db.write_csv(my_csv, "pop_1", variables=["spikes", "v"],
-                         view_indexes=[2, 4, 7, 8])
+            db.csv_block_metadata(my_csv, "pop_1", annotations=None)
+            db.csv_segment(
+                my_csv, "pop_1", variables=["spikes", "v"],
+                view_indexes=[2, 4, 7, 8])
 
         neo = NeoCsv().read_csv(my_csv)
 
@@ -91,17 +95,18 @@ class TestCSV(BaseTestCase):
         spiketrains = neo.segments[0].spiketrains
         assert 4 == len(spiketrains)
 
-        v = neo.segments[0].filter(name='v')[0].magnitude
+        v = neo.segments[0].filter(name='v')[0]
         target = self.v_expected[:, [2, 4, 7, 8]]
         assert v.shape == target.shape
-        assert numpy.array_equal(v,  target)
+        assert numpy.array_equal(v.magnitude,  target)
 
     def test_over_view(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")
         my_csv = os.path.join(my_dir, "test.csv")
         with NeoBufferDatabase(my_buffer) as db:
-            db.write_csv(my_csv, "pop_1", variables="all")
+            db.csv_block_metadata(my_csv, "pop_1", annotations=None)
+            db.csv_segment(my_csv, "pop_1", variables="all")
 
         neo = NeoCsv().read_csv(my_csv)
         spikes = neo_convertor.convert_spikes(neo)
@@ -120,7 +125,9 @@ class TestCSV(BaseTestCase):
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")
         my_csv = os.path.join(my_dir, "test.csv")
         with NeoBufferDatabase(my_buffer) as db:
-            db.write_csv(my_csv, "pop_1", variables="all", view_indexes=[2, 4])
+            db.csv_block_metadata(my_csv, "pop_1", annotations=None)
+            db.csv_segment(
+                my_csv, "pop_1", variables="all", view_indexes=[2, 4])
 
         neo = NeoCsv().read_csv(my_csv)
         spikes = neo_convertor.convert_spikes(neo)
@@ -139,7 +146,9 @@ class TestCSV(BaseTestCase):
         my_buffer = os.path.join(my_dir, "view_data.sqlite3")
         my_csv = os.path.join(my_dir, "test.csv")
         with NeoBufferDatabase(my_buffer) as db:
-            db.write_csv(my_csv, "pop_1", variables="all", view_indexes=[4, 6])
+            db.csv_block_metadata(my_csv, "pop_1", annotations=None)
+            db.csv_segment(
+                my_csv, "pop_1", variables="all", view_indexes=[4, 6])
 
         neo = NeoCsv().read_csv(my_csv)
         spikes = neo_convertor.convert_spikes(neo)
@@ -157,7 +166,8 @@ class TestCSV(BaseTestCase):
 
         my_csv = os.path.join(my_dir, "test.csv")
         with NeoBufferDatabase(my_buffer) as db:
-            db.write_csv(my_csv, "pop_1", variables="all")
+            db.csv_block_metadata(my_csv, "pop_1", annotations=None)
+            db.csv_segment(my_csv, "pop_1", variables="all")
         neo = NeoCsv().read_csv(my_csv)
         formation_events = neo.segments[0].events[0]
         elimination_events = neo.segments[0].events[1]

@@ -269,7 +269,7 @@ class NeoCsv(object):
         """
         # pylint: disable=too-many-arguments, no-member, c-extension-no-member
         block = segment.block
-        t_start = t_start * quantities.ms
+
         first_id = block.annotations[self._FIRST_ID]
 
         ids = list(map(lambda x: x+first_id, indexes))

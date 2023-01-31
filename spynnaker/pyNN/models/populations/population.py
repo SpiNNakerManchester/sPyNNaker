@@ -233,9 +233,9 @@ class Population(PopulationBase):
         if isinstance(io, str):
             extension = os.path.splitext(io)[1][1:]
             if extension == "csv":
-                with NeoBufferDatabase() as db:
-                    db.write_csv(io, self._vertex.label, variables)
-                    return
+                self.__recorder.csv_neo_block(
+                    io, variables, annotations=annotations)
+                return
             io = neo.get_io(io)
 
         data = self.__recorder.extract_neo_block(

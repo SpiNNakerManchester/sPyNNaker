@@ -199,6 +199,43 @@ class Recorder(object):
 
         return block
 
+    def csv_neo_block(
+            self, csv_file, variables, view_indexes=None, annotations=None):
+        """ Extracts block from the vertices and puts them into a Neo block
+
+        :param str variables: the variables to extract
+        :param list(str) variables: the variables to extract
+        :param slice view_indexes: the indexes to be included in the view
+        :param dict(str,object) annotations:
+            annotations to put on the Neo block
+        :return: The Neo block
+        :rtype: ~neo.core.Block
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording not setup correctly
+        """
+        pop_label = self.__population.label
+        with NeoBufferDatabase() as db:
+            db.csv_block_metadata(csv_file, pop_label, annotations)
+
+        for segment in range(0, SpynnakerDataView.get_segment_counter()):
+            if segment not in self.__data_cache:
+                logger.warning("No Data available for Segment {}", segment)
+                continue
+            with NeoBufferDatabase(self.__data_cache[segment]) as db:
+                db.csv_segment(
+                    csv_file, pop_label, variables, view_indexes)
+
+        with NeoBufferDatabase() as db:
+            if SpynnakerDataView.is_reset_last():
+                logger.warning(
+                    "Due to the call directly after reset. "
+                    "The data will only contain "
+                    f"{SpynnakerDataView.get_segment_counter()-1} segments")
+            else:
+                db.csv_segment(
+                    csv_file, pop_label, variables, view_indexes)
+
     def cache_data(self):
         """ Store data for later extraction
         """

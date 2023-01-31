@@ -1059,6 +1059,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             signal_array, indexes = self.__get_matrix_data(
                 cursor, rec_id, data_type, view_indexes, pop_size, variable)
             sampling_rate = 1000/sampling_interval_ms * quantities.Hz
+            t_start = t_start * quantities.ms
             self._insert_matrix_data(
                 variable, segment, signal_array,
                 indexes, t_start, sampling_rate, units)
@@ -1189,10 +1190,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 cursor, block, pop_label, variables, view_indexes)
             return block
 
-    def write_csv(self, csv_file, pop_label, variables, view_indexes=None):
+    def csv_segment(
+            self,  csv_file, pop_label, variables, view_indexes=None):
         """
         Writes the data including metadata to a csv file
 
+        :param str csvfile: Path to file write block metdtadat to
         :param str pop_label: The label for the population of interest
 
             .. note::
@@ -1208,19 +1211,15 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        with open(csv_file, 'w', newline='') as csvfile:
+        if not os.path.isfile(csv_file):
+            raise SpynnakerException("PLease call csv_block_metadata first")
+        with open(csv_file, 'a', newline='') as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"',
                                     quoting=csv.QUOTE_MINIMAL)
 
             with self.transaction() as cursor:
-                segment_number, rec_datetime, t_stop, dt, _ = \
+                segment_number, rec_datetime, t_stop, _, _ = \
                     self.__get_segment_info(cursor)
-                pop_size, first_id, description = \
-                    self.__get_population_metadata(cursor, pop_label)
-                # block.annotate(**annotations)
-                self._csv_block_metadat(csv_writer, pop_label, dt,
-                                        pop_size, first_id, description)
-
                 self._csv_segment_metadata(
                     csv_writer, segment_number, rec_datetime)
 
@@ -1230,6 +1229,37 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     self.__read_and_csv_data(
                         cursor, pop_label, variable, csv_writer,
                         view_indexes, t_stop)
+
+    def csv_block_metadata(self, csv_file, pop_label, annotations):
+        """
+        Writes the data including metadata to a csv file
+
+        Overwrites and previous data in the file
+
+        :param str csvfile: Path to file write block metdtadat to
+        :param str pop_label: The label for the population of interest
+
+            .. note::
+                This is actually the label of the Application Vertex
+                Typical the Population label corrected for None or
+                duplicate values
+
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording metadata not setup correctly
+        """
+        with open(csv_file, 'w', newline='') as csvfile:
+            csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"',
+                                    quoting=csv.QUOTE_MINIMAL)
+
+            with self.transaction() as cursor:
+                _, _, _, dt, _ = self.__get_segment_info(cursor)
+                pop_size, first_id, description = \
+                    self.__get_population_metadata(cursor, pop_label)
+                # block.annotate(**annotations)
+                self._csv_block_metadat(csv_writer, pop_label, dt,
+                                        pop_size, first_id, description)
+
 
     def add_segment(self, block, pop_label, variables, view_indexes=None):
         """
