@@ -42,6 +42,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NeoBufferDatabase(BufferDatabase, NeoCsv):
+    # pylint: disable=c-extension-no-member
 
     __N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     __TWO_WORDS = struct.Struct("<II")
@@ -426,7 +427,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         with self.transaction() as cursor:
             info = self.__get_recording_metadeta(cursor, pop_label, variable)
-            (_, datatype, _, _, sampling_interval_ms, _, _, units) = info
+            (_, datatype, _, _, sampling_interval_ms, _, units) = info
             return (datatype, sampling_interval_ms, units)
 
     def __get_recording_metadeta(
@@ -454,8 +455,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         for row in cursor.execute(
                 """
                 SELECT rec_id,  data_type, buffered_type,  t_start,
-                       sampling_interval_ms, first_id, pop_size, units,
-                       atoms_shape, n_colour_bits
+                       sampling_interval_ms, pop_size, units, atoms_shape,
+                        n_colour_bits
                 FROM recording_view
                 WHERE label = ? AND variable = ?
                 LIMIT 1
@@ -472,8 +473,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             buffered_type = BufferDataType[str(row["buffered_type"], 'utf-8')]
             atoms_shape = self.string_to_array(row["atoms_shape"])
             return (row["rec_id"], data_type, buffered_type, row["t_start"],
-                    row["sampling_interval_ms"], row["first_id"],
-                    row["pop_size"], units, atoms_shape, row["n_colour_bits"])
+                    row["sampling_interval_ms"], row["pop_size"], units,
+                    atoms_shape, row["n_colour_bits"])
         raise ConfigurationException(
             f"No metadata for {variable} on {pop_label}")
 
@@ -999,7 +1000,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
             (rec_id, data_type, buffered_type, _, sampling_interval_ms,
-             _, pop_size, _, atoms_shape, n_colour_bits) = \
+             pop_size, _, atoms_shape, n_colour_bits) = \
                 self.__get_recording_metadeta(cursor, pop_label, variable)
             if buffered_type == BufferDataType.MATRIX:
                 return self.__get_recorded_pynn7(
@@ -1017,8 +1018,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         with self.transaction() as cursor:
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
-            (rec_id, _, buffered_type, _, _,
-             _, pop_size, _, atoms_shape, n_colour_bits) = \
+            (rec_id, _, buffered_type, _, _, pop_size, _, atoms_shape,
+             n_colour_bits) = \
                 self.__get_recording_metadeta(cursor, pop_label, SPIKES)
             if view_indexes is None:
                 view_indexes = range(pop_size)
@@ -1053,7 +1054,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
-         first_id, pop_size, units, atoms_shape, n_colour_bits) = \
+         pop_size, units, atoms_shape, n_colour_bits) = \
             self.__get_recording_metadeta(cursor, pop_label, variable)
 
         if buffer_type == BufferDataType.MATRIX:
@@ -1102,7 +1103,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param float t_stop
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
-         first_id, pop_size, units, atoms_shape, n_colour_bits) = \
+         pop_size, units, atoms_shape, n_colour_bits) = \
             self.__get_recording_metadeta(cursor, pop_label, variable)
 
         if buffer_type == BufferDataType.MATRIX:
@@ -1237,7 +1238,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         if not os.path.isfile(csv_file):
             raise SpynnakerException("PLease call csv_block_metadata first")
-        with open(csv_file, 'a', newline='') as csvfile:
+        with open(csv_file, 'a', newline='', encoding="utf-8") as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"',
                                     quoting=csv.QUOTE_MINIMAL)
 
@@ -1274,7 +1275,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
         """
-        with open(csv_file, 'w', newline='') as csvfile:
+        with open(csv_file, 'w', newline='',  encoding="utf-8") as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"',
                                     quoting=csv.QUOTE_MINIMAL)
 

@@ -27,6 +27,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NeoCsv(object):
+     # pylint: disable=c-extension-no-member
+
     _POPULATION = "population"
     _DESCRIPTION = "description"
     _SIZE = "size"
@@ -223,7 +225,7 @@ class NeoCsv(object):
         :param str variable: Name of the variable being read
         """
         try:
-            t_start, t_stop, sampling_period, units = \
+            t_start, t_stop, sampling_period, _ = \
                 self.__read_variable_metadata(csv_reader)
             indexes = self.__read_indexes(csv_reader)
             spikes = self.__read_signal_array(csv_reader)
@@ -309,7 +311,7 @@ class NeoCsv(object):
         :param Segment segment:
         :param str variable:
         """
-        t_start, t_stop, sampling_period, units = \
+        t_start, _, sampling_period, units = \
             self.__read_variable_metadata(csv_reader)
         indexes = self.__read_indexes(csv_reader)
         signal_array = self.__read_signal_array(csv_reader)
@@ -630,7 +632,7 @@ class NeoCsv(object):
         :param str csv_file: Path of file to reads
         :return: a Block with all the data in the csv file.
         """
-        with open(csv_file, newline='') as csvfile:
+        with open(csv_file, newline='',  encoding="utf-8") as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
             block = self.__read_empty_block(csv_reader)
             category = block
