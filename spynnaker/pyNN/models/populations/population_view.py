@@ -563,11 +563,10 @@ class PopulationView(PopulationBase):
         if isinstance(io, str):
             extension = os.path.splitext(io)[1][1:]
             if extension == "csv":
-                with NeoBufferDatabase() as db:
-                    self.__recorder.csv_neo_block(
-                        io, variables, view_indexes=self.__indexes,
-                        annotations=annotations)
-                    return
+                 self.__recorder.csv_neo_block(
+                    io, variables, view_indexes=self.__indexes,
+                    annotations=annotations)
+                return
             io = neo.get_io(io)
 
         data = self.__recorder.extract_neo_block(
