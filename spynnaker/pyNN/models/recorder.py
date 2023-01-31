@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from datetime import datetime
 import logging
-import numpy
 import neo
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once

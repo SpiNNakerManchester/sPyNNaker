@@ -102,7 +102,7 @@ class NeoCsv(object):
             ~quantities.Quantity, str)
         """
         metadata = self.__read_metadata(csv_reader)
-        return(
+        return (
             self.__quantify(metadata[self._T_START]),
             self.__quantify(metadata[self._T_STOP]),
             self.__quantify(metadata[self._SAMPLING_PERIOD]),

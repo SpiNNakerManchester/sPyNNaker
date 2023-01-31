@@ -1260,7 +1260,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 self._csv_block_metadat(csv_writer, pop_label, dt,
                                         pop_size, first_id, description)
 
-
     def add_segment(self, block, pop_label, variables, view_indexes=None):
         """
         Adds a segment to the block
