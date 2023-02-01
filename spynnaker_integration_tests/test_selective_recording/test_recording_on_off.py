@@ -72,6 +72,7 @@ class TestRecordingOnOff(BaseTestCase):
         assert len(gsyn_neo.segments[0].spiketrains) == 0
         assert len(spikes_neo.segments[0].filter(name="v")) == 0
         assert len(gsyn_neo.segments[0].filter(name="gsyn_exc")) > 0
+        sim.end()
 
     def test_record_all(self):
         self.runsafe(self.record_all)
@@ -111,6 +112,7 @@ class TestRecordingOnOff(BaseTestCase):
             pop.write_data(pickle_path, "spikes")
         with self.assertRaises(ConfigurationException):
             pop.write_data(pickle_path, "gsyn_exc")
+        sim.end()
 
     def test_record_v(self):
         self.runsafe(self.record_v)

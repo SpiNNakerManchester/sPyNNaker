@@ -33,3 +33,4 @@ class TestPopulation(BaseTestCase):
         for value in values:
             self.assertGreater(value, range_low)
             self.assertLess(value, range_high)
+        sim.end()

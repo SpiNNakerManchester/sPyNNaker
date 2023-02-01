@@ -25,6 +25,7 @@ def a_run():
         n_neurons, p.IF_curr_exp(), label='pop_1',
         additional_parameters={"spikes_per_second": "bacon"})
     assert x._vertex.spikes_per_second == "bacon"
+    p.end()
 
 
 class PopAdditionParamsTest(BaseTestCase):

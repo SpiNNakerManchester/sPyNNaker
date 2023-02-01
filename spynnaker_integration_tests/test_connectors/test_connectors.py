@@ -192,6 +192,8 @@ class ConnectorsTest(BaseTestCase):
                 sim.FixedTotalNumberConnector(
                     connections, with_replacement=with_replacement),
                 connections,  with_replacement, conn_type="total")
+        # We have to end here as the exception happens before end
+        sim.end()
 
     def test_total_connector_too_many(self):
         self.runsafe(self.total_connector_too_many)

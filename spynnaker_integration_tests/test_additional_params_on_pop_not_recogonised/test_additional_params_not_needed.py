@@ -24,6 +24,7 @@ def a_run():
     p.Population(
         n_neurons, p.IF_curr_exp(), label='pop_1',
         additional_parameters={"bacon": "bacon"})
+    p.end()
 
 
 class PopAdditionParamsTest(BaseTestCase):

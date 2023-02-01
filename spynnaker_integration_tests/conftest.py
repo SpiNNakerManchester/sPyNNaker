@@ -18,12 +18,16 @@ import pyNN.spiNNaker as sim
 
 
 @pytest.fixture(autouse=True)
-def check_end_is_called():
+def check_end_is_called(request):
     """ Fixture for all tests, to make sure end is used!
     """
     yield
     # If we never setup or we are currently shut down, we are ok
-    if not SpynnakerDataView.is_setup() and SpynnakerDataView().is_shutdown():
+    if not SpynnakerDataView.is_setup() or SpynnakerDataView().is_shutdown():
         return
-    sim.end()
-    raise Exception("Simulation has not been stopped!")
+    try:
+        sim.end()
+    except Exception:  # pylint: disable=broad-except
+        # Ignore anything that comes from this
+        pass
+    raise Exception(f"Simulation has not been stopped in {request.function}!")
