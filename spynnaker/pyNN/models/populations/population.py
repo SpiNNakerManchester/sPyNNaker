@@ -268,10 +268,15 @@ class Population(PopulationBase):
         }
         context.update(self.annotations)
         if self.size > 0:
+            parameters = self.__vertex.get_parameters()
+            if parameters:
+                cell_parameters = self.__vertex.get_parameter_values(
+                    parameters, 0)
+            else:
+                cell_parameters = "No cell parameters"
             context.update({
                 "local_first_id": 0,
-                "cell_parameters": self.__vertex.get_parameter_values(
-                    self.__vertex.get_parameters(), 0)
+                "cell_parameters": cell_parameters
             })
         if self.structure:
             context["structure"] = self.structure.describe(template=None)
