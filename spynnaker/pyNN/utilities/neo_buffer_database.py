@@ -74,7 +74,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         else:
             read_only = True
 
-        super().__init__(
+        super(BufferDatabase, self).__init__(
             database_file, read_only=read_only)
         with open(self.__NEO_DDL_FILE, encoding="utf-8") as f:
             sql = f.read()
