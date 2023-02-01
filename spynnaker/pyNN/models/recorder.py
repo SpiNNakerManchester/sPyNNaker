@@ -186,7 +186,11 @@ class Recorder(object):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
-        with NeoBufferDatabase() as db:
+        if self.__data_cache:
+            dbfile = next(iter(self.__data_cache.values()))
+        else:
+            dbfile = None   # use current
+        with NeoBufferDatabase(dbfile) as db:
             block = db.get_empty_block(self.__population.label, annotations)
 
         for previous in range(0, SpynnakerDataView.get_segment_counter()):
@@ -214,7 +218,11 @@ class Recorder(object):
             If the recording not setup correctly
         """
         pop_label = self.__population.label
-        with NeoBufferDatabase() as db:
+        if self.__data_cache:
+            dbfile = next(iter(self.__data_cache.values()))
+        else:
+            dbfile = None   # use current
+        with NeoBufferDatabase(dbfile) as db:
             db.csv_block_metadata(csv_file, pop_label, annotations)
 
         for segment in range(0, SpynnakerDataView.get_segment_counter()):
