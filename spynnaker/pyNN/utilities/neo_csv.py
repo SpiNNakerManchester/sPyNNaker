@@ -199,7 +199,7 @@ class NeoCsv(object):
                 units=quantities.ms,
                 dtype=numpy.float64,
                 sampling_rate=sampling_rate,
-                 source_population=block.name,
+                source_population=block.name,
                 source_id=index + first_id,
                 source_index=index)
             segment.spiketrains.append(spiketrain)
