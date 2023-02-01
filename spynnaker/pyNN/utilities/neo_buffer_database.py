@@ -1161,7 +1161,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             pop_label, description, pop_size, first_id, dt, simulator,
             annotations)
 
-    def get_empty_block(self, pop_label, annotations):
+    def get_empty_block(self, pop_label, annotations=None):
         """
         Creates a block with just metadata but not data segments
 
@@ -1255,7 +1255,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                         cursor, pop_label, variable, csv_writer,
                         view_indexes, t_stop)
 
-    def csv_block_metadata(self, csv_file, pop_label, annotations):
+    def csv_block_metadata(self, csv_file, pop_label, annotations=None):
         """
         Writes the data including metadata to a csv file
 
