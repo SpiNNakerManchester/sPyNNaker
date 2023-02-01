@@ -359,25 +359,21 @@ class NeoCsv(object):
         segment.events.append(elimination_event_array)
 
     def _insert_neo_rewirings(
-            self, segment, event_array, variable, recording_start_time):
+            self, segment, event_array, variable):
         """ Adds data that represent rewirings events to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
         :param ~numpy.ndarray event_array: the raw "event" data
         :param str variable: the variable name
-        :param recording_start_time: when recording started
-        :type recording_start_time: float or int
         """
         # pylint: disable=too-many-arguments, no-member, c-extension-no-member
-        t_start = recording_start_time * quantities.ms
-
         formation_times = []
         formation_labels = []
         elimination_times = []
         elimination_labels = []
 
         for i in range(len(event_array)):
-            event_time = t_start + event_array[i][0] * quantities.ms
+            event_time = event_array[i][0] * quantities.ms
             pre_id = int(event_array[i][1])
             post_id = int(event_array[i][2])
             if event_array[i][3] == 1:

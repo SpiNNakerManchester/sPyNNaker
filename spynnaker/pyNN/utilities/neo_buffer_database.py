@@ -1071,7 +1071,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     f"{variable} can not be extracted using a view")
             event_array = self.__get_rewires(
                 cursor, rec_id, sampling_interval_ms)
-            self._insert_neo_rewirings(segment, event_array, variable, t_start)
+            self._insert_neo_rewirings(segment, event_array, variable)
         else:
             if view_indexes is None:
                 view_indexes = range(pop_size)
@@ -1364,8 +1364,19 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :param list(str) variables: names of variable to get data for
         """
+        t_start = SpynnakerDataView.get_current_run_time_ms()
         with self.transaction() as cursor:
+            variables = self.__clean_variables(variables, pop_label, cursor)
             for variable in variables:
+                cursor.execute(
+                    """
+                    UPDATE recording SET
+                        t_start = ?
+                    WHERE rec_id in
+                        (SELECT rec_id
+                        FROM recording_view
+                        WHERE label = ? AND variable = ?)
+                    """, (t_start, pop_label, variable))
                 cursor.execute(
                     """
                     UPDATE region SET
