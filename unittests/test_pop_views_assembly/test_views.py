@@ -95,8 +95,13 @@ class Test_IDMixin(BaseTestCase):
         pop_1.set(tau_m=2)
         self.assertEqual([2, 2, 2, 2], pop_1.get("tau_m"))
         self.assertEqual([2, 2], view.get("tau_m", simplify=False))
+        # This is not standard PyNN over a view
+        self.assertEqual([2, 2], view.tau_m)
         view.set(tau_m=3)
         self.assertEqual([2, 3, 2, 3], pop_1.get("tau_m"))
+        # This is not standard PyNN over a view
+        view.tau_m = 4
+        self.assertEqual([2, 4, 2, 4], pop_1.get("tau_m"))
         sim.end()
 
     def test_view_of_view(self):
