@@ -338,11 +338,11 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     def _get_distances(self, values, synapse_info):
         if self.__space is None:
-            raise Exception(
-                "Weights or delays are distance-dependent but no space object"
-                "was specified in projection {}-{}".format(
-                    synapse_info.pre_population,
-                    synapse_info.post_population))
+            raise ValueError(
+                f"Weights or delays are distance-dependent "
+                f"but no space object was specified in projection "
+                f"{synapse_info.pre_population}-"
+                f"{synapse_info.post_population}")
 
         expand_distances = self._expand_distances(values)
 
