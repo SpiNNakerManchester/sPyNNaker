@@ -101,7 +101,7 @@ class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
                 weight_dependence=p.AdditiveWeightDependence(w_min=1.0,
                                                              w_max=1.0), )
         else:
-            raise Exception(mode)
+            raise ValueError(mode)
 
         injectionConnection = [(0, 0, weight_to_spike, 1)]
         spikeArray1 = {'spike_times': [[0]]}
