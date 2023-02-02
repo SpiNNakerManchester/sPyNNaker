@@ -610,7 +610,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             eieio_header = EIEIODataHeader.from_bytestring(
                 spike_data, data_offset)
             if eieio_header.eieio_type.payload_bytes > 0:
-                raise Exception("Can only read spikes as keys")
+                raise ValueError("Can only read spikes as keys")
 
             data_offset += eieio_header.size
             timestamps = numpy.repeat([time], eieio_header.count)

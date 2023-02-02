@@ -22,17 +22,17 @@ def check_gsyn(gsyn1, gsyn2):
 
     :param gsyn1: An array of conductances.
     :param gsyn2: An array of conductances.
-    :raise Exception: If the arrays differ.
+    :raises ValueError: If the arrays differ.
     """
     if len(gsyn1) != len(gsyn2):
-        raise Exception("Length of gsyn does not match expected {} but "
-                        "found {}".format(len(gsyn1), len(gsyn2)))
+        raise ValueError(f"Length of gsyn does not match expected "
+                         f"{len(gsyn1)} but found {len(gsyn2)}")
     for gsyn1i, i in enumerate(gsyn1):
         for j in range(3):
             if round(gsyn1i[j], 1) != round(gsyn2[i][j], 1):
-                raise Exception("Mismatch between gsyn found at position {}{}"
-                                "expected {} but found {}".
-                                format(i, j, gsyn1i[j], gsyn2[i][j]))
+                raise ValueError(
+                    f"Mismatch between gsyn found at position {i}{j} "
+                    f"expected {gsyn1i[j]} but found {gsyn2[i][j]}")
 
 
 def check_path_gysn(path, n_neurons, runtime, gsyn):
@@ -43,7 +43,7 @@ def check_path_gysn(path, n_neurons, runtime, gsyn):
     :param n_neurons: The number of neurons that produced the data.
     :param runtime: The length of time that the generated data represents.
     :param gsyn: An array of conductances.
-    :raise Exception: If the arrays differ.
+    :raises ValueError: If the arrays differ.
     """
     gsyn2 = utility_calls.read_in_data_from_file(
         path, 0, n_neurons, 0, runtime, True)
@@ -59,7 +59,7 @@ def check_sister_gysn(sister, n_neurons, runtime, gsyn):
     :param n_neurons: The number of neurons that produced the data.
     :param runtime: The length of time that the generated data represents.
     :param gsyn: An array of conductances.
-    :raise Exception: If the arrays differ.
+    :raises ValueError: If the arrays differ.
     """
     path = os.path.join(os.path.dirname(os.path.abspath(sister)), "gsyn.data")
     check_path_gysn(path, n_neurons, runtime, gsyn)

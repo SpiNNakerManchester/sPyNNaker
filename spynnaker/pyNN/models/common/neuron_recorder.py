@@ -551,13 +551,11 @@ class NeuronRecorder(object):
         :param iterable(int) indexes:
         """
         if sampling_interval is not None:
-            raise Exception(
-                "Variable {} does not support a sampling interval".format(
-                    variable))
+            raise ValueError(
+                f"Variable {variable} does not support a sampling interval")
         if indexes is not None:
-            raise Exception(
-                "Variable {} can only be recorded on the whole population"
-                .format(variable))
+            raise ValueError(f"Variable {variable} can only be recorded "
+                             f"on the whole population")
 
     def __check_events_per_core_params(
             self, variable, sampling_interval, indexes):
@@ -569,13 +567,11 @@ class NeuronRecorder(object):
         :param iterable(int) indexes:
         """
         if sampling_interval is not None:
-            raise Exception(
-                "Variable {} does not support a sampling interval".format(
-                    variable))
+            raise ValueError(
+                f"Variable {variable} does not support a sampling interval")
         if indexes is not None:
-            raise Exception(
-                "Variable {} can only be recorded on the whole population"
-                .format(variable))
+            raise ValueError(f"Variable {variable} can only be recorded "
+                             f"on the whole population")
 
     def _turn_off_recording(self, variable, sampling_interval, remove_indexes):
         """
