@@ -376,11 +376,11 @@
 
     <span class="k">def</span> <span class="nf">_get_distances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__space</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s2">&quot;Weights or delays are distance-dependent but no space object&quot;</span>
-                <span class="s2">&quot;was specified in projection </span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="p">,</span>
-                    <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Weights or delays are distance-dependent &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;but no space object was specified in projection &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="si">}</span><span class="s2">-&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">expand_distances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expand_distances</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
 

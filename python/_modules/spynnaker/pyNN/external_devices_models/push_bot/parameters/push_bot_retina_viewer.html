@@ -94,7 +94,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__pyplot</span> <span class="o">=</span> <span class="n">pyplot</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__animation</span> <span class="o">=</span> <span class="n">animation</span>
         <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
                 <span class="s2">&quot;matplotlib must be installed to use this viewer&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;PushBotRetinaViewer&quot;</span><span class="p">)</span>

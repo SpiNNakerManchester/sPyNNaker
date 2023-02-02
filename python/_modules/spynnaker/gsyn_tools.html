@@ -59,17 +59,17 @@
 
 <span class="sd">    :param gsyn1: An array of conductances.</span>
 <span class="sd">    :param gsyn2: An array of conductances.</span>
-<span class="sd">    :raise Exception: If the arrays differ.</span>
+<span class="sd">    :raises ValueError: If the arrays differ.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gsyn1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gsyn2</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Length of gsyn does not match expected </span><span class="si">{}</span><span class="s2"> but &quot;</span>
-                        <span class="s2">&quot;found </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gsyn1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">gsyn2</span><span class="p">)))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Length of gsyn does not match expected &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gsyn1</span><span class="p">)</span><span class="si">}</span><span class="s2"> but found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gsyn2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">gsyn1i</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gsyn1</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">gsyn1i</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">round</span><span class="p">(</span><span class="n">gsyn2</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Mismatch between gsyn found at position </span><span class="si">{}{}</span><span class="s2">&quot;</span>
-                                <span class="s2">&quot;expected </span><span class="si">{}</span><span class="s2"> but found </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span>
-                                <span class="nb">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">gsyn1i</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">gsyn2</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]))</span></div>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Mismatch between gsyn found at position </span><span class="si">{</span><span class="n">i</span><span class="si">}{</span><span class="n">j</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;expected </span><span class="si">{</span><span class="n">gsyn1i</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2"> but found </span><span class="si">{</span><span class="n">gsyn2</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="check_path_gysn"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.gsyn_tools.check_path_gysn">[docs]</a><span class="k">def</span> <span class="nf">check_path_gysn</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="n">gsyn</span><span class="p">):</span>
@@ -80,7 +80,7 @@
 <span class="sd">    :param n_neurons: The number of neurons that produced the data.</span>
 <span class="sd">    :param runtime: The length of time that the generated data represents.</span>
 <span class="sd">    :param gsyn: An array of conductances.</span>
-<span class="sd">    :raise Exception: If the arrays differ.</span>
+<span class="sd">    :raises ValueError: If the arrays differ.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">gsyn2</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">read_in_data_from_file</span><span class="p">(</span>
         <span class="n">path</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -96,7 +96,7 @@
 <span class="sd">    :param n_neurons: The number of neurons that produced the data.</span>
 <span class="sd">    :param runtime: The length of time that the generated data represents.</span>
 <span class="sd">    :param gsyn: An array of conductances.</span>
-<span class="sd">    :raise Exception: If the arrays differ.</span>
+<span class="sd">    :raises ValueError: If the arrays differ.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">sister</span><span class="p">)),</span> <span class="s2">&quot;gsyn.data&quot;</span><span class="p">)</span>
     <span class="n">check_path_gysn</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="n">gsyn</span><span class="p">)</span></div>

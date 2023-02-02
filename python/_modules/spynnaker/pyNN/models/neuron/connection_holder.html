@@ -162,16 +162,15 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span><span class="p">:</span>
             <span class="c1"># If there are no connections added, raise an exception</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                    <span class="s2">&quot;Connections are only set after run has been called, &quot;</span>
-                    <span class="s2">&quot;even if you are trying to see the data before changes &quot;</span>
-                    <span class="s2">&quot;have been made.  &quot;</span>
-                    <span class="s2">&quot;Try examining the </span><span class="si">{}</span><span class="s2"> after the call to run.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">__data_items_to_return</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Connections are only set after run has been called, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;even if you are trying to see the data before changes &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;have been made. Try examining the &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__data_items_to_return</span><span class="si">}</span><span class="s2"> after the call to run.&quot;</span><span class="p">)</span>
             <span class="c1"># If the list is empty assume on a virtual machine</span>
             <span class="c1"># with generation on machine</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__connections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                     <span class="s2">&quot;Connections list is empty. &quot;</span>
                     <span class="s2">&quot;This may be because you are using a virtual machine. &quot;</span>
                     <span class="s2">&quot;This projection creates connections on machine.&quot;</span><span class="p">)</span>

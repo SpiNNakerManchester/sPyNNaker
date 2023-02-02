@@ -258,9 +258,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">next_addr</span> <span class="o">=</span> <span class="n">block_addr</span> <span class="o">+</span> <span class="n">size</span>
         <span class="k">if</span> <span class="n">next_addr</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s2">&quot;Too much synaptic memory has been written: </span><span class="si">{}</span><span class="s2"> of </span><span class="si">{}</span><span class="s2"> &quot;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">next_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Too much synaptic memory has been written: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">next_addr</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">next_addr</span>
 
 <div class="viewcode-block" id="SynapticMatrixApp.write_matrix"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">write_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
@@ -312,9 +312,9 @@
                 <span class="n">connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">delay_edge</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">delayed_row_data</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s2">&quot;Found delayed source IDs but no delay &quot;</span>
-                <span class="s2">&quot;edge for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Found delayed source IDs but no delay &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;edge for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">row_data</span><span class="p">,</span> <span class="n">delayed_row_data</span>
 

@@ -104,11 +104,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
                 <span class="n">command_container</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;Each command container must be an instance of&quot;</span>
                 <span class="s2">&quot; AbstractSendMeMulticastCommandsVertex&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">command_container</span><span class="o">.</span><span class="n">timed_commands</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Timed commands cannot be handled by this class&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Timed commands cannot be handled by this class&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__command_containers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">command_container</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_start_resume_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
