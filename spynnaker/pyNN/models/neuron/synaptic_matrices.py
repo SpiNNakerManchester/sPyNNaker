@@ -30,6 +30,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region, get_bitfield_key_map_data,
     write_bitfield_init_data)
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # 1 for synaptic matrix region
 # 1 for master pop region
@@ -370,7 +371,9 @@ class SynapticMatrices(object):
 
         # Find the bit that is just for the core
         mask_size = r_info.n_bits_atoms
-        core_mask = (r_info.machine_mask - r_info.mask) >> mask_size
+        core_mask = get_n_bits(
+            len(self.__app_vertex.splitter.get_out_going_vertices(
+                SPIKE_PARTITION_ID)))
         pre = r_info.vertex
         n_atoms = min(max_atoms_per_core, pre.n_atoms)
 
