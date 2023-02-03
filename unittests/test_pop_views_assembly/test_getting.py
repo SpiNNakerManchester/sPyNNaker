@@ -72,7 +72,9 @@ class TestGetting(BaseTestCase):
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label="pop_1")
         copy_db(_ALL_DATA)
 
-        neo = pop.get_data("spikes")
+        neo = pop.get_data("spikes", annotations={"foo": 12, "bar": 34})
+        self.assertEqual(neo.annotations["foo"], 12)
+        self.assertEqual(neo.annotations["bar"], 34)
         spikes = neo_convertor.convert_spikes(neo)
         assert numpy.array_equal(spikes, self.spikes_expected)
         spiketrains = neo.segments[0].spiketrains

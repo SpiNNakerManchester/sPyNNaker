@@ -16,6 +16,7 @@
 import logging
 import neo
 import numpy
+import os
 from spinn_utilities.log import FormatAdapter
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
@@ -572,17 +573,23 @@ class PopulationView(PopulationBase):
             If the variable or variables have not been previously set to
             record.
         """
-        FecTimer.start_category(TimerCategory.POP_GET_DATA)
+        FecTimer.start_category(TimerCategory.POP_WRITE_DATA)
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
                            "as if gather was set to True.")
+        if isinstance(io, str):
+            extension = os.path.splitext(io)[1][1:]
+            if extension == "csv":
+                self.__recorder.csv_neo_block(
+                    io, variables, view_indexes=self.__indexes,
+                    annotations=annotations)
+                return
+            io = neo.get_io(io)
+
+        FecTimer.start_category(TimerCategory.POP_GET_DATA)
         data = self.__recorder.extract_neo_block(
             variables, self.__indexes, clear, annotations)
         FecTimer.end_category(TimerCategory.POP_GET_DATA)
-
-        FecTimer.start_category(TimerCategory.POP_WRITE_DATA)
-        if isinstance(io, str):
-            io = neo.get_io(io)
 
         # write the neo block to the file
         io.write(data)
