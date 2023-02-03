@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from datetime import datetime
 import logging
-import numpy
 import neo
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
@@ -187,7 +186,12 @@ class Recorder(object):
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
         """
-        block = neo.Block()
+        if self.__data_cache:
+            dbfile = next(iter(self.__data_cache.values()))
+        else:
+            dbfile = None   # use current
+        with NeoBufferDatabase(dbfile) as db:
+            block = db.get_empty_block(self.__population.label, annotations)
 
         for previous in range(0, SpynnakerDataView.get_segment_counter()):
             self.__append_previous_segment(
@@ -196,15 +200,48 @@ class Recorder(object):
         # add to the segments the new block
         self.__append_current_segment(block, variables, view_indexes, clear)
 
-        # add fluff to the neo block
-        block.name = self.__population.label
-        block.description = self.__population.describe()
-        # pylint: disable=no-member
-        block.rec_datetime = block.segments[0].rec_datetime
-        block.annotate(**self.__metadata())
-        if annotations:
-            block.annotate(**annotations)
         return block
+
+    def csv_neo_block(
+            self, csv_file, variables, view_indexes=None, annotations=None):
+        """ Extracts block from the vertices and puts them into a Neo block
+
+        :param str variables: the variables to extract
+        :param list(str) variables: the variables to extract
+        :param slice view_indexes: the indexes to be included in the view
+        :param dict(str,object) annotations:
+            annotations to put on the Neo block
+        :return: The Neo block
+        :rtype: ~neo.core.Block
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            If the recording not setup correctly
+        """
+        pop_label = self.__population.label
+        if self.__data_cache:
+            dbfile = next(iter(self.__data_cache.values()))
+        else:
+            dbfile = None   # use current
+        with NeoBufferDatabase(dbfile) as db:
+            db.csv_block_metadata(csv_file, pop_label, annotations)
+
+        for segment in range(0, SpynnakerDataView.get_segment_counter()):
+            if segment not in self.__data_cache:
+                logger.warning("No Data available for Segment {}", segment)
+                continue
+            with NeoBufferDatabase(self.__data_cache[segment]) as db:
+                db.csv_segment(
+                    csv_file, pop_label, variables, view_indexes)
+
+        with NeoBufferDatabase() as db:
+            if SpynnakerDataView.is_reset_last():
+                logger.warning(
+                    "Due to the call directly after reset. "
+                    "The data will only contain "
+                    f"{SpynnakerDataView.get_segment_counter()-1} segments")
+            else:
+                db.csv_segment(
+                    csv_file, pop_label, variables, view_indexes)
 
     def cache_data(self):
         """ Store data for later extraction
@@ -269,32 +306,3 @@ class Recorder(object):
                 block, self.__population.label, variables, view_indexes)
             if clear:
                 db.clear_data(self.__population.label, variables)
-
-    def __metadata(self):
-        metadata = {
-            'size': self.__population.size,
-            'first_index': 0,
-            'last_index': self.__population.size,
-            'first_id': int(self.__population.first_id),
-            'last_id': int(self.__population.last_id),
-            'label': self.__population.label,
-            'simulator': SpynnakerDataView.get_sim_name()
-        }
-        metadata.update(self.__population.annotations)
-        metadata['dt'] = SpynnakerDataView.get_simulation_time_step_ms()
-        metadata['mpi_processes'] = 1  # meaningless on Spinnaker
-        return metadata
-
-
-def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
-    """ Converts data between sPyNNaker format and Neo format
-
-    :param ~numpy.ndarray signal_array: Draw data in sPyNNaker format
-    :param list(int) indexes:
-    :rtype: ~numpy.ndarray
-    """
-    processed_data = [
-        signal_array[:, 2][signal_array[:, 0] == index]
-        for index in indexes]
-    processed_data = numpy.vstack(processed_data).T
-    return processed_data
