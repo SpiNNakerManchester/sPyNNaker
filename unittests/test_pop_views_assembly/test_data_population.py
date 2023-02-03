@@ -72,8 +72,9 @@ class TestDataPopulation(BaseTestCase):
         assert N_NEURONS == len(spiketrains)
 
         neo = pop.get_data("v")
-        v = neo.segments[0].filter(name='v')[0].magnitude
-        assert numpy.array_equal(v,  self.v_expected)
+        v = neo.segments[0].filter(name='v')[0]
+        self.assertEqual(35, len(v.times))
+        assert numpy.array_equal(v.magnitude,  self.v_expected)
 
     def test_get_spikes_by_index(self):
         my_dir = os.path.dirname(os.path.abspath(__file__))
