@@ -328,9 +328,10 @@ class Population(PopulationBase):
         """
         FecTimer.start_category(TimerCategory.POP_GET_DATA)
         self._check_params(gather, annotations)
-        return self.__recorder.extract_neo_block(
+        neo = self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
         FecTimer.end_category(TimerCategory.POP_GET_DATA)
+        return neo
 
     def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
         """ Public accessor for getting data as a numpy array, instead of\
