@@ -369,7 +369,7 @@ class SynapticMatrices(object):
         # Find the part that is just for the core
         mask_size = r_info.n_bits_atoms
         core_mask = (2 ** allocator_bits_needed(
-            len(self.__app_vertex.splitter.get_out_going_vertices(
+            len(r_info.vertex.splitter.get_out_going_vertices(
                 SPIKE_PARTITION_ID)))) - 1
         pre = r_info.vertex
         n_atoms = min(max_atoms_per_core, pre.n_atoms)
