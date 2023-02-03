@@ -30,7 +30,6 @@ _SELECTIVE_RECORDED_MSG = (
 
 
 class DataPopulation(object):
-    # Included here to due to circular init calls
 
     __slots__ = [
         "__database_file",
@@ -45,10 +44,7 @@ class DataPopulation(object):
         with NeoBufferDatabase(self.__database_file) as db:
             size = db.get_population_metdadata(label)[0]
         self._size = size
-        if indexes is None:
-            self._indexes = range(size)
-        else:
-            self._indexes = indexes
+        self._indexes = indexes
 
     @overrides(Population.write_data)
     def write_data(self, io, variables='all', gather=True, clear=False,
@@ -60,8 +56,7 @@ class DataPopulation(object):
         if isinstance(io, str):
             io = neo.get_io(io)
 
-        with NeoBufferDatabase(self.__database_file) as db:
-            data = db.get_block(self.__label, variables, self._indexes)
+        data = self.get_data(variables)
         # write the neo block to the file
         io.write(data)
 
@@ -83,8 +78,8 @@ class DataPopulation(object):
         if clear:
             logger.warning("Ignoring clear as supported in this mode")
         with NeoBufferDatabase(self.__database_file) as db:
-            return db.get_block(self.__label, variables, self._indexes,
-                                annotations)
+            return db.get_full_block(
+                self.__label, variables, self._indexes, annotations)
 
     @overrides(Population.spinnaker_get_data)
     def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
@@ -124,6 +119,7 @@ class DataPopulation(object):
 
     @overrides(Population.id_to_index)
     def id_to_index(self, id):  # @ReservedAssignment
+        # pylint: disable=redefined-builtin
         # assuming not called often so not caching first id
         with NeoBufferDatabase(self.__database_file) as db:
             _, first_id, _ = db.get_population_metdadata(self.__label)
@@ -173,11 +169,14 @@ class DataPopulation(object):
         """
         sized = AbstractSized(self._size)
         ids = sized.selector_to_ids(index_or_slice, warn=True)
-        indexes = [self._indexes[index] for index in ids]
+        if self._indexes:
+            indexes = [self._indexes[index] for index in ids]
+        else:
+            indexes = [range(self._size)[index] for index in ids]
         return DataPopulation(self.__database_file, self.__label, indexes)
 
     @overrides(Population.mean_spike_count)
     def mean_spike_count(self, gather=True):
-        Population._check_params(gather)
+        Population._check_params(gather)  # pylint: disable=protected-access
         counts = self.get_spike_counts()
         return sum(counts.values()) / len(counts)

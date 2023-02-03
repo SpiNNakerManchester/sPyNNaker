@@ -192,17 +192,14 @@ def plot_segment(axes, segment, label='', **options):
                 axes, segment.filter(name=name)[0], label=label, **options)
     elif segment.spiketrains:
         if len(analogsignals) > 1:
-            raise Exception("Block.segment[0] has spikes and "
-                            "other data; please specify one to plot")
+            raise ValueError("please specify data to plot using name=")
         plot_spiketrains(axes, segment.spiketrains, label=label, **options)
     elif len(analogsignals) == 1:
         heat_plot_neo(axes, analogsignals[0], label=label, **options)
     elif len(analogsignals) > 1:
-        raise Exception("Block.segment[0] has {} types of data; "
-                        "please specify one to plot using name="
-                        "".format(len(analogsignals)))
+        raise ValueError("please specify data to plot using name=")
     else:
-        raise Exception("Block does not appear to hold any data")
+        raise ValueError("Block does not appear to hold any data")
 
 
 class SpynnakerPanel(object):
@@ -244,7 +241,7 @@ class SpynnakerPanel(object):
         :param options: Any additional information.
         """
         if _matplotlib_missing:
-            raise Exception("No matplotlib module found")
+            raise ImportError("No matplotlib module found")
         self.data = list(data)
         self.options = options
         self.data_labels = options.pop("data_labels", repeat(None))
@@ -263,7 +260,7 @@ class SpynnakerPanel(object):
             # for example result of segments[0].filter(name='v')
             if isinstance(datum, list):
                 if not datum:
-                    raise Exception("Can't handle empty list")
+                    raise ValueError("Can't handle empty list")
                 if len(datum) == 1 and not isinstance(datum[0], SpikeTrain):
                     datum = datum[0]
 
@@ -280,14 +277,13 @@ class SpynnakerPanel(object):
             elif isinstance(datum, Segment):
                 plot_segment(axes, datum, label=label, **properties)
             else:
-                raise Exception("Can't handle type {}; consider using "
-                                "pyNN.utility.plotting".format(type(datum)))
+                raise ValueError(f"Can't handle type {type(datum)}; "
+                                 f"consider using pyNN.utility.plotting")
 
     @staticmethod
     def __plot_list(axes, datum, label, properties):
         if not isinstance(datum[0], SpikeTrain):
-            raise Exception("Can't handle lists of type {}"
-                            "".format(type(datum)))
+            raise ValueError(f"Can't handle lists of type {type(datum)}")
         plot_spiketrains(axes, datum, label=label, **properties)
 
     @staticmethod
@@ -297,21 +293,20 @@ class SpynnakerPanel(object):
         elif len(datum[0]) == 3:
             heat_plot_numpy(axes, datum, label=label, **properties)
         else:
-            raise Exception("Can't handle ndarray with {} columns".format(
-                len(datum[0])))
+            raise ValueError(
+                f"Can't handle ndarray with {len(datum[0])} columns")
 
     @staticmethod
     def __plot_block(axes, datum, label, properties):
         if "run" in properties:
             run = int(properties.pop("run"))
             if len(datum.segments) <= run:
-                raise Exception("Block only has {} segments".format(
-                    len(datum.segments)))
+                raise ValueError(
+                    "Block only has {len(datum.segments)} segments")
             segment = datum.segments[run]
         elif len(datum.segments) != 1:
-            raise Exception(
-                "Block has {} segments please specify one to plot using run="
-                .format(len(datum.segments)))
+            raise ValueError("Block has {len(datum.segments)} segments "
+                             "please specify one to plot using run=")
         else:
             segment = datum.segments[0]
         plot_segment(axes, segment, label=label, **properties)

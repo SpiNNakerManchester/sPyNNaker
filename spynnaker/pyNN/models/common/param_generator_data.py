@@ -30,7 +30,7 @@ _GENERATOR_TYPES = {
 def get_generator_type(data_type):
     if data_type in _GENERATOR_TYPES:
         return _GENERATOR_TYPES[data_type]
-    raise Exception(f"Ungeneratable type {data_type}")
+    raise TypeError(f"Ungeneratable type {data_type}")
 
 
 def type_has_generator(data_type):
@@ -64,7 +64,7 @@ def param_generator_id(value):
         if value.name in PARAM_TYPE_BY_NAME:
             return PARAM_TYPE_BY_NAME[value.name]
 
-    raise Exception(f"Ungeneratable parameter {value}")
+    raise TypeError(f"Ungeneratable parameter {value}")
 
 
 def is_param_generatable(value):

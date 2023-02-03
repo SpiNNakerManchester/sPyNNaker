@@ -30,23 +30,23 @@ add_spynnaker_cfg()
 
 try:
     SpynnakerDataView.get_simulation_time_step_us()
-    raise Exception("OOPS")
+    raise NotImplementedError("OOPS")
 except NotSetupException:
     pass
 try:
     SpynnakerDataView.get_min_delay()
-    raise Exception("OOPS")
+    raise NotImplementedError("OOPS")
 except NotSetupException:
     pass
 writer = SpynnakerDataWriter.setup()
 try:
     SpynnakerDataView.get_simulation_time_step_us()
-    raise Exception("OOPS")
+    raise NotImplementedError("OOPS")
 except DataNotYetAvialable:
     pass
 try:
     SpynnakerDataView.get_min_delay()
-    raise Exception("OOPS")
+    raise NotImplementedError("OOPS")
 except DataNotYetAvialable:
     pass
 writer.set_up_timings_and_delay(1000, 1, 1)

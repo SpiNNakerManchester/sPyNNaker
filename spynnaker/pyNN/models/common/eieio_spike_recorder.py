@@ -16,8 +16,6 @@
 import logging
 import struct
 from spinn_utilities.log import FormatAdapter
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -53,27 +51,3 @@ class EIEIOSpikeRecorder(object):
             logger.warning("Sampling interval currently not supported for "
                            "SpikeSourceArray so being ignored")
         self.__record = new_state
-
-    def write_spike_metadata(
-            self, region, application_vertex, base_key_function,
-            n_colour_bits, population):
-        """
-         Write the metadata to retrieve spikes based on just the data
-
-        :param int region: local region this vertex will write to
-        :param ApplicationVertex application_vertex:
-            vertex which will supply the data
-        :param method base_key_function: Function to calculate the base key
-        :param int n_colour_bits:
-            The number of colour bits sent by this vertex.
-        :param ~spynnaker.pyNN.models.populations.Population population:
-            the population to record for
-        """
-        with NeoBufferDatabase() as db:
-            vertices = application_vertex.machine_vertices
-            for vertex in vertices:
-                vertex._update_virtual_key()
-                db.write_eieio_spikes_metadata(
-                    vertex, "spikes", region, population,
-                    SpynnakerDataView.get_simulation_time_step_ms(),
-                    base_key_function(vertex), n_colour_bits)

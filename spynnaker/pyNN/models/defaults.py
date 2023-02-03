@@ -143,7 +143,7 @@ def defaults(cls):
         parameters.
     """
     if not inspect.isclass(cls):
-        raise Exception("{} is not a class".format(cls))
+        raise TypeError(f"{cls} is not a class")
     if not hasattr(cls, "__init__"):
         raise AttributeError("No __init__ found in {}".format(cls))
     init = getattr(cls, "__init__")
