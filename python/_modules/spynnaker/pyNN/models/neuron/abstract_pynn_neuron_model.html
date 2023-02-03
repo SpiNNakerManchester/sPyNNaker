@@ -94,6 +94,11 @@
             <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">ring_buffer_sigma</span><span class="p">,</span>
             <span class="n">incoming_spike_buffer_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span>
             <span class="n">splitter</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model</span><span class="o">.</span><span class="n">model_name</span>
 </pre></div>
 
             <div class="clearer"></div>

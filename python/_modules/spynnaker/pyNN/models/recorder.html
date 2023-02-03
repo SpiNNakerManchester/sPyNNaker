@@ -52,7 +52,6 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">neo</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
@@ -225,7 +224,12 @@
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
 <span class="sd">            If the recording not setup correctly</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">block</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">Block</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">:</span>
+            <span class="n">dbfile</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dbfile</span> <span class="o">=</span> <span class="kc">None</span>   <span class="c1"># use current</span>
+        <span class="k">with</span> <span class="n">NeoBufferDatabase</span><span class="p">(</span><span class="n">dbfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_empty_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">previous</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__append_previous_segment</span><span class="p">(</span>
@@ -234,15 +238,48 @@
         <span class="c1"># add to the segments the new block</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__append_current_segment</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">)</span>
 
-        <span class="c1"># add fluff to the neo block</span>
-        <span class="n">block</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span>
-        <span class="n">block</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
-        <span class="c1"># pylint: disable=no-member</span>
-        <span class="n">block</span><span class="o">.</span><span class="n">rec_datetime</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rec_datetime</span>
-        <span class="n">block</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">__metadata</span><span class="p">())</span>
-        <span class="k">if</span> <span class="n">annotations</span><span class="p">:</span>
-            <span class="n">block</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="o">**</span><span class="n">annotations</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">block</span></div>
+
+<div class="viewcode-block" id="Recorder.csv_neo_block"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.csv_neo_block">[docs]</a>    <span class="k">def</span> <span class="nf">csv_neo_block</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">csv_file</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Extracts block from the vertices and puts them into a Neo block</span>
+
+<span class="sd">        :param str variables: the variables to extract</span>
+<span class="sd">        :param list(str) variables: the variables to extract</span>
+<span class="sd">        :param slice view_indexes: the indexes to be included in the view</span>
+<span class="sd">        :param dict(str,object) annotations:</span>
+<span class="sd">            annotations to put on the Neo block</span>
+<span class="sd">        :return: The Neo block</span>
+<span class="sd">        :rtype: ~neo.core.Block</span>
+<span class="sd">        :raises \</span>
+<span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
+<span class="sd">            If the recording not setup correctly</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pop_label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">:</span>
+            <span class="n">dbfile</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dbfile</span> <span class="o">=</span> <span class="kc">None</span>   <span class="c1"># use current</span>
+        <span class="k">with</span> <span class="n">NeoBufferDatabase</span><span class="p">(</span><span class="n">dbfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">csv_block_metadata</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">segment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No Data available for Segment </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">segment</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">with</span> <span class="n">NeoBufferDatabase</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">[</span><span class="n">segment</span><span class="p">])</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">csv_segment</span><span class="p">(</span>
+                    <span class="n">csv_file</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">NeoBufferDatabase</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_reset_last</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Due to the call directly after reset. &quot;</span>
+                    <span class="s2">&quot;The data will only contain &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2"> segments&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">csv_segment</span><span class="p">(</span>
+                    <span class="n">csv_file</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.cache_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.cache_data">[docs]</a>    <span class="k">def</span> <span class="nf">cache_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Store data for later extraction</span>
@@ -306,36 +343,7 @@
             <span class="n">db</span><span class="o">.</span><span class="n">add_segment</span><span class="p">(</span>
                 <span class="n">block</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">clear</span><span class="p">:</span>
-                <span class="n">db</span><span class="o">.</span><span class="n">clear_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-            <span class="s1">&#39;first_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s1">&#39;last_index&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-            <span class="s1">&#39;first_id&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">first_id</span><span class="p">),</span>
-            <span class="s1">&#39;last_id&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">last_id</span><span class="p">),</span>
-            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="s1">&#39;simulator&#39;</span><span class="p">:</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_sim_name</span><span class="p">()</span>
-        <span class="p">}</span>
-        <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">annotations</span><span class="p">)</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;mpi_processes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># meaningless on Spinnaker</span>
-        <span class="k">return</span> <span class="n">metadata</span></div>
-
-
-<span class="k">def</span> <span class="nf">_convert_extracted_data_into_neo_expected_format</span><span class="p">(</span><span class="n">signal_array</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Converts data between sPyNNaker format and Neo format</span>
-
-<span class="sd">    :param ~numpy.ndarray signal_array: Draw data in sPyNNaker format</span>
-<span class="sd">    :param list(int) indexes:</span>
-<span class="sd">    :rtype: ~numpy.ndarray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">processed_data</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">signal_array</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">][</span><span class="n">signal_array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">index</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
-    <span class="n">processed_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">processed_data</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="k">return</span> <span class="n">processed_data</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">clear_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

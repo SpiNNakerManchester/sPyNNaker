@@ -256,7 +256,7 @@
         <span class="n">first_id</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_id_counter</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_id_counter</span> <span class="o">+=</span> <span class="n">population</span><span class="o">.</span><span class="n">size</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">population</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">first_id</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_id_counter</span></div>
+        <span class="k">return</span> <span class="n">first_id</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_id_counter</span><span class="o">-</span><span class="mi">1</span></div>
 
 <div class="viewcode-block" id="SpynnakerDataView.set_number_of_neurons_per_dimension_per_core"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.set_number_of_neurons_per_dimension_per_core">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">set_number_of_neurons_per_dimension_per_core</span><span class="p">(</span>
