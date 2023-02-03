@@ -56,7 +56,7 @@ class PushBotRetinaViewer(Thread):
             self.__pyplot = pyplot
             self.__animation = animation
         except ImportError as e:
-            raise Exception(
+            raise ImportError(
                 "matplotlib must be installed to use this viewer") from e
 
         super().__init__(name="PushBotRetinaViewer")

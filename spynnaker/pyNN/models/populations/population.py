@@ -16,6 +16,7 @@
 import logging
 import numpy
 import neo
+import os
 import inspect
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
@@ -27,9 +28,8 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.recorder import Recorder
-from .idmixin import IDMixin
 from .population_base import PopulationBase
-from .population_view import PopulationView
+from .population_view import PopulationView, IDMixin
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
@@ -230,6 +230,11 @@ class Population(PopulationBase):
         self._check_params(gather, annotations)
 
         if isinstance(io, str):
+            extension = os.path.splitext(io)[1][1:]
+            if extension == "csv":
+                self.__recorder.csv_neo_block(
+                    io, variables, annotations=annotations)
+                return
             io = neo.get_io(io)
 
         data = self.__recorder.extract_neo_block(
@@ -252,24 +257,29 @@ class Population(PopulationBase):
         :type engine: str or ~pyNN.descriptions.TemplateEngine or None
         :rtype: str or dict
         """
-        vertex_context = self.__vertex.describe()
-
         context = {
             "label": self.label,
-            "celltype": vertex_context,
+            "celltype": self.celltype.describe(template=None),
             "structure": None,
             "size": self.size,
             "size_local": self.size,
             "first_id": self.first_id,
             "last_id": self.last_id,
         }
-        context.update(self.__annotations)
+        context.update(self.annotations)
         if self.size > 0:
+            parameters = self.__vertex.get_parameters()
+            if parameters:
+                cell_parameters = self.__vertex.get_parameter_values(
+                    parameters, 0)
+            else:
+                cell_parameters = "No cell parameters"
             context.update({
-                "local_first_id": self.first_id,
-                "cell_parameters": {}})
-        if self.__structure:
-            context["structure"] = self.__structure.describe(template=None)
+                "local_first_id": 0,
+                "cell_parameters": cell_parameters
+            })
+        if self.structure:
+            context["structure"] = self.structure.describe(template=None)
         return descriptions.render(engine, template, context)
 
     def _end(self):
