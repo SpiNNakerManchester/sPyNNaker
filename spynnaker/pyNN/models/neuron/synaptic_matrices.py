@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-import math
 from collections import namedtuple
 
 from pacman.model.routing_info import BaseKeyAndMask
