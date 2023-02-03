@@ -220,9 +220,9 @@ class SynapticMatrixApp(object):
         """
         next_addr = block_addr + size
         if next_addr > self.__all_syn_block_sz:
-            raise Exception(
-                "Too much synaptic memory has been written: {} of {} "
-                .format(next_addr, self.__all_syn_block_sz))
+            raise ValueError(
+                f"Too much synaptic memory has been written: "
+                f"{next_addr} of {self.__all_syn_block_sz} ")
         return next_addr
 
     def write_matrix(self, spec, post_vertex_slice):
@@ -274,9 +274,9 @@ class SynapticMatrixApp(object):
                 connections, post_vertex_slice, self.__app_edge,
                 self.__synapse_info)
         if self.__app_edge.delay_edge is None and len(delayed_row_data) != 0:
-            raise Exception(
-                "Found delayed source IDs but no delay "
-                "edge for {}".format(self.__app_edge.label))
+            raise ValueError(
+                f"Found delayed source IDs but no delay "
+                f"edge for {self.__app_edge.label}")
 
         return row_data, delayed_row_data
 
