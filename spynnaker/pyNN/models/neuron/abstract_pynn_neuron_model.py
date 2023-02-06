@@ -57,3 +57,8 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             n_neurons, label, max_atoms, spikes_per_second, ring_buffer_sigma,
             incoming_spike_buffer_size, self.__model, self, drop_late_spikes,
             splitter, seed, n_colour_bits, rb_left_shifts)
+
+    @property
+    @overrides(AbstractPyNNModel.name)
+    def name(self):
+        return self.__model.model_name

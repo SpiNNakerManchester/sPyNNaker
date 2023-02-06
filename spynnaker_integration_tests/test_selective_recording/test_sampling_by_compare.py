@@ -139,7 +139,7 @@ def compare_spikearrays(this, full, tolerance=False):
     if numpy.array_equal(this, full):
         return sys.maxsize
     if this[0] != full[0]:
-        raise Exception("Index mismatch")
+        raise ValueError("Index mismatch")
     if len(this) != len(full):
         print("{} spikes length differ. {} != {}".format(
             this[0], len(this), len(full)))
@@ -175,7 +175,6 @@ def compare_spikearrays(this, full, tolerance=False):
     if lowest is None:
         lowest = sys.maxsize
     return lowest
-    # raise Exception("Spikes not equal")
 
 
 def compare_spikes(file_path, full_path, simtime, n_neurons, spike_rate=1,
@@ -184,14 +183,14 @@ def compare_spikes(file_path, full_path, simtime, n_neurons, spike_rate=1,
     full_spikes = read_spikes(full_path, simtime, n_neurons, rate=spike_rate,
                               indexes=spike_indexes)
     if len(this_spikes) != len(full_spikes):
-        raise Exception("Spikes different length this {} full {}"
-                        "".format(len(this_spikes), len(full_spikes)))
+        raise ValueError(f"Spikes different length this {len(this_spikes)} "
+                         "full {len(full_spikes)}")
     lowest = sys.maxsize
     for this, full in zip(this_spikes, full_spikes):
         low = compare_spikearrays(this, full)
         lowest = min(lowest, low)
     if lowest < tolerance:
-        raise Exception("Spikes different from {}".format(lowest))
+        raise ValueError(f"Spikes different from {lowest}")
     print("Spikes equal")
     return lowest
 
@@ -356,15 +355,15 @@ def compare(current, full, rate, indexes):
         if d1.shape != d2_rate.shape:
             if d1.shape[0] == 0 or d1.shape[1] == 0:
                 return  # Empty so ignore shape
-            raise Exception(
-                "Shape not equal {} {}".format(d1.shape, d2_rate.shape))
+            raise ValueError(
+                f"Shape not equal {d1.shape} {d2_rate.shape}")
         for i in range(d1.shape[0]):
             if not numpy.array_equal(d1[i], d2_rate[i]):
                 for j in range(len(d1[i])):
                     if d1[i][j] != d2_rate[i][j]:
-                        raise Exception(
-                            "row {} column{} index{} current {} full {}"
-                            .format(i, j, indexes[j], d1[i][j], d2_rate[i][j]))
+                        raise ValueError(
+                            f"row {i} column{j} index{indexes[j]} "
+                            f"current {d1[i][j]} full {d2_rate[i][j]}")
 
 
 class TestSampling(BaseTestCase):

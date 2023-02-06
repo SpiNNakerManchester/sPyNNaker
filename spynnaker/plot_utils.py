@@ -153,6 +153,7 @@ def plot_spikes(spikes, title="spikes"):
     print("Plotting {} set of spikes".format(len(spikes)))
     (numrows, numcols) = _grid(len(spikes))
     for single_spikes, index in enumerate(spikes):
+        # pylint: disable=nested-min-max
         plt.subplot(numrows, numcols, index+1)
         spike_time = [i[1] for i in single_spikes]
         spike_id = [i[0] for i in single_spikes]

@@ -32,6 +32,7 @@ from spinn_utilities.log import FormatAdapter
 
 # connections
 # noinspection PyUnresolvedReferences
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AllToAllConnector, ArrayConnector, CSAConnector,
     DistanceDependentProbabilityConnector, FixedNumberPostConnector,
@@ -180,7 +181,8 @@ def use_spynnaker_pynn():
 
 if is_pynn_call():
     setup_pynn()
-    raise Exception("Pynn needed to be setup. Now done. Please try again")
+    raise SpynnakerException(
+        "Pynn needed to be setup. Now done. Please try again")
 else:
     use_spynnaker_pynn()
 

@@ -147,7 +147,7 @@ class WholeBoardTest(object):
             spikes = neo.segments[0].spiketrains
             print(name, spikes)
             if len(spikes) != 1:
-                raise Exception("Chain {name} has {len(spikes)} spikes")
+                raise ValueError(f"Chain {name} has {len(spikes)} spikes")
 
     def do_run(self):
         # find actual machine
