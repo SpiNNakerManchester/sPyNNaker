@@ -33,7 +33,7 @@ class Translator(AbstractEthernetTranslator):
 
     def translate_control_packet(self, multicast_packet):
         if multicast_packet.key not in self.__keys:
-            raise Exception("Unknown key {} received".format(
+            raise ValueError("Unknown key {} received".format(
                 multicast_packet.key))
         voltage = multicast_packet.payload
         self.voltages[multicast_packet.key].append(

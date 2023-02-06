@@ -17,6 +17,7 @@ import numpy
 from collections import namedtuple
 
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.utilities.utility_calls import allocator_bits_needed
 from data_specification.enums.data_type import DataType
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -359,18 +360,17 @@ class SynapticMatrices(object):
             self, r_info, n_stages, max_atoms_per_core, n_colour_bits):
         """ Get a key and mask for an incoming application vertex as a whole
 
-        :param list(tuple(int, Slice)) keys:
-            The key and slice of each relevant machine vertex in the incoming
-            application vertex
-        :param int mask: The mask that covers all keys
+        :param RoutingInfo r_info: The routing information for the vertex
         :param n_stages: The number of delay stages
+        :param max_atoms_per_core: The max atoms per core
         :param n_colour_bits: The number of colour bits sent
         :rtype: None or _AppKeyInfo
         """
-
-        # Find the bit that is just for the core
+        # Find the part that is just for the core
         mask_size = r_info.n_bits_atoms
-        core_mask = (r_info.machine_mask - r_info.mask) >> mask_size
+        core_mask = (2 ** allocator_bits_needed(
+            len(r_info.vertex.splitter.get_out_going_vertices(
+                SPIKE_PARTITION_ID)))) - 1
         pre = r_info.vertex
         n_atoms = min(max_atoms_per_core, pre.n_atoms)
 
@@ -382,7 +382,6 @@ class SynapticMatrices(object):
 
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
-        :param RoutingInfo routing_info: The routing information of all edges
         """
         routing_info = SpynnakerDataView.get_routing_infos()
         r_info = routing_info.get_routing_info_from_pre_vertex(
@@ -399,7 +398,6 @@ class SynapticMatrices(object):
 
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
-        :param RoutingInfo routing_info: The routing information of all edges
         """
         delay_edge = app_edge.delay_edge
         if delay_edge is None:

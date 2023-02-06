@@ -56,7 +56,7 @@ def setup_pynn():
 
 # Check the version; we really want PyNN 0.9
 if not version_satisfies(pyNN, "0.9"):
-    raise Exception(
+    raise NotImplementedError(
         f"PyNN version {pyNN.__version__} found; "
         f"sPyNNaker requires PyNN version 0.9")
 

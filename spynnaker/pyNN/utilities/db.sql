@@ -42,16 +42,17 @@ CREATE UNIQUE INDEX IF NOT EXISTS recording_sanity
 
 CREATE VIEW IF NOT EXISTS recording_view AS
     SELECT rec_id, variable, label, data_type, buffered_type, t_start,
-        sampling_interval_ms, first_id, pop_size, units, atoms_shape,
-        n_colour_bits
+        sampling_interval_ms, pop_size, units, atoms_shape, n_colour_bits
     FROM population NATURAL JOIN recording;
 
 CREATE TABLE IF NOT EXISTS segment(
     segment_id INTEGER PRIMARY KEY AUTOINCREMENT,
     simulation_time_step_ms FLOAT NOT NULL,
     segment_number INTEGER NOT NULL,
+    rec_datetime TIMESTAMP NOT NULL,
     t_stop FLOAT,
-    rec_datetime TIMESTAMP NOT NULL);
+    dt FLOAT NOT NULL,
+    simulator STRING NOT NULL);
 
 CREATE TABLE IF NOT EXISTS region_metadata(
     region_metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
