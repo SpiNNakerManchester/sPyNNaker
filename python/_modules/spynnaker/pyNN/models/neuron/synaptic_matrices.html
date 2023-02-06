@@ -55,6 +55,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
 <span class="kn">from</span> <span class="nn">pacman.model.routing_info</span> <span class="kn">import</span> <span class="n">BaseKeyAndMask</span>
+<span class="kn">from</span> <span class="nn">pacman.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">allocator_bits_needed</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
 
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
@@ -397,18 +398,17 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">r_info</span><span class="p">,</span> <span class="n">n_stages</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a key and mask for an incoming application vertex as a whole</span>
 
-<span class="sd">        :param list(tuple(int, Slice)) keys:</span>
-<span class="sd">            The key and slice of each relevant machine vertex in the incoming</span>
-<span class="sd">            application vertex</span>
-<span class="sd">        :param int mask: The mask that covers all keys</span>
+<span class="sd">        :param RoutingInfo r_info: The routing information for the vertex</span>
 <span class="sd">        :param n_stages: The number of delay stages</span>
+<span class="sd">        :param max_atoms_per_core: The max atoms per core</span>
 <span class="sd">        :param n_colour_bits: The number of colour bits sent</span>
 <span class="sd">        :rtype: None or _AppKeyInfo</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Find the bit that is just for the core</span>
+        <span class="c1"># Find the part that is just for the core</span>
         <span class="n">mask_size</span> <span class="o">=</span> <span class="n">r_info</span><span class="o">.</span><span class="n">n_bits_atoms</span>
-        <span class="n">core_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">machine_mask</span> <span class="o">-</span> <span class="n">r_info</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">mask_size</span>
+        <span class="n">core_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">allocator_bits_needed</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">(</span>
+                <span class="n">SPIKE_PARTITION_ID</span><span class="p">))))</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">pre</span> <span class="o">=</span> <span class="n">r_info</span><span class="o">.</span><span class="n">vertex</span>
         <span class="n">n_atoms</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">pre</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
 
@@ -420,7 +420,6 @@
 
 <span class="sd">        :param PopulationApplicationEdge app_edge:</span>
 <span class="sd">            The application edge to get the key and mask of</span>
-<span class="sd">        :param RoutingInfo routing_info: The routing information of all edges</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
         <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
@@ -437,7 +436,6 @@
 
 <span class="sd">        :param PopulationApplicationEdge app_edge:</span>
 <span class="sd">            The application edge to get the key and mask of</span>
-<span class="sd">        :param RoutingInfo routing_info: The routing information of all edges</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">delay_edge</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span>
         <span class="k">if</span> <span class="n">delay_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
