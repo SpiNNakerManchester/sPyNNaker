@@ -201,7 +201,7 @@ def EthernetControlPopulation(
     population = Population(n_neurons, model, label=label)
     vertex = population._vertex
     if not isinstance(vertex, AbstractEthernetController):
-        raise Exception(
+        raise TypeError(
             "Vertex must be an instance of AbstractEthernetController")
     translator = vertex.get_message_translator()
     live_packet_gather_label = "EthernetControlReceiver"
@@ -262,7 +262,8 @@ def EthernetSensorPopulation(
     :rtype: ~spynnaker.pyNN.models.populations.Population
     """
     if not isinstance(device, AbstractEthernetSensor):
-        raise Exception("Device must be an instance of AbstractEthernetSensor")
+        raise TypeError(
+            "Device must be an instance of AbstractEthernetSensor")
     injector_params = dict(device.get_injector_parameters())
 
     population = Population(
@@ -321,5 +322,5 @@ def _set_simulator(simulator):
 
     :param spynnaker.pyNN.spinnaker.SpiNNaker simulator:
     """
-    global __simulator
+    global __simulator  # pylint: disable=global-statement
     __simulator = simulator

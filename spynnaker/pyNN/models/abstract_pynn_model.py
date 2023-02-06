@@ -16,6 +16,7 @@
 from collections import defaultdict
 import sys
 import numpy
+from pyNN import descriptions
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
@@ -143,5 +144,34 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         :param int n_neurons: The number of neurons in the population
         :param str label: The label to give to the vertex
         :return: An application vertex for the population
-        :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        :rtype: ~spynnaker.pyNN.models.common.PopulationApplicationVertex
         """
+
+    @property
+    def name(self):
+        """
+        The name of this model
+
+        :rtype: str
+        """
+        return self.__class__.__name__
+
+    def describe(self, template='modeltype_default.txt', engine='default'):
+        """ Returns a human-readable description of the population.
+
+        The output may be customized by specifying a different template
+        together with an associated template engine (see
+        :mod:`pyNN.descriptions`).
+
+        If ``template`` is ``None``, then a dictionary containing the template
+        context will be returned.
+
+        :param str template: Template filename
+        :param engine: Template substitution engine
+        :type engine: str or ~pyNN.descriptions.TemplateEngine or None
+        :rtype: str or dict
+        """
+        context = {
+            "name": self.name
+        }
+        return descriptions.render(engine, template, context)

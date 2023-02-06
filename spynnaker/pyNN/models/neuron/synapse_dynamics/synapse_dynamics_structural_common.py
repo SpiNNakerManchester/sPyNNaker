@@ -329,7 +329,8 @@ class SynapseDynamicsStructuralCommon(
                 for i in range(0, vertex_slice.n_atoms)]
 
         if any(len(row) > self.s_max for row in rows):
-            raise Exception("Too many initial connections per incoming neuron")
+            raise ValueError(
+                "Too many initial connections per incoming neuron")
 
         # Make each row the required length through padding with 0xFFFF
         padded_rows = [numpy.pad(row, [(self.s_max - len(row), 0), (0, 0)],
@@ -340,9 +341,9 @@ class SynapseDynamicsStructuralCommon(
         post_to_pre = numpy.core.records.fromarrays(
             numpy.concatenate(padded_rows).T, formats="u1, u1, u2").view("u4")
         if len(post_to_pre) != vertex_slice.n_atoms * self.s_max:
-            raise Exception(
-                "Wrong size of pre-to-pop tables: {} Found, {} Expected"
-                .format(len(post_to_pre), vertex_slice.n_atoms * self.s_max))
+            raise ValueError(
+                f"Wrong size of pre-to-pop tables: {len(post_to_pre)} "
+                f"Found, {vertex_slice.n_atoms * self.s_max} Expected")
         spec.comment("Writing post-to-pre table of {} words".format(
             vertex_slice.n_atoms * self.s_max))
         spec.write_array(post_to_pre)
@@ -438,16 +439,13 @@ class SynapseDynamicsStructuralCommon(
             # pylint: disable=unsubscriptable-object
             init_del = self.initial_delay
             if init_del[0] > max_delay_ms or init_del[1] > max_delay_ms:
-                raise Exception(
-                    "The initial delay {} has one or more values that are"
-                    " bigger than {}.  This is not supported in the current"
-                    " implementation.".format(
-                        self.initial_delay, max_delay_ms))
+                raise ValueError(
+                    f"The initial delay {self.initial_delay} has one or more "
+                    f"values that are bigger than {max_delay_ms}.")
         elif self.initial_delay > max_delay_ms:
-            raise Exception(
-                "The initial delay {} is bigger than {}.  This is not"
-                " supported in the current implementation".format(
-                    self.initial_delay, max_delay_ms))
+            raise ValueError(
+                f"The initial delay {self.initial_delay} "
+                f"is bigger than {max_delay_ms}.")
 
     def get_max_rewires_per_ts(self):
         max_rewires_per_ts = 1
