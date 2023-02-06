@@ -94,3 +94,19 @@ class TestSampling(BaseTestCase):
 
     def test_standard(self):
         self.runsafe(self.standard)
+
+    def one_core_no_recording(self):
+        sim.setup(timestep=1)
+        sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
+
+        pop_1 = sim.Population(10, sim.IF_curr_exp(), label="pop_1")
+        input_pop = sim.Population(
+            10, sim.SpikeSourceArray(spike_times=[0]), label="input")
+        sim.Projection(input_pop, pop_1, sim.OneToOneConnector(),
+                       synapse_type=sim.StaticSynapse(weight=5, delay=1))
+        pop_1[0:3].record(["spikes", "v"])
+        simtime = 10
+        sim.run(simtime)
+
+    def test_one_core_no_recording(self):
+        self.runsafe(self.one_core_no_recording)

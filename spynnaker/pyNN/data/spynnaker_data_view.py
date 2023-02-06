@@ -218,7 +218,7 @@ class SpynnakerDataView(FecDataView):
         first_id = cls.__spy_data._id_counter
         cls.__spy_data._id_counter += population.size
         cls.__spy_data._populations.append(population)
-        return first_id, cls.__spy_data._id_counter
+        return first_id, cls.__spy_data._id_counter-1
 
     @classmethod
     def set_number_of_neurons_per_dimension_per_core(

@@ -297,7 +297,7 @@ class SynfireRunner(object):
             set_between_runs = []
 
         if len(set_between_runs) > 0 and len(run_times) != 2:
-            raise Exception("set_between_runs requires exactly 2 run times")
+            raise ValueError("set_between_runs requires exactly 2 run times")
 
         if spike_times is None:
             spike_times = [[0]]
@@ -306,31 +306,31 @@ class SynfireRunner(object):
             get_spikes = record
         elif not record:
             if record_7:
-                raise Exception(
+                raise NotImplementedError(
                     "record_7 will cause spike recording to be turned on")
             if spike_path:
-                raise Exception("spike_path will cause spike recording to be "
-                                "turned on")
+                raise NotImplementedError(
+                    "spike_path will cause spike recording to be turned on")
 
         if get_v is None:
             get_v = record_v
         elif not record_v:
             if record_v_7:
-                raise Exception(
+                raise NotImplementedError(
                     "record_v_7 will cause v recording to be turned on")
             if v_path:
-                raise Exception(
+                raise NotImplementedError(
                     "v_path will cause v recording to be turned on")
 
         if get_gsyn_exc is None:
             get_gsyn_exc = record_gsyn_exc
         elif not record_gsyn_exc:
             if record_gsyn_exc_7:
-                raise Exception(
+                raise NotImplementedError(
                     "record_gsyn_exc_7 will cause gsyn_exc recording "
                     "to be turned on")
             if gsyn_path_exc:
-                raise Exception(
+                raise NotImplementedError(
                     "gsyn_path_exc will cause gsyn_exc recording "
                     "to be turned on")
 
@@ -338,11 +338,11 @@ class SynfireRunner(object):
             get_gsyn_inh = record_gsyn_inh
         elif not record_gsyn_inh:
             if record_gsyn_inh_7:
-                raise Exception(
+                raise NotImplementedError(
                     "record_gsyn_inh_7 will cause gsyn_inh recording "
                     "to be turned on")
             if gsyn_path_inh:
-                raise Exception(
+                raise NotImplementedError(
                     "gsyn_path_inh will cause gsyn_exc recording "
                     "to be turned on")
 
@@ -444,12 +444,13 @@ class SynfireRunner(object):
             run_count += 1
 
             if extract_between_runs:
-                self._get_data(populations[0], populations[1],
-                               get_spikes, record_7, get_v, record_v_7,
-                               get_gsyn_exc, record_gsyn_exc_7,
-                               get_gsyn_inh, record_gsyn_inh_7,
-                               record_input_spikes, record_input_spikes_7,
-                               get_all)
+                if runtime > 0:
+                    self._get_data(populations[0], populations[1],
+                                   get_spikes, record_7, get_v, record_v_7,
+                                   get_gsyn_exc, record_gsyn_exc_7,
+                                   get_gsyn_inh, record_gsyn_inh_7,
+                                   record_input_spikes, record_input_spikes_7,
+                                   get_all)
                 self._get_weight_delay(projections[0], get_weights, get_delays)
 
             if new_pop:

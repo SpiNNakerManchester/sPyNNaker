@@ -15,6 +15,7 @@
 
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 
 class SynfireExtractingSpikesWhenNothingSetToRecorded(BaseTestCase):
@@ -22,7 +23,7 @@ class SynfireExtractingSpikesWhenNothingSetToRecorded(BaseTestCase):
     # NO unittest_setup() as sim.setup is called
 
     def test_cause_error(self):
-        with self.assertRaises(KeyError):
+        with self.assertRaises(ConfigurationException):
             sim.setup(timestep=1.0)
             sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
