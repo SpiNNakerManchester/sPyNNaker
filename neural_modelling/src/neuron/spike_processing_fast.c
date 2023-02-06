@@ -126,11 +126,11 @@ static uint32_t spikes_this_time_step = 0;
 static uint32_t dmas_this_time_step = 0;
 static uint32_t pipeline_restarts = 0;
 
-#if LOG_LEVEL >= LOG_DEBUG
+//#if LOG_LEVEL >= LOG_DEBUG
 static uint32_t spike_pipeline_deactivation_time = 0;
 static uint32_t max_flushed_spikes = 0;
 static uint32_t total_flushed_spikes = 0;
-#endif
+//#endif
 
 //! The number of packets received this time step for recording
 static struct {
@@ -702,11 +702,9 @@ void spike_processing_fast_store_provenance(
     prov->max_dmas_in_a_tick = max_dmas_in_a_tick;
     prov->max_pipeline_restarts = max_pipeline_restarts;
     prov->timer_callback_completed = timer_callback_completed;
-#if LOG_LEVEL >= LOG_DEBUG
     prov->spike_pipeline_deactivated = spike_pipeline_deactivation_time;
     prov->max_flushed_spikes = max_flushed_spikes;
     prov->total_flushed_spikes = total_flushed_spikes;
-#endif
 }
 
 // Custom provenance from SpiNNCer
@@ -731,7 +729,6 @@ void spike_processing_get_and_reset_pipeline_restarts_this_tick(void) {
 	pipeline_restarts = 0;
 }
 
-#if LOG_LEVEL >= LOG_DEBUG
 uint32_t spike_processing_get_pipeline_deactivation_time(){
 	return spike_pipeline_deactivation_time;
 }
@@ -744,4 +741,3 @@ uint32_t spike_processing_get_total_flushed_spikes(){
 uint32_t spike_processing_get_max_flushed_spikes(){
 	return max_flushed_spikes;
 }
-#endif

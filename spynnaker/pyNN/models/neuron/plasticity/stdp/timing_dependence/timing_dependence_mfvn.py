@@ -33,9 +33,9 @@ class TimingDependenceMFVN(AbstractTimingDependence):
     __slots__ = [
         "_synapse_structure",
         "_tau_minus",
-        "_tau_minus_last_entry",
+        "_tau_minus_data",
         "_tau_plus",
-        "_tau_plus_last_entry",
+        "_tau_plus_data",
         "__a_plus",
         "__a_minus",
         "_beta",
@@ -59,8 +59,8 @@ class TimingDependenceMFVN(AbstractTimingDependence):
         self._sigma = sigma
 
         # provenance data
-        self._tau_plus_last_entry = None
-        self._tau_minus_last_entry = None
+        self._tau_plus_data = None
+        self._tau_minus_data = None
 
     @property
     def tau_plus(self):
@@ -138,7 +138,7 @@ class TimingDependenceMFVN(AbstractTimingDependence):
                 "exp cos LUT generation currently only supports 1ms timesteps")
 
         # Write exp_sin lookup table
-        self._tau_plus_last_entry = write_mfvn_lut(
+        self._tau_plus_data = write_mfvn_lut(
             spec,
             sigma=self._sigma,
             beta=self._beta,
@@ -153,43 +153,45 @@ class TimingDependenceMFVN(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_provenance_data)
     def get_provenance_data(self, synapse_info):
-        tauplus = self._tau_plus_last_entry
-        tauminus = self._tau_minus_last_entry
+        tauplus = 0
+        if self._tau_plus_data is not None:
+            tauplus = self._tau_plus_data[-1]
+        tauminus = 0
+        if self._tau_minus_data is not None:
+            tauminus = self._tau_minus_data[-1]
         with ProvenanceWriter() as db:
             db.insert_lut(
                 synapse_info.pre_population.label,
                 synapse_info.post_population.label,
-                self.__class__.__name__, "tau_plus_last_entry",
+                self.__class__.__name__, "tau_plus last_entry",
                 tauplus)
-            if tauplus is not None:
-                if tauplus[-1] > 0:
-                    db.insert_report(
-                        f"The last entry in the STDP exponential lookup table "
-                        f"for the tau_plus parameter of the"
-                        f"{self.__class__.__name__} between "
-                        f"{synapse_info.pre_population.label} and "
-                        f"{synapse_info.post_population.label} was {tauplus} "
-                        f"rather than 0, indicating that the lookup table was "
-                        f"not big enough at this timestep and value.  Try "
-                        f"reducing the parameter value, or increasing the "
-                        f"timestep.")
+            if tauplus > 0:
+                db.insert_report(
+                    f"The last entry in the STDP exponential lookup table "
+                    f"for the tau_plus parameter of the"
+                    f"{self.__class__.__name__} between "
+                    f"{synapse_info.pre_population.label} and "
+                    f"{synapse_info.post_population.label} was {tauplus} "
+                    f"rather than 0, indicating that the lookup table was "
+                    f"not big enough at this timestep and value.  Try "
+                    f"reducing the parameter value, or increasing the "
+                    f"timestep.")
             db.insert_lut(
                 synapse_info.pre_population.label,
                 synapse_info.post_population.label,
-                self.__class__.__name__, "tau_minus_last_entry",
+                self.__class__.__name__, "tau_minus last_entry",
                 tauminus)
-            if tauminus is not None:
-                if tauminus > 0:
-                    db.insert_report(
-                        f"The last entry in the STDP exponential lookup table "
-                        f"for the tau_minus parameter of the "
-                        f"{self.__class__.__name__} between "
-                        f"{synapse_info.pre_population.label} and "
-                        f"{synapse_info.post_population.label} was {tauminus} "
-                        f"rather than 0, indicating that the lookup table was "
-                        f"not big enough at this timestep and value.  Try "
-                        f"reducing the parameter value, or increasing the "
-                        f"timestep.")
+            if tauminus > 0:
+                db.insert_report(
+                    f"The last entry in the STDP exponential lookup table "
+                    f"for the tau_minus parameter of the "
+                    f"{self.__class__.__name__} between "
+                    f"{synapse_info.pre_population.label} and "
+                    f"{synapse_info.post_population.label} was {tauminus} "
+                    f"rather than 0, indicating that the lookup table was "
+                    f"not big enough at this timestep and value.  Try "
+                    f"reducing the parameter value, or increasing the "
+                    f"timestep.")
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
