@@ -19,8 +19,6 @@ from spinnaker_testbase import BaseTestCase
 import numpy
 
 
-
-
 def triplet_additive():
     # -------------------------------------------------------------------
     # This test uses a single data point from the Pfister/Gerstner example
@@ -32,7 +30,6 @@ def triplet_additive():
     # Common parameters
     # -------------------------------------------------------------------
     start_time = 100
-    time_between_pairs = 1000
     num_pairs = 60
     start_w = 0.5
     freq = 10
@@ -43,9 +40,9 @@ def triplet_additive():
     # -------------------------------------------------------------------
     # Population parameters
     model = sim.IF_curr_exp
-    cell_params = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 10.0, 'tau_refrac': 2.0,
-                   'tau_syn_E': 2.5, 'tau_syn_I': 2.5, 'v_reset': -70.0,
-                   'v_rest': -65.0, 'v_thresh': -55.4}
+    cell_params = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 10.0,
+                   'tau_refrac': 2.0, 'tau_syn_E': 2.5, 'tau_syn_I': 2.5,
+                   'v_reset': -70.0, 'v_rest': -65.0, 'v_thresh': -55.4}
 
     # SpiNNaker setup
     sim.setup(timestep=1.0, min_delay=1.0)
