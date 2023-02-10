@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_SHORT, BYTES_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array, get_min_lut_value)
@@ -152,8 +153,8 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         :rtype: int
         """
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
-        # and the time of the last spike
-        return BYTES_PER_WORD * 2
+        # (Note: this is the pre-trace size, not the post-trace size)
+        return BYTES_PER_SHORT * 2
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):

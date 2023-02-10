@@ -124,16 +124,15 @@ class ConnectionHolder(object):
         if not self.__connections:
             # If there are no connections added, raise an exception
             if self.__connections is None:
-                raise Exception(
-                    "Connections are only set after run has been called, "
-                    "even if you are trying to see the data before changes "
-                    "have been made.  "
-                    "Try examining the {} after the call to run.".format(
-                        self.__data_items_to_return))
+                raise NotImplementedError(
+                    f"Connections are only set after run has been called, "
+                    f"even if you are trying to see the data before changes "
+                    f"have been made. Try examining the "
+                    f"{self.__data_items_to_return} after the call to run.")
             # If the list is empty assume on a virtual machine
             # with generation on machine
             if len(self.__connections) == 0:
-                raise Exception(
+                raise NotImplementedError(
                     "Connections list is empty. "
                     "This may be because you are using a virtual machine. "
                     "This projection creates connections on machine.")

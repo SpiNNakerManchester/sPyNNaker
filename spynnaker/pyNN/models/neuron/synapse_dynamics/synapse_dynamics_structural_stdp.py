@@ -164,7 +164,7 @@ class SynapseDynamicsStructuralSTDP(
                 setattr(item, param, value)
                 break
         else:
-            raise Exception("Unknown parameter {}".format(param))
+            raise ValueError(f"Unknown parameter {param}")
 
     @overrides(SynapseDynamicsSTDP.is_same_as)
     def is_same_as(self, synapse_dynamics):

@@ -66,11 +66,11 @@ class EthernetCommandConnection(DatabaseConnection):
         """
         if not isinstance(
                 command_container, AbstractSendMeMulticastCommandsVertex):
-            raise Exception(
+            raise TypeError(
                 "Each command container must be an instance of"
                 " AbstractSendMeMulticastCommandsVertex")
         if command_container.timed_commands:
-            raise Exception("Timed commands cannot be handled by this class")
+            raise TypeError("Timed commands cannot be handled by this class")
         self.__command_containers.append(command_container)
 
     def _start_resume_callback(self):

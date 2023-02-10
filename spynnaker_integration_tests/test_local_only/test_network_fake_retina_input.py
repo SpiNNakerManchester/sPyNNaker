@@ -72,13 +72,13 @@ def find_square_of_spikes(x, y, time, spikes, s_label, t_label):
             index, target_time = find_next_spike_after(
                 spikes[target_neuron], time)
             if index is None:
-                raise Exception(
+                raise ValueError(
                     f"Spike in source {s_label}: {x}, {y} at time {time} not"
                     f" found in target {t_label}: {x_t}, {y_t}:"
                     f" {spikes[target_neuron]}")
             if last_target_time is not None:
                 if last_target_time != target_time:
-                    raise Exception(
+                    raise ValueError(
                         f"Spike in source {s_label}: {x}, {y} at time {time}"
                         " does not have matching time in all surrounding"
                         " targets")

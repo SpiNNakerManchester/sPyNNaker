@@ -31,7 +31,7 @@ def synfire_spike_checker(spikes, nNeurons):
             if num != round(row[0]):
                 numpy.savetxt("spikes.csv", sorted_spikes, fmt=['%d', '%d'],
                               delimiter=',')
-                raise Exception("Unexpected spike at time " + str(row[1]))
+                raise ValueError(f"Unexpected spike at time {row[1]}")
             num += 1
             if num >= nNeurons:
                 num = 0
@@ -70,12 +70,12 @@ def synfire_multiple_lines_spike_checker(
         if not found:
             numpy.savetxt("sorted_spikes.csv", sorted_spikes, fmt=['%d', '%d'],
                           delimiter=',')
-            raise Exception("Unexpected spike at time " + str(row[1]))
+            raise ValueError(f"Unexpected spike at time {row[1]}")
     if False in used:
         numpy.savetxt("sorted_spikes.csv", sorted_spikes, fmt=['%d', '%d'],
                       delimiter=',')
         print(used)
-        raise Exception("Expected " + str(lines) + " spike lines")
+        raise ValueError(f"Expected {lines} spike lines")
 
 
 if __name__ == '__main__':

@@ -17,6 +17,7 @@ import pyNN.spiNNaker as sim
 from spynnaker.pyNN.utilities import neo_compare
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import check_neuron_data
+from spynnaker.pyNN.utilities.neo_csv import NeoCsv
 
 n_neurons = 20  # number of neurons in each population
 neurons_per_core = n_neurons / 2
@@ -25,8 +26,7 @@ simtime = 200
 
 class TestResetDifferent(BaseTestCase):
 
-    def check_data(self, pop, expected_spikes, simtime):
-        neo = pop.get_data("all")
+    def check_data(self, neo, pop, expected_spikes, simtime):
         spikes = neo.segments[0].spiketrains
         v = neo.segments[0].filter(name="v")[0]
         gsyn_exc = neo.segments[0].filter(name="gsyn_exc")[0]
@@ -52,7 +52,13 @@ class TestResetDifferent(BaseTestCase):
         sim.reset()
         sim.run(simtime/2)
         sim.run(simtime/2)
-        self.check_data(pop_1, expected_spikes, simtime)
+        neo = pop_1.get_data("all")
+        self.check_data(neo, pop_1, expected_spikes, simtime)
+
+        pop_1.write_data("test.csv")
+        neo = NeoCsv().read_csv("test.csv")
+        self.check_data(neo, pop_1, expected_spikes, simtime)
+
         sim.end()
 
     def test_do_run(self):
