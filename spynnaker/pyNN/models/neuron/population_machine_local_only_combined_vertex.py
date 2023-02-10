@@ -25,6 +25,7 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 
 class LocalOnlyProvenance(ctypes.LittleEndianStructure):
@@ -270,12 +271,15 @@ class PopulationMachineLocalOnlyCombinedVertex(
         log_n_max_atoms = get_n_bits(self._max_atoms_per_core)
         log_n_synapse_types = get_n_bits(
             self._app_vertex.neuron_impl.get_n_synapse_types())
-        # Delay is always 1
-        log_max_delay = 1
+        # Find the maximum delay
+        # pylint: disable=protected-access
+        max_delay = SpynnakerDataView.get_simulation_time_step_per_ms() * max(
+            proj._synapse_information.delays
+            for proj in self._app_vertex.incoming_projections)
 
         spec.write_value(log_n_max_atoms)
         spec.write_value(log_n_synapse_types)
-        spec.write_value(log_max_delay)
+        spec.write_value(get_n_bits(max_delay))
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
         spec.write_value(int(self._app_vertex.drop_late_spikes))
 

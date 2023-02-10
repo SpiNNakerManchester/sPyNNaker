@@ -31,6 +31,17 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     """ A convolution synapse dynamics that can process spikes with only DTCM
     """
 
+    __slots__ = ["__delay"]
+
+    def __init__(self, delay=None):
+        """
+        :param float delay:
+            The delay used in the connection; by default 1 time step
+        """
+        self.__delay = delay
+        if delay is None:
+            self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
+
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
         if not isinstance(synapse_dynamics, LocalOnlyPoolDense):
@@ -135,7 +146,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     @property
     @overrides(AbstractLocalOnly.delay)
     def delay(self):
-        return SpynnakerDataView.get_simulation_time_step_ms()
+        return self.__delay
 
     @property
     @overrides(AbstractLocalOnly.weight)

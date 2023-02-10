@@ -38,14 +38,20 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     """
 
     __slots__ = [
-        "__cached_2d_overlaps"
+        "__cached_2d_overlaps",
+        "__delay"
     ]
 
-    def __init__(self):
+    def __init__(self, delay=None):
+        """
+        :param float delay:
+            The delay used in the connection; by default 1 time step
+        """
         # Store the overlaps between 2d vertices to avoid recalculation
         self.__cached_2d_overlaps = dict()
-
-        # Store the merged keys for sources to avoid recalculation
+        self.__delay = delay
+        if delay is None:
+            self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
@@ -193,7 +199,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     @property
     @overrides(AbstractLocalOnly.delay)
     def delay(self):
-        return SpynnakerDataView.get_simulation_time_step_ms()
+        return self.__delay
 
     @property
     @overrides(AbstractLocalOnly.weight)

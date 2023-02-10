@@ -27,6 +27,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 #: The number of 32-bit words in the source_key_info struct
 SOURCE_KEY_INFO_WORDS = 7
@@ -410,6 +411,10 @@ class ConvolutionConnector(AbstractConnector):
             self.__negative_receptor_type)
         spec.write_value(pos_synapse_type, data_type=DataType.UINT16)
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
+
+        # Write delay
+        spec.write_value(app_edge.post_vertex.synapse_dynamics.delay *
+                         SpynnakerDataView.get_simulation_time_step_per_ms())
 
         # Encode weights with weight scaling
         encoded_kernel_weights = self.__kernel_weights.flatten()
