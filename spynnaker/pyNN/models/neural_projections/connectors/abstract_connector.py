@@ -312,7 +312,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             if len(non_zero_weights) == 0:
                 return 0.0
             return utility_calls.float_gcd_of_array(non_zero_weights)
-        raise Exception("Unrecognised weight format")
+        raise SpynnakerException("Unrecognised weight format")
 
     def _get_weight_maximum(self, weights, n_connections, synapse_info):
         """ Get the maximum of the weights.
