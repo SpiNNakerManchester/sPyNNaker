@@ -72,41 +72,40 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="param__generator_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (c) 2017-2019 The University of Manchester</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (c) 2017-2023 The University of Manchester</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * This program is free software: you can redistribute it and/or modify</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * it under the terms of the GNU General Public License as published by</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * the Free Software Foundation, either version 3 of the License, or</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> * (at your option) any later version.</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> * This program is distributed in the hope that it will be useful,</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * GNU General Public License for more details.</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * You should have received a copy of the GNU General Public License</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html">common-typedefs.h</a>&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="param__generator_8c.html#structparam__generator">param_generator</a> *param_generator_t;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;param_generator_t <a class="code" href="param__generator_8h.html#aa8fc0d4f24db6ca96094f0aed98867cc">param_generator_init</a>(uint32_t hash, <span class="keywordtype">void</span> **<a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;accum <a class="code" href="param__generator_8h.html#afef726e38862303036b706f63cb5408d">param_generator_generate</a>(param_generator_t generator);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keywordtype">void</span> <a class="code" href="param__generator_8h.html#a20b9f761fb073750e083d131cf49812e">param_generator_free</a>(param_generator_t generator);</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * you may not use this file except in compliance with the License.</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * You may obtain a copy of the License at</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *     http://www.apache.org/licenses/LICENSE-2.0</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * Unless required by applicable law or agreed to in writing, software</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> * See the License for the specific language governing permissions and</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * limitations under the License.</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html">common-typedefs.h</a>&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="param__generator_8c.html#structparam__generator">param_generator</a> *param_generator_t;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;param_generator_t <a class="code" href="param__generator_8h.html#aa8fc0d4f24db6ca96094f0aed98867cc">param_generator_init</a>(uint32_t hash, <span class="keywordtype">void</span> **<a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;accum <a class="code" href="param__generator_8h.html#afef726e38862303036b706f63cb5408d">param_generator_generate</a>(param_generator_t generator);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keywordtype">void</span> <a class="code" href="param__generator_8h.html#a20b9f761fb073750e083d131cf49812e">param_generator_free</a>(param_generator_t generator);</div>
 <div class="ttc" id="acommon-typedefs_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html">common-typedefs.h</a></div></div>
-<div class="ttc" id="aparam__generator_8c_html_structparam__generator"><div class="ttname"><a href="param__generator_8c.html#structparam__generator">param_generator</a></div><div class="ttdoc">The data for a parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00073">param_generator.c:73</a></div></div>
-<div class="ttc" id="aparam__generator_8h_html_a20b9f761fb073750e083d131cf49812e"><div class="ttname"><a href="param__generator_8h.html#a20b9f761fb073750e083d131cf49812e">param_generator_free</a></div><div class="ttdeci">void param_generator_free(param_generator_t generator)</div><div class="ttdoc">Finish with a parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00139">param_generator.c:139</a></div></div>
-<div class="ttc" id="aparam__generator_8h_html_aa8fc0d4f24db6ca96094f0aed98867cc"><div class="ttname"><a href="param__generator_8h.html#aa8fc0d4f24db6ca96094f0aed98867cc">param_generator_init</a></div><div class="ttdeci">param_generator_t param_generator_init(uint32_t hash, void **region)</div><div class="ttdoc">Initialise a specific parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00108">param_generator.c:108</a></div></div>
-<div class="ttc" id="aparam__generator_8h_html_afef726e38862303036b706f63cb5408d"><div class="ttname"><a href="param__generator_8h.html#afef726e38862303036b706f63cb5408d">param_generator_generate</a></div><div class="ttdeci">accum param_generator_generate(param_generator_t generator)</div><div class="ttdoc">Generate value with a parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00135">param_generator.c:135</a></div></div>
-<div class="ttc" id="aspike__source__poisson_8c_html_a1b9edddb3735d131c67e9e824f07c402"><div class="ttname"><a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></div><div class="ttdeci">region</div><div class="ttdoc">spike source array region IDs in human readable form</div><div class="ttdef"><b>Definition:</b> <a href="spike__source__poisson_8c_source.html#l00082">spike_source_poisson.c:82</a></div></div>
+<div class="ttc" id="aparam__generator_8c_html_structparam__generator"><div class="ttname"><a href="param__generator_8c.html#structparam__generator">param_generator</a></div><div class="ttdoc">The data for a parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00072">param_generator.c:72</a></div></div>
+<div class="ttc" id="aparam__generator_8h_html_a20b9f761fb073750e083d131cf49812e"><div class="ttname"><a href="param__generator_8h.html#a20b9f761fb073750e083d131cf49812e">param_generator_free</a></div><div class="ttdeci">void param_generator_free(param_generator_t generator)</div><div class="ttdoc">Finish with a parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00138">param_generator.c:138</a></div></div>
+<div class="ttc" id="aparam__generator_8h_html_aa8fc0d4f24db6ca96094f0aed98867cc"><div class="ttname"><a href="param__generator_8h.html#aa8fc0d4f24db6ca96094f0aed98867cc">param_generator_init</a></div><div class="ttdeci">param_generator_t param_generator_init(uint32_t hash, void **region)</div><div class="ttdoc">Initialise a specific parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00107">param_generator.c:107</a></div></div>
+<div class="ttc" id="aparam__generator_8h_html_afef726e38862303036b706f63cb5408d"><div class="ttname"><a href="param__generator_8h.html#afef726e38862303036b706f63cb5408d">param_generator_generate</a></div><div class="ttdeci">accum param_generator_generate(param_generator_t generator)</div><div class="ttdoc">Generate value with a parameter generator.</div><div class="ttdef"><b>Definition:</b> <a href="param__generator_8c_source.html#l00134">param_generator.c:134</a></div></div>
+<div class="ttc" id="aspike__source__poisson_8c_html_a1b9edddb3735d131c67e9e824f07c402"><div class="ttname"><a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></div><div class="ttdeci">region</div><div class="ttdoc">spike source array region IDs in human readable form</div><div class="ttdef"><b>Definition:</b> <a href="spike__source__poisson_8c_source.html#l00081">spike_source_poisson.c:81</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 10 2023 07:50:02 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Feb 13 2023 16:48:38 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

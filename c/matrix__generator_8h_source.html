@@ -72,44 +72,43 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="matrix__generator_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (c) 2017-2019 The University of Manchester</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (c) 2017-2023 The University of Manchester</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * This program is free software: you can redistribute it and/or modify</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * it under the terms of the GNU General Public License as published by</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * the Free Software Foundation, either version 3 of the License, or</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> * (at your option) any later version.</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> * This program is distributed in the hope that it will be useful,</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * GNU General Public License for more details.</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * You should have received a copy of the GNU General Public License</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html">common-typedefs.h</a>&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a> *matrix_generator_t;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;matrix_generator_t <a class="code" href="matrix__generator_8h.html#a8fbcc0eb851d4f4ba5952ba9e3459e93">matrix_generator_init</a>(uint32_t hash, <span class="keywordtype">void</span> **<a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>,</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <span class="keywordtype">void</span> *synaptic_matrix);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keywordtype">void</span> <a class="code" href="matrix__generator_8h.html#aafbab40316b9861d41999287c65d1dbe">matrix_generator_free</a>(matrix_generator_t generator);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="matrix__generator_8h.html#a7d0ab0ac823dba9d0d1bfaa5304d4fda">matrix_generator_write_synapse</a>(matrix_generator_t generator,</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> accum weight_scale);</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * you may not use this file except in compliance with the License.</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * You may obtain a copy of the License at</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *     http://www.apache.org/licenses/LICENSE-2.0</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * Unless required by applicable law or agreed to in writing, software</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> * See the License for the specific language governing permissions and</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * limitations under the License.</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html">common-typedefs.h</a>&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a> *matrix_generator_t;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;matrix_generator_t <a class="code" href="matrix__generator_8h.html#a8fbcc0eb851d4f4ba5952ba9e3459e93">matrix_generator_init</a>(uint32_t hash, <span class="keywordtype">void</span> **<a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>,</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordtype">void</span> *synaptic_matrix);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keywordtype">void</span> <a class="code" href="matrix__generator_8h.html#aafbab40316b9861d41999287c65d1dbe">matrix_generator_free</a>(matrix_generator_t generator);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="matrix__generator_8h.html#a7d0ab0ac823dba9d0d1bfaa5304d4fda">matrix_generator_write_synapse</a>(matrix_generator_t generator,</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> accum weight_scale);</div>
 <div class="ttc" id="acommon-typedefs_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html">common-typedefs.h</a></div></div>
-<div class="ttc" id="amatrix__generator_8c_html_structmatrix__generator"><div class="ttname"><a href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a></div><div class="ttdoc">The data for a matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator_8c_source.html#l00070">matrix_generator.c:70</a></div></div>
-<div class="ttc" id="amatrix__generator_8h_html_a7d0ab0ac823dba9d0d1bfaa5304d4fda"><div class="ttname"><a href="matrix__generator_8h.html#a7d0ab0ac823dba9d0d1bfaa5304d4fda">matrix_generator_write_synapse</a></div><div class="ttdeci">bool matrix_generator_write_synapse(matrix_generator_t generator, uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay, unsigned long accum weight_scale)</div><div class="ttdoc">Write a synapse with a matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator_8c_source.html#l00127">matrix_generator.c:127</a></div></div>
-<div class="ttc" id="amatrix__generator_8h_html_a8fbcc0eb851d4f4ba5952ba9e3459e93"><div class="ttname"><a href="matrix__generator_8h.html#a8fbcc0eb851d4f4ba5952ba9e3459e93">matrix_generator_init</a></div><div class="ttdeci">matrix_generator_t matrix_generator_init(uint32_t hash, void **region, void *synaptic_matrix)</div><div class="ttdoc">Initialise a specific matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator_8c_source.html#l00093">matrix_generator.c:93</a></div></div>
-<div class="ttc" id="amatrix__generator_8h_html_aafbab40316b9861d41999287c65d1dbe"><div class="ttname"><a href="matrix__generator_8h.html#aafbab40316b9861d41999287c65d1dbe">matrix_generator_free</a></div><div class="ttdeci">void matrix_generator_free(matrix_generator_t generator)</div><div class="ttdoc">Finish with a matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator_8c_source.html#l00121">matrix_generator.c:121</a></div></div>
-<div class="ttc" id="aspike__source__poisson_8c_html_a1b9edddb3735d131c67e9e824f07c402"><div class="ttname"><a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></div><div class="ttdeci">region</div><div class="ttdoc">spike source array region IDs in human readable form</div><div class="ttdef"><b>Definition:</b> <a href="spike__source__poisson_8c_source.html#l00082">spike_source_poisson.c:82</a></div></div>
+<div class="ttc" id="amatrix__generator_8c_html_structmatrix__generator"><div class="ttname"><a href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a></div><div class="ttdoc">The data for a matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator_8c_source.html#l00069">matrix_generator.c:69</a></div></div>
+<div class="ttc" id="amatrix__generator_8h_html_a7d0ab0ac823dba9d0d1bfaa5304d4fda"><div class="ttname"><a href="matrix__generator_8h.html#a7d0ab0ac823dba9d0d1bfaa5304d4fda">matrix_generator_write_synapse</a></div><div class="ttdeci">bool matrix_generator_write_synapse(matrix_generator_t generator, uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay, unsigned long accum weight_scale)</div><div class="ttdoc">Write a synapse with a matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator_8c_source.html#l00126">matrix_generator.c:126</a></div></div>
+<div class="ttc" id="amatrix__generator_8h_html_a8fbcc0eb851d4f4ba5952ba9e3459e93"><div class="ttname"><a href="matrix__generator_8h.html#a8fbcc0eb851d4f4ba5952ba9e3459e93">matrix_generator_init</a></div><div class="ttdeci">matrix_generator_t matrix_generator_init(uint32_t hash, void **region, void *synaptic_matrix)</div><div class="ttdoc">Initialise a specific matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator_8c_source.html#l00092">matrix_generator.c:92</a></div></div>
+<div class="ttc" id="amatrix__generator_8h_html_aafbab40316b9861d41999287c65d1dbe"><div class="ttname"><a href="matrix__generator_8h.html#aafbab40316b9861d41999287c65d1dbe">matrix_generator_free</a></div><div class="ttdeci">void matrix_generator_free(matrix_generator_t generator)</div><div class="ttdoc">Finish with a matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator_8c_source.html#l00120">matrix_generator.c:120</a></div></div>
+<div class="ttc" id="aspike__source__poisson_8c_html_a1b9edddb3735d131c67e9e824f07c402"><div class="ttname"><a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></div><div class="ttdeci">region</div><div class="ttdoc">spike source array region IDs in human readable form</div><div class="ttdef"><b>Definition:</b> <a href="spike__source__poisson_8c_source.html#l00081">spike_source_poisson.c:81</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 10 2023 07:50:02 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Feb 13 2023 16:48:38 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -172,8 +172,8 @@ Synapse Row Representation</h1>
 <div class="line">|-------------------|------------------|-----------------|------------------|</div>
 <div class="line">|<a class="code" href="synapse__row_8h.html#a6e5ee3925245f54cf5f6c4312338c25c">SYNAPSE_WEIGHT_BITS</a>|SYNAPSE_DELAY_BITS|<a class="code" href="synapse__types__alpha__impl_8h.html#a6a9484756434bfd11111a5187ac8f4bb">SYNAPSE_TYPE_BITS</a>|SYNAPSE_INDEX_BITS|</div>
 <div class="line">|                   |                  |       SYNAPSE_TYPE_INDEX_BITS      |</div>
-<div class="ttc" id="asynapse__row_8h_html_a6e5ee3925245f54cf5f6c4312338c25c"><div class="ttname"><a href="synapse__row_8h.html#a6e5ee3925245f54cf5f6c4312338c25c">SYNAPSE_WEIGHT_BITS</a></div><div class="ttdeci">#define SYNAPSE_WEIGHT_BITS</div><div class="ttdoc">how many bits the synapse weight will take</div><div class="ttdef"><b>Definition:</b> <a href="synapse__row_8h_source.html#l00096">synapse_row.h:96</a></div></div>
-<div class="ttc" id="asynapse__types__alpha__impl_8h_html_a6a9484756434bfd11111a5187ac8f4bb"><div class="ttname"><a href="synapse__types__alpha__impl_8h.html#a6a9484756434bfd11111a5187ac8f4bb">SYNAPSE_TYPE_BITS</a></div><div class="ttdeci">#define SYNAPSE_TYPE_BITS</div><div class="ttdoc">Number of bits to encode the synapse type.</div><div class="ttdef"><b>Definition:</b> <a href="synapse__types__alpha__impl_8h_source.html#l00031">synapse_types_alpha_impl.h:31</a></div></div>
+<div class="ttc" id="asynapse__row_8h_html_a6e5ee3925245f54cf5f6c4312338c25c"><div class="ttname"><a href="synapse__row_8h.html#a6e5ee3925245f54cf5f6c4312338c25c">SYNAPSE_WEIGHT_BITS</a></div><div class="ttdeci">#define SYNAPSE_WEIGHT_BITS</div><div class="ttdoc">how many bits the synapse weight will take</div><div class="ttdef"><b>Definition:</b> <a href="synapse__row_8h_source.html#l00095">synapse_row.h:95</a></div></div>
+<div class="ttc" id="asynapse__types__alpha__impl_8h_html_a6a9484756434bfd11111a5187ac8f4bb"><div class="ttname"><a href="synapse__types__alpha__impl_8h.html#a6a9484756434bfd11111a5187ac8f4bb">SYNAPSE_TYPE_BITS</a></div><div class="ttdeci">#define SYNAPSE_TYPE_BITS</div><div class="ttdoc">Number of bits to encode the synapse type.</div><div class="ttdef"><b>Definition:</b> <a href="synapse__types__alpha__impl_8h_source.html#l00030">synapse_types_alpha_impl.h:30</a></div></div>
 </div><!-- fragment --><p> The API interface supports:</p>
 <ul>
 <li><a class="el" href="synapse__row_8h.html#ab9de8a1b79ad078f892038e4051781d0" title="Get the size of the plastic region.">synapse_row_plastic_size()</a></li>
@@ -200,7 +200,7 @@ Data Structure</h1>
 <div class="line">N+1:  [ First word of fixed <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>             ]</div>
 <div class="line">  ...</div>
 <div class="line"> M:   [ Last word of fixed <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>              ]</div>
-<div class="ttc" id="aspike__source__poisson_8c_html_a1b9edddb3735d131c67e9e824f07c402"><div class="ttname"><a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></div><div class="ttdeci">region</div><div class="ttdoc">spike source array region IDs in human readable form</div><div class="ttdef"><b>Definition:</b> <a href="spike__source__poisson_8c_source.html#l00082">spike_source_poisson.c:82</a></div></div>
+<div class="ttc" id="aspike__source__poisson_8c_html_a1b9edddb3735d131c67e9e824f07c402"><div class="ttname"><a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></div><div class="ttdeci">region</div><div class="ttdoc">spike source array region IDs in human readable form</div><div class="ttdef"><b>Definition:</b> <a href="spike__source__poisson_8c_source.html#l00081">spike_source_poisson.c:81</a></div></div>
 </div><!-- fragment --><h1><a class="anchor" id="fixed"></a>
 Fixed and Fixed-Plastic Regions</h1>
 <p>Within the fixed-region extracted using the above API, <code>fixed[0]</code> contains the number of 32-bit fixed synaptic words, <code>fixed[1]</code> contains the number of 16-bit plastic synapse control words. (The weights for the plastic synapses are assumed to be stored in some learning-rule-specific format in the plastic region) </p><div class="fragment"><div class="line">  0:           [ F = Num fixed synapses                                    ]</div>
@@ -211,7 +211,7 @@ Fixed and Fixed-Plastic Regions</h1>
 <div class="line">F+2:           [ 1st plastic synapse control word|2nd plastic control word ]</div>
 <div class="line">  ...</div>
 <div class="line">F+1+ceil(P/2): [ Last word of fixed <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>                                 ]</div>
-<div class="ttc" id="amaths-util_8h_html_a37c4c48ff47f0838f64b5a1fb3c803b2"><div class="ttname"><a href="maths-util_8h.html#a37c4c48ff47f0838f64b5a1fb3c803b2">HALF</a></div><div class="ttdeci">#define HALF</div><div class="ttdoc">A REAL 0.5.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00120">maths-util.h:120</a></div></div>
+<div class="ttc" id="amaths-util_8h_html_a37c4c48ff47f0838f64b5a1fb3c803b2"><div class="ttname"><a href="maths-util_8h.html#a37c4c48ff47f0838f64b5a1fb3c803b2">HALF</a></div><div class="ttdeci">#define HALF</div><div class="ttdoc">A REAL 0.5.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00119">maths-util.h:119</a></div></div>
 </div><!-- fragment --><p> Note that <code>P</code> is effectively rounded up to a multiple of two for storage purposes. </p>
 
 <p class="definition">Definition in file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
@@ -229,7 +229,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </div><div class="memdoc">
 <div class="textblock"><p>The type of the plastic-plastic part of the row. </p>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00113">113</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00112">112</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -261,7 +261,7 @@ The plastic words, followed by the fixed part. </td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>The type of the fixed part of the row. The fixed-plastic part follows. </p>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00119">119</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00118">118</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -320,7 +320,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The size of the plastic region of the row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00130">130</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00129">129</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -357,7 +357,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the plastic region of the row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00139">139</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00138">138</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -394,7 +394,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Address of the fixed region of the row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00148">148</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00147">147</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -431,7 +431,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Size of the fixed region of the row (in words) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00157">157</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00156">156</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -468,7 +468,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Size of the fixed-plastic region of the row (in <em>half</em> words) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00165">165</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00164">164</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -505,7 +505,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Address of the fixed-plastic region of the row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00173">173</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00172">172</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -542,7 +542,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Address of the fixed-fixed region of the row </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00181">181</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00180">180</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -590,7 +590,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the index </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00191">191</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00190">190</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -645,7 +645,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the type code </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00202">202</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00201">201</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -693,7 +693,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the type and index (packed in the low bits of a word) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00212">212</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00211">211</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -748,7 +748,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the delay </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00223">223</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00222">222</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -785,7 +785,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the weight </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00231">231</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00230">230</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -833,7 +833,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the actual input weight for the model </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00239">239</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00238">238</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -909,7 +909,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index into the ring buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00260">260</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00259">259</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -964,7 +964,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index into the ring buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00275">275</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00274">274</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -1019,7 +1019,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index into the ring buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00286">286</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00285">285</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -1081,14 +1081,14 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index into the ring buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00299">299</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00298">298</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 10 2023 07:50:02 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Feb 13 2023 16:48:38 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
