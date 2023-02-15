@@ -138,6 +138,9 @@ class ConvolutionConnector(AbstractConnector):
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
 
+        if horizontal_delay_step:
+            self.__kernel_shape = self.__get_kernel_shape(kernel_shape)
+
         self.__horizontal_delay_step = horizontal_delay_step
 
     @property
@@ -187,6 +190,8 @@ class ConvolutionConnector(AbstractConnector):
             raise SynapticConfigurationException(
                 f"Unknown combination of kernel_weights ({w}) and"
                 f" kernel_shape ({shape})")
+        
+        self.__kernel_shape = self.__kernel_weights.shape
 
     @staticmethod
     def __to_2d_shape(shape, param_name):
