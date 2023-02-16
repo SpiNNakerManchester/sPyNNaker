@@ -103,32 +103,46 @@ class CheckDebug(BaseTestCase):
                        synapse_type=sim.StaticSynapse(weight=5))
         sim.run(0)
         pop.get_data("v")
-        found = os.listdir(SpynnakerDataView.get_run_dir_path())
+        run0 = SpynnakerDataView.get_run_dir_path()
+        found = os.listdir(run0)
         for report in reports:
             self.assertIn(report, found)
         self.assertIn("data.sqlite3", found)
+        self.assertIn("ds.sqlite3", found)
 
-        sim.run(10)
+        sim.run(10)  # second run
         pop.get_data("v")
+        self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
         # No point in checking files they are already there
 
-        sim.reset()
+        sim.reset()  # Soft
+        # check get works directly after a reset
         pop.get_data("v")
+        sim.run(10)
+        found = os.listdir(SpynnakerDataView.get_run_dir_path())
+        self.assertIn("data1.sqlite3", found)
+        self.assertNotIn("ds1.sqlite3", found)
+
+        sim.reset()  # soft with dsg
         SpynnakerDataView.set_requires_data_generation()
         sim.run(10)
         pop.get_data("v")
-        found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        self.assertIn("data1.sqlite3", found)
+        self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
+        found = os.listdir(run0)
+        self.assertIn("data2.sqlite3", found)
+        self.assertIn("ds2.sqlite3", found)
         # No point in checking files they are already there
 
-        sim.reset()
+        sim.reset()  # hard
         SpynnakerDataView.set_requires_mapping()
         sim.run(10)
         pop.get_data("v")
+        self.assertNotEqual(run0, SpynnakerDataView.get_run_dir_path())
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
         for report in reports:
             self.assertIn(report, found)
-        self.assertIn("data2.sqlite3", found)
+        self.assertIn("data3.sqlite3", found)
+        self.assertIn("ds3.sqlite3", found)
 
         sim.end()
         found = os.listdir(SpynnakerDataView.get_timestamp_dir_path())

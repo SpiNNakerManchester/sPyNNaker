@@ -76,7 +76,7 @@ class TestDebug(BaseTestCase):
             # DataSpeedUpPacketGatherMachineVertex.REPORT_NAME
             _GRAPH_NAME,
             # TODO why svg when default is png
-            _GRAPH_NAME + ".svg",
+            _GRAPH_NAME + ".svg"
             ]
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
@@ -94,6 +94,7 @@ class TestDebug(BaseTestCase):
             self.assertIn(report, found)
         found = os.listdir(SpynnakerDataView.get_timestamp_dir_path())
         self.assertIn(TIMER_FILENAME, found)
+        self.assertIn("ds.sqlite3", found)
 
     def test_debug(self):
         self.runsafe(self.debug)
