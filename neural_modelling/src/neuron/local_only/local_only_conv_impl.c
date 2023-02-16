@@ -64,8 +64,14 @@ typedef struct {
     lc_coord_t recip_pool_strides;
     uint16_t positive_synapse_type;
     uint16_t negative_synapse_type;
-    uint32_t delay;
-    uint32_t strides_delay_step;
+    union {
+        uint32_t delay;
+        struct {
+            uint16_t multisynaptic_delay_max;
+            uint16_t multisynaptic_delay_step;
+        };
+    };
+    uint32_t num_multisynaptic_connections;
     lc_weight_t weights[]; // n_weights = next_even(kernel.width * kernel.height)
 } connector;
 
@@ -194,55 +200,74 @@ static inline void do_convolution_operation(
             continue;
         }
 
-        uint32_t delay = connector->delay;
-        if (connector->strides_delay_step != 0)
-        {
-            delay -= start_i.col * connector->strides_delay_step;
-            log_debug("start_i.col = %u, delay = %u", start_i.col, delay);
-        }
-        
         for (int32_t i_col = start_i.col, tmp_col = post_coord.col; i_col < connector->kernel.width; i_col += connector->strides.col, --tmp_col) {
             int32_t kc = connector->kernel.width - 1 - i_col;
+
+            uint32_t delay;
+            if (connector->num_multisynaptic_connections == 1)
+            {
+                delay = connector->delay;
+            }
+            else
+            {
+                kc = connector->kernel.width - 1 - connector->num_multisynaptic_connections * i_col;
+                if (kc < 0)
+                {
+                    log_debug("Multisynaptic connection: i_col = %u, kc = %u, tmp_col = %u", i_col, kc, tmp_col);
+                    break;
+                }
+                delay = connector->multisynaptic_delay_max;
+                log_debug("Multisynaptic connection: start_i.col = %u, delay = %u", start_i.col, delay);
+            }
+
             log_debug("i_col = %u, kc = %u, tmp_col = %u", i_col, kc, tmp_col);
+
             if ((tmp_col < config.post_start.col) || (tmp_col > config.post_end.col)) {
                 log_debug("tmp_col outside");
                 continue;
             }
 
-            // This the neuron id relative to the neurons on this core
-            uint32_t post_index =
-                ((tmp_row - config.post_start.row) * config.post_shape.width)
-                    + (tmp_col - config.post_start.col);
-            uint32_t k = (kr * kw) + kc;
-            log_debug("weight index = %u", k);
-            lc_weight_t weight = connector->weights[k];
-            if (weight == 0) {
-                log_debug("zero weight");
-                continue;
-            }
-            uint32_t rb_index = 0;
-            if (weight > 0) {
-                rb_index = synapse_row_get_ring_buffer_index(time + delay,
-                    connector->positive_synapse_type, post_index,
-                    synapse_type_index_bits, synapse_index_bits,
-                    synapse_delay_mask);
-            } else {
-                rb_index = synapse_row_get_ring_buffer_index(time + delay,
-                    connector->negative_synapse_type, post_index,
-                    synapse_type_index_bits, synapse_index_bits,
-                    synapse_delay_mask);
-                weight = -weight;
-            }
-            log_debug("Updating ring_buffers[%u] for post neuron %u = %u, %u, with weight %u",
-                    rb_index, post_index, tmp_col, tmp_row, weight);
+            for (int32_t multisynapse_index = 0;
+                multisynapse_index < connector->num_multisynaptic_connections;
+                ++multisynapse_index, delay -= connector->multisynaptic_delay_step, --kc)
+            {
+                log_debug("kc = %u, delay = %u", kc, delay);
 
-            // Add weight to current ring buffer value, avoiding saturation
-            uint32_t accumulation = ring_buffers[rb_index] + weight;
-            uint32_t sat_test = accumulation & 0x10000;
-            if (sat_test) {
-                accumulation = sat_test - 1;
+                // This the neuron id relative to the neurons on this core
+                uint32_t post_index =
+                    ((tmp_row - config.post_start.row) * config.post_shape.width)
+                        + (tmp_col - config.post_start.col);
+                uint32_t k = (kr * kw) + kc;
+                log_debug("weight index = %u", k);
+                lc_weight_t weight = connector->weights[k];
+                if (weight == 0) {
+                    log_debug("zero weight");
+                    continue;
+                }
+                uint32_t rb_index = 0;
+                if (weight > 0) {
+                    rb_index = synapse_row_get_ring_buffer_index(time + delay,
+                        connector->positive_synapse_type, post_index,
+                        synapse_type_index_bits, synapse_index_bits,
+                        synapse_delay_mask);
+                } else {
+                    rb_index = synapse_row_get_ring_buffer_index(time + delay,
+                        connector->negative_synapse_type, post_index,
+                        synapse_type_index_bits, synapse_index_bits,
+                        synapse_delay_mask);
+                    weight = -weight;
+                }
+                log_debug("Updating ring_buffers[%u] for post neuron %u = %u, %u, with weight %u",
+                        rb_index, post_index, tmp_col, tmp_row, weight);
+
+                // Add weight to current ring buffer value, avoiding saturation
+                uint32_t accumulation = ring_buffers[rb_index] + weight;
+                uint32_t sat_test = accumulation & 0x10000;
+                if (sat_test) {
+                    accumulation = sat_test - 1;
+                }
+                ring_buffers[rb_index] = accumulation;
             }
-            ring_buffers[rb_index] = accumulation;
         }
     }
 }

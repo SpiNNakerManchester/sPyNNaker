@@ -53,14 +53,16 @@ class ConvolutionConnector(AbstractConnector):
         "__pool_stride",
         "__positive_receptor_type",
         "__negative_receptor_type",
-        "__horizontal_delay_step"
+        "__num_multisynaptic_connections",
+        "__multisynaptic_delay_min"
     ]
 
     def __init__(self, kernel_weights, kernel_shape=None, strides=None,
                  padding=None, pool_shape=None, pool_stride=None,
                  positive_receptor_type="excitatory",
                  negative_receptor_type="inhibitory",
-                 horizontal_delay_step=0,
+                 num_multisynaptic_connections=1,
+                 multisynaptic_delay_min=0,
                  safe=True,
                  verbose=False, callback=None):
         """
@@ -139,10 +141,11 @@ class ConvolutionConnector(AbstractConnector):
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
 
-        if horizontal_delay_step:
+        self.__num_multisynaptic_connections = num_multisynaptic_connections
+        if num_multisynaptic_connections != 1:
             self.__kernel_shape = self.__get_kernel_shape(kernel_shape)
+            self.__multisynaptic_delay_min = multisynaptic_delay_min
 
-        self.__horizontal_delay_step = horizontal_delay_step
 
     @property
     def positive_receptor_type(self):
@@ -424,10 +427,18 @@ class ConvolutionConnector(AbstractConnector):
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
 
         # Write delay
-        spec.write_value(app_edge.post_vertex.synapse_dynamics.delay *
-                         SpynnakerDataView.get_simulation_time_step_per_ms())
+        max_delay = app_edge.post_vertex.synapse_dynamics.delay * \
+                            SpynnakerDataView.get_simulation_time_step_per_ms()
 
-        spec.write_value(self.__horizontal_delay_step, data_type=DataType.UINT32)
+        if self.__num_multisynaptic_connections == 1:
+            spec.write_value(max_delay)
+        else:
+            spec.write_value(max_delay, data_type=DataType.UINT16)
+            delay_range = max_delay - self.__multisynaptic_delay_min
+            delay_step = delay_range / (self.__num_multisynaptic_connections - 1)
+            spec.write_value(delay_step, data_type=DataType.UINT16)
+
+        spec.write_value(self.__num_multisynaptic_connections, data_type=DataType.UINT32)
 
         # Encode weights with weight scaling
         encoded_kernel_weights = self.__kernel_weights.flatten()
