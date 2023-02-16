@@ -46,6 +46,7 @@ class ConvolutionConnector(AbstractConnector):
 
     __slots__ = [
         "__kernel_weights",
+        "__kernel_shape",
         "__strides",
         "__padding_shape",
         "__pool_shape",
@@ -225,7 +226,7 @@ class ConvolutionConnector(AbstractConnector):
             post_pool_shape = shape - (self.__pool_shape - 1)
             shape = (post_pool_shape // self.__pool_stride) + 1
 
-        kernel_shape = numpy.array(self.__kernel_weights.shape)
+        kernel_shape = numpy.array(self.__kernel_shape)
         post_shape = shape - kernel_shape + (2 * self.__padding_shape)
 
         return numpy.clip(
@@ -274,12 +275,12 @@ class ConvolutionConnector(AbstractConnector):
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-        w, h = self.__kernel_weights.shape
+        w, h = self.__kernel_shape
         return numpy.clip(w * h, 0, n_post_atoms)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        w, h = self.__kernel_weights.shape
+        w, h = self.__kernel_shape
         return numpy.clip(w * h, 0, synapse_info.n_pre_neurons)
 
     @overrides(AbstractConnector.get_weight_maximum)
@@ -300,7 +301,7 @@ class ConvolutionConnector(AbstractConnector):
         pre_vertex_in_post_layer_upper_left = pre_vertex_in_post_layer[:,0]
         pre_vertex_in_post_layer_lower_right = pre_vertex_in_post_layer[:,1]
 
-        kernel_shape = numpy.array(self.__kernel_weights.shape)
+        kernel_shape = numpy.array(self.__kernel_shape)
 
         j = (kernel_shape - 1 - start_i) // self.__strides
         j_upper_left = j[:,0]
