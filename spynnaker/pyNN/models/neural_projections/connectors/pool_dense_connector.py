@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 # Based on work Copyright (c) The University of Sussex,
 # Garibaldi Pineda Garcia, James Turner, James Knight and Thomas Nowotny
 #

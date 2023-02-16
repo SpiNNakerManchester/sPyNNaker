@@ -2,7 +2,7 @@
 # Make now has to convert c files before building
 # SEE http://spinnakermanchester.github.io/spynnaker/5.0.0/Makefiles.html
 
-# Copyright (c) 2015-2023 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
