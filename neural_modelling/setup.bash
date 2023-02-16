@@ -1,6 +1,6 @@
 # THIS IS A BASH SCRIPT INTENDED TO BE SOURCED!
 
-# Copyright (c) 2014-2023 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
