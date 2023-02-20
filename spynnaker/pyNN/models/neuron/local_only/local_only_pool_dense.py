@@ -91,7 +91,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 r_info = routing_info.get_routing_info_from_pre_vertex(
                     pre_m_vertex, SPIKE_PARTITION_ID)
                 if r_info is None:
-                    raise Exception(f"Missing r_info for {pre_m_vertex}")
+                    raise SynapticConfigurationException(
+                        f"Missing r_info for {pre_m_vertex}")
                 vertex_slice = pre_m_vertex.vertex_slice
                 key = (app_edge.pre_vertex, vertex_slice)
                 edges_for_source[key].append((pre_m_vertex, r_info))
