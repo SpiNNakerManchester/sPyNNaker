@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MODELS = IF_curr_exp_conv\
+MODELS = IF_curr_delta_conv\
+		 IF_curr_exp_conv\
          IF_curr_exp_pool_dense
 
 all:
