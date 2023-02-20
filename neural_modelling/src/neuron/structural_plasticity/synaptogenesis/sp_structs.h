@@ -1,18 +1,17 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2017 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 //! \dir
@@ -177,7 +176,7 @@ static inline bool sp_structs_get_sub_pop_info(
             pre_pop_info_table->prepop_info[population_id];
     uint32_t neuron_id = pop_neuron_id;
     for (uint32_t i = 0; i < app_pop_info->no_pre_vertices; i++) {
-    	key_atom_info_t *kai = &app_pop_info->key_atom_info[i];
+    	const key_atom_info_t *kai = &app_pop_info->key_atom_info[i];
         uint32_t n_atoms = kai->n_atoms;
         if (neuron_id < n_atoms) {
             *sub_population_id = i;

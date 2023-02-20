@@ -1,22 +1,22 @@
-# Copyright (c) 2017-2020 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import numpy
 from collections import namedtuple
 
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.utilities.utility_calls import allocator_bits_needed
 from data_specification.enums.data_type import DataType
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -359,18 +359,17 @@ class SynapticMatrices(object):
             self, r_info, n_stages, max_atoms_per_core, n_colour_bits):
         """ Get a key and mask for an incoming application vertex as a whole
 
-        :param list(tuple(int, Slice)) keys:
-            The key and slice of each relevant machine vertex in the incoming
-            application vertex
-        :param int mask: The mask that covers all keys
+        :param RoutingInfo r_info: The routing information for the vertex
         :param n_stages: The number of delay stages
+        :param max_atoms_per_core: The max atoms per core
         :param n_colour_bits: The number of colour bits sent
         :rtype: None or _AppKeyInfo
         """
-
-        # Find the bit that is just for the core
+        # Find the part that is just for the core
         mask_size = r_info.n_bits_atoms
-        core_mask = (r_info.machine_mask - r_info.mask) >> mask_size
+        core_mask = (2 ** allocator_bits_needed(
+            len(r_info.vertex.splitter.get_out_going_vertices(
+                SPIKE_PARTITION_ID)))) - 1
         pre = r_info.vertex
         n_atoms = min(max_atoms_per_core, pre.n_atoms)
 
@@ -382,7 +381,6 @@ class SynapticMatrices(object):
 
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
-        :param RoutingInfo routing_info: The routing information of all edges
         """
         routing_info = SpynnakerDataView.get_routing_infos()
         r_info = routing_info.get_routing_info_from_pre_vertex(
@@ -399,7 +397,6 @@ class SynapticMatrices(object):
 
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
-        :param RoutingInfo routing_info: The routing information of all edges
         """
         delay_edge = app_edge.delay_edge
         if delay_edge is None:
