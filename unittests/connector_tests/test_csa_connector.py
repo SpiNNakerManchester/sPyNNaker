@@ -13,11 +13,9 @@
 # limitations under the License.
 
 import csa
-import sys
 from spynnaker.pyNN.models.neural_projections.connectors import CSAConnector
 from unittests.mocks import MockPopulation
 from pacman.model.graphs.common.slice import Slice
-from unittest import SkipTest
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
 from spynnaker.pyNN.config_setup import unittest_setup
 
@@ -90,33 +88,24 @@ def test_csa_random_connector():
 
 def test_csa_block_connector():
     unittest_setup()
-    try:
-        # This creates a block of size (2, 5) with a probability of 0.5; then
-        # within the block an individual connection has a probability of 0.3
-        connector = CSAConnector(
-            csa.block(2, 5) * csa.random(0.5) * csa.random(0.3))
-        weight = 1.0
-        delay = 2.0
-        mock_synapse_info = SynapseInformation(
-            connector=None, pre_population=MockPopulation(10, "Pre"),
-            post_population=MockPopulation(10, "Post"), prepop_is_view=False,
-            postpop_is_view=False, rng=None, synapse_dynamics=None,
-            synapse_type=None, receptor_type=None,
-            synapse_type_from_dynamics=False,
-            weights=weight, delays=delay)
+    # This creates a block of size (2, 5) with a probability of 0.5; then
+    # within the block an individual connection has a probability of 0.3
+    connector = CSAConnector(
+        csa.block(2, 5) * csa.random(0.5) * csa.random(0.3))
+    weight = 1.0
+    delay = 2.0
+    mock_synapse_info = SynapseInformation(
+        connector=None, pre_population=MockPopulation(10, "Pre"),
+        post_population=MockPopulation(10, "Post"), prepop_is_view=False,
+        postpop_is_view=False, rng=None, synapse_dynamics=None,
+        synapse_type=None, receptor_type=None,
+        synapse_type_from_dynamics=False,
+        weights=weight, delays=delay)
 
-        connector.set_projection_information(mock_synapse_info)
-        pre_vertex_slice = Slice(0, 10)
-        post_vertex_slice = Slice(0, 10)
-        block = connector.create_synaptic_block(
-            [pre_vertex_slice], 0, [post_vertex_slice], 0,
-            pre_vertex_slice, post_vertex_slice, 0, mock_synapse_info)
-        assert len(block) >= 0
-        assert all(item["weight"] == 1.0 for item in block)
-        assert all(item["delay"] == 2.0 for item in block)
-    except TypeError as e:
-        raise SkipTest("https://github.com/INCF/csa/issues/17") from e
-    except RuntimeError as e:
-        if sys.version_info >= (3, 7):
-            raise SkipTest("https://github.com/INCF/csa/issues/16") from e
-        raise e
+    connector.set_projection_information(mock_synapse_info)
+    post_vertex_slice = Slice(0, 10)
+    block = connector.create_synaptic_block(
+        [post_vertex_slice], post_vertex_slice, 0, mock_synapse_info)
+    assert len(block) >= 0
+    assert all(item["weight"] == 1.0 for item in block)
+    assert all(item["delay"] == 2.0 for item in block)
