@@ -13,11 +13,9 @@
 # limitations under the License.
 
 import csa
-import sys
 from spynnaker.pyNN.models.neural_projections.connectors import CSAConnector
 from unittests.mocks import MockPopulation
 from pacman.model.graphs.common.slice import Slice
-from unittest import SkipTest
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
 from spynnaker.pyNN.config_setup import unittest_setup
 
@@ -105,7 +103,6 @@ def test_csa_block_connector():
         weights=weight, delays=delay)
 
     connector.set_projection_information(mock_synapse_info)
-    pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
         [post_vertex_slice], post_vertex_slice, 0, mock_synapse_info)
