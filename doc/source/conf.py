@@ -418,6 +418,8 @@ def excluded_because_in_init(base):
                     if line.startswith("from ."):
                         parts = line.split()
                         yield os.path.join(root, parts[1][1:]+".py")
+
+    # warning excluded added here must also be in global doc conf.py
     # excluding a semantic sugar init which double imports
     yield os.path.join("spynnaker", "pyNN", "external_devices", "__init__.py")
 
