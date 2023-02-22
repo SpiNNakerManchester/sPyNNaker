@@ -420,24 +420,8 @@ def excluded_because_in_init(base):
                         yield os.path.join(root, parts[1][1:]+".py")
 
 
-def filtered_files(base, unfiltered_files_filename):
-    with open(unfiltered_files_filename, encoding="utf-8") as f:
-        lines = [line.rstrip() for line in f]
-    # Skip comments and empty lines to get list of files we DON'T want to
-    # filter out; this is definitely complicated
-    unfiltered = set(
-        line for line in lines if not line.startswith("#") and line != "")
-    for root, _dirs, files in os.walk(base):
-        for filename in files:
-            if filename.endswith(".py") and not filename.startswith("_"):
-                full = root + "/" + filename
-                if full not in unfiltered:
-                    yield full
-
-
 _output_dir = os.path.abspath(".")
 _package_base = "spynnaker"
-_unfiltered_files = os.path.abspath("../unfiltered-files.txt")
 
 # Do the rst generation; remove files which aren't in git first!
 for fl in os.listdir("."):
@@ -445,13 +429,6 @@ for fl in os.listdir("."):
             fl not in ("index.rst", "modules.rst")):
         os.remove(fl)
 os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
-filtered = list(filtered_files("spynnaker", _unfiltered_files))
-excluded = list(excluded_because_in_init(_package_base))
-for py in filtered:
-    if py not in excluded:
-        print(py)
 apidoc.main([
-    '-o', _output_dir, _package_base,])
-    # Exclude test and setup code
-    #"spynnaker_integration_tests/*", "unittests/*", "setup.py", "spynnaker8/*",
-    #*filtered_files("spynnaker", _unfiltered_files)])
+    '-o', _output_dir, _package_base,
+    excluded_because_in_init(_package_base)])
