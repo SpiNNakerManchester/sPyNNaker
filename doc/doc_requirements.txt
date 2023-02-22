@@ -19,4 +19,3 @@
 -e git+https://github.com/SpiNNakerManchester/DataSpecification.git@master#egg=spinnaker-dataspecification
 -e git+https://github.com/SpiNNakerManchester/spalloc.git@master#egg=spalloc
 -e git+https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master#egg=spinnfrontendcommon
--e git+https://github.com/SpiNNakerManchester/sPyNNaker.git@master#egg=spynnaker
