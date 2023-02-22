@@ -409,24 +409,20 @@ def setup(app):
     app.connect('autodoc-skip-member', skip_handler)
 
 
-def filtered_files(base, unfiltered_files_filename):
-    with open(unfiltered_files_filename, encoding="utf-8") as f:
-        lines = [line.rstrip() for line in f]
-    # Skip comments and empty lines to get list of files we DON'T want to
-    # filter out; this is definitely complicated
-    unfiltered = set(
-        line for line in lines if not line.startswith("#") and line != "")
+def excluded_because_in_init(base):
     for root, _dirs, files in os.walk(base):
-        for filename in files:
-            if filename.endswith(".py") and not filename.startswith("_"):
-                full = root + "/" + filename
-                if full not in unfiltered:
-                    yield full
+        if "__init__.py" in files:
+            init = os.path.join(root,  "__init__.py")
+            with open(init) as f:
+                for line in f:
+                    if line.startswith("from ."):
+                        parts = line.split()
+                        yield os.path.join(root, parts[1][1:]+".py")
 
 
-# sys.path.append(os.path.abspath('../..'))
+
 _output_dir = os.path.abspath(".")
-_unfiltered_files = os.path.abspath("../unfiltered-files.txt")
+_package_base = "spynnaker"
 
 # Do the rst generation; remove files which aren't in git first!
 for fl in os.listdir("."):
@@ -438,4 +434,4 @@ apidoc.main([
     '-o', _output_dir, ".",
     # Exclude test and setup code
     "spynnaker_integration_tests/*", "unittests/*", "setup.py", "spynnaker8/*",
-    *filtered_files("spynnaker", _unfiltered_files)])
+    *excluded_because_in_init(_package_base)])
