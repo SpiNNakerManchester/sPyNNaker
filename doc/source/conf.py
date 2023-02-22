@@ -451,7 +451,7 @@ for py in filtered:
     if py not in excluded:
         print(py)
 apidoc.main([
-    '-o', _output_dir, ".",
+    '-o', _output_dir, _package_base,])
     # Exclude test and setup code
-    "spynnaker_integration_tests/*", "unittests/*", "setup.py", "spynnaker8/*",
-    *filtered_files("spynnaker", _unfiltered_files)])
+    #"spynnaker_integration_tests/*", "unittests/*", "setup.py", "spynnaker8/*",
+    #*filtered_files("spynnaker", _unfiltered_files)])
