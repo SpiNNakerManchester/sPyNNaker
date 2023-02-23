@@ -441,8 +441,12 @@ semantic_sugar_files = [
     os.path.join("doc", "source", "spynnaker.pyNN.extra_models.rst"),
 ]
 for semantic_sugar_file in semantic_sugar_files:
-    with open(semantic_sugar_file, "a",  encoding="utf-8") as f:
-        f.write("   :noindex:\n")
-    print(semantic_sugar_file)
     with open(semantic_sugar_file, 'r') as f:
+        for line in f:
+            pass
+        noindex_line = line.replace("show-inheritance","noindex")
+    with open(semantic_sugar_file, "a",  encoding="utf-8") as f:
+        f.write(noindex_line)
+    print(semantic_sugar_file)
         print(f.read())
+        with open('filename.txt') as f:
