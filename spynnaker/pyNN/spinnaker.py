@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import logging
 from lazyarray import __version__ as lazyarray_version
@@ -29,11 +28,10 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.interface.provenance import (
-    FecTimer, ProvenanceWriter, TimerCategory, TimerWork)
+    FecTimer, GlobalProvenance, TimerCategory, TimerWork)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
@@ -52,6 +50,7 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_partitioner, spynnaker_splitter_selector)
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import (
     moved_in_v7_warning)
 
@@ -119,7 +118,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
 
-        with ProvenanceWriter() as db:
+        with GlobalProvenance() as db:
             db.insert_version("sPyNNaker_version", _version.__version__)
             db.insert_version("pyNN_version", pynn_version)
             db.insert_version("quantities_version", quantities_version)
@@ -431,6 +430,17 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return AbstractSpinnakerBase._do_delayed_compression(
             self, name, compressed)
 
+    def _execute_write_neo_metadata(self):
+        with FecTimer("Write Neo Metadata", TimerWork.OTHER):
+            with NeoBufferDatabase() as db:
+                db.write_segment_metadata()
+                db.write_metadata()
+
+    @overrides(AbstractSpinnakerBase._do_write_metadata)
+    def _do_write_metadata(self):
+        self._execute_write_neo_metadata()
+        super()._do_write_metadata()
+
     def _execute_synapse_expander(self):
         with FecTimer("Synapse expander", TimerWork.SYNAPSE) as timer:
             if timer.skip_if_virtual_board():
@@ -511,3 +521,10 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         with FecTimer("SpynnakerSplitterPartitioner", TimerWork.OTHER):
             n_chips_in_graph = spynnaker_splitter_partitioner()
             self._data_writer.set_n_chips_in_graph(n_chips_in_graph)
+
+    @overrides(AbstractSpinnakerBase._execute_buffer_extractor)
+    def _execute_buffer_extractor(self):
+        super()._execute_buffer_extractor()
+        if not get_config_bool("Machine", "virtual_board"):
+            with NeoBufferDatabase() as db:
+                db.write_t_stop()

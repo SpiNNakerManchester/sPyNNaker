@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2016 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from collections.abc import Iterable
 import numpy
@@ -329,7 +328,8 @@ class SynapseDynamicsStructuralCommon(
                 for i in range(0, vertex_slice.n_atoms)]
 
         if any(len(row) > self.s_max for row in rows):
-            raise Exception("Too many initial connections per incoming neuron")
+            raise ValueError(
+                "Too many initial connections per incoming neuron")
 
         # Make each row the required length through padding with 0xFFFF
         padded_rows = [numpy.pad(row, [(self.s_max - len(row), 0), (0, 0)],
@@ -340,9 +340,9 @@ class SynapseDynamicsStructuralCommon(
         post_to_pre = numpy.core.records.fromarrays(
             numpy.concatenate(padded_rows).T, formats="u1, u1, u2").view("u4")
         if len(post_to_pre) != vertex_slice.n_atoms * self.s_max:
-            raise Exception(
-                "Wrong size of pre-to-pop tables: {} Found, {} Expected"
-                .format(len(post_to_pre), vertex_slice.n_atoms * self.s_max))
+            raise ValueError(
+                f"Wrong size of pre-to-pop tables: {len(post_to_pre)} "
+                f"Found, {vertex_slice.n_atoms * self.s_max} Expected")
         spec.comment("Writing post-to-pre table of {} words".format(
             vertex_slice.n_atoms * self.s_max))
         spec.write_array(post_to_pre)
@@ -438,16 +438,13 @@ class SynapseDynamicsStructuralCommon(
             # pylint: disable=unsubscriptable-object
             init_del = self.initial_delay
             if init_del[0] > max_delay_ms or init_del[1] > max_delay_ms:
-                raise Exception(
-                    "The initial delay {} has one or more values that are"
-                    " bigger than {}.  This is not supported in the current"
-                    " implementation.".format(
-                        self.initial_delay, max_delay_ms))
+                raise ValueError(
+                    f"The initial delay {self.initial_delay} has one or more "
+                    f"values that are bigger than {max_delay_ms}.")
         elif self.initial_delay > max_delay_ms:
-            raise Exception(
-                "The initial delay {} is bigger than {}.  This is not"
-                " supported in the current implementation".format(
-                    self.initial_delay, max_delay_ms))
+            raise ValueError(
+                f"The initial delay {self.initial_delay} "
+                f"is bigger than {max_delay_ms}.")
 
     def get_max_rewires_per_ts(self):
         max_rewires_per_ts = 1

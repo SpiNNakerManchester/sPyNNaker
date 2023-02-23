@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import os
 from spinn_utilities.config_holder import get_config_bool
@@ -102,27 +101,45 @@ class CheckDebug(BaseTestCase):
                        synapse_type=sim.StaticSynapse(weight=5))
         sim.run(0)
         pop.get_data("v")
-        found = os.listdir(SpynnakerDataView.get_run_dir_path())
+        run0 = SpynnakerDataView.get_run_dir_path()
+        found = os.listdir(run0)
         for report in reports:
             self.assertIn(report, found)
+        self.assertIn("data.sqlite3", found)
+        self.assertIn("ds.sqlite3", found)
 
-        sim.run(10)
+        sim.run(10)  # second run
         pop.get_data("v")
+        self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
         # No point in checking files they are already there
 
-        sim.reset()
+        sim.reset()  # Soft
+        # check get works directly after a reset
         pop.get_data("v")
+        sim.run(10)
+        found = os.listdir(SpynnakerDataView.get_run_dir_path())
+        self.assertIn("data1.sqlite3", found)
+        self.assertNotIn("ds1.sqlite3", found)
+
+        sim.reset()  # soft with dsg
         SpynnakerDataView.set_requires_data_generation()
         sim.run(10)
         pop.get_data("v")
+        self.assertEqual(run0, SpynnakerDataView.get_run_dir_path())
+        found = os.listdir(run0)
+        self.assertIn("data2.sqlite3", found)
+        self.assertIn("ds2.sqlite3", found)
         # No point in checking files they are already there
 
-        sim.reset()
+        sim.reset()  # hard
         SpynnakerDataView.set_requires_mapping()
         sim.run(10)
         pop.get_data("v")
+        self.assertNotEqual(run0, SpynnakerDataView.get_run_dir_path())
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
         for report in reports:
             self.assertIn(report, found)
+        self.assertIn("data3.sqlite3", found)
+        self.assertIn("ds3.sqlite3", found)
 
         sim.end()

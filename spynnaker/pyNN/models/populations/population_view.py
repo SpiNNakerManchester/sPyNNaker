@@ -1,29 +1,29 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import logging
 import neo
 import numpy
+import os
 from spinn_utilities.log import FormatAdapter
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ranged.abstract_sized import AbstractSized
-from .idmixin import IDMixin
 from .population_base import PopulationBase
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -51,6 +51,8 @@ class PopulationView(PopulationBase):
         "__population",
         "__vertex",
         "__recorder"]
+
+    __realslots__ = tuple("_PopulationView" + item for item in __slots__)
 
     def __init__(self, parent, selector, label=None):
         """
@@ -95,6 +97,15 @@ class PopulationView(PopulationBase):
         self.__vertex = self.__population._vertex
         # pylint: disable=protected-access
         self.__recorder = self.__population._recorder
+
+    def __getattr__(self, name):
+        return self.__vertex.get_parameter_values(name, self.__indexes)
+
+    def __setattr__(self, name, value):
+        if name in self.__realslots__:
+            object.__setattr__(self, name, value)
+            return
+        return self.__vertex.set_parameter_values(name, value, self.__indexes)
 
     @property
     def size(self):
@@ -216,7 +227,7 @@ class PopulationView(PopulationBase):
 
         :rtype: bool
         """
-        return self.__vertex.can_record(variable)
+        return variable in self.__vertex.get_recordable_variables()
 
     @property
     def conductance_based(self):
@@ -369,16 +380,10 @@ class PopulationView(PopulationBase):
 
         :rtype: dict(int,int)
         """
-        if not gather:
-            logger.warning(
-                logger, "sPyNNaker only supports gather=True. We will run "
-                "as if gather was set to True.")
-        logger.info("get_spike_counts is inefficient as it just counts the "
-                    "results of get_datas('spikes')")
-        spikes = self.__recorder.get_data("spikes")
-        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
-                                minlength=self.__vertex.n_atoms)
-        return {i: counts[i] for i in self.__indexes}
+        self._check_params(gather)
+        with NeoBufferDatabase() as db:
+            return db.get_spike_counts(
+                self.__recorder.recording_label, self.__indexes)
 
     @property
     def grandparent(self):
@@ -564,11 +569,17 @@ class PopulationView(PopulationBase):
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
                            "as if gather was set to True.")
+        if isinstance(io, str):
+            extension = os.path.splitext(io)[1][1:]
+            if extension == "csv":
+                self.__recorder.csv_neo_block(
+                    io, variables, view_indexes=self.__indexes,
+                    annotations=annotations)
+                return
+            io = neo.get_io(io)
+
         data = self.__recorder.extract_neo_block(
             variables, self.__indexes, clear, annotations)
-
-        if isinstance(io, str):
-            io = neo.get_io(io)
 
         # write the neo block to the file
         io.write(data)
@@ -582,3 +593,95 @@ class PopulationView(PopulationBase):
     @overrides(PopulationBase._recorder)
     def _recorder(self):
         return self.__recorder
+
+    def __eq__(self, other):
+        if not isinstance(other, PopulationView):
+            return False
+        return (self.__vertex == other._vertex and
+                self._indexes == other._indexes)
+
+    def __ne__(self, other):
+        if not isinstance(other, PopulationView):
+            return True
+        return not self.__eq__(other)
+
+    def __str__(self):
+        return str(self.__vertex) + str(self.__indexes)
+
+    def __repr__(self):
+        return repr(self.__vertex) + str(self.__indexes)
+
+
+class IDMixin(PopulationView):
+
+    __slots__ = []
+
+    def get_parameters(self):
+        """ Return a dict of all cell parameters.
+
+        :rtype: dict(str, ...)
+        """
+        return self._vertex.get_parameter_values(
+            self._vertex.get_parameters(), self.id)
+
+    # NON-PYNN API CALLS
+    @property
+    def id(self):
+        """
+        :rtype: int
+        """
+        return self._indexes[0]
+
+    def __getattr__(self, name):
+        if name == "_vertex":
+            raise KeyError("Shouldn't come through here!")
+        return self._vertex.get_parameter_values(name, self.id)
+
+    def __setattr__(self, name, value):
+        if name in self.__realslots__:
+            object.__setattr__(self, name, value)
+            return
+        return self._vertex.set_parameter_values(name, value, self.id)
+
+    def get_initial_value(self, variable):
+        """ Get the initial value of a state variable of the cell.
+
+        :param str variable: The name of the variable
+        :rtype: float
+        """
+        return self._vertex.get_initial_state_values(variable, self.id)
+
+    @property
+    def initial_values(self):
+        return self._vertex.get_initial_state_values(
+            self._vertex.get_state_variables(), self.id)
+
+    def set_initial_value(self, variable, value):
+        """ Set the initial value of a state variable of the cell.
+        :param str variable: The name of the variable
+        :param float value: The value of the variable
+        """
+        self._vertex.set_initial_state_values(variable, value, self.id)
+
+    def set_parameters(self, **parameters):
+        """ Set cell parameters, given as a sequence of parameter=value\
+            arguments.
+        """
+        for (name, value) in parameters.items():
+            self._vertex.set_parameter_values(name, value, self.id)
+
+    def as_view(self):
+        """ Return a PopulationView containing just this cell.
+
+        :rtype: ~spynnaker.pyNN.models.populations.PopulationView
+        """
+        return self
+
+    @property
+    def local(self):
+        """ Whether this cell is local to the current MPI node.
+
+        :rtype: bool
+        """
+        # There are no MPI nodes!
+        return True
