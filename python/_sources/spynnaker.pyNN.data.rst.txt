@@ -1,6 +1,17 @@
 spynnaker.pyNN.data package
 ===========================
 
+Submodules
+----------
+
+spynnaker.pyNN.data.spynnaker\_data\_writer module
+--------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.data.spynnaker_data_writer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

@@ -1,6 +1,17 @@
 spynnaker.pyNN.models.utility\_models.spike\_injector package
 =============================================================
 
+Submodules
+----------
+
+spynnaker.pyNN.models.utility\_models.spike\_injector.spike\_injector\_vertex module
+------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

@@ -22,10 +22,42 @@ Subpackages
 Submodules
 ----------
 
+spynnaker.pyNN.models.neuron.generator\_data module
+---------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.generator_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 spynnaker.pyNN.models.neuron.master\_pop\_table module
 ------------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.models.neuron.master_pop_table
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+spynnaker.pyNN.models.neuron.neuron\_data module
+------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.neuron_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+spynnaker.pyNN.models.neuron.population\_machine\_common module
+---------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.population_machine_common
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+spynnaker.pyNN.models.neuron.population\_machine\_synapses module
+-----------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.population_machine_synapses
    :members:
    :undoc-members:
    :show-inheritance:

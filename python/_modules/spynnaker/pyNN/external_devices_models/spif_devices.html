@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.external_devices_models.spif_devices &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.spif_devices</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.external_devices_models.spif_devices</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2022 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">MultiCastCommand</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+
+<span class="n">_REPEATS</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">_DELAY_BETWEEN_REPEATS</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1">#: Base key to send packets to SpiNNaker FPGA (add register offset)</span>
+<span class="n">_LC_KEY</span> <span class="o">=</span> <span class="mh">0xFFFFFE00</span>
+
+<span class="c1">#: Base key to send packets to SPIF (add register offset)</span>
+<span class="n">_RC_KEY</span> <span class="o">=</span> <span class="mh">0xFFFFFF00</span>
+
+<span class="c1">#: The number of pipes</span>
+<span class="n">N_PIPES</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1">#: The number of fields supported for each pipe</span>
+<span class="n">N_FIELDS</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1">#: The number of filters supported for each pipe</span>
+<span class="n">N_FILTERS</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1">#: The number of FPGA inputs per pipe</span>
+<span class="c1">#: NOTE: the 16 inputs are not actually separated in the hardware,</span>
+<span class="c1">#: but a logical separation per pipe is useful</span>
+<span class="n">N_INPUTS</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1">#: SPIF is always connected to FPGA 0</span>
+<span class="n">SPIF_FPGA_ID</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1">#: SPIF always outputs to FPGA link 15 on FPGA 0</span>
+<span class="n">SPIF_OUTPUT_FPGA_LINK</span> <span class="o">=</span> <span class="mi">15</span>
+
+<span class="c1">#: SPIF always gets input from odd links on FPGA 0 (1, 3, 5, 7, 9, 11, 13, 15)</span>
+<span class="n">SPIF_INPUT_FPGA_LINKS</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SPIFRegister"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister">[docs]</a><span class="k">class</span> <span class="nc">SPIFRegister</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The register offsets on a SPIF device</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># The key to send messages back when requested</span>
+    <span class="n">REPLY_KEY</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># The input key register base (8 inputs per pipe)</span>
+    <span class="n">IR_KEY_BASE</span> <span class="o">=</span> <span class="mi">16</span>
+
+    <span class="c1"># The input mask register base (8 inputs per pipe)</span>
+    <span class="n">IR_MASK_BASE</span> <span class="o">=</span> <span class="mi">32</span>
+
+    <span class="c1"># The input route register base (8 inputs per pipe)</span>
+    <span class="n">IR_ROUTE_BASE</span> <span class="o">=</span> <span class="mi">48</span>
+
+    <span class="c1"># The output peripheral packet count register</span>
+    <span class="n">OUT_PERIPH_PKT_CNT</span> <span class="o">=</span> <span class="mi">64</span>
+
+    <span class="c1"># The configuration packet count register</span>
+    <span class="n">CONFIG_PKT_CNT</span> <span class="o">=</span> <span class="mi">65</span>
+
+    <span class="c1"># The dropped packet count register</span>
+    <span class="n">DROPPED_PKT_CNT</span> <span class="o">=</span> <span class="mi">66</span>
+
+    <span class="c1"># The input peripheral packet count register</span>
+    <span class="n">IN_PERIPH_PKT_CNT</span> <span class="o">=</span> <span class="mi">67</span>
+
+    <span class="c1"># The output mapper key base register (2 pipes)</span>
+    <span class="n">MP_KEY_BASE</span> <span class="o">=</span> <span class="mi">80</span>
+
+    <span class="c1"># The output mapper field mask base register (4 fields per pipe)</span>
+    <span class="n">MP_FLD_MASK_BASE</span> <span class="o">=</span> <span class="mi">96</span>
+
+    <span class="c1"># The output mapper field shift base register (4 fields per pipe)</span>
+    <span class="n">MP_FLD_SHIFT_BASE</span> <span class="o">=</span> <span class="mi">112</span>
+
+    <span class="c1"># The output mapper field limit base register (4 fields per pipe)</span>
+    <span class="n">MP_FLD_LIMIT_BASE</span> <span class="o">=</span> <span class="mi">128</span>
+
+    <span class="c1"># The filter value base register (8 filters per pipe)</span>
+    <span class="n">FL_VALUE_BASE</span> <span class="o">=</span> <span class="mi">144</span>
+
+    <span class="c1"># The filter mask base register (8 filters per pipe)</span>
+    <span class="n">FL_MASK_BASE</span> <span class="o">=</span> <span class="mi">176</span>
+
+<div class="viewcode-block" id="SPIFRegister.cmd"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.cmd">[docs]</a>    <span class="k">def</span> <span class="nf">cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Make a command to send to a SPIF device to set a register value</span>
+
+<span class="sd">        :param payload:</span>
+<span class="sd">            The payload to use in the command, or None for no payload</span>
+<span class="sd">        :type payload: int or None</span>
+<span class="sd">        :param int index:</span>
+<span class="sd">            The index of the register to send to when there are multiple</span>
+<span class="sd">            registers starting from a base</span>
+<span class="sd">        :rtype: MultiCastCommand</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">MultiCastCommand</span><span class="p">(</span>
+            <span class="n">_RC_KEY</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">index</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="n">_REPEATS</span><span class="p">,</span>
+            <span class="n">delay_between_repeats</span><span class="o">=</span><span class="n">_DELAY_BETWEEN_REPEATS</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="set_mapper_key"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.set_mapper_key">[docs]</a><span class="k">def</span> <span class="nf">set_mapper_key</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get a command to set the output base key for packets from SPIF.  This</span>
+<span class="sd">        will be added to the keys determined by the mapper output.</span>
+
+<span class="sd">    :param int pipe: The SPIF pipe to set the key of (0-1)</span>
+<span class="sd">    :param int key: The output key to set</span>
+<span class="sd">    :rtype: MultiCastCommand</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SPIFRegister</span><span class="o">.</span><span class="n">MP_KEY_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">pipe</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_field_mask"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.set_field_mask">[docs]</a><span class="k">def</span> <span class="nf">set_field_mask</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get a command to set the mask of a mapper field on SPIF.  This masks</span>
+<span class="sd">        off the bits of the field from the incoming UDP or USB packet values</span>
+<span class="sd">        (which are 32-bits each).</span>
+
+<span class="sd">    :param int pipe: The SPIF pipe to set the mask of (0-1)</span>
+<span class="sd">    :param int index: The index of the field to set (0-3)</span>
+<span class="sd">    :param int mask: The mask to set</span>
+<span class="sd">    :rtype: MultiCastCommand</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SPIFRegister</span><span class="o">.</span><span class="n">MP_FLD_MASK_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">N_FIELDS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_field_shift"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.set_field_shift">[docs]</a><span class="k">def</span> <span class="nf">set_field_shift</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get a command to set the shift of a mapper field on SPIF.  This shifts</span>
+<span class="sd">        the masked bits of the field from the incoming UDP or USB packet values</span>
+<span class="sd">        (which are 32-bits each).</span>
+
+<span class="sd">    :param int pipe: The SPIF pipe to set the shift of (0-1)</span>
+<span class="sd">    :param int index: The index of the field to set (0-3)</span>
+<span class="sd">    :param int shift:</span>
+<span class="sd">        The shift value to set (0-31); positive = right, negative = left</span>
+<span class="sd">    :rtype: MultiCastCommand</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SPIFRegister</span><span class="o">.</span><span class="n">MP_FLD_SHIFT_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+        <span class="n">shift</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">N_FIELDS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_field_limit"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.set_field_limit">[docs]</a><span class="k">def</span> <span class="nf">set_field_limit</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">limit</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get a command to set the limit of a mapper field on SPIF.  This sets</span>
+<span class="sd">        a limit on the value of the field after shifting and masking.</span>
+
+<span class="sd">    :param int pipe: The SPIF pipe to set the limit of (0-1)</span>
+<span class="sd">    :param int index: The index of the field to set (0-3)</span>
+<span class="sd">    :param int limit: The maximum value of the field</span>
+<span class="sd">    :rtype: MultiCastCommand</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SPIFRegister</span><span class="o">.</span><span class="n">MP_FLD_LIMIT_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+        <span class="n">limit</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">N_FIELDS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_filter_value"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.set_filter_value">[docs]</a><span class="k">def</span> <span class="nf">set_filter_value</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get a command to set the value of a filter of SPIF.  This will drop</span>
+<span class="sd">        input events from the UDP or USB packets where filter value ==</span>
+<span class="sd">        filter mask &amp; event value.</span>
+
+<span class="sd">    :param int pipe: The SPIF pipe to set the filter of (0-1)</span>
+<span class="sd">    :param int index: The index of the filter to set (0-7)</span>
+<span class="sd">    :param int value: The filter value to set</span>
+<span class="sd">    :rtype: MultiCastCommand</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SPIFRegister</span><span class="o">.</span><span class="n">FL_VALUE_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+        <span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">N_FILTERS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_filter_mask"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.set_filter_mask">[docs]</a><span class="k">def</span> <span class="nf">set_filter_mask</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get a command to set the mask of a filter of SPIF.  This will drop</span>
+<span class="sd">        input events from the UDP or USB packets where filter value ==</span>
+<span class="sd">        filter mask &amp; event value.</span>
+
+<span class="sd">    :param int pipe: The SPIF pipe to set the filter of (0-1)</span>
+<span class="sd">    :param int index: The index of the filter to set (0-7)</span>
+<span class="sd">    :param int mask: The filter mask to set</span>
+<span class="sd">    :rtype: MultiCastCommand</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SPIFRegister</span><span class="o">.</span><span class="n">FL_MASK_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+        <span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">N_FILTERS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_input_key"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.set_input_key">[docs]</a><span class="k">def</span> <span class="nf">set_input_key</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get a command to set the key of the FPGA input of SPIF.  This tells</span>
+<span class="sd">        SPIF how to route the incoming packets after they have been assembled</span>
+<span class="sd">        by the mapper; when incoming key &amp; input mask == input_key, the packet</span>
+<span class="sd">        will be routed to input_route.</span>
+
+<span class="sd">    :param int pipe: The SPIF pipe to set the input of (0-1)</span>
+<span class="sd">    :param int index: The index of the input to set (0-7)</span>
+<span class="sd">    :param int key: The key to set</span>
+<span class="sd">    :rtype: MultiCastCommand</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SPIFRegister</span><span class="o">.</span><span class="n">IR_KEY_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">N_INPUTS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_input_mask"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.set_input_mask">[docs]</a><span class="k">def</span> <span class="nf">set_input_mask</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get a command to set the mask of the FPGA input of SPIF.  This tells</span>
+<span class="sd">        SPIF how to route the incoming packets after they have been assembled</span>
+<span class="sd">        by the mapper; when incoming key &amp; input mask == input_key, the packet</span>
+<span class="sd">        will be routed to input_route.</span>
+
+<span class="sd">    :param int pipe: The SPIF pipe to set the input of (0-1)</span>
+<span class="sd">    :param int index: The index of the input to set (0-7)</span>
+<span class="sd">    :param int mask: The mask to set</span>
+<span class="sd">    :rtype: MultiCastCommand</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SPIFRegister</span><span class="o">.</span><span class="n">IR_MASK_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">N_INPUTS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_input_route"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.set_input_route">[docs]</a><span class="k">def</span> <span class="nf">set_input_route</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">route</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get a command to set the route of the FPGA input of SPIF.  This tells</span>
+<span class="sd">        SPIF how to route the incoming packets after they have been assembled</span>
+<span class="sd">        by the mapper; when incoming key &amp; input mask == input_key, the packet</span>
+<span class="sd">        will be routed to input_route.</span>
+
+<span class="sd">        Note: route 0 refers to FPGA link 15, 1 to 13 and so on in twos.</span>
+
+<span class="sd">    :param int pipe: The SPIF pipe to set the input of (0-1)</span>
+<span class="sd">    :param int index: The index of the input to set (0-7)</span>
+<span class="sd">    :param int route: The route to set</span>
+<span class="sd">    :rtype: MultiCastCommand</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SPIFRegister</span><span class="o">.</span><span class="n">IR_ROUTE_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">N_INPUTS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">_DelayedMultiCastCommand</span><span class="p">(</span><span class="n">MultiCastCommand</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A command where the getting of the payload is delayed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__get_payload&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">get_payload</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">delay_between_repeats</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param int key: The key to send</span>
+<span class="sd">        :param func()-&gt;int get_payload:</span>
+<span class="sd">            A function to call that returns a payload</span>
+<span class="sd">        :param int repeat: The number of times to repeat the command</span>
+<span class="sd">        :param int delay_between_repeats: The delay between the repeats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">key</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="n">repeat</span><span class="p">,</span> <span class="n">delay_between_repeats</span><span class="o">=</span><span class="n">delay_between_repeats</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__get_payload</span> <span class="o">=</span> <span class="n">get_payload</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MultiCastCommand</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_payload</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MultiCastCommand</span><span class="o">.</span><span class="n">is_payload</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+
+<div class="viewcode-block" id="SpiNNFPGARegister"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister">[docs]</a><span class="k">class</span> <span class="nc">SpiNNFPGARegister</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The register offsets on the SpiNNaker FPGAs for devices</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># The base key which identifies packets to send out to the peripheral</span>
+    <span class="n">P_KEY</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># The mask which identifies packets to send out to the peripheral</span>
+    <span class="n">P_MASK</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># The base key which identifies packets to write to the FPGA registers</span>
+    <span class="n">LC_KEY</span> <span class="o">=</span> <span class="mi">12</span>
+
+    <span class="c1"># The mask which identifies packets to write to the FPGA registers</span>
+    <span class="n">LC_MASK</span> <span class="o">=</span> <span class="mi">13</span>
+
+    <span class="c1"># The base key which identifies packets to write to the peripheral</span>
+    <span class="c1"># registers</span>
+    <span class="n">RC_KEY</span> <span class="o">=</span> <span class="mi">14</span>
+
+    <span class="c1"># The mask which identifies packets to write to the peripheral registers</span>
+    <span class="n">RC_MASK</span> <span class="o">=</span> <span class="mi">15</span>
+
+    <span class="c1"># The register to write to to stop the sending of data from the peripheral</span>
+    <span class="c1"># to SpiNNaker</span>
+    <span class="n">STOP</span> <span class="o">=</span> <span class="mi">16</span>
+
+    <span class="c1"># The register to write to to start the sending of data from the peripheral</span>
+    <span class="c1"># to SpiNNaker</span>
+    <span class="n">START</span> <span class="o">=</span> <span class="mi">17</span>
+
+<div class="viewcode-block" id="SpiNNFPGARegister.cmd"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.cmd">[docs]</a>    <span class="k">def</span> <span class="nf">cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Make a command to send to the FPGA to set a register value</span>
+
+<span class="sd">        :param payload:</span>
+<span class="sd">            The payload to use in the command, or None for no payload</span>
+<span class="sd">        :type payload: int or None</span>
+<span class="sd">        :rtype: MultiCastCommand</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">MultiCastCommand</span><span class="p">(</span>
+            <span class="n">_LC_KEY</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="n">_REPEATS</span><span class="p">,</span>
+            <span class="n">delay_between_repeats</span><span class="o">=</span><span class="n">_DELAY_BETWEEN_REPEATS</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpiNNFPGARegister.delayed_command"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.delayed_command">[docs]</a>    <span class="k">def</span> <span class="nf">delayed_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_payload</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Make a command to send to the FPGA to set a register value,</span>
+<span class="sd">            where the value itself is currently unknown</span>
+
+<span class="sd">        :param func()-&gt;int get_payload:</span>
+<span class="sd">            A function to call to get the payload later</span>
+<span class="sd">        :rtype: MultiCastCommand</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_DelayedMultiCastCommand</span><span class="p">(</span>
+            <span class="n">_LC_KEY</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">get_payload</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="n">_REPEATS</span><span class="p">,</span>
+            <span class="n">delay_between_repeats</span><span class="o">=</span><span class="n">_DELAY_BETWEEN_REPEATS</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.spif_devices</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

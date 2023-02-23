@@ -29,10 +29,34 @@ spynnaker.pyNN.abstract\_spinnaker\_common module
    :undoc-members:
    :show-inheritance:
 
+spynnaker.pyNN.config\_setup module
+-----------------------------------
+
+.. automodule:: spynnaker.pyNN.config_setup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 spynnaker.pyNN.exceptions module
 --------------------------------
 
 .. automodule:: spynnaker.pyNN.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+spynnaker.pyNN.setup\_pynn module
+---------------------------------
+
+.. automodule:: spynnaker.pyNN.setup_pynn
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+spynnaker.pyNN.spinnaker module
+-------------------------------
+
+.. automodule:: spynnaker.pyNN.spinnaker
    :members:
    :undoc-members:
    :show-inheritance:
@@ -52,3 +76,4 @@ Module contents
    :members:
    :undoc-members:
    :show-inheritance:
+   :noindex:

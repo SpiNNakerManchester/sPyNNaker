@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.spynnaker_plotting &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.spynnaker_plotting</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.spynnaker_plotting</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Plotting tools to be used together with</span>
+<span class="sd">https://github.com/NeuralEnsemble/PyNN/blob/master/pyNN/utility/plotting.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">neo</span> <span class="kn">import</span> <span class="n">SpikeTrain</span><span class="p">,</span> <span class="n">Block</span><span class="p">,</span> <span class="n">Segment</span><span class="p">,</span> <span class="n">AnalogSignal</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">quantities</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pyNN.utility.plotting</span> <span class="kn">import</span> <span class="n">repeat</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="n">_matplotlib_missing</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">_matplotlib_missing</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_handle_options</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Handles options that can not be passed to axes.plot</span>
+
+<span class="sd">    Removes the ones it has handled</span>
+
+<span class="sd">    axes.plot will throw an exception if it gets unwanted options</span>
+
+<span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
+<span class="sd">    :param dict options: All options the plotter can be configured with</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;xticks&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span> <span class="ow">or</span> <span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;xticks&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;xlabel&quot;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;xlabel&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (ms)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;yticks&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span> <span class="ow">or</span> <span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;yticks&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">(),</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;ylabel&quot;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;ylabel&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Neuron index&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;ylim&quot;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;ylim&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s2">&quot;xlim&quot;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;xlim&quot;</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_plot_spikes</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plots the spikes based on two lists</span>
+
+<span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
+<span class="sd">    :param list(~neo.core.SpikeTrain) spike_times: List of Spiketimes</span>
+<span class="sd">    :param neurons: List of Neuron Ids</span>
+<span class="sd">    :param str label: Label for the graph</span>
+<span class="sd">    :param options: plotting options</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">neurons</span><span class="p">):</span>
+        <span class="n">max_index</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">neurons</span><span class="p">)</span>
+        <span class="n">min_index</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">neurons</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="s1">&#39;b.&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">min_index</span><span class="p">,</span> <span class="n">max_index</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span>
+                 <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span>
+                 <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="plot_spiketrains"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.plot_spiketrains">[docs]</a><span class="k">def</span> <span class="nf">plot_spiketrains</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spiketrains</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plot all spike trains in a Segment in a raster plot.</span>
+
+<span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
+<span class="sd">    :param list(~neo.core.SpikeTrain) spiketrains: List of spiketimes</span>
+<span class="sd">    :param str label: Label for the graph</span>
+<span class="sd">    :param options: plotting options</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=c-extension-no-member</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">spiketrains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">t_stop</span> <span class="o">/</span> <span class="n">quantities</span><span class="o">.</span><span class="n">ms</span><span class="p">)</span>
+    <span class="n">_handle_options</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+    <span class="n">neurons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">annotations</span><span class="p">[</span><span class="s1">&#39;source_index&#39;</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">spiketrains</span><span class="p">])</span>
+    <span class="n">spike_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">spiketrains</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">_plot_spikes</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plot_spikes_numpy"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.plot_spikes_numpy">[docs]</a><span class="k">def</span> <span class="nf">plot_spikes_numpy</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plot all spikes</span>
+
+<span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
+<span class="sd">    :param ~numpy.ndarray spikes: spynakker7 format nparray of spikes</span>
+<span class="sd">    :param str label: Label for the graph</span>
+<span class="sd">    :param options: plotting options</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_handle_options</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+    <span class="n">neurons</span> <span class="o">=</span> <span class="n">spikes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">spike_times</span> <span class="o">=</span> <span class="n">spikes</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">_plot_spikes</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_heat_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plots three lists of neurons, times and values into a heatmap</span>
+
+<span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
+<span class="sd">    :param neurons: List of neuron IDs</span>
+<span class="sd">    :param times: List of times</span>
+<span class="sd">    :param values: List of values to plot</span>
+<span class="sd">    :param str label: Label for the graph</span>
+<span class="sd">    :param options: plotting options</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_handle_options</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+    <span class="n">info_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">max</span><span class="p">(</span><span class="n">neurons</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">info_array</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">info_array</span><span class="p">[</span><span class="n">neurons</span><span class="p">,</span> <span class="n">times</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+    <span class="n">heat_map</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">info_array</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;hot&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+                         <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">heat_map</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span>
+                 <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span>
+                 <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="heat_plot_numpy"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.heat_plot_numpy">[docs]</a><span class="k">def</span> <span class="nf">heat_plot_numpy</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plots neurons, times and values into a heatmap</span>
+
+<span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
+<span class="sd">    :param ~numpy.ndarray data: nparray of values in spynnaker7 format</span>
+<span class="sd">    :param str label: Label for the graph</span>
+<span class="sd">    :param options: plotting options</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">neurons</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">_heat_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="heat_plot_neo"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.heat_plot_neo">[docs]</a><span class="k">def</span> <span class="nf">heat_plot_neo</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">signal_array</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plots neurons, times and values into a heatmap</span>
+
+<span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
+<span class="sd">    :param ~neo.core.AnalogSignal signal_array: Neo Signal array Object</span>
+<span class="sd">    :param str label: Label for the graph</span>
+<span class="sd">    :param options: plotting options</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">signal_array</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">n_neurons</span> <span class="o">=</span> <span class="n">signal_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">))</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">signal_array</span><span class="o">.</span><span class="n">times</span> <span class="o">/</span> <span class="n">signal_array</span><span class="o">.</span><span class="n">sampling_period</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">times</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">all_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">)</span>
+    <span class="n">neurons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
+    <span class="n">magnitude</span> <span class="o">=</span> <span class="n">signal_array</span><span class="o">.</span><span class="n">magnitude</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">magnitude</span><span class="p">[:,</span> <span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">])</span>
+    <span class="n">_heat_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">all_times</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plot_segment"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.plot_segment">[docs]</a><span class="k">def</span> <span class="nf">plot_segment</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plots a segment into a plot of spikes or a heatmap</span>
+
+<span class="sd">        If there is more than ode type of Data in the segment options must\</span>
+<span class="sd">        include the name of the data to plot</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        method signature defined by pynn plotting.\</span>
+<span class="sd">        This allows mixing of this plotting tool and pynn&#39;s</span>
+
+<span class="sd">    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure</span>
+<span class="sd">    :param ~neo.core.Segment segment: Data for one run to plot</span>
+<span class="sd">    :param str label: Label for the graph</span>
+<span class="sd">    :param options: plotting options</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">analogsignals</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">analogsignals</span>
+    <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;spikes&#39;</span><span class="p">:</span>
+            <span class="n">plot_spiketrains</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">spiketrains</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">heat_plot_neo</span><span class="p">(</span>
+                <span class="n">axes</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">segment</span><span class="o">.</span><span class="n">spiketrains</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">analogsignals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;please specify data to plot using name=&quot;</span><span class="p">)</span>
+        <span class="n">plot_spiketrains</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">segment</span><span class="o">.</span><span class="n">spiketrains</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">analogsignals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">heat_plot_neo</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">analogsignals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">analogsignals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;please specify data to plot using name=&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Block does not appear to hold any data&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SpynnakerPanel"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.SpynnakerPanel">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerPanel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Represents a single panel in a multi-panel figure.</span>
+
+<span class="sd">    Compatible with :py:class:`pyNN.utility.plotting.Frame` and\</span>
+<span class="sd">        can be mixed with :py:class:`pyNN.utility.plotting.Panel`</span>
+
+<span class="sd">    Unlike :py:class:`pyNN.utility.plotting.Panel`,\</span>
+<span class="sd">        Spikes are plotted faster,\</span>
+<span class="sd">        other data is plotted as a heatmap</span>
+
+<span class="sd">    A panel is a Matplotlib Axes or Subplot instance. A data item may be an\</span>
+<span class="sd">    :py:class:`~neo.core.AnalogSignal`, or a list of \</span>
+<span class="sd">    :py:class:`~neo.core.SpikeTrain`\\ s. The Panel will\</span>
+<span class="sd">    automatically choose an appropriate representation. Multiple data items\</span>
+<span class="sd">    may be plotted in the same panel.</span>
+
+<span class="sd">    Valid options are any valid Matplotlib formatting options that should be\</span>
+<span class="sd">    applied to the Axes/Subplot, plus in addition:</span>
+
+<span class="sd">        `data_labels`:</span>
+<span class="sd">            a list of strings of the same length as the number of data items.</span>
+<span class="sd">        `line_properties`:</span>
+<span class="sd">            a list of dicts containing Matplotlib formatting options, of the\</span>
+<span class="sd">            same length as the number of data items.</span>
+
+<span class="sd">    Whole Neo Objects can be passed in as long as they\</span>
+<span class="sd">        contain a single Segment/run\</span>
+<span class="sd">        and only contain one type of data</span>
+<span class="sd">    Whole Segments can be passed in only if they only contain one type of data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param data: One or more data series to be plotted.</span>
+<span class="sd">        :type data: list(~neo.core.SpikeTrain) or ~neo.core.AnalogSignal \</span>
+<span class="sd">            or ~numpy.ndarray or ~neo.core.Block or ~neo.core.Segment</span>
+<span class="sd">        :param options: Any additional information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">_matplotlib_missing</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;No matplotlib module found&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">options</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_labels</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;data_labels&quot;</span><span class="p">,</span> <span class="n">repeat</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_properties</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;line_properties&quot;</span><span class="p">,</span> <span class="n">repeat</span><span class="p">({}))</span>
+
+<div class="viewcode-block" id="SpynnakerPanel.plot"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.SpynnakerPanel.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Plot the Panel&#39;s data in the provided Axes/Subplot instance.</span>
+
+<span class="sd">        :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">properties</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_labels</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">line_properties</span><span class="p">):</span>
+            <span class="n">properties</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+
+            <span class="c1"># Support lists length one</span>
+            <span class="c1"># for example result of segments[0].filter(name=&#39;v&#39;)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datum</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">datum</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t handle empty list&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datum</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">SpikeTrain</span><span class="p">):</span>
+                    <span class="n">datum</span> <span class="o">=</span> <span class="n">datum</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datum</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__plot_list</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">properties</span><span class="p">)</span>
+            <span class="c1"># AnalogSignal is also a ndarray, but data format different!</span>
+            <span class="c1"># We import them as a single name here</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datum</span><span class="p">,</span> <span class="n">AnalogSignal</span><span class="p">):</span>
+                <span class="n">heat_plot_neo</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">properties</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datum</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__plot_array</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">properties</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datum</span><span class="p">,</span> <span class="n">Block</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__plot_block</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">properties</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datum</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
+                <span class="n">plot_segment</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">properties</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can&#39;t handle type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span><span class="si">}</span><span class="s2">; &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;consider using pyNN.utility.plotting&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__plot_list</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datum</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">SpikeTrain</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can&#39;t handle lists of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">plot_spiketrains</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">properties</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__plot_array</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">datum</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">plot_spikes_numpy</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">properties</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">datum</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">heat_plot_numpy</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">properties</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Can&#39;t handle ndarray with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">datum</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2"> columns&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__plot_block</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">datum</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;run&quot;</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
+            <span class="n">run</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">properties</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;run&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">run</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Block only has {len(datum.segments)} segments&quot;</span><span class="p">)</span>
+            <span class="n">segment</span> <span class="o">=</span> <span class="n">datum</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">run</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Block has {len(datum.segments)} segments &quot;</span>
+                             <span class="s2">&quot;please specify one to plot using run=&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">segment</span> <span class="o">=</span> <span class="n">datum</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">plot_segment</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">properties</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.spynnaker_plotting</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

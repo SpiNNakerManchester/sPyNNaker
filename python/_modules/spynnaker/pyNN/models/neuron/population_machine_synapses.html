@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.models.neuron.population_machine_synapses &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.population_machine_synapses</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neuron.population_machine_synapses</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">abstractproperty</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">locate_memory_region_for_placement</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_n_bits</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSynapseExpandable</span><span class="p">,</span> <span class="n">HasSynapses</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">.population_machine_synapses_provenance</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PopulationMachineSynapsesProvenance</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.synaptic_matrices</span> <span class="kn">import</span> <span class="n">SynapseRegions</span><span class="p">,</span> <span class="n">SYNAPSE_FIELDS</span>
+
+
+<div class="viewcode-block" id="PopulationMachineSynapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_synapses.PopulationMachineSynapses">[docs]</a><span class="k">class</span> <span class="nc">PopulationMachineSynapses</span><span class="p">(</span>
+        <span class="n">PopulationMachineSynapsesProvenance</span><span class="p">,</span>
+        <span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="p">,</span>
+        <span class="n">AbstractSynapseExpandable</span><span class="p">,</span>
+        <span class="n">HasSynapses</span><span class="p">,</span> <span class="n">allow_derivation</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Mix-in for machine vertices that contain synapses</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># This MUST stay empty to allow mixing with other things with slots</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The application vertex of the machine vertex.</span>
+
+<span class="sd">        :note: This is likely to be available via the MachineVertex.</span>
+
+<span class="sd">        :rtype: AbstractPopulationVertex</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">_vertex_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The slice of the application vertex atoms on this machine vertex.</span>
+
+<span class="sd">        :note: This is likely to be available via the MachineVertex.</span>
+
+<span class="sd">        :rtype: ~pacman.model.graphs.common.Slice</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">_synaptic_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The object holding synaptic matrices</span>
+
+<span class="sd">        :rtype: SynapticMatrices</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">_synapse_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The identifiers of synaptic regions</span>
+
+<span class="sd">        :rtype: .SynapseRegions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">_max_atoms_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum number of atoms on any core targetted by these synapses</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PopulationMachineSynapses.set_do_synapse_regeneration"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_synapses.PopulationMachineSynapses.set_do_synapse_regeneration">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">set_do_synapse_regeneration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Indicates that synaptic data regeneration is required</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_synapse_references</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The references to synapse regions.  Override to provide these.</span>
+
+<span class="sd">        :rtype: .SynapseRegions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">SynapseRegions</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">SYNAPSE_FIELDS</span><span class="p">))])</span>
+
+<div class="viewcode-block" id="PopulationMachineSynapses.bit_field_base_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_synapses.PopulationMachineSynapses.bit_field_base_address">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="o">.</span>
+               <span class="n">bit_field_base_address</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">bit_field_base_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
+            <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">bitfield_filter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PopulationMachineSynapses.regeneratable_sdram_blocks_and_sizes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_synapses.PopulationMachineSynapses.regeneratable_sdram_blocks_and_sizes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsBitFieldRoutingCompression</span><span class="o">.</span>
+               <span class="n">regeneratable_sdram_blocks_and_sizes</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">regeneratable_sdram_blocks_and_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+        <span class="n">synaptic_matrix_base_address</span> <span class="o">=</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
+            <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">synaptic_matrix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_synaptic_matrices</span><span class="o">.</span><span class="n">host_generated_block_addr</span> <span class="o">+</span>
+            <span class="n">synaptic_matrix_base_address</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_synaptic_matrices</span><span class="o">.</span><span class="n">on_chip_generated_matrix_size</span><span class="p">)]</span></div>
+
+    <span class="k">def</span> <span class="nf">_write_synapse_data_spec</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">ring_buffer_shifts</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
+            <span class="n">structural_sz</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the data specification for the synapse data</span>
+
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            The data specification to write to</span>
+<span class="sd">        :param list(int) ring_buffer_shifts:</span>
+<span class="sd">            The shifts to apply to convert ring buffer values to S1615 values</span>
+<span class="sd">        :param list(int) weight_scales:</span>
+<span class="sd">            The scaling to apply to weights to store them in the synapses</span>
+<span class="sd">        :param int all_syn_block_sz: The maximum size of the synapses in bytes</span>
+<span class="sd">        :param int structural_sz: The size of the structural data</span>
+<span class="sd">        :param int n_neuron_bits: The number of bits to use for neuron ids</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Write the synapse parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_synapse_parameters</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">ring_buffer_shifts</span><span class="p">)</span>
+
+        <span class="c1"># Write the synaptic matrices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synaptic_matrices</span><span class="o">.</span><span class="n">generate_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synaptic_matrices</span><span class="o">.</span><span class="n">write_synaptic_data</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synapse_references</span><span class="p">)</span>
+
+        <span class="c1"># Write any synapse dynamics</span>
+        <span class="n">synapse_dynamics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_dynamics</span>
+        <span class="n">synapse_dynamics_sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_synapse_dynamics_size</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">synapse_dynamics_sz</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+                <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">synapse_dynamics_sz</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;synapseDynamicsParams&#39;</span><span class="p">,</span>
+                <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_references</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">)</span>
+            <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
+                <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">weight_scale</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synapse_references</span><span class="o">.</span><span class="n">synapse_dynamics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># If there is a reference for this region, we have to create it!</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+                <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;synapseDynamicsParams&#39;</span><span class="p">,</span>
+                <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_references</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+                <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">structural_dynamics</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">structural_sz</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;synapseDynamicsStructuralParams&#39;</span><span class="p">,</span>
+                <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_references</span><span class="o">.</span><span class="n">structural_dynamics</span><span class="p">)</span>
+            <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">(</span>
+                <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">structural_dynamics</span><span class="p">,</span>
+                <span class="n">weight_scales</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_synaptic_matrices</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synapse_references</span><span class="o">.</span><span class="n">structural_dynamics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># If there is a reference for this region, we have to create it!</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+                <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">structural_dynamics</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;synapseDynamicsStructuralParams&#39;</span><span class="p">,</span>
+                <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_references</span><span class="o">.</span><span class="n">structural_dynamics</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_synapse_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">ring_buffer_shifts</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the synapse parameters data region</span>
+
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            The data specification to write to</span>
+<span class="sd">        :param list(int) ring_buffer_shifts:</span>
+<span class="sd">            The shifts to apply to convert ring buffer values to S1615 values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Reserve space</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">synapse_params</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_synapse_params_size</span><span class="p">(),</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SynapseParams&#39;</span><span class="p">,</span>
+            <span class="n">reference</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_references</span><span class="o">.</span><span class="n">synapse_params</span><span class="p">)</span>
+
+        <span class="c1"># Get values</span>
+        <span class="n">n_neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_atoms_per_core</span>
+        <span class="c1"># We only count neuron synapse types here, as this is related to</span>
+        <span class="c1"># the ring buffers</span>
+        <span class="n">n_synapse_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">()</span>
+        <span class="n">max_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()</span>
+
+        <span class="c1"># Write synapse parameters</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">synapse_params</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">get_n_bits</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">get_n_bits</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">get_n_bits</span><span class="p">(</span><span class="n">max_delay</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">incoming_spike_buffer_size</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">ring_buffer_shifts</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PopulationMachineSynapses.gen_on_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_synapses.PopulationMachineSynapses.gen_on_machine">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synaptic_matrices</span><span class="o">.</span><span class="n">gen_on_machine</span></div>
+
+<div class="viewcode-block" id="PopulationMachineSynapses.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_synapses.PopulationMachineSynapses.read_generated_connection_holders">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_synaptic_matrices</span><span class="o">.</span><span class="n">read_generated_connection_holders</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">connection_generator_region</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">connection_generator_region</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synapse_regions</span><span class="o">.</span><span class="n">connection_builder</span>
+
+<div class="viewcode-block" id="PopulationMachineSynapses.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_synapses.PopulationMachineSynapses.get_connections_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the connections from the machine for this vertex.</span>
+
+<span class="sd">        :param ~pacman.model.placement.Placement placements:</span>
+<span class="sd">            Where the connection data is on the machine</span>
+<span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
+<span class="sd">            The edge for which the data is being read</span>
+<span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">            The specific projection within the edge</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synaptic_matrices</span><span class="o">.</span><span class="n">get_connections_from_machine</span><span class="p">(</span>
+            <span class="n">placement</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">max_gen_data</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">max_gen_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synaptic_matrices</span><span class="o">.</span><span class="n">max_gen_data</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseExpandable</span><span class="o">.</span><span class="n">bit_field_size</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">bit_field_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synaptic_matrices</span><span class="o">.</span><span class="n">bit_field_size</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.population_machine_synapses</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    </div>
+  </body>
+</html>

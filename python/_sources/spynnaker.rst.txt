@@ -36,6 +36,14 @@ spynnaker.spike\_checker module
    :undoc-members:
    :show-inheritance:
 
+spynnaker.spynnaker\_plotting module
+------------------------------------
+
+.. automodule:: spynnaker.spynnaker_plotting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

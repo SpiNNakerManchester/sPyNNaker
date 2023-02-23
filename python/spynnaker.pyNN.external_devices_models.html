@@ -93,6 +93,560 @@
 </ul>
 </div>
 </section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex">
+<span id="spynnaker-pynn-external-devices-models-external-device-lif-control-vertex-module"></span><h2>spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex module<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.</span></span><span class="sig-name descname"><span class="pre">ExternalDeviceLifControlVertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">devices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neuron_impl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pynn_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes_per_second</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_buffer_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_spike_buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_late_spikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_colour_bits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control_vertex.html#ExternalDeviceLifControlVertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPopulationVertex</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetController" title="spynnaker.pyNN.external_devices_models.AbstractEthernetController"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractEthernetController</span></code></a>, <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models.html#spinn_front_end_common.abstract_models.AbstractVertexWithEdgeToDependentVertices" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractVertexWithEdgeToDependentVertices</span></code></a>, <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models.html#spinn_front_end_common.abstract_models.HasCustomAtomKeyMap" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">HasCustomAtomKeyMap</span></code></a></p>
+<p>Abstract control module for the pushbot, based on the LIF neuron,        but without spikes, and using the voltage as the output to the various        devices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>devices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><em>AbstractMulticastControllableDevice</em></a><em>)</em>) – The AbstractMulticastControllableDevice instances to be controlled
+by the population</p></li>
+<li><p><strong>create_edges</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – True if edges to the devices should be added by this dev (set
+to False if using the dev over Ethernet using a translator)</p></li>
+<li><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>neuron_impl</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl" title="spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl"><em>AbstractNeuronImpl</em></a>) – </p></li>
+<li><p><strong>pynn_model</strong> – </p></li>
+<li><p><strong>translator</strong> (<a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator" title="spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator"><em>AbstractEthernetTranslator</em></a><em> or </em><em>None</em>) – Translator to be used when used for Ethernet communication.  Must
+be provided if the dev is to be controlled over Ethernet.</p></li>
+<li><p><strong>spikes_per_second</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
+<li><p><strong>ring_buffer_sigma</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
+<li><p><strong>incoming_spike_buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>splitter</strong> (<em>None</em><em> or
+</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_splitters.abstract_splitters/#pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon" title="(in PACMAN v6.0)"><em>AbstractSplitterCommon</em></a>) – splitter from app to machine</p></li>
+<li><p><strong>n_colour_bits</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of colour bits to use</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.dependent_vertices">
+<span class="sig-name descname"><span class="pre">dependent_vertices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control_vertex.html#ExternalDeviceLifControlVertex.dependent_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.dependent_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the vertices which this vertex depends upon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.edge_partition_identifiers_for_dependent_vertex">
+<span class="sig-name descname"><span class="pre">edge_partition_identifiers_for_dependent_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control_vertex.html#ExternalDeviceLifControlVertex.edge_partition_identifiers_for_dependent_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.edge_partition_identifiers_for_dependent_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the dependent edge identifiers for a particular dependent            vertex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_atom_key_map">
+<span class="sig-name descname"><span class="pre">get_atom_key_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control_vertex.html#ExternalDeviceLifControlVertex.get_atom_key_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_atom_key_map" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the mapping between atoms and keys for the given partition id,</dt><dd><p>and for the given machine pre-vertex</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pre_vertex</strong> (<em>MachineVertex</em>) – The machine vertex to get the map for</p></li>
+<li><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The partition to get the map for</p></li>
+<li><p><strong>routing_info</strong> (<em>RoutingInfo</em>) – Routing information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of (atom_id, key)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>,<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_external_devices">
+<span class="sig-name descname"><span class="pre">get_external_devices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control_vertex.html#ExternalDeviceLifControlVertex.get_external_devices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_external_devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the external devices that are to be controlled by the            controller</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable(<a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice">AbstractMulticastControllableDevice</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_fixed_key_and_mask">
+<span class="sig-name descname"><span class="pre">get_fixed_key_and_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control_vertex.html#ExternalDeviceLifControlVertex.get_fixed_key_and_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_fixed_key_and_mask" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get a fixed key and mask for the application vertex or None if not</dt><dd><p>fixed (the default).  See get_machine_gixed_key_and_mask for the
+conditions.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The identifier of the partition to get the key for</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>BaseKeyAndMask or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_message_translator">
+<span class="sig-name descname"><span class="pre">get_message_translator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control_vertex.html#ExternalDeviceLifControlVertex.get_message_translator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_message_translator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the translator of messages</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator" title="spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator">AbstractEthernetTranslator</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_outgoing_partition_ids">
+<span class="sig-name descname"><span class="pre">get_outgoing_partition_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control_vertex.html#ExternalDeviceLifControlVertex.get_outgoing_partition_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_outgoing_partition_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the partition IDs of messages coming out of the controller</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-spynnaker.pyNN.external_devices_models.spif_devices">
+<span id="spynnaker-pynn-external-devices-models-spif-devices-module"></span><h2>spynnaker.pyNN.external_devices_models.spif_devices module<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.spif_devices" title="Permalink to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.N_FIELDS">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">N_FIELDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.N_FIELDS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of fields supported for each pipe</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.N_FILTERS">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">N_FILTERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.N_FILTERS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of filters supported for each pipe</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.N_INPUTS">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">N_INPUTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.N_INPUTS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of FPGA inputs per pipe
+NOTE: the 16 inputs are not actually separated in the hardware,
+but a logical separation per pipe is useful</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.N_PIPES">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">N_PIPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.N_PIPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of pipes</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">SPIFRegister</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#SPIFRegister"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.IntEnum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></a></p>
+<p>The register offsets on a SPIF device</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.CONFIG_PKT_CNT">
+<span class="sig-name descname"><span class="pre">CONFIG_PKT_CNT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">65</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.CONFIG_PKT_CNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.DROPPED_PKT_CNT">
+<span class="sig-name descname"><span class="pre">DROPPED_PKT_CNT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">66</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.DROPPED_PKT_CNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.FL_MASK_BASE">
+<span class="sig-name descname"><span class="pre">FL_MASK_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">176</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.FL_MASK_BASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.FL_VALUE_BASE">
+<span class="sig-name descname"><span class="pre">FL_VALUE_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">144</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.FL_VALUE_BASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IN_PERIPH_PKT_CNT">
+<span class="sig-name descname"><span class="pre">IN_PERIPH_PKT_CNT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">67</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IN_PERIPH_PKT_CNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IR_KEY_BASE">
+<span class="sig-name descname"><span class="pre">IR_KEY_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IR_KEY_BASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IR_MASK_BASE">
+<span class="sig-name descname"><span class="pre">IR_MASK_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">32</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IR_MASK_BASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IR_ROUTE_BASE">
+<span class="sig-name descname"><span class="pre">IR_ROUTE_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">48</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IR_ROUTE_BASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_FLD_LIMIT_BASE">
+<span class="sig-name descname"><span class="pre">MP_FLD_LIMIT_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">128</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_FLD_LIMIT_BASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_FLD_MASK_BASE">
+<span class="sig-name descname"><span class="pre">MP_FLD_MASK_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">96</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_FLD_MASK_BASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_FLD_SHIFT_BASE">
+<span class="sig-name descname"><span class="pre">MP_FLD_SHIFT_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">112</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_FLD_SHIFT_BASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_KEY_BASE">
+<span class="sig-name descname"><span class="pre">MP_KEY_BASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">80</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_KEY_BASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.OUT_PERIPH_PKT_CNT">
+<span class="sig-name descname"><span class="pre">OUT_PERIPH_PKT_CNT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">64</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.OUT_PERIPH_PKT_CNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.REPLY_KEY">
+<span class="sig-name descname"><span class="pre">REPLY_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.REPLY_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.cmd">
+<span class="sig-name descname"><span class="pre">cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#SPIFRegister.cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.cmd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a command to send to a SPIF device to set a register value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>payload</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The payload to use in the command, or None for no payload</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the register to send to when there are multiple
+registers starting from a base</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIF_FPGA_ID">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">SPIF_FPGA_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIF_FPGA_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>SPIF is always connected to FPGA 0</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIF_INPUT_FPGA_LINKS">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">SPIF_INPUT_FPGA_LINKS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">range(1,</span> <span class="pre">16,</span> <span class="pre">2)</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIF_INPUT_FPGA_LINKS" title="Permalink to this definition">¶</a></dt>
+<dd><p>SPIF always gets input from odd links on FPGA 0 (1, 3, 5, 7, 9, 11, 13, 15)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SPIF_OUTPUT_FPGA_LINK">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">SPIF_OUTPUT_FPGA_LINK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIF_OUTPUT_FPGA_LINK" title="Permalink to this definition">¶</a></dt>
+<dd><p>SPIF always outputs to FPGA link 15 on FPGA 0</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">SpiNNFPGARegister</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#SpiNNFPGARegister"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.IntEnum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></a></p>
+<p>The register offsets on the SpiNNaker FPGAs for devices</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.LC_KEY">
+<span class="sig-name descname"><span class="pre">LC_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.LC_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.LC_MASK">
+<span class="sig-name descname"><span class="pre">LC_MASK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">13</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.LC_MASK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.P_KEY">
+<span class="sig-name descname"><span class="pre">P_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.P_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.P_MASK">
+<span class="sig-name descname"><span class="pre">P_MASK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.P_MASK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.RC_KEY">
+<span class="sig-name descname"><span class="pre">RC_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">14</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.RC_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.RC_MASK">
+<span class="sig-name descname"><span class="pre">RC_MASK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.RC_MASK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.START">
+<span class="sig-name descname"><span class="pre">START</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">17</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.START" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.STOP">
+<span class="sig-name descname"><span class="pre">STOP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.STOP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.cmd">
+<span class="sig-name descname"><span class="pre">cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#SpiNNFPGARegister.cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.cmd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a command to send to the FPGA to set a register value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>payload</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The payload to use in the command, or None for no payload</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.delayed_command">
+<span class="sig-name descname"><span class="pre">delayed_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">get_payload</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#SpiNNFPGARegister.delayed_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.delayed_command" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Make a command to send to the FPGA to set a register value,</dt><dd><p>where the value itself is currently unknown</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>get_payload</strong> (<em>func</em><em>(</em><em>)</em><em>-&gt;int</em>) – A function to call to get the payload later</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.set_field_limit">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">set_field_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#set_field_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_field_limit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get a command to set the limit of a mapper field on SPIF.  This sets</dt><dd><p>a limit on the value of the field after shifting and masking.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pipe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SPIF pipe to set the limit of (0-1)</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the field to set (0-3)</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum value of the field</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.set_field_mask">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">set_field_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#set_field_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_field_mask" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get a command to set the mask of a mapper field on SPIF.  This masks</dt><dd><p>off the bits of the field from the incoming UDP or USB packet values
+(which are 32-bits each).</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pipe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SPIF pipe to set the mask of (0-1)</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the field to set (0-3)</p></li>
+<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The mask to set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.set_field_shift">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">set_field_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#set_field_shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_field_shift" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get a command to set the shift of a mapper field on SPIF.  This shifts</dt><dd><p>the masked bits of the field from the incoming UDP or USB packet values
+(which are 32-bits each).</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pipe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SPIF pipe to set the shift of (0-1)</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the field to set (0-3)</p></li>
+<li><p><strong>shift</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The shift value to set (0-31); positive = right, negative = left</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.set_filter_mask">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">set_filter_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#set_filter_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_filter_mask" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get a command to set the mask of a filter of SPIF.  This will drop</dt><dd><p>input events from the UDP or USB packets where filter value ==
+filter mask &amp; event value.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pipe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SPIF pipe to set the filter of (0-1)</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the filter to set (0-7)</p></li>
+<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The filter mask to set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.set_filter_value">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">set_filter_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#set_filter_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_filter_value" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get a command to set the value of a filter of SPIF.  This will drop</dt><dd><p>input events from the UDP or USB packets where filter value ==
+filter mask &amp; event value.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pipe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SPIF pipe to set the filter of (0-1)</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the filter to set (0-7)</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The filter value to set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.set_input_key">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">set_input_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#set_input_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_input_key" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get a command to set the key of the FPGA input of SPIF.  This tells</dt><dd><p>SPIF how to route the incoming packets after they have been assembled
+by the mapper; when incoming key &amp; input mask == input_key, the packet
+will be routed to input_route.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pipe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SPIF pipe to set the input of (0-1)</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the input to set (0-7)</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The key to set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.set_input_mask">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">set_input_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#set_input_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_input_mask" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get a command to set the mask of the FPGA input of SPIF.  This tells</dt><dd><p>SPIF how to route the incoming packets after they have been assembled
+by the mapper; when incoming key &amp; input mask == input_key, the packet
+will be routed to input_route.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pipe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SPIF pipe to set the input of (0-1)</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the input to set (0-7)</p></li>
+<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The mask to set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.set_input_route">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">set_input_route</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">route</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#set_input_route"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_input_route" title="Permalink to this definition">¶</a></dt>
+<dd><dl>
+<dt>Get a command to set the route of the FPGA input of SPIF.  This tells</dt><dd><p>SPIF how to route the incoming packets after they have been assembled
+by the mapper; when incoming key &amp; input mask == input_key, the packet
+will be routed to input_route.</p>
+<p>Note: route 0 refers to FPGA link 15, 1 to 13 and so on in twos.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pipe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SPIF pipe to set the input of (0-1)</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the input to set (0-7)</p></li>
+<li><p><strong>route</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The route to set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.spif_devices.set_mapper_key">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.spif_devices.</span></span><span class="sig-name descname"><span class="pre">set_mapper_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_devices.html#set_mapper_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_mapper_key" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get a command to set the output base key for packets from SPIF.  This</dt><dd><p>will be added to the keys determined by the mapper output.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pipe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SPIF pipe to set the key of (0-1)</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The output key to set</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>MultiCastCommand</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-spynnaker.pyNN.external_devices_models">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -466,7 +1020,7 @@ conditions.</p>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -477,7 +1031,7 @@ conditions.</p>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -488,7 +1042,7 @@ conditions.</p>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -656,7 +1210,7 @@ in the order of the fields</p>
 <dd><p>Get the start type of the binary to be run.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs/#spinn_front_end_common.utilities.utility_objs.ExecutableType" title="(in SpiNNFrontEndCommon v6.0)"><em>ExecutableType</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableType" title="(in SpiNNFrontEndCommon v6.0)"><em>ExecutableType</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -732,7 +1286,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.MunichMotorDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">MunichMotorDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4096</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">23</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">continue_if_not_different</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichMotorDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractOneAppOneMachineVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractVertexWithEdgeToDependentVertices</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractOneAppOneMachineVertex</span></code>, <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models.html#spinn_front_end_common.abstract_models.AbstractVertexWithEdgeToDependentVertices" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractVertexWithEdgeToDependentVertices</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code></p>
 <p>An Omnibot motor control device. This has a real vertex and an         external device vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -765,7 +1319,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>Return the vertices which this vertex depends upon</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<em>ApplicationVertex</em>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -776,7 +1330,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>Return the dependent edge identifiers for a particular dependent            vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex</strong> (<em>ApplicationVertex</em>) – </p>
+<dd class="field-odd"><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -857,7 +1411,7 @@ conditions.</p>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -868,7 +1422,7 @@ conditions.</p>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -879,7 +1433,7 @@ conditions.</p>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -920,7 +1474,7 @@ but could be used to track incoming edges, and/or report faults.</p>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -931,7 +1485,7 @@ but could be used to track incoming edges, and/or report faults.</p>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -942,7 +1496,7 @@ but could be used to track incoming edges, and/or report faults.</p>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1080,7 +1634,7 @@ in the order of the fields</p>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1091,7 +1645,7 @@ in the order of the fields</p>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1102,7 +1656,7 @@ in the order of the fields</p>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1125,7 +1679,7 @@ in the order of the fields</p>
 <dd><p>Add the initial values of the parameters to the parameter holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
+<dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1136,7 +1690,7 @@ in the order of the fields</p>
 <dd><p>Add the initial values of the state variables to the state            variables holder</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
+<dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1158,6 +1712,70 @@ in the order of the fields</p>
     <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.external_devices_models package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex">spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControlVertex</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.dependent_vertices"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControlVertex.dependent_vertices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.edge_partition_identifiers_for_dependent_vertex"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControlVertex.edge_partition_identifiers_for_dependent_vertex()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_atom_key_map"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControlVertex.get_atom_key_map()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_external_devices"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControlVertex.get_external_devices()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControlVertex.get_fixed_key_and_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_message_translator"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControlVertex.get_message_translator()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex.ExternalDeviceLifControlVertex.get_outgoing_partition_ids"><code class="docutils literal notranslate"><span class="pre">ExternalDeviceLifControlVertex.get_outgoing_partition_ids()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.spif_devices">spynnaker.pyNN.external_devices_models.spif_devices module</a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.N_FIELDS"><code class="docutils literal notranslate"><span class="pre">N_FIELDS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.N_FILTERS"><code class="docutils literal notranslate"><span class="pre">N_FILTERS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.N_INPUTS"><code class="docutils literal notranslate"><span class="pre">N_INPUTS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.N_PIPES"><code class="docutils literal notranslate"><span class="pre">N_PIPES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister"><code class="docutils literal notranslate"><span class="pre">SPIFRegister</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.CONFIG_PKT_CNT"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.CONFIG_PKT_CNT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.DROPPED_PKT_CNT"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.DROPPED_PKT_CNT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.FL_MASK_BASE"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.FL_MASK_BASE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.FL_VALUE_BASE"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.FL_VALUE_BASE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IN_PERIPH_PKT_CNT"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.IN_PERIPH_PKT_CNT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IR_KEY_BASE"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.IR_KEY_BASE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IR_MASK_BASE"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.IR_MASK_BASE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.IR_ROUTE_BASE"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.IR_ROUTE_BASE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_FLD_LIMIT_BASE"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.MP_FLD_LIMIT_BASE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_FLD_MASK_BASE"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.MP_FLD_MASK_BASE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_FLD_SHIFT_BASE"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.MP_FLD_SHIFT_BASE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.MP_KEY_BASE"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.MP_KEY_BASE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.OUT_PERIPH_PKT_CNT"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.OUT_PERIPH_PKT_CNT</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.REPLY_KEY"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.REPLY_KEY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIFRegister.cmd"><code class="docutils literal notranslate"><span class="pre">SPIFRegister.cmd()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIF_FPGA_ID"><code class="docutils literal notranslate"><span class="pre">SPIF_FPGA_ID</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIF_INPUT_FPGA_LINKS"><code class="docutils literal notranslate"><span class="pre">SPIF_INPUT_FPGA_LINKS</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SPIF_OUTPUT_FPGA_LINK"><code class="docutils literal notranslate"><span class="pre">SPIF_OUTPUT_FPGA_LINK</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.LC_KEY"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister.LC_KEY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.LC_MASK"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister.LC_MASK</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.P_KEY"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister.P_KEY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.P_MASK"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister.P_MASK</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.RC_KEY"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister.RC_KEY</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.RC_MASK"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister.RC_MASK</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.START"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister.START</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.STOP"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister.STOP</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.cmd"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister.cmd()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.SpiNNFPGARegister.delayed_command"><code class="docutils literal notranslate"><span class="pre">SpiNNFPGARegister.delayed_command()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_field_limit"><code class="docutils literal notranslate"><span class="pre">set_field_limit()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_field_mask"><code class="docutils literal notranslate"><span class="pre">set_field_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_field_shift"><code class="docutils literal notranslate"><span class="pre">set_field_shift()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_filter_mask"><code class="docutils literal notranslate"><span class="pre">set_filter_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_filter_value"><code class="docutils literal notranslate"><span class="pre">set_filter_value()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_input_key"><code class="docutils literal notranslate"><span class="pre">set_input_key()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_input_mask"><code class="docutils literal notranslate"><span class="pre">set_input_mask()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_input_route"><code class="docutils literal notranslate"><span class="pre">set_input_route()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.spif_devices.set_mapper_key"><code class="docutils literal notranslate"><span class="pre">set_mapper_key()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models">Module contents</a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetController"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetController</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractEthernetController.get_external_devices"><code class="docutils literal notranslate"><span class="pre">AbstractEthernetController.get_external_devices()</span></code></a></li>

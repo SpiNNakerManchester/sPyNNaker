@@ -21,10 +21,26 @@ spynnaker.pyNN.utilities.bit\_field\_utilities module
    :undoc-members:
    :show-inheritance:
 
+spynnaker.pyNN.utilities.buffer\_data\_type module
+--------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.utilities.buffer_data_type
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 spynnaker.pyNN.utilities.constants module
 -----------------------------------------
 
 .. automodule:: spynnaker.pyNN.utilities.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+spynnaker.pyNN.utilities.data\_population module
+------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.utilities.data_population
    :members:
    :undoc-members:
    :show-inheritance:
@@ -45,6 +61,14 @@ spynnaker.pyNN.utilities.fake\_HBP\_Portal\_machine\_provider module
    :undoc-members:
    :show-inheritance:
 
+spynnaker.pyNN.utilities.neo\_buffer\_database module
+-----------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.utilities.neo_buffer_database
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 spynnaker.pyNN.utilities.neo\_compare module
 --------------------------------------------
 
@@ -57,6 +81,14 @@ spynnaker.pyNN.utilities.neo\_convertor module
 ----------------------------------------------
 
 .. automodule:: spynnaker.pyNN.utilities.neo_convertor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+spynnaker.pyNN.utilities.neo\_csv module
+----------------------------------------
+
+.. automodule:: spynnaker.pyNN.utilities.neo_csv
    :members:
    :undoc-members:
    :show-inheritance:

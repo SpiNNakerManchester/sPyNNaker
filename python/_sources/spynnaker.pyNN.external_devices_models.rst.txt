@@ -9,6 +9,25 @@ Subpackages
 
    spynnaker.pyNN.external_devices_models.push_bot
 
+Submodules
+----------
+
+spynnaker.pyNN.external\_devices\_models.external\_device\_lif\_control\_vertex module
+--------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.external_devices_models.external_device_lif_control_vertex
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+spynnaker.pyNN.external\_devices\_models.spif\_devices module
+-------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.external_devices_models.spif_devices
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

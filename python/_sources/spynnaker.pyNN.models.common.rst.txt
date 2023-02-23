@@ -4,6 +4,14 @@ spynnaker.pyNN.models.common package
 Submodules
 ----------
 
+spynnaker.pyNN.models.common.param\_generator\_data module
+----------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.common.param_generator_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 spynnaker.pyNN.models.common.recording\_utils module
 ----------------------------------------------------
 
