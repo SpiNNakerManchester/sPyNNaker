@@ -849,6 +849,10 @@ class MunichIoSpiNNakerLinkProtocol(object):
         :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
 
+        retina_key_value = 0
+        if retina_key is not None:
+            retina_key_value = retina_key.value
+
         if retina_key == RetinaKey.FIXED_KEY and retina_payload is None:
             retina_payload = RetinaPayload.EVENTS_IN_PAYLOAD
 
@@ -863,5 +867,5 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         return MultiCastCommand(
             key=self.set_retina_transmission_key,
-            payload=retina_key.value | retina_payload.value,
+            payload=retina_key_value | retina_payload.value,
             time=time)
