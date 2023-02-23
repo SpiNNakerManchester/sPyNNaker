@@ -251,18 +251,20 @@ class ConvolutionConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
-        # All delays are 1 timestep
-        return 1
+        return synapse_info.delays
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        # All delays are 1 timestep
-        return 1
+        return synapse_info.delays
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
+        if min_delay is not None and max_delay is not None:
+            delay = synapse_info.delays
+            if min_delay > delay or max_delay < delay:
+                return 0
         w, h = self.__kernel_weights.shape
         return numpy.clip(w * h, 0, n_post_atoms)
 

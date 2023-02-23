@@ -41,6 +41,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         self.__delay = delay
         if delay is None:
             self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
+        elif not isinstance(delay, (float, int)):
+            raise SynapticConfigurationException(
+                "Only single value delays are supported")
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
