@@ -438,7 +438,7 @@ apidoc.main([
 semantic_sugar_files = [
     os.path.join("doc", "source", "spynnaker.pyNN.rst"),
     os.path.join("doc", "source", "spynnaker.pyNN.external_devices.rst"),
-    os.path.join("doc", "source"", "spynnaker.pyNN.extra_models.rst"),
+    os.path.join("doc", "source", "spynnaker.pyNN.extra_models.rst"),
 ]
 for semantic_sugar_file in semantic_sugar_files:
     with open(semantic_sugar_file, "a",  encoding="utf-8") as f:
