@@ -434,11 +434,12 @@ apidoc.main([
     *excluded_because_in_init(_package_base)])
 
 
-# warning noindex added here must also be in global doc conf.py
-# excluding a semantic sugar init which double imports
-fname = os.path.join("doc", "source", "spynnaker.pyNN.rst");
-with open(fname, "a",  encoding="utf-8") as f:
-    f.write("   :noindex:\n")
-fname = os.path.join("doc", "source", "spynnaker.pyNN.external_devices.rst");
-with open(fname, "a",  encoding="utf-8") as f:
-    f.write("   :noindex:\n")
+# See Note at bottom of global doc conf.py
+semantic_sugar_files = [
+    os.path.join("doc", "source", "spynnaker.pyNN.rst"),
+    os.path.join("doc", "source", "spynnaker.pyNN.external_devices.rst"),
+    os.path.join("doc", "source"", "spynnaker.pyNN.extra_models.rst"),
+]
+for semantic_sugar_file in semantic_sugar_files:
+    with open(semantic_sugar_file, "a",  encoding="utf-8") as f:
+        f.write("   :noindex:\n")
