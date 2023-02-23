@@ -419,10 +419,6 @@ def excluded_because_in_init(base):
                         parts = line.split()
                         yield os.path.join(root, parts[1][1:]+".py")
 
-    # warning excluded added here must also be in global doc conf.py
-    # excluding a semantic sugar init which double imports
-    yield os.path.join("spynnaker", "pyNN", "external_devices", "__init__.py")
-
 
 _output_dir = os.path.abspath(".")
 _package_base = "spynnaker"
@@ -436,3 +432,13 @@ os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
 apidoc.main([
     '-o', _output_dir, _package_base,
     *excluded_because_in_init(_package_base)])
+
+
+# warning noindex added here must also be in global doc conf.py
+# excluding a semantic sugar init which double imports
+fname = os.path.join("doc", "source", "spynnaker.pyNN.rst");
+with open(fname, "a",  encoding="utf-8") as f:
+    f.write("   :noindex:\n")
+fname = os.path.join("doc", "source", "spynnaker.pyNN.external_devices.rst");
+with open(fname, "a",  encoding="utf-8") as f:
+    f.write("   :noindex:\n")
