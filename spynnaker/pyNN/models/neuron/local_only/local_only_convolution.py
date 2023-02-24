@@ -158,12 +158,13 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     for tgt, srcs in s_info.connector.get_connected_vertices(
                             s_info, source_vertex, app_vertex):
                         r_info = self.__get_rinfo_for_sources(
-                            key_cache, srcs, incoming, app_vertex)
+                            key_cache, srcs, incoming, app_edge, app_vertex)
                         sources_for_target[tgt].extend(r_info)
             self.__cached_2d_overlaps[app_vertex] = sources_for_target
         return sources_for_target
 
-    def __get_rinfo_for_sources(self, key_cache, srcs, incoming, app_vertex):
+    def __get_rinfo_for_sources(
+            self, key_cache, srcs, incoming, app_edge, app_vertex):
         """ Get the routing information for sources, merging sources that have
             the same vertex slice (note this happens in retinas from FPGAs).
 
@@ -183,8 +184,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # For each slice, merge the keys
         keys = list()
         for vertex_slice, slice_sources in sources.items():
-            if vertex_slice in key_cache:
-                keys.append(key_cache.get(vertex_slice))
+            cache_key = (app_edge.pre_vertex, vertex_slice)
+            if cache_key in key_cache:
+                keys.append(key_cache.get(cache_key))
             else:
                 r_info = self.__get_rinfo(
                     routing_info, slice_sources[0], delay_vertex)
@@ -198,7 +200,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                         r_info.mask)
                 key_source = Source(
                     incoming, vertex_slice, group_key, group_mask)
-                key_cache[vertex_slice] = key_source
+                key_cache[cache_key] = key_source
                 keys.append(key_source)
         return keys
 
