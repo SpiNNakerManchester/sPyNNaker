@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
@@ -27,9 +27,7 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
 
     __slots__ = []
 
-    # max delays supported by a slice split machine vertex
-    MAX_SUPPORTED_DELAY_TICS = 16
-
+    @abstractmethod
     def max_support_delay(self):
         """
         returns the max amount of delay this post vertex can support.
@@ -37,7 +35,6 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
         :return: max delay supported in ticks
         :rtype: int
         """
-        return self.MAX_SUPPORTED_DELAY_TICS
 
     def accepts_edges_from_delay_vertex(self):
         """
