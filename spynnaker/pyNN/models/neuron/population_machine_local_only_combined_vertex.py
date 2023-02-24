@@ -272,9 +272,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
             self._app_vertex.neuron_impl.get_n_synapse_types())
         # Find the maximum delay
         # pylint: disable=protected-access
-        max_delay = SpynnakerDataView.get_simulation_time_step_per_ms() * max(
-            proj._synapse_information.delays
-            for proj in self._app_vertex.incoming_projections)
+        max_delay = self._app_vertex.splitter.max_support_delay()
 
         spec.write_value(log_n_max_atoms)
         spec.write_value(log_n_synapse_types)
