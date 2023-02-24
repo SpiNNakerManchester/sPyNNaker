@@ -399,8 +399,11 @@ class ConvolutionConnector(AbstractConnector):
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
 
         # Write delay
-        spec.write_value(app_edge.post_vertex.synapse_dynamics.delay *
-                         SpynnakerDataView.get_simulation_time_step_per_ms())
+        delay_step = (app_edge.post_vertex.synapse_dynamics.delay *
+                      SpynnakerDataView.get_simulation_time_step_per_ms())
+        local_delay = min(delay_step,
+                          app_edge.post_vertex.splitter.max_support_delay())
+        spec.write_value(local_delay)
 
         # Encode weights with weight scaling
         encoded_kernel_weights = self.__kernel_weights.flatten()
