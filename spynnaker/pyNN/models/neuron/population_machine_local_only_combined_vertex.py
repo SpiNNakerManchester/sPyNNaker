@@ -24,7 +24,6 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
     NeuronRegions, PopulationMachineNeurons, NeuronProvenance)
-from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 
 class LocalOnlyProvenance(ctypes.LittleEndianStructure):
