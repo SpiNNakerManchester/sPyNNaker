@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from collections import Counter
 import logging
@@ -22,11 +21,10 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.common import (
-    PopulationApplicationVertex, RecordingType)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.models.common import ParameterHolder
 from .spike_source_array_machine_vertex import SpikeSourceArrayMachineVertex
@@ -63,7 +61,6 @@ class SpikeSourceArrayVertex(
                  "__model",
                  "__structure",
                  "_spike_times",
-                 "__spike_recorder",
                  "__n_colour_bits"]
 
     SPIKE_RECORDING_REGION_ID = 0
@@ -93,8 +90,6 @@ class SpikeSourceArrayVertex(
             splitter=splitter)
 
         self._check_spike_density(spike_times)
-        # handle recording
-        self.__spike_recorder = EIEIOSpikeRecorder()
         # Do colouring
         self.__n_colour_bits = n_colour_bits
         if self.__n_colour_bits is None:
@@ -261,9 +256,17 @@ class SpikeSourceArrayVertex(
     def get_recordable_variables(self):
         return ["spikes"]
 
-    @overrides(PopulationApplicationVertex.can_record)
-    def can_record(self, name):
-        return name == "spikes"
+    @overrides(PopulationApplicationVertex.get_buffer_data_type)
+    def get_buffer_data_type(self, name):
+        if name == "spikes":
+            return BufferDataType.EIEIO_SPIKES
+        raise KeyError(f"Cannot record {name}")
+
+    @overrides(PopulationApplicationVertex.get_neurons_recording)
+    def get_neurons_recording(self, name, vertex_slice):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return vertex_slice.get_raster_ids(self.atoms_shape)
 
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(self, name, sampling_interval=None, indices=None):
@@ -293,53 +296,23 @@ class SpikeSourceArrayVertex(
             return ["spikes"]
         return []
 
-    @overrides(PopulationApplicationVertex.is_recording_variable)
-    def is_recording_variable(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self._is_recording
-
-    @overrides(PopulationApplicationVertex.get_recorded_data)
-    def get_recorded_data(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        return self.__spike_recorder.get_spikes(
-            self.label, 0, self,
-            lambda vertex:
-                vertex.virtual_key
-                if vertex.virtual_key is not None
-                else 0,
-            self.__n_colour_bits)
-
-    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
-    def get_recording_sampling_interval(self, name):
+    @overrides(PopulationApplicationVertex.get_sampling_interval_ms)
+    def get_sampling_interval_ms(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
         return SpynnakerDataView.get_simulation_time_step_us()
 
-    @overrides(PopulationApplicationVertex.get_recording_indices)
-    def get_recording_indices(self, name):
+    @overrides(PopulationApplicationVertex.get_recording_region)
+    def get_recording_region(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return range(self.n_atoms)
+        return 0
 
-    @overrides(PopulationApplicationVertex.get_recording_type)
-    def get_recording_type(self, name):
+    @overrides(PopulationApplicationVertex.get_data_type)
+    def get_data_type(self, name):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return RecordingType.BIT_FIELD
-
-    @overrides(PopulationApplicationVertex.clear_recording_data)
-    def clear_recording_data(self, name):
-        if name != "spikes":
-            raise KeyError(f"Cannot record {name}")
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
-        for machine_vertex in self.machine_vertices:
-            placement = SpynnakerDataView.get_placement_of_vertex(
-                machine_vertex)
-            buffer_manager.clear_recorded_data(
-                placement.x, placement.y, placement.p,
-                SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID)
+        return None
 
     def describe(self):
         """ Returns a human-readable description of the cell or synapse type.

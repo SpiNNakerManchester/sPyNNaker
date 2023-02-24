@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import numpy
 
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -220,9 +219,9 @@ class SynapticMatrixApp(object):
         """
         next_addr = block_addr + size
         if next_addr > self.__all_syn_block_sz:
-            raise Exception(
-                "Too much synaptic memory has been written: {} of {} "
-                .format(next_addr, self.__all_syn_block_sz))
+            raise ValueError(
+                f"Too much synaptic memory has been written: "
+                f"{next_addr} of {self.__all_syn_block_sz} ")
         return next_addr
 
     def write_matrix(self, spec, post_vertex_slice):
@@ -274,9 +273,9 @@ class SynapticMatrixApp(object):
                 connections, post_vertex_slice, self.__app_edge,
                 self.__synapse_info)
         if self.__app_edge.delay_edge is None and len(delayed_row_data) != 0:
-            raise Exception(
-                "Found delayed source IDs but no delay "
-                "edge for {}".format(self.__app_edge.label))
+            raise ValueError(
+                f"Found delayed source IDs but no delay "
+                f"edge for {self.__app_edge.label}")
 
         return row_data, delayed_row_data
 

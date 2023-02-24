@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2022 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
@@ -94,3 +93,19 @@ class TestSampling(BaseTestCase):
 
     def test_standard(self):
         self.runsafe(self.standard)
+
+    def one_core_no_recording(self):
+        sim.setup(timestep=1)
+        sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 5)
+
+        pop_1 = sim.Population(10, sim.IF_curr_exp(), label="pop_1")
+        input_pop = sim.Population(
+            10, sim.SpikeSourceArray(spike_times=[0]), label="input")
+        sim.Projection(input_pop, pop_1, sim.OneToOneConnector(),
+                       synapse_type=sim.StaticSynapse(weight=5, delay=1))
+        pop_1[0:3].record(["spikes", "v"])
+        simtime = 10
+        sim.run(simtime)
+
+    def test_one_core_no_recording(self):
+        self.runsafe(self.one_core_no_recording)

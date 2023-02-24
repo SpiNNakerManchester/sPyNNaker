@@ -1,18 +1,17 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2015 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 //! \file
@@ -27,6 +26,8 @@ struct synapse_row_plastic_data_t {
     //! The per-synapse information
     plastic_synapse_t synapses[];
 };
+
+extern uint32_t skipped_synapses;
 
 //---------------------------------------
 //! \brief Synapse update loop core
@@ -214,10 +215,12 @@ static inline plastic_synapse_t process_plastic_synapse(
 			&post_event_history[s.index]);
 
 	// Add weight to ring-buffer entry, but only if not too late
-	if (s.delay_axonal + s.delay_dendritic >= colour_delay) {
+	if (s.delay_axonal + s.delay_dendritic > colour_delay) {
 	    int32_t weight = synapse_structure_get_final_weight(final_state);
 	    synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s, weight);
-	}
+    } else {
+        skipped_synapses++;
+    }
 
 	return synapse_structure_get_final_synaptic_word(final_state);
 }
