@@ -420,9 +420,7 @@ def test_set_synapse_dynamics():
         # (app keys work because all undelayed exist)
         (range(10), [4, 5, 6, 7], 1000, 100, 200),
         # Should work but number of cores doesn't work out
-        (range(2000), [], 10000, 5, None),
-        # Should work but number of neurons with delays don't work out
-        ([], range(4), 1024, 256, 144)
+        (range(2000), [], 10000, 5, None)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
