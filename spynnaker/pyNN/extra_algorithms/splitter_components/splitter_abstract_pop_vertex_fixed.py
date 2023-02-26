@@ -1,17 +1,17 @@
-# Copyright (c) 2020-2021 The University of Manchester
+# Copyright (c) 2020 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
@@ -28,16 +28,19 @@ from spynnaker.pyNN.models.neuron.population_machine_vertex import (
     SpikeProcessingProvenance)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
-from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
-from collections import defaultdict
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
+
+# The maximum number of bits for the ring buffer index that are likely to
+# fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
+MAX_RING_BUFFER_BITS = 14
 
 
 class SplitterAbstractPopulationVertexFixed(
@@ -48,7 +51,9 @@ class SplitterAbstractPopulationVertexFixed(
 
     __slots__ = [
         # The pre-calculated slices of the vertex
-        "__slices"
+        "__slices",
+        "__max_delay",
+        "__expect_delay_extension"
     ]
 
     """ The message to use when the Population is invalid """
@@ -62,6 +67,8 @@ class SplitterAbstractPopulationVertexFixed(
     def __init__(self):
         super().__init__()
         self.__slices = None
+        self.__max_delay = None
+        self.__expect_delay_extension = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -294,3 +301,25 @@ class SplitterAbstractPopulationVertexFixed(
         if self.__slices is not None:
             return
         self.__slices = get_multidimensional_slices(self._governed_app_vertex)
+
+    def __update_max_delay(self):
+        # Find the maximum delay from incoming synapses
+        app_vertex = self._governed_app_vertex
+        self.__max_delay, self.__expect_delay_extension = \
+            app_vertex.get_max_delay(MAX_RING_BUFFER_BITS)
+
+    @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
+    def max_support_delay(self):
+        if self.__max_delay is None:
+            self.__update_max_delay()
+        return self.__max_delay
+
+    @overrides(AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex)
+    def accepts_edges_from_delay_vertex(self):
+        if self.__expect_delay_extension is None:
+            self.__update_max_delay()
+        if self.__expect_delay_extension:
+            return True
+        raise NotImplementedError(
+            "This call was unexpected as it was calculated that "
+            "the max needed delay was less that the max possible")

@@ -1,18 +1,18 @@
-# Copyright (c) The University of Sussex, Garibaldi Pineda Garcia,
-# James Turner, James Knight and Thomas Nowotny
+# Copyright (c) 2021 The University of Manchester
+# Based on work Copyright (c) The University of Sussex,
+# Garibaldi Pineda Garcia, James Turner, James Knight and Thomas Nowotny
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import numpy
 from spinn_utilities.overrides import overrides
@@ -257,18 +257,20 @@ class ConvolutionConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
-        # All delays are 1 timestep
-        return 1
+        return synapse_info.delays
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        # All delays are 1 timestep
-        return 1
+        return synapse_info.delays
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
+        if min_delay is not None and max_delay is not None:
+            delay = synapse_info.delays
+            if min_delay > delay or max_delay < delay:
+                return 0
         w, h = self.__kernel_weights.shape
         return numpy.clip(w * h, 0, n_post_atoms)
 
@@ -418,8 +420,11 @@ class ConvolutionConnector(AbstractConnector):
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
 
         # Write delay
-        spec.write_value(app_edge.post_vertex.synapse_dynamics.delay *
-                         SpynnakerDataView.get_simulation_time_step_per_ms())
+        delay_step = (app_edge.post_vertex.synapse_dynamics.delay *
+                      SpynnakerDataView.get_simulation_time_step_per_ms())
+        local_delay = min(delay_step,
+                          app_edge.post_vertex.splitter.max_support_delay())
+        spec.write_value(local_delay)
 
         spec.write_value(self.__horizontal_delay_step, data_type=DataType.UINT32)
 
