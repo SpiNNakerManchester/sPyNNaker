@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 """
 Synfirechain-like example
@@ -297,7 +296,7 @@ class SynfireRunner(object):
             set_between_runs = []
 
         if len(set_between_runs) > 0 and len(run_times) != 2:
-            raise Exception("set_between_runs requires exactly 2 run times")
+            raise ValueError("set_between_runs requires exactly 2 run times")
 
         if spike_times is None:
             spike_times = [[0]]
@@ -306,31 +305,31 @@ class SynfireRunner(object):
             get_spikes = record
         elif not record:
             if record_7:
-                raise Exception(
+                raise NotImplementedError(
                     "record_7 will cause spike recording to be turned on")
             if spike_path:
-                raise Exception("spike_path will cause spike recording to be "
-                                "turned on")
+                raise NotImplementedError(
+                    "spike_path will cause spike recording to be turned on")
 
         if get_v is None:
             get_v = record_v
         elif not record_v:
             if record_v_7:
-                raise Exception(
+                raise NotImplementedError(
                     "record_v_7 will cause v recording to be turned on")
             if v_path:
-                raise Exception(
+                raise NotImplementedError(
                     "v_path will cause v recording to be turned on")
 
         if get_gsyn_exc is None:
             get_gsyn_exc = record_gsyn_exc
         elif not record_gsyn_exc:
             if record_gsyn_exc_7:
-                raise Exception(
+                raise NotImplementedError(
                     "record_gsyn_exc_7 will cause gsyn_exc recording "
                     "to be turned on")
             if gsyn_path_exc:
-                raise Exception(
+                raise NotImplementedError(
                     "gsyn_path_exc will cause gsyn_exc recording "
                     "to be turned on")
 
@@ -338,11 +337,11 @@ class SynfireRunner(object):
             get_gsyn_inh = record_gsyn_inh
         elif not record_gsyn_inh:
             if record_gsyn_inh_7:
-                raise Exception(
+                raise NotImplementedError(
                     "record_gsyn_inh_7 will cause gsyn_inh recording "
                     "to be turned on")
             if gsyn_path_inh:
-                raise Exception(
+                raise NotImplementedError(
                     "gsyn_path_inh will cause gsyn_exc recording "
                     "to be turned on")
 
@@ -444,12 +443,13 @@ class SynfireRunner(object):
             run_count += 1
 
             if extract_between_runs:
-                self._get_data(populations[0], populations[1],
-                               get_spikes, record_7, get_v, record_v_7,
-                               get_gsyn_exc, record_gsyn_exc_7,
-                               get_gsyn_inh, record_gsyn_inh_7,
-                               record_input_spikes, record_input_spikes_7,
-                               get_all)
+                if runtime > 0:
+                    self._get_data(populations[0], populations[1],
+                                   get_spikes, record_7, get_v, record_v_7,
+                                   get_gsyn_exc, record_gsyn_exc_7,
+                                   get_gsyn_inh, record_gsyn_inh_7,
+                                   record_input_spikes, record_input_spikes_7,
+                                   get_all)
                 self._get_weight_delay(projections[0], get_weights, get_delays)
 
             if new_pop:

@@ -1,19 +1,19 @@
 /*
- * Copyright (c) The University of Sussex, Garibaldi Pineda Garcia,
- * James Turner, James Knight and Thomas Nowotny
+ * Copyright (c) 2021 The University of Manchester
+ * based on work Copyright (c) The University of Sussex,
+ * Garibaldi Pineda Garcia, James Turner, James Knight and Thomas Nowotny
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 //! \file DTCM-only convolutional processing implementation
 
@@ -224,19 +224,33 @@ static inline void do_convolution_operation(
     }
 }
 
-static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
-        uint32_t *core_local_col, uint32_t *core_local_row) {
+static inline bool key_to_index_lookup(uint32_t spike, uint32_t *start_index,
+		uint32_t *end_index) {
     for (uint32_t i = 0; i < config.n_connectors; i++) {
         connector *c = connectors[i];
         if ((spike & c->key_info.mask) == c->key_info.key) {
-        	uint32_t local_spike = (spike & ~c->key_info.mask) >> c->key_info.n_colour_bits;
-            *conn = c;
-            *core_local_col = (local_spike & c->key_info.col_mask) >> c->key_info.col_shift;
-            *core_local_row = (local_spike & c->key_info.row_mask) >> c->key_info.row_shift;
-            return true;
+        	*start_index = i;
+            uint32_t e = i + 1;
+        	while (e < config.n_connectors) {
+        		connector *c_e = connectors[e];
+        		if ((spike & c_e->key_info.mask) != c_e->key_info.mask) {
+        			break;
+        		}
+        		e = e + 1;
+        	}
+        	*end_index = e;
+        	return true;
         }
     }
     return false;
+}
+
+static inline void get_row_col(uint32_t spike, uint32_t index,
+		uint32_t *core_local_col, uint32_t *core_local_row) {
+	connector *c = connectors[index];
+	uint32_t local_spike = (spike & ~c->key_info.mask) >> c->key_info.n_colour_bits;
+	*core_local_col = (local_spike & c->key_info.col_mask) >> c->key_info.col_shift;
+	*core_local_row = (local_spike & c->key_info.row_mask) >> c->key_info.row_shift;
 }
 
 //! \brief Process incoming spikes. In this implementation we need to:
@@ -247,24 +261,30 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
 //! 4. Add the weights to the appropriate current buffers
 void local_only_impl_process_spike(
         uint32_t time, uint32_t spike, uint16_t* ring_buffers) {
-    connector *connector;
-    uint32_t core_local_col;
-    uint32_t core_local_row;
 
     // Lookup the spike, and if found, get the appropriate parts
-    if (!key_to_index_lookup(
-            spike, &connector, &core_local_col, &core_local_row)) {
+    uint32_t start;
+    uint32_t end;
+    if (!key_to_index_lookup(spike, &start, &end)) {
+    	log_warning("Spike %u didn't match any connectors!", spike);
         return;
     }
+    log_debug("Received spike %u, using connectors between %u and %u", spike, start, end);
 
     // compute the population-based coordinates
-    lc_coord_t pre_coord = {
-            core_local_row + connector->pre_start.row,
-            core_local_col + connector->pre_start.col
-    };
-    log_debug("Received spike %u = %u, %u (Global: %u, %u)", spike, core_local_col, core_local_row,
-            pre_coord.col, pre_coord.row);
+    for (uint32_t i = start; i < end; i++) {
+		uint32_t core_local_col;
+		uint32_t core_local_row;
+		connector *connector = connectors[i];
+		get_row_col(spike, i, &core_local_col, &core_local_row);
+		lc_coord_t pre_coord = {
+				core_local_row + connector->pre_start.row,
+				core_local_col + connector->pre_start.col
+		};
+		log_debug("Spike %u = %u, %u (Global: %u, %u)", spike, core_local_col, core_local_row,
+				pre_coord.col, pre_coord.row);
 
-    // Compute the convolution
-    do_convolution_operation(time, pre_coord, connector, ring_buffers);
+		// Compute the convolution
+		do_convolution_operation(time, pre_coord, connector, ring_buffers);
+    }
 }

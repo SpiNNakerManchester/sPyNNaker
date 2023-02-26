@@ -1,17 +1,16 @@
-# Copyright (c) 2021-2022 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import numpy
 from collections import defaultdict, namedtuple
 from spinn_utilities.overrides import overrides
@@ -52,6 +51,9 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         self.__delay = delay
         if delay is None:
             self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
+        elif not isinstance(delay, (float, int)):
+            raise SynapticConfigurationException(
+                "Only single value delays are supported")
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
@@ -156,18 +158,23 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     for tgt, srcs in s_info.connector.get_connected_vertices(
                             s_info, source_vertex, app_vertex):
                         r_info = self.__get_rinfo_for_sources(
-                            key_cache, srcs, incoming)
+                            key_cache, srcs, incoming, app_edge, app_vertex)
                         sources_for_target[tgt].extend(r_info)
             self.__cached_2d_overlaps[app_vertex] = sources_for_target
         return sources_for_target
 
-    def __get_rinfo_for_sources(self, key_cache, srcs, incoming):
+    def __get_rinfo_for_sources(
+            self, key_cache, srcs, incoming, app_edge, app_vertex):
         """ Get the routing information for sources, merging sources that have
             the same vertex slice (note this happens in retinas from FPGAs).
 
         :rtype: list(Source)
         """
         routing_info = SpynnakerDataView.get_routing_infos()
+        delay_vertex = None
+        if self.__delay > app_vertex.splitter.max_support_delay():
+            # pylint: disable=protected-access
+            delay_vertex = incoming._projection_edge.delay_edge.pre_vertex
 
         # Group sources by vertex slice
         sources = defaultdict(list)
@@ -177,24 +184,34 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # For each slice, merge the keys
         keys = list()
         for vertex_slice, slice_sources in sources.items():
-            if vertex_slice in key_cache:
-                keys.append(key_cache.get(vertex_slice))
+            cache_key = (app_edge.pre_vertex, vertex_slice)
+            if cache_key in key_cache:
+                keys.append(key_cache.get(cache_key))
             else:
-                r_info = routing_info.get_routing_info_from_pre_vertex(
-                    slice_sources[0], SPIKE_PARTITION_ID)
+                r_info = self.__get_rinfo(
+                    routing_info, slice_sources[0], delay_vertex)
                 group_key = r_info.key
                 group_mask = r_info.mask
                 for source in slice_sources:
-                    r_info = routing_info.get_routing_info_from_pre_vertex(
-                        source, SPIKE_PARTITION_ID)
+                    r_info = self.__get_rinfo(
+                        routing_info, source, delay_vertex)
                     group_key, group_mask = self.__merge_key_and_mask(
                         group_key, group_mask, r_info.key,
                         r_info.mask)
                 key_source = Source(
                     incoming, vertex_slice, group_key, group_mask)
-                key_cache[vertex_slice] = key_source
+                key_cache[cache_key] = key_source
                 keys.append(key_source)
         return keys
+
+    def __get_rinfo(self, routing_info, source, delay_vertex):
+        if delay_vertex is None:
+            return routing_info.get_routing_info_from_pre_vertex(
+                source, SPIKE_PARTITION_ID)
+        delay_source = delay_vertex.splitter.get_machine_vertex(
+            source.vertex_slice)
+        return routing_info.get_routing_info_from_pre_vertex(
+            delay_source, SPIKE_PARTITION_ID)
 
     @property
     @overrides(AbstractLocalOnly.delay)

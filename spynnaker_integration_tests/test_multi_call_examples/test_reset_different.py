@@ -1,22 +1,22 @@
-# Copyright (c) 2017-2022 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.utilities import neo_compare
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import check_neuron_data
+from spynnaker.pyNN.utilities.neo_csv import NeoCsv
 
 n_neurons = 20  # number of neurons in each population
 neurons_per_core = n_neurons / 2
@@ -25,8 +25,7 @@ simtime = 200
 
 class TestResetDifferent(BaseTestCase):
 
-    def check_data(self, pop, expected_spikes, simtime):
-        neo = pop.get_data("all")
+    def check_data(self, neo, pop, expected_spikes, simtime):
         spikes = neo.segments[0].spiketrains
         v = neo.segments[0].filter(name="v")[0]
         gsyn_exc = neo.segments[0].filter(name="gsyn_exc")[0]
@@ -52,7 +51,13 @@ class TestResetDifferent(BaseTestCase):
         sim.reset()
         sim.run(simtime/2)
         sim.run(simtime/2)
-        self.check_data(pop_1, expected_spikes, simtime)
+        neo = pop_1.get_data("all")
+        self.check_data(neo, pop_1, expected_spikes, simtime)
+
+        pop_1.write_data("test.csv")
+        neo = NeoCsv().read_csv("test.csv")
+        self.check_data(neo, pop_1, expected_spikes, simtime)
+
         sim.end()
 
     def test_do_run(self):

@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2015 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import logging
 import math
@@ -31,6 +30,7 @@ from data_specification.enums.data_type import DataType
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
+from pacman.utilities.utility_calls import get_n_bits_for_fields, get_n_bits
 from spinn_front_end_common.abstract_models import (
     AbstractCanReset)
 from spinn_front_end_common.utilities.constants import (
@@ -63,7 +63,6 @@ from spynnaker.pyNN.models.common import (
 from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-
 from .population_machine_neurons import PopulationMachineNeurons
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
@@ -708,10 +707,13 @@ class AbstractPopulationVertex(
         variables.extend(self.__synapse_recorder.get_recordable_variables())
         return variables
 
-    @overrides(PopulationApplicationVertex.can_record)
-    def can_record(self, name):
-        return (self.__neuron_recorder.is_recordable(name) or
-                self.__synapse_recorder.is_recordable(name))
+    @overrides(PopulationApplicationVertex.get_buffer_data_type)
+    def get_buffer_data_type(self, name):
+        if self.__neuron_recorder.is_recordable(name):
+            return self.__neuron_recorder.get_buffer_data_type(name)
+        if self.__synapse_recorder.is_recordable(name):
+            return self.__synapse_recorder.get_buffer_data_type(name)
+        raise KeyError(f"It is not possible to record {name}")
 
     @overrides(PopulationApplicationVertex.set_recording)
     def set_recording(self, name, sampling_interval=None, indices=None):
@@ -741,63 +743,39 @@ class AbstractPopulationVertex(
         recording.extend(self.__synapse_recorder.recording_variables)
         return recording
 
-    @overrides(PopulationApplicationVertex.is_recording_variable)
-    def is_recording_variable(self, name):
-        return (
-            self.__neuron_recorder.is_recording(name) or
-            self.__synapse_recorder.is_recording(name))
-
-    @overrides(PopulationApplicationVertex.get_recorded_data)
-    def get_recorded_data(self, name):
-        if self.__neuron_recorder.is_recording(name):
-            return self.__neuron_recorder.get_recorded_data(
-                self.label, self, name)
-        if self.__synapse_recorder.is_recording(name):
-            return self.__synapse_recorder.get_recorded_data(
-                self.label, self, name)
-        if (not self.__neuron_recorder.is_recordable(name) and
-                not self.__synapse_recorder.is_recordable(name)):
-            raise KeyError(f"{name} is not a supported variable")
-        raise KeyError(f"{name} has not been set to record")
-
-    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
-    def get_recording_sampling_interval(self, name):
+    @overrides(PopulationApplicationVertex.get_sampling_interval_ms)
+    def get_sampling_interval_ms(self, name):
         if self.__neuron_recorder.is_recordable(name):
-            return self.__neuron_recorder.get_sampling_interval(name)
+            return self.__neuron_recorder.get_sampling_interval_ms(name)
         if self.__synapse_recorder.is_recordable(name):
-            return self.__synapse_recorder.get_sampling_interval(name)
+            return self.__synapse_recorder.get_sampling_interval_ms(name)
         raise KeyError(f"It is not possible to record {name}")
 
-    @overrides(PopulationApplicationVertex.get_recording_indices)
-    def get_recording_indices(self, name):
+    @overrides(PopulationApplicationVertex.get_data_type)
+    def get_data_type(self, name):
         if self.__neuron_recorder.is_recordable(name):
-            return self.__neuron_recorder.get_recorded_indices(self, name)
+            return self.__neuron_recorder.get_data_type(name)
         if self.__synapse_recorder.is_recordable(name):
-            return self.__synapse_recorder.get_recorded_indices(self, name)
+            return self.__synapse_recorder.get_data_type(name)
         raise KeyError(f"It is not possible to record {name}")
 
-    @overrides(PopulationApplicationVertex.get_recording_type)
-    def get_recording_type(self, name):
+    @overrides(PopulationApplicationVertex.get_recording_region)
+    def get_recording_region(self, name):
         if self.__neuron_recorder.is_recordable(name):
-            return self.__neuron_recorder.get_recorded_data_type(name)
+            return self.__neuron_recorder.get_region(name)
         if self.__synapse_recorder.is_recordable(name):
-            return self.__synapse_recorder.get_recorded_data_type(name)
+            return self.__synapse_recorder.get_region(name)
         raise KeyError(f"It is not possible to record {name}")
 
-    @overrides(PopulationApplicationVertex.clear_recording_data)
-    def clear_recording_data(self, name):
+    @overrides(PopulationApplicationVertex.get_neurons_recording)
+    def get_neurons_recording(self, name, vertex_slice):
         if self.__neuron_recorder.is_recordable(name):
-            region = self.__neuron_recorder.get_region(name)
-        elif self.__synapse_recorder.is_recordable(name):
-            region = self.__synapse_recorder.get_region(name)
-        else:
-            raise KeyError(f"It is not possible to record {name}")
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
-        for machine_vertex in self.machine_vertices:
-            placement = SpynnakerDataView.get_placement_of_vertex(
-                machine_vertex)
-            buffer_manager.clear_recorded_data(
-                placement.x, placement.y, placement.p, region)
+            return self.__neuron_recorder.neurons_recording(
+                name, vertex_slice, self.atoms_shape)
+        if self.__synapse_recorder.is_recordable(name):
+            return self.__synapse_recorder.neurons_recording(
+                name, vertex_slice, self.atoms_shape)
+        raise KeyError(f"It is not possible to record {name}")
 
     @property
     def weight_scale(self):
@@ -1424,6 +1402,46 @@ class AbstractPopulationVertex(
     @overrides(PopulationApplicationVertex.n_colour_bits)
     def n_colour_bits(self):
         return self.__n_colour_bits
+
+    def get_max_delay(self, max_ring_buffer_bits):
+        """ Get the maximum delay and whether a delay extension is needed
+            for a given maximum number of ring buffer bits
+
+        :param int max_ring_buffer_bits:
+            The maximum number of bits that can be used for the ring buffer
+            identifier (i.e. delay, synapse type, neuron index)
+        :return:
+            Tuple of the maximum delay supported on the core and whether
+            a delay extension is needed to support delays
+        :rtype: (int, bool)
+        """
+        # Find the maximum delay from incoming synapses
+        max_delay_ms = 0
+        for proj in self.incoming_projections:
+            # pylint: disable=protected-access
+            s_info = proj._synapse_information
+            proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
+                s_info.connector, s_info)
+            max_delay_ms = max(max_delay_ms, proj_max_delay)
+        max_delay_steps = math.ceil(
+            max_delay_ms / SpynnakerDataView.get_simulation_time_step_ms())
+        max_delay_bits = get_n_bits(max_delay_steps)
+
+        # Find the maximum possible delay
+        n_atom_bits = self.get_n_atom_bits()
+        n_synapse_bits = get_n_bits(
+            self.neuron_impl.get_n_synapse_types())
+        n_delay_bits = max_ring_buffer_bits - (n_atom_bits + n_synapse_bits)
+
+        # Pick the smallest between the two, so that not too many bits are used
+        final_n_delay_bits = min(n_delay_bits, max_delay_bits)
+        return 2 ** final_n_delay_bits, max_delay_bits > final_n_delay_bits
+
+    def get_n_atom_bits(self):
+        field_sizes = [
+            min(max_atoms, n) for max_atoms, n in zip(
+                self.get_max_atoms_per_dimension_per_core(), self.atoms_shape)]
+        return get_n_bits_for_fields(field_sizes)
 
 
 class _Stats(object):
