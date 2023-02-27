@@ -24,8 +24,8 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
 _RETINA_PACKET_SIZE = BYTES_PER_SHORT
 _MIN_PIXEL_VALUE = 32768
 _BITS_PER_PIXEL = 7
-_Y_SHIFT = 8
-_X_SHIFT = 0
+_Y_SHIFT = 0
+_X_SHIFT = 8
 _P_SHIFT = 7
 _P_MASK = 0x1
 
