@@ -94,7 +94,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
             if command.key == self._protocol.set_retina_transmission_key:
                 # This has to be stored so that the payload can be updated
                 self.__new_key_command = DelayedPayloadMultiCastCommand(
-                    self._protocol.set_retina_transmission_key, self)
+                    self._protocol.set_retina_key_key, self)
                 new_commands.append(self.__new_key_command)
             new_commands.append(command)
         return new_commands
