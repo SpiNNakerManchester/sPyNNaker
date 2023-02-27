@@ -34,7 +34,7 @@ SOURCE_KEY_INFO_WORDS = 7
 
 #: The number of 16-bit shorts in the connector struct,
 #: ignoring the source_key_info struct and the weights (which are dynamic)
-CONNECTOR_CONFIG_SHORTS = 16
+CONNECTOR_CONFIG_SHORTS = 18
 
 
 class ConvolutionConnector(AbstractConnector):
