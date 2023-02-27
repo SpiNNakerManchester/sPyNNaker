@@ -46,18 +46,24 @@ class ConvolutionConnector(AbstractConnector):
 
     __slots__ = [
         "__kernel_weights",
+        "__kernel_shape",
         "__strides",
         "__padding_shape",
         "__pool_shape",
         "__pool_stride",
         "__positive_receptor_type",
-        "__negative_receptor_type"
+        "__negative_receptor_type",
+        "__num_multisynaptic_connections",
+        "__multisynaptic_delay_min"
     ]
 
     def __init__(self, kernel_weights, kernel_shape=None, strides=None,
                  padding=None, pool_shape=None, pool_stride=None,
                  positive_receptor_type="excitatory",
-                 negative_receptor_type="inhibitory", safe=True,
+                 negative_receptor_type="inhibitory",
+                 num_multisynaptic_connections=1,
+                 multisynaptic_delay_min=0,
+                 safe=True,
                  verbose=False, callback=None):
         """
         :param kernel_weights:
@@ -135,6 +141,12 @@ class ConvolutionConnector(AbstractConnector):
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
 
+        self.__num_multisynaptic_connections = num_multisynaptic_connections
+        if num_multisynaptic_connections != 1:
+            self.__kernel_shape = self.__get_kernel_shape(kernel_shape)
+            self.__multisynaptic_delay_min = multisynaptic_delay_min
+
+
     @property
     def positive_receptor_type(self):
         return self.__positive_receptor_type
@@ -182,6 +194,8 @@ class ConvolutionConnector(AbstractConnector):
             raise SynapticConfigurationException(
                 f"Unknown combination of kernel_weights ({w}) and"
                 f" kernel_shape ({shape})")
+        
+        self.__kernel_shape = self.__kernel_weights.shape
 
     @staticmethod
     def __to_2d_shape(shape, param_name):
@@ -215,7 +229,7 @@ class ConvolutionConnector(AbstractConnector):
             post_pool_shape = shape - (self.__pool_shape - 1)
             shape = (post_pool_shape // self.__pool_stride) + 1
 
-        kernel_shape = numpy.array(self.__kernel_weights.shape)
+        kernel_shape = numpy.array(self.__kernel_shape)
         post_shape = shape - kernel_shape + (2 * self.__padding_shape)
 
         return numpy.clip(
@@ -271,7 +285,7 @@ class ConvolutionConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        w, h = self.__kernel_weights.shape
+        w, h = self.__kernel_shape
         return numpy.clip(w * h, 0, synapse_info.n_pre_neurons)
 
     @overrides(AbstractConnector.get_weight_maximum)
@@ -292,7 +306,7 @@ class ConvolutionConnector(AbstractConnector):
         pre_vertex_in_post_layer_upper_left = pre_vertex_in_post_layer[:,0]
         pre_vertex_in_post_layer_lower_right = pre_vertex_in_post_layer[:,1]
 
-        kernel_shape = numpy.array(self.__kernel_weights.shape)
+        kernel_shape = numpy.array(self.__kernel_shape)
 
         j = (kernel_shape - 1 - start_i) // self.__strides
         j_upper_left = j[:,0]
@@ -415,11 +429,21 @@ class ConvolutionConnector(AbstractConnector):
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
 
         # Write delay
-        delay_step = (app_edge.post_vertex.synapse_dynamics.delay *
-                      SpynnakerDataView.get_simulation_time_step_per_ms())
-        local_delay = min(delay_step,
+        max_delay = app_edge.post_vertex.synapse_dynamics.delay * \
+                            SpynnakerDataView.get_simulation_time_step_per_ms()
+
+        max_delay = min(max_delay,
                           app_edge.post_vertex.splitter.max_support_delay())
-        spec.write_value(local_delay)
+
+        if self.__num_multisynaptic_connections == 1:
+            spec.write_value(max_delay)
+        else:
+            spec.write_value(max_delay, data_type=DataType.UINT16)
+            delay_range = max_delay - self.__multisynaptic_delay_min
+            delay_step = delay_range / (self.__num_multisynaptic_connections - 1)
+            spec.write_value(delay_step, data_type=DataType.UINT16)
+
+        spec.write_value(self.__num_multisynaptic_connections, data_type=DataType.UINT32)
 
         # Encode weights with weight scaling
         encoded_kernel_weights = self.__kernel_weights.flatten()
