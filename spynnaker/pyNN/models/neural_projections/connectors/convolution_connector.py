@@ -34,7 +34,7 @@ SOURCE_KEY_INFO_WORDS = 7
 
 #: The number of 16-bit shorts in the connector struct,
 #: ignoring the source_key_info struct and the weights (which are dynamic)
-CONNECTOR_CONFIG_SHORTS = 18
+CONNECTOR_CONFIG_SHORTS = 16
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -51,16 +51,13 @@ class ConvolutionConnector(AbstractConnector):
         "__pool_shape",
         "__pool_stride",
         "__positive_receptor_type",
-        "__negative_receptor_type",
-        "__horizontal_delay_step"
+        "__negative_receptor_type"
     ]
 
     def __init__(self, kernel_weights, kernel_shape=None, strides=None,
                  padding=None, pool_shape=None, pool_stride=None,
                  positive_receptor_type="excitatory",
-                 negative_receptor_type="inhibitory",
-                 horizontal_delay_step=0,
-                 safe=True,
+                 negative_receptor_type="inhibitory", safe=True,
                  verbose=False, callback=None):
         """
         :param kernel_weights:
@@ -137,8 +134,6 @@ class ConvolutionConnector(AbstractConnector):
 
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
-
-        self.__horizontal_delay_step = horizontal_delay_step
 
     @property
     def positive_receptor_type(self):
@@ -425,8 +420,6 @@ class ConvolutionConnector(AbstractConnector):
         local_delay = min(delay_step,
                           app_edge.post_vertex.splitter.max_support_delay())
         spec.write_value(local_delay)
-
-        spec.write_value(self.__horizontal_delay_step, data_type=DataType.UINT32)
 
         # Encode weights with weight scaling
         encoded_kernel_weights = self.__kernel_weights.flatten()

@@ -65,7 +65,6 @@ typedef struct {
     uint16_t positive_synapse_type;
     uint16_t negative_synapse_type;
     uint32_t delay;
-    uint32_t strides_delay_step;
     lc_weight_t weights[]; // n_weights = next_even(kernel.width * kernel.height)
 } connector;
 
@@ -193,14 +192,6 @@ static inline void do_convolution_operation(
             log_debug("tmp_row outside");
             continue;
         }
-
-        uint32_t delay = connector->delay;
-        if (connector->strides_delay_step != 0)
-        {
-            delay -= start_i.col * connector->strides_delay_step;
-            log_debug("start_i.col = %u, delay = %u", start_i.col, delay);
-        }
-        
         for (int32_t i_col = start_i.col, tmp_col = post_coord.col; i_col < connector->kernel.width; i_col += connector->strides.col, --tmp_col) {
             int32_t kc = connector->kernel.width - 1 - i_col;
             log_debug("i_col = %u, kc = %u, tmp_col = %u", i_col, kc, tmp_col);
@@ -222,12 +213,12 @@ static inline void do_convolution_operation(
             }
             uint32_t rb_index = 0;
             if (weight > 0) {
-                rb_index = synapse_row_get_ring_buffer_index(time + delay,
+                rb_index = synapse_row_get_ring_buffer_index(time + connector->delay,
                     connector->positive_synapse_type, post_index,
                     synapse_type_index_bits, synapse_index_bits,
                     synapse_delay_mask);
             } else {
-                rb_index = synapse_row_get_ring_buffer_index(time + delay,
+                rb_index = synapse_row_get_ring_buffer_index(time + connector->delay,
                     connector->negative_synapse_type, post_index,
                     synapse_type_index_bits, synapse_index_bits,
                     synapse_delay_mask);
