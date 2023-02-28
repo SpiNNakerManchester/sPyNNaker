@@ -131,7 +131,11 @@ bool local_only_impl_initialise(void *address){
         // this comes after the last weight in the last connector, which comes
         // after the last dimension!
         lc_weight_t* weights = get_weights(conn);
-        conn = (connector *) &weights[connectors[i]->n_weights];
+        uint32_t n_weights = connectors[i]->n_weights;
+        if (n_weights & 0x1) {
+        	n_weights += 1;
+        }
+        conn = (connector *) &weights[n_weights];
     }
 
     return true;
@@ -150,7 +154,7 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
     for (uint32_t i = 0; i < config.n_connectors; i++) {
         connector *c = connectors[i];
         if ((spike & c->key_info.mask) == c->key_info.key) {
-        	uint32_t local_spike = spike >> c->key_info.n_colour_bits;
+        	uint32_t local_spike = (spike & ~c->key_info.mask) & c->key_info.n_colour_bits;
             *conn = c;
 
             // Now work out the index into the weights from the coordinates

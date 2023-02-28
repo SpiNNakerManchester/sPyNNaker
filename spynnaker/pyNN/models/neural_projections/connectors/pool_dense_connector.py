@@ -91,7 +91,7 @@ class PoolDenseConnector(AbstractConnector):
         super(PoolDenseConnector, self).__init__(
             safe=safe, callback=callback, verbose=verbose)
 
-        self.__weights = weights
+        self.__weights = numpy.array(weights)
 
         self.__pool_shape = pool_shape
         self.__pool_stride = pool_stride
