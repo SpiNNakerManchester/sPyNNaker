@@ -117,9 +117,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__local_ip_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_port</span> <span class="o">=</span> <span class="n">get_socket_address</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="p">)</span>
 
-        <span class="c1"># Set a general timeout on the socket</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__socket</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
 <div class="viewcode-block" id="PushBotWIFIConnection.is_connected"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.is_connected">[docs]</a>    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; See\</span>
 <span class="sd">            :py:meth:`~spinnman.connections.Connection.is_connected`</span>

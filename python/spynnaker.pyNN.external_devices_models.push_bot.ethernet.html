@@ -53,18 +53,31 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.ethernet" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uses_payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_between_send</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uses_payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_between_send</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_send_timestep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice</span></code></a></p>
 <p>An arbitrary PushBot device</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – The protocol instance to get commands from</p></li>
-<li><p><strong>device</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice" title="spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice"><em>AbstractPushBotOutputDevice</em></a>) – The Enum instance of the device to control</p></li>
+<li><p><strong>AbstractPushBotOutputDevicedevice</strong> – The Enum instance of the device to control</p></li>
 <li><p><strong>uses_payload</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – True if the device uses a payload for control</p></li>
+<li><p><strong>time_between_send</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The timesteps between sending</p></li>
+<li><p><strong>first_send_timestep</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The first timestep to send</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_first_send_timestep">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_control_first_send_timestep</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_first_send_timestep" title="Permalink to this definition">¶</a></dt>
+<dd><p>The first timestep that the device should send in (0 by default).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_key">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_control_key</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_key" title="Permalink to this definition">¶</a></dt>
@@ -712,6 +725,7 @@ or None to use the default</p></li>
 <li><a class="reference internal" href="#">spynnaker.pyNN.external_devices_models.push_bot.ethernet package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.ethernet">Module contents</a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_first_send_timestep"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_first_send_timestep</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_key"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_key</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_max_value"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_max_value</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_min_value"><code class="docutils literal notranslate"><span class="pre">PushBotEthernetDevice.device_control_min_value</span></code></a></li>

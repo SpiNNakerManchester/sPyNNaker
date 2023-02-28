@@ -157,35 +157,30 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.parameters.</span></span><span class="sig-name descname"><span class="pre">PushBotRetinaViewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">33.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_time_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decay_time_constant_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/threading.html#threading.Thread" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a></p>
-<p>A viewer for the pushbot’s retina. This is a thread that can be         launched in parallel with the control code.</p>
-<p>Based on matplotlib</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.parameters.</span></span><span class="sig-name descname"><span class="pre">PushBotRetinaViewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retina_resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Viewer of retina from the PushBot</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.port">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">port</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.port" title="Permalink to this definition">¶</a></dt>
+<dd><p>The port the connection is listening on</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>resolution</strong> (<a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution"><em>PushBotRetinaResolution</em></a>) – </p></li>
-<li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>display_max</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Value of brightest pixel to show</p></li>
-<li><p><strong>frame_time_ms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – How regularity to display frames (milliseconds)</p></li>
-<li><p><strong>decay_time_constant_ms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Time constant of pixel decay (milliseconds)</p></li>
-</ul>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.local_host">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">local_host</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.local_host" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.local_port">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">local_port</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.local_port" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/parameters/push_bot_retina_viewer.html#PushBotRetinaViewer.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>How the viewer works when the thread is running.</p>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/parameters/push_bot_retina_viewer.html#PushBotRetinaViewer.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the viewer and simulation for a fixed time.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.run_until_closed">
+<span class="sig-name descname"><span class="pre">run_until_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/parameters/push_bot_retina_viewer.html#PushBotRetinaViewer.run_until_closed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.run_until_closed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the viewer and simulation until the viewer is closed.</p>
 </dd></dl>
 
 </dd></dl>
@@ -260,9 +255,9 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer</span></code></a><ul>
-<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.local_host"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.local_host</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.local_port"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.local_port</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.port"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.port</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.run"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.run()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaViewer.run_until_closed"><code class="docutils literal notranslate"><span class="pre">PushBotRetinaViewer.run_until_closed()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker"><code class="docutils literal notranslate"><span class="pre">PushBotSpeaker</span></code></a><ul>

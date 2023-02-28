@@ -77,9 +77,9 @@
 <span class="n">PUSH_BOT_MOTOR_UART_SHIFT</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">+</span> <span class="n">_OFFSET_TO_I</span>
 
 
-<span class="k">def</span> <span class="nf">_munich_key</span><span class="p">(</span><span class="n">instr</span><span class="p">,</span> <span class="n">format_bit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">((</span><span class="n">instr</span> <span class="o">&lt;&lt;</span> <span class="n">_OFFSET_TO_I</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">format_bit</span> <span class="o">&lt;&lt;</span> <span class="n">_OFFSET_TO_F</span><span class="p">)</span> <span class="o">|</span>
-            <span class="p">(</span><span class="n">device</span> <span class="o">&lt;&lt;</span> <span class="n">_OFFSET_TO_D</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">_munich_key</span><span class="p">(</span><span class="n">instr_id</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">format_bit</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">instr_id</span> <span class="o">&lt;&lt;</span> <span class="n">_OFFSET_TO_I</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">format_bit</span> <span class="o">&lt;&lt;</span> <span class="n">_OFFSET_TO_F</span><span class="p">)</span> <span class="o">|</span>
+            <span class="p">(</span><span class="n">dim</span> <span class="o">&lt;&lt;</span> <span class="n">_OFFSET_TO_D</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">get_munich_i</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
@@ -887,6 +887,10 @@
 <span class="sd">        :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">retina_key_value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">retina_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">retina_key_value</span> <span class="o">=</span> <span class="n">retina_key</span><span class="o">.</span><span class="n">value</span>
+
         <span class="k">if</span> <span class="n">retina_key</span> <span class="o">==</span> <span class="n">RetinaKey</span><span class="o">.</span><span class="n">FIXED_KEY</span> <span class="ow">and</span> <span class="n">retina_payload</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">retina_payload</span> <span class="o">=</span> <span class="n">RetinaPayload</span><span class="o">.</span><span class="n">EVENTS_IN_PAYLOAD</span>
 
@@ -901,7 +905,7 @@
 
         <span class="k">return</span> <span class="n">MultiCastCommand</span><span class="p">(</span>
             <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">set_retina_transmission_key</span><span class="p">,</span>
-            <span class="n">payload</span><span class="o">=</span><span class="n">retina_key</span><span class="o">.</span><span class="n">value</span> <span class="o">|</span> <span class="n">retina_payload</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">payload</span><span class="o">=</span><span class="n">retina_key_value</span> <span class="o">|</span> <span class="n">retina_payload</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
             <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span></div>
 </pre></div>
 

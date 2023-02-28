@@ -106,7 +106,8 @@
 
 <div class="viewcode-block" id="ThresholdTypeMulticastDeviceControl.add_state_variables"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.add_state_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
-        <span class="n">state_variables</span><span class="p">[</span><span class="n">TS_NEXT_SEND</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">TS_NEXT_SEND</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">device_control_first_send_timestep</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__devices</span><span class="p">]</span></div>
 </pre></div>
 
             <div class="clearer"></div>

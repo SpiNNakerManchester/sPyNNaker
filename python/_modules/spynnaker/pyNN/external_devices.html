@@ -96,6 +96,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.populations</span> <span class="kn">import</span> <span class="n">Population</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.spike_injector</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SpikeInjector</span> <span class="k">as</span> <span class="n">ExternalDeviceSpikeInjector</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">protocols</span>
 
 
 <span class="c1"># useful functions</span>
@@ -143,7 +144,8 @@
     <span class="s2">&quot;SpikeInjector&quot;</span><span class="p">,</span>
     <span class="s2">&quot;register_database_notification_request&quot;</span><span class="p">,</span>
     <span class="s2">&quot;run_forever&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;add_poisson_live_rate_control&quot;</span>
+    <span class="s2">&quot;add_poisson_live_rate_control&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;protocols&quot;</span>
 <span class="p">]</span>
 <span class="c1"># Cache of the simulator provided by pyNN/__init__py</span>
 <span class="n">__simulator</span> <span class="o">=</span> <span class="kc">None</span>

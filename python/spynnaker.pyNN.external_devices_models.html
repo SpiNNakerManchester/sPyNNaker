@@ -777,6 +777,17 @@ will be routed to input_route.</p>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A device that can be controlled by sending multicast packets to it,        either directly, or via Ethernet using an AbstractEthernetTranslator</p>
 <dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_first_send_timestep">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_control_first_send_timestep</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_first_send_timestep" title="Permalink to this definition">¶</a></dt>
+<dd><p>The first timestep that the device should send in (0 by default).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_key">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_control_key</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>The key that must be sent to the device to control it</p>
@@ -1796,6 +1807,7 @@ in the order of the fields</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice</span></code></a><ul>
+<li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_first_send_timestep"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_first_send_timestep</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_key"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_key</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_max_value"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_max_value</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice.device_control_min_value"><code class="docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice.device_control_min_value</span></code></a></li>

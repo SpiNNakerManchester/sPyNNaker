@@ -79,7 +79,7 @@
 <span class="sd">        :param retina_injector_label:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">resolution</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">pushbot_wifi_connection</span> <span class="o">=</span> <span class="n">get_pushbot_wifi_connection</span><span class="p">(</span>
             <span class="n">pushbot_ip_address</span><span class="p">,</span> <span class="n">pushbot_port</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__translator</span> <span class="o">=</span> <span class="n">PushBotTranslator</span><span class="p">(</span>
@@ -90,10 +90,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__database_connection</span> <span class="o">=</span> <span class="n">PushBotRetinaConnection</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__retina_injector_label</span><span class="p">,</span> <span class="n">pushbot_wifi_connection</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span>
             <span class="n">local_host</span><span class="p">,</span> <span class="n">local_port</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_neurons</span> <span class="o">=</span> <span class="n">resolution</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">n_neurons</span>
 
 <div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_n_neurons"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_n_neurons">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_n_neurons</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_neurons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">n_neurons</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_neurons</span></div>
 
 <div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_injector_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_injector_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_injector_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_injector_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

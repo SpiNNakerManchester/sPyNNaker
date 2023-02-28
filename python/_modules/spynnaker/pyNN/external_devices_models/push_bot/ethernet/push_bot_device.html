@@ -55,6 +55,10 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.external_devices_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractMulticastControllableDevice</span><span class="p">)</span>
 
+<span class="c1"># The default timestep to use for first send.  Avoids clashes with other</span>
+<span class="c1"># control commands.</span>
+<span class="n">_DEFAULT_FIRST_SEND_TIMESTEP</span> <span class="o">=</span> <span class="mi">100</span>
+
 
 <span class="k">class</span> <span class="nc">PushBotEthernetDevice</span><span class="p">(</span>
         <span class="n">AbstractMulticastControllableDevice</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
@@ -62,14 +66,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">uses_payload</span><span class="p">,</span> <span class="n">time_between_send</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">uses_payload</span><span class="p">,</span> <span class="n">time_between_send</span><span class="p">,</span>
+            <span class="n">first_send_timestep</span><span class="o">=</span><span class="n">_DEFAULT_FIRST_SEND_TIMESTEP</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param protocol: The protocol instance to get commands from</span>
-<span class="sd">        :type protocol: MunichIoEthernetProtocol</span>
-<span class="sd">        :param device: The Enum instance of the device to control</span>
-<span class="sd">        :type device: AbstractPushBotOutputDevice</span>
-<span class="sd">        :param uses_payload: True if the device uses a payload for control</span>
-<span class="sd">        :type uses_payload: bool</span>
+<span class="sd">        :param MunichIoEthernetProtocol protocol:</span>
+<span class="sd">            The protocol instance to get commands from</span>
+<span class="sd">        :param AbstractPushBotOutputDevicedevice:</span>
+<span class="sd">            The Enum instance of the device to control</span>
+<span class="sd">        :param bool uses_payload:</span>
+<span class="sd">            True if the device uses a payload for control</span>
+<span class="sd">        :param int time_between_send: The timesteps between sending</span>
+<span class="sd">        :param int first_send_timestep: The first timestep to send</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__protocol</span> <span class="o">=</span> <span class="n">protocol</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__device</span> <span class="o">=</span> <span class="n">device</span>
@@ -77,6 +84,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__time_between_send</span> <span class="o">=</span> <span class="n">time_between_send</span>
         <span class="k">if</span> <span class="n">time_between_send</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__time_between_send</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">time_between_send</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__first_send_timestep</span> <span class="o">=</span> <span class="n">first_send_timestep</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMulticastControllableDevice</span><span class="o">.</span><span class="n">device_control_key</span><span class="p">)</span>
@@ -114,6 +122,12 @@
                <span class="o">.</span><span class="n">device_control_send_type</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">device_control_send_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__device</span><span class="o">.</span><span class="n">send_type</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMulticastControllableDevice</span>
+               <span class="o">.</span><span class="n">device_control_first_send_timestep</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">device_control_first_send_timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__first_send_timestep</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">protocol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

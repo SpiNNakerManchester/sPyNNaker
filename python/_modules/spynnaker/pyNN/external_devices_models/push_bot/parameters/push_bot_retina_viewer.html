@@ -49,136 +49,98 @@
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
-
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">spinnman.utilities.socket_utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">get_udp_socket</span><span class="p">,</span> <span class="n">get_socket_address</span><span class="p">,</span> <span class="n">bind_socket</span><span class="p">)</span>
 
-<span class="c1"># Value of brightest pixel to show</span>
-<span class="n">_DISPLAY_MAX</span> <span class="o">=</span> <span class="mf">33.0</span>
-<span class="c1"># How regularity to display frames</span>
-<span class="n">_FRAME_TIME_MS</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="c1"># Time constant of pixel decay</span>
-<span class="n">_DECAY_TIME_CONSTANT_MS</span> <span class="o">=</span> <span class="mi">100</span>
-<span class="n">_BUFFER_SIZE</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">MAX_VALUE</span> <span class="o">=</span> <span class="mf">33.0</span>
+<span class="n">ADD_VALUE</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">DECAY_FACTOR</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">SLEEP_TIME</span> <span class="o">=</span> <span class="mf">0.1</span>
 
 
-<span class="k">class</span> <span class="nc">PushBotRetinaViewer</span><span class="p">(</span><span class="n">Thread</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; A viewer for the pushbot&#39;s retina. This is a thread that can be \</span>
-<span class="sd">        launched in parallel with the control code.</span>
-
-<span class="sd">    Based on matplotlib</span>
+<span class="k">class</span> <span class="nc">PushBotRetinaViewer</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Viewer of retina from the PushBot</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">display_max</span><span class="o">=</span><span class="n">_DISPLAY_MAX</span><span class="p">,</span>
-            <span class="n">frame_time_ms</span><span class="o">=</span><span class="n">_FRAME_TIME_MS</span><span class="p">,</span>
-            <span class="n">decay_time_constant_ms</span><span class="o">=</span><span class="n">_DECAY_TIME_CONSTANT_MS</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param PushBotRetinaResolution resolution:</span>
-<span class="sd">        :param int port:</span>
-<span class="sd">        :param float display_max: Value of brightest pixel to show</span>
-<span class="sd">        :param int frame_time_ms:</span>
-<span class="sd">            How regularity to display frames (milliseconds)</span>
-<span class="sd">        :param int decay_time_constant_ms:</span>
-<span class="sd">            Time constant of pixel decay (milliseconds)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>  <span class="c1"># NOQA</span>
-            <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">animation</span>  <span class="c1"># NOQA</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__pyplot</span> <span class="o">=</span> <span class="n">pyplot</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__animation</span> <span class="o">=</span> <span class="n">animation</span>
-        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="s2">&quot;matplotlib must be installed to use this viewer&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">retina_resolution</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">sim</span><span class="p">):</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;PushBotRetinaViewer&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__display_max</span> <span class="o">=</span> <span class="n">display_max</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__frame_time_ms</span> <span class="o">=</span> <span class="n">frame_time_ms</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__image</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">retina_resolution</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">pixels</span><span class="p">,</span> <span class="n">retina_resolution</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">pixels</span><span class="p">),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__plot</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greens&quot;</span><span class="p">,</span>
+            <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">MAX_VALUE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">flush_events</span><span class="p">()</span>
 
-        <span class="c1"># Open socket to receive UDP</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_init_socket</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__without_polarity_mask</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">retina_resolution</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">bits_per_coordinate</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__height</span> <span class="o">=</span> <span class="n">retina_resolution</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">pixels</span>
 
-        <span class="c1"># Determine mask for coordinates</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__coordinate_mask</span> <span class="o">=</span> \
-            <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">resolution</span><span class="o">.</span><span class="n">bits_per_coordinate</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__running</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="c1"># Set up the image</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">resolution</span><span class="o">.</span><span class="n">pixels</span> <span class="o">*</span> <span class="n">resolution</span><span class="o">.</span><span class="n">pixels</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__image_data_view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span><span class="o">.</span><span class="n">view</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__image_data_view</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">resolution</span><span class="o">.</span><span class="n">pixels</span><span class="p">,</span> <span class="n">resolution</span><span class="o">.</span><span class="n">pixels</span><span class="p">)</span>
-
-        <span class="c1"># Calculate decay proportion each frame</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__decay_proportion</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
-            <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__frame_time_ms</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">decay_time_constant_ms</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">_init_socket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Open socket to receive UDP.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__spike_socket</span> <span class="o">=</span> <span class="n">get_udp_socket</span><span class="p">()</span>
-        <span class="n">bind_socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__spike_socket</span><span class="p">,</span> <span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__spike_socket</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__local_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_port</span> <span class="o">=</span> <span class="n">get_socket_address</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__spike_socket</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sim</span> <span class="o">=</span> <span class="n">sim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__conn</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">external_devices</span><span class="o">.</span><span class="n">SpynnakerLiveSpikesConnection</span><span class="p">(</span>
+            <span class="n">receive_labels</span><span class="o">=</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">local_port</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__conn</span><span class="o">.</span><span class="n">add_receive_callback</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recv</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">local_host</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_host</span>
+    <span class="k">def</span> <span class="nf">port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The port the connection is listening on</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">local_port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__local_port</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__conn</span><span class="o">.</span><span class="n">local_port</span>
 
-    <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__spike_socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="k">def</span> <span class="nf">__recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">spikes</span><span class="p">):</span>
+        <span class="n">np_spikes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__without_polarity_mask</span>
+        <span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">divmod</span><span class="p">(</span><span class="n">np_spikes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__height</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span><span class="p">[</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
 
-    <span class="k">def</span> <span class="nf">_parse_raw_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">):</span>
-        <span class="c1"># Slice off EIEIO header and timestamp, and convert to numpy</span>
-        <span class="c1"># array of uint32</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">raw_data</span><span class="p">[</span><span class="mi">6</span><span class="p">:],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__run_sim_forever</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sim</span><span class="o">.</span><span class="n">external_devices</span><span class="o">.</span><span class="n">run_forever</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sim</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
 
-        <span class="c1"># Mask out x, y coordinates</span>
-        <span class="n">payload</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__coordinate_mask</span>
+    <span class="k">def</span> <span class="nf">__run_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_time</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sim</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
 
-        <span class="c1"># Increment these pixels</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span><span class="p">[</span><span class="n">payload</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+    <span class="k">def</span> <span class="nf">__run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_thread</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">_updatefig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Read all UDP messages received during last frame</span>
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">__running</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fig</span><span class="o">.</span><span class="n">get_visible</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_parse_raw_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__spike_socket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">_BUFFER_SIZE</span><span class="p">))</span>
-            <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
-                <span class="c1"># Stop reading</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__plot</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">flush_events</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span> <span class="o">*=</span> <span class="n">DECAY_FACTOR</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="c1"># pylint: disable=broad-except</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">break</span>
 
-        <span class="c1"># Decay image data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__decay_proportion</span>
-
-        <span class="c1"># Set image data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__image</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__image_data_view</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__image</span><span class="p">]</span>
-
-<div class="viewcode-block" id="PushBotRetinaViewer.run"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices.PushBotRetinaViewer.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; How the viewer works when the thread is running.</span>
+<div class="viewcode-block" id="PushBotRetinaViewer.run_until_closed"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices.PushBotRetinaViewer.run_until_closed">[docs]</a>    <span class="k">def</span> <span class="nf">run_until_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Run the viewer and simulation until the viewer is closed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Create image plot of retina output</span>
-        <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pyplot</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pyplot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__image_data_view</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-            <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__display_max</span><span class="p">)</span>
+        <span class="n">run_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__run_sim_forever</span><span class="p">)</span>
+        <span class="n">run_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__run</span><span class="p">(</span><span class="n">run_thread</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sim</span><span class="o">.</span><span class="n">external_devices</span><span class="o">.</span><span class="n">request_stop</span><span class="p">()</span>
+        <span class="n">run_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
 
-        <span class="c1"># Play animation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__animation</span><span class="o">.</span><span class="n">FuncAnimation</span><span class="p">(</span>
-            <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_frame</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_updatefig</span><span class="p">()),</span>
-            <span class="n">interval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__frame_time_ms</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+<div class="viewcode-block" id="PushBotRetinaViewer.run"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices.PushBotRetinaViewer.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_time</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Run the viewer and simulation for a fixed time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">run_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__run_sim</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">run_time</span><span class="p">])</span>
+        <span class="n">run_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__run</span><span class="p">(</span><span class="n">run_thread</span><span class="p">)</span>
+        <span class="n">run_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
 </pre></div>
 
             <div class="clearer"></div>
