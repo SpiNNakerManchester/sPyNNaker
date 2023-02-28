@@ -15,7 +15,9 @@ from threading import Thread
 from time import sleep
 from matplotlib import pyplot
 import numpy
-import pyNN.spiNNaker as p
+from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
+from spynnaker.pyNN.external_devices import run_forever, request_stop
+from spynnaker.pyNN import end, run
 
 MAX_VALUE = 33.0
 ADD_VALUE = 1.0
@@ -46,7 +48,7 @@ class PushBotRetinaViewer():
 
         self.__running = True
 
-        self.__conn = p.external_devices.SpynnakerLiveSpikesConnection(
+        self.__conn = SpynnakerLiveSpikesConnection(
             receive_labels=[label], local_port=None)
         self.__conn.add_receive_callback(label, self.__recv)
 
@@ -65,14 +67,14 @@ class PushBotRetinaViewer():
         self.__image_data[x_vals, y_vals] += 1.0
 
     def __run_sim_forever(self):
-        p.external_devices.run_forever()
+        run_forever()
         self.__running = False
-        p.end()
+        end()
 
     def __run_sim(self, run_time):
-        p.run(run_time)
+        run(run_time)
         self.__running = False
-        p.end()
+        end()
 
     def __run(self, run_thread):
 
@@ -93,7 +95,7 @@ class PushBotRetinaViewer():
         run_thread = Thread(target=self.__run_sim_forever)
         run_thread.start()
         self.__run(run_thread)
-        p.external_devices.request_stop()
+        request_stop()
         run_thread.join()
 
     def run(self, run_time):
