@@ -108,6 +108,8 @@ class TestFixedNumberPostConnector(BaseTestCase):
         with self.assertRaises(SpynnakerException):
             self.check_self_connect(DESTINATIONS, with_replacement,
                                     allow_self_connections)
+        # We have to end here as the exception happens before end
+        sim.end()
 
     def test_with_many_replace_self(self):
         with_replacement = True
@@ -131,6 +133,8 @@ class TestFixedNumberPostConnector(BaseTestCase):
         with_replacement = False
         with self.assertRaises(SpynnakerException):
             self.check_other_connect(DESTINATIONS+3, with_replacement)
+        # We have to end here as the exception happens before end
+        sim.end()
 
     def test_get_before_run(self):
         sim.setup(1.0)

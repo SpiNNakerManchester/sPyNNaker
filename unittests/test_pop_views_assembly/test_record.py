@@ -119,3 +119,4 @@ class TestPopulation(BaseTestCase):
         pop.record("v")
         with pytest.raises(ConfigurationException):
             pop.record(None, sampling_interval=2)
+        sim.end()
