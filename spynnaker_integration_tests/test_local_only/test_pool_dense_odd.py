@@ -29,13 +29,21 @@ def do_run():
              for idx in range(n_input)]
 
     vline0 = [[10. + idx // shape[1]]
-              if (idx % shape[1]) == (shape[1] // 2) else []
+              if (idx % shape[1]) == 0 else []
               for idx in range(n_input)]
+
+    vline1 = [[5. + idx // shape[1]]
+              if (idx % shape[1]) == shape[1] - 1 else []
+              for idx in range(n_input)]
+
+    print(vline)
+    print(vline0)
+    print(vline1)
 
     run_time = 60.
 
     sim.setup(timestep=1.)
-    sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, (3, 3))
+    sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, (5, 5))
     sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 16)
 
     src = sim.Population(n_input, sim.SpikeSourceArray,
@@ -47,10 +55,16 @@ def do_run():
                           {'spike_times': vline0},
                           label='input spikes 1',
                           structure=Grid2D(shape[0] / shape[1]))
+
+    src2 = sim.Population(n_input, sim.SpikeSourceArray,
+                          {'spike_times': vline1},
+                          label='input spikes 1',
+                          structure=Grid2D(shape[0] / shape[1]))
     n_out = 3
 
-    conn = sim.PoolDenseConnector([1, 2, 3], pool_shape=shape)
-    conn1 = sim.PoolDenseConnector([3, 2, 1], pool_shape=shape)
+    conn = sim.PoolDenseConnector([0, 200, 0], pool_shape=shape)
+    conn1 = sim.PoolDenseConnector([200, 0, 0], pool_shape=shape)
+    conn2 = sim.PoolDenseConnector([0, 0, 200], pool_shape=shape)
 
     post_cfg = {
         'v_thresh': 5.,
@@ -67,6 +81,7 @@ def do_run():
 
     sim.Projection(src, dst, conn, sim.PoolDense())
     sim.Projection(src1, dst, conn1, sim.PoolDense())
+    sim.Projection(src2, dst, conn2, sim.PoolDense())
 
     sim.run(run_time)
 
