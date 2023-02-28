@@ -26,6 +26,7 @@ def a_run():
             "spikes_per_second": "bacon",
             "bacon": "bacon"})
     assert pop._vertex.spikes_per_second == "bacon"
+    p.end()
 
 
 class PopAdditionParamsTest(BaseTestCase):
