@@ -79,9 +79,6 @@ class PushBotWIFIConnection(Connection, Listenable):
         self.__local_ip_address, self.__local_port = get_socket_address(
             self.__socket)
 
-        # Set a general timeout on the socket
-        self.__socket.settimeout(0)
-
     def is_connected(self):
         """ See\
             :py:meth:`~spinnman.connections.Connection.is_connected`

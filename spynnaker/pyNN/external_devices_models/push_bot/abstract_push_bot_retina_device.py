@@ -46,8 +46,11 @@ class AbstractPushBotRetinaDevice(
 
         # device specific commands
         commands.append(self._protocol.disable_retina())
+        retina_key = None
+        if self._resolution is not None:
+            retina_key = self._resolution.value
         commands.append(self._protocol.set_retina_transmission(
-            retina_key=self._resolution.value))
+            retina_key=retina_key))
 
         return commands
 
