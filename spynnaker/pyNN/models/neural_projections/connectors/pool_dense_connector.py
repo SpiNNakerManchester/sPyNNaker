@@ -234,6 +234,8 @@ class PoolDenseConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
+        if isinstance(self.__weights, Iterable):
+            return numpy.amax(numpy.abs(self.__weights))
         n_conns = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         return super(PoolDenseConnector, self)._get_weight_maximum(
             self.__weights, n_conns, synapse_info)
@@ -291,24 +293,25 @@ class PoolDenseConnector(AbstractConnector):
         else:
             dim_info["recip_pool_stride"] = self.__recip(1)
         if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
-            pre_start_mask_shift = numpy.array(
+            pre_start_size_mask_shift = numpy.array(
                 app_edge.pre_vertex.get_shape_key_fields(pre_vertex_slice))
-            dim_info["pre_start"] = pre_start_mask_shift[:, 0]
-            dim_info["mask"] = pre_start_mask_shift[:, 1]
-            dim_info["shift"] = pre_start_mask_shift[:, 2]
+            start = pre_start_size_mask_shift[:, 0]
+            size = pre_start_size_mask_shift[:, 1]
+            dim_info["pre_start"] = start
+            dim_info["mask"] = pre_start_size_mask_shift[:, 2]
+            dim_info["shift"] = pre_start_size_mask_shift[:, 3]
         else:
-            n_bits = numpy.ceil(numpy.log2(
-                pre_vertex_slice.shape)).astype("int")
+            start = numpy.array(pre_vertex_slice.start)
+            size = numpy.array(pre_vertex_slice.shape)
+            n_bits = numpy.ceil(numpy.log2(size)).astype("int")
             shifts = numpy.concatenate(([0], numpy.cumsum(n_bits[:-1])))
             masks = numpy.left_shift(numpy.left_shift(1, n_bits) - 1, shifts)
-            dim_info["pre_start"] = pre_vertex_slice.start
+            dim_info["pre_start"] = start
             dim_info["mask"] = masks
             dim_info["shift"] = shifts
 
-        dim_info["pre_in_post_start"] = self.__pre_as_post(
-            pre_vertex_slice.start)
-        dim_info["pre_in_post_end"] = self.__pre_as_post(
-            pre_vertex_slice.end)
+        dim_info["pre_in_post_start"] = self.__pre_as_post(start)
+        dim_info["pre_in_post_end"] = self.__pre_as_post(start + size)
         dim_info["pre_in_post_shape"] = (
             dim_info["pre_in_post_end"] - dim_info["pre_in_post_start"] + 1)
         spec.write_array(dim_info.view(numpy.uint32))

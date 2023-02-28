@@ -150,7 +150,7 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
     for (uint32_t i = 0; i < config.n_connectors; i++) {
         connector *c = connectors[i];
         if ((spike & c->key_info.mask) == c->key_info.key) {
-        	uint32_t local_spike = (spike & ~c->key_info.mask) & c->key_info.n_colour_bits;
+        	uint32_t local_spike = spike >> c->key_info.n_colour_bits;
             *conn = c;
 
             // Now work out the index into the weights from the coordinates
