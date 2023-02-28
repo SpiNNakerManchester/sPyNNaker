@@ -15,9 +15,6 @@ from threading import Thread
 from time import sleep
 from matplotlib import pyplot
 import numpy
-from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
-from spynnaker.pyNN.external_devices import run_forever, request_stop
-from spynnaker.pyNN import end, run
 
 MAX_VALUE = 33.0
 ADD_VALUE = 1.0
@@ -29,7 +26,7 @@ class PushBotRetinaViewer():
     """ Viewer of retina from the PushBot
     """
 
-    def __init__(self, retina_resolution, label):
+    def __init__(self, retina_resolution, label, sim):
 
         pyplot.ion()
         self.__image_data = numpy.zeros(
@@ -48,7 +45,8 @@ class PushBotRetinaViewer():
 
         self.__running = True
 
-        self.__conn = SpynnakerLiveSpikesConnection(
+        self.__sim = sim
+        self.__conn = sim.external_devices.SpynnakerLiveSpikesConnection(
             receive_labels=[label], local_port=None)
         self.__conn.add_receive_callback(label, self.__recv)
 
@@ -67,14 +65,14 @@ class PushBotRetinaViewer():
         self.__image_data[x_vals, y_vals] += 1.0
 
     def __run_sim_forever(self):
-        run_forever()
+        self.__sim.external_devices.run_forever()
         self.__running = False
-        end()
+        self.__sim.end()
 
     def __run_sim(self, run_time):
-        run(run_time)
+        self.__sim.run(run_time)
         self.__running = False
-        end()
+        self.__sim.end()
 
     def __run(self, run_thread):
 
@@ -95,7 +93,7 @@ class PushBotRetinaViewer():
         run_thread = Thread(target=self.__run_sim_forever)
         run_thread.start()
         self.__run(run_thread)
-        request_stop()
+        self.__sim.external_devices.request_stop()
         run_thread.join()
 
     def run(self, run_time):
