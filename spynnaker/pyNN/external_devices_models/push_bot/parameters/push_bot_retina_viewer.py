@@ -11,133 +11,95 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import math
-import socket
 from threading import Thread
+from time import sleep
+from matplotlib import pyplot
 import numpy
-from spinnman.utilities.socket_utils import (
-    get_udp_socket, get_socket_address, bind_socket)
+import pyNN.spiNNaker as p
 
-# Value of brightest pixel to show
-_DISPLAY_MAX = 33.0
-# How regularity to display frames
-_FRAME_TIME_MS = 10
-# Time constant of pixel decay
-_DECAY_TIME_CONSTANT_MS = 100
-_BUFFER_SIZE = 512
+MAX_VALUE = 33.0
+ADD_VALUE = 1.0
+DECAY_FACTOR = 0.5
+SLEEP_TIME = 0.1
 
 
-class PushBotRetinaViewer(Thread):
-    """ A viewer for the pushbot's retina. This is a thread that can be \
-        launched in parallel with the control code.
-
-    Based on matplotlib
+class PushBotRetinaViewer():
+    """ Viewer of retina from the PushBot
     """
 
-    def __init__(
-            self, resolution, port=0, display_max=_DISPLAY_MAX,
-            frame_time_ms=_FRAME_TIME_MS,
-            decay_time_constant_ms=_DECAY_TIME_CONSTANT_MS):
-        """
-        :param PushBotRetinaResolution resolution:
-        :param int port:
-        :param float display_max: Value of brightest pixel to show
-        :param int frame_time_ms:
-            How regularity to display frames (milliseconds)
-        :param int decay_time_constant_ms:
-            Time constant of pixel decay (milliseconds)
-        """
-        # pylint: disable=too-many-arguments
-        try:
-            from matplotlib import pyplot  # NOQA
-            from matplotlib import animation  # NOQA
-            self.__pyplot = pyplot
-            self.__animation = animation
-        except ImportError as e:
-            raise ImportError(
-                "matplotlib must be installed to use this viewer") from e
+    def __init__(self, retina_resolution, label):
 
-        super().__init__(name="PushBotRetinaViewer")
-        self.__display_max = display_max
-        self.__frame_time_ms = frame_time_ms
-        self.__image = None
+        pyplot.ion()
+        self.__image_data = numpy.zeros(
+            (retina_resolution.value.pixels, retina_resolution.value.pixels),
+            dtype=numpy.float32)
+        self.__fig, axes = pyplot.subplots(figsize=(8, 8))
+        self.__plot = axes.imshow(
+            self.__image_data, interpolation="nearest", cmap="Greens",
+            vmin=0, vmax=MAX_VALUE)
+        self.__fig.canvas.draw()
+        self.__fig.canvas.flush_events()
 
-        # Open socket to receive UDP
-        self._init_socket(port)
+        self.__without_polarity_mask = (
+            2 ** (retina_resolution.value.bits_per_coordinate * 2)) - 1
+        self.__height = retina_resolution.value.pixels
 
-        # Determine mask for coordinates
-        self.__coordinate_mask = \
-            (1 << (2 * resolution.bits_per_coordinate)) - 1
+        self.__running = True
 
-        # Set up the image
-        self.__image_data = numpy.zeros(resolution.pixels * resolution.pixels)
-        self.__image_data_view = self.__image_data.view()
-        self.__image_data_view.shape = (resolution.pixels, resolution.pixels)
-
-        # Calculate decay proportion each frame
-        self.__decay_proportion = math.exp(
-            -float(self.__frame_time_ms) / float(decay_time_constant_ms))
-
-    def _init_socket(self, port):
-        """ Open socket to receive UDP.
-        """
-        self.__spike_socket = get_udp_socket()
-        bind_socket(self.__spike_socket, "0.0.0.0", port)
-        self.__spike_socket.setblocking(False)
-
-        self.__local_host, self.__local_port = get_socket_address(
-            self.__spike_socket)
+        self.__conn = p.external_devices.SpynnakerLiveSpikesConnection(
+            receive_labels=[label], local_port=None)
+        self.__conn.add_receive_callback(label, self.__recv)
 
     @property
-    def local_host(self):
-        return self.__local_host
+    def port(self):
+        """ The port the connection is listening on
 
-    @property
-    def local_port(self):
-        return self.__local_port
+        :rtype: int
+        """
+        return self.__conn.local_port
 
-    def _close(self):
-        self.__spike_socket.close()
+    # pylint: disable=unused-argument
+    def __recv(self, label, time, spikes):
+        np_spikes = numpy.array(spikes) & self.__without_polarity_mask
+        x_vals, y_vals = numpy.divmod(np_spikes, self.__height)
+        self.__image_data[x_vals, y_vals] += 1.0
 
-    def _parse_raw_data(self, raw_data):
-        # Slice off EIEIO header and timestamp, and convert to numpy
-        # array of uint32
-        payload = numpy.fromstring(raw_data[6:], dtype="uint32")
+    def __run_sim_forever(self):
+        p.external_devices.run_forever()
+        self.__running = False
+        p.end()
 
-        # Mask out x, y coordinates
-        payload &= self.__coordinate_mask
+    def __run_sim(self, run_time):
+        p.run(run_time)
+        self.__running = False
+        p.end()
 
-        # Increment these pixels
-        self.__image_data[payload] += 1.0
+    def __run(self, run_thread):
 
-    def _updatefig(self):
-        # Read all UDP messages received during last frame
-        while True:
+        while self.__running and self.__fig.get_visible():
             try:
-                self._parse_raw_data(self.__spike_socket.recv(_BUFFER_SIZE))
-            except socket.error:
-                # Stop reading
+                self.__plot.set_array(self.__image_data)
+                self.__fig.canvas.draw()
+                self.__fig.canvas.flush_events()
+                self.__image_data *= DECAY_FACTOR
+                sleep(0.1)
+            # pylint: disable=broad-except
+            except Exception:
                 break
 
-        # Decay image data
-        self.__image_data *= self.__decay_proportion
-
-        # Set image data
-        self.__image.set_array(self.__image_data_view)
-        return [self.__image]
-
-    def run(self):
-        """ How the viewer works when the thread is running.
+    def run_until_closed(self):
+        """ Run the viewer and simulation until the viewer is closed.
         """
-        # Create image plot of retina output
-        fig = self.__pyplot.figure()
-        self.__image = self.__pyplot.imshow(
-            self.__image_data_view, cmap="viridis", vmin=0.0,
-            vmax=self.__display_max)
+        run_thread = Thread(target=self.__run_sim_forever)
+        run_thread.start()
+        self.__run(run_thread)
+        p.external_devices.request_stop()
+        run_thread.join()
 
-        # Play animation
-        self.__animation.FuncAnimation(
-            fig, (lambda _frame: self._updatefig()),
-            interval=self.__frame_time_ms, blit=True)
-        self.__pyplot.show()
+    def run(self, run_time):
+        """ Run the viewer and simulation for a fixed time.
+        """
+        run_thread = Thread(target=self.__run_sim, args=[run_time])
+        run_thread.start()
+        self.__run(run_thread)
+        run_thread.join()
