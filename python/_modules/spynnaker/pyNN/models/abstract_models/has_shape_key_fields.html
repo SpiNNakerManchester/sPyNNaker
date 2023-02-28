@@ -62,12 +62,12 @@
 <div class="viewcode-block" id="HasShapeKeyFields.get_shape_key_fields"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.HasShapeKeyFields.get_shape_key_fields">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_shape_key_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the fields to be used for each dimension in the shape of the</span>
-<span class="sd">            given source vertex slice, as a list of start, mask, shift values</span>
-<span class="sd">            in the order of the fields</span>
+<span class="sd">            given source vertex slice, as a list of start, size, mask, shift</span>
+<span class="sd">            values in the order of the fields</span>
 
 <span class="sd">        :param Slice vertex_slice: The slice of the source vertex</span>
 
-<span class="sd">        :rtype: list(tuple(int, int, int))</span>
+<span class="sd">        :rtype: list(tuple(int, int, int, int))</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 </pre></div>
 

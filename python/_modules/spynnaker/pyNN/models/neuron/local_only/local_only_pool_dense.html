@@ -123,9 +123,14 @@
             <span class="c1"># Keep track of all the same source squares, so they can be</span>
             <span class="c1"># merged; this will make sure the keys line up!</span>
             <span class="n">edges_for_source</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">pre_m_vertex</span> <span class="ow">in</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
+            <span class="n">pre_splitter</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span>
+            <span class="k">for</span> <span class="n">pre_m_vertex</span> <span class="ow">in</span> <span class="n">pre_splitter</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">(</span>
+                    <span class="n">SPIKE_PARTITION_ID</span><span class="p">):</span>
                 <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
                     <span class="n">pre_m_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">r_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Missing r_info for </span><span class="si">{</span><span class="n">pre_m_vertex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">pre_m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
                 <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
                 <span class="n">edges_for_source</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pre_m_vertex</span><span class="p">,</span> <span class="n">r_info</span><span class="p">))</span>
@@ -214,7 +219,10 @@
     <span class="k">def</span> <span class="nf">get_mean_positive_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="n">conn</span> <span class="o">=</span> <span class="n">incoming_projection</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">connector</span>
-        <span class="n">pos_weights</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">conn</span><span class="o">.</span><span class="n">weights</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">weights</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">weights</span>
+        <span class="n">pos_weights</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">weights</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos_weights</span><span class="p">):</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">pos_weights</span><span class="p">)</span></div>
@@ -223,7 +231,10 @@
     <span class="k">def</span> <span class="nf">get_mean_negative_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="n">conn</span> <span class="o">=</span> <span class="n">incoming_projection</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">connector</span>
-        <span class="n">neg_weights</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">conn</span><span class="o">.</span><span class="n">weights</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">weights</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">weights</span>
+        <span class="n">neg_weights</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">weights</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">neg_weights</span><span class="p">):</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">neg_weights</span><span class="p">)</span></div>
@@ -232,7 +243,10 @@
     <span class="k">def</span> <span class="nf">get_variance_positive_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="n">conn</span> <span class="o">=</span> <span class="n">incoming_projection</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">connector</span>
-        <span class="n">pos_weights</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">conn</span><span class="o">.</span><span class="n">weights</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">weights</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">pos_weights</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">weights</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos_weights</span><span class="p">):</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">pos_weights</span><span class="p">)</span></div>
@@ -241,7 +255,10 @@
     <span class="k">def</span> <span class="nf">get_variance_negative_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="n">conn</span> <span class="o">=</span> <span class="n">incoming_projection</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">connector</span>
-        <span class="n">neg_weights</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">conn</span><span class="o">.</span><span class="n">weights</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">weights</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="n">neg_weights</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">weights</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">neg_weights</span><span class="p">):</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">neg_weights</span><span class="p">)</span></div>

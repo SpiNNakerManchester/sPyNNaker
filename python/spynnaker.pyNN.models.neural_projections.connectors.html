@@ -1109,6 +1109,21 @@ is “inhibitory”.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_encoded_kernel_weights">
+<span class="sig-name descname"><span class="pre">get_encoded_kernel_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_scales</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_encoded_kernel_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_encoded_kernel_weights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_local_only_data">
+<span class="sig-name descname"><span class="pre">get_local_only_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_colour_bits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_local_only_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_local_only_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_max_n_incoming_slices">
+<span class="sig-name descname"><span class="pre">get_max_n_incoming_slices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_max_n_incoming_slices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_max_n_incoming_slices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_n_connections_from_pre_vertex_maximum">
 <span class="sig-name descname"><span class="pre">get_n_connections_from_pre_vertex_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_post_atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_n_connections_from_pre_vertex_maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_n_connections_from_pre_vertex_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
@@ -1171,18 +1186,28 @@ for connections with a delay between min_delay and max_delay
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.kernel_n_bytes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_n_bytes</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.kernel_n_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.kernel_n_weights">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_n_weights</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.kernel_n_weights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.kernel_weights">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_weights</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.kernel_weights" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.local_only_n_bytes">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">local_only_n_bytes</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.local_only_n_bytes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.negative_receptor_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">negative_receptor_type</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.negative_receptor_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.negative_receptor_type">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">negative_receptor_type</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.negative_receptor_type" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.parameters_n_bytes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters_n_bytes</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.parameters_n_bytes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -1208,11 +1233,6 @@ is assumed that an Exception will be raised if anything is wrong.</p>
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.write_local_only_data">
-<span class="sig-name descname"><span class="pre">write_local_only_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_colour_bits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_scales</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.write_local_only_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.write_local_only_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -3447,16 +3467,20 @@ for connections with a delay between min_delay and max_delay
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_connected_vertices"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.get_connected_vertices()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_delay_maximum"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.get_delay_maximum()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_delay_minimum"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.get_delay_minimum()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_encoded_kernel_weights"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.get_encoded_kernel_weights()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_local_only_data"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.get_local_only_data()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_max_n_incoming_slices"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.get_max_n_incoming_slices()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_n_connections_from_pre_vertex_maximum"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.get_n_connections_from_pre_vertex_maximum()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_n_connections_to_post_vertex_maximum"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.get_n_connections_to_post_vertex_maximum()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_post_shape"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.get_post_shape()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.get_weight_maximum"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.get_weight_maximum()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.kernel_n_bytes"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.kernel_n_bytes</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.kernel_n_weights"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.kernel_n_weights</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.kernel_weights"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.kernel_weights</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.local_only_n_bytes"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.local_only_n_bytes</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.negative_receptor_type"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.negative_receptor_type</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.parameters_n_bytes"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.parameters_n_bytes</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.positive_receptor_type"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.positive_receptor_type</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.validate_connection"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.validate_connection()</span></code></a></li>
-<li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.ConvolutionConnector.write_local_only_data"><code class="docutils literal notranslate"><span class="pre">ConvolutionConnector.write_local_only_data()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.connectors.DistanceDependentProbabilityConnector"><code class="docutils literal notranslate"><span class="pre">DistanceDependentProbabilityConnector</span></code></a><ul>

@@ -296,6 +296,7 @@
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.X_MASK"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.X_MASK</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.X_PER_ROW"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.X_PER_ROW</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.Y_MASK"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.Y_MASK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_atom_key_map"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_atom_key_map()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_fixed_key_and_mask()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_incoming_slice_for_link"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_incoming_slice_for_link()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_machine_fixed_key_and_mask"><code class="docutils literal notranslate"><span class="pre">SPIFRetinaDevice.get_machine_fixed_key_and_mask()</span></code></a></li>
@@ -1844,6 +1845,21 @@ is “inhibitory”.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_encoded_kernel_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_scales</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_encoded_kernel_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_local_only_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_colour_bits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_local_only_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_max_n_incoming_slices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_max_n_incoming_slices"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">get_n_connections_from_pre_vertex_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_post_atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_n_connections_from_pre_vertex_maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="simple">
 <dt>Get the maximum number of connections from any</dt><dd><p>neuron in the pre vertex to the neurons in the post_vertex_slice,
@@ -1906,17 +1922,27 @@ for connections with a delay between min_delay and max_delay
 
 <dl class="py property">
 <dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_n_bytes</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_n_weights</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_weights</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">local_only_n_bytes</span></span></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">negative_receptor_type</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">negative_receptor_type</span></span></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parameters_n_bytes</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -1942,11 +1968,6 @@ is assumed that an Exception will be raised if anything is wrong.</p>
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">write_local_only_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_colour_bits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_scales</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.write_local_only_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 

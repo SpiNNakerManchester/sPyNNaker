@@ -57,7 +57,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.</span></span><span class="sig-name descname"><span class="pre">SpikeInjectorVertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtual_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reserve_reverse_ip_tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.ReverseIpTagMultiCastSource" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReverseIpTagMultiCastSource</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="spynnaker.pyNN.models.common.PopulationApplicationVertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.ReverseIpTagMultiCastSource" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReverseIpTagMultiCastSource</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="spynnaker.pyNN.models.common.PopulationApplicationVertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.SupportsStructure" title="spynnaker.pyNN.models.abstract_models.SupportsStructure"><code class="xref py py-class docutils literal notranslate"><span class="pre">SupportsStructure</span></code></a></p>
 <p>An Injector of Spikes for PyNN populations.  This only allows the user        to specify the virtual_key of the population to identify the population</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -100,6 +100,22 @@ send injected keys with</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID">
 <span class="sig-name descname"><span class="pre">SPIKE_RECORDING_REGION_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.atoms_shape">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">atoms_shape</span></span><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.atoms_shape" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>The “shape” of the atoms in the vertex i.e. how the atoms are split</dt><dd><p>between the dimensions of the vertex.  By default everything is
+1-dimensional, so the return will be a 1-tuple but can be
+overridden by a vertex that supports multiple dimensions.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, …)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.default_parameters">
@@ -284,6 +300,17 @@ time step, in milliseconds</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_structure">
+<span class="sig-name descname"><span class="pre">set_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.set_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the structure of the object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>structure</strong> (<em>pynn.space.BaseStructure</em>) – The structure to set</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -338,6 +365,7 @@ time step, in milliseconds</p></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex">spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex module</a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex"><code class="docutils literal notranslate"><span class="pre">SpikeInjectorVertex</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID"><code class="docutils literal notranslate"><span class="pre">SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.atoms_shape"><code class="docutils literal notranslate"><span class="pre">SpikeInjectorVertex.atoms_shape</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.default_parameters"><code class="docutils literal notranslate"><span class="pre">SpikeInjectorVertex.default_parameters</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.describe"><code class="docutils literal notranslate"><span class="pre">SpikeInjectorVertex.describe()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_buffer_data_type"><code class="docutils literal notranslate"><span class="pre">SpikeInjectorVertex.get_buffer_data_type()</span></code></a></li>
@@ -350,6 +378,7 @@ time step, in milliseconds</p></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_units"><code class="docutils literal notranslate"><span class="pre">SpikeInjectorVertex.get_units()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_not_recording"><code class="docutils literal notranslate"><span class="pre">SpikeInjectorVertex.set_not_recording()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_recording"><code class="docutils literal notranslate"><span class="pre">SpikeInjectorVertex.set_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_structure"><code class="docutils literal notranslate"><span class="pre">SpikeInjectorVertex.set_structure()</span></code></a></li>
 </ul>
 </li>
 </ul>

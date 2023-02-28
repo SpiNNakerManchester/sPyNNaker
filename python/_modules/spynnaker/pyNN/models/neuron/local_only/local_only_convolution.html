@@ -69,20 +69,25 @@
 <span class="c1">#: Number of shorts in the conv_config struct</span>
 <span class="n">CONV_CONFIG_N_SHORTS</span> <span class="o">=</span> <span class="mi">6</span>
 
+<span class="c1">#: Number of words in the conv_config struct</span>
+<span class="n">CONV_CONFIG_N_WORDS</span> <span class="o">=</span> <span class="mi">2</span>
+
 
 <span class="k">class</span> <span class="nc">LocalOnlyConvolution</span><span class="p">(</span><span class="n">AbstractLocalOnly</span><span class="p">,</span> <span class="n">AbstractSupportsSignedWeights</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; A convolution synapse dynamics that can process spikes with only DTCM</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__cached_2d_overlaps&quot;</span>
+        <span class="s2">&quot;__cached_2d_overlaps&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__cached_n_incoming&quot;</span>
     <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Store the overlaps between 2d vertices to avoid recalculation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__cached_2d_overlaps</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-        <span class="c1"># Store the merged keys for sources to avoid recalculation</span>
+        <span class="c1"># Store the n_incoming to avoid recalcaultion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_n_incoming</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
 <div class="viewcode-block" id="LocalOnlyConvolution.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.local_only.html#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.merge">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractLocalOnly</span><span class="o">.</span><span class="n">merge</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
@@ -105,6 +110,7 @@
     <span class="k">def</span> <span class="nf">get_parameters_usage_in_bytes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">):</span>
         <span class="n">n_bytes</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">kernel_bytes</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">incoming</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
             <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">s_info</span> <span class="o">=</span> <span class="n">incoming</span><span class="o">.</span><span class="n">_synapse_information</span>
@@ -114,12 +120,22 @@
                     <span class="s2">&quot; of Convolution&quot;</span><span class="p">)</span>
             <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">app_edge</span> <span class="o">=</span> <span class="n">incoming</span><span class="o">.</span><span class="n">_projection_edge</span>
-            <span class="n">n_incoming</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
-                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span>
-            <span class="n">n_bytes</span> <span class="o">+=</span> <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">local_only_n_bytes</span> <span class="o">*</span> <span class="n">n_incoming</span>
 
-        <span class="k">return</span> <span class="p">((</span><span class="n">CONV_CONFIG_N_SHORTS</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span> <span class="o">+</span> <span class="n">BYTES_PER_WORD</span> <span class="o">+</span>
-                <span class="n">n_bytes</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="n">app_edge</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_n_incoming</span><span class="p">:</span>
+                <span class="n">n_incoming</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_n_incoming</span><span class="p">[</span><span class="n">app_edge</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n_incoming</span> <span class="o">=</span> <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">get_max_n_incoming_slices</span><span class="p">(</span>
+                    <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__cached_n_incoming</span><span class="p">[</span><span class="n">app_edge</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_incoming</span>
+            <span class="n">n_bytes</span> <span class="o">+=</span> <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">parameters_n_bytes</span> <span class="o">*</span> <span class="n">n_incoming</span>
+            <span class="n">kernel_bytes</span> <span class="o">+=</span> <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">kernel_n_bytes</span>
+
+        <span class="k">if</span> <span class="n">kernel_bytes</span> <span class="o">%</span> <span class="n">BYTES_PER_WORD</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">kernel_bytes</span> <span class="o">+=</span> <span class="n">BYTES_PER_SHORT</span>
+
+        <span class="k">return</span> <span class="p">((</span><span class="n">CONV_CONFIG_N_SHORTS</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span> <span class="o">+</span>
+                <span class="p">(</span><span class="n">CONV_CONFIG_N_WORDS</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span> <span class="n">n_bytes</span> <span class="o">+</span>
+                <span class="n">kernel_bytes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LocalOnlyConvolution.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.local_only.html#spynnaker.pyNN.models.neuron.local_only.LocalOnlyConvolution.write_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractLocalOnly</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
@@ -135,6 +151,32 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;LocalOnlyConvolution&quot;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
 
+        <span class="c1"># Get spec for each incoming source</span>
+        <span class="n">connector_weight_index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">unique_connectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">next_weight_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">sources_for_m_vertex</span><span class="p">:</span>
+            <span class="n">incoming</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">projection</span>
+            <span class="c1"># pylint: disable=protected-access</span>
+            <span class="n">s_info</span> <span class="o">=</span> <span class="n">incoming</span><span class="o">.</span><span class="n">_synapse_information</span>
+            <span class="n">app_edge</span> <span class="o">=</span> <span class="n">incoming</span><span class="o">.</span><span class="n">_projection_edge</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span>
+            <span class="k">if</span> <span class="n">conn</span> <span class="ow">in</span> <span class="n">connector_weight_index</span><span class="p">:</span>
+                <span class="n">weight_index</span> <span class="o">=</span> <span class="n">connector_weight_index</span><span class="p">[</span><span class="n">conn</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">unique_connectors</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">))</span>
+                <span class="n">weight_index</span> <span class="o">=</span> <span class="n">next_weight_index</span>
+                <span class="n">connector_weight_index</span><span class="p">[</span><span class="n">conn</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight_index</span>
+                <span class="n">next_weight_index</span> <span class="o">+=</span> <span class="n">conn</span><span class="o">.</span><span class="n">kernel_n_weights</span>
+
+            <span class="n">data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">get_local_only_data</span><span class="p">(</span>
+                <span class="n">app_edge</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span>
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">,</span> <span class="n">weight_index</span><span class="p">))</span>
+        <span class="n">n_weights</span> <span class="o">=</span> <span class="n">next_weight_index</span>
+        <span class="k">if</span> <span class="n">next_weight_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">n_weights</span> <span class="o">+=</span> <span class="mi">1</span>
+
         <span class="c1"># Write the common spec</span>
         <span class="n">post_slice</span> <span class="o">=</span> <span class="n">machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
         <span class="n">post_start</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">post_slice</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
@@ -146,20 +188,26 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">post_end</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">post_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">post_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">next_weight_index</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sources_for_m_vertex</span><span class="p">),</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
 
-        <span class="c1"># Write spec for each incoming source</span>
-        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">sources_for_m_vertex</span><span class="p">:</span>
-            <span class="n">incoming</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">projection</span>
-            <span class="c1"># pylint: disable=protected-access</span>
-            <span class="n">s_info</span> <span class="o">=</span> <span class="n">incoming</span><span class="o">.</span><span class="n">_synapse_information</span>
-            <span class="n">app_edge</span> <span class="o">=</span> <span class="n">incoming</span><span class="o">.</span><span class="n">_projection_edge</span>
-            <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">write_local_only_data</span><span class="p">(</span>
-                <span class="n">spec</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
-                <span class="n">source</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">)</span></div>
+        <span class="c1"># Write the data</span>
+        <span class="c1"># pylint: disable=unexpected-keyword-arg</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Write weights where they are unique</span>
+        <span class="n">kernel_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">conn</span><span class="p">,</span> <span class="n">app_edge</span> <span class="ow">in</span> <span class="n">unique_connectors</span><span class="p">:</span>
+            <span class="n">kernel_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">get_encoded_kernel_weights</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">next_weight_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">kernel_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int16&quot;</span><span class="p">))</span>
+        <span class="c1"># pylint: disable=unexpected-keyword-arg</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">kernel_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int16&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">__merge_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_a</span><span class="p">,</span> <span class="n">mask_a</span><span class="p">,</span> <span class="n">key_b</span><span class="p">,</span> <span class="n">mask_b</span><span class="p">):</span>
-        <span class="n">new_xs</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">key_a</span> <span class="o">^</span> <span class="n">key_b</span><span class="p">)</span>
+        <span class="n">new_xs</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="p">(</span><span class="n">key_a</span> <span class="o">^</span> <span class="n">key_b</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">mask_a</span> <span class="o">&amp;</span> <span class="n">mask_b</span> <span class="o">&amp;</span> <span class="n">new_xs</span>
         <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key_a</span> <span class="o">|</span> <span class="n">key_b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">mask</span>
         <span class="k">return</span> <span class="n">key</span><span class="p">,</span> <span class="n">mask</span>

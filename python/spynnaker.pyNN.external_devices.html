@@ -382,8 +382,8 @@ iff there is only one machine vertex.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">get_shape_key_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/icub_retina_device.html#ICUBRetinaDevice.get_shape_key_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="simple">
-<dt>Get the fields to be used for each dimension in the shape of the</dt><dd><p>given source vertex slice, as a list of start, mask, shift values
-in the order of the fields</p>
+<dt>Get the fields to be used for each dimension in the shape of the</dt><dd><p>given source vertex slice, as a list of start, size, mask, shift
+values in the order of the fields</p>
 </dd>
 </dl>
 <dl class="field-list simple">
@@ -391,7 +391,7 @@ in the order of the fields</p>
 <dd class="field-odd"><p><strong>vertex_slice</strong> (<em>Slice</em>) – The slice of the source vertex</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>))</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>))</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2051,6 +2051,30 @@ an FPGA.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_atom_key_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_retina_device.html#SPIFRetinaDevice.get_atom_key_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><dl class="simple">
+<dt>Get the mapping between atoms and keys for the given partition id,</dt><dd><p>and for the given machine pre-vertex</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pre_vertex</strong> (<em>MachineVertex</em>) – The machine vertex to get the map for</p></li>
+<li><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The partition to get the map for</p></li>
+<li><p><strong>routing_info</strong> (<em>RoutingInfo</em>) – Routing information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of (atom_id, key)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>,<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">get_fixed_key_and_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_retina_device.html#SPIFRetinaDevice.get_fixed_key_and_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="simple">
 <dt>Get a fixed key and mask for the application vertex or None if not</dt><dd><p>fixed (the default).  See get_machine_gixed_key_and_mask for the
@@ -2114,8 +2138,8 @@ iff there is only one machine vertex.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">get_shape_key_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_retina_device.html#SPIFRetinaDevice.get_shape_key_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="simple">
-<dt>Get the fields to be used for each dimension in the shape of the</dt><dd><p>given source vertex slice, as a list of start, mask, shift values
-in the order of the fields</p>
+<dt>Get the fields to be used for each dimension in the shape of the</dt><dd><p>given source vertex slice, as a list of start, size, mask, shift
+values in the order of the fields</p>
 </dd>
 </dl>
 <dl class="field-list simple">
@@ -2123,7 +2147,7 @@ in the order of the fields</p>
 <dd class="field-odd"><p><strong>vertex_slice</strong> (<em>Slice</em>) – The slice of the source vertex</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>))</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>))</p>
 </dd>
 </dl>
 </dd></dl>
