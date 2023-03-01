@@ -31,20 +31,25 @@ Source = namedtuple("Source", ["projection", "vertex_slice", "key", "mask"])
 #: Number of shorts in the conv_config struct
 CONV_CONFIG_N_SHORTS = 6
 
+#: Number of words in the conv_config struct
+CONV_CONFIG_N_WORDS = 2
+
 
 class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     """ A convolution synapse dynamics that can process spikes with only DTCM
     """
 
     __slots__ = [
-        "__cached_2d_overlaps"
+        "__cached_2d_overlaps",
+        "__cached_n_incoming"
     ]
 
     def __init__(self):
         # Store the overlaps between 2d vertices to avoid recalculation
         self.__cached_2d_overlaps = dict()
 
-        # Store the merged keys for sources to avoid recalculation
+        # Store the n_incoming to avoid recalcaultion
+        self.__cached_n_incoming = dict()
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
@@ -67,6 +72,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_parameters_usage_in_bytes(
             self, n_atoms, incoming_projections):
         n_bytes = 0
+        kernel_bytes = 0
         for incoming in incoming_projections:
             # pylint: disable=protected-access
             s_info = incoming._synapse_information
@@ -76,12 +82,22 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     " of Convolution")
             # pylint: disable=protected-access
             app_edge = incoming._projection_edge
-            n_incoming = len(
-                app_edge.pre_vertex.splitter.get_out_going_slices())
-            n_bytes += s_info.connector.local_only_n_bytes * n_incoming
 
-        return ((CONV_CONFIG_N_SHORTS * BYTES_PER_SHORT) + BYTES_PER_WORD +
-                n_bytes)
+            if app_edge in self.__cached_n_incoming:
+                n_incoming = self.__cached_n_incoming[app_edge]
+            else:
+                n_incoming = s_info.connector.get_max_n_incoming_slices(
+                    app_edge.pre_vertex, app_edge.post_vertex)
+                self.__cached_n_incoming[app_edge] = n_incoming
+            n_bytes += s_info.connector.parameters_n_bytes * n_incoming
+            kernel_bytes += s_info.connector.kernel_n_bytes
+
+        if kernel_bytes % BYTES_PER_WORD != 0:
+            kernel_bytes += BYTES_PER_SHORT
+
+        return ((CONV_CONFIG_N_SHORTS * BYTES_PER_SHORT) +
+                (CONV_CONFIG_N_WORDS * BYTES_PER_WORD) + n_bytes +
+                kernel_bytes)
 
     @overrides(AbstractLocalOnly.write_parameters)
     def write_parameters(self, spec, region, machine_vertex, weight_scales):
@@ -97,6 +113,32 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.reserve_memory_region(region, size, label="LocalOnlyConvolution")
         spec.switch_write_focus(region)
 
+        # Get spec for each incoming source
+        connector_weight_index = dict()
+        unique_connectors = list()
+        next_weight_index = 0
+        data = list()
+        for source in sources_for_m_vertex:
+            incoming = source.projection
+            # pylint: disable=protected-access
+            s_info = incoming._synapse_information
+            app_edge = incoming._projection_edge
+            conn = s_info.connector
+            if conn in connector_weight_index:
+                weight_index = connector_weight_index[conn]
+            else:
+                unique_connectors.append((s_info.connector, app_edge))
+                weight_index = next_weight_index
+                connector_weight_index[conn] = weight_index
+                next_weight_index += conn.kernel_n_weights
+
+            data.extend(s_info.connector.get_local_only_data(
+                app_edge, source.vertex_slice, source.key, source.mask,
+                app_edge.pre_vertex.n_colour_bits, weight_index))
+        n_weights = next_weight_index
+        if next_weight_index % 2 != 0:
+            n_weights += 1
+
         # Write the common spec
         post_slice = machine_vertex.vertex_slice
         post_start = numpy.array(post_slice.start)
@@ -108,20 +150,26 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_value(post_end[0], data_type=DataType.INT16)
         spec.write_value(post_shape[1], data_type=DataType.INT16)
         spec.write_value(post_shape[0], data_type=DataType.INT16)
+        spec.write_value(next_weight_index)
         spec.write_value(len(sources_for_m_vertex), data_type=DataType.UINT32)
 
-        # Write spec for each incoming source
-        for source in sources_for_m_vertex:
-            incoming = source.projection
-            # pylint: disable=protected-access
-            s_info = incoming._synapse_information
-            app_edge = incoming._projection_edge
-            s_info.connector.write_local_only_data(
-                spec, app_edge, source.vertex_slice, source.key,
-                source.mask, app_edge.pre_vertex.n_colour_bits, weight_scales)
+        # Write the data
+        # pylint: disable=unexpected-keyword-arg
+        spec.write_array(numpy.concatenate(data, dtype="uint32"))
+
+        # Write weights where they are unique
+        kernel_data = list()
+        for conn, app_edge in unique_connectors:
+            kernel_data.append(
+                conn.get_encoded_kernel_weights(app_edge, weight_scales))
+        if next_weight_index % 2 != 0:
+            kernel_data.append(numpy.array([0], dtype="int16"))
+        # pylint: disable=unexpected-keyword-arg
+        spec.write_array(
+            numpy.concatenate(kernel_data, dtype="int16").view("uint32"))
 
     def __merge_key_and_mask(self, key_a, mask_a, key_b, mask_b):
-        new_xs = ~(key_a ^ key_b)
+        new_xs = (~(key_a ^ key_b)) & 0xFFFFFFFF
         mask = mask_a & mask_b & new_xs
         key = (key_a | key_b) & mask
         return key, mask

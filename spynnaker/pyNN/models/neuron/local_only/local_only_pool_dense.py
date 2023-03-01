@@ -85,9 +85,14 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             # Keep track of all the same source squares, so they can be
             # merged; this will make sure the keys line up!
             edges_for_source = defaultdict(list)
-            for pre_m_vertex in app_edge.pre_vertex.machine_vertices:
+            pre_splitter = app_edge.pre_vertex.splitter
+            for pre_m_vertex in pre_splitter.get_out_going_vertices(
+                    SPIKE_PARTITION_ID):
                 r_info = routing_info.get_routing_info_from_pre_vertex(
                     pre_m_vertex, SPIKE_PARTITION_ID)
+                if r_info is None:
+                    raise SynapticConfigurationException(
+                        f"Missing r_info for {pre_m_vertex}")
                 vertex_slice = pre_m_vertex.vertex_slice
                 key = (app_edge.pre_vertex, vertex_slice)
                 edges_for_source[key].append((pre_m_vertex, r_info))
@@ -176,7 +181,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_mean_positive_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        pos_weights = conn.weights[conn.weights > 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return weights
+        pos_weights = weights[weights > 0]
         if not len(pos_weights):
             return 0
         return numpy.mean(pos_weights)
@@ -185,7 +193,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_mean_negative_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        neg_weights = conn.weights[conn.weights < 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return weights
+        neg_weights = weights[weights < 0]
         if not len(neg_weights):
             return 0
         return numpy.mean(neg_weights)
@@ -194,7 +205,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_variance_positive_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        pos_weights = conn.weights[conn.weights > 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return 0
+        pos_weights = weights[weights > 0]
         if not len(pos_weights):
             return 0
         return numpy.var(pos_weights)
@@ -203,7 +217,10 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_variance_negative_weight(self, incoming_projection):
         # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
-        neg_weights = conn.weights[conn.weights < 0]
+        weights = conn.weights
+        if isinstance(weights, (int, float)):
+            return 0
+        neg_weights = weights[weights < 0]
         if not len(neg_weights):
             return 0
         return numpy.var(neg_weights)
