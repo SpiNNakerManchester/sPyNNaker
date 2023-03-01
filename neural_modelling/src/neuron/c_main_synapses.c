@@ -40,7 +40,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    MC = 0, DMA = -2, TIMER = -1, SDP = 0
+    MC = 0, DMA = -2, TIMER = 0, SDP = 0, BACKGROUND = 1
 } callback_priorities;
 
 //! Provenance data region layout
@@ -125,6 +125,15 @@ void resume_callback(void) {
     synapses_resume(time + 1);
 }
 
+void background_callback(uint local_time, UNUSED uint unused) {
+	// Skip if we have moved on by the time we get to do this
+	if (time > local_time) {
+		return;
+	}
+	uint32_t n_rewires = synaptogenesis_n_updates();
+	spike_processing_fast_time_step_loop(local_time, n_rewires);
+}
+
 //! \brief Timer event callback.
 //! \param[in] unused0: unused
 //! \param[in] unused1: unused
@@ -141,8 +150,7 @@ void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
         return;
     }
 
-    uint32_t n_rewires = synaptogenesis_n_updates();
-    spike_processing_fast_time_step_loop(time, n_rewires);
+    spin1_schedule_callback(background_callback, time, 0, BACKGROUND);
 }
 
 //! \brief Initialises the model by reading in the regions and checking
