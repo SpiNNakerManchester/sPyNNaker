@@ -342,7 +342,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         create a single Neo Segment wrapped in a neo Block
 
             .. note::
-            As each database only includes
+                As each database only includes
 
         :param str pop_label: The label for the population of interest
 
@@ -1198,6 +1198,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 This is actually the label of the Application Vertex
                 Typical the Population label corrected for None or
                 duplicate values
+
         :param variables: One or more variable names or None for all available
         :type variables: str, list(str) or None
         :param view_indexes: List of neurons ids to include or None for all
@@ -1267,6 +1268,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 This is actually the label of the Application Vertex
                 Typical the Population label corrected for None or
                 duplicate values
+
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
 

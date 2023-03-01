@@ -40,6 +40,7 @@ def do_run():
     sim.reset()
     sim.run(20)
     second_spikes = pop_1.spinnaker_get_data("spikes")
+    sim.end()
 
     return first_spikes, second_spikes
 

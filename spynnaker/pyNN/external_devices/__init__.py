@@ -58,6 +58,7 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.models.utility_models.spike_injector import (
     SpikeInjector as ExternalDeviceSpikeInjector)
+from spynnaker.pyNN import protocols
 
 
 # useful functions
@@ -105,7 +106,8 @@ __all__ = [
     "SpikeInjector",
     "register_database_notification_request",
     "run_forever",
-    "add_poisson_live_rate_control"
+    "add_poisson_live_rate_control",
+    "protocols"
 ]
 # Cache of the simulator provided by pyNN/__init__py
 __simulator = None
