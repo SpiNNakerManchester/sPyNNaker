@@ -40,7 +40,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    DMA = -2, SDP = 0, TIMER = 0
+    DMA = -2, SDP = 0, TIMER = -1
 } callback_priorities;
 
 //! Overall regions to be used by the neuron core

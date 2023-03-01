@@ -40,7 +40,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    MC = -1, DMA = -2, TIMER = 0, SDP = 0
+    MC = 0, DMA = -2, TIMER = -1, SDP = 0
 } callback_priorities;
 
 //! Provenance data region layout
