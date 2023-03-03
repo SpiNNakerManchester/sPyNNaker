@@ -72,76 +72,67 @@ typedef struct {
         };
     };
     uint32_t num_multisynaptic_connections;
-    lc_weight_t weights[]; // n_weights = next_even(kernel.width * kernel.height)
+    uint32_t kernel_index;
 } connector;
 
 typedef struct {
     lc_coord_t post_start;
     lc_coord_t post_end;
     lc_shape_t post_shape;
+    uint32_t n_weights_total;
     uint32_t n_connectors;
+    connector connectors[];
     // In SDRAM, below here is the following:
-    // connector connectors[n_connectors]
+    // lc_weight_t[] weights;
 } conv_config;
 
 // The main configuration data
-static conv_config config;
+static conv_config *config;
 
-// The per-connection data
-static connector** connectors;
-
-//! \brief Load the required data into DTCM.
-bool local_only_impl_initialise(void *address){
-    log_info("+++++++++++++++++ CONV init ++++++++++++++++++++");
-    conv_config* sdram_config = address;
-    config = *sdram_config;
+static lc_weight_t *weights;t_simulation_time_st
+    if (config == NULL) {
+    	log_error("Can't allocate memory for config!");
+    	return false;
+    }
+    spin1_memcpy(config, sdram_config, n_bytes);
 
     log_info("post_start = %u, %u, post_end = %u, %u, post_shape = %u, %u",
-            config.post_start.col, config.post_start.row,
-            config.post_end.col, config.post_end.row,
-            config.post_shape.width, config.post_shape.height);
-    log_info("num connectors = %u", config.n_connectors);
-    if (config.n_connectors == 0) {
-        return false;
+            config->post_start.col, config->post_start.row,
+            config->post_end.col, config->post_end.row,
+            config->post_shape.width, config->post_shape.height);
+    log_info("num connectors = %u", config->n_connectors);
+
+    if (config->n_connectors == 0) {
+    	log_error("No connectors!");
+    	return false;
     }
 
-    // Allocate space for connector information and pre-to-post table
-    connectors = spin1_malloc(config.n_connectors * sizeof(connectors[0]));
-    if (connectors == NULL) {
-        log_error("Can't allocate memory for connectors");
-        return false;
+    // The weights come after the config in SDRAM
+    lc_weight_t *kernel_weights =
+    		(lc_weight_t *) &(sdram_config->connectors[config->n_connectors]);
+    uint32_t n_weight_bytes = sizeof(lc_weight_t) * config->n_weights_total;
+    weights = spin1_malloc(n_weight_bytes);
+    if (weights == NULL) {
+    	log_error("Can't allocate memory for weights!");
+    	return false;
     }
+    spin1_memcpy(weights, kernel_weights, n_weight_bytes);
 
-    // The first connector comes after the configuration in SDRAM
-    connector *conn = (connector *) &sdram_config[1];
-    for (uint32_t i = 0; i < config.n_connectors; i++) {
-        // We need the number of weights to calculate the size
-        uint32_t n_weights = conn->kernel.width * conn->kernel.height;
-        if (n_weights & 0x1) {
-            n_weights += 1;
-        }
-        uint32_t n_bytes = sizeof(*conn) + (n_weights * sizeof(conn->weights[0]));
-
-        // Copy the data from SDRAM
-        connectors[i] = spin1_malloc(n_bytes);
-        if (connectors[i] == NULL) {
-            log_error("Can't allocate memory for connectors[%u]", i);
-            return false;
-        }
-        spin1_memcpy(connectors[i], conn, n_bytes);
-
+    // Print what we have
+    for (uint32_t i = 0; i < config->n_connectors; i++) {
         log_info("Connector %u: key=0x%08x, mask=0x%08x,"
                 "col_mask=0x%08x, col_shift=%u, row_mask=0x%08x, row_shift=%u",
-                i, connectors[i]->key_info.key, connectors[i]->key_info.mask,
-                connectors[i]->key_info.col_mask, connectors[i]->key_info.col_shift,
-                connectors[i]->key_info.row_mask, connectors[i]->key_info.row_shift);
+                i, config->connectors[i].key_info.key,
+				config->connectors[i].key_info.mask,
+				config->connectors[i].key_info.col_mask,
+				config->connectors[i].key_info.col_shift,
+				config->connectors[i].key_info.row_mask,
+				config->connectors[i].key_info.row_shift);
         log_info("              pre_start=%u, %u, kernel_shape=%u %u",
-                connectors[i]->pre_start.col, connectors[i]->pre_start.row,
-                connectors[i]->kernel.width, connectors[i]->kernel.height);
-
-        // Move to the next connector; because it is dynamically sized,
-        // this comes after the last weight in the previous connector
-        conn = (connector *) &conn->weights[n_weights];
+        		config->connectors[i].pre_start.col,
+				config->connectors[i].pre_start.row,
+				config->connectors[i].kernel.width,
+				config->connectors[i].kernel.height);
     }
 
     return true;
@@ -189,6 +180,7 @@ static inline void do_convolution_operation(
     lc_coord_t post_coord = map_pre_to_post(connector, pre_coord, &start_i);
     log_debug("pre row %d, col %d AS post row %d, col %d",
             pre_coord.row, pre_coord.col, post_coord.row, post_coord.col);
+    lc_weight_t *connector_weights = &weights[connector->kernel_index];
 
     int32_t kw = connector->kernel.width;
     for (int32_t i_row = start_i.row, tmp_row = post_coord.row; i_row < connector->kernel.height; i_row += connector->strides.row, --tmp_row) {
@@ -233,32 +225,32 @@ static inline void do_convolution_operation(
             {
                 log_debug("kc = %u, delay = %u", kc, delay);
 
-                // This the neuron id relative to the neurons on this core
-                uint32_t post_index =
-                    ((tmp_row - config.post_start.row) * config.post_shape.width)
-                        + (tmp_col - config.post_start.col);
-                uint32_t k = (kr * kw) + kc;
-                log_debug("weight index = %u", k);
-                lc_weight_t weight = connector->weights[k];
-                if (weight == 0) {
-                    log_debug("zero weight");
-                    continue;
-                }
-                uint32_t rb_index = 0;
-                if (weight > 0) {
-                    rb_index = synapse_row_get_ring_buffer_index(time + delay,
-                        connector->positive_synapse_type, post_index,
-                        synapse_type_index_bits, synapse_index_bits,
-                        synapse_delay_mask);
-                } else {
-                    rb_index = synapse_row_get_ring_buffer_index(time + delay,
-                        connector->negative_synapse_type, post_index,
-                        synapse_type_index_bits, synapse_index_bits,
-                        synapse_delay_mask);
-                    weight = -weight;
-                }
-                log_debug("Updating ring_buffers[%u] for post neuron %u = %u, %u, with weight %u",
-                        rb_index, post_index, tmp_col, tmp_row, weight);
+            // This the neuron id relative to the neurons on this core
+            uint32_t post_index =
+                ((tmp_row - config.post_start.row) * config.post_shape.width)
+                    + (tmp_col - config.post_start.col);
+            uint32_t k = (kr * kw) + kc;
+            log_debug("weight index = %u", k);
+            lc_weight_t weight = connector_weights[k];
+            if (weight == 0) {
+                log_debug("zero weight");
+                continue;
+            }
+            uint32_t rb_index = 0;
+            if (weight > 0) {
+                rb_index = synapse_row_get_ring_buffer_index(time + delay,
+                    connector->positive_synapse_type, post_index,
+                    synapse_type_index_bits, synapse_index_bits,
+                    synapse_delay_mask);
+            } else {
+                rb_index = synapse_row_get_ring_buffer_index(time + delay,
+                    connector->negative_synapse_type, post_index,
+                    synapse_type_index_bits, synapse_index_bits,
+                    synapse_delay_mask);
+                weight = -weight;
+            }
+            log_debug("Updating ring_buffers[%u] for post neuron %u = %u, %u, with weight %u",
+                    rb_index, post_index, tmp_col, tmp_row, weight);
 
                 // Add weight to current ring buffer value, avoiding saturation
                 uint32_t accumulation = ring_buffers[rb_index] + weight;
@@ -272,22 +264,16 @@ static inline void do_convolution_operation(
     }
 }
 
-static inline bool key_to_index_lookup(uint32_t spike, uint32_t *start_index,
-		uint32_t *end_index) {
+static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
+        uint32_t *core_local_col, uint32_t *core_local_row) {
     for (uint32_t i = 0; i < config.n_connectors; i++) {
         connector *c = connectors[i];
         if ((spike & c->key_info.mask) == c->key_info.key) {
-        	*start_index = i;
-            uint32_t e = i + 1;
-        	while (e < config.n_connectors) {
-        		connector *c_e = connectors[e];
-        		if ((spike & c_e->key_info.mask) != c_e->key_info.mask) {
-        			break;
-        		}
-        		e = e + 1;
-        	}
-        	*end_index = e;
-        	return true;
+        	uint32_t local_spike = (spike & ~c->key_info.mask) >> c->key_info.n_colour_bits;
+            *conn = c;
+            *core_local_col = (local_spike & c->key_info.col_mask) >> c->key_info.col_shift;
+            *core_local_row = (local_spike & c->key_info.row_mask) >> c->key_info.row_shift;
+            return true;
         }
     }
     return false;
