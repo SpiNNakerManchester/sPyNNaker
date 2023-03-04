@@ -33,7 +33,7 @@ SOURCE_KEY_INFO_WORDS = 7
 
 #: The number of 16-bit shorts in the connector struct,
 #: ignoring the source_key_info struct and the weights (which are dynamic)
-CONNECTOR_CONFIG_SHORTS = 18
+CONNECTOR_CONFIG_SHORTS = 20
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -340,13 +340,25 @@ class ConvolutionConnector(AbstractConnector):
         return connected
 
     def get_max_n_incoming_slices(self, source_vertex, target_vertex):
-        pre_slices = list(source_vertex.splitter.get_out_going_slices())
+        pre_vertices = numpy.array(
+            source_vertex.splitter.get_out_going_vertices(SPIKE_PARTITION_ID))
+        pre_slices = [m_vertex.vertex_slice for m_vertex in pre_vertices]
         pre_slices_x = [vtx_slice.get_slice(0) for vtx_slice in pre_slices]
         pre_slices_y = [vtx_slice.get_slice(1) for vtx_slice in pre_slices]
-        pre_ranges = [[[px.start, py.start], [px.stop - 1, py.stop - 1]]
+        pre_ranges = [[[py.start, px.start], [py.stop - 1, px.stop - 1]]
                       for px, py in zip(pre_slices_x, pre_slices_y)]
-        pres_as_posts = self.__pre_as_post(pre_ranges)
-        hlf_k_w, hlf_k_h = numpy.array(self.__kernel_weights.shape) // 2
+        pre_vertex_in_post_layer, start_i = self.__pre_as_post(pre_ranges)
+
+        pre_vertex_in_post_layer_upper_left = pre_vertex_in_post_layer[:,0]
+        pre_vertex_in_post_layer_lower_right = pre_vertex_in_post_layer[:,1]
+
+        kernel_shape = numpy.array(self.__kernel_shape)
+
+        j = (kernel_shape - 1 - start_i) // self.__strides
+        j_upper_left = j[:,0]
+
+        pre_vertex_max_reach_in_post_layer_upper_left = pre_vertex_in_post_layer_upper_left - j_upper_left
+        pre_vertex_max_reach_in_post_layer_lower_right = pre_vertex_in_post_layer_lower_right
 
         max_connected = 0
         for post_slice in target_vertex.splitter.get_in_coming_slices():
@@ -365,39 +377,6 @@ class ConvolutionConnector(AbstractConnector):
             # Test that the end coords are in range i.e. more than min
             end_in_range = numpy.logical_not(
                 numpy.any(pre_vertex_max_reach_in_post_layer_lower_right < [min_y, min_x], axis=1))
-            # When both things are true, we have a vertex in range
-            pre_in_range = numpy.logical_and(start_in_range, end_in_range)
-            n_connected = pre_in_range.sum()
-            max_connected = max(max_connected, n_connected)
-
-        return max_connected
-
-    def get_max_n_incoming_slices(self, source_vertex, target_vertex):
-        pre_slices = list(source_vertex.splitter.get_out_going_slices())
-        pre_slices_x = [vtx_slice.get_slice(0) for vtx_slice in pre_slices]
-        pre_slices_y = [vtx_slice.get_slice(1) for vtx_slice in pre_slices]
-        pre_ranges = [[[px.start, py.start], [px.stop - 1, py.stop - 1]]
-                      for px, py in zip(pre_slices_x, pre_slices_y)]
-        pres_as_posts = self.__pre_as_post(pre_ranges)
-        hlf_k_w, hlf_k_h = numpy.array(self.__kernel_weights.shape) // 2
-
-        max_connected = 0
-        for post_slice in target_vertex.splitter.get_in_coming_slices():
-            post_slice_x = post_slice.get_slice(0)
-            post_slice_y = post_slice.get_slice(1)
-
-            # Get ranges allowed in post
-            min_x = post_slice_x.start - hlf_k_w
-            max_x = (post_slice_x.stop + hlf_k_w) - 1
-            min_y = post_slice_y.start - hlf_k_h
-            max_y = (post_slice_y.stop + hlf_k_h) - 1
-
-            # Test that the start coords are in range i.e. less than max
-            start_in_range = numpy.logical_not(
-                numpy.any(pres_as_posts[:, 0] > [max_x, max_y], axis=1))
-            # Test that the end coords are in range i.e. more than min
-            end_in_range = numpy.logical_not(
-                numpy.any(pres_as_posts[:, 1] < [min_x, min_y], axis=1))
             # When both things are true, we have a vertex in range
             pre_in_range = numpy.logical_and(start_in_range, end_in_range)
             n_connected = pre_in_range.sum()
@@ -465,8 +444,6 @@ class ConvolutionConnector(AbstractConnector):
             values.extend([col_mask, 0, row_mask, n_bits_col])
 
         # Do a new list for remaining connector details as uint16s
-
-        # Write synapse information
         pos_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
             self.__positive_receptor_type)
         neg_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
@@ -476,14 +453,9 @@ class ConvolutionConnector(AbstractConnector):
             kernel_shape[0], kernel_shape[1],
             self.__padding_shape[0], self.__padding_shape[1],
             self.__recip(self.__strides[0]), self.__recip(self.__strides[1]),
-            self.__strides[0], self.__strides[1]
+            self.__strides[0], self.__strides[1],
             self.__recip(ps_y), self.__recip(ps_x),
             pos_synapse_type, neg_synapse_type], dtype="uint16")
-
-        data = [numpy.array(values, dtype="uint32"),
-                short_values.view("uint32"),
-                numpy.array([weight_index], dtype="uint32")]
-        return data
 
         # Write delay
         max_delay = app_edge.post_vertex.synapse_dynamics.delay * \
@@ -493,14 +465,19 @@ class ConvolutionConnector(AbstractConnector):
                           app_edge.post_vertex.splitter.max_support_delay())
 
         if self.__num_multisynaptic_connections == 1:
-            spec.write_value(max_delay)
+            delay_view = numpy.array([max_delay], dtype="uint32")
         else:
-            spec.write_value(max_delay, data_type=DataType.UINT16)
             delay_range = max_delay - self.__multisynaptic_delay_min
             delay_step = delay_range / (self.__num_multisynaptic_connections - 1)
-            spec.write_value(delay_step, data_type=DataType.UINT16)
+            delay_view = numpy.array([max_delay, delay_step], dtype="uint16").view("uint32")
 
-        spec.write_value(self.__num_multisynaptic_connections, data_type=DataType.UINT32)
+        # Compile all values
+        data = [numpy.array(values, dtype="uint32"),
+                short_values.view("uint32"),
+                delay_view,
+                numpy.array([self.__num_multisynaptic_connections], dtype="uint32"),
+                numpy.array([weight_index], dtype="uint32")]
+        return data
 
     def get_encoded_kernel_weights(self, app_edge, weight_scales):
         # Encode weights with weight scaling

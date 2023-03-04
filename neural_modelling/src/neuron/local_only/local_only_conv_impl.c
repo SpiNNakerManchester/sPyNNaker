@@ -89,7 +89,15 @@ typedef struct {
 // The main configuration data
 static conv_config *config;
 
-static lc_weight_t *weights;t_simulation_time_st
+static lc_weight_t *weights;
+
+//! \brief Load the required data into DTCM.
+bool local_only_impl_initialise(void *address){
+    log_info("+++++++++++++++++ CONV init ++++++++++++++++++++");
+    conv_config* sdram_config = address;
+    uint32_t n_bytes = sizeof(conv_config) +
+    		(sizeof(connector) * sdram_config->n_connectors);
+    config = spin1_malloc(n_bytes);
     if (config == NULL) {
     	log_error("Can't allocate memory for config!");
     	return false;
@@ -187,7 +195,7 @@ static inline void do_convolution_operation(
         int32_t kr = connector->kernel.height - 1 - i_row;
         log_debug("i_row = %u, kr = %u, tmp_row = %u", i_row, kr, tmp_row);
 
-        if ((tmp_row < config.post_start.row) || (tmp_row > config.post_end.row)) {
+        if ((tmp_row < config->post_start.row) || (tmp_row > config->post_end.row)) {
             log_debug("tmp_row outside");
             continue;
         }
@@ -214,7 +222,7 @@ static inline void do_convolution_operation(
 
             log_debug("i_col = %u, kc = %u, tmp_col = %u", i_col, kc, tmp_col);
 
-            if ((tmp_col < config.post_start.col) || (tmp_col > config.post_end.col)) {
+            if ((tmp_col < config->post_start.col) || (tmp_col > config->post_end.col)) {
                 log_debug("tmp_col outside");
                 continue;
             }
@@ -227,8 +235,8 @@ static inline void do_convolution_operation(
 
             // This the neuron id relative to the neurons on this core
             uint32_t post_index =
-                ((tmp_row - config.post_start.row) * config.post_shape.width)
-                    + (tmp_col - config.post_start.col);
+                ((tmp_row - config->post_start.row) * config->post_shape.width)
+                    + (tmp_col - config->post_start.col);
             uint32_t k = (kr * kw) + kc;
             log_debug("weight index = %u", k);
             lc_weight_t weight = connector_weights[k];
@@ -266,8 +274,8 @@ static inline void do_convolution_operation(
 
 static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
         uint32_t *core_local_col, uint32_t *core_local_row) {
-    for (uint32_t i = 0; i < config.n_connectors; i++) {
-        connector *c = connectors[i];
+    for (uint32_t i = 0; i < config->n_connectors; i++) {
+        connector *c = &(config->connectors[i]);
         if ((spike & c->key_info.mask) == c->key_info.key) {
         	uint32_t local_spike = (spike & ~c->key_info.mask) >> c->key_info.n_colour_bits;
             *conn = c;
@@ -279,14 +287,6 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
     return false;
 }
 
-static inline void get_row_col(uint32_t spike, uint32_t index,
-		uint32_t *core_local_col, uint32_t *core_local_row) {
-	connector *c = connectors[index];
-	uint32_t local_spike = (spike & ~c->key_info.mask) >> c->key_info.n_colour_bits;
-	*core_local_col = (local_spike & c->key_info.col_mask) >> c->key_info.col_shift;
-	*core_local_row = (local_spike & c->key_info.row_mask) >> c->key_info.row_shift;
-}
-
 //! \brief Process incoming spikes. In this implementation we need to:
 //! 1. Check if it's in the population table
 //! 2. Convert the relative (per core) Id to a global (per population) one
@@ -295,30 +295,24 @@ static inline void get_row_col(uint32_t spike, uint32_t index,
 //! 4. Add the weights to the appropriate current buffers
 void local_only_impl_process_spike(
         uint32_t time, uint32_t spike, uint16_t* ring_buffers) {
+    connector *connector;
+    uint32_t core_local_col;
+    uint32_t core_local_row;
 
     // Lookup the spike, and if found, get the appropriate parts
-    uint32_t start;
-    uint32_t end;
-    if (!key_to_index_lookup(spike, &start, &end)) {
-    	log_warning("Spike %u didn't match any connectors!", spike);
+    if (!key_to_index_lookup(
+            spike, &connector, &core_local_col, &core_local_row)) {
         return;
     }
-    log_debug("Received spike %u, using connectors between %u and %u", spike, start, end);
 
     // compute the population-based coordinates
-    for (uint32_t i = start; i < end; i++) {
-		uint32_t core_local_col;
-		uint32_t core_local_row;
-		connector *connector = connectors[i];
-		get_row_col(spike, i, &core_local_col, &core_local_row);
-		lc_coord_t pre_coord = {
-				core_local_row + connector->pre_start.row,
-				core_local_col + connector->pre_start.col
-		};
-		log_debug("Spike %u = %u, %u (Global: %u, %u)", spike, core_local_col, core_local_row,
-				pre_coord.col, pre_coord.row);
+    lc_coord_t pre_coord = {
+            core_local_row + connector->pre_start.row,
+            core_local_col + connector->pre_start.col
+    };
+    log_debug("Received spike %u = %u, %u (Global: %u, %u)", spike, core_local_col, core_local_row,
+            pre_coord.col, pre_coord.row);
 
-		// Compute the convolution
-		do_convolution_operation(time, pre_coord, connector, ring_buffers);
-    }
+    // Compute the convolution
+    do_convolution_operation(time, pre_coord, connector, ring_buffers);
 }
