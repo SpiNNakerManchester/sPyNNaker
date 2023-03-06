@@ -132,7 +132,11 @@ bool local_only_impl_initialise(void *address){
         // this comes after the last weight in the last connector, which comes
         // after the last dimension!
         lc_weight_t* weights = get_weights(conn);
-        conn = (connector *) &weights[connectors[i]->n_weights];
+        uint32_t n_weights = connectors[i]->n_weights;
+        if (n_weights & 0x1) {
+        	n_weights += 1;
+        }
+        conn = (connector *) &weights[n_weights];
     }
 
     return true;
