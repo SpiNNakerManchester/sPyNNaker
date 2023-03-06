@@ -68,4 +68,5 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[TS_NEXT_SEND] = 0
+        state_variables[TS_NEXT_SEND] = [
+            d.device_control_first_send_timestep for d in self.__devices]
