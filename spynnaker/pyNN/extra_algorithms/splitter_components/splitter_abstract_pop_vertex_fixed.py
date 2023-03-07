@@ -294,6 +294,8 @@ class SplitterAbstractPopulationVertexFixed(
     def reset_called(self):
         super(SplitterAbstractPopulationVertexFixed, self).reset_called()
         self.__slices = None
+        self.__max_delay = None
+        self.__expect_delay_extension = None
 
     def __create_slices(self):
         """ Create slices if not already done
