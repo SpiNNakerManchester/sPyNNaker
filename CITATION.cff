@@ -90,7 +90,7 @@ preferred-citation:
 title: The common code for supporting the different PyNN Implementations for executing on SpiNNaker machines.
 authors:
     - name: SpiNNaker Software Team
-      alias: For a list of contributors see https://github.com/SpiNNakerManchester/SpiNNUtils/graphs/contributors or for a combined list see http://spinnakermanchester.github.io/latest/LicenseAgreement.html#contributors
+      alias: For a list of contributors see https://github.com/SpiNNakerManchester/sPyNNaker/graphs/contributors or for a combined list see http://spinnakermanchester.github.io/latest/LicenseAgreement.html#contributors
       address: University of Manchester, Oxford Road
       city: Manchester
       country: GB
@@ -106,4 +106,4 @@ contact:
   name: SpiNNaker Software Team
   post-code: M13 9PL
 license: Apache-2.0
-repository: https://github.com/SpiNNakerManchester/SpiNNUtils
+repository: https://github.com/SpiNNakerManchester/sPyNNaker
