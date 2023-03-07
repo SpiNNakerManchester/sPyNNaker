@@ -420,7 +420,7 @@ class ConvolutionConnector(AbstractConnector):
             pos_synapse_type, neg_synapse_type], dtype="uint16")
 
         # Work out delay
-        delay_step = (app_edge.post_vertex.synapse_dynamics.delay *
+        delay_step = (delay *
                       SpynnakerDataView.get_simulation_time_step_per_ms())
         local_delay = min(delay_step,
                           app_edge.post_vertex.splitter.max_support_delay())
