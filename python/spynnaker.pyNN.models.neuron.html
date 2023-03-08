@@ -2110,6 +2110,28 @@ which might be one if this is a single-dimension vertex</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_delay">
+<span class="sig-name descname"><span class="pre">get_max_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_ring_buffer_bits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_max_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_delay" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the maximum delay and whether a delay extension is needed</dt><dd><p>for a given maximum number of ring buffer bits</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_ring_buffer_bits</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of bits that can be used for the ring buffer
+identifier (i.e. delay, synapse type, neuron index)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of the maximum delay supported on the core and whether
+a delay extension is needed to support delays</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_neuron_variable_sdram">
 <span class="sig-name descname"><span class="pre">get_max_neuron_variable_sdram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_max_neuron_variable_sdram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_neuron_variable_sdram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the amount of SDRAM per timestep used by neuron parts</p>
@@ -2151,6 +2173,11 @@ which might be one if this is a single-dimension vertex</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_n_atom_bits">
+<span class="sig-name descname"><span class="pre">get_n_atom_bits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_n_atom_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_n_atom_bits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_constant_sdram">
@@ -4702,9 +4729,11 @@ buffering</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_initial_state_values"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_initial_state_values()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_atoms_per_core"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_max_atoms_per_core()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_atoms_per_dimension_per_core"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_max_atoms_per_dimension_per_core()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_delay"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_max_delay()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_neuron_variable_sdram"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_max_neuron_variable_sdram()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_row_info"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_max_row_info()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_synapse_variable_sdram"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_max_synapse_variable_sdram()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_n_atom_bits"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_n_atom_bits()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_constant_sdram"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_neuron_constant_sdram()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_variable_sdram"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_neuron_variable_sdram()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neurons_recording"><code class="docutils literal notranslate"><span class="pre">AbstractPopulationVertex.get_neurons_recording()</span></code></a></li>

@@ -53,13 +53,13 @@
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_splitters.abstract_splitters</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSplitterCommon</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="n">PacmanConfigurationException</span>
+<span class="kn">from</span> <span class="nn">pacman.model.partitioner_splitters</span> <span class="kn">import</span> <span class="n">SplitterFixedLegacy</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.spike_source</span> <span class="kn">import</span> <span class="n">SpikeSourcePoissonVertex</span>
-<span class="kn">from</span> <span class="nn">.spynnaker_splitter_fixed_legacy</span> <span class="kn">import</span> <span class="n">SpynnakerSplitterFixedLegacy</span>
 <span class="kn">from</span> <span class="nn">.abstract_supports_one_to_one_sdram_input</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSupportsOneToOneSDRAMInput</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">SplitterPoissonDelegate</span><span class="p">(</span><span class="n">SpynnakerSplitterFixedLegacy</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SplitterPoissonDelegate</span><span class="p">(</span><span class="n">SplitterFixedLegacy</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; A splitter for Poisson sources that will ignore sources that are</span>
 <span class="sd">        one-to-one connected to a single Population</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -90,14 +90,14 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">handles_source_vertex</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SplitterPoissonDelegate.set_governed_app_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.set_governed_app_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SpynnakerSplitterFixedLegacy</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">)</span>
+<div class="viewcode-block" id="SplitterPoissonDelegate.set_governed_app_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.set_governed_app_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SplitterFixedLegacy</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
         <span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">SpikeSourcePoissonVertex</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">PacmanConfigurationException</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POP_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SplitterPoissonDelegate.create_machine_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.create_machine_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SpynnakerSplitterFixedLegacy</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">)</span>
+<div class="viewcode-block" id="SplitterPoissonDelegate.create_machine_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.create_machine_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SplitterFixedLegacy</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_machine_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chip_counter</span><span class="p">):</span>
         <span class="c1"># If sending over SDRAM, let the target handle this</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_over_sdram</span><span class="p">:</span>

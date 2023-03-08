@@ -68,6 +68,7 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_config_int</span><span class="p">,</span> <span class="n">get_config_float</span><span class="p">,</span> <span class="n">get_config_bool</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="n">MultiRegionSDRAM</span>
+<span class="kn">from</span> <span class="nn">pacman.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_n_bits_for_fields</span><span class="p">,</span> <span class="n">get_n_bits</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractCanReset</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
@@ -347,6 +348,11 @@
                 <span class="s2">&quot; that the total number of neurons per core is less than or&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot; equal to </span><span class="si">{</span><span class="n">max_atoms</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">max_per_dim</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">):</span>
+            <span class="c1"># If the maximum atoms per core is one-dimensional, we can apply</span>
+            <span class="c1"># that to the first dimension and make all others 0</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">max_per_dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">max_per_dim</span> <span class="o">+</span>
+                        <span class="nb">tuple</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
             <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
                 <span class="s2">&quot;When using a multidimensional Population, a maximum number of&quot;</span>
                 <span class="s2">&quot; neurons per core must be provided for each dimension (in&quot;</span>
@@ -1439,6 +1445,46 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationApplicationVertex</span><span class="o">.</span><span class="n">n_colour_bits</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">n_colour_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span>
+
+<div class="viewcode-block" id="AbstractPopulationVertex.get_max_delay"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_delay">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_ring_buffer_bits</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the maximum delay and whether a delay extension is needed</span>
+<span class="sd">            for a given maximum number of ring buffer bits</span>
+
+<span class="sd">        :param int max_ring_buffer_bits:</span>
+<span class="sd">            The maximum number of bits that can be used for the ring buffer</span>
+<span class="sd">            identifier (i.e. delay, synapse type, neuron index)</span>
+<span class="sd">        :return:</span>
+<span class="sd">            Tuple of the maximum delay supported on the core and whether</span>
+<span class="sd">            a delay extension is needed to support delays</span>
+<span class="sd">        :rtype: (int, bool)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Find the maximum delay from incoming synapses</span>
+        <span class="n">max_delay_ms</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=protected-access</span>
+            <span class="n">s_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
+            <span class="n">proj_max_delay</span> <span class="o">=</span> <span class="n">s_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">(</span>
+                <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span>
+            <span class="n">max_delay_ms</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_delay_ms</span><span class="p">,</span> <span class="n">proj_max_delay</span><span class="p">)</span>
+        <span class="n">max_delay_steps</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
+            <span class="n">max_delay_ms</span> <span class="o">/</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">())</span>
+        <span class="n">max_delay_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">max_delay_steps</span><span class="p">)</span>
+
+        <span class="c1"># Find the maximum possible delay</span>
+        <span class="n">n_atom_bits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_n_atom_bits</span><span class="p">()</span>
+        <span class="n">n_synapse_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">())</span>
+        <span class="n">n_delay_bits</span> <span class="o">=</span> <span class="n">max_ring_buffer_bits</span> <span class="o">-</span> <span class="p">(</span><span class="n">n_atom_bits</span> <span class="o">+</span> <span class="n">n_synapse_bits</span><span class="p">)</span>
+
+        <span class="c1"># Pick the smallest between the two, so that not too many bits are used</span>
+        <span class="n">final_n_delay_bits</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_delay_bits</span><span class="p">,</span> <span class="n">max_delay_bits</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">final_n_delay_bits</span><span class="p">,</span> <span class="n">max_delay_bits</span> <span class="o">&gt;</span> <span class="n">final_n_delay_bits</span></div>
+
+<div class="viewcode-block" id="AbstractPopulationVertex.get_n_atom_bits"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_n_atom_bits">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_atom_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">field_sizes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">min</span><span class="p">(</span><span class="n">max_atoms</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_max_atoms_per_dimension_per_core</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">get_n_bits_for_fields</span><span class="p">(</span><span class="n">field_sizes</span><span class="p">)</span></div>
 
 
 <span class="k">class</span> <span class="nc">_Stats</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>

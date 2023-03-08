@@ -63,11 +63,12 @@
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">HasShapeKeyFields</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data.spynnaker_data_view</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 
 
 <span class="n">_DIMENSION_SIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
 <span class="n">_KEY_INFO_SIZE</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-<span class="n">_CONN_SIZE</span> <span class="o">=</span> <span class="n">_KEY_INFO_SIZE</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
+<span class="n">_CONN_SIZE</span> <span class="o">=</span> <span class="n">_KEY_INFO_SIZE</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
 <span class="n">_DIM_DTYPE</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="s2">&quot;uint32&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;shift&quot;</span><span class="p">,</span> <span class="s2">&quot;uint32&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;pre_start&quot;</span><span class="p">,</span> <span class="s2">&quot;uint16&quot;</span><span class="p">),</span>
               <span class="p">(</span><span class="s2">&quot;pre_in_post_start&quot;</span><span class="p">,</span> <span class="s2">&quot;uint16&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;pre_in_post_end&quot;</span><span class="p">,</span> <span class="s2">&quot;uint16&quot;</span><span class="p">),</span>
               <span class="p">(</span><span class="s2">&quot;pre_in_post_shape&quot;</span><span class="p">,</span> <span class="s2">&quot;uint16&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;recip_pool_stride&quot;</span><span class="p">,</span> <span class="s2">&quot;uint16&quot;</span><span class="p">),</span>
@@ -250,18 +251,20 @@
 
 <div class="viewcode-block" id="PoolDenseConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.PoolDenseConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="c1"># All delays are 1 timestep</span>
-        <span class="k">return</span> <span class="mi">1</span></div>
+        <span class="k">return</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span></div>
 
 <div class="viewcode-block" id="PoolDenseConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.PoolDenseConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="c1"># All delays are 1 timestep</span>
-        <span class="k">return</span> <span class="mi">1</span></div>
+        <span class="k">return</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span></div>
 
 <div class="viewcode-block" id="PoolDenseConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.PoolDenseConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">min_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span>
+            <span class="k">if</span> <span class="n">min_delay</span> <span class="o">&gt;</span> <span class="n">delay</span> <span class="ow">or</span> <span class="n">max_delay</span> <span class="o">&lt;</span> <span class="n">delay</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
         <span class="c1"># Every pre connects to every post</span>
         <span class="k">return</span> <span class="n">n_post_atoms</span></div>
 
@@ -322,6 +325,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__negative_receptor_type</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">pos_synapse_type</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT16</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">neg_synapse_type</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT16</span><span class="p">)</span>
+
+        <span class="c1"># Write delay</span>
+        <span class="n">delay_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span> <span class="o">*</span>
+                      <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_ms</span><span class="p">())</span>
+        <span class="n">local_delay</span> <span class="o">=</span> <span class="p">(</span><span class="n">delay_step</span> <span class="o">%</span>
+                       <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">())</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">local_delay</span><span class="p">)</span>
 
         <span class="c1"># Generate the dimension information</span>
         <span class="n">dim_info</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_DIM_DTYPE</span><span class="p">)</span>

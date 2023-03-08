@@ -307,12 +307,13 @@
         <span class="n">log_n_max_atoms</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_atoms_per_core</span><span class="p">)</span>
         <span class="n">log_n_synapse_types</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">())</span>
-        <span class="c1"># Delay is always 1</span>
-        <span class="n">log_max_delay</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># Find the maximum delay</span>
+        <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">max_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()</span>
 
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">log_n_max_atoms</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">log_n_synapse_types</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">log_max_delay</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">get_n_bits</span><span class="p">(</span><span class="n">max_delay</span><span class="p">))</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">incoming_spike_buffer_size</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span><span class="p">))</span>
 

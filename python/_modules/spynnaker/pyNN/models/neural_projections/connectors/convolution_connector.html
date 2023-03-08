@@ -64,13 +64,15 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_n_bits</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">HasShapeKeyFields</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data.spynnaker_data_view</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 
 <span class="c1">#: The number of 32-bit words in the source_key_info struct</span>
 <span class="n">SOURCE_KEY_INFO_WORDS</span> <span class="o">=</span> <span class="mi">7</span>
 
 <span class="c1">#: The number of 16-bit shorts in the connector struct,</span>
-<span class="c1">#: ignoring the source_key_info struct but including the 32-bit weight index</span>
-<span class="n">CONNECTOR_CONFIG_SHORTS</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="c1">#: ignoring the source_key_info struct but including the delay and the</span>
+<span class="c1">#: 32-bit weight index</span>
+<span class="n">CONNECTOR_CONFIG_SHORTS</span> <span class="o">=</span> <span class="mi">16</span>
 
 
 <span class="k">class</span> <span class="nc">ConvolutionConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
@@ -287,18 +289,20 @@
 
 <div class="viewcode-block" id="ConvolutionConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="c1"># All delays are 1 timestep</span>
-        <span class="k">return</span> <span class="mi">1</span></div>
+        <span class="k">return</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span></div>
 
 <div class="viewcode-block" id="ConvolutionConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="c1"># All delays are 1 timestep</span>
-        <span class="k">return</span> <span class="mi">1</span></div>
+        <span class="k">return</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span></div>
 
 <div class="viewcode-block" id="ConvolutionConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">min_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span>
+            <span class="k">if</span> <span class="n">min_delay</span> <span class="o">&gt;</span> <span class="n">delay</span> <span class="ow">or</span> <span class="n">max_delay</span> <span class="o">&lt;</span> <span class="n">delay</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
         <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">h</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">)</span></div>
 
@@ -414,7 +418,7 @@
 
 <div class="viewcode-block" id="ConvolutionConnector.get_local_only_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_local_only_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_local_only_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">,</span>
-            <span class="n">weight_index</span><span class="p">):</span>
+            <span class="n">delay</span><span class="p">,</span> <span class="n">weight_index</span><span class="p">):</span>
         <span class="c1"># Get info about things</span>
         <span class="n">kernel_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">ps_x</span><span class="p">,</span> <span class="n">ps_y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
@@ -453,9 +457,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__recip</span><span class="p">(</span><span class="n">ps_y</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recip</span><span class="p">(</span><span class="n">ps_x</span><span class="p">),</span>
             <span class="n">pos_synapse_type</span><span class="p">,</span> <span class="n">neg_synapse_type</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span>
 
+        <span class="c1"># Work out delay</span>
+        <span class="n">delay_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">delay</span> <span class="o">*</span>
+                      <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_ms</span><span class="p">())</span>
+        <span class="n">local_delay</span> <span class="o">=</span> <span class="p">(</span><span class="n">delay_step</span> <span class="o">%</span>
+                       <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">())</span>
+
         <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">),</span>
                 <span class="n">short_values</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">),</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">weight_index</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)]</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">local_delay</span><span class="p">,</span> <span class="n">weight_index</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="ConvolutionConnector.get_encoded_kernel_weights"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_encoded_kernel_weights">[docs]</a>    <span class="k">def</span> <span class="nf">get_encoded_kernel_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>

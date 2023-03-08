@@ -228,7 +228,7 @@ $(function() {
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    uint32_t <a class="code" href="synapses_8c.html#ab03dd903d4fed6afbcd9648d49beb9ae">synapse_delay_bits</a> = <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/reverse__iptag__multicast__source_8c.html">config</a>.log_max_delay;</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <a class="code" href="local__only_8c.html#a2ef4427415ac67eb603a14ca1bb86f83">synapse_delay_mask</a> = (1 &lt;&lt; <a class="code" href="synapses_8c.html#ab03dd903d4fed6afbcd9648d49beb9ae">synapse_delay_bits</a>) - 1;</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#af4431e39155e80c53e1f9aab22d5a0ef">log_info</a>(<span class="stringliteral">&quot;synapse_index_bits = %u, synapse_type_index_bits = %u, &quot;</span></div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;            <span class="stringliteral">&quot;synapse_delay_mask = %u&quot;</span>, <a class="code" href="local__only_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, <a class="code" href="local__only_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516">synapse_type_index_bits</a>,</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;            <span class="stringliteral">&quot;synapse_delay_bits = %u&quot;</span>, <a class="code" href="local__only_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, <a class="code" href="local__only_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516">synapse_type_index_bits</a>,</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;            <a class="code" href="synapses_8c.html#ab03dd903d4fed6afbcd9648d49beb9ae">synapse_delay_bits</a>);</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    uint32_t n_ring_buffer_bits = <a class="code" href="local__only_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516">synapse_type_index_bits</a> + <a class="code" href="synapses_8c.html#ab03dd903d4fed6afbcd9648d49beb9ae">synapse_delay_bits</a>;</div>
@@ -339,7 +339,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Mar 7 2023 15:06:07 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Mar 8 2023 11:22:55 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

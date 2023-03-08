@@ -58,11 +58,6 @@
 <p>Ideally the splitter and therefore the vertices it creates are able to
 handle some delay themselves and if more is needed have the ability to
 accept spikes from a <code class="xref py py-class docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex</span></code></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.MAX_SUPPORTED_DELAY_TICS">
-<span class="sig-name descname"><span class="pre">MAX_SUPPORTED_DELAY_TICS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.MAX_SUPPORTED_DELAY_TICS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex">
 <span class="sig-name descname"><span class="pre">accepts_edges_from_delay_vertex</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/abstract_spynnaker_splitter_delay.html#AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex" title="Permalink to this definition">¶</a></dt>
@@ -79,7 +74,7 @@ raised saying a different splitter is required.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.max_support_delay">
-<span class="sig-name descname"><span class="pre">max_support_delay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/abstract_spynnaker_splitter_delay.html#AbstractSpynnakerSplitterDelay.max_support_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.max_support_delay" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_support_delay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/abstract_spynnaker_splitter_delay.html#AbstractSpynnakerSplitterDelay.max_support_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.max_support_delay" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the max amount of delay this post vertex can support.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -134,6 +129,20 @@ slices</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.INVALID_POP_ERROR_MESSAGE">
 <span class="sig-name descname"><span class="pre">INVALID_POP_ERROR_MESSAGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'The</span> <span class="pre">vertex</span> <span class="pre">{}</span> <span class="pre">cannot</span> <span class="pre">be</span> <span class="pre">supported</span> <span class="pre">by</span> <span class="pre">the</span> <span class="pre">SplitterAbstractPopulationVertexFixed</span> <span class="pre">as</span> <span class="pre">the</span> <span class="pre">only</span> <span class="pre">vertex</span> <span class="pre">supported</span> <span class="pre">by</span> <span class="pre">this</span> <span class="pre">splitter</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">AbstractPopulationVertex.</span> <span class="pre">Please</span> <span class="pre">use</span> <span class="pre">the</span> <span class="pre">correct</span> <span class="pre">splitter</span> <span class="pre">for</span> <span class="pre">your</span> <span class="pre">vertex</span> <span class="pre">and</span> <span class="pre">try</span> <span class="pre">again.'</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.INVALID_POP_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.accepts_edges_from_delay_vertex">
+<span class="sig-name descname"><span class="pre">accepts_edges_from_delay_vertex</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.accepts_edges_from_delay_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.accepts_edges_from_delay_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confirms that the splitter’s vertices can handle spikes coming from a         <code class="xref py py-class docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex</span></code>.</p>
+<p>If this method returns False and the users ask for a delay larger than
+that allowed by <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.max_support_delay" title="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.max_support_delay"><code class="xref py py-meth docutils literal notranslate"><span class="pre">max_support_delay()</span></code></a>, an exception will be
+raised saying a different splitter is required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex">
@@ -261,6 +270,20 @@ machine or application vertices that should hit the target)</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.max_support_delay">
+<span class="sig-name descname"><span class="pre">max_support_delay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.max_support_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.max_support_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the max amount of delay this post vertex can support.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>max delay supported in ticks</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -777,7 +800,7 @@ machine or application vertices that should hit the target)</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">SplitterPoissonDelegate</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterFixedLegacy" title="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterFixedLegacy"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpynnakerSplitterFixedLegacy</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SplitterFixedLegacy</span></code></p>
 <p>A splitter for Poisson sources that will ignore sources that are
 one-to-one connected to a single Population</p>
 <dl class="field-list simple">
@@ -888,17 +911,6 @@ machine vertices on the same chip.</p>
 
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterFixedLegacy">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">SpynnakerSplitterFixedLegacy</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterFixedLegacy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SplitterFixedLegacy</span></code>, <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay" title="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>splitter_name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">spynnaker_splitter_partitioner</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner" title="Permalink to this definition">¶</a></dt>
@@ -918,7 +930,7 @@ machine vertices on the same chip.</p>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">spynnaker_splitter_selector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a splitter to every vertex that doesn’t already have one.</p>
 <blockquote>
-<div><p>default for APV is the SplitterAbstractPopulationVertexFixed        default for external device splitters are SplitterOneToOneLegacy        default for the rest is the SpynnakerSplitterFixedLegacy.</p>
+<div><p>default for APV is the SplitterAbstractPopulationVertexFixed        default for external device splitters are SplitterExternalDevice        default for the rest is the SplitterFixedLegacy.</p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
@@ -943,7 +955,6 @@ machine vertices on the same chip.</p>
 <li><a class="reference internal" href="#">spynnaker.pyNN.extra_algorithms.splitter_components package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.extra_algorithms.splitter_components">Module contents</a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay"><code class="docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay</span></code></a><ul>
-<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.MAX_SUPPORTED_DELAY_TICS"><code class="docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay.MAX_SUPPORTED_DELAY_TICS</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex"><code class="docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.max_support_delay"><code class="docutils literal notranslate"><span class="pre">AbstractSpynnakerSplitterDelay.max_support_delay()</span></code></a></li>
 </ul>
@@ -954,6 +965,7 @@ machine vertices on the same chip.</p>
 </li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed</span></code></a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.INVALID_POP_ERROR_MESSAGE"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.INVALID_POP_ERROR_MESSAGE</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.accepts_edges_from_delay_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.accepts_edges_from_delay_vertex()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.create_machine_vertex()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.create_machine_vertices()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_in_coming_slices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.get_in_coming_slices()</span></code></a></li>
@@ -963,6 +975,7 @@ machine vertices on the same chip.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_source_specific_in_coming_vertices"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.get_source_specific_in_coming_vertices()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.machine_vertices_for_recording"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.machine_vertices_for_recording()</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.max_support_delay"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.max_support_delay()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.reset_called"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.reset_called()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.set_governed_app_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterAbstractPopulationVertexFixed.set_governed_app_vertex()</span></code></a></li>
 </ul>
@@ -1017,7 +1030,6 @@ machine vertices on the same chip.</p>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.set_governed_app_vertex"><code class="docutils literal notranslate"><span class="pre">SplitterPoissonDelegate.set_governed_app_vertex()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterFixedLegacy"><code class="docutils literal notranslate"><span class="pre">SpynnakerSplitterFixedLegacy</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner"><code class="docutils literal notranslate"><span class="pre">spynnaker_splitter_partitioner()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector"><code class="docutils literal notranslate"><span class="pre">spynnaker_splitter_selector()</span></code></a></li>
 </ul>

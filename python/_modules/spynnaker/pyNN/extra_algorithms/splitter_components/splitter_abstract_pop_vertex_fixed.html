@@ -49,6 +49,7 @@
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.ordered_set</span> <span class="kn">import</span> <span class="n">OrderedSet</span>
 <span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="n">PacmanConfigurationException</span>
@@ -65,16 +66,19 @@
     <span class="n">SpikeProcessingProvenance</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.master_pop_table</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MasterPopTableAsBinarySearch</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.abstract_spynnaker_splitter_delay</span> <span class="kn">import</span> <span class="n">AbstractSpynnakerSplitterDelay</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.bit_field_utilities</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_sdram_for_bit_field_region</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.local_only</span> <span class="kn">import</span> <span class="n">AbstractLocalOnly</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synaptic_matrices</span> <span class="kn">import</span> <span class="n">SynapticMatrices</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.neuron_data</span> <span class="kn">import</span> <span class="n">NeuronData</span>
+<span class="kn">from</span> <span class="nn">.abstract_spynnaker_splitter_delay</span> <span class="kn">import</span> <span class="n">AbstractSpynnakerSplitterDelay</span>
+
+<span class="c1"># The maximum number of bits for the ring buffer index that are likely to</span>
+<span class="c1"># fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM</span>
+<span class="n">MAX_RING_BUFFER_BITS</span> <span class="o">=</span> <span class="mi">14</span>
 
 
 <span class="k">class</span> <span class="nc">SplitterAbstractPopulationVertexFixed</span><span class="p">(</span>
@@ -85,7 +89,9 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># The pre-calculated slices of the vertex</span>
-        <span class="s2">&quot;__slices&quot;</span>
+        <span class="s2">&quot;__slices&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__max_delay&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__expect_delay_extension&quot;</span>
     <span class="p">]</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; The message to use when the Population is invalid &quot;&quot;&quot;</span>
@@ -99,6 +105,8 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__slices</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexFixed.set_governed_app_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.set_governed_app_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
@@ -323,7 +331,9 @@
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexFixed.reset_called"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.reset_called">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">reset_called</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">reset_called</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SplitterAbstractPopulationVertexFixed</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">reset_called</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__slices</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__slices</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="o">=</span> <span class="kc">None</span></div>
 
     <span class="k">def</span> <span class="nf">__create_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Create slices if not already done</span>
@@ -331,6 +341,28 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__slices</span> <span class="o">=</span> <span class="n">get_multidimensional_slices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__update_max_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Find the maximum delay from incoming synapses</span>
+        <span class="n">app_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="o">=</span> \
+            <span class="n">app_vertex</span><span class="o">.</span><span class="n">get_max_delay</span><span class="p">(</span><span class="n">MAX_RING_BUFFER_BITS</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SplitterAbstractPopulationVertexFixed.max_support_delay"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.max_support_delay">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpynnakerSplitterDelay</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">max_support_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__update_max_delay</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span></div>
+
+<div class="viewcode-block" id="SplitterAbstractPopulationVertexFixed.accepts_edges_from_delay_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.accepts_edges_from_delay_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpynnakerSplitterDelay</span><span class="o">.</span><span class="n">accepts_edges_from_delay_vertex</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">accepts_edges_from_delay_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__update_max_delay</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;This call was unexpected as it was calculated that &quot;</span>
+            <span class="s2">&quot;the max needed delay was less that the max possible&quot;</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>
