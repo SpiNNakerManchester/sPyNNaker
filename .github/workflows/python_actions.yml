@@ -102,3 +102,7 @@ jobs:
     - name: Validate CITATION.cff
       if: matrix.python-version == 3.8
       uses: dieghernan/cff-validator@main
+
+    - name: Validate CITATION.cff
+      if: matrix.python-version == 3.8
+      uses: dieghernan/cff-validator@main
