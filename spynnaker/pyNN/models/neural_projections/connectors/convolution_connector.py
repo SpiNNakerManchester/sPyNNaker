@@ -26,13 +26,15 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 #: The number of 32-bit words in the source_key_info struct
 SOURCE_KEY_INFO_WORDS = 7
 
 #: The number of 16-bit shorts in the connector struct,
-#: ignoring the source_key_info struct but including the 32-bit weight index
-CONNECTOR_CONFIG_SHORTS = 14
+#: ignoring the source_key_info struct but including the delay and the
+#: 32-bit weight index
+CONNECTOR_CONFIG_SHORTS = 16
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -249,18 +251,20 @@ class ConvolutionConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
-        # All delays are 1 timestep
-        return 1
+        return synapse_info.delays
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        # All delays are 1 timestep
-        return 1
+        return synapse_info.delays
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
+        if min_delay is not None and max_delay is not None:
+            delay = synapse_info.delays
+            if min_delay > delay or max_delay < delay:
+                return 0
         w, h = self.__kernel_weights.shape
         return numpy.clip(w * h, 0, n_post_atoms)
 
@@ -376,7 +380,7 @@ class ConvolutionConnector(AbstractConnector):
 
     def get_local_only_data(
             self, app_edge, vertex_slice, key, mask, n_colour_bits,
-            weight_index):
+            delay, weight_index):
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
@@ -415,9 +419,15 @@ class ConvolutionConnector(AbstractConnector):
             self.__recip(ps_y), self.__recip(ps_x),
             pos_synapse_type, neg_synapse_type], dtype="uint16")
 
+        # Work out delay
+        delay_step = (delay *
+                      SpynnakerDataView.get_simulation_time_step_per_ms())
+        local_delay = (delay_step %
+                       app_edge.post_vertex.splitter.max_support_delay())
+
         data = [numpy.array(values, dtype="uint32"),
                 short_values.view("uint32"),
-                numpy.array([weight_index], dtype="uint32")]
+                numpy.array([local_delay, weight_index], dtype="uint32")]
         return data
 
     def get_encoded_kernel_weights(self, app_edge, weight_scales):
