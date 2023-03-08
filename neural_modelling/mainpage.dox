@@ -27,12 +27,12 @@
 *
 * This is the documentation of the part of sPyNNaker, implemented in C, that
 * is actually deployed onto SpiNNaker to execute. The
-* [Python parts](http://spinnakermanchester.github.io/sPyNNaker/python/)
+* [Python parts](https://spinnakermanchester.github.io/sPyNNaker/python/)
 * of the sPyNNaker package are responsible for the user interface, data
 * preparation, execution planning, and runtime control.
 *
 * Note that this code depends on
-* [SpiNNFrontEndCommon](http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/)
+* [SpiNNFrontEndCommon](https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/)
 * for many support functions.
 *
 * @section neuron Neuron Simulation Implementation

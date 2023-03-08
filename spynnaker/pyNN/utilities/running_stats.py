@@ -17,7 +17,7 @@ import math
 
 class RunningStats(object):
     """ Keeps running statistics.
-        From: http://www.johndcook.com/blog/skewness_kurtosis/
+        From: https://www.johndcook.com/blog/skewness_kurtosis/
     """
     __slots__ = ["__mean", "__mean_2", "__n_items"]
 

@@ -15,7 +15,7 @@
 """
 The :py:mod:`spynnaker.pyNN` package contains the front end specifications
 and implementation for the PyNN High-level API
-(http://neuralensemble.org/trac/PyNN).
+(https://neuralensemble.org/trac/PyNN).
 
 This package contains the profile of that code for PyNN 0.9
 """
