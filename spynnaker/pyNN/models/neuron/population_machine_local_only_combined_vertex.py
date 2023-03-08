@@ -269,12 +269,13 @@ class PopulationMachineLocalOnlyCombinedVertex(
         log_n_max_atoms = get_n_bits(self._max_atoms_per_core)
         log_n_synapse_types = get_n_bits(
             self._app_vertex.neuron_impl.get_n_synapse_types())
-        # Delay is always 1
-        log_max_delay = 1
+        # Find the maximum delay
+        # pylint: disable=protected-access
+        max_delay = self._app_vertex.splitter.max_support_delay()
 
         spec.write_value(log_n_max_atoms)
         spec.write_value(log_n_synapse_types)
-        spec.write_value(log_max_delay)
+        spec.write_value(get_n_bits(max_delay))
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
         spec.write_value(int(self._app_vertex.drop_late_spikes))
 

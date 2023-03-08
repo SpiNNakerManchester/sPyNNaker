@@ -187,7 +187,7 @@ bool local_only_initialise(void *local_only_addr, void *local_only_params_addr,
     uint32_t synapse_delay_bits = config.log_max_delay;
     synapse_delay_mask = (1 << synapse_delay_bits) - 1;
     log_info("synapse_index_bits = %u, synapse_type_index_bits = %u, "
-            "synapse_delay_mask = %u", synapse_index_bits, synapse_type_index_bits,
+            "synapse_delay_bits = %u", synapse_index_bits, synapse_type_index_bits,
             synapse_delay_bits);
 
     uint32_t n_ring_buffer_bits = synapse_type_index_bits + synapse_delay_bits;

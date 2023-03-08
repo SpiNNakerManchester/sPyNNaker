@@ -42,14 +42,26 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     __slots__ = [
         "__cached_2d_overlaps",
         "__cached_n_incoming"
+        "__delay"
     ]
 
-    def __init__(self):
+    def __init__(self, delay=None):
+        """
+        :param float delay:
+            The delay used in the connection; by default 1 time step
+        """
         # Store the overlaps between 2d vertices to avoid recalculation
         self.__cached_2d_overlaps = dict()
 
         # Store the n_incoming to avoid recalcaultion
         self.__cached_n_incoming = dict()
+
+        self.__delay = delay
+        if delay is None:
+            self.__delay = SpynnakerDataView.get_simulation_time_step_ms()
+        elif not isinstance(delay, (float, int)):
+            raise SynapticConfigurationException(
+                "Only single value delays are supported")
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
@@ -134,7 +146,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
             data.extend(s_info.connector.get_local_only_data(
                 app_edge, source.vertex_slice, source.key, source.mask,
-                app_edge.pre_vertex.n_colour_bits, weight_index))
+                app_edge.pre_vertex.n_colour_bits, self.__delay, weight_index))
         n_weights = next_weight_index
         if next_weight_index % 2 != 0:
             n_weights += 1
@@ -197,18 +209,23 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     for tgt, srcs in s_info.connector.get_connected_vertices(
                             s_info, source_vertex, app_vertex):
                         r_info = self.__get_rinfo_for_sources(
-                            key_cache, srcs, incoming)
+                            key_cache, srcs, incoming, app_edge, app_vertex)
                         sources_for_target[tgt].extend(r_info)
             self.__cached_2d_overlaps[app_vertex] = sources_for_target
         return sources_for_target
 
-    def __get_rinfo_for_sources(self, key_cache, srcs, incoming):
+    def __get_rinfo_for_sources(
+            self, key_cache, srcs, incoming, app_edge, app_vertex):
         """ Get the routing information for sources, merging sources that have
             the same vertex slice (note this happens in retinas from FPGAs).
 
         :rtype: list(Source)
         """
         routing_info = SpynnakerDataView.get_routing_infos()
+        delay_vertex = None
+        if self.__delay > app_vertex.splitter.max_support_delay():
+            # pylint: disable=protected-access
+            delay_vertex = incoming._projection_edge.delay_edge.pre_vertex
 
         # Group sources by vertex slice
         sources = defaultdict(list)
@@ -218,29 +235,39 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # For each slice, merge the keys
         keys = list()
         for vertex_slice, slice_sources in sources.items():
-            if vertex_slice in key_cache:
-                keys.append(key_cache.get(vertex_slice))
+            cache_key = (app_edge.pre_vertex, vertex_slice)
+            if cache_key in key_cache:
+                keys.append(key_cache.get(cache_key))
             else:
-                r_info = routing_info.get_routing_info_from_pre_vertex(
-                    slice_sources[0], SPIKE_PARTITION_ID)
+                r_info = self.__get_rinfo(
+                    routing_info, slice_sources[0], delay_vertex)
                 group_key = r_info.key
                 group_mask = r_info.mask
                 for source in slice_sources:
-                    r_info = routing_info.get_routing_info_from_pre_vertex(
-                        source, SPIKE_PARTITION_ID)
+                    r_info = self.__get_rinfo(
+                        routing_info, source, delay_vertex)
                     group_key, group_mask = self.__merge_key_and_mask(
                         group_key, group_mask, r_info.key,
                         r_info.mask)
                 key_source = Source(
                     incoming, vertex_slice, group_key, group_mask)
-                key_cache[vertex_slice] = key_source
+                key_cache[cache_key] = key_source
                 keys.append(key_source)
         return keys
+
+    def __get_rinfo(self, routing_info, source, delay_vertex):
+        if delay_vertex is None:
+            return routing_info.get_routing_info_from_pre_vertex(
+                source, SPIKE_PARTITION_ID)
+        delay_source = delay_vertex.splitter.get_machine_vertex(
+            source.vertex_slice)
+        return routing_info.get_routing_info_from_pre_vertex(
+            delay_source, SPIKE_PARTITION_ID)
 
     @property
     @overrides(AbstractLocalOnly.delay)
     def delay(self):
-        return SpynnakerDataView.get_simulation_time_step_ms()
+        return self.__delay
 
     @property
     @overrides(AbstractLocalOnly.weight)

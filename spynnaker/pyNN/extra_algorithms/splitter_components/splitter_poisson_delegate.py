@@ -15,13 +15,13 @@ from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
 
 
-class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
+class SplitterPoissonDelegate(SplitterFixedLegacy):
     """ A splitter for Poisson sources that will ignore sources that are
         one-to-one connected to a single Population
     """
@@ -52,14 +52,14 @@ class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
             return False
         return post_vertex.splitter.handles_source_vertex(proj)
 
-    @overrides(SpynnakerSplitterFixedLegacy.set_governed_app_vertex)
+    @overrides(SplitterFixedLegacy.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, SpikeSourcePoissonVertex):
             raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
-    @overrides(SpynnakerSplitterFixedLegacy.create_machine_vertices)
+    @overrides(SplitterFixedLegacy.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
         # If sending over SDRAM, let the target handle this
         if self.send_over_sdram:
