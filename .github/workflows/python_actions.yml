@@ -98,3 +98,7 @@ jobs:
       uses: ./support/actions/sphinx
       with:
         directory: doc/source
+
+    - name: Validate CITATION.cff
+      if: matrix.python-version == 3.8
+      uses: dieghernan/cff-validator@main

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
@@ -27,16 +28,19 @@ from spynnaker.pyNN.models.neuron.population_machine_vertex import (
     SpikeProcessingProvenance)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
-from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
-from collections import defaultdict
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
+
+# The maximum number of bits for the ring buffer index that are likely to
+# fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
+MAX_RING_BUFFER_BITS = 14
 
 
 class SplitterAbstractPopulationVertexFixed(
@@ -47,7 +51,9 @@ class SplitterAbstractPopulationVertexFixed(
 
     __slots__ = [
         # The pre-calculated slices of the vertex
-        "__slices"
+        "__slices",
+        "__max_delay",
+        "__expect_delay_extension"
     ]
 
     """ The message to use when the Population is invalid """
@@ -61,6 +67,8 @@ class SplitterAbstractPopulationVertexFixed(
     def __init__(self):
         super().__init__()
         self.__slices = None
+        self.__max_delay = None
+        self.__expect_delay_extension = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -286,6 +294,8 @@ class SplitterAbstractPopulationVertexFixed(
     def reset_called(self):
         super(SplitterAbstractPopulationVertexFixed, self).reset_called()
         self.__slices = None
+        self.__max_delay = None
+        self.__expect_delay_extension = None
 
     def __create_slices(self):
         """ Create slices if not already done
@@ -293,3 +303,25 @@ class SplitterAbstractPopulationVertexFixed(
         if self.__slices is not None:
             return
         self.__slices = get_multidimensional_slices(self._governed_app_vertex)
+
+    def __update_max_delay(self):
+        # Find the maximum delay from incoming synapses
+        app_vertex = self._governed_app_vertex
+        self.__max_delay, self.__expect_delay_extension = \
+            app_vertex.get_max_delay(MAX_RING_BUFFER_BITS)
+
+    @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
+    def max_support_delay(self):
+        if self.__max_delay is None:
+            self.__update_max_delay()
+        return self.__max_delay
+
+    @overrides(AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex)
+    def accepts_edges_from_delay_vertex(self):
+        if self.__expect_delay_extension is None:
+            self.__update_max_delay()
+        if self.__expect_delay_extension:
+            return True
+        raise NotImplementedError(
+            "This call was unexpected as it was calculated that "
+            "the max needed delay was less that the max possible")
