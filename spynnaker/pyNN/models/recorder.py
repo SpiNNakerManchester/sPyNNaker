@@ -61,10 +61,7 @@ class Recorder(object):
         return self.__write_to_files_indicators
 
     def record(self, variables, to_file, sampling_interval, indexes):
-        """ Same as record but without non-standard PyNN warning
-
-        This method is non-standard PyNN and is intended only to be called by
-        record in a Population, View or Assembly
+        """ Turns on (or off) recording
 
         :param variables: either a single variable name or a list of variable
             names. For a given celltype class, ``celltype.recordable`` contains
@@ -102,23 +99,40 @@ class Recorder(object):
         elif isinstance(variables, str):
             # handle special case of 'all'
             if variables == "all":
-                warn_once(
-                    logger, 'record("all") is non-standard PyNN, and '
-                    'therefore may not be portable to other simulators.')
-
-                # iterate though all possible recordings for this vertex
-                for variable in self.__vertex.get_recordable_variables():
-                    self.turn_on_record(
-                        variable, sampling_interval, to_file, indexes)
+                self.__turn_on_all_record(sampling_interval, to_file, indexes)
             else:
                 # record variable
                 self.turn_on_record(
                     variables, sampling_interval, to_file, indexes)
 
         else:  # list of variables, so just iterate though them
-            for variable in variables:
-                self.turn_on_record(
-                    variable, sampling_interval, to_file, indexes)
+            if "all" in variables:
+                self.__turn_on_all_record(sampling_interval, to_file, indexes)
+            else:
+                for variable in variables:
+                    self.turn_on_record(
+                        variable, sampling_interval, to_file, indexes)
+
+    def __turn_on_all_record(self, sampling_interval, to_file, indexes):
+        """
+
+        :param int sampling_interval: the interval to record them
+        :param to_file: If set, a file to write to (by handle or name)
+        :type to_file: neo.io.baseio.BaseIO or str or None
+        :param indexes: List of indexes to record or None for all
+        :type indexes: list(int) or None
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
+        """
+        warn_once(
+            logger, 'record("all") is non-standard PyNN, and '
+                    'therefore may not be portable to other simulators.')
+
+        # iterate though all possible recordings for this vertex
+        for variable in self.__vertex.get_recordable_variables():
+            self.turn_on_record(
+                variable, sampling_interval, to_file, indexes)
 
     def turn_on_record(self, variable, sampling_interval=None, to_file=None,
                        indexes=None):
@@ -300,7 +314,8 @@ class Recorder(object):
             block.segments.append(segment)
             return
 
-        with NeoBufferDatabase(self.__data_cache[segment_number]) as db:
+        with NeoBufferDatabase(
+                self.__data_cache[segment_number], read_only=False) as db:
             db.add_segment(
                 block, self.__population.label, variables, view_indexes)
             if clear:

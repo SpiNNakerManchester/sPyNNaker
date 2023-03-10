@@ -117,7 +117,7 @@ def record_weights_using_callback():
     return ILSpike, LIFLSpikes, vLIFL, w_LIFL_LIFL
 
 
-# http://neuralensemble.org/docs/PyNN/examples/simple_STDP.html
+# https://neuralensemble.org/docs/PyNN/examples/simple_STDP.html
 class weight_recorder(object):
     """
     Recording of weights is not yet built in to PyNN, so therefore we need

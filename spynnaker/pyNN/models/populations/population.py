@@ -585,7 +585,7 @@ class Population(PopulationBase):
             index (order in the Population).
 
         Defined by
-        http://neuralensemble.org/docs/PyNN/reference/populations.html
+        https://neuralensemble.org/docs/PyNN/reference/populations.html
 
         :param id:
         :type id: int or iterable(int)
@@ -623,7 +623,7 @@ class Population(PopulationBase):
             MPI node.
 
         Defined by
-        http://neuralensemble.org/docs/PyNN/reference/populations.html
+        https://neuralensemble.org/docs/PyNN/reference/populations.html
 
         :param cell_id:
         :type cell_id: int or iterable(int)
@@ -636,7 +636,7 @@ class Population(PopulationBase):
         """ Connect a current source to all cells in the Population.
 
         Defined by
-        http://neuralensemble.org/docs/PyNN/reference/populations.html
+        https://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # Pass this into the vertex
         self.__vertex.inject(current_source, [n for n in range(self.__size)])
@@ -664,7 +664,7 @@ class Population(PopulationBase):
         """ The number of local cells
 
         Defined by
-        http://neuralensemble.org/docs/PyNN/reference/populations.html
+        https://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # Doesn't make much sense on SpiNNaker
         return self.__size
