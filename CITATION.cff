@@ -80,7 +80,6 @@ preferred-citation:
     family-names: Stokes
     affiliation: University Of Manchester
     orcid: https://orcid.org/0000-0002-6110-1484
-    website: http://www.cs.man.ac.uk/~stokesa6/
   - given-names: Steve B.
     family-names: Furber
     affiliation: University Of Manchester
@@ -90,14 +89,14 @@ preferred-citation:
 title: The common code for supporting the different PyNN Implementations for executing on SpiNNaker machines.
 authors:
     - name: SpiNNaker Software Team
-      alias: For a list of contributors see https://github.com/SpiNNakerManchester/sPyNNaker/graphs/contributors or for a combined list see http://spinnakermanchester.github.io/latest/LicenseAgreement.html#contributors
+      alias: For a list of contributors see https://github.com/SpiNNakerManchester/sPyNNaker/graphs/contributors or for a combined list see https://spinnakermanchester.github.io/latest/LicenseAgreement.html#contributors
       address: University of Manchester, Oxford Road
       city: Manchester
       country: GB
       email: spinnakerusers@googlegroups.com
       post-code: M13 9PL
       website: https://apt.cs.manchester.ac.uk/projects/SpiNNaker/
-url: http://spinnakermanchester.github.io/
+url: https://spinnakermanchester.github.io/
 contact:
 - address: University of Manchester, Oxford Road
   city: Manchester
