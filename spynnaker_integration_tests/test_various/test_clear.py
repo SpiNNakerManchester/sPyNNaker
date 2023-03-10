@@ -110,7 +110,6 @@ class TestClearData(BaseTestCase):
             repr(spikes[0]))
         sim.end()
 
-
     def test_rewires(self):
         self.runsafe(self.make_rewires)
 
