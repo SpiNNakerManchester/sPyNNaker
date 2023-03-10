@@ -88,8 +88,8 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> */</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="matrix__generator_8h.html">matrix_generator.h</a>&quot;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a>&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a>&gt;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="generator__types_8h.html">generator_types.h</a>&quot;</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="matrix__generator__static_8h.html">matrix_generators/matrix_generator_static.h</a>&quot;</span></div>
@@ -145,9 +145,9 @@ $(function() {
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            <span class="comment">// Prepare a space for the data</span></div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            <span class="keyword">struct </span><a class="code" href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a> *generator =</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                    spin1_malloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> <a class="code" href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a>));</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            <span class="keywordflow">if</span> (generator == <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>) {</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;                <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Could not create generator&quot;</span>);</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                <span class="keywordflow">return</span> <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            <span class="keywordflow">if</span> (generator == <a class="codeRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>) {</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;                <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Could not create generator&quot;</span>);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                <span class="keywordflow">return</span> <a class="codeRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>;</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            }</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            <span class="comment">// Store the index</span></div>
@@ -158,13 +158,13 @@ $(function() {
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            <span class="keywordflow">return</span> generator;</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        }</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    }</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Matrix generator with hash %u not found&quot;</span>, hash);</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">return</span> <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Matrix generator with hash %u not found&quot;</span>, hash);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">return</span> <a class="codeRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>;</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;}</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
 <div class="line"><a name="l00120"></a><span class="lineno"><a class="line" href="matrix__generator_8c.html#aafbab40316b9861d41999287c65d1dbe">  120</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="matrix__generator_8c.html#aafbab40316b9861d41999287c65d1dbe">matrix_generator_free</a>(matrix_generator_t generator) {</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    generator-&gt;type-&gt;free(generator-&gt;data);</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a40ce895f48f22b29d2aefc923b38b280">sark_free</a>(generator);</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <a class="codeRef" href="https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a40ce895f48f22b29d2aefc923b38b280">sark_free</a>(generator);</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;}</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
@@ -175,8 +175,8 @@ $(function() {
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">return</span> generator-&gt;type-&gt;write_synapse(</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            generator-&gt;data, pre_index, post_index, weight, delay, weight_scale);</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;}</div>
-<div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
-<div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
+<div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
+<div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
 <div class="ttc" id="adelay__extension_8h_html"><div class="ttname"><a href="delay__extension_8h.html">delay_extension.h</a></div><div class="ttdoc">Declarations for delay extensions.</div></div>
 <div class="ttc" id="agenerator__types_8h_html"><div class="ttname"><a href="generator__types_8h.html">generator_types.h</a></div><div class="ttdoc">General types associated with generators.</div></div>
 <div class="ttc" id="agenerator__types_8h_html_a2ddfc8a6851657caf368b43e958e7cdf"><div class="ttname"><a href="generator__types_8h.html#a2ddfc8a6851657caf368b43e958e7cdf">write_synapse_func</a></div><div class="ttdeci">bool() write_synapse_func(void *generator, uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay, unsigned long accum weight_scale)</div><div class="ttdoc">How to write a synapse to a matrix.</div><div class="ttdef"><b>Definition:</b> <a href="generator__types_8h_source.html#l00090">generator_types.h:90</a></div></div>
@@ -209,13 +209,13 @@ $(function() {
 <div class="ttc" id="amatrix__generator__stdp_8h_html_a06a33655a1c01edaf72f5d4403608823"><div class="ttname"><a href="matrix__generator__stdp_8h.html#a06a33655a1c01edaf72f5d4403608823">matrix_generator_stdp_initialize</a></div><div class="ttdeci">void * matrix_generator_stdp_initialize(void **region, void *synaptic_matrix)</div><div class="ttdoc">Initialise the STDP synaptic matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__stdp_8h_source.html#l00196">matrix_generator_stdp.h:196</a></div></div>
 <div class="ttc" id="amatrix__generator__stdp_8h_html_aa0ccbf6127b7bd9ba00efc3ba17373e9"><div class="ttname"><a href="matrix__generator__stdp_8h.html#aa0ccbf6127b7bd9ba00efc3ba17373e9">matrix_generator_stdp_free</a></div><div class="ttdeci">void matrix_generator_stdp_free(void *generator)</div><div class="ttdoc">Free any data for the STDP synaptic matrix generator.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__stdp_8h_source.html#l00236">matrix_generator_stdp.h:236</a></div></div>
 <div class="ttc" id="amatrix__generator__stdp_8h_html_aa7dc79c13959aa923b5193e825048565"><div class="ttname"><a href="matrix__generator__stdp_8h.html#aa7dc79c13959aa923b5193e825048565">matrix_generator_stdp_write_synapse</a></div><div class="ttdeci">static bool matrix_generator_stdp_write_synapse(void *generator, uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay, unsigned long accum weight_scale)</div><div class="ttdoc">How to write a synapse to a matrix.</div><div class="ttdef"><b>Definition:</b> <a href="matrix__generator__stdp_8h_source.html#l00250">matrix_generator_stdp.h:250</a></div></div>
-<div class="ttc" id="asark_8h_html_a40ce895f48f22b29d2aefc923b38b280"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a40ce895f48f22b29d2aefc923b38b280">sark_free</a></div><div class="ttdeci">void sark_free(void *ptr)</div></div>
-<div class="ttc" id="aspin1__api_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a></div></div>
-<div class="ttc" id="aspin1__api_8h_html_a070d2ce7b6bb7e5c05602aa8c308d0c4"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></div><div class="ttdeci">#define NULL</div></div>
+<div class="ttc" id="asark_8h_html_a40ce895f48f22b29d2aefc923b38b280"><div class="ttname"><a href="https://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a40ce895f48f22b29d2aefc923b38b280">sark_free</a></div><div class="ttdeci">void sark_free(void *ptr)</div></div>
+<div class="ttc" id="aspin1__api_8h.html_html"><div class="ttname"><a href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a></div></div>
+<div class="ttc" id="aspin1__api_8h_html_a070d2ce7b6bb7e5c05602aa8c308d0c4"><div class="ttname"><a href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></div><div class="ttdeci">#define NULL</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 10 2023 09:46:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Mar 10 2023 11:25:22 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

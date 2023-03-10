@@ -101,7 +101,7 @@ $(function() {
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="weight__one__term_8h.html">neuron/plasticity/stdp/weight_dependence/weight_one_term.h</a>&gt;</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">// Include debug header for log_info etc</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">// Include generic plasticity maths functions</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="maths_8h.html">neuron/plasticity/stdp/maths.h</a>&gt;</span></div>
@@ -178,7 +178,7 @@ $(function() {
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    int32_t decayed_o1 = <a class="code" href="stdp__typedefs_8h.html#aadb4d7a82820e2de3f998e902b7cd87a">STDP_FIXED_MUL_16X16</a>(last_post_trace, exponential_decay)</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            - <a class="code" href="timing__recurrent__dual__fsm__impl_8c.html#aa00b23ef207940abda557ff4899420c0">plasticity_trace_region_data</a>.alpha;</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n&quot;</span>,</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n&quot;</span>,</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;            time_since_last_post, decayed_o1);</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="comment">// Apply potentiation to state (which is a weight_state)</span></div>
@@ -196,7 +196,7 @@ $(function() {
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;            time_since_last_pre, <a class="code" href="timing__vogels__2011__impl_8h.html#af6ff5d053eae1db7ea80f598852073c4">tau_lookup</a>);</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    int32_t decayed_r1 = <a class="code" href="stdp__typedefs_8h.html#aadb4d7a82820e2de3f998e902b7cd87a">STDP_FIXED_MUL_16X16</a>(last_pre_trace, exponential_decay);</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n&quot;</span>,</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n&quot;</span>,</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;            time_since_last_pre, decayed_r1);</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="comment">// Apply potentiation to state (which is a weight_state)</span></div>
@@ -204,8 +204,8 @@ $(function() {
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;}</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="preprocessor">#endif  </span><span class="comment">// VOGELS_2011_IMPL_H</span></div>
-<div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
-<div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
+<div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
+<div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
 <div class="ttc" id="adelay__extension_8c_html_ae73654f333e4363463ad8c594eca1905"><div class="ttname"><a href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a></div><div class="ttdeci">static uint32_t time</div><div class="ttdoc">Simulation time.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00098">delay_extension.c:98</a></div></div>
 <div class="ttc" id="alast__neuron__selection__impl_8c_html_adf31bd4dca7310ba032781bf74fee32c"><div class="ttname"><a href="last__neuron__selection__impl_8c.html#adf31bd4dca7310ba032781bf74fee32c">last_time</a></div><div class="ttdeci">uint32_t last_time</div><div class="ttdoc">The time of the most recently-considered spike.</div><div class="ttdef"><b>Definition:</b> <a href="last__neuron__selection__impl_8c_source.html#l00026">last_neuron_selection_impl.c:26</a></div></div>
 <div class="ttc" id="amaths_8h_html"><div class="ttname"><a href="maths_8h.html">maths.h</a></div><div class="ttdoc">Support functions for STDP.</div></div>
@@ -236,7 +236,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 10 2023 09:46:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Mar 10 2023 11:25:22 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

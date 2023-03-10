@@ -103,7 +103,7 @@ $(function() {
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordflow">for</span> (uint32_t n_dc=0; n_dc &lt; n_dc_sources; n_dc++) {</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        dc_source[n_dc] = spin1_malloc(<span class="keyword">sizeof</span>(<a class="code" href="current__source__dc_8h.html#structdc__source__t">dc_source_t</a>));</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <span class="keywordflow">if</span> (dc_source[n_dc] == NULL) {</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate DC source parameters - out of DTCM&quot;</span>);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;            <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate DC source parameters - out of DTCM&quot;</span>);</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        }</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        *next += <span class="keyword">sizeof</span>(<a class="code" href="current__source__dc_8h.html#structdc__source__t">dc_source_t</a>) / 4;</div>
@@ -112,9 +112,9 @@ $(function() {
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> current_source_dc_load_parameters(</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> cs_address, uint32_t n_dc_sources, uint32_t *next) {</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> cs_address, uint32_t n_dc_sources, uint32_t *next) {</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">for</span> (uint32_t n_dc=0; n_dc &lt; n_dc_sources; n_dc++) {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(dc_source[n_dc], &amp;cs_address[*next], <span class="keyword">sizeof</span>(<a class="code" href="current__source__dc_8h.html#structdc__source__t">dc_source_t</a>));</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <a class="codeRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(dc_source[n_dc], &amp;cs_address[*next], <span class="keyword">sizeof</span>(<a class="code" href="current__source__dc_8h.html#structdc__source__t">dc_source_t</a>));</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        *next += <span class="keyword">sizeof</span>(<a class="code" href="current__source__dc_8h.html#structdc__source__t">dc_source_t</a>) / 4;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    }</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
@@ -128,17 +128,17 @@ $(function() {
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CURRENT_SOURCE_DC_H_</span></div>
-<div class="ttc" id="acommon-typedefs_8h_html_ac8dc08dd5f5827994d1b06351f925669"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a></div><div class="ttdeci">uint32_t * address_t</div></div>
+<div class="ttc" id="acommon-typedefs_8h_html_ac8dc08dd5f5827994d1b06351f925669"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a></div><div class="ttdeci">uint32_t * address_t</div></div>
 <div class="ttc" id="acurrent__source__dc_8h_html_structdc__source__t"><div class="ttname"><a href="current__source__dc_8h.html#structdc__source__t">dc_source_t</a></div><div class="ttdef"><b>Definition:</b> <a href="current__source__dc_8h_source.html#l00024">current_source_dc.h:24</a></div></div>
-<div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
+<div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
 <div class="ttc" id="adelay__extension_8c_html_ae73654f333e4363463ad8c594eca1905"><div class="ttname"><a href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a></div><div class="ttdeci">static uint32_t time</div><div class="ttdoc">Simulation time.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00098">delay_extension.c:98</a></div></div>
 <div class="ttc" id="amaths-util_8h_html_a67277c5a9b43a598ef8c22aea7dbe1b6"><div class="ttname"><a href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></div><div class="ttdeci">accum REAL</div><div class="ttdoc">Type used for &quot;real&quot; numbers.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00089">maths-util.h:89</a></div></div>
 <div class="ttc" id="amaths-util_8h_html_ac328e551bde3d39b6d7b8cc9e048d941"><div class="ttname"><a href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a></div><div class="ttdeci">#define ZERO</div><div class="ttdoc">A REAL 0.0.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00121">maths-util.h:121</a></div></div>
-<div class="ttc" id="aspin1__api_8h_html_a8c23f19c28f2c3ed0a9b86ce8c98802d"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a></div><div class="ttdeci">void spin1_memcpy(void *dst, void const *src, uint len)</div></div>
+<div class="ttc" id="aspin1__api_8h_html_a8c23f19c28f2c3ed0a9b86ce8c98802d"><div class="ttname"><a href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a></div><div class="ttdeci">void spin1_memcpy(void *dst, void const *src, uint len)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 10 2023 09:46:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Mar 10 2023 11:25:22 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

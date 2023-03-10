@@ -77,12 +77,12 @@ $(function() {
 
 <p>Expands bitfields on SpiNNaker to reduce data transfer times.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html">bit_field.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="elRef" href="https://spinnakermanchester.github.io/spinn_common/bit__field_8h.html">bit_field.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="synapse__row_8h_source.html">neuron/synapse_row.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="population__table_8h_source.html">neuron/population_table/population_table.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="sp__structs_8h_source.html">neuron/structural_plasticity/synaptogenesis/sp_structs.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_info.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/key__atom__map_8h.html">key_atom_map.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_info.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/key__atom__map_8h.html">key_atom_map.h</a>&gt;</code><br />
 </div>
 <p><a href="bit__field__expander_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -92,10 +92,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:aedbb9078114fc3e4f94a7e6c4ca3c5ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read row and test if there are any synapses.  <a href="bit__field__expander_8h.html#aedbb9078114fc3e4f94a7e6c4ca3c5ae">More...</a><br /></td></tr>
 <tr class="separator:aedbb9078114fc3e4f94a7e6c4ca3c5ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15cfb9de720808f7005d7d93f426c162"><td class="memItemLeft" align="right" valign="top"><a id="a15cfb9de720808f7005d7d93f426c162"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8h.html#a15cfb9de720808f7005d7d93f426c162">determine_redundancy</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_region_t</a> *bitfield_filters)</td></tr>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8h.html#a15cfb9de720808f7005d7d93f426c162">determine_redundancy</a> (<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_region_t</a> *bitfield_filters)</td></tr>
 <tr class="memdesc:a15cfb9de720808f7005d7d93f426c162"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine which bit fields are redundant. <br /></td></tr>
 <tr class="separator:a15cfb9de720808f7005d7d93f426c162"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4477b4a6faf287e216d3a2ba19f91ca"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8h.html#ac4477b4a6faf287e216d3a2ba19f91ca">generate_bit_field</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_region_t</a> *bitfield_filters, uint32_t *n_atom_data, void *synaptic_matrix, void *structural_matrix, <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *<a class="el" href="topographic__map__impl_8c.html#a25e63ee99aecac3677f299c1cccec889">pre_info</a>, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row_data)</td></tr>
+<tr class="memitem:ac4477b4a6faf287e216d3a2ba19f91ca"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8h.html#ac4477b4a6faf287e216d3a2ba19f91ca">generate_bit_field</a> (<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_region_t</a> *bitfield_filters, uint32_t *n_atom_data, void *synaptic_matrix, void *structural_matrix, <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *<a class="el" href="topographic__map__impl_8c.html#a25e63ee99aecac3677f299c1cccec889">pre_info</a>, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row_data)</td></tr>
 <tr class="memdesc:ac4477b4a6faf287e216d3a2ba19f91ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create the bitfield for this master pop table and synaptic matrix.  <a href="bit__field__expander_8h.html#ac4477b4a6faf287e216d3a2ba19f91ca">More...</a><br /></td></tr>
 <tr class="separator:ac4477b4a6faf287e216d3a2ba19f91ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9fb8dd78e38e33e88fa72cc981744d2a"><td class="memItemLeft" align="right" valign="top"><a id="a9fb8dd78e38e33e88fa72cc981744d2a"></a>
@@ -181,7 +181,7 @@ static <a class="el" href="population__table_8h.html#structaddress__list__entry"
         <tr>
           <td class="memname">static bool generate_bit_field </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_region_t</a> *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_region_t</a> *&#160;</td>
           <td class="paramname"><em>bitfield_filters</em>, </td>
         </tr>
         <tr>
@@ -237,7 +237,7 @@ static <a class="el" href="population__table_8h.html#structaddress__list__entry"
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 10 2023 09:46:51 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Mar 10 2023 11:25:23 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

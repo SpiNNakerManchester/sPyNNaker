@@ -90,8 +90,8 @@ $(function() {
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#ifndef _CURRENT_SOURCE_STEP_H_</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#define _CURRENT_SOURCE_STEP_H_</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/spinn_common/random_8h.html">random.h</a>&gt;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/spinn_common/normal_8h.html">normal.h</a>&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://spinnakermanchester.github.io/spinn_common/random_8h.html">random.h</a>&gt;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="https://spinnakermanchester.github.io/spinn_common/normal_8h.html">normal.h</a>&gt;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">// Structures for different current sources used in this impl</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="current__source__step_8h.html">   28</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="current__source__step_8h.html#structstep__current__source__times__t">step_current_source_times_t</a> {</div>
@@ -111,18 +111,18 @@ $(function() {
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">static</span> uint32_t *step_cs_index;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> current_source_step_init(</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> cs_address, uint32_t n_step_current_sources, uint32_t *next) {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> cs_address, uint32_t n_step_current_sources, uint32_t *next) {</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">if</span> (n_step_current_sources &gt; 0) {</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        step_cs_times = spin1_malloc(n_step_current_sources * <span class="keyword">sizeof</span>(uint32_t*));</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        step_cs_amps = spin1_malloc(n_step_current_sources * <span class="keyword">sizeof</span>(uint32_t*));</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        step_cs_amp_last = spin1_malloc(n_step_current_sources * <span class="keyword">sizeof</span>(<a class="code" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>));</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        step_cs_index = spin1_malloc(n_step_current_sources * <span class="keyword">sizeof</span>(uint32_t));</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keywordflow">if</span> (step_cs_amp_last == NULL) {</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source amp last - out of DTCM&quot;</span>);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source amp last - out of DTCM&quot;</span>);</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        }</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keywordflow">if</span> (step_cs_index == NULL) {</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source index - out of DTCM&quot;</span>);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source index - out of DTCM&quot;</span>);</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        }</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    }</div>
@@ -131,14 +131,14 @@ $(function() {
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        uint32_t struct_size = (arr_len + 1) * <span class="keyword">sizeof</span>(uint32_t);</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        step_cs_times[n_step] = spin1_malloc(struct_size);</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordflow">if</span> (step_cs_times[n_step] == NULL) {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source times - out of DTCM&quot;</span>,</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source times - out of DTCM&quot;</span>,</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                    <span class="stringliteral">&quot;struct_size is %u next %u n_step %u)&quot;</span>, struct_size, *next, n_step);</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        }</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        step_cs_amps[n_step] = spin1_malloc(struct_size);</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="keywordflow">if</span> (step_cs_amps[n_step] == NULL) {</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source amplitudes - out of DTCM&quot;</span>,</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source amplitudes - out of DTCM&quot;</span>,</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                    <span class="stringliteral">&quot;(struct_size is %u next %u n_step %u)&quot;</span>, struct_size, *next, n_step);</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        }</div>
@@ -152,13 +152,13 @@ $(function() {
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;}</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> current_source_step_load_parameters(</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> cs_address, uint32_t n_step_current_sources, uint32_t *next) {</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <a class="codeRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> cs_address, uint32_t n_step_current_sources, uint32_t *next) {</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordflow">for</span> (uint32_t n_step=0; n_step &lt; n_step_current_sources; n_step++) {</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        uint32_t arr_len = (uint32_t) cs_address[*next];</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        uint32_t struct_size = (arr_len + 1) * <span class="keyword">sizeof</span>(uint32_t);</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(step_cs_times[n_step], &amp;cs_address[*next], struct_size);</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(step_cs_amps[n_step], &amp;cs_address[*next+arr_len+1], struct_size);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <a class="codeRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(step_cs_times[n_step], &amp;cs_address[*next], struct_size);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <a class="codeRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(step_cs_amps[n_step], &amp;cs_address[*next+arr_len+1], struct_size);</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        *next += 2 * (arr_len + 1);</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
@@ -179,20 +179,20 @@ $(function() {
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;}</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CURRENT_SOURCE_STEP_H_</span></div>
-<div class="ttc" id="acommon-typedefs_8h_html_ac8dc08dd5f5827994d1b06351f925669"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a></div><div class="ttdeci">uint32_t * address_t</div></div>
+<div class="ttc" id="acommon-typedefs_8h_html_ac8dc08dd5f5827994d1b06351f925669"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a></div><div class="ttdeci">uint32_t * address_t</div></div>
 <div class="ttc" id="acurrent__source__step_8h_html_structstep__current__source__amps__t"><div class="ttname"><a href="current__source__step_8h.html#structstep__current__source__amps__t">step_current_source_amps_t</a></div><div class="ttdef"><b>Definition:</b> <a href="current__source__step_8h_source.html#l00033">current_source_step.h:33</a></div></div>
 <div class="ttc" id="acurrent__source__step_8h_html_structstep__current__source__times__t"><div class="ttname"><a href="current__source__step_8h.html#structstep__current__source__times__t">step_current_source_times_t</a></div><div class="ttdef"><b>Definition:</b> <a href="current__source__step_8h_source.html#l00028">current_source_step.h:28</a></div></div>
-<div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
+<div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
 <div class="ttc" id="adelay__extension_8c_html_ae73654f333e4363463ad8c594eca1905"><div class="ttname"><a href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a></div><div class="ttdeci">static uint32_t time</div><div class="ttdoc">Simulation time.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00098">delay_extension.c:98</a></div></div>
 <div class="ttc" id="amaths-util_8h_html_a67277c5a9b43a598ef8c22aea7dbe1b6"><div class="ttname"><a href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></div><div class="ttdeci">accum REAL</div><div class="ttdoc">Type used for &quot;real&quot; numbers.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00089">maths-util.h:89</a></div></div>
 <div class="ttc" id="amaths-util_8h_html_ac328e551bde3d39b6d7b8cc9e048d941"><div class="ttname"><a href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a></div><div class="ttdeci">#define ZERO</div><div class="ttdoc">A REAL 0.0.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00121">maths-util.h:121</a></div></div>
-<div class="ttc" id="anormal_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinn_common/normal_8h.html">normal.h</a></div></div>
-<div class="ttc" id="arandom_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinn_common/random_8h.html">random.h</a></div></div>
-<div class="ttc" id="aspin1__api_8h_html_a8c23f19c28f2c3ed0a9b86ce8c98802d"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a></div><div class="ttdeci">void spin1_memcpy(void *dst, void const *src, uint len)</div></div>
+<div class="ttc" id="anormal_8h.html_html"><div class="ttname"><a href="https://spinnakermanchester.github.io/spinn_common/normal_8h.html">normal.h</a></div></div>
+<div class="ttc" id="arandom_8h.html_html"><div class="ttname"><a href="https://spinnakermanchester.github.io/spinn_common/random_8h.html">random.h</a></div></div>
+<div class="ttc" id="aspin1__api_8h_html_a8c23f19c28f2c3ed0a9b86ce8c98802d"><div class="ttname"><a href="https://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a></div><div class="ttdeci">void spin1_memcpy(void *dst, void const *src, uint len)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 10 2023 09:46:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Mar 10 2023 11:25:22 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

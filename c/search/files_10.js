@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['tdma_5fprocessing_2ec_3141',['tdma_processing.c',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8c.html',1,'']]],
-  ['tdma_5fprocessing_2eh_3142',['tdma_processing.h',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8h.html',1,'']]],
+  ['tdma_5fprocessing_2ec_3141',['tdma_processing.c',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8c.html',1,'']]],
+  ['tdma_5fprocessing_2eh_3142',['tdma_processing.h',['https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8h.html',1,'']]],
   ['threshold_5ftype_2eh_3143',['threshold_type.h',['../threshold__type_8h.html',1,'']]],
   ['threshold_5ftype_5fmaass_5fstochastic_2eh_3144',['threshold_type_maass_stochastic.h',['../threshold__type__maass__stochastic_8h.html',1,'']]],
   ['threshold_5ftype_5fnone_2eh_3145',['threshold_type_none.h',['../threshold__type__none_8h.html',1,'']]],

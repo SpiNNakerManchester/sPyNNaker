@@ -80,8 +80,8 @@ $(function() {
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="synapse__dynamics_8h_source.html">neuron/plasticity/synapse_dynamics.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="synapse__row_8h_source.html">neuron/synapse_row.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/random_8h.html">random.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="https://spinnakermanchester.github.io/spinn_common/random_8h.html">random.h</a>&gt;</code><br />
 </div>
 <p><a href="sp__structs_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -115,7 +115,7 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:abfe9bbac4f366e370a68a174d26c0261"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#abfe9bbac4f366e370a68a174d26c0261">rand_int</a> (uint32_t max, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a> <a class="el" href="random__util_8h.html#a242fd815ccc9f4b3ad34154405da64c6">seed</a>)</td></tr>
+<tr class="memitem:abfe9bbac4f366e370a68a174d26c0261"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#abfe9bbac4f366e370a68a174d26c0261">rand_int</a> (uint32_t max, <a class="elRef" href="https://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a> <a class="el" href="random__util_8h.html#a242fd815ccc9f4b3ad34154405da64c6">seed</a>)</td></tr>
 <tr class="separator:abfe9bbac4f366e370a68a174d26c0261"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca9cfbe9add5978e97d5fe58039b2d3b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#aca9cfbe9add5978e97d5fe58039b2d3b">sp_structs_find_by_spike</a> (const <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *pre_pop_info_table, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, uint32_t *restrict neuron_id, uint32_t *restrict population_id, uint32_t *restrict sub_population_id, uint32_t *restrict m_pop_index)</td></tr>
 <tr class="memdesc:aca9cfbe9add5978e97d5fe58039b2d3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">unpack the spike into key and identifying information for the neuron; Identify pop, sub-population and low and high atoms  <a href="sp__structs_8h.html#aca9cfbe9add5978e97d5fe58039b2d3b">More...</a><br /></td></tr>
@@ -129,7 +129,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a430fd8b92b5f0b7a6b523de8b692cc9d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#a430fd8b92b5f0b7a6b523de8b692cc9d">sp_structs_add_synapse</a> (<a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict current_state, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> restrict row)</td></tr>
 <tr class="memdesc:a430fd8b92b5f0b7a6b523de8b692cc9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a synapse to the relevant structures.  <a href="sp__structs_8h.html#a430fd8b92b5f0b7a6b523de8b692cc9d">More...</a><br /></td></tr>
 <tr class="separator:a430fd8b92b5f0b7a6b523de8b692cc9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0f53340995f427043f318c118d3d974"><td class="memItemLeft" align="right" valign="top">static uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#af0f53340995f427043f318c118d3d974">sp_structs_read_in_common</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> sdram_sp_address, <a class="el" href="sp__structs_8h.html#structrewiring__data__t">rewiring_data_t</a> *<a class="el" href="topographic__map__impl_8c.html#a14052fb746b24752fc5a96accf39d8b8">rewiring_data</a>, <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *<a class="el" href="topographic__map__impl_8c.html#a25e63ee99aecac3677f299c1cccec889">pre_info</a>, <a class="el" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a> **<a class="el" href="topographic__map__impl_8c.html#ab4adc13b137ccdbaff9d8883400182eb">post_to_pre_table</a>)</td></tr>
+<tr class="memitem:af0f53340995f427043f318c118d3d974"><td class="memItemLeft" align="right" valign="top">static uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#af0f53340995f427043f318c118d3d974">sp_structs_read_in_common</a> (<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> sdram_sp_address, <a class="el" href="sp__structs_8h.html#structrewiring__data__t">rewiring_data_t</a> *<a class="el" href="topographic__map__impl_8c.html#a14052fb746b24752fc5a96accf39d8b8">rewiring_data</a>, <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *<a class="el" href="topographic__map__impl_8c.html#a25e63ee99aecac3677f299c1cccec889">pre_info</a>, <a class="el" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a> **<a class="el" href="topographic__map__impl_8c.html#ab4adc13b137ccdbaff9d8883400182eb">post_to_pre_table</a>)</td></tr>
 <tr class="memdesc:af0f53340995f427043f318c118d3d974"><td class="mdescLeft">&#160;</td><td class="mdescRight">Common code for structural plasticity initialisation.  <a href="sp__structs_8h.html#af0f53340995f427043f318c118d3d974">More...</a><br /></td></tr>
 <tr class="separator:af0f53340995f427043f318c118d3d974"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -397,13 +397,13 @@ with_replacement</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a631f7848a7e968513a8c9fe47cf757ce"></a><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a></td>
+<a id="a631f7848a7e968513a8c9fe47cf757ce"></a><a class="elRef" href="https://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a></td>
 <td class="fieldname">
 shared_seed</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a7d9b2747705db7ce4e0ea78b7be0c728"></a><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a></td>
+<a id="a7d9b2747705db7ce4e0ea78b7be0c728"></a><a class="elRef" href="https://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a></td>
 <td class="fieldname">
 local_seed</td>
 <td class="fielddoc">
@@ -435,7 +435,7 @@ no_pre_pops</td>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a id="a95fc96bd4899b31f5950f74e458fcba2"></a><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a> *</td>
+<a id="a95fc96bd4899b31f5950f74e458fcba2"></a><a class="elRef" href="https://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a> *</td>
 <td class="fieldname">
 local_seed</td>
 <td class="fielddoc">
@@ -541,7 +541,7 @@ synapse type </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="https://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a>&#160;</td>
           <td class="paramname"><em>seed</em>&#160;</td>
         </tr>
         <tr>
@@ -829,7 +829,7 @@ synapse type </td></tr>
         <tr>
           <td class="memname">static uint8_t* sp_structs_read_in_common </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>sdram_sp_address</em>, </td>
         </tr>
         <tr>
@@ -882,7 +882,7 @@ synapse type </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 10 2023 09:46:51 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Mar 10 2023 11:25:23 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

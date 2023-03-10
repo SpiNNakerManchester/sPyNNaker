@@ -11,6 +11,6 @@ var searchData=
   ['neuron_5fmodel_5fizh_5fimpl_2eh_3024',['neuron_model_izh_impl.h',['../neuron__model__izh__impl_8h.html',1,'']]],
   ['neuron_5fmodel_5flif_5fimpl_2eh_3025',['neuron_model_lif_impl.h',['../neuron__model__lif__impl_8h.html',1,'']]],
   ['neuron_5frecording_2eh_3026',['neuron_recording.h',['../neuron__recording_8h.html',1,'']]],
-  ['normal_2ec_3027',['normal.c',['http://spinnakermanchester.github.io/spinn_common/normal_8c.html',1,'']]],
-  ['normal_2eh_3028',['normal.h',['http://spinnakermanchester.github.io/spinn_common/normal_8h.html',1,'']]]
+  ['normal_2ec_3027',['normal.c',['https://spinnakermanchester.github.io/spinn_common/normal_8c.html',1,'']]],
+  ['normal_2eh_3028',['normal.h',['https://spinnakermanchester.github.io/spinn_common/normal_8h.html',1,'']]]
 ];

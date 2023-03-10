@@ -82,9 +82,9 @@ $(function() {
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="neuron-typedefs_8h_source.html">common/neuron-typedefs.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="in__spikes_8h_source.html">common/in_spikes.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/simulation_8h.html">simulation.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/simulation_8h.html">simulation.h</a>&gt;</code><br />
 <code>#include &lt;stdbool.h&gt;</code><br />
 </div>
 <p><a href="robot__motor__control_8c_source.html">Go to the source code of this file.</a></p>
@@ -148,19 +148,19 @@ Functions</h2></td></tr>
 <tr class="memitem:a559960c23f8a6e90bde4d3e5b8dc7811"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a559960c23f8a6e90bde4d3e5b8dc7811">do_update</a> (<a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a> direction_index, <a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a> opposite_index, const char *direction, const char *opposite)</td></tr>
 <tr class="memdesc:a559960c23f8a6e90bde4d3e5b8dc7811"><td class="mdescLeft">&#160;</td><td class="mdescRight">Commands the robot's motors to continue a motion started by <a class="el" href="robot__motor__control_8c.html#a96363d8d245d659d10d5512cb46aa0e3" title="Commands the robot&#39;s motors to start doing a motion.">do_motion()</a>  <a href="robot__motor__control_8c.html#a559960c23f8a6e90bde4d3e5b8dc7811">More...</a><br /></td></tr>
 <tr class="separator:a559960c23f8a6e90bde4d3e5b8dc7811"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa51de182df34173453b5d99dcd2ffedc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#aa51de182df34173453b5d99dcd2ffedc">timer_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused0, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused1)</td></tr>
+<tr class="memitem:aa51de182df34173453b5d99dcd2ffedc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#aa51de182df34173453b5d99dcd2ffedc">timer_callback</a> (<a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused0, <a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused1)</td></tr>
 <tr class="memdesc:aa51de182df34173453b5d99dcd2ffedc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Regular 1ms callback. Takes spikes from circular buffer and converts to motor activity level.  <a href="robot__motor__control_8c.html#aa51de182df34173453b5d99dcd2ffedc">More...</a><br /></td></tr>
 <tr class="separator:aa51de182df34173453b5d99dcd2ffedc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa23e1c102ba93d20434d86c3fda24fce"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#aa23e1c102ba93d20434d86c3fda24fce">read_parameters</a> (<a class="el" href="robot__motor__control_8c.html#structmotor__control__config__t">motor_control_config_t</a> *config_region)</td></tr>
 <tr class="memdesc:aa23e1c102ba93d20434d86c3fda24fce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the configuration.  <a href="robot__motor__control_8c.html#aa23e1c102ba93d20434d86c3fda24fce">More...</a><br /></td></tr>
 <tr class="separator:aa23e1c102ba93d20434d86c3fda24fce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95885055138e174e0b8e70fcafa07388"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a95885055138e174e0b8e70fcafa07388">incoming_spike_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> <a class="el" href="robot__motor__control_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> payload)</td></tr>
+<tr class="memitem:a95885055138e174e0b8e70fcafa07388"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a95885055138e174e0b8e70fcafa07388">incoming_spike_callback</a> (<a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> <a class="el" href="robot__motor__control_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>, <a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> payload)</td></tr>
 <tr class="memdesc:a95885055138e174e0b8e70fcafa07388"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add incoming spike message (in FIQ) to circular buffer.  <a href="robot__motor__control_8c.html#a95885055138e174e0b8e70fcafa07388">More...</a><br /></td></tr>
 <tr class="separator:a95885055138e174e0b8e70fcafa07388"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a55ebafbff10f99685495e8f745ff53ca"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a55ebafbff10f99685495e8f745ff53ca">incoming_spike_callback_payload</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> <a class="el" href="robot__motor__control_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> payload)</td></tr>
+<tr class="memitem:a55ebafbff10f99685495e8f745ff53ca"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a55ebafbff10f99685495e8f745ff53ca">incoming_spike_callback_payload</a> (<a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> <a class="el" href="robot__motor__control_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>, <a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> payload)</td></tr>
 <tr class="memdesc:a55ebafbff10f99685495e8f745ff53ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add incoming spike message (in FIQ) to circular buffer.  <a href="robot__motor__control_8c.html#a55ebafbff10f99685495e8f745ff53ca">More...</a><br /></td></tr>
 <tr class="separator:a55ebafbff10f99685495e8f745ff53ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1dc4d17392d4c0a6dac7ab12267da487"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a1dc4d17392d4c0a6dac7ab12267da487">c_main_store_provenance_data</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> provenance_region)</td></tr>
+<tr class="memitem:a1dc4d17392d4c0a6dac7ab12267da487"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a1dc4d17392d4c0a6dac7ab12267da487">c_main_store_provenance_data</a> (<a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> provenance_region)</td></tr>
 <tr class="memdesc:a1dc4d17392d4c0a6dac7ab12267da487"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback to store provenance data (format: <a class="el" href="structneuron__provenance.html" title="The provenance information provided by neurons.">neuron_provenance</a>).  <a href="robot__motor__control_8c.html#a1dc4d17392d4c0a6dac7ab12267da487">More...</a><br /></td></tr>
 <tr class="separator:a1dc4d17392d4c0a6dac7ab12267da487"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37f0b2315f3101f6ff9936c212c5bd84"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a37f0b2315f3101f6ff9936c212c5bd84">initialize</a> (uint32_t *<a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>)</td></tr>
@@ -585,13 +585,13 @@ A count of the times that the synaptic input circular buffers overflowed. </td><
         <tr>
           <td class="memname">static void timer_callback </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
           <td class="paramname"><em>unused0</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
           <td class="paramname"><em>unused1</em>&#160;</td>
         </tr>
         <tr>
@@ -668,13 +668,13 @@ A count of the times that the synaptic input circular buffers overflowed. </td><
         <tr>
           <td class="memname">static void incoming_spike_callback </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
           <td class="paramname"><em>key</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
           <td class="paramname"><em>payload</em>&#160;</td>
         </tr>
         <tr>
@@ -715,13 +715,13 @@ A count of the times that the synaptic input circular buffers overflowed. </td><
         <tr>
           <td class="memname">static void incoming_spike_callback_payload </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
           <td class="paramname"><em>key</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="https://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
           <td class="paramname"><em>payload</em>&#160;</td>
         </tr>
         <tr>
@@ -762,7 +762,7 @@ A count of the times that the synaptic input circular buffers overflowed. </td><
         <tr>
           <td class="memname">static void c_main_store_provenance_data </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="https://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>provenance_region</em></td><td>)</td>
           <td></td>
         </tr>
@@ -826,7 +826,7 @@ A count of the times that the synaptic input circular buffers overflowed. </td><
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Mar 10 2023 09:46:51 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Fri Mar 10 2023 11:25:23 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
