@@ -99,10 +99,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_to_files_indicators</span>
 
 <div class="viewcode-block" id="Recorder.record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Same as record but without non-standard PyNN warning</span>
-
-<span class="sd">        This method is non-standard PyNN and is intended only to be called by</span>
-<span class="sd">        record in a Population, View or Assembly</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Turns on (or off) recording</span>
 
 <span class="sd">        :param variables: either a single variable name or a list of variable</span>
 <span class="sd">            names. For a given celltype class, ``celltype.recordable`` contains</span>
@@ -140,23 +137,40 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="c1"># handle special case of &#39;all&#39;</span>
             <span class="k">if</span> <span class="n">variables</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
-                <span class="n">warn_once</span><span class="p">(</span>
-                    <span class="n">logger</span><span class="p">,</span> <span class="s1">&#39;record(&quot;all&quot;) is non-standard PyNN, and &#39;</span>
-                    <span class="s1">&#39;therefore may not be portable to other simulators.&#39;</span><span class="p">)</span>
-
-                <span class="c1"># iterate though all possible recordings for this vertex</span>
-                <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">():</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">turn_on_record</span><span class="p">(</span>
-                        <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__turn_on_all_record</span><span class="p">(</span><span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># record variable</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">turn_on_record</span><span class="p">(</span>
                     <span class="n">variables</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># list of variables, so just iterate though them</span>
-            <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">turn_on_record</span><span class="p">(</span>
-                    <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="s2">&quot;all&quot;</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__turn_on_all_record</span><span class="p">(</span><span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">turn_on_record</span><span class="p">(</span>
+                        <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__turn_on_all_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param int sampling_interval: the interval to record them</span>
+<span class="sd">        :param to_file: If set, a file to write to (by handle or name)</span>
+<span class="sd">        :type to_file: neo.io.baseio.BaseIO or str or None</span>
+<span class="sd">        :param indexes: List of indexes to record or None for all</span>
+<span class="sd">        :type indexes: list(int) or None</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warn_once</span><span class="p">(</span>
+            <span class="n">logger</span><span class="p">,</span> <span class="s1">&#39;record(&quot;all&quot;) is non-standard PyNN, and &#39;</span>
+                    <span class="s1">&#39;therefore may not be portable to other simulators.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># iterate though all possible recordings for this vertex</span>
+        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">turn_on_record</span><span class="p">(</span>
+                <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Recorder.turn_on_record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.turn_on_record">[docs]</a>    <span class="k">def</span> <span class="nf">turn_on_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -338,7 +352,8 @@
             <span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
             <span class="k">return</span>
 
-        <span class="k">with</span> <span class="n">NeoBufferDatabase</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">[</span><span class="n">segment_number</span><span class="p">])</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">NeoBufferDatabase</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">[</span><span class="n">segment_number</span><span class="p">],</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
             <span class="n">db</span><span class="o">.</span><span class="n">add_segment</span><span class="p">(</span>
                 <span class="n">block</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">clear</span><span class="p">:</span>

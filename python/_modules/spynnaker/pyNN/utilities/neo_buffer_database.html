@@ -92,7 +92,7 @@
     <span class="c1">#: number of words per rewiring entry</span>
     <span class="n">__REWIRING_N_WORDS</span> <span class="o">=</span> <span class="mi">2</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extra support for Neo on top of the Database for SQLite 3.</span>
 
@@ -104,12 +104,18 @@
 <span class="sd">            database holding the data.</span>
 <span class="sd">            If omitted the default location will be used.</span>
 <span class="sd">        :type database_file: None or str</span>
+<span class="sd">        :param read_only:</span>
+<span class="sd">            By default the database is readonly if given a databas file.</span>
+<span class="sd">            This allows to overwire that (mainly for clear)</span>
+<span class="sd">        :type read_only: None or bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">database_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">database_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_database_file</span><span class="p">()</span>
-            <span class="n">read_only</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">read_only</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">read_only</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">read_only</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">read_only</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">read_only</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">BufferDatabase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">database_file</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="n">read_only</span><span class="p">)</span>

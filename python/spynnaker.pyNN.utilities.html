@@ -660,16 +660,20 @@ record.</p>
 <span id="spynnaker-pynn-utilities-neo-buffer-database-module"></span><h2>spynnaker.pyNN.utilities.neo_buffer_database module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.neo_buffer_database" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_buffer_database.</span></span><span class="sig-name descname"><span class="pre">NeoBufferDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_buffer_database.html#NeoBufferDatabase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_buffer_database.</span></span><span class="sig-name descname"><span class="pre">NeoBufferDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_buffer_database.html#NeoBufferDatabase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.buffer_management.storage_objects.html#spinn_front_end_common.interface.buffer_management.storage_objects.BufferDatabase" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferDatabase</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.utilities.neo_csv.NeoCsv" title="spynnaker.pyNN.utilities.neo_csv.NeoCsv"><code class="xref py py-class docutils literal notranslate"><span class="pre">NeoCsv</span></code></a></p>
 <p>Extra support for Neo on top of the Database for SQLite 3.</p>
 <p>This is the same database as used by BufferManager but with
 extra tables and access methods added.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>database_file</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of a file that contains (or will contain) an SQLite
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database_file</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of a file that contains (or will contain) an SQLite
 database holding the data.
-If omitted the default location will be used.</p>
+If omitted the default location will be used.</p></li>
+<li><p><strong>read_only</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – By default the database is readonly if given a databas file.
+This allows to overwire that (mainly for clear)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py method">
