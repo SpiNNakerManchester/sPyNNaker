@@ -14,7 +14,7 @@
 
 """
 This contains functions and classes for handling external devices such as the
-PushBot (http://spinnakermanchester.github.io/docs/push_bot/).
+PushBot (https://spinnakermanchester.github.io/docs/push_bot/).
 
 .. note::
     When using external devices, it is normally important to configure your
