@@ -314,7 +314,8 @@ class Recorder(object):
             block.segments.append(segment)
             return
 
-        with NeoBufferDatabase(self.__data_cache[segment_number]) as db:
+        with NeoBufferDatabase(
+                self.__data_cache[segment_number], read_only=False) as db:
             db.add_segment(
                 block, self.__population.label, variables, view_indexes)
             if clear:
