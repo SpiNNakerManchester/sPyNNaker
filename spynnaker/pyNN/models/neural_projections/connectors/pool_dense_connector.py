@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -92,7 +92,7 @@ class PoolDenseConnector(AbstractConnector):
         super(PoolDenseConnector, self).__init__(
             safe=safe, callback=callback, verbose=verbose)
 
-        self.__weights = weights
+        self.__weights = numpy.array(weights)
 
         self.__pool_shape = pool_shape
         self.__pool_stride = pool_stride
@@ -213,18 +213,20 @@ class PoolDenseConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
-        # All delays are 1 timestep
-        return 1
+        return synapse_info.delays
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        # All delays are 1 timestep
-        return 1
+        return synapse_info.delays
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
+        if min_delay is not None and max_delay is not None:
+            delay = synapse_info.delays
+            if min_delay > delay or max_delay < delay:
+                return 0
         # Every pre connects to every post
         return n_post_atoms
 
@@ -235,6 +237,8 @@ class PoolDenseConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
+        if isinstance(self.__weights, Iterable):
+            return numpy.amax(numpy.abs(self.__weights))
         n_conns = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         return super(PoolDenseConnector, self)._get_weight_maximum(
             self.__weights, n_conns, synapse_info)
@@ -285,8 +289,11 @@ class PoolDenseConnector(AbstractConnector):
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
 
         # Write delay
-        spec.write_value(app_edge.post_vertex.synapse_dynamics.delay *
-                         SpynnakerDataView.get_simulation_time_step_per_ms())
+        delay_step = (app_edge.post_vertex.synapse_dynamics.delay *
+                      SpynnakerDataView.get_simulation_time_step_per_ms())
+        local_delay = (delay_step %
+                       app_edge.post_vertex.splitter.max_support_delay())
+        spec.write_value(local_delay)
 
         # Generate the dimension information
         dim_info = numpy.zeros(n_dims, dtype=_DIM_DTYPE)
@@ -296,24 +303,25 @@ class PoolDenseConnector(AbstractConnector):
         else:
             dim_info["recip_pool_stride"] = self.__recip(1)
         if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
-            pre_start_mask_shift = numpy.array(
+            pre_start_size_mask_shift = numpy.array(
                 app_edge.pre_vertex.get_shape_key_fields(pre_vertex_slice))
-            dim_info["pre_start"] = pre_start_mask_shift[:, 0]
-            dim_info["mask"] = pre_start_mask_shift[:, 1]
-            dim_info["shift"] = pre_start_mask_shift[:, 2]
+            start = pre_start_size_mask_shift[:, 0]
+            size = pre_start_size_mask_shift[:, 1]
+            dim_info["pre_start"] = start
+            dim_info["mask"] = pre_start_size_mask_shift[:, 2]
+            dim_info["shift"] = pre_start_size_mask_shift[:, 3]
         else:
-            n_bits = numpy.ceil(numpy.log2(
-                pre_vertex_slice.shape)).astype("int")
+            start = numpy.array(pre_vertex_slice.start)
+            size = numpy.array(pre_vertex_slice.shape)
+            n_bits = numpy.ceil(numpy.log2(size)).astype("int")
             shifts = numpy.concatenate(([0], numpy.cumsum(n_bits[:-1])))
             masks = numpy.left_shift(numpy.left_shift(1, n_bits) - 1, shifts)
-            dim_info["pre_start"] = pre_vertex_slice.start
+            dim_info["pre_start"] = start
             dim_info["mask"] = masks
             dim_info["shift"] = shifts
 
-        dim_info["pre_in_post_start"] = self.__pre_as_post(
-            pre_vertex_slice.start)
-        dim_info["pre_in_post_end"] = self.__pre_as_post(
-            pre_vertex_slice.end)
+        dim_info["pre_in_post_start"] = self.__pre_as_post(start)
+        dim_info["pre_in_post_end"] = self.__pre_as_post(start + size)
         dim_info["pre_in_post_shape"] = (
             dim_info["pre_in_post_end"] - dim_info["pre_in_post_start"] + 1)
         spec.write_array(dim_info.view(numpy.uint32))

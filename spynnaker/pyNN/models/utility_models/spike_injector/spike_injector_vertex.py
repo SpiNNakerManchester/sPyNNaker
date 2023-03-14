@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+from pyNN.space import Grid2D, Grid3D
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
@@ -21,17 +22,20 @@ from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.abstract_models import SupportsStructure
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpikeInjectorVertex(
-        ReverseIpTagMultiCastSource, PopulationApplicationVertex):
+        ReverseIpTagMultiCastSource, PopulationApplicationVertex,
+        SupportsStructure):
     """ An Injector of Spikes for PyNN populations.  This only allows the user\
         to specify the virtual_key of the population to identify the population
     """
     __slots__ = [
-        "__spike_recorder"]
+        "__spike_recorder",
+        "__structure"]
 
     default_parameters = {
         'label': "spikeInjector", 'port': None, 'virtual_key': None}
@@ -52,6 +56,19 @@ class SpikeInjectorVertex(
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()
+
+        self.__structure = None
+
+    @overrides(SupportsStructure.set_structure)
+    def set_structure(self, structure):
+        self.__structure = structure
+
+    @property
+    @overrides(PopulationApplicationVertex.atoms_shape)
+    def atoms_shape(self):
+        if isinstance(self.__structure, (Grid2D, Grid3D)):
+            return self.__structure.calculate_size(self.n_atoms)
+        return super().atoms_shape
 
     @overrides(PopulationApplicationVertex.get_recordable_variables)
     def get_recordable_variables(self):

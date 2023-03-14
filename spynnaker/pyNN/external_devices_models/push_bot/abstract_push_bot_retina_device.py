@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,8 +46,11 @@ class AbstractPushBotRetinaDevice(
 
         # device specific commands
         commands.append(self._protocol.disable_retina())
+        retina_key = None
+        if self._resolution is not None:
+            retina_key = self._resolution.value
         commands.append(self._protocol.set_retina_transmission(
-            retina_key=self._resolution.value))
+            retina_key=retina_key))
 
         return commands
 

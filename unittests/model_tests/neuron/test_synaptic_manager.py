@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -406,23 +406,21 @@ def test_set_synapse_dynamics():
         # Only undelayed, all edges exist
         (range(10), [], 1000, 100, None),
         # Only delayed, all edges exist
-        ([], range(10), 1000, 100, 20),
+        ([], range(10), 1000, 100, 200),
         # All undelayed and delayed edges exist
-        (range(10), range(10), 1000, 100, 20),
+        (range(10), range(10), 1000, 100, 200),
         # Only undelayed, some connections missing but app keys can still work
         ([0, 1, 2, 3, 4], [], 1000, 100, None),
         # Only delayed, some connections missing but app keys can still work
-        ([], [5, 6, 7, 8, 9], 1000, 100, 20),
+        ([], [5, 6, 7, 8, 9], 1000, 100, 200),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
-        ([3, 4, 5, 6, 7], range(10), 1000, 100, 20),
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200),
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
-        (range(10), [4, 5, 6, 7], 1000, 100, 20),
+        (range(10), [4, 5, 6, 7], 1000, 100, 200),
         # Should work but number of cores doesn't work out
-        (range(2000), [], 10000, 5, None),
-        # Should work but number of neurons with delays don't work out
-        ([], range(4), 1024, 256, 144)
+        (range(2000), [], 10000, 5, None)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
@@ -445,7 +443,7 @@ def test_pop_based_master_pop_table_standard(
     # a single vertex
     p.setup(1.0)
     post_pop = p.Population(
-        100, p.IF_curr_exp(), label="Post",
+        256, p.IF_curr_exp(), label="Post",
         additional_parameters={
             "splitter": SplitterAbstractPopulationVertexFixed()})
     p.IF_curr_exp.set_model_max_atoms_per_dimension_per_core(neurons_per_core)

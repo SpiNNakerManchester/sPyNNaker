@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -109,6 +109,8 @@ class TestFixedNumberPreConnector(BaseTestCase):
         with self.assertRaises(SpynnakerException):
             self.check_self_connect(
                 DESTINATIONS, with_replacement, allow_self_connections)
+        # We have to end here as the exception happens before end
+        sim.end()
 
     def test_all_replace_no_self(self):
         with_replacement = False
@@ -132,6 +134,8 @@ class TestFixedNumberPreConnector(BaseTestCase):
         with_replacement = False
         with self.assertRaises(SpynnakerException):
             self.check_other_connect(SOURCES+3, with_replacement)
+        # We have to end here as the exception happens before end
+        sim.end()
 
     def test_get_before_run(self):
         sim.setup(1.0)

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,7 @@
 # limitations under the License.
 """
 This contains functions and classes for handling external devices such as the
-PushBot (http://spinnakermanchester.github.io/docs/push_bot/).
+PushBot (https://spinnakermanchester.github.io/docs/push_bot/).
 
 .. note::
     When using external devices, it is normally important to configure your
@@ -58,6 +58,7 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.models.utility_models.spike_injector import (
     SpikeInjector as ExternalDeviceSpikeInjector)
+from spynnaker.pyNN import protocols
 
 
 # useful functions
@@ -105,7 +106,8 @@ __all__ = [
     "SpikeInjector",
     "register_database_notification_request",
     "run_forever",
-    "add_poisson_live_rate_control"
+    "add_poisson_live_rate_control",
+    "protocols"
 ]
 # Cache of the simulator provided by pyNN/__init__py
 __simulator = None

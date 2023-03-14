@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,7 @@ import math
 
 class RunningStats(object):
     """ Keeps running statistics.
-        From: http://www.johndcook.com/blog/skewness_kurtosis/
+        From: https://www.johndcook.com/blog/skewness_kurtosis/
     """
     __slots__ = ["__mean", "__mean_2", "__n_items"]
 

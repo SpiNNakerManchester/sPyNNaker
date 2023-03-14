@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +30,7 @@ from data_specification.enums.data_type import DataType
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
+from pacman.utilities.utility_calls import get_n_bits_for_fields, get_n_bits
 from spinn_front_end_common.abstract_models import (
     AbstractCanReset)
 from spinn_front_end_common.utilities.constants import (
@@ -309,6 +310,11 @@ class AbstractPopulationVertex(
                 " that the total number of neurons per core is less than or"
                 f" equal to {max_atoms}")
         if len(max_per_dim) != len(self.atoms_shape):
+            # If the maximum atoms per core is one-dimensional, we can apply
+            # that to the first dimension and make all others 0
+            if len(max_per_dim) == 1:
+                return (max_per_dim +
+                        tuple(1 for _ in range(len(self.atoms_shape) - 1)))
             raise SpynnakerException(
                 "When using a multidimensional Population, a maximum number of"
                 " neurons per core must be provided for each dimension (in"
@@ -1401,6 +1407,46 @@ class AbstractPopulationVertex(
     @overrides(PopulationApplicationVertex.n_colour_bits)
     def n_colour_bits(self):
         return self.__n_colour_bits
+
+    def get_max_delay(self, max_ring_buffer_bits):
+        """ Get the maximum delay and whether a delay extension is needed
+            for a given maximum number of ring buffer bits
+
+        :param int max_ring_buffer_bits:
+            The maximum number of bits that can be used for the ring buffer
+            identifier (i.e. delay, synapse type, neuron index)
+        :return:
+            Tuple of the maximum delay supported on the core and whether
+            a delay extension is needed to support delays
+        :rtype: (int, bool)
+        """
+        # Find the maximum delay from incoming synapses
+        max_delay_ms = 0
+        for proj in self.incoming_projections:
+            # pylint: disable=protected-access
+            s_info = proj._synapse_information
+            proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
+                s_info.connector, s_info)
+            max_delay_ms = max(max_delay_ms, proj_max_delay)
+        max_delay_steps = math.ceil(
+            max_delay_ms / SpynnakerDataView.get_simulation_time_step_ms())
+        max_delay_bits = get_n_bits(max_delay_steps)
+
+        # Find the maximum possible delay
+        n_atom_bits = self.get_n_atom_bits()
+        n_synapse_bits = get_n_bits(
+            self.neuron_impl.get_n_synapse_types())
+        n_delay_bits = max_ring_buffer_bits - (n_atom_bits + n_synapse_bits)
+
+        # Pick the smallest between the two, so that not too many bits are used
+        final_n_delay_bits = min(n_delay_bits, max_delay_bits)
+        return 2 ** final_n_delay_bits, max_delay_bits > final_n_delay_bits
+
+    def get_n_atom_bits(self):
+        field_sizes = [
+            min(max_atoms, n) for max_atoms, n in zip(
+                self.get_max_atoms_per_dimension_per_core(), self.atoms_shape)]
+        return get_n_bits_for_fields(field_sizes)
 
 
 class _Stats(object):

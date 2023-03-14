@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
@@ -26,9 +26,7 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
 
     __slots__ = []
 
-    # max delays supported by a slice split machine vertex
-    MAX_SUPPORTED_DELAY_TICS = 16
-
+    @abstractmethod
     def max_support_delay(self):
         """
         returns the max amount of delay this post vertex can support.
@@ -36,7 +34,6 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
         :return: max delay supported in ticks
         :rtype: int
         """
-        return self.MAX_SUPPORTED_DELAY_TICS
 
     def accepts_edges_from_delay_vertex(self):
         """

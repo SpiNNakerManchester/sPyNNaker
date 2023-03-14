@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -91,7 +91,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
         # Update the commands with the additional one to set the key
         new_commands = list()
         for command in super().start_resume_commands:
-            if command.key == self._protocol.disable_retina_key:
+            if command.key == self._protocol.set_retina_transmission_key:
                 # This has to be stored so that the payload can be updated
                 self.__new_key_command = DelayedPayloadMultiCastCommand(
                     self._protocol.set_retina_key_key, self)
