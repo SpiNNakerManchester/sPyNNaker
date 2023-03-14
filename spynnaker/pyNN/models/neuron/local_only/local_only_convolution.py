@@ -147,9 +147,6 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             data.extend(s_info.connector.get_local_only_data(
                 app_edge, source.vertex_slice, source.key, source.mask,
                 app_edge.pre_vertex.n_colour_bits, self.__delay, weight_index))
-        n_weights = next_weight_index
-        if next_weight_index % 2 != 0:
-            n_weights += 1
 
         # Write the common spec
         post_slice = machine_vertex.vertex_slice
