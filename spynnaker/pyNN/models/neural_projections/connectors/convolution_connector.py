@@ -486,7 +486,8 @@ class ConvolutionConnector(AbstractConnector):
         data = [numpy.array(values, dtype="uint32"),
                 short_values.view("uint32"),
                 delay_view,
-                numpy.array([self.__num_multisynaptic_connections], dtype="uint32"),
+                numpy.array([self.__num_multisynaptic_connections],
+                            dtype="uint32"),
                 numpy.array([weight_index], dtype="uint32")]
         return data
 
