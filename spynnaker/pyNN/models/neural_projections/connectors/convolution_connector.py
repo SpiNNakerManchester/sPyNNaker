@@ -360,9 +360,7 @@ class ConvolutionConnector(AbstractConnector):
             pre_vertex_in_post_layer_lower_right)
 
         max_connected = 0
-        for post in target_vertex.splitter.get_in_coming_vertices(
-                SPIKE_PARTITION_ID):
-            post_slice = post.vertex_slice
+        for post_slice in target_vertex.splitter.get_in_coming_slices():
             post_slice_x = post_slice.get_slice(0)
             post_slice_y = post_slice.get_slice(1)
 
@@ -383,7 +381,7 @@ class ConvolutionConnector(AbstractConnector):
             # When both things are true, we have a vertex in range
             pre_in_range = pre_vertices[
                 numpy.logical_and(start_in_range, end_in_range)]
-            n_connected = pre_in_range.sum()
+            n_connected = len(pre_in_range)
             max_connected = max(max_connected, n_connected)
 
         return max_connected
