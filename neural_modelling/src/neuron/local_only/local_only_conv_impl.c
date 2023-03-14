@@ -163,7 +163,8 @@ static inline int16_t recip_multiply(int16_t integer, int16_t recip) {
 }
 
 //! \brief Do a mapping from pre to post 2D spaces
-static inline lc_coord_t map_pre_to_post(connector *connector, lc_coord_t pre, lc_coord_t *start_i) {
+static inline lc_coord_t map_pre_to_post(connector *connector, lc_coord_t pre,
+		lc_coord_t *start_i) {
     pre.col = recip_multiply(pre.col, connector->recip_pool_strides.col);
     pre.row = recip_multiply(pre.row, connector->recip_pool_strides.row);
     pre.col += connector->padding.width;
