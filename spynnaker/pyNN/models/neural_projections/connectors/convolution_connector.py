@@ -34,7 +34,7 @@ SOURCE_KEY_INFO_WORDS = 7
 #: The number of 16-bit shorts in the connector struct,
 #: ignoring the source_key_info struct but including the delay and the
 #: 32-bit weight index
-CONNECTOR_CONFIG_SHORTS = 28
+CONNECTOR_CONFIG_SHORTS = 18
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -46,24 +46,18 @@ class ConvolutionConnector(AbstractConnector):
 
     __slots__ = [
         "__kernel_weights",
-        "__kernel_shape",
         "__strides",
         "__padding_shape",
         "__pool_shape",
         "__pool_stride",
         "__positive_receptor_type",
-        "__negative_receptor_type",
-        "__num_multisynaptic_connections",
-        "__multisynaptic_delay_min"
+        "__negative_receptor_type"
     ]
 
     def __init__(self, kernel_weights, kernel_shape=None, strides=None,
                  padding=None, pool_shape=None, pool_stride=None,
                  positive_receptor_type="excitatory",
-                 negative_receptor_type="inhibitory",
-                 num_multisynaptic_connections=1,
-                 multisynaptic_delay_min=0,
-                 safe=True,
+                 negative_receptor_type="inhibitory", safe=True,
                  verbose=False, callback=None):
         """
         :param kernel_weights:
@@ -141,11 +135,6 @@ class ConvolutionConnector(AbstractConnector):
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
 
-        self.__num_multisynaptic_connections = num_multisynaptic_connections
-        if num_multisynaptic_connections != 1:
-            self.__kernel_shape = self.__get_kernel_shape(kernel_shape)
-            self.__multisynaptic_delay_min = multisynaptic_delay_min
-
     @property
     def positive_receptor_type(self):
         return self.__positive_receptor_type
@@ -194,8 +183,6 @@ class ConvolutionConnector(AbstractConnector):
                 f"Unknown combination of kernel_weights ({w}) and"
                 f" kernel_shape ({shape})")
 
-        self.__kernel_shape = self.__kernel_weights.shape
-
     @staticmethod
     def __to_2d_shape(shape, param_name):
         if shape is None:
@@ -228,7 +215,7 @@ class ConvolutionConnector(AbstractConnector):
             post_pool_shape = shape - (self.__pool_shape - 1)
             shape = (post_pool_shape // self.__pool_stride) + 1
 
-        kernel_shape = numpy.array(self.__kernel_shape)
+        kernel_shape = numpy.array(self.__kernel_weights.shape)
         post_shape = shape - kernel_shape + (2 * self.__padding_shape)
 
         return numpy.clip(
@@ -285,7 +272,7 @@ class ConvolutionConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        w, h = self.__kernel_shape
+        w, h = self.__kernel_weights.shape
         return numpy.clip(w * h, 0, synapse_info.n_pre_neurons)
 
     @overrides(AbstractConnector.get_weight_maximum)
@@ -306,7 +293,7 @@ class ConvolutionConnector(AbstractConnector):
         pre_vertex_in_post_layer_upper_left = pre_vertex_in_post_layer[:, 0]
         pre_vertex_in_post_layer_lower_right = pre_vertex_in_post_layer[:, 1]
 
-        kernel_shape = numpy.array(self.__kernel_shape)
+        kernel_shape = numpy.array(self.__kernel_weights.shape)
 
         j = (kernel_shape - 1 - start_i) // self.__strides
         j_upper_left = j[:, 0]
@@ -345,9 +332,7 @@ class ConvolutionConnector(AbstractConnector):
         return connected
 
     def get_max_n_incoming_slices(self, source_vertex, target_vertex):
-        pre_vertices = numpy.array(
-            source_vertex.splitter.get_out_going_vertices(SPIKE_PARTITION_ID))
-        pre_slices = [m_vertex.vertex_slice for m_vertex in pre_vertices]
+        pre_slices = list(source_vertex.splitter.get_out_going_slices())
         pre_slices_x = [vtx_slice.get_slice(0) for vtx_slice in pre_slices]
         pre_slices_y = [vtx_slice.get_slice(1) for vtx_slice in pre_slices]
         pre_ranges = [[[py.start, px.start], [py.stop - 1, px.stop - 1]]
@@ -357,7 +342,7 @@ class ConvolutionConnector(AbstractConnector):
         pre_vertex_in_post_layer_upper_left = pre_vertex_in_post_layer[:, 0]
         pre_vertex_in_post_layer_lower_right = pre_vertex_in_post_layer[:, 1]
 
-        kernel_shape = numpy.array(self.__kernel_shape)
+        kernel_shape = numpy.array(self.__kernel_weights.shape)
 
         j = (kernel_shape - 1 - start_i) // self.__strides
         j_upper_left = j[:, 0]
@@ -372,7 +357,7 @@ class ConvolutionConnector(AbstractConnector):
             post_slice_x = post_slice.get_slice(0)
             post_slice_y = post_slice.get_slice(1)
 
-            # Get ranges allowed in post vertex
+            # Get ranges allowed in post
             min_x = post_slice_x.start
             max_x = post_slice_x.stop - 1
             min_y = post_slice_y.start
@@ -387,9 +372,8 @@ class ConvolutionConnector(AbstractConnector):
                 numpy.any(pre_vertex_max_reach_in_post_layer_lower_right <
                           [min_y, min_x], axis=1))
             # When both things are true, we have a vertex in range
-            pre_in_range = pre_vertices[
-                numpy.logical_and(start_in_range, end_in_range)]
-            n_connected = len(pre_in_range)
+            pre_in_range = numpy.logical_and(start_in_range, end_in_range)
+            n_connected = pre_in_range.sum()
             max_connected = max(max_connected, n_connected)
 
         return max_connected
@@ -467,28 +451,15 @@ class ConvolutionConnector(AbstractConnector):
             self.__recip(ps_y), self.__recip(ps_x),
             pos_synapse_type, neg_synapse_type], dtype="uint16")
 
-        # Write delay
+        # Work out delay
         delay_step = (delay *
                       SpynnakerDataView.get_simulation_time_step_per_ms())
         local_delay = (delay_step %
                        app_edge.post_vertex.splitter.max_support_delay())
 
-        if self.__num_multisynaptic_connections == 1:
-            delay_view = numpy.array([local_delay], dtype="uint32")
-        else:
-            delay_range = local_delay - self.__multisynaptic_delay_min
-            delay_step = (delay_range /
-                          (self.__num_multisynaptic_connections - 1))
-            delay_view = numpy.array(
-                [local_delay, delay_step], dtype="uint16").view("uint32")
-
-        # Compile all values
         data = [numpy.array(values, dtype="uint32"),
                 short_values.view("uint32"),
-                delay_view,
-                numpy.array([self.__num_multisynaptic_connections],
-                            dtype="uint32"),
-                numpy.array([weight_index], dtype="uint32")]
+                numpy.array([local_delay, weight_index], dtype="uint32")]
         return data
 
     def get_encoded_kernel_weights(self, app_edge, weight_scales):
