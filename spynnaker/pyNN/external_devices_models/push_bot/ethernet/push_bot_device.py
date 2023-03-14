@@ -1,22 +1,25 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.external_devices_models import (
     AbstractMulticastControllableDevice)
+
+# The default timestep to use for first send.  Avoids clashes with other
+# control commands.
+_DEFAULT_FIRST_SEND_TIMESTEP = 100
 
 
 class PushBotEthernetDevice(
@@ -25,14 +28,17 @@ class PushBotEthernetDevice(
     """
 
     def __init__(
-            self, protocol, device, uses_payload, time_between_send):
+            self, protocol, device, uses_payload, time_between_send,
+            first_send_timestep=_DEFAULT_FIRST_SEND_TIMESTEP):
         """
-        :param protocol: The protocol instance to get commands from
-        :type protocol: MunichIoEthernetProtocol
-        :param device: The Enum instance of the device to control
-        :type device: AbstractPushBotOutputDevice
-        :param uses_payload: True if the device uses a payload for control
-        :type uses_payload: bool
+        :param MunichIoEthernetProtocol protocol:
+            The protocol instance to get commands from
+        :param AbstractPushBotOutputDevicedevice:
+            The Enum instance of the device to control
+        :param bool uses_payload:
+            True if the device uses a payload for control
+        :param int time_between_send: The timesteps between sending
+        :param int first_send_timestep: The first timestep to send
         """
         self.__protocol = protocol
         self.__device = device
@@ -40,6 +46,7 @@ class PushBotEthernetDevice(
         self.__time_between_send = time_between_send
         if time_between_send is None:
             self.__time_between_send = device.time_between_send
+        self.__first_send_timestep = first_send_timestep
 
     @property
     @overrides(AbstractMulticastControllableDevice.device_control_key)
@@ -77,6 +84,12 @@ class PushBotEthernetDevice(
                .device_control_send_type)
     def device_control_send_type(self):
         return self.__device.send_type
+
+    @property
+    @overrides(AbstractMulticastControllableDevice
+               .device_control_first_send_timestep)
+    def device_control_first_send_timestep(self):
+        return self.__first_send_timestep
 
     @property
     def protocol(self):

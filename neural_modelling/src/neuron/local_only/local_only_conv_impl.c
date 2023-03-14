@@ -1,19 +1,19 @@
 /*
- * Copyright (c) The University of Sussex, Garibaldi Pineda Garcia,
- * James Turner, James Knight and Thomas Nowotny
+ * Copyright (c) 2021 The University of Manchester
+ * based on work Copyright (c) The University of Sussex,
+ * Garibaldi Pineda Garcia, James Turner, James Knight and Thomas Nowotny
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 //! \file DTCM-only convolutional processing implementation
 
@@ -64,76 +64,76 @@ typedef struct {
     lc_coord_t recip_pool_strides;
     uint16_t positive_synapse_type;
     uint16_t negative_synapse_type;
-    lc_weight_t weights[]; // n_weights = next_even(kernel.width * kernel.height)
+    uint32_t delay;
+    uint32_t kernel_index;
 } connector;
 
 typedef struct {
     lc_coord_t post_start;
     lc_coord_t post_end;
     lc_shape_t post_shape;
+    uint32_t n_weights_total;
     uint32_t n_connectors;
+    connector connectors[];
     // In SDRAM, below here is the following:
-    // connector connectors[n_connectors]
+    // lc_weight_t[] weights;
 } conv_config;
 
 // The main configuration data
-static conv_config config;
+static conv_config *config;
 
-// The per-connection data
-static connector** connectors;
+static lc_weight_t *weights;
 
 //! \brief Load the required data into DTCM.
 bool local_only_impl_initialise(void *address){
     log_info("+++++++++++++++++ CONV init ++++++++++++++++++++");
     conv_config* sdram_config = address;
-    config = *sdram_config;
+    uint32_t n_bytes = sizeof(conv_config) +
+    		(sizeof(connector) * sdram_config->n_connectors);
+    config = spin1_malloc(n_bytes);
+    if (config == NULL) {
+    	log_error("Can't allocate memory for config!");
+    	return false;
+    }
+    spin1_memcpy(config, sdram_config, n_bytes);
 
     log_info("post_start = %u, %u, post_end = %u, %u, post_shape = %u, %u",
-            config.post_start.col, config.post_start.row,
-            config.post_end.col, config.post_end.row,
-            config.post_shape.width, config.post_shape.height);
-    log_info("num connectors = %u", config.n_connectors);
-    if (config.n_connectors == 0) {
-        return false;
+            config->post_start.col, config->post_start.row,
+            config->post_end.col, config->post_end.row,
+            config->post_shape.width, config->post_shape.height);
+    log_info("num connectors = %u", config->n_connectors);
+
+    if (config->n_connectors == 0) {
+    	log_error("No connectors!");
+    	return false;
     }
 
-    // Allocate space for connector information and pre-to-post table
-    connectors = spin1_malloc(config.n_connectors * sizeof(connectors[0]));
-    if (connectors == NULL) {
-        log_error("Can't allocate memory for connectors");
-        return false;
+    // The weights come after the config in SDRAM
+    lc_weight_t *kernel_weights =
+    		(lc_weight_t *) &(sdram_config->connectors[config->n_connectors]);
+    uint32_t n_weight_bytes = sizeof(lc_weight_t) * config->n_weights_total;
+    weights = spin1_malloc(n_weight_bytes);
+    if (weights == NULL) {
+    	log_error("Can't allocate memory for weights!");
+    	return false;
     }
+    spin1_memcpy(weights, kernel_weights, n_weight_bytes);
 
-    // The first connector comes after the configuration in SDRAM
-    connector *conn = (connector *) &sdram_config[1];
-    for (uint32_t i = 0; i < config.n_connectors; i++) {
-        // We need the number of weights to calculate the size
-        uint32_t n_weights = conn->kernel.width * conn->kernel.height;
-        if (n_weights & 0x1) {
-            n_weights += 1;
-        }
-        uint32_t n_bytes = sizeof(*conn) + (n_weights * sizeof(conn->weights[0]));
-
-        // Copy the data from SDRAM
-        connectors[i] = spin1_malloc(n_bytes);
-        if (connectors[i] == NULL) {
-            log_error("Can't allocate memory for connectors[%u]", i);
-            return false;
-        }
-        spin1_memcpy(connectors[i], conn, n_bytes);
-
+    // Print what we have
+    for (uint32_t i = 0; i < config->n_connectors; i++) {
         log_info("Connector %u: key=0x%08x, mask=0x%08x,"
                 "col_mask=0x%08x, col_shift=%u, row_mask=0x%08x, row_shift=%u",
-                i, connectors[i]->key_info.key, connectors[i]->key_info.mask,
-                connectors[i]->key_info.col_mask, connectors[i]->key_info.col_shift,
-                connectors[i]->key_info.row_mask, connectors[i]->key_info.row_shift);
+                i, config->connectors[i].key_info.key,
+				config->connectors[i].key_info.mask,
+				config->connectors[i].key_info.col_mask,
+				config->connectors[i].key_info.col_shift,
+				config->connectors[i].key_info.row_mask,
+				config->connectors[i].key_info.row_shift);
         log_info("              pre_start=%u, %u, kernel_shape=%u %u",
-                connectors[i]->pre_start.col, connectors[i]->pre_start.row,
-                connectors[i]->kernel.width, connectors[i]->kernel.height);
-
-        // Move to the next connector; because it is dynamically sized,
-        // this comes after the last weight in the previous connector
-        conn = (connector *) &conn->weights[n_weights];
+        		config->connectors[i].pre_start.col,
+				config->connectors[i].pre_start.row,
+				config->connectors[i].kernel.width,
+				config->connectors[i].kernel.height);
     }
 
     return true;
@@ -181,43 +181,44 @@ static inline void do_convolution_operation(
     lc_coord_t post_coord = map_pre_to_post(connector, pre_coord, &start_i);
     log_debug("pre row %d, col %d AS post row %d, col %d",
             pre_coord.row, pre_coord.col, post_coord.row, post_coord.col);
+    lc_weight_t *connector_weights = &weights[connector->kernel_index];
 
     int32_t kw = connector->kernel.width;
     for (int32_t i_row = start_i.row, tmp_row = post_coord.row; i_row < connector->kernel.height; i_row += connector->strides.row, --tmp_row) {
         int32_t kr = connector->kernel.height - 1 - i_row;
         log_debug("i_row = %u, kr = %u, tmp_row = %u", i_row, kr, tmp_row);
 
-        if ((tmp_row < config.post_start.row) || (tmp_row > config.post_end.row)) {
+        if ((tmp_row < config->post_start.row) || (tmp_row > config->post_end.row)) {
             log_debug("tmp_row outside");
             continue;
         }
         for (int32_t i_col = start_i.col, tmp_col = post_coord.col; i_col < connector->kernel.width; i_col += connector->strides.col, --tmp_col) {
             int32_t kc = connector->kernel.width - 1 - i_col;
             log_debug("i_col = %u, kc = %u, tmp_col = %u", i_col, kc, tmp_col);
-            if ((tmp_col < config.post_start.col) || (tmp_col > config.post_end.col)) {
+            if ((tmp_col < config->post_start.col) || (tmp_col > config->post_end.col)) {
                 log_debug("tmp_col outside");
                 continue;
             }
 
             // This the neuron id relative to the neurons on this core
             uint32_t post_index =
-                ((tmp_row - config.post_start.row) * config.post_shape.width)
-                    + (tmp_col - config.post_start.col);
+                ((tmp_row - config->post_start.row) * config->post_shape.width)
+                    + (tmp_col - config->post_start.col);
             uint32_t k = (kr * kw) + kc;
             log_debug("weight index = %u", k);
-            lc_weight_t weight = connector->weights[k];
+            lc_weight_t weight = connector_weights[k];
             if (weight == 0) {
                 log_debug("zero weight");
                 continue;
             }
             uint32_t rb_index = 0;
             if (weight > 0) {
-                rb_index = synapse_row_get_ring_buffer_index(time + 1,
+                rb_index = synapse_row_get_ring_buffer_index(time + connector->delay,
                     connector->positive_synapse_type, post_index,
                     synapse_type_index_bits, synapse_index_bits,
                     synapse_delay_mask);
             } else {
-                rb_index = synapse_row_get_ring_buffer_index(time + 1,
+                rb_index = synapse_row_get_ring_buffer_index(time + connector->delay,
                     connector->negative_synapse_type, post_index,
                     synapse_type_index_bits, synapse_index_bits,
                     synapse_delay_mask);
@@ -237,19 +238,33 @@ static inline void do_convolution_operation(
     }
 }
 
-static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
-        uint32_t *core_local_col, uint32_t *core_local_row) {
-    for (uint32_t i = 0; i < config.n_connectors; i++) {
-        connector *c = connectors[i];
+static inline bool key_to_index_lookup(uint32_t spike, uint32_t *start_index,
+		uint32_t *end_index) {
+    for (uint32_t i = 0; i < config->n_connectors; i++) {
+        connector *c = &(config->connectors[i]);
         if ((spike & c->key_info.mask) == c->key_info.key) {
-        	uint32_t local_spike = (spike & ~c->key_info.mask) >> c->key_info.n_colour_bits;
-            *conn = c;
-            *core_local_col = (local_spike & c->key_info.col_mask) >> c->key_info.col_shift;
-            *core_local_row = (local_spike & c->key_info.row_mask) >> c->key_info.row_shift;
-            return true;
+        	*start_index = i;
+            uint32_t e = i + 1;
+        	while (e < config->n_connectors) {
+        		connector *c_e = &(config->connectors[e]);
+        		if ((spike & c_e->key_info.mask) != c_e->key_info.mask) {
+        			break;
+        		}
+        		e = e + 1;
+        	}
+        	*end_index = e;
+        	return true;
         }
     }
     return false;
+}
+
+static inline void get_row_col(uint32_t spike, uint32_t index,
+		uint32_t *core_local_col, uint32_t *core_local_row) {
+	connector *c = &(config->connectors[index]);
+	uint32_t local_spike = (spike & ~c->key_info.mask) >> c->key_info.n_colour_bits;
+	*core_local_col = (local_spike & c->key_info.col_mask) >> c->key_info.col_shift;
+	*core_local_row = (local_spike & c->key_info.row_mask) >> c->key_info.row_shift;
 }
 
 //! \brief Process incoming spikes. In this implementation we need to:
@@ -260,24 +275,30 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
 //! 4. Add the weights to the appropriate current buffers
 void local_only_impl_process_spike(
         uint32_t time, uint32_t spike, uint16_t* ring_buffers) {
-    connector *connector;
-    uint32_t core_local_col;
-    uint32_t core_local_row;
 
     // Lookup the spike, and if found, get the appropriate parts
-    if (!key_to_index_lookup(
-            spike, &connector, &core_local_col, &core_local_row)) {
+    uint32_t start;
+    uint32_t end;
+    if (!key_to_index_lookup(spike, &start, &end)) {
+    	log_warning("Spike %u didn't match any connectors!", spike);
         return;
     }
+    log_debug("Received spike %u, using connectors between %u and %u", spike, start, end);
 
     // compute the population-based coordinates
-    lc_coord_t pre_coord = {
-            core_local_row + connector->pre_start.row,
-            core_local_col + connector->pre_start.col
-    };
-    log_debug("Received spike %u = %u, %u (Global: %u, %u)", spike, core_local_col, core_local_row,
-            pre_coord.col, pre_coord.row);
+    for (uint32_t i = start; i < end; i++) {
+		uint32_t core_local_col;
+		uint32_t core_local_row;
+		connector *connector = &(config->connectors[i]);
+		get_row_col(spike, i, &core_local_col, &core_local_row);
+		lc_coord_t pre_coord = {
+				core_local_row + connector->pre_start.row,
+				core_local_col + connector->pre_start.col
+		};
+		log_debug("Spike %u = %u, %u (Global: %u, %u)", spike, core_local_col, core_local_row,
+				pre_coord.col, pre_coord.row);
 
-    // Compute the convolution
-    do_convolution_operation(time, pre_coord, connector, ring_buffers);
+		// Compute the convolution
+		do_convolution_operation(time, pre_coord, connector, ring_buffers);
+    }
 }

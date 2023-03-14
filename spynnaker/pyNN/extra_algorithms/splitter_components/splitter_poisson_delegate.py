@@ -1,28 +1,27 @@
-# Copyright (c) 2020-2021 The University of Manchester
+# Copyright (c) 2020 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
 
 
-class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
+class SplitterPoissonDelegate(SplitterFixedLegacy):
     """ A splitter for Poisson sources that will ignore sources that are
         one-to-one connected to a single Population
     """
@@ -53,14 +52,14 @@ class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
             return False
         return post_vertex.splitter.handles_source_vertex(proj)
 
-    @overrides(SpynnakerSplitterFixedLegacy.set_governed_app_vertex)
+    @overrides(SplitterFixedLegacy.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, SpikeSourcePoissonVertex):
             raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
-    @overrides(SpynnakerSplitterFixedLegacy.create_machine_vertices)
+    @overrides(SplitterFixedLegacy.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
         # If sending over SDRAM, let the target handle this
         if self.send_over_sdram:

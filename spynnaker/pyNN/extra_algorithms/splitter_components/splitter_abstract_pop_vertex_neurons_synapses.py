@@ -1,17 +1,16 @@
-# Copyright (c) 2020-2022 The University of Manchester
+# Copyright (c) 2020 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import math
 import logging
 from collections import defaultdict
@@ -25,20 +24,18 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
 from pacman.model.graphs.machine import (
     MachineEdge, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge,
     MulticastEdgePartition)
-from pacman.utilities.utility_calls import get_n_bits_for_fields
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
     import get_multidimensional_slices
+from data_specification.reference_context import ReferenceContext
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertexLead,
     PopulationSynapsesMachineVertexShared, NeuronProvenance, SynapseProvenance,
     AbstractPopulationVertex, SpikeProcessingFastProvenance)
 from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
     SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE, NeuronMainProvenance)
-from data_specification.reference_context import ReferenceContext
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
@@ -195,7 +192,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 " of synapse cores is set to 1")
 
         # Do some checks to make sure everything is likely to fit
-        n_atom_bits = self.__n_atom_bits()
+        n_atom_bits = app_vertex.get_n_atom_bits()
         n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
         if (n_atom_bits + get_n_bits(n_synapse_types) +
                 get_n_bits(self.max_support_delay())) > MAX_RING_BUFFER_BITS:
@@ -792,36 +789,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def __update_max_delay(self):
         # Find the maximum delay from incoming synapses
         app_vertex = self._governed_app_vertex
-        max_delay_ms = 0
-        for proj in app_vertex.incoming_projections:
-            # pylint: disable=protected-access
-            s_info = proj._synapse_information
-            proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
-                s_info.connector, s_info)
-            max_delay_ms = max(max_delay_ms, proj_max_delay)
-        max_delay_steps = math.ceil(
-            max_delay_ms / SpynnakerDataView.get_simulation_time_step_ms())
-        max_delay_bits = get_n_bits(max_delay_steps)
-
-        # Find the maximum possible delay
-        n_atom_bits = self.__n_atom_bits()
-        n_synapse_bits = get_n_bits(
-            app_vertex.neuron_impl.get_n_synapse_types())
-        n_delay_bits = MAX_RING_BUFFER_BITS - (n_atom_bits + n_synapse_bits)
-
-        # Pick the smallest between the two, so that not too many bits are used
-        final_n_delay_bits = min(n_delay_bits, max_delay_bits)
-        self.__max_delay = 2 ** final_n_delay_bits
+        self.__max_delay, needs_delay_extension = app_vertex.get_max_delay(
+            MAX_RING_BUFFER_BITS)
         if self.__user_allow_delay_extension is None:
-            self.__expect_delay_extension = max_delay_bits > final_n_delay_bits
-
-    def __n_atom_bits(self):
-        app_vertex = self._governed_app_vertex
-        field_sizes = [
-            min(max_atoms, n) for max_atoms, n in zip(
-                app_vertex.get_max_atoms_per_dimension_per_core(),
-                app_vertex.atoms_shape)]
-        return get_n_bits_for_fields(field_sizes)
+            self.__expect_delay_extension = needs_delay_extension
 
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self):

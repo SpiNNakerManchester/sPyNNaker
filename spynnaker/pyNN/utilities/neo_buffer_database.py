@@ -1,17 +1,16 @@
 # Copyright (c) 2022 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import csv
 from datetime import datetime
@@ -55,7 +54,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     #: number of words per rewiring entry
     __REWIRING_N_WORDS = 2
 
-    def __init__(self, database_file=None):
+    def __init__(self, database_file=None, read_only=None):
         """
         Extra support for Neo on top of the Database for SQLite 3.
 
@@ -67,12 +66,18 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             database holding the data.
             If omitted the default location will be used.
         :type database_file: None or str
+        :param read_only:
+            By default the database is readonly if given a databas file.
+            This allows to overwire that (mainly for clear)
+        :type read_only: None or bool
         """
         if database_file is None:
             database_file = self.default_database_file()
-            read_only = False
+            if read_only is None:
+                read_only = False
         else:
-            read_only = True
+            if read_only is None:
+                read_only = True
 
         super(BufferDatabase, self).__init__(
             database_file, read_only=read_only)
@@ -343,7 +348,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         create a single Neo Segment wrapped in a neo Block
 
             .. note::
-            As each database only includes
+                As each database only includes
 
         :param str pop_label: The label for the population of interest
 
@@ -1199,6 +1204,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 This is actually the label of the Application Vertex
                 Typical the Population label corrected for None or
                 duplicate values
+
         :param variables: One or more variable names or None for all available
         :type variables: str, list(str) or None
         :param view_indexes: List of neurons ids to include or None for all
@@ -1268,6 +1274,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 This is actually the label of the Application Vertex
                 Typical the Population label corrected for None or
                 duplicate values
+
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
 

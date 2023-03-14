@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2021 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 from datetime import datetime
 import logging
 import neo
@@ -62,10 +61,7 @@ class Recorder(object):
         return self.__write_to_files_indicators
 
     def record(self, variables, to_file, sampling_interval, indexes):
-        """ Same as record but without non-standard PyNN warning
-
-        This method is non-standard PyNN and is intended only to be called by
-        record in a Population, View or Assembly
+        """ Turns on (or off) recording
 
         :param variables: either a single variable name or a list of variable
             names. For a given celltype class, ``celltype.recordable`` contains
@@ -103,23 +99,40 @@ class Recorder(object):
         elif isinstance(variables, str):
             # handle special case of 'all'
             if variables == "all":
-                warn_once(
-                    logger, 'record("all") is non-standard PyNN, and '
-                    'therefore may not be portable to other simulators.')
-
-                # iterate though all possible recordings for this vertex
-                for variable in self.__vertex.get_recordable_variables():
-                    self.turn_on_record(
-                        variable, sampling_interval, to_file, indexes)
+                self.__turn_on_all_record(sampling_interval, to_file, indexes)
             else:
                 # record variable
                 self.turn_on_record(
                     variables, sampling_interval, to_file, indexes)
 
         else:  # list of variables, so just iterate though them
-            for variable in variables:
-                self.turn_on_record(
-                    variable, sampling_interval, to_file, indexes)
+            if "all" in variables:
+                self.__turn_on_all_record(sampling_interval, to_file, indexes)
+            else:
+                for variable in variables:
+                    self.turn_on_record(
+                        variable, sampling_interval, to_file, indexes)
+
+    def __turn_on_all_record(self, sampling_interval, to_file, indexes):
+        """
+
+        :param int sampling_interval: the interval to record them
+        :param to_file: If set, a file to write to (by handle or name)
+        :type to_file: neo.io.baseio.BaseIO or str or None
+        :param indexes: List of indexes to record or None for all
+        :type indexes: list(int) or None
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
+        """
+        warn_once(
+            logger, 'record("all") is non-standard PyNN, and '
+                    'therefore may not be portable to other simulators.')
+
+        # iterate though all possible recordings for this vertex
+        for variable in self.__vertex.get_recordable_variables():
+            self.turn_on_record(
+                variable, sampling_interval, to_file, indexes)
 
     def turn_on_record(self, variable, sampling_interval=None, to_file=None,
                        indexes=None):
@@ -301,7 +314,8 @@ class Recorder(object):
             block.segments.append(segment)
             return
 
-        with NeoBufferDatabase(self.__data_cache[segment_number]) as db:
+        with NeoBufferDatabase(
+                self.__data_cache[segment_number], read_only=False) as db:
             db.add_segment(
                 block, self.__population.label, variables, view_indexes)
             if clear:
