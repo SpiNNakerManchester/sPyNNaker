@@ -24,7 +24,7 @@ import re
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from data_specification.enums import DataType
-from pacman.model.graphs.common import Slice
+from pacman.model.graphs.common import MDSlice
 from pacman.utilities.utility_calls import get_field_based_index
 from spinn_front_end_common.interface.buffer_management.storage_objects \
     import BufferDatabase
@@ -501,7 +501,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             """, [rec_id]))
         index = 0
         for row in rows:
-            vertex_slice = Slice.from_string(str(row["vertex_slice"], "utf-8"))
+            vertex_slice = MDSlice.from_string(
+                str(row["vertex_slice"], "utf-8"))
             recording_neurons_st = row["recording_neurons_st"]
             if recording_neurons_st:
                 neurons = numpy.array(self.string_to_array(
