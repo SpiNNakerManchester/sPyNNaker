@@ -307,7 +307,7 @@ class AbstractPopulationVertex(
                 " that the total number of neurons per core is less than or"
                 f" equal to {max_atoms}")
         if len(max_per_dim) != len(self.atoms_shape):
-             raise SpynnakerException(
+            raise SpynnakerException(
                 "When using a multidimensional Population, a maximum number of"
                 " neurons per core must be provided for each dimension (in"
                 " this case, please set a max neurons per core with"
