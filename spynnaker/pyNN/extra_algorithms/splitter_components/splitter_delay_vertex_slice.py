@@ -24,7 +24,8 @@ from spynnaker.pyNN.models.utility_models.delays import (
 
 
 class SplitterDelayVertexSlice(AbstractSplitterCommon):
-    """ handles the splitting of the DelayExtensionVertex via slice logic.
+    """
+    Handles the splitting of the DelayExtensionVertex via slice logic.
     """
 
     __slots__ = [
@@ -48,9 +49,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         "asking for them is deemed an error.")
 
     def __init__(self):
-        """ splitter for delay extensions
-
-        """
         super().__init__()
         self._machine_vertex_by_slice = dict()
 
@@ -102,7 +100,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
 
     def create_machine_vertex(
             self, source_app_vertex, vertex_slice):
-        """ creates a delay extension machine vertex and adds to the tracker.
+        """
+        Creates a delay extension machine vertex and adds to the tracker.
 
         :param MachineVertex source_vertex: The source of the delay
         :return: machine vertex
@@ -118,7 +117,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         return machine_vertex
 
     def get_sdram_used_by_atoms(self):
-        """ returns the sdram used by the delay extension
+        """
+        Gets the amount of SDRAM used by the delay extension.
 
         :rtype: ConstantSDRAM
         """
@@ -138,7 +138,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         self._machine_vertex_by_slice = dict()
 
     def get_machine_vertex(self, vertex_slice):
-        """ Get a delay extension machine vertex for a given vertex slice
+        """
+        Get a delay extension machine vertex for a given vertex slice.
 
         :param Slice vertex_slice: The slice to get the data for
         :rtype: DelayExtensionMachineVertex

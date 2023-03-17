@@ -17,7 +17,8 @@ from .abstract_partner_selection import AbstractPartnerSelection
 
 
 class RandomSelection(AbstractPartnerSelection):
-    """ Partner selection that picks a random source neuron from all sources
+    """
+    Partner selection that picks a random source neuron from all sources.
     """
 
     __slots__ = []

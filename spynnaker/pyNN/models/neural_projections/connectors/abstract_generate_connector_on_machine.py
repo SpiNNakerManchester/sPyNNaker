@@ -40,7 +40,8 @@ class ConnectorIDs(Enum):
 
 class AbstractGenerateConnectorOnMachine(
         AbstractConnector, metaclass=AbstractBase):
-    """ Indicates that the connectivity can be generated on the machine
+    """
+    Indicates that the connectivity can be generated on the machine.
     """
 
     __slots__ = [
@@ -68,7 +69,8 @@ class AbstractGenerateConnectorOnMachine(
                     " be generated on host!")
 
     def _get_connector_seed(self, pre_vertex_slice, post_vertex_slice, rng):
-        """ Get the seed of the connector for a given pre-post pairing
+        """
+        Get the seed of the connector for a given pre-post pairing.
 
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -81,9 +83,10 @@ class AbstractGenerateConnectorOnMachine(
         return self.__connector_seed[key]
 
     def generate_on_machine(self, weights, delays):
-        """ Determine if this instance can generate on the machine.
+        """
+        Determine if this instance can generate on the machine.
 
-        Default implementation returns True if the weights and delays can\
+        Default implementation returns True if the weights and delays can
         be generated on the machine
 
         :param weights:
@@ -98,7 +101,8 @@ class AbstractGenerateConnectorOnMachine(
                 is_param_generatable(delays))
 
     def gen_weights_id(self, weights):
-        """ Get the id of the weight generator on the machine
+        """
+        Get the id of the weight generator on the machine.
 
         :param weights:
         :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
@@ -108,7 +112,8 @@ class AbstractGenerateConnectorOnMachine(
         return param_generator_id(weights)
 
     def gen_weights_params(self, weights):
-        """ Get the parameters of the weight generator on the machine
+        """
+        Get the parameters of the weight generator on the machine.
 
         :param weights:
         :type weights: ~pyNN.random.NumpyRNG or int or float
@@ -117,7 +122,8 @@ class AbstractGenerateConnectorOnMachine(
         return param_generator_params(weights)
 
     def gen_weight_params_size_in_bytes(self, weights):
-        """ The size of the weight parameters in bytes
+        """
+        The size of the weight parameters in bytes.
 
         :param weights:
         :type weights: ~pyNN.random.NumpyRNG or int or float
@@ -126,7 +132,8 @@ class AbstractGenerateConnectorOnMachine(
         return param_generator_params_size_in_bytes(weights)
 
     def gen_delays_id(self, delays):
-        """ Get the id of the delay generator on the machine
+        """
+        Get the id of the delay generator on the machine.
 
         :param delays:
         :type delays: ~pyNN.random.NumpyRNG or int or float
@@ -135,7 +142,8 @@ class AbstractGenerateConnectorOnMachine(
         return param_generator_id(delays)
 
     def gen_delay_params(self, delays):
-        """ Get the parameters of the delay generator on the machine
+        """
+        Get the parameters of the delay generator on the machine.
 
         :param delays:
         :type delays: ~pyNN.random.NumpyRNG or int or float
@@ -144,7 +152,8 @@ class AbstractGenerateConnectorOnMachine(
         return param_generator_params(delays)
 
     def gen_delay_params_size_in_bytes(self, delays):
-        """ The size of the delay parameters in bytes
+        """
+        The size of the delay parameters in bytes.
 
         :param delays:
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
@@ -155,13 +164,15 @@ class AbstractGenerateConnectorOnMachine(
 
     @abstractproperty
     def gen_connector_id(self):
-        """ The ID of the connection generator on the machine.
+        """
+        The ID of the connection generator on the machine.
 
         :rtype: int
         """
 
     def gen_connector_params(self):
-        """ Get the parameters of the on machine generation.
+        """
+        Get the parameters of the on machine generation.
 
         :rtype: ~numpy.ndarray(uint32)
         """
@@ -170,7 +181,8 @@ class AbstractGenerateConnectorOnMachine(
 
     @property
     def gen_connector_params_size_in_bytes(self):
-        """ The size of the connector parameters in bytes.
+        """
+        The size of the connector parameters in bytes.
 
         :rtype: int
         """

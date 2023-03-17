@@ -47,7 +47,8 @@ def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
 
 
 class Population(PopulationBase):
-    """ PyNN 0.9 population object.
+    """
+    PyNN 0.9 population object.
     """
 
     __slots__ = [
@@ -116,7 +117,8 @@ class Population(PopulationBase):
                 self.__vertex.set_initial_state_values(variable, value)
 
     def __iter__(self):
-        """ Iterate over local cells
+        """
+        Iterate over local cells.
         """
         for _id in range(self.__size):
             yield IDMixin(self, _id)
@@ -126,10 +128,11 @@ class Population(PopulationBase):
             return IDMixin(self, index_or_slice)
         else:
             return PopulationView(
-                self, index_or_slice, label="view over {}".format(self.label))
+                self, index_or_slice, label=f"view over {self.label}")
 
     def all(self):
-        """ Iterator over cell IDs on all MPI nodes.
+        """
+        Iterator over cell IDs on all MPI nodes.
 
         :rtype: iterable(IDMixin)
         """
@@ -138,7 +141,8 @@ class Population(PopulationBase):
 
     @property
     def annotations(self):
-        """ The annotations given by the end user
+        """
+        The annotations given by the end user.
 
         :rtype: dict(str, ...)
         """
@@ -146,7 +150,8 @@ class Population(PopulationBase):
 
     @property
     def celltype(self):
-        """ Implements the PyNN expected celltype property
+        """
+        Implements the PyNN expected celltype property.
 
         :return: The celltype this property has been set to
         :rtype: AbstractPyNNModel
@@ -154,7 +159,8 @@ class Population(PopulationBase):
         return self.__celltype
 
     def can_record(self, variable):
-        """ Determine whether `variable` can be recorded from this population.
+        """
+        Determine whether `variable` can be recorded from this population.
 
         :param str variable: The variable to answer the question about
         :rtype: bool
@@ -163,8 +169,9 @@ class Population(PopulationBase):
 
     @overrides(PopulationBase.record, extend_doc=False)
     def record(self, variables, to_file=None, sampling_interval=None):
-        """ Record the specified variable or variables for all cells in the\
-            Population or view.
+        """
+        Record the specified variable or variables for all cells in the
+        Population or view.
 
         :param variables: either a single variable name or a list of variable
             names. For a given celltype class, ``celltype.recordable`` contains
@@ -181,8 +188,9 @@ class Population(PopulationBase):
             variables, to_file, sampling_interval, indexes=None)
 
     def sample(self, n, rng=None):
-        """ Randomly sample `n` cells from the Population, and return a\
-            PopulationView object.
+        """
+        Randomly sample `n` cells from the Population, and return a
+        PopulationView object.
 
         :param int n: The number of cells to put in the view.
         :param rng: The random number generator to use
@@ -195,13 +203,14 @@ class Population(PopulationBase):
             numpy.arange(len(self), dtype=numpy.int))[0:n]
         return PopulationView(
             self, indices,
-            label="Random sample size {} from {}".format(n, self.label))
+            label=f"Random sample size {n} from {self.label}")
 
     @overrides(PopulationBase.write_data, extend_doc=False)
     def write_data(self, io, variables='all', gather=True, clear=False,
                    annotations=None):
-        """ Write recorded data to file, using one of the file formats\
-            supported by Neo.
+        """
+        Write recorded data to file, using one of the file formats
+        supported by Neo.
 
         :param io:
             a Neo IO instance, or a string for where to put a neo instance
@@ -242,7 +251,8 @@ class Population(PopulationBase):
         io.write(data)
 
     def describe(self, template='population_default.txt', engine='default'):
-        """ Returns a human-readable description of the population.
+        """
+        Returns a human-readable description of the population.
 
         The output may be customized by specifying a different template
         together with an associated template engine (see
@@ -282,7 +292,8 @@ class Population(PopulationBase):
         return descriptions.render(engine, template, context)
 
     def _end(self):
-        """ Do final steps at the end of the simulation
+        """
+        Do final steps at the end of the simulation.
         """
         for variable in self.__recorder.write_to_files_indicators:
             if self.__recorder.write_to_files_indicators[variable]:
@@ -293,8 +304,9 @@ class Population(PopulationBase):
     @overrides(PopulationBase.get_data, extend_doc=False)
     def get_data(
             self, variables='all', gather=True, clear=False, annotations=None):
-        """ Return a Neo Block containing the data\
-            (spikes, state variables) recorded from the Assembly.
+        """
+        Return a Neo Block containing the data (spikes, state variables)
+        recorded from the Assembly.
 
         :param variables: either a single variable name or a list of variable
             names. Variables must have been previously recorded, otherwise an
@@ -322,8 +334,9 @@ class Population(PopulationBase):
             variables, None, clear, annotations)
 
     def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
-        """ Public accessor for getting data as a numpy array, instead of\
-            the neo based object
+        """
+        Public accessor for getting data as a numpy array, instead of
+        the Neo-based object
 
         :param str variable: a single variable name.
         :type variable: str or list(str)
@@ -342,7 +355,8 @@ class Population(PopulationBase):
 
     @overrides(PopulationBase.get_spike_counts, extend_doc=False)
     def get_spike_counts(self, gather=True):
-        """ Return the number of spikes for each neuron.
+        """
+        Return the number of spikes for each neuron.
 
         :rtype: ~numpy.ndarray
         """
@@ -351,7 +365,8 @@ class Population(PopulationBase):
             return db.get_spike_counts(self.__recorder.recording_label)
 
     def find_units(self, variable):
-        """ Get the units of a variable
+        """
+        Get the units of a variable.
 
         :param str variable: The name of the variable
         :return: The units of the variable
@@ -360,7 +375,8 @@ class Population(PopulationBase):
         return self.__vertex.get_units(variable)
 
     def set(self, **parameters):
-        """ Set one or more parameters for every cell in the population.
+        """
+        Set one or more parameters for every cell in the population.
 
         ``parameter`` can be a dict, in which case ``value`` should not be
         supplied, or a string giving the parameter name, in which case
@@ -385,8 +401,9 @@ class Population(PopulationBase):
             self.__vertex.set_parameter_values(parameter, value)
 
     def initialize(self, **kwargs):
-        """ Set initial values of state variables, e.g. the membrane\
-            potential.  Values passed to ``initialize()`` may be:
+        """
+        Set initial values of state variables, e.g. the membrane potential.
+        Values passed to ``initialize()`` may be:
 
         * single numeric values (all neurons set to the same value), or
         * :py:class:`~pyNN.random.RandomDistribution` objects, or
@@ -415,10 +432,13 @@ class Population(PopulationBase):
 
     @property
     def initial_values(self):
-        """ Get the initial values of the state variables.  Note that these
-            values will be the same as the values set with the last call to
-            initialize rather than the actual initial values if this call has
-            been made.
+        """
+        Get the initial values of the state variables.
+
+        .. note::
+            These values will be the same as the values set with the last call
+            to initialize rather than the actual initial values if this call
+            has been made.
 
         :rtype: InitialValuesHolder
         """
@@ -427,8 +447,9 @@ class Population(PopulationBase):
             self.__vertex.get_state_variables())
 
     def set_state(self, **kwargs):
-        """ Set current values of state variables, e.g. the membrane\
-            potential.  Values passed to ``set_state()`` may be:
+        """
+        Set current values of state variables, e.g. the membrane potential.
+        Values passed to ``set_state()`` may be:
 
         * single numeric values (all neurons set to the same value), or
         * :py:class:`~pyNN.random.RandomDistribution` objects, or
@@ -455,7 +476,8 @@ class Population(PopulationBase):
 
     @property
     def current_values(self):
-        """ Get the current values of the state variables.
+        """
+        Get the current values of the state variables.
 
         :rtype: InitialValuesHolder
         """
@@ -468,7 +490,8 @@ class Population(PopulationBase):
 
     @property
     def positions(self):
-        """ Return the position array for structured populations.
+        """
+        Return the position array for structured populations.
 
         :return: a 3xN array
         :rtype: ~numpy.ndarray
@@ -483,7 +506,8 @@ class Population(PopulationBase):
 
     @positions.setter
     def positions(self, positions):
-        """ Sets all the positions in the population.
+        """
+        Sets all the positions in the population.
         """
         self.__positions = positions
 
@@ -508,7 +532,8 @@ class Population(PopulationBase):
 
     @property
     def first_id(self):
-        """ The ID of the first member of the population.
+        """
+        The ID of the first member of the population.
 
         :rtype: int
         """
@@ -516,7 +541,8 @@ class Population(PopulationBase):
 
     @property
     def last_id(self):
-        """ The ID of the last member of the population.
+        """
+        The ID of the last member of the population.
 
         :rtype: int
         """
@@ -538,15 +564,16 @@ class Population(PopulationBase):
 
     @property
     def conductance_based(self):
-        """ True if the population uses conductance inputs
+        """
+        True if the population uses conductance inputs
 
         :rtype: bool
         """
         return self.__vertex.conductance_based
 
     def get(self, parameter_names, gather=True, simplify=True):
-        """ Get the values of a parameter for every local cell in the\
-            population.
+        """
+        Get the values of a parameter for every local cell in the population.
 
         :param parameter_names: Name of parameter. This is either a single
             string or a list of strings
@@ -566,8 +593,9 @@ class Population(PopulationBase):
         return self.__vertex.get_parameter_values(parameter_names)
 
     def id_to_index(self, id):  # @ReservedAssignment
-        """ Given the ID(s) of cell(s) in the Population, return its (their)\
-            index (order in the Population).
+        """
+        Given the ID(s) of cell(s) in the Population, return its (their)
+        index (order in the Population).
 
         Defined by
         https://neuralensemble.org/docs/PyNN/reference/populations.html
@@ -580,14 +608,15 @@ class Population(PopulationBase):
         if not numpy.iterable(id):
             if not self.__first_id <= id <= self.__last_id:
                 raise ValueError(
-                    "id should be in the range [{},{}], actually {}".format(
-                        self.__first_id, self.__last_id, id))
+                    f"id should be in the range [{self.__first_id},"
+                    f"{self.__last_id}], actually {id}")
             return int(id - self.__first_id)  # assume IDs are consecutive
         return id - self.__first_id
 
     def index_to_id(self, index):
-        """ Given the index (order in the Population) of cell(s) in the\
-            Population, return their ID(s)
+        """
+        Given the index (order in the Population) of cell(s) in the
+        Population, return their ID(s)
 
         :param index:
         :type index: int or iterable(int)
@@ -596,16 +625,17 @@ class Population(PopulationBase):
         if not numpy.iterable(index):
             if index > self.__last_id - self.__first_id:
                 raise ValueError(
-                    "indexes should be in the range [{},{}], actually {}"
-                    "".format(0, self.__last_id - self.__first_id, index))
+                    "indexes should be in the range [0,"
+                    f"{self.__last_id - self.__first_id}], actually {index}")
             return int(index + self.__first_id)
         # this assumes IDs are consecutive
         return index + self.__first_id
 
     def id_to_local_index(self, cell_id):
-        """ Given the ID(s) of cell(s) in the Population, return its (their)\
-            index (order in the Population), counting only cells on the local\
-            MPI node.
+        """
+        Given the ID(s) of cell(s) in the Population, return its (their)
+        index (order in the Population), counting only cells on the local
+        MPI node.
 
         Defined by
         https://neuralensemble.org/docs/PyNN/reference/populations.html
@@ -618,7 +648,8 @@ class Population(PopulationBase):
         _we_dont_do_this_now(cell_id)
 
     def inject(self, current_source):
-        """ Connect a current source to all cells in the Population.
+        """
+        Connect a current source to all cells in the Population.
 
         Defined by
         https://neuralensemble.org/docs/PyNN/reference/populations.html
@@ -627,13 +658,15 @@ class Population(PopulationBase):
         self.__vertex.inject(current_source, [n for n in range(self.__size)])
 
     def __len__(self):
-        """ Get the total number of cells in the population.
+        """
+        Get the total number of cells in the population.
         """
         return self.__size
 
     @property
     def label(self):
-        """ The label of the population
+        """
+        The label of the population.
 
         :rtype: str
         """
@@ -646,7 +679,8 @@ class Population(PopulationBase):
 
     @property
     def local_size(self):
-        """ The number of local cells
+        """
+        The number of local cells.
 
         Defined by
         https://neuralensemble.org/docs/PyNN/reference/populations.html
@@ -656,7 +690,8 @@ class Population(PopulationBase):
 
     @property
     def structure(self):
-        """ Return the structure for the population.
+        """
+        Return the structure for the population.
 
         :rtype: ~pyNN.space.BaseStructure or None
         """
@@ -664,7 +699,8 @@ class Population(PopulationBase):
 
     # NON-PYNN API CALL
     def add_placement_constraint(self, x, y, p=None):
-        """ Add a placement constraint
+        """
+        Add a placement constraint.
 
         :param int x: The x-coordinate of the placement constraint
         :param int y: The y-coordinate of the placement constraint
@@ -677,8 +713,9 @@ class Population(PopulationBase):
 
     # NON-PYNN API CALL
     def set_max_atoms_per_core(self, max_atoms_per_core):
-        """ Supports the setting of this population's max atoms per
-            dimension per core
+        """
+        Supports the setting of this population's max atoms per
+        dimension per core.
 
         :param int max_atoms_per_core:
             the new value for the max atoms per dimension per core.
@@ -698,14 +735,16 @@ class Population(PopulationBase):
 
     @property
     def size(self):
-        """ The number of neurons in the population
+        """
+        The number of neurons in the population.
 
         :rtype: int
         """
         return self.__vertex.n_atoms
 
     def _cache_data(self):
-        """ Store data for later extraction
+        """
+        Store data for later extraction.
         """
         self.__recorder.cache_data()
 
@@ -765,8 +804,8 @@ class Population(PopulationBase):
         elif isinstance(model, PopulationApplicationVertex):
             if additional_parameters is not None:
                 raise ConfigurationException(
-                    "Cannot accept additional parameters {} when the cell is"
-                    " a vertex".format(additional_parameters))
+                    "Cannot accept additional parameters "
+                    f"{additional_parameters} when the cell is a vertex")
             self.__vertex = model
             if size is None:
                 size = self.__vertex.n_atoms
@@ -784,7 +823,8 @@ class Population(PopulationBase):
 
     @staticmethod
     def create(cellclass, cellparams=None, n=1):
-        """ Pass through method to the constructor defined by PyNN.\
+        """
+        Pass through method to the constructor defined by PyNN.
         Create ``n`` cells all of the same type.
 
         :param cellclass: see :py:meth:`~.Population.__init__`
@@ -800,13 +840,14 @@ class Population(PopulationBase):
     @staticmethod
     def __process_additional_params(
             additional_parameters, population_parameters):
-        """ essential method for allowing things like splitter objects at\
-            pop level
+        """
+        Essential method for allowing things like splitter objects at
+        pop level.
 
-        :param additional_parameters: the additional params handed down from
-            user
-        :param population_parameters: the additional params the vertex can
-            support.
+        :param additional_parameters:
+            the additional params handed down from user
+        :param population_parameters:
+            the additional params the vertex can support.
         :return: the list of params that are accepted.
         """
         for key in additional_parameters.keys():
@@ -814,7 +855,7 @@ class Population(PopulationBase):
                 population_parameters[key] = additional_parameters[key]
             else:
                 logger.warning(
-                    "additional_parameter {} will be ignored".format(key))
+                    "additional_parameter {} will be ignored", key)
         return population_parameters
 
     @staticmethod
@@ -830,5 +871,5 @@ class Population(PopulationBase):
                            label, size, temp)
             return temp
         raise ConfigurationException(
-            "Size of a population with label {} must be an int,"
-            " received {}".format(label, size))
+            f"Size of a population with label {label} must be an int,"
+            f" received {size}")

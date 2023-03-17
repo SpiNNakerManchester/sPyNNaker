@@ -21,7 +21,8 @@ V_THRESH = "v_thresh"
 
 
 class ThresholdTypeStatic(AbstractThresholdType):
-    """ A threshold that is a static value.
+    """
+    A threshold that is a static value.
     """
     __slots__ = ["__v_thresh"]
 

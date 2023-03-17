@@ -24,7 +24,7 @@ CONFIG_FILE_NAME = "spynnaker.cfg"
 
 def setup_configs():
     """
-    Sets up the configs including the users cfg file
+    Sets up the configs including the users cfg file.
 
     Clears out any previous read configs but does not load the new configs
     so a warning is generated if a config is used before setup is called.
@@ -39,7 +39,7 @@ def setup_configs():
 
 def unittest_setup():
     """
-    Does all the steps that may be required before a unittest
+    Does all the steps that may be required before a unittest.
 
     Resets the configs so only the local default configs are included.
     The user cfg is NOT included!
@@ -49,7 +49,6 @@ def unittest_setup():
     .. note::
          This file should only be called from Spynnaker tests
          that do not call sim.setup
-
     """
     clear_cfg_files(True)
     add_spynnaker_cfg()

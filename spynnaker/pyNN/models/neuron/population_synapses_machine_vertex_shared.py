@@ -24,7 +24,8 @@ class PopulationSynapsesMachineVertexShared(
         PopulationSynapsesMachineVertexCommon,
         PopulationMachineSynapsesProvenance,
         AbstractGeneratesDataSpecification):
-    """ A machine vertex for PyNN Populations
+    """
+    A machine vertex for PyNN Populations.
     """
 
     __slots__ = [

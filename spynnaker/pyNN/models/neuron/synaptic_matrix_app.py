@@ -23,8 +23,9 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 
 
 class SynapticMatrixApp(object):
-    """ The synaptic matrix (and delay matrix if applicable) for an incoming
-        app edge
+    """
+    The synaptic matrix (and delay matrix if applicable) for an incoming
+    app edge.
     """
 
     # pylint: disable=unused-private-member
@@ -124,7 +125,8 @@ class SynapticMatrixApp(object):
                 (self.__app_edge.n_delay_stages + 1))
 
     def reserve_matrices(self, block_addr, poptable):
-        """ Allocate the master pop table entries for the blocks
+        """
+        Allocate the master pop table entries for the blocks.
 
         :param int block_addr: Where the allocation can start from
         :param MasterPopTableAsBinarySearch poptable:
@@ -137,7 +139,8 @@ class SynapticMatrixApp(object):
         return block_addr
 
     def __reserve_app_matrix(self, block_addr, poptable):
-        """ Reserve space for the matrix in the master pop table
+        """
+        Reserve space for the matrix in the master pop table.
 
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
@@ -171,7 +174,8 @@ class SynapticMatrixApp(object):
         return block_addr
 
     def __reserve_delay_app_matrix(self, block_addr, poptable):
-        """ Reserve space in the master pop table for a delayed matrix
+        """
+        Reserve space in the master pop table for a delayed matrix.
 
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
@@ -208,7 +212,8 @@ class SynapticMatrixApp(object):
         return block_addr
 
     def __next_addr(self, block_addr, size):
-        """ Get the next address after a block, checking it is in range
+        """
+        Get the next address after a block, checking it is in range.
 
         :param int block_addr: The address of the start of the block
         :param int size: The size of the block in bytes
@@ -225,7 +230,8 @@ class SynapticMatrixApp(object):
         return next_addr
 
     def write_matrix(self, spec, post_vertex_slice):
-        """ Write a synaptic matrix from host
+        """
+        Write a synaptic matrix from host.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The specification to write to
@@ -243,12 +249,12 @@ class SynapticMatrixApp(object):
             spec.write_array(delay_row_data)
 
     def __get_row_data(self, post_vertex_slice):
-        """ Generate the row data for a synaptic matrix from the description
+        """
+        Generate the row data for a synaptic matrix from the description.
 
         :return: The data and the delayed data
         :rtype: tuple(~numpy.ndarray or None, ~numpy.ndarray or None)
         """
-
         # Get the actual connections
         post_slices =\
             self.__app_edge.post_vertex.splitter.get_in_coming_slices()
@@ -281,7 +287,8 @@ class SynapticMatrixApp(object):
 
     def __update_connection_holders(
             self, data, delayed_data, post_vertex_slice):
-        """ Fill in connections in the connection holders as they are created
+        """
+        Fill in connections in the connection holders as they are created.
 
         :param ~numpy.ndarray data: The row data created
         :param ~numpy.ndarray delayed_data: The delayed row data created
@@ -300,7 +307,8 @@ class SynapticMatrixApp(object):
                     self.__max_row_info, self.__max_atoms_per_core))
 
     def get_generator_data(self):
-        """ Prepare to write a matrix using an on-chip generator
+        """
+        Prepare to write a matrix using an on-chip generator.
 
         :return: The data to generate with
         :rtype: GeneratorData
@@ -314,7 +322,8 @@ class SynapticMatrixApp(object):
             max_pre_atoms_per_core, self.__max_atoms_per_core)
 
     def get_connections(self, placement):
-        """ Get the connections for this matrix from the machine
+        """
+        Get the connections for this matrix from the machine.
 
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
@@ -327,7 +336,8 @@ class SynapticMatrixApp(object):
         return self.__read_connections(placement, synapses_address)
 
     def read_generated_connection_holders(self, placement):
-        """ Read any pre-run connection holders after data has been generated
+        """
+        Read any pre-run connection holders after data has been generated.
 
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
@@ -340,7 +350,8 @@ class SynapticMatrixApp(object):
                     holder.add_connections(connections)
 
     def __read_connections(self, placement, synapses_address):
-        """ Read connections from an address on the machine
+        """
+        Read connections from an address on the machine.
 
         :param Placement placement: Where the matrix is on the machine
         :param int synapses_address:
@@ -375,7 +386,8 @@ class SynapticMatrixApp(object):
         return connections
 
     def __get_block(self, placement, synapses_address):
-        """ Get a block of data for undelayed synapses
+        """
+        Get a block of data for undelayed synapses.
 
         :param Placement placement: Where the matrix is on the machine
         :param int synapses_address:
@@ -388,7 +400,8 @@ class SynapticMatrixApp(object):
         return block
 
     def __get_delayed_block(self, placement, synapses_address):
-        """ Get a block of data for delayed synapses
+        """
+        Get a block of data for delayed synapses.
 
         :param Placement placement: Where the matrix is on the machine
         :param int synapses_address:
@@ -401,7 +414,8 @@ class SynapticMatrixApp(object):
         return block
 
     def get_index(self):
-        """ Get the index in the master population table of the matrix
+        """
+        Get the index in the master population table of the matrix.
 
         :param ~pacman.model.graph.machine.MachineVertex m_vertex:
             The source machine vertex

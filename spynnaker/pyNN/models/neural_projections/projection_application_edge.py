@@ -58,7 +58,8 @@ def are_dynamics_neuromodulation(synapse_dynamics):
 
 class ProjectionApplicationEdge(
         ApplicationEdge, AbstractProvidesLocalProvenanceData):
-    """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
+    """
+    An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
         "__delay_edge",
@@ -109,7 +110,8 @@ class ProjectionApplicationEdge(
 
     @property
     def delay_edge(self):
-        """ Settable.
+        """
+        Settable.
 
         :rtype: DelayedApplicationEdge or None
         """
@@ -121,7 +123,8 @@ class ProjectionApplicationEdge(
 
     @property
     def is_neuromodulation(self):
-        """ Check if this edge is providing neuromodulation
+        """
+        Check if this edge is providing neuromodulation.
 
         :rtype: bool
         """

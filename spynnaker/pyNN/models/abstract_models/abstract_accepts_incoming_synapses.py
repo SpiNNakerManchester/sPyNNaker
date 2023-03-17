@@ -20,8 +20,9 @@ from pacman.model.graphs.application import ApplicationVertex
 
 @require_subclass(ApplicationVertex)
 class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
-    """ Indicates an application vertex that can be a post-vertex in a PyNN\
-        projection.
+    """
+    Indicates an application vertex that can be a post-vertex in a PyNN
+    projection.
 
     .. note::
         See :py:meth:`verify_splitter`
@@ -30,7 +31,8 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_synapse_id_by_target(self, target):
-        """ Get the ID of a synapse given the name.
+        """
+        Get the ID of a synapse given the name.
 
         :param str target: The name of the synapse
         :rtype: int
@@ -38,15 +40,16 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
 
     @abstractmethod
     def set_synapse_dynamics(self, synapse_dynamics):
-        """ Set the synapse dynamics of this vertex.
+        """
+        Set the synapse dynamics of this vertex.
 
         :param AbstractSynapseDynamics synapse_dynamics:
         """
 
     @abstractmethod
     def get_connections_from_machine(self, app_edge, synapse_info):
-        # pylint: disable=too-many-arguments
-        """ Get the connections from the machine post-run.
+        """
+        Get the connections from the machine post-run.
 
         :param ProjectionApplicationEdge app_edge:
             The edge for which the data is being read
@@ -56,12 +59,13 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
 
     @abstractmethod
     def clear_connection_cache(self):
-        """ Clear the connection data stored in the vertex so far.
+        """
+        Clear the connection data stored in the vertex so far.
         """
 
     def verify_splitter(self, splitter):
         """
-        Check that the splitter implements the API(s) expected by the\
+        Check that the splitter implements the API(s) expected by the
         SynapticMatrices
 
         Any Vertex that implements this api should override

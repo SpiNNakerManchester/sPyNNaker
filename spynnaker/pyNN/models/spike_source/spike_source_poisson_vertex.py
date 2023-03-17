@@ -63,7 +63,8 @@ DURATION_FOREVER = 0xFFFFFFFF
 class SpikeSourcePoissonVertex(
         PopulationApplicationVertex,
         LegacyPartitionerAPI, SupportsStructure):
-    """ A Poisson Spike source object
+    """
+    A Poisson Spike source object.
     """
 
     __slots__ = [
@@ -262,14 +263,16 @@ class SpikeSourcePoissonVertex(
 
     @property
     def rates(self):
-        """ Get the rates
+        """
+        Get the rates.
 
         :rtype: RangedList
         """
         return self.__data["rates"]
 
     def add_outgoing_projection(self, projection):
-        """ Add an outgoing projection from this vertex
+        """
+        Add an outgoing projection from this vertex.
 
         :param PyNNProjectionCommon projection: The projection to add
         """
@@ -277,7 +280,8 @@ class SpikeSourcePoissonVertex(
 
     @property
     def outgoing_projections(self):
-        """ The projections outgoing from this vertex
+        """
+        The projections outgoing from this vertex.
 
         :rtype: list(PyNNProjectionCommon)
         """
@@ -506,7 +510,8 @@ class SpikeSourcePoissonVertex(
         return self.__kiss_seed[vertex_slice]
 
     def update_kiss_seed(self, vertex_slice, seed):
-        """ updates a kiss seed from the machine
+        """
+        Updates a kiss seed from the machine.
 
         :param vertex_slice: the vertex slice to update seed of
         :param seed: the seed
@@ -524,18 +529,18 @@ class SpikeSourcePoissonVertex(
                 SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 
     def describe(self):
-        """ Return a human-readable description of the cell or synapse type.
+        """
+        Return a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template\
-        together with an associated template engine\
+        The output may be customised by specifying a different template
+        together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template context\
-        will be returned.
+        If template is `None`, then a dictionary containing the template
+        context will be returned.
 
         :rtype: dict(str, ...)
         """
-
         parameters = self.get_parameter_values(self.__model.default_parameters)
 
         context = {

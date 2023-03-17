@@ -23,7 +23,8 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
 
 class PushBotEthernetLaserDevice(
         PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex):
-    """ The Laser of a PushBot
+    """
+    The Laser of a PushBot.
     """
 
     def __init__(
@@ -41,8 +42,8 @@ class PushBotEthernetLaserDevice(
             The "total period" value to send at the start
         :param start_frequency: The "frequency" to send at the start
         :param timesteps_between_send:
-            The number of timesteps between sending commands to the device,\
-            or None to use the default
+            The number of timesteps between sending commands to the device,
+            or `None` to use the default
         """
         # pylint: disable=too-many-arguments
         if not isinstance(laser, PushBotLaser):

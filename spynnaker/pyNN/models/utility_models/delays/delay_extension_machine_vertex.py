@@ -281,7 +281,8 @@ class DelayExtensionMachineVertex(
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask):
-        """ Generate Delay Parameter data
+        """
+        Generate Delay Parameter data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -292,8 +293,8 @@ class DelayExtensionMachineVertex(
         # pylint: disable=too-many-arguments
 
         # Write spec with commands to construct required delay region:
-        spec.comment("\nWriting Delay Parameters for {} Neurons:\n"
-                     .format(vertex_slice.n_atoms))
+        spec.comment(
+            f"Writing Delay Parameters for {vertex_slice.n_atoms} Neurons:\n")
 
         # Set the focus to the memory region 2 (delay parameters):
         spec.switch_write_focus(

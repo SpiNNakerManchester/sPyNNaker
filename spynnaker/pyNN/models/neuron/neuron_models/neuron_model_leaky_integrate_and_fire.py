@@ -31,7 +31,8 @@ REFRACT_TIMER = "refract_timer"
 
 
 class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
-    """ Classic leaky integrate and fire neuron model.
+    """
+    Classic leaky integrate and fire neuron model.
     """
     __slots__ = [
         "__v_init",
@@ -114,7 +115,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def v_init(self):
-        """ Settable model parameter: :math:`V_{init}`
+        """
+        Settable model parameter: :math:`V_{init}`
 
         :rtype: float
         """
@@ -122,7 +124,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def v_rest(self):
-        """ Settable model parameter: :math:`V_{rest}`
+        """
+        Settable model parameter: :math:`V_{rest}`
 
         :rtype: float
         """
@@ -130,7 +133,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def tau_m(self):
-        r""" Settable model parameter: :math:`\tau_{m}`
+        r"""
+        Settable model parameter: :math:`\tau_{m}`
 
         :rtype: float
         """
@@ -138,7 +142,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def cm(self):
-        """ Settable model parameter: :math:`C_m`
+        """
+        Settable model parameter: :math:`C_m`
 
         :rtype: float
         """
@@ -146,7 +151,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def i_offset(self):
-        """ Settable model parameter: :math:`I_{offset}`
+        """
+        Settable model parameter: :math:`I_{offset}`
 
         :rtype: float
         """
@@ -154,7 +160,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def v_reset(self):
-        """ Settable model parameter: :math:`V_{reset}`
+        """
+        Settable model parameter: :math:`V_{reset}`
 
         :rtype: float
         """
@@ -162,7 +169,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def tau_refrac(self):
-        r""" Settable model parameter: :math:`\tau_{refrac}`
+        r"""
+        Settable model parameter: :math:`\tau_{refrac}`
 
         :rtype: float
         """

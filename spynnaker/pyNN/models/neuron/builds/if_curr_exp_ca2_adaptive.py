@@ -24,11 +24,12 @@ from spynnaker.pyNN.models.neuron.additional_inputs import (
 
 
 class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
-    """ Model from Liu, Y. H., & Wang, X. J. (2001). Spike-frequency\
-        adaptation of a generalized leaky integrate-and-fire model neuron. \
-        *Journal of Computational Neuroscience*, 10(1), 25-45. \
-        `doi:10.1023/A:1008916026143 \
-        <https://doi.org/10.1023/A:1008916026143>`_
+    """
+    Model from Liu, Y. H., & Wang, X. J. (2001). Spike-frequency
+    adaptation of a generalized leaky integrate-and-fire model neuron.
+    *Journal of Computational Neuroscience*, 10(1), 25-45.
+    `doi:10.1023/A:1008916026143
+    <https://doi.org/10.1023/A:1008916026143>`_
 
     :param tau_m: :math:`\\tau_m`
     :type tau_m: float, iterable(float), ~pyNN.random.RandomDistribution

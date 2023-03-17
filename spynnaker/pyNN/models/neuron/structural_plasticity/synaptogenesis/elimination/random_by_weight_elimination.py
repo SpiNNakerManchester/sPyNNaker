@@ -17,7 +17,8 @@ from .abstract_elimination import AbstractElimination
 
 
 class RandomByWeightElimination(AbstractElimination):
-    """ Elimination Rule that depends on the weight of a synapse
+    """
+    Elimination Rule that depends on the weight of a synapse.
     """
 
     __slots__ = [

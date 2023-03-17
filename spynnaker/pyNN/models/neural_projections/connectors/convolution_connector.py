@@ -39,8 +39,8 @@ CONNECTOR_CONFIG_SHORTS = 16
 
 class ConvolutionConnector(AbstractConnector):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D\
-    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
+    Where the pre- and post-synaptic populations are considered as a 2D
+    array. Connect every post(row, col) neuron to many pre(row, col, kernel)
     through a (kernel) set of weights and/or delays.
     """
 
@@ -208,7 +208,8 @@ class ConvolutionConnector(AbstractConnector):
                 f"Unrecognized padding {padding}")
 
     def get_post_shape(self, shape):
-        """ Get the shape of the post image given the pre-image shape
+        """
+        Get the shape of the post image given the pre-image shape.
         """
         shape = numpy.array(shape)
         if self.__pool_shape is not None:
@@ -349,7 +350,8 @@ class ConvolutionConnector(AbstractConnector):
         return max_connected
 
     def __pre_as_post(self, pre_coords):
-        """ Write pre coords as post coords.
+        """
+        Write pre coords as post coords.
 
         :param Iterable pre_coords: An iterable of (x, y) coordinates
         :rtype: numpy.ndarray
@@ -446,7 +448,8 @@ class ConvolutionConnector(AbstractConnector):
         return kernel_weights
 
     def __recip(self, v):
-        """ Compute the reciprocal of a number as an signed 1-bit integer,
-            14-bit fractional fixed point number, encoded in an integer
+        """
+        Compute the reciprocal of a number as an signed 1-bit integer,
+        14-bit fractional fixed point number, encoded in an integer.
         """
         return int(round((1 / v) * (1 << 14)))

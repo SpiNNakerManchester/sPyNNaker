@@ -49,7 +49,8 @@ SPIF_INPUT_FPGA_LINKS = range(1, 16, 2)
 
 
 class SPIFRegister(IntEnum):
-    """ The register offsets on a SPIF device
+    """
+    The register offsets on a SPIF device.
     """
     # The key to send messages back when requested
     REPLY_KEY = 2
@@ -94,7 +95,8 @@ class SPIFRegister(IntEnum):
     FL_MASK_BASE = 176
 
     def cmd(self, payload=None, index=0):
-        """ Make a command to send to a SPIF device to set a register value
+        """
+        Make a command to send to a SPIF device to set a register value.
 
         :param payload:
             The payload to use in the command, or None for no payload
@@ -110,8 +112,9 @@ class SPIFRegister(IntEnum):
 
 
 def set_mapper_key(pipe, key):
-    """ Get a command to set the output base key for packets from SPIF.  This
-        will be added to the keys determined by the mapper output.
+    """
+    Get a command to set the output base key for packets from SPIF.  This
+    will be added to the keys determined by the mapper output.
 
     :param int pipe: The SPIF pipe to set the key of (0-1)
     :param int key: The output key to set
@@ -121,9 +124,10 @@ def set_mapper_key(pipe, key):
 
 
 def set_field_mask(pipe, index, mask):
-    """ Get a command to set the mask of a mapper field on SPIF.  This masks
-        off the bits of the field from the incoming UDP or USB packet values
-        (which are 32-bits each).
+    """
+    Get a command to set the mask of a mapper field on SPIF.  This masks
+    off the bits of the field from the incoming UDP or USB packet values
+    (which are 32-bits each).
 
     :param int pipe: The SPIF pipe to set the mask of (0-1)
     :param int index: The index of the field to set (0-3)
@@ -134,9 +138,10 @@ def set_field_mask(pipe, index, mask):
 
 
 def set_field_shift(pipe, index, shift):
-    """ Get a command to set the shift of a mapper field on SPIF.  This shifts
-        the masked bits of the field from the incoming UDP or USB packet values
-        (which are 32-bits each).
+    """
+    Get a command to set the shift of a mapper field on SPIF.  This shifts
+    the masked bits of the field from the incoming UDP or USB packet values
+    (which are 32-bits each).
 
     :param int pipe: The SPIF pipe to set the shift of (0-1)
     :param int index: The index of the field to set (0-3)
@@ -149,8 +154,9 @@ def set_field_shift(pipe, index, shift):
 
 
 def set_field_limit(pipe, index, limit):
-    """ Get a command to set the limit of a mapper field on SPIF.  This sets
-        a limit on the value of the field after shifting and masking.
+    """
+    Get a command to set the limit of a mapper field on SPIF.  This sets
+    a limit on the value of the field after shifting and masking.
 
     :param int pipe: The SPIF pipe to set the limit of (0-1)
     :param int index: The index of the field to set (0-3)
@@ -162,9 +168,10 @@ def set_field_limit(pipe, index, limit):
 
 
 def set_filter_value(pipe, index, value):
-    """ Get a command to set the value of a filter of SPIF.  This will drop
-        input events from the UDP or USB packets where filter value ==
-        filter mask & event value.
+    """
+    Get a command to set the value of a filter of SPIF.  This will drop
+    input events from the UDP or USB packets where filter value ==
+    filter mask & event value.
 
     :param int pipe: The SPIF pipe to set the filter of (0-1)
     :param int index: The index of the filter to set (0-7)
@@ -176,9 +183,10 @@ def set_filter_value(pipe, index, value):
 
 
 def set_filter_mask(pipe, index, mask):
-    """ Get a command to set the mask of a filter of SPIF.  This will drop
-        input events from the UDP or USB packets where filter value ==
-        filter mask & event value.
+    """
+    Get a command to set the mask of a filter of SPIF.  This will drop
+    input events from the UDP or USB packets where filter value ==
+    filter mask & event value.
 
     :param int pipe: The SPIF pipe to set the filter of (0-1)
     :param int index: The index of the filter to set (0-7)
@@ -190,10 +198,11 @@ def set_filter_mask(pipe, index, mask):
 
 
 def set_input_key(pipe, index, key):
-    """ Get a command to set the key of the FPGA input of SPIF.  This tells
-        SPIF how to route the incoming packets after they have been assembled
-        by the mapper; when incoming key & input mask == input_key, the packet
-        will be routed to input_route.
+    """
+    Get a command to set the key of the FPGA input of SPIF.  This tells
+    SPIF how to route the incoming packets after they have been assembled
+    by the mapper; when incoming key & input mask == input_key, the packet
+    will be routed to input_route.
 
     :param int pipe: The SPIF pipe to set the input of (0-1)
     :param int index: The index of the input to set (0-7)
@@ -204,10 +213,11 @@ def set_input_key(pipe, index, key):
 
 
 def set_input_mask(pipe, index, mask):
-    """ Get a command to set the mask of the FPGA input of SPIF.  This tells
-        SPIF how to route the incoming packets after they have been assembled
-        by the mapper; when incoming key & input mask == input_key, the packet
-        will be routed to input_route.
+    """
+    Get a command to set the mask of the FPGA input of SPIF.  This tells
+    SPIF how to route the incoming packets after they have been assembled
+    by the mapper; when incoming key & input mask == input_key, the packet
+    will be routed to input_route.
 
     :param int pipe: The SPIF pipe to set the input of (0-1)
     :param int index: The index of the input to set (0-7)
@@ -218,12 +228,14 @@ def set_input_mask(pipe, index, mask):
 
 
 def set_input_route(pipe, index, route):
-    """ Get a command to set the route of the FPGA input of SPIF.  This tells
-        SPIF how to route the incoming packets after they have been assembled
-        by the mapper; when incoming key & input mask == input_key, the packet
-        will be routed to input_route.
+    """
+    Get a command to set the route of the FPGA input of SPIF.  This tells
+    SPIF how to route the incoming packets after they have been assembled
+    by the mapper; when incoming key & input mask == input_key, the packet
+    will be routed to input_route.
 
-        Note: route 0 refers to FPGA link 15, 1 to 13 and so on in twos.
+    .. note::
+        route 0 refers to FPGA link 15, 1 to 13 and so on in twos.
 
     :param int pipe: The SPIF pipe to set the input of (0-1)
     :param int index: The index of the input to set (0-7)
@@ -234,13 +246,13 @@ def set_input_route(pipe, index, route):
 
 
 class _DelayedMultiCastCommand(MultiCastCommand):
-    """ A command where the getting of the payload is delayed
+    """
+    A command where the getting of the payload is delayed.
     """
     __slots__ = ["__get_payload"]
 
     def __init__(self, key, get_payload, repeat, delay_between_repeats):
         """
-
         :param int key: The key to send
         :param func()->int get_payload:
             A function to call that returns a payload
@@ -263,7 +275,8 @@ class _DelayedMultiCastCommand(MultiCastCommand):
 
 
 class SpiNNFPGARegister(IntEnum):
-    """ The register offsets on the SpiNNaker FPGAs for devices
+    """
+    The register offsets on the SpiNNaker FPGAs for devices.
     """
 
     # The base key which identifies packets to send out to the peripheral
@@ -294,7 +307,8 @@ class SpiNNFPGARegister(IntEnum):
     START = 17
 
     def cmd(self, payload=None):
-        """ Make a command to send to the FPGA to set a register value
+        """
+        Make a command to send to the FPGA to set a register value.
 
         :param payload:
             The payload to use in the command, or None for no payload
@@ -306,8 +320,9 @@ class SpiNNFPGARegister(IntEnum):
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
 
     def delayed_command(self, get_payload):
-        """ Make a command to send to the FPGA to set a register value,
-            where the value itself is currently unknown
+        """
+        Make a command to send to the FPGA to set a register value,
+        where the value itself is currently unknown.
 
         :param func()->int get_payload:
             A function to call to get the payload later

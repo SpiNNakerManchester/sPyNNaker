@@ -26,9 +26,9 @@ class ExternalDeviceLifControlVertex(
         AbstractEthernetController,
         AbstractVertexWithEdgeToDependentVertices,
         HasCustomAtomKeyMap):
-    """ Abstract control module for the pushbot, based on the LIF neuron,\
-        but without spikes, and using the voltage as the output to the various\
-        devices
+    """
+    Abstract control module for the pushbot, based on the LIF neuron, but
+    without spikes, and using the voltage as the output to the various devices.
     """
     __slots__ = [
         "__dependent_vertices",

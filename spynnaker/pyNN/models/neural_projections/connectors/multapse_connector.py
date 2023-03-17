@@ -27,11 +27,12 @@ from .abstract_generate_connector_on_host import (
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine,
                         AbstractGenerateConnectorOnHost):
-    """ Create a multapse connector. The size of the source and destination\
-        populations are obtained when the projection is connected. The number\
-        of synapses is specified. when instantiated, the required number of\
-        synapses is created by selecting at random from the source and target\
-        populations with replacement. Uniform selection probability is assumed.
+    """
+    Create a multapse connector. The size of the source and destination
+    populations are obtained when the projection is connected. The number
+    of synapses is specified. when instantiated, the required number of
+    synapses is created by selecting at random from the source and target
+    populations with replacement. Uniform selection probability is assumed.
     """
     __slots__ = [
         "__allow_self_connections",
@@ -91,7 +92,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                 "and n = n_pre * n_post")
 
     def get_rng_next(self, num_synapses, prob_connect):
-        """ Get the required RNGs
+        """
+        Get the required RNGs.
 
         :param int num_synapses:
             The number of synapses to make random numbers for in this call
@@ -151,8 +153,9 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                 self.__synapses_per_edge = self.get_rng_next(
                     self.__num_synapses, prob_connect)
             if sum(self.__synapses_per_edge) != self.__num_synapses:
-                raise SpynnakerException("{} of {} synapses generated".format(
-                    sum(self.__synapses_per_edge), self.__num_synapses))
+                raise SpynnakerException(
+                    f"{sum(self.__synapses_per_edge)} of "
+                    f"{self.__num_synapses} synapses generated")
             self.__post_slices = post_slices
 
     def _get_n_connections(self, post_slice_index):
@@ -251,7 +254,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return "MultapseConnector({})".format(self.__num_synapses)
+        return f"MultapseConnector({self.__num_synapses})"
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)

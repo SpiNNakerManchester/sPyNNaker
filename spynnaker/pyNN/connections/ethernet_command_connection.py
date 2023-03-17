@@ -19,8 +19,9 @@ from spinn_front_end_common.utilities.database import DatabaseConnection
 
 
 class EthernetCommandConnection(DatabaseConnection):
-    """ A connection that can send commands to a device at the start and end\
-        of a simulation
+    """
+    A connection that can send commands to a device at the start and end
+    of a simulation.
     """
     __slots__ = [
         "__command_containers",
@@ -33,7 +34,7 @@ class EthernetCommandConnection(DatabaseConnection):
         :param AbstractEthernetTranslator translator:
             A translator of multicast commands to device commands
         :param command_containers:
-            A list of vertices that have commands to be sent at the start \
+            A list of vertices that have commands to be sent at the start
             and end of simulation
         :type command_containers:
             list(~spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex)
@@ -55,10 +56,11 @@ class EthernetCommandConnection(DatabaseConnection):
         self.__translator = translator
 
     def add_command_container(self, command_container):
-        """ Add a command container.
+        """
+        Add a command container.
 
         :param command_container:
-            A vertex that has commands to be sent at the start and end of \
+            A vertex that has commands to be sent at the start and end of
             simulation
         :type command_container:
             ~spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex

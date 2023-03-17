@@ -21,7 +21,8 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 class PushBotSpiNNakerLinkSpeakerDevice(
         PushBotEthernetSpeakerDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
-    """ The speaker of a PushBot
+    """
+    The speaker of a PushBot.
     """
     __slots__ = []
 

@@ -47,8 +47,8 @@ def _get_diagram(label):
 
 def spynnaker_neuron_graph_network_specification_report():
     """
-    Produces a report describing the graph created from the neural \
-        populations and projections.
+    Produces a report describing the graph created from the neural
+    populations and projections.
 
     :param str report_folder: the report folder to put figure into
     """

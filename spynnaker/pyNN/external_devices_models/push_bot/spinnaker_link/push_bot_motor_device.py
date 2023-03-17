@@ -21,7 +21,8 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 class PushBotSpiNNakerLinkMotorDevice(
         PushBotEthernetMotorDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
-    """ The motor of a PushBot
+    """
+    The motor of a PushBot.
     """
     __slots__ = []
 

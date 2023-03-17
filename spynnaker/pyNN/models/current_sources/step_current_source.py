@@ -21,8 +21,8 @@ from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
 
 
 class StepCurrentSource(AbstractCurrentSource):
-    """ Current source where the amplitude changes based on a time array
-
+    """
+    Current source where the amplitude changes based on a time array.
     """
     __slots__ = [
         "__amplitudes",
@@ -38,10 +38,9 @@ class StepCurrentSource(AbstractCurrentSource):
         self.__amplitudes = amplitudes
 
         if (len(times) != len(amplitudes)):
-            msg = "In StepCurrentSource, len(times) is {}, "\
-                " but len(amplitudes) is {}".format(
-                    len(times), len(amplitudes))
-            raise SpynnakerException(msg)
+            raise SpynnakerException(
+                f"In StepCurrentSource, len(times) is {len(times)}, "
+                f" but len(amplitudes) is {len(amplitudes)}")
 
         self.__parameter_types = dict()
         self.__parameter_types['times'] = DataType.UINT32  # arrays?
@@ -54,37 +53,35 @@ class StepCurrentSource(AbstractCurrentSource):
         super().__init__()
 
     def set_parameters(self, **parameters):
-        """ Set the current source parameters
+        """
+        Set the current source parameters.
 
         :param parameters: the parameters to set
         """
         for key, value in parameters.items():
             if key not in self.__parameters.keys():
                 # throw an exception
-                msg = "{} is not a parameter of {}".format(key, self)
-                raise SpynnakerException(msg)
+                raise SpynnakerException(f"{key} is not a parameter of {self}")
+            if key == 'times':
+                time_convert_ms = SpynnakerDataView.\
+                    get_simulation_time_step_per_ms()
+                self.__times = [
+                    value[i] * time_convert_ms for i in range(len(value))]
+                value = self.__times
             else:
-                if key == 'times':
-                    time_convert_ms = SpynnakerDataView.\
-                        get_simulation_time_step_per_ms()
-                    self.__times = [
-                        value[i] * time_convert_ms for i in range(len(value))]
-                    value = self.__times
-                else:
-                    # Check length: if longer, need to remap
-                    if (len(self.__amplitudes) < len(value)):
-                        if self.population is not None:
-                            SpynnakerDataView.set_requires_mapping()
+                # Check length: if longer, need to remap
+                if (len(self.__amplitudes) < len(value)):
+                    if self.population is not None:
+                        SpynnakerDataView.set_requires_mapping()
 
-                    self.__amplitudes = value
-                self.__parameters[key] = value
+                self.__amplitudes = value
+            self.__parameters[key] = value
 
         # Check the arrays are still the same lengths
         if (len(self.__times) != len(self.__amplitudes)):
-            msg = "In StepCurrentSource, len(times) is {}, "\
-                " but len(amplitudes) is {}".format(
-                    len(self.__times), len(self.__amplitudes))
-            raise SpynnakerException(msg)
+            raise SpynnakerException(
+                f"In StepCurrentSource, len(times) is {len(self.__times)}, "
+                f"but len(amplitudes) is {len(self.__amplitudes)}")
 
         # Parameters have been set, so if multi-run then it will have been
         # injected already; if not then it can just be ignored
@@ -95,7 +92,8 @@ class StepCurrentSource(AbstractCurrentSource):
     @property
     @overrides(AbstractCurrentSource.get_parameters)
     def get_parameters(self):
-        """ Get the parameters of the current source
+        """
+        Get the parameters of the current source.
 
         :rtype dict(str, Any)
         """
@@ -104,7 +102,8 @@ class StepCurrentSource(AbstractCurrentSource):
     @property
     @overrides(AbstractCurrentSource.get_parameter_types)
     def get_parameter_types(self):
-        """ Get the parameters of the current source
+        """
+        Get the parameters of the current source.
 
         :rtype dict(str, Any)
         """
@@ -113,7 +112,8 @@ class StepCurrentSource(AbstractCurrentSource):
     @property
     @overrides(AbstractCurrentSource.current_source_id)
     def current_source_id(self):
-        """ The ID of the current source.
+        """
+        The ID of the current source.
 
         :rtype: int
         """
@@ -121,7 +121,8 @@ class StepCurrentSource(AbstractCurrentSource):
 
     @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self):
-        """ The sdram usage of the current source.
+        """
+        The SDRAM usage of the current source.
 
         :rtype: int
         """

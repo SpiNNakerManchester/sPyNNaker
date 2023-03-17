@@ -30,8 +30,9 @@ def _signed_int(uint_value):
 
 
 class PushBotTranslator(AbstractEthernetTranslator):
-    """ Translates packets between PushBot Multicast packets and PushBot\
-        Wi-Fi Commands
+    """
+    Translates packets between PushBot Multicast packets and PushBot
+    Wi-Fi Commands.
     """
     __slots__ = [
         "__protocol",

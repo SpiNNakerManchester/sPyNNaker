@@ -21,7 +21,8 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 class PushBotSpiNNakerLinkLaserDevice(
         PushBotEthernetLaserDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
-    """ The Laser of a PushBot
+    """
+    The Laser of a PushBot.
     """
     __slots__ = []
 

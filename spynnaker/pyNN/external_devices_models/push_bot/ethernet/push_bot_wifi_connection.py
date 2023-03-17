@@ -29,7 +29,8 @@ _existing_connections = dict()
 
 
 def get_pushbot_wifi_connection(remote_host, remote_port=56000):
-    """ Get an existing connection to a PushBot, or make a new one.
+    """
+    Get an existing connection to a PushBot, or make a new one.
 
     :param str remote_host: The IP address of the PushBot
     :param int remote_port: The port number of the PushBot (default 56000)
@@ -42,7 +43,8 @@ def get_pushbot_wifi_connection(remote_host, remote_port=56000):
 
 
 class PushBotWIFIConnection(Connection, Listenable):
-    """ A connection to a PushBot via Wi-Fi.
+    """
+    A connection to a PushBot via Wi-Fi.
     """
     __slots__ = [
         "__local_ip_address",
@@ -80,8 +82,9 @@ class PushBotWIFIConnection(Connection, Listenable):
             self.__socket)
 
     def is_connected(self):
-        """ See\
-            :py:meth:`~spinnman.connections.Connection.is_connected`
+        """
+        See
+        :py:meth:`~spinnman.connections.Connection.is_connected`.
         """
         # check if machine is active and on the network
         for _ in range(5):  # Try up to five times...
@@ -95,8 +98,9 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def local_ip_address(self):
-        """ The local IP address to which the connection is bound, \
-            as a dotted string, e.g. `0.0.0.0`
+        """
+        The local IP address to which the connection is bound,
+        as a dotted string, e.g. `0.0.0.0`.
 
         :rtype: str
         """
@@ -104,7 +108,8 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def local_port(self):
-        """ The local port to which the connection is bound.
+        """
+        The local port to which the connection is bound.
 
         :rtype: int
         """
@@ -112,8 +117,9 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def remote_ip_address(self):
-        """ The remote IP address to which the connection is connected, \
-            as a dotted string, or None if not connected remotely
+        """
+        The remote IP address to which the connection is connected,
+        as a dotted string, or `None` if not connected remotely.
 
         :rtype: str or None
         """
@@ -121,15 +127,17 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def remote_port(self):
-        """ The remote port to which the connection is connected, \
-            or None if not connected remotely
+        """
+        The remote port to which the connection is connected,
+        or `None` if not connected remotely.
 
         :rtype: int or None
         """
         return self.__remote_port
 
     def receive(self, timeout=None):
-        """ Receive data from the connection
+        """
+        Receive data from the connection
 
         :param timeout: The timeout, or None to wait forever
         :type timeout: float or None
@@ -142,7 +150,8 @@ class PushBotWIFIConnection(Connection, Listenable):
         return receive_message(self.__socket, timeout, self.RECV_SIZE)
 
     def send(self, data):
-        """ Send data down this connection
+        """
+        Send data down this connection
 
         :param bytearray data: The data to be sent
         :raise SpinnmanIOException: If there is an error sending the data
@@ -150,8 +159,9 @@ class PushBotWIFIConnection(Connection, Listenable):
         send_message(self.__socket, data)
 
     def close(self):
-        """ See\
-            :py:meth:`spinnman.connections.Connection.close`
+        """
+        See
+        :py:meth:`spinnman.connections.Connection.close`.
         """
         try:
             self.__socket.shutdown(socket.SHUT_WR)

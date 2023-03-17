@@ -22,7 +22,8 @@ ISYN_INH = "isyn_inh"
 
 
 class SynapseTypeDelta(AbstractSynapseType):
-    """ This represents a synapse type with two delta synapses
+    """
+    This represents a synapse type with two delta synapses.
     """
     __slots__ = [
         "__isyn_exc",

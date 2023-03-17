@@ -17,7 +17,8 @@ from numpy.lib.recfunctions import merge_arrays
 
 
 class ConnectionHolder(object):
-    """ Holds a set of connections to be returned in a PyNN-specific format
+    """
+    Holds a set of connections to be returned in a PyNN-specific format.
     """
 
     __slots__ = (
@@ -89,7 +90,8 @@ class ConnectionHolder(object):
         self.__fixed_values = fixed_values
 
     def add_connections(self, connections):
-        """ Add connections to the holder to be returned
+        """
+        Add connections to the holder to be returned.
 
         :param ~numpy.ndarray connections:
             The connection to add, as a numpy structured array of
@@ -101,20 +103,23 @@ class ConnectionHolder(object):
 
     @property
     def connections(self):
-        """ The connections stored
+        """
+        The connections stored.
 
         :rtype: list(~numpy.ndarray)
         """
         return self.__connections
 
     def finish(self):
-        """ Finish adding connections
+        """
+        Finish adding connections.
         """
         if self.__notify is not None:
             self.__notify(self)
 
     def _get_data_items(self):
-        """ Merges the connections into the result data format
+        """
+        Merges the connections into the result data format.
         """
         # If there are already merged connections cached, return those
         if self.__data_items is not None:
@@ -144,7 +149,7 @@ class ConnectionHolder(object):
         if self.__fixed_values is not None and self.__fixed_values:
             # Generate a numpy type for the fixed values
             fixed_dtypes = [
-                ('{}'.format(field[0]), None)
+                (f'{field[0]}', None)
                 for field in self.__fixed_values]
 
             # Get the actual data as a record array

@@ -32,7 +32,8 @@ from .spif_devices import (
 class SPIFRetinaDevice(
         Application2DFPGAVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex, HasShapeKeyFields):
-    """ A retina device connected to SpiNNaker using a SPIF board.
+    """
+    A retina device connected to SpiNNaker using a SPIF board.
     """
 
     #: SPIF outputs to 8 FPGA output links, so we split into (2 x 4), meaning
@@ -62,7 +63,6 @@ class SPIFRetinaDevice(
                  base_key=None, input_x_shift=16, input_y_shift=0,
                  board_address=None, chip_coords=None):
         """
-
         :param int pipe: Which pipe on SPIF the retina is connected to
         :param int width: The width of the retina in pixels
         :param int height: The height of the retina in pixels
@@ -153,7 +153,8 @@ class SPIFRetinaDevice(
         return n & 0xFFFFFFFF
 
     def __incoming_fpgas(self, board_address, chip_coords):
-        """ Get the incoming FPGA connections
+        """
+        Get the incoming FPGA connections.
 
         :rtype: list(FPGAConnection)
         """
@@ -162,7 +163,8 @@ class SPIFRetinaDevice(
                 for i in SPIF_INPUT_FPGA_LINKS]
 
     def __outgoing_fpga(self, board_address, chip_coords):
-        """ Get the outgoing FPGA connection (for commands)
+        """
+        Get the outgoing FPGA connection (for commands).
 
         :rtype: FGPA_Connection
         """

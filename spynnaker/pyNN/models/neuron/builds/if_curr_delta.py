@@ -22,7 +22,8 @@ from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeDelta
 
 
 class IFCurrDelta(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with an instantaneous current input.
+    """
+    Leaky integrate and fire neuron with an instantaneous current input.
 
     :param tau_m: :math:`\\tau_m`
     :type tau_m: float, iterable(float), ~pyNN.random.RandomDistribution

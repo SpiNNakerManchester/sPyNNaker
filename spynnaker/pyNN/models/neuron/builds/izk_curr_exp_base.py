@@ -23,7 +23,8 @@ _IZK_THRESHOLD = 30.0
 
 
 class IzkCurrExpBase(AbstractPyNNNeuronModelStandard):
-    """ Izhikevich neuron model with current inputs.
+    """
+    Izhikevich neuron model with current inputs.
 
     :param a: :math:`a`
     :type a: float, iterable(float), ~pyNN.random.RandomDistribution

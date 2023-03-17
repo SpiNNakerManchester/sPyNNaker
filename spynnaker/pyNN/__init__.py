@@ -185,8 +185,9 @@ __simulator = None
 
 
 class RandomDistribution(_PynnRandomDistribution):
-    """ Class which defines a next(n) method which returns an array of ``n``\
-        random numbers from a given distribution.
+    """
+    Class which defines a next(n) method which returns an array of ``n``
+    random numbers from a given distribution.
 
     :param str distribution: the name of a random number distribution.
     :param parameters_pos:
@@ -261,7 +262,8 @@ class RandomDistribution(_PynnRandomDistribution):
 # Patch the bugs in the PyNN documentation... Ugh!
 def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
              periodic_boundaries=None):
-    """ Return the Euclidian distance between two cells.
+    """
+    Return the Euclidian distance between two cells.
 
     :param src:
     :param tgt:
@@ -285,8 +287,9 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
           max_delay=None,
           database_socket_addresses=None, time_scale_factor=None,
           n_chips_required=None, n_boards_required=None, **extra_params):
-    """ The main method needed to be called to make the PyNN 0.8 setup. Needs\
-        to be called before any other function
+    """
+    The main method needed to be called to make the PyNN 0.8 setup.
+    Needs to be called before any other function
 
     :param timestep:
         the time step of the simulations in micro seconds
@@ -366,7 +369,8 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
 
 
 def name():
-    """ Returns the name of the simulator
+    """
+    Returns the name of the simulator.
 
     :rtype: str
     """
@@ -377,7 +381,8 @@ def Projection(
         presynaptic_population, postsynaptic_population,
         connector, synapse_type=None, source=None, receptor_type="excitatory",
         space=None, label=None):
-    """ Used to support PEP 8 spelling correctly
+    """
+    Used to support PEP 8 spelling correctly.
 
     :param presynaptic_population: the source pop
     :type presynaptic_population:
@@ -405,12 +410,12 @@ def Projection(
 
 
 def _create_overloaded_functions(spinnaker_simulator):
-    """ Creates functions that the main PyNN interface supports\
-        (given from PyNN)
+    """
+    Creates functions that the main PyNN interface supports
+    (given from PyNN)
 
     :param spinnaker_simulator: the simulator object we use underneath
     """
-
     # overload the failed ones with now valid ones, now that we're in setup
     # phase.
     __pynn["run"], __pynn["run_until"] = pynn_common.build_run(
@@ -431,7 +436,8 @@ def _create_overloaded_functions(spinnaker_simulator):
 
 
 def end(_=True):
-    """ Cleans up the SpiNNaker machine and software
+    """
+    Cleans up the SpiNNaker machine and software
 
     :param _: was named compatible_output, which we don't care about,
         so is a non-existent parameter
@@ -453,8 +459,9 @@ def end(_=True):
 
 
 def record_v(source, filename):
-    """ Deprecated method for getting voltage.\
-        This is not documented in the public facing API.
+    """
+    Deprecated method for getting voltage.
+    This is not documented in the public facing API.
 
     .. deprecated:: 5.0
 
@@ -470,8 +477,9 @@ def record_v(source, filename):
 
 
 def record_gsyn(source, filename):
-    """ Deprecated method for getting both types of gsyn.\
-        This is not documented in the public facing API
+    """
+    Deprecated method for getting both types of gsyn.
+    This is not documented in the public facing API
 
     .. deprecated:: 5.0
 
@@ -487,8 +495,9 @@ def record_gsyn(source, filename):
 
 
 def list_standard_models():
-    """ Return a list of all the StandardCellType classes available for this\
-        simulator.
+    """
+    Return a list of all the StandardCellType classes available for this
+    simulator.
 
     :rtype: list(str)
     """
@@ -500,16 +509,18 @@ def list_standard_models():
 
 
 def set_number_of_neurons_per_core(neuron_type, max_permitted):
-    """ Sets a ceiling on the number of neurons of a given model that can be\
-        placed on a single core.
-        This can be overridden by the individual Population.
-        The new value can be None, meaning that the maximum is the same as
-        the number of atoms, an int, meaning all Populations of this model
-        must have one dimension, or a tuple of n integers, meaning all
-        Populations of this model must have n dimensions.
-        If not all Populations of this model have the same number of
-        dimensions, it is recommended to set this to None here and then
-        set the maximum on each Population.
+    """
+    Sets a ceiling on the number of neurons of a given model that can be
+    placed on a single core.
+    This can be overridden by the individual Population.
+
+    The new value can be None, meaning that the maximum is the same as
+    the number of atoms, an int, meaning all Populations of this model
+    must have one dimension, or a tuple of n integers, meaning all
+    Populations of this model must have n dimensions.
+    If not all Populations of this model have the same number of
+    dimensions, it is recommended to set this to None here and then
+    set the maximum on each Population.
 
     :param type(AbstractPopulationVertex) neuron_type: neuron type
     :param int max_permitted: the number to set to
@@ -538,7 +549,8 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
 
 def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
             rng=None):
-    """ Builds a projection
+    """
+    Builds a projection.
 
     :param ~spynnaker.pyNN.models.populations.Population pre: source pop
     :param ~spynnaker.pyNN.models.populations.Population post: destination pop
@@ -554,7 +566,8 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
 
 
 def create(cellclass, cellparams=None, n=1):
-    """ Builds a population with certain params
+    """
+    Builds a population with certain params.
 
     :param cellclass: population class
     :type cellclass: type or AbstractPyNNModel
@@ -567,7 +580,8 @@ def create(cellclass, cellparams=None, n=1):
 
 
 def NativeRNG(seed_value):
-    """ Fixes the random number generator's seed
+    """
+    Fixes the random number generator's seed.
 
     :param seed_value:
     :type seed_value: int or list(int) or ~numpy.ndarray(int32)
@@ -576,7 +590,8 @@ def NativeRNG(seed_value):
 
 
 def get_current_time():
-    """ Gets the time within the simulation
+    """
+    Gets the time within the simulation.
 
     :return: returns the current time
     """
@@ -585,8 +600,9 @@ def get_current_time():
 
 
 def get_min_delay():
-    """ The minimum allowed synaptic delay; delays will be clamped to be at\
-        least this.
+    """
+    The minimum allowed synaptic delay; delays will be clamped to be at
+    least this.
 
     :return: returns the min delay of the simulation
     :rtype: int
@@ -596,11 +612,12 @@ def get_min_delay():
 
 
 def get_max_delay():
-    """ Part of the PyNN api but does not make sense for sPyNNaker as
-     different Projection, Vertex splitter combination could have different
-     delays they can support
+    """
+    Part of the PyNN API but does not make sense for sPyNNaker as
+    different Projection, Vertex splitter combination could have different
+    delays they can support.
 
-     Most likely value is timestep * 144
+    Most likely value is timestep * 144
 
     :raises NotImplementedError: As there is no system wide max_delay
     """
@@ -609,7 +626,8 @@ def get_max_delay():
 
 
 def get_time_step():
-    """ The integration time step
+    """
+    The integration time step.
 
     :return: get the time step of the simulation (in ms)
     :rtype: float
@@ -619,7 +637,8 @@ def get_time_step():
 
 
 def initialize(cells, **initial_values):
-    """ Sets cells to be initialised to the given values
+    """
+    Sets cells to be initialised to the given values.
 
     :param cells: the cells to change params on
     :type cells: ~spynnaker.pyNN.models.populations.Population or
@@ -631,7 +650,8 @@ def initialize(cells, **initial_values):
 
 
 def num_processes():
-    """ The number of MPI processes.
+    """
+    The number of MPI processes.
 
     .. note::
         Always 1 on SpiNNaker, which doesn't use MPI.
@@ -644,7 +664,8 @@ def num_processes():
 
 
 def rank():
-    """ The MPI rank of the current node.
+    """
+    The MPI rank of the current node.
 
     .. note::
         Always 0 on SpiNNaker, which doesn't use MPI.
@@ -658,7 +679,8 @@ def rank():
 
 def record(variables, source, filename, sampling_interval=None,
            annotations=None):
-    """ Sets variables to be recorded.
+    """
+    Sets variables to be recorded.
 
     :param variables: may be either a single variable name or a list of
         variable names. For a given celltype class, celltype.recordable
@@ -681,7 +703,8 @@ def record(variables, source, filename, sampling_interval=None,
 
 
 def reset(annotations=None):
-    """ Resets the simulation to t = 0
+    """
+    Resets the simulation to t = 0.
 
     :param annotations: the annotations to the data objects
     :type annotations: dict(str, ...)
@@ -694,8 +717,9 @@ def reset(annotations=None):
 
 
 def run(simtime, callbacks=None):
-    """ The run() function advances the simulation for a given number of \
-        milliseconds, e.g.:
+    """
+    The run() function advances the simulation for a given number of
+    milliseconds.
 
     :param float simtime: time to run for (in milliseconds)
     :param callbacks: callbacks to run
@@ -712,7 +736,8 @@ run_for = run
 
 
 def run_until(tstop):
-    """ Run until a (simulation) time period has completed.
+    """
+    Run until a (simulation) time period has completed.
 
     :param float tstop: the time to stop at (in milliseconds)
     :return: the actual simulation time that the simulation stopped at
@@ -723,7 +748,8 @@ def run_until(tstop):
 
 
 def get_machine():
-    """ Get the SpiNNaker machine in use.
+    """
+    Get the SpiNNaker machine in use.
 
     :return: the machine object
     :rtype: ~spinn_machine.Machine

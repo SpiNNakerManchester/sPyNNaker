@@ -22,9 +22,10 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 
 class IFCurrExpSEMDBase(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with an exponentially decaying\
-        current input, where the excitatory input depends upon the inhibitory\
-        input (see https://www.cit-ec.de/en/nbs/spiking-insect-vision)
+    """
+    Leaky integrate and fire neuron with an exponentially decaying
+    current input, where the excitatory input depends upon the inhibitory
+    input (see https://www.cit-ec.de/en/nbs/spiking-insect-vision)
 
     :param tau_m: :math:`\\tau_m`
     :type tau_m: float, iterable(float), ~pyNN.random.RandomDistribution

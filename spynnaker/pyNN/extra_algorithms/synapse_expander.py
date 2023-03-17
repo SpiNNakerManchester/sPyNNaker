@@ -15,8 +15,8 @@ import logging
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.system_control_logic import \
-    run_system_application
+from spinn_front_end_common.utilities.system_control_logic import (
+    run_system_application)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
@@ -30,13 +30,12 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def synapse_expander():
-    """ Run the synapse expander.
+    """
+    Run the synapse expander.
 
     .. note::
         Needs to be done after data has been loaded.
-
     """
-
     # Find the places where the synapse expander and delay receivers should run
     expander_cores, expanded_pop_vertices, max_data, max_bf = _plan_expansion()
 
@@ -59,11 +58,12 @@ def synapse_expander():
 
 
 def _plan_expansion():
-    """ Plan the expansion of synapses and set up the regions using USER1
+    """
+    Plan the expansion of synapses and set up the regions using USER1.
 
     :return: The places to load the synapse expander and delay expander
         executables, and the target machine vertices to read synapses back from
-    :rtype: (ExecutableTargets, list(MachineVertex, Placement))
+    :rtype: tuple(ExecutableTargets, list(tuple(MachineVertex, Placement)))
     """
     synapse_bin = SpynnakerDataView.get_executable_path(SYNAPSE_EXPANDER_APLX)
     expander_cores = ExecutableTargets()
@@ -94,12 +94,11 @@ def _plan_expansion():
 
 
 def _fill_in_connection_data(expanded_pop_vertices):
-    """ Once expander has run, fill in the connection data
+    """
+    Once expander has run, fill in the connection data.
 
     :param list(MachineVertex, Placement) expanded_pop_vertices:
         List of machine vertices to read data from
-
-    :rtype: None
     """
     for vertex, placement in expanded_pop_vertices:
         vertex.read_generated_connection_holders(placement)

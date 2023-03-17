@@ -23,13 +23,14 @@ def _check_args(args_to_find, default_args, init):
     for arg in args_to_find:
         if arg not in default_args:
             raise AttributeError(
-                "Argument {} not found, or no default value provided in {}"
-                .format(arg, init))
+                f"Argument {arg} not found, or "
+                f"no default value provided in {init}")
 
 
 def get_dict_from_init(init, skip=None, include=None):
-    """ Get an argument initialisation dictionary by examining an \
-        ``__init__`` method or function.
+    """
+    Get an argument initialisation dictionary by examining an
+    ``__init__`` method or function.
 
     :param callable init: The method.
     :param frozenset(str) skip: The arguments to be skipped, if any
@@ -58,9 +59,10 @@ def get_dict_from_init(init, skip=None, include=None):
 
 
 def default_parameters(parameters):
-    """ Specifies arguments which are parameters.  Only works on the \
-        ``__init__`` method of a class that is additionally decorated with\
-        :py:meth:`defaults`
+    """
+    Specifies arguments which are parameters.  Only works on the
+    ``__init__`` method of a class that is additionally decorated with
+    :py:meth:`defaults`
 
     :param iterable(str) parameters:
         The names of the arguments that are parameters
@@ -85,7 +87,7 @@ def default_parameters(parameters):
                 if arg not in method._parameters and arg != "self":
                     logger.warning(
                         "Formal PyNN specifies that {} should be set using "
-                        "initial_values not cell_params".format(arg))
+                        "initial_values not cell_params", arg)
             wrapped(*args, **kwargs)
 
         # Store the real method in the returned object
@@ -95,9 +97,10 @@ def default_parameters(parameters):
 
 
 def default_initial_values(state_variables):
-    """ Specifies arguments which are state variables.  Only works on the\
-        ``__init__`` method of a class that is additionally decorated with\
-        :py:meth:`defaults`
+    """
+    Specifies arguments which are state variables.  Only works on the
+    ``__init__`` method of a class that is additionally decorated with
+    :py:meth:`defaults`
 
     :param iterable(str) state_variables:
         The names of the arguments that are state variables
@@ -122,7 +125,7 @@ def default_initial_values(state_variables):
                 if arg in method._state_variables:
                     logger.warning(
                         "Formal PyNN specifies that {} should be set using "
-                        "initial_values not cell_params".format(arg))
+                        "initial_values not cell_params", arg)
             wrapped(*args, **kwargs)
 
         # Store the real method in the returned object
@@ -132,19 +135,20 @@ def default_initial_values(state_variables):
 
 
 def defaults(cls):
-    """ Get the default parameters and state variables from the arguments to\
-        the ``__init__`` method.  This uses the decorators\
-        :py:func:`default_parameters` and :py:func:`default_initial_values` to\
-        determine the parameters and state variables respectively.\
-        If only one is specified, the other is assumed to be the remaining\
-        arguments.\
-        If neither are specified, it is assumed that all default arguments are\
-        parameters.
+    """
+    Get the default parameters and state variables from the arguments to
+    the ``__init__`` method.  This uses the decorators
+    :py:func:`default_parameters` and :py:func:`default_initial_values` to
+    determine the parameters and state variables respectively.
+    If only one is specified, the other is assumed to be the remaining
+    arguments.
+    If neither are specified, it is assumed that all default arguments are
+    parameters.
     """
     if not inspect.isclass(cls):
         raise TypeError(f"{cls} is not a class")
     if not hasattr(cls, "__init__"):
-        raise AttributeError("No __init__ found in {}".format(cls))
+        raise AttributeError(f"No __init__ found in {cls}")
     init = getattr(cls, "__init__")
     while hasattr(init, "_method"):
         init = getattr(init, "_method")

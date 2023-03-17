@@ -22,8 +22,9 @@ _population_parameters["n_steps_per_timestep"] = 1
 
 
 class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
-    """ A neuron model that follows the sPyNNaker standard composed model \
-        pattern for point neurons.
+    """
+    A neuron model that follows the sPyNNaker standard composed model
+    pattern for point neurons.
     """
 
     __slots__ = []

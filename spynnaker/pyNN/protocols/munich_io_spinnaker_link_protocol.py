@@ -45,19 +45,22 @@ def _munich_key(instr_id, dim=0, format_bit=0):
 
 
 def get_munich_i(key):
-    """ Get the instruction field from the key.
+    """
+    Get the instruction field from the key.
     """
     return key & _I_MASK
 
 
 def get_munich_f(key):
-    """ Get the format field from the key.
+    """
+    Get the format field from the key.
     """
     return key & _F_MASK
 
 
 def get_munich_d(key):
-    """ Get the device field from the key.
+    """
+    Get the device field from the key.
     """
     return key & _D_MASK
 
@@ -271,7 +274,9 @@ class RetinaPayload(Enum):
 
 
 class MUNICH_MODES(Enum):
-    """types of modes supported by this protocol"""
+    """
+    Types of modes supported by this protocol.
+    """
     RESET_TO_DEFAULT = 0
     PUSH_BOT = 1
     SPOMNIBOT = 2
@@ -281,7 +286,8 @@ class MUNICH_MODES(Enum):
 
 
 class MunichIoSpiNNakerLinkProtocol(object):
-    """ Provides Multicast commands for the Munich SpiNNaker-Link protocol
+    """
+    Provides Multicast commands for the Munich SpiNNaker-Link protocol.
     """
     __slots__ = ["__instance_key", "__mode", "__uart_id"]
 
@@ -295,9 +301,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def __init__(self, mode, instance_key=None, uart_id=0):
         """
-        :param mode: The mode of operation of the protocol
-        :type modes:
-            ~spynnaker.pyNN.protocols.MUNICH_MODES
+        :param ~spynnaker.pyNN.protocols.MUNICH_MODES mode:
+            The mode of operation of the protocol
         :param instance_key: The optional instance key to use
         :type instance_key: int or None
         :param int uart_id: The ID of the UART when needed
@@ -333,13 +338,15 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     @staticmethod
     def sent_mode_command():
-        """ True if the mode command has ever been requested by any instance
+        """
+        True if the mode command has ever been requested by any instance.
         """
         return MunichIoSpiNNakerLinkProtocol.__sent_mode_command
 
     @property
     def instance_key(self):
-        """ The key of this instance of the protocol
+        """
+        The key of this instance of the protocol.
 
         :rtype: int
         """
@@ -652,7 +659,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         if self.__mode is not MUNICH_MODES.PUSH_BOT:
             raise ConfigurationException(
                 "The mode you configured is not the PushBot, and so this "
-                "message is invalid for mode {}".format(self.__mode))
+                f"message is invalid for mode {self.__mode}")
 
     @property
     def push_bot_laser_config_total_period_key(self):
@@ -837,7 +844,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def set_retina_transmission(
             self, retina_key=RetinaKey.NATIVE_128_X_128,
             retina_payload=None, time=None):
-        """ Set the retina transmission key
+        """
+        Set the retina transmission key.
 
         :param RetinaKey retina_key: the new key for the retina
         :param retina_payload:

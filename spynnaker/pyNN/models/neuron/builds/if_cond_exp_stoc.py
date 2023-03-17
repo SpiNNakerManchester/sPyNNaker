@@ -23,7 +23,8 @@ from spynnaker.pyNN.models.neuron.threshold_types import (
 
 
 class IFCondExpStoc(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with a stochastic threshold.
+    """
+    Leaky integrate and fire neuron with a stochastic threshold.
 
     Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical
     microcircuit models. *PLoS Computational Biology.* 2013;9(11):e1003311.

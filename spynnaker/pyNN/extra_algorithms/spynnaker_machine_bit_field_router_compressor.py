@@ -37,7 +37,8 @@ _RERUN_IOBUF_NAME_PATTERN = "rerun_of_synaptic_expander_on_{}_{}_{}.txt"
 
 
 def _locate_expander_rerun_targets(bitfield_targets):
-    """ removes host based cores for synaptic matrix regeneration
+    """
+    Removes host based cores for synaptic matrix regeneration.
 
     :param ~.ExecutableTargets bitfield_targets: the cores that were used
     :return: new targets for synaptic expander
@@ -79,7 +80,8 @@ def __machine_expandables(cores):
 
 def _rerun_synaptic_cores(
         synaptic_expander_rerun_cores, needs_sync_barrier):
-    """ reruns the synaptic expander
+    """
+    Reruns the synaptic expander.
 
     :param ~.ExecutableTargets synaptic_expander_rerun_cores:
         the cores to rerun the synaptic matrix generator for
@@ -96,8 +98,8 @@ def _rerun_synaptic_cores(
 
 
 def spynnaker_machine_bitfield_ordered_covering_compressor():
-    """ entrance for routing table compression with bit field
-
+    """
+    Entrance for routing table compression with bit field.
     """
     compressor_executable_targets = \
         machine_bit_field_ordered_covering_compressor()
@@ -111,8 +113,8 @@ def spynnaker_machine_bitfield_ordered_covering_compressor():
 
 
 def spynnaker_machine_bitField_pair_router_compressor():
-    """ entrance for routing table compression with bit field
-
+    """
+    Entrance for routing table compression with bit field.
     """
     compressor_executable_targets = \
         machine_bit_field_pair_router_compressor()

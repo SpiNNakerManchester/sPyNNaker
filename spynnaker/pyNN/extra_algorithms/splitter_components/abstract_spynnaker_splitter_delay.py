@@ -37,7 +37,7 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
 
     def accepts_edges_from_delay_vertex(self):
         """
-        Confirms that the splitter's vertices can handle spikes coming from a \
+        Confirms that the splitter's vertices can handle spikes coming from a
         :py:class:`DelayExtensionMachineVertex`.
 
         If this method returns False and the users ask for a delay larger than

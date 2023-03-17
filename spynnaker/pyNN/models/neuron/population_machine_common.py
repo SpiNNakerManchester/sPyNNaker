@@ -47,7 +47,8 @@ class PopulationMachineCommon(
         AbstractReceiveBuffersToHost,
         AbstractHasProfileData,
         AbstractHasAssociatedBinary):
-    """ A common machine vertex for all population binaries
+    """
+    A common machine vertex for all population binaries.
     """
 
     __slots__ = [
@@ -119,7 +120,8 @@ class PopulationMachineCommon(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     def _write_common_data_spec(self, spec, rec_regions):
-        """ Write the data specification for the common regions
+        """
+        Write the data specification for the common regions.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to

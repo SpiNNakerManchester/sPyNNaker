@@ -20,7 +20,8 @@ from pacman.utilities.constants import BITS_IN_KEY
 
 class ICUBRetinaDevice(
         Application2DSpiNNakerLinkVertex, HasShapeKeyFields):
-    """ An ICUB retina device connected to SpiNNaker using a SpiNNakerLink
+    """
+    An ICUB retina device connected to SpiNNaker using a SpiNNakerLink.
     """
 
     __slots__ = [
@@ -30,7 +31,6 @@ class ICUBRetinaDevice(
     def __init__(self, base_key=0, width=304, height=240, sub_width=16,
                  sub_height=16, spinnaker_link_id=0, board_address=None):
         """
-
         :param int base_key: The key that is common over the whole vertex
         :param int width: The width of the retina in pixels
         :param int height: The height of the retina in pixels

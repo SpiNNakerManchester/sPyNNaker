@@ -34,8 +34,9 @@ class MachineMunichMotorDevice(
         MachineVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary,
         ProvidesProvenanceDataFromMachineImpl):
-    """ An Omnibot motor control device. This has a real vertex and an \
-        external device vertex.
+    """
+    An Omnibot motor control device. This has a real vertex and an
+    external device vertex.
     """
     __slots__ = [
         "__continue_if_not_different",
@@ -169,7 +170,8 @@ class MachineMunichMotorDevice(
         spec.end_specification()
 
     def reserve_memory_regions(self, spec):
-        """ Reserve SDRAM space for memory areas:
+        """
+        Reserve SDRAM space for memory areas:
 
         #. Area for information on what data to record
         #. area for start commands

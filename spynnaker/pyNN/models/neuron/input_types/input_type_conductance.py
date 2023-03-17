@@ -22,7 +22,8 @@ E_REV_I = "e_rev_I"
 
 
 class InputTypeConductance(AbstractInputType):
-    """ The conductance input type
+    """
+    The conductance input type.
     """
     __slots__ = [
         "__e_rev_E",

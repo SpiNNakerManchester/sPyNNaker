@@ -38,8 +38,9 @@ class MunichMotorDevice(
         AbstractOneAppOneMachineVertex,
         AbstractVertexWithEdgeToDependentVertices,
         PopulationApplicationVertex):
-    """ An Omnibot motor control device. This has a real vertex and an \
-        external device vertex.
+    """
+    An Omnibot motor control device. This has a real vertex and an
+    external device vertex.
     """
 
     __slots__ = ["__dependent_vertices"]

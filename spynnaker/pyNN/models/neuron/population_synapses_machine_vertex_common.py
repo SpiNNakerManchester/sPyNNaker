@@ -76,7 +76,8 @@ class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
 class PopulationSynapsesMachineVertexCommon(
         PopulationMachineCommon,
         SendsSynapticInputsOverSDRAM):
-    """ Common parts of a machine vertex for the synapses of a Population
+    """
+    Common parts of a machine vertex for the synapses of a Population.
     """
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
@@ -100,7 +101,9 @@ class PopulationSynapsesMachineVertexCommon(
         "__partition_id"]
 
     class REGIONS(Enum):
-        """Regions for populations."""
+        """
+        Regions for populations.
+        """
         SYSTEM = 0
         PROVENANCE_DATA = 1
         PROFILING = 2
@@ -160,7 +163,8 @@ class PopulationSynapsesMachineVertexCommon(
         self.__partition_id = None
 
     def set_sdram_partition(self, sdram_partition):
-        """ Set the SDRAM partition.  Must only be called once per instance
+        """
+        Set the SDRAM partition.  Must only be called once per instance.
 
         :param ~pacman.model.graphs.machine\
                 .SourceSegmentedSDRAMMachinePartition sdram_partition:
@@ -172,8 +176,9 @@ class PopulationSynapsesMachineVertexCommon(
         self.__sdram_partition = sdram_partition
 
     def set_neuron_vertex_and_partition_id(self, neuron_vertex, partition_id):
-        """ Set the neuron vertex and partition ID for the case with a self-
-            connection.
+        """
+        Set the neuron vertex and partition ID for the case with a
+        self-connection.
 
         :param ~pacman.model.graphs.machine.MachineEdge neuron_to_synapse_edge:
             The edge that we will receive spikes from
@@ -183,14 +188,14 @@ class PopulationSynapsesMachineVertexCommon(
 
     @staticmethod
     def __get_binary_file_name(app_vertex):
-        """ Get the local binary filename for this vertex.  Static because at
-            the time this is needed, the local app_vertex is not set.
+        """
+        Get the local binary filename for this vertex.  Static because at
+        the time this is needed, the local app_vertex is not set.
 
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
         :rtype: str
         """
-
         # Reunite title and extension and return
         return "synapses" + app_vertex.synapse_executable_suffix + ".aplx"
 
@@ -201,7 +206,8 @@ class PopulationSynapsesMachineVertexCommon(
         return ids
 
     def _write_sdram_edge_spec(self, spec):
-        """ Write information about SDRAM Edge
+        """
+        Write information about SDRAM Edge.
 
         :param DataSpecificationGenerator spec:
             The generator of the specification to write
@@ -218,7 +224,8 @@ class PopulationSynapsesMachineVertexCommon(
             "Simulation", "transfer_overhead_clocks"))
 
     def _write_key_spec(self, spec):
-        """ Write key config region
+        """
+        Write key config region.
 
         :param DataSpecificationGenerator spec:
             The generator of the specification to write
@@ -249,7 +256,7 @@ class PopulationSynapsesMachineVertexCommon(
                       ReceivesSynapticInputsOverSDRAM):
             return sdram_machine_edge.post_vertex.n_bytes_for_transfer
         raise SynapticConfigurationException(
-            "Unknown post vertex type in edge {}".format(sdram_machine_edge))
+            f"Unknown post vertex type in edge {sdram_machine_edge}")
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
@@ -261,7 +268,8 @@ class PopulationSynapsesMachineVertexCommon(
 
     @abstractmethod
     def _parse_synapse_provenance(self, label, x, y, p, provenance_data):
-        """ Extract and yield synapse provenance
+        """
+        Extract and yield synapse provenance.
 
         :param str label: The label of the node
         :param int x: x coordinate of the chip where this core
@@ -274,7 +282,8 @@ class PopulationSynapsesMachineVertexCommon(
 
     def _parse_spike_processing_fast_provenance(
             self, label, x, y, p, provenance_data):
-        """ Extract and yield spike processing provenance
+        """
+        Extract and yield spike processing provenance.
 
         :param str label: The label of the node
         :param int x: x coordinate of the chip where this core

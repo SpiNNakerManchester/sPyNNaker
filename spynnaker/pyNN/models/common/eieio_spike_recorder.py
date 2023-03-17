@@ -21,10 +21,11 @@ _TWO_WORDS = struct.Struct("<II")
 
 
 class EIEIOSpikeRecorder(object):
-    """ Records spikes using EIEIO format
     """
-    __slots__ = [
-        "__record"]
+    Records spikes using EIEIO format.
+    """
+    __slots__ = (
+        "__record")
 
     def __init__(self):
         self.__record = False
@@ -38,7 +39,9 @@ class EIEIOSpikeRecorder(object):
 
     @record.setter
     def record(self, new_state):
-        """ Old method assumed to be spikes """
+        """
+        Old method assumed to be spikes.
+        """
         self.__record = new_state
 
     def set_recording(self, new_state, sampling_interval=None):

@@ -61,7 +61,8 @@ SynapseRegions = namedtuple(
 
 
 class SynapticMatrices(object):
-    """ Handler of synaptic matrices for a core of a population vertex
+    """
+    Handler of synaptic matrices for a core of a population vertex.
     """
 
     __slots__ = [
@@ -141,7 +142,8 @@ class SynapticMatrices(object):
 
     @property
     def max_gen_data(self):
-        """  The maximum amount of data to be generated for the synapses.
+        """
+        The maximum amount of data to be generated for the synapses.
 
         :rtype: int
         """
@@ -149,7 +151,8 @@ class SynapticMatrices(object):
 
     @property
     def bit_field_size(self):
-        """ The size of the bit field data
+        """
+        The size of the bit field data.
 
         :rtype: int
         """
@@ -157,10 +160,11 @@ class SynapticMatrices(object):
 
     @property
     def host_generated_block_addr(self):
-        """ The address within the synaptic region after the last block
-            written by the on-host synaptic generation i.e. the start of
-            the space that can be overwritten provided the synapse expander
-            is run again
+        """
+        The address within the synaptic region after the last block
+        written by the on-host synaptic generation, i.e. the start of
+        the space that can be overwritten provided the synapse expander
+        is run again.
 
         :rtype: int
         """
@@ -168,9 +172,10 @@ class SynapticMatrices(object):
 
     @property
     def on_chip_generated_matrix_size(self):
-        """ The size of the space used by the generated matrix i.e. the
-            space that can be overwritten provided the synapse expander
-            is run again
+        """
+        The size of the space used by the generated matrix, i.e. the
+        space that can be overwritten provided the synapse expander
+        is run again.
 
         :rtype: int
         """
@@ -267,7 +272,8 @@ class SynapticMatrices(object):
 
     def write_synaptic_data(
             self, spec, post_vertex_slice, references):
-        """ Write the synaptic data for all incoming projections
+        """
+        Write the synaptic data for all incoming projections.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to
@@ -275,9 +281,8 @@ class SynapticMatrices(object):
             The slice of the post-vertex the matrix is for
         :param SynapseRegions references:
             Regions which are referenced; each region which is not referenced
-            can be None.
+            can be `None`.
         """
-
         # Reserve the region
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
@@ -303,7 +308,8 @@ class SynapticMatrices(object):
 
     def __write_synapse_expander_data_spec(
             self, spec, post_vertex_slice, connection_builder_ref=None):
-        """ Write the data spec for the synapse expander
+        """
+        Write the data spec for the synapse expander.
 
         :param ~.DataSpecificationGenerator spec:
             The specification to write to
@@ -357,7 +363,8 @@ class SynapticMatrices(object):
 
     def __get_app_key_and_mask(
             self, r_info, n_stages, max_atoms_per_core, n_colour_bits):
-        """ Get a key and mask for an incoming application vertex as a whole
+        """
+        Get a key and mask for an incoming application vertex as a whole.
 
         :param RoutingInfo r_info: The routing information for the vertex
         :param n_stages: The number of delay stages
@@ -377,7 +384,8 @@ class SynapticMatrices(object):
                            mask_size, n_atoms * n_stages, n_colour_bits)
 
     def __app_key_and_mask(self, app_edge):
-        """ Get a key and mask for an incoming application vertex as a whole
+        """
+        Get a key and mask for an incoming application vertex as a whole.
 
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
@@ -392,8 +400,9 @@ class SynapticMatrices(object):
             app_edge.pre_vertex.n_colour_bits)
 
     def __delay_app_key_and_mask(self, app_edge):
-        """ Get a key and mask for a whole incoming delayed application\
-            vertex, or return None if no delay edge exists
+        """
+        Get a key and mask for a whole incoming delayed application
+        vertex, or return `None` if no delay edge exists.
 
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
@@ -413,7 +422,8 @@ class SynapticMatrices(object):
             app_edge.pre_vertex.n_colour_bits)
 
     def get_connections_from_machine(self, placement, app_edge, synapse_info):
-        """ Get the synaptic connections from the machine
+        """
+        Get the synaptic connections from the machine.
 
         :param ~pacman.model.placements.Placement placement:
             Where the vertices are on the machine
@@ -429,8 +439,9 @@ class SynapticMatrices(object):
         return matrix.get_connections(placement)
 
     def read_generated_connection_holders(self, placement):
-        """ Fill in any pre-run connection holders for data which is generated
-            on the machine, after it has been generated
+        """
+        Fill in any pre-run connection holders for data which is generated
+        on the machine, after it has been generated.
 
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
@@ -440,14 +451,16 @@ class SynapticMatrices(object):
 
     @property
     def gen_on_machine(self):
-        """ Whether any matrices need to be generated on the machine
+        """
+        Whether any matrices need to be generated on the machine.
 
         :rtype: bool
         """
         return self.__gen_on_machine
 
     def get_index(self, app_edge, synapse_info):
-        """ Get the index of an incoming projection in the population table
+        """
+        Get the index of an incoming projection in the population table.
 
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
@@ -459,8 +472,9 @@ class SynapticMatrices(object):
 
 
 class _AppKeyInfo(object):
-    """ An object which holds an application key and mask along with the other
-        details
+    """
+    An object which holds an application key and mask along with the other
+    details.
     """
 
     __slots__ = ["app_key", "app_mask", "core_mask", "core_shift", "n_neurons",
@@ -469,7 +483,6 @@ class _AppKeyInfo(object):
     def __init__(self, app_key, app_mask, core_mask, core_shift, n_neurons,
                  n_colour_bits):
         """
-
         :param int app_key: The application-level key
         :param int app_mask: The application-level mask
         :param int core_mask: The mask to get the core from the key
@@ -487,7 +500,8 @@ class _AppKeyInfo(object):
 
     @property
     def key_and_mask(self):
-        """ Convenience method to get the key and mask as an object
+        """
+        Convenience method to get the key and mask as an object.
 
         :rtype: BaseKeyAndMask
         """

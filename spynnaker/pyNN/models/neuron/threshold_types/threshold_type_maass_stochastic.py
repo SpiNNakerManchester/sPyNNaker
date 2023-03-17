@@ -25,11 +25,12 @@ TIMESTEP = "timestep"
 
 
 class ThresholdTypeMaassStochastic(AbstractThresholdType):
-    """ A stochastic threshold.
+    """
+    A stochastic threshold.
 
-    Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical \
-    microcircuit models. *PLoS Computational Biology.* 2013;9(11):e1003311. \
-    `doi:10.1371/journal.pcbi.1003311 \
+    Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical
+    microcircuit models. *PLoS Computational Biology.* 2013;9(11):e1003311.
+    `doi:10.1371/journal.pcbi.1003311
     <https://doi.org/10.1371/journal.pcbi.1003311>`_
     """
     __slots__ = [

@@ -19,8 +19,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 class KernelConnector(_BaseClass):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D array.\
-    Connect every post(row, col) neuron to many pre(row, col, kernel) through\
+    Where the pre- and post-synaptic populations are considered as a 2D array.
+    Connect every post(row, col) neuron to many pre(row, col, kernel) through
     a (kernel) set of weights and/or delays.
 
     .. deprecated:: 6.0

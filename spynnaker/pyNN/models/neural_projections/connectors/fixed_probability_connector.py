@@ -35,8 +35,8 @@ N_GEN_PARAMS = 6
 
 class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
                                 AbstractGenerateConnectorOnHost):
-    """ For each pair of pre-post cells, the connection probability is \
-        constant.
+    """
+    For each pair of pre-post cells, the connection probability is constant.
     """
 
     __slots__ = [
@@ -169,7 +169,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return "FixedProbabilityConnector({})".format(self._p_connect)
+        return f"FixedProbabilityConnector({self._p_connect})"
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)

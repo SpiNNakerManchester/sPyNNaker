@@ -60,7 +60,8 @@ STATS_BY_NAME = {
 
 
 def check_directory_exists_and_create_if_not(filename):
-    """ Create a parent directory for a file if it doesn't exist
+    """
+    Create a parent directory for a file if it doesn't exist.
 
     :param str filename: The file whose parent directory is to be created
     """
@@ -70,7 +71,8 @@ def check_directory_exists_and_create_if_not(filename):
 
 
 def convert_param_to_numpy(param, no_atoms):
-    """ Convert parameters into numpy arrays.
+    """
+    Convert parameters into numpy arrays.
 
     :param param: the param to convert
     :type param: ~pyNN.random.NumpyRNG or int or float or list(int) or
@@ -105,7 +107,8 @@ def convert_param_to_numpy(param, no_atoms):
 
 
 def convert_to(value, data_type):
-    """ Convert a value to a given data type
+    """
+    Convert a value to a given data type.
 
     :param value: The value to convert
     :param ~data_specification.enums.DataType data_type:
@@ -119,7 +122,9 @@ def convert_to(value, data_type):
 
 def read_in_data_from_file(
         file_path, min_atom, max_atom, min_time, max_time, extra=False):
-    """ Read in a file of data values where the values are in a format of:
+    """
+    Read in a file of data values where the values are in a format of::
+
         <time>\t<atom ID>\t<data value>
 
     :param str file_path: absolute path to a file containing the data
@@ -154,7 +159,7 @@ def read_in_data_from_file(
                 atom_ids.append(neuron_id)
                 data_items.append(data_value)
             else:
-                print("failed to enter {}:{}".format(neuron_id, time))
+                print(f"failed to enter {neuron_id}:{time}")
 
     result = numpy.dstack((atom_ids, times, data_items))[0]
     return result[numpy.lexsort((times, atom_ids))]
@@ -162,7 +167,9 @@ def read_in_data_from_file(
 
 def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
                           min_time=0, max_time=float('inf'), split_value="\t"):
-    """ Read spikes from a file formatted as:
+    """
+    Read spikes from a file formatted as::
+
         <time>\t<neuron ID>
 
     :param str file_path: absolute path to a file containing spike values
@@ -176,7 +183,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     :type max_time: float or int
     :param str split_value: the pattern to split by
     :return:
-        a numpy array with max_atom elements each of which is a list of\
+        a numpy array with max_atom elements each of which is a list of
         spike times.
     :rtype: numpy.ndarray(int, int)
     """
@@ -213,9 +220,10 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
 
 def get_probable_maximum_selected(
         n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
-    """ Get the likely maximum number of items that will be selected from a\
-        set of n_trials from a total set of n_total_trials\
-        with a probability of selection of selection_prob
+    """
+    Get the likely maximum number of items that will be selected from a
+    set of n_trials from a total set of n_total_trials
+    with a probability of selection of selection_prob.
     """
     prob = 1.0 - (chance / float(n_total_trials))
     val = binom.ppf(prob, n_trials, selection_prob)
@@ -229,25 +237,28 @@ def get_probable_maximum_selected(
 
 def get_probable_minimum_selected(
         n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
-    """ Get the likely minimum number of items that will be selected from a\
-        set of n_trials from a total set of n_total_trials\
-        with a probability of selection of selection_prob
+    """
+    Get the likely minimum number of items that will be selected from a
+    set of n_trials from a total set of n_total_trials
+    with a probability of selection of selection_prob.
     """
     prob = (chance / float(n_total_trials))
     return binom.ppf(prob, n_trials, selection_prob)
 
 
 def get_probability_within_range(dist, lower, upper):
-    """ Get the probability that a value will fall within the given range for\
-        a given RandomDistribution
+    """
+    Get the probability that a value will fall within the given range for
+    a given RandomDistribution.
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.cdf(dist, upper) - stats.cdf(dist, lower)
 
 
 def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
-    """ Get the likely maximum value of a RandomDistribution given a\
-        number of draws
+    """
+    Get the likely maximum value of a RandomDistribution given a
+    number of draws.
     """
     stats = STATS_BY_NAME[dist.name]
     prob = 1.0 - (chance / float(n_items))
@@ -255,8 +266,9 @@ def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
 
 
 def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
-    """ Get the likely minimum value of a RandomDistribution given a\
-        number of draws
+    """
+    Get the likely minimum value of a RandomDistribution given a
+    number of draws.
     """
     stats = STATS_BY_NAME[dist.name]
     prob = chance / float(n_items)
@@ -264,46 +276,52 @@ def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
 
 
 def get_mean(dist):
-    """ Get the mean of a RandomDistribution
+    """
+    Get the mean of a RandomDistribution.
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.mean(dist)
 
 
 def get_standard_deviation(dist):
-    """ Get the standard deviation of a RandomDistribution
+    """
+    Get the standard deviation of a RandomDistribution.
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.std(dist)
 
 
 def get_variance(dist):
-    """ Get the variance of a RandomDistribution
+    """
+    Get the variance of a RandomDistribution.
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.var(dist)
 
 
 def high(dist):
-    """ Gets the high or max boundary value for this distribution
+    """
+    Gets the high or max boundary value for this distribution.
 
-    Could return None
+    Could return `None`.
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.high(dist)
 
 
 def low(dist):
-    """ Gets the high or min boundary value for this distribution
+    """
+    Gets the high or min boundary value for this distribution.
 
-    Could return None
+    Could return `None`.
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.low(dist)
 
 
 def _validate_mars_kiss_64_seed(seed):
-    """ Update the seed to make it compatible with the RNG algorithm
+    """
+    Update the seed to make it compatible with the RNG algorithm.
     """
     if seed[1] == 0:
         # y (<- seed[1]) can't be zero so set to arbitrary non-zero if so
@@ -315,9 +333,10 @@ def _validate_mars_kiss_64_seed(seed):
 
 
 def create_mars_kiss_seeds(rng):
-    """ generates and checks that the seed values generated by the given\
-        random number generator or seed to a random number generator are\
-        suitable for use as a mars 64 kiss seed.
+    """
+    Generates and checks that the seed values generated by the given
+    random number generator or seed to a random number generator are
+    suitable for use as a mars 64 kiss seed.
 
     :param rng: the random number generator.
     :type rng: ~numpy.random.RandomState
@@ -335,7 +354,8 @@ def create_mars_kiss_seeds(rng):
 
 
 def get_n_bits(n_values):
-    """ Determine how many bits are required for the given number of values
+    """
+    Determine how many bits are required for the given number of values.
 
     :param int n_values: the number of values (starting at 0)
     :return: the number of bits required to express that many values
@@ -350,12 +370,12 @@ def get_n_bits(n_values):
 
 def moved_in_v6(old_location, _):
     """
-    Tells the users that old code is no lonfger implemented
+    Tells the users that old code is no longer implemented.
 
     :param str old_location: old import
     :raise: NotImplementedError
     """
-    raise NotImplementedError("Old import: {}".format(old_location))
+    raise NotImplementedError(f"Old import: {old_location}")
 
 
 def moved_in_v7(old_location, new_location):
@@ -369,15 +389,15 @@ def moved_in_v7(old_location, new_location):
     :raise: an exception if in CONTINUOUS_INTEGRATION
     """
     if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-        raise NotImplementedError("Old import: {}".format(old_location))
+        raise NotImplementedError(f"Old import: {old_location}")
     logger.warning("File {} moved to {}. Please fix your imports. "
-                   "In version 8 this will fail completely."
-                   "".format(old_location, new_location))
+                   "In version 8 this will fail completely.",
+                   old_location, new_location)
 
 
 def moved_in_v7_warning(message):
     """
-    Warns the user that they are using old code
+    Warns the user that they are using old code.
 
     In version 8 this will be upgraded to a exception and then later removed
 
@@ -389,7 +409,8 @@ def moved_in_v7_warning(message):
 
 
 def get_time_to_write_us(n_bytes, n_cores):
-    """ Determine how long a write of a given number of bytes will take in us
+    """
+    Determine how long a write of a given number of bytes will take in us.
 
     :param int n_bytes: The number of bytes to transfer
     :param int n_cores: How many cores will be writing at the same time

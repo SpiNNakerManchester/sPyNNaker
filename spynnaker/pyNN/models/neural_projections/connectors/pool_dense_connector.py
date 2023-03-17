@@ -39,8 +39,8 @@ _DIM_DTYPE = [("mask", "uint32"), ("shift", "uint32"), ("pre_start", "uint16"),
 
 class PoolDenseConnector(AbstractConnector):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D\
-    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
+    Where the pre- and post-synaptic populations are considered as a 2D
+    array. Connect every post(row, col) neuron to many pre(row, col, kernel)
     through a (kernel) set of weights and/or delays.
     """
 
@@ -58,7 +58,7 @@ class PoolDenseConnector(AbstractConnector):
                  verbose=False, callback=None):
         """
         :param weights:
-            The synaptic strengths
+            The synaptic strengths.
             Can be:
             * single value: the same value will be used for all weights
             * list: the total number of elements must be\
@@ -171,7 +171,8 @@ class PoolDenseConnector(AbstractConnector):
             pre_shape, self.__pool_shape, self.__pool_stride)
 
     def __get_n_weights(self, pre_shape, post_shape):
-        """ Get the expected number of weights
+        """
+        Get the expected number of weights.
         """
         shape = self.__get_pre_in_post_shape(pre_shape)
         return numpy.prod(shape) * numpy.prod(post_shape)
@@ -244,7 +245,8 @@ class PoolDenseConnector(AbstractConnector):
             self.__weights, n_conns, synapse_info)
 
     def __pre_as_post(self, pre_coords):
-        """ Write pre coords as post coords.
+        """
+        Write pre coords as post coords.
 
         :param Iterable pre_coords: An iterable of (x, y) coordinates
         :rtype: numpy.ndarray
@@ -348,7 +350,8 @@ class PoolDenseConnector(AbstractConnector):
         spec.write_array(final_weights.view(numpy.uint32))
 
     def __recip(self, v):
-        """ Compute the reciprocal of a number as an signed 1-bit integer,
-            14-bit fractional fixed point number, encoded in an integer
+        """
+        Compute the reciprocal of a number as an signed 1-bit integer,
+        14-bit fractional fixed point number, encoded in an integer.
         """
         return int(round((1 / v) * (1 << 14)))

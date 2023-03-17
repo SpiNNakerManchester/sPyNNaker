@@ -22,7 +22,8 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
 
     @abstractmethod
     def is_same_as(self, timing_dependence):
-        """ Determine if this timing dependence is the same as another
+        """
+        Determine if this timing dependence is the same as another.
 
         :param AbstractTimingDependence timing_dependence:
         :rtype: bool
@@ -30,28 +31,32 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
 
     @abstractproperty
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
 
     @abstractproperty
     def pre_trace_n_bytes(self):
-        """ The number of bytes used by the pre-trace of the rule per neuron
+        """
+        The number of bytes used by the pre-trace of the rule per neuron.
 
         :rtype: int
         """
 
     @abstractmethod
     def get_parameters_sdram_usage_in_bytes(self):
-        """ Get the amount of SDRAM used by the parameters of this rule
+        """
+        Get the amount of SDRAM used by the parameters of this rule.
 
         :rtype: int
         """
 
     @abstractproperty
     def n_weight_terms(self):
-        """ The number of weight terms expected by this timing rule
+        """
+        The number of weight terms expected by this timing rule.
 
         :rtype: int
         """
@@ -59,7 +64,8 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
     @abstractmethod
     def write_parameters(
             self, spec, global_weight_scale, synapse_weight_scales):
-        """ Write the parameters of the rule to the spec
+        """
+        Write the parameters of the rule to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The specification to write to
@@ -71,15 +77,17 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
 
     @abstractproperty
     def synaptic_structure(self):
-        """ Get the synaptic structure of the plastic part of the rows
+        """
+        Get the synaptic structure of the plastic part of the rows.
 
         :rtype: AbstractSynapseStructure
         """
 
     @abstractmethod
     def get_parameter_names(self):
-        """ Return the names of the parameters supported by this timing\
-            dependency model.
+        """
+        Return the names of the parameters supported by this timing
+        dependency model.
 
         :rtype: iterable(str)
         """

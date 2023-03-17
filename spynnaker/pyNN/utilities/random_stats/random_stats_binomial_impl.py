@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsBinomialImpl(AbstractRandomStats):
-    """ An implementation of AbstractRandomStats for binomial distributions
+    """
+    An implementation of AbstractRandomStats for binomial distributions.
     """
 
     def _get_params(self, dist):

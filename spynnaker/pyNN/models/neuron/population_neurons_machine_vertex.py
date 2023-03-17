@@ -36,7 +36,8 @@ SDRAM_PARAMS_SIZE = 6 * BYTES_PER_WORD
 
 
 class NeuronMainProvenance(ctypes.LittleEndianStructure):
-    """ Provenance items from synapse processing
+    """
+    Provenance items from synapse processing.
     """
     _fields_ = [
         # the maximum number of times the timer tick didn't complete in time
@@ -52,7 +53,8 @@ class PopulationNeuronsMachineVertex(
         AbstractGeneratesDataSpecification,
         AbstractRewritesDataSpecification,
         ReceivesSynapticInputsOverSDRAM):
-    """ A machine vertex for the Neurons of PyNN Populations
+    """
+    A machine vertex for the Neurons of PyNN Populations.
     """
 
     __slots__ = [
@@ -66,7 +68,9 @@ class PopulationNeuronsMachineVertex(
         "__regenerate_data"]
 
     class REGIONS(Enum):
-        """Regions for populations."""
+        """
+        Regions for populations.
+        """
         SYSTEM = 0
         CORE_PARAMS = 1
         PROVENANCE_DATA = 2
@@ -165,7 +169,8 @@ class PopulationNeuronsMachineVertex(
         return self.__max_atoms_per_core
 
     def set_sdram_partition(self, sdram_partition):
-        """ Set the SDRAM partition.  Must only be called once per instance
+        """
+        Set the SDRAM partition.  Must only be called once per instance.
 
         :param ~pacman.model.graphs.machine\
                 .SourceSegmentedSDRAMMachinePartition sdram_partition:
@@ -178,8 +183,9 @@ class PopulationNeuronsMachineVertex(
 
     @staticmethod
     def __get_binary_file_name(app_vertex):
-        """ Get the local binary filename for this vertex.  Static because at
-            the time this is needed, the local app_vertex is not set.
+        """
+        Get the local binary filename for this vertex.  Static because at
+        the time this is needed, the local app_vertex is not set.
 
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -285,7 +291,7 @@ class PopulationNeuronsMachineVertex(
                       SendsSynapticInputsOverSDRAM):
             return self.n_bytes_for_transfer
         raise SynapticConfigurationException(
-            "Unknown pre vertex type in edge {}".format(sdram_machine_edge))
+            f"Unknown pre vertex type in edge {sdram_machine_edge}")
 
     @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
     def set_do_neuron_regeneration(self):

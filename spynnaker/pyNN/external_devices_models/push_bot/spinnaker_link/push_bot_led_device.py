@@ -20,7 +20,8 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 class PushBotSpiNNakerLinkLEDDevice(
         PushBotEthernetLEDDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
-    """ The LED of a PushBot
+    """
+    The LED of a PushBot
     """
     __slots__ = []
 

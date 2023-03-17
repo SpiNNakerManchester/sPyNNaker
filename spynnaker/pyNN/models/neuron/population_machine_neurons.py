@@ -30,7 +30,8 @@ from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):
-    """ Provenance items from neuron processing
+    """
+    Provenance items from neuron processing.
     """
     _fields_ = [
         # The timer tick at the end of simulation
@@ -55,7 +56,8 @@ NeuronRegions = namedtuple(
 
 class PopulationMachineNeurons(
         AbstractNeuronExpandable, allow_derivation=True):
-    """ Mix-in for machine vertices that have neurons in them
+    """
+    Mix-in for machine vertices that have neurons in them.
     """
 
     # This MUST stay empty to allow mixing with other things with slots
@@ -63,74 +65,86 @@ class PopulationMachineNeurons(
 
     @abstractproperty
     def _app_vertex(self):
-        """ The application vertex of the machine vertex.
+        """
+        The application vertex of the machine vertex.
 
-        :note: This is likely to be available via the MachineVertex.
+        .. note::
+            This is likely to be available via the MachineVertex.
 
         :rtype: AbstractPopulationVertex
         """
 
     @abstractproperty
     def _vertex_slice(self):
-        """ The slice of the application vertex atoms on this machine vertex.
+        """
+        The slice of the application vertex atoms on this machine vertex.
 
-        :note: This is likely to be available via the MachineVertex.
+        .. note::
+            This is likely to be available via the MachineVertex.
 
         :rtype: ~pacman.model.graphs.common.Slice
         """
 
     @abstractproperty
     def _slice_index(self):
-        """ The index of the slice of this vertex in the list of slices
+        """
+        The index of the slice of this vertex in the list of slices.
 
         :rtype: int
         """
 
     @abstractproperty
     def _key(self):
-        """ The key for spikes.
+        """
+        The key for spikes.
 
         :rtype: int
         """
 
     @abstractmethod
     def _set_key(self, key):
-        """ Set the key for spikes.
+        """
+        Set the key for spikes.
 
-        :note: This is required because this class cannot have any storage.
+        .. note::
+            This is required because this class cannot have any storage.
 
         :param int key: The key to be set
         """
 
     @abstractproperty
     def _neuron_regions(self):
-        """ The region identifiers for the neuron regions
+        """
+        The region identifiers for the neuron regions.
 
         :rtype: .NeuronRegions
         """
 
     @abstractproperty
     def _neuron_data(self):
-        """ The neuron data handler
+        """
+        The neuron data handler.
 
         :rtype: NeuronData
         """
 
     @abstractproperty
     def _max_atoms_per_core(self):
-        """ The maximum number of atoms on a core, used for neuron data
-            transfer
+        """
+        The maximum number of atoms on a core, used for neuron data transfer.
 
         :rtype: int
         """
 
     @abstractmethod
     def set_do_neuron_regeneration(self):
-        """ Indicate that data re-generation of neuron parameters is required
+        """
+        Indicate that data re-generation of neuron parameters is required.
         """
 
     def _parse_neuron_provenance(self, x, y, p, provenance_data):
-        """ Extract and yield neuron provenance
+        """
+        Extract and yield neuron provenance.
 
         :param int x: x coordinate of the chip where this core
         :param int y: y coordinate of the core where this core
@@ -150,7 +164,8 @@ class PopulationMachineNeurons(
                 x, y, p, "Latest_Send_time", neuron_prov.latest_send)
 
     def _write_neuron_data_spec(self, spec, ring_buffer_shifts):
-        """ Write the data specification of the neuron data
+        """
+        Write the data specification of the neuron data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
@@ -173,14 +188,14 @@ class PopulationMachineNeurons(
             spec, self._vertex_slice, self._neuron_regions)
 
     def _rewrite_neuron_data_spec(self, spec):
-        """ Re-Write the data specification of the neuron data
+        """
+        Re-Write the data specification of the neuron data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
         :param list(int) ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
-
         # Write the current source parameters
         self._write_current_source_parameters(spec)
 
@@ -189,18 +204,18 @@ class PopulationMachineNeurons(
             spec, self._vertex_slice, self._neuron_regions, False)
 
     def _write_neuron_core_parameters(self, spec, ring_buffer_shifts):
-        """ Write the neuron parameters region
+        """
+        Write the neuron parameters region.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
         :param list(int) ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
-
         # pylint: disable=too-many-arguments
         n_atoms = self._vertex_slice.n_atoms
-        spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
-            n_atoms))
+        spec.comment(
+            f"\nWriting Neuron Parameters for {n_atoms} Neurons:\n")
 
         # Reserve and switch to the memory region
         params_size = self._app_vertex.get_sdram_usage_for_core_neuron_params(
@@ -255,8 +270,7 @@ class PopulationMachineNeurons(
         hi_atom = self._vertex_slice.hi_atom
 
         spec.comment(
-            "\nWriting Current Source Parameters for {} Neurons:\n".format(
-                n_atoms))
+            f"\nWriting Current Source Parameters for {n_atoms} Neurons:\n")
 
         # Reserve and switch to the current source region
         params_size = self._app_vertex.\
@@ -357,16 +371,18 @@ class PopulationMachineNeurons(
                             spec.write_value(data=value_convert)
 
     def read_parameters_from_machine(self, placement):
-        """ Read the parameters and state of the neurons from the machine
-            at the current time
+        """
+        Read the parameters and state of the neurons from the machine
+        at the current time.
 
         :param Placement placement: Where to read the data from
         """
         self._neuron_data.read_data(placement, self._neuron_regions)
 
     def read_initial_parameters_from_machine(self, placement):
-        """ Read the parameters and state of the neurons from the machine
-            as they were at the last time 0
+        """
+        Read the parameters and state of the neurons from the machine
+        as they were at the last time 0.
 
         :param Placement placement: Where to read the data from
         """

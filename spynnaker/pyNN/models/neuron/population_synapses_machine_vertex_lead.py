@@ -25,8 +25,9 @@ class PopulationSynapsesMachineVertexLead(
         PopulationMachineSynapses,
         AbstractGeneratesDataSpecification,
         AbstractRewritesDataSpecification):
-    """ A synaptic machine vertex that leads other Synaptic machine vertices,
-        writing shared areas.
+    """
+    A synaptic machine vertex that leads other Synaptic machine vertices,
+    writing shared areas.
     """
 
     __slots__ = [

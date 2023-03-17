@@ -23,7 +23,8 @@ _IZK_THRESHOLD = 30.0
 
 
 class IzkCondExpBase(AbstractPyNNNeuronModelStandard):
-    """ Izhikevich neuron model with conductance inputs.
+    """
+    Izhikevich neuron model with conductance inputs.
 
     :param a: :math:`a`
     :type a: float, iterable(float), ~pyNN.random.RandomDistribution

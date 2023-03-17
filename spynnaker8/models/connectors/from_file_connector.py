@@ -18,7 +18,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class FromFileConnector(_BaseClass):
-    """ Make connections according to a list read from a file.
+    """
+    Make connections according to a list read from a file.
 
     .. deprecated:: 6.0
         Use

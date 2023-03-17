@@ -30,8 +30,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class SpikeInjectorVertex(
         ReverseIpTagMultiCastSource, PopulationApplicationVertex,
         SupportsStructure):
-    """ An Injector of Spikes for PyNN populations.  This only allows the user\
-        to specify the virtual_key of the population to identify the population
+    """
+    An Injector of Spikes for PyNN populations.  This only allows the user
+    to specify the virtual_key of the population to identify the population.
     """
     __slots__ = [
         "__spike_recorder",

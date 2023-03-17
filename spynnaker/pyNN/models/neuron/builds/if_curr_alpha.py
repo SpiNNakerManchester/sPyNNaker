@@ -22,8 +22,8 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 
 class IFCurrAlpha(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with an alpha-shaped current-based\
-        input.
+    """
+    Leaky integrate and fire neuron with an alpha-shaped current-based input.
 
     :param tau_m: :math:`\\tau_m`
     :type tau_m: float, iterable(float), ~pyNN.random.RandomDistribution

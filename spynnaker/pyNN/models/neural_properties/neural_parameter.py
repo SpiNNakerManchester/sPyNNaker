@@ -18,8 +18,9 @@ from data_specification.exceptions import UnknownTypeException
 
 
 class _Range_Iterator(object):
-    """ Iterator over a :py:class:`~spinn_utilities.ranged.RangedList` \
-        which is range based
+    """
+    Iterator over a :py:class:`~spinn_utilities.ranged.RangedList`
+    which is range based.
     """
     __slots__ = [
         "__cmd_pair",
@@ -65,7 +66,8 @@ class _Range_Iterator(object):
 
 
 class _Get_Iterator(object):
-    """ Iterator over a standard collection that supports ``__getitem__``
+    """
+    Iterator over a standard collection that supports ``__getitem__``.
     """
     __slots__ = [
         "__datatype",
@@ -102,7 +104,8 @@ class _Get_Iterator(object):
 
 
 class _SingleValue_Iterator(object):
-    """ Iterator that repeats the single values the required number of times.
+    """
+    Iterator that repeats the single values the required number of times.
 
     Allows a single Value parameter to be treated the same as parameters with
     len. Caches `cmd_word_list` and `cmd_string` so they are only created once.
@@ -136,7 +139,8 @@ class _SingleValue_Iterator(object):
 
 
 class NeuronParameter(object):
-    """ A settable parameter of a neuron model.
+    """
+    A settable parameter of a neuron model.
     """
 
     __slots__ = [
@@ -160,8 +164,9 @@ class NeuronParameter(object):
         self.__data_type = data_type
 
     def get_value(self):
-        """ What the value of the parameter is; if a list or array,\
-            potentially provides a different value for each neuron.
+        """
+        What the value of the parameter is; if a list or array,
+        potentially provides a different value for each neuron.
 
         :rtype: int or float or bool or list(int) or list(float) or
             list(bool) or ~numpy.ndarray or
@@ -170,15 +175,17 @@ class NeuronParameter(object):
         return self.__value
 
     def get_dataspec_datatype(self):
-        """ Get the serialization type of the parameter in the neuron model.
+        """
+        Get the serialization type of the parameter in the neuron model.
 
         :rtype: ~data_specification.enums.DataType
         """
         return self.__data_type
 
     def iterator_by_slice(self, slice_start, slice_stop, spec):
-        """ Creates an iterator over the commands to use to write the\
-            parameter to the data specification being generated.
+        """
+        Creates an iterator over the commands to use to write the
+        parameter to the data specification being generated.
 
         :param int slice_start: Inclusive start of the range
         :param int slice_stop: Exclusive end of the range

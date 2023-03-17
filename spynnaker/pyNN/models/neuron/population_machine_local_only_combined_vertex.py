@@ -43,7 +43,8 @@ class LocalOnlyProvenance(ctypes.LittleEndianStructure):
 
 
 class MainProvenance(ctypes.LittleEndianStructure):
-    """ Provenance items from synapse processing
+    """
+    Provenance items from synapse processing.
     """
     _fields_ = [
         # the maximum number of background tasks queued
@@ -60,7 +61,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
         PopulationMachineNeurons,
         AbstractGeneratesDataSpecification,
         AbstractRewritesDataSpecification):
-    """ A machine vertex for PyNN Populations
+    """
+    A machine vertex for PyNN Populations.
     """
 
     __slots__ = [
@@ -84,7 +86,9 @@ class PopulationMachineLocalOnlyCombinedVertex(
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     class REGIONS(Enum):
-        """Regions for populations."""
+        """
+        Regions for populations.
+        """
         SYSTEM = 0
         PROVENANCE_DATA = 1
         PROFILING = 2
@@ -190,8 +194,9 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     @staticmethod
     def __get_binary_file_name(app_vertex):
-        """ Get the local binary filename for this vertex.  Static because at
-            the time this is needed, the local app_vertex is not set.
+        """
+        Get the local binary filename for this vertex.  Static because at
+        the time this is needed, the local app_vertex is not set.
 
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -299,7 +304,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     def _parse_local_only_provenance(
             self, label, x, y, p, provenance_data):
-        """ Extract and yield local-only provenance
+        """
+        Extract and yield local-only provenance.
 
         :param str label: The label of the node
         :param int x: x coordinate of the chip where this core

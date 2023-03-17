@@ -32,7 +32,8 @@ BIT_IN_A_WORD = 32.0
 
 
 def get_sdram_for_bit_field_region(incoming_projections):
-    """ the SDRAM for the bit field filter region
+    """
+    The SDRAM for the bit field filter region.
 
     :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
         The projections that target the vertex in question
@@ -56,14 +57,14 @@ def get_sdram_for_bit_field_region(incoming_projections):
 
 
 def get_sdram_for_keys(incoming_projections):
-    """ gets the space needed for keys
+    """
+    Gets the space needed for keys.
 
     :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
         The projections that target the vertex in question
     :return: SDRAM needed
     :rtype: int
     """
-
     # basic sdram
     sdram = 0
     seen_app_edges = set()
@@ -79,7 +80,8 @@ def get_sdram_for_keys(incoming_projections):
 
 
 def get_bitfield_key_map_data(incoming_projections):
-    """ Get data for the key map region
+    """
+    Get data for the key map region.
 
     :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
         The projections to generate bitfields for
@@ -118,7 +120,8 @@ def get_bitfield_key_map_data(incoming_projections):
 
 def write_bitfield_init_data(
         spec, bit_field_region, n_bit_field_bytes, bit_field_region_ref=None):
-    """ writes the init data needed for the bitfield generator
+    """
+    Writes the init data needed for the bitfield generator.
 
     :param ~data_specification.DataSpecificationGenerator spec:
         data spec writer

@@ -14,7 +14,8 @@
 
 
 def _clamp(a, b, c):
-    """ Force `b` to be between `a` and `c`. `a` must be no larger than `c`.
+    """
+    Force `b` to be between `a` and `c`. `a` must be no larger than `c`.
     """
     return max(a, min(b, c))
 
@@ -26,8 +27,9 @@ def _active_time_for_frequency(frequency):
 
 
 class MunichIoEthernetProtocol(object):
-    """ Implementation of the Munich robot IO protocol, communicating over
-        ethernet.
+    """
+    Implementation of the Munich robot IO protocol, communicating over
+    ethernet.
     """
 
     def __init__(self):
@@ -44,7 +46,7 @@ class MunichIoEthernetProtocol(object):
 
     @staticmethod
     def set_retina_transmission(event_format):
-        return "!E{}\n".format(event_format).encode("ascii")
+        return f"!E{event_format}\n".encode("ascii")
 
     @staticmethod
     def disable_motor():
@@ -56,66 +58,60 @@ class MunichIoEthernetProtocol(object):
 
     @staticmethod
     def motor_0_permanent_velocity(velocity):
-        return "!MV0={}\n".format(
-            _clamp(-100, velocity, 100)).encode("ascii")
+        return f"!MV0={_clamp(-100, velocity, 100)}\n".encode("ascii")
 
     @staticmethod
     def motor_1_permanent_velocity(velocity):
-        return "!MV1={}\n".format(
-            _clamp(-100, velocity, 100)).encode("ascii")
+        return f"!MV1={_clamp(-100, velocity, 100)}\n".encode("ascii")
 
     @staticmethod
     def motor_0_leaky_velocity(velocity):
-        return "!MVD0={}\n".format(
-            _clamp(-100, velocity, 100)).encode("ascii")
+        return f"!MVD0={_clamp(-100, velocity, 100)}\n".encode("ascii")
 
     @staticmethod
     def motor_1_leaky_velocity(velocity):
-        return "!MVD1={}\n".format(
-            _clamp(-100, velocity, 100)).encode("ascii")
+        return f"!MVD1={_clamp(-100, velocity, 100)}\n".encode("ascii")
 
     @staticmethod
     def led_total_period(total_period):
-        return "!PC={}\n".format(total_period).encode("ascii")
+        return f"!PC={total_period}\n".encode("ascii")
 
     @staticmethod
     def led_front_active_time(active_time):
-        return "!PC1={}\n".format(active_time).encode("ascii")
+        return f"!PC1={active_time}\n".encode("ascii")
 
     @staticmethod
     def led_back_active_time(active_time):
-        return "!PC0={}\n".format(active_time).encode("ascii")
+        return f"!PC0={active_time}\n".encode("ascii")
 
     @staticmethod
     def led_frequency(frequency):
         active_time = _active_time_for_frequency(frequency)
-        return "!PC={}\n!PC0={}\n!PC1={}\n".format(
-            active_time, active_time // 2, active_time // 2).encode("ascii")
+        at2 = active_time // 2
+        return f"!PC={active_time}\n!PC0={at2}\n!PC1={at2}\n".encode("ascii")
 
     @staticmethod
     def speaker_frequency(frequency):
         active_time = _active_time_for_frequency(frequency)
-        return "!PB={}\n!PB0={}\n".format(
-            active_time, active_time // 2).encode("ascii")
+        return f"!PB={active_time}\n!PB0={active_time // 2}\n".encode("ascii")
 
     @staticmethod
     def speaker_total_period(total_period):
-        return "!PB={}\n".format(total_period).encode("ascii")
+        return f"!PB={total_period}\n".encode("ascii")
 
     @staticmethod
     def speaker_active_time(active_time):
-        return "!PB0={}\n".format(active_time).encode("ascii")
+        return f"!PB0={active_time}\n".encode("ascii")
 
     @staticmethod
     def laser_frequency(frequency):
         active_time = _active_time_for_frequency(frequency)
-        return "!PA={}\n!PA0={}\n".format(
-            active_time, active_time // 2).encode("ascii")
+        return f"!PA={active_time}\n!PA0={active_time // 2}\n".encode("ascii")
 
     @staticmethod
     def laser_total_period(total_period):
-        return "!PA={}\n".format(total_period).encode("ascii")
+        return f"!PA={total_period}\n".encode("ascii")
 
     @staticmethod
     def laser_active_time(active_time):
-        return "!PA0={}\n".format(active_time).encode("ascii")
+        return f"!PA0={active_time}\n".encode("ascii")

@@ -21,7 +21,8 @@ class HasSynapses(object):
     @abstractmethod
     def get_connections_from_machine(
             self, placement, app_edge, synapse_info):
-        """ Get the connections from the machine for this vertex.
+        """
+        Get the connections from the machine for this vertex.
 
         :param ~pacman.model.placement.Placement placement:
             Where the connection data is on the machine

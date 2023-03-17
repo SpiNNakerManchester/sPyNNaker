@@ -31,9 +31,12 @@ _P_MASK = 0x1
 
 
 class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
-    """ A connection that sends spikes from the PushBot retina to a\
-        spike injector in SpiNNaker.  Note that this assumes a packet format\
-        of 16-bits per retina event.
+    """
+    A connection that sends spikes from the PushBot retina to a spike injector
+    in SpiNNaker.
+
+    .. note::
+        This assumes a packet format of 16-bits per retina event.
     """
     __slots__ = [
         "__lock",
@@ -108,8 +111,9 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
             self.__ready = False
 
     def _receive_retina_data(self, data):
-        """ Receive retina packets from the PushBot and converts them into\
-            neuron spikes within the spike injector system.
+        """
+        Receive retina packets from the PushBot and converts them into
+        neuron spikes within the spike injector system.
 
         :param data: Data to be processed
         """

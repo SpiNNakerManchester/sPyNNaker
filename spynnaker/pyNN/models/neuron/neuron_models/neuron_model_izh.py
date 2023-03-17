@@ -30,7 +30,8 @@ NEXT_H = 'next_h'
 
 
 class NeuronModelIzh(AbstractStandardNeuronComponent):
-    """ Model of neuron due to Eugene M. Izhikevich et al
+    """
+    Model of neuron due to Eugene M. Izhikevich et al.
     """
     __slots__ = [
         "__a", "__b", "__c", "__d", "__v_init", "__u_init", "__i_offset"
@@ -102,7 +103,8 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
 
     @property
     def a(self):
-        """ Settable model parameter: :math:`a`
+        """
+        Settable model parameter: :math:`a`
 
         :rtype: float
         """
@@ -110,7 +112,8 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
 
     @property
     def b(self):
-        """ Settable model parameter: :math:`b`
+        """
+        Settable model parameter: :math:`b`
 
         :rtype: float
         """
@@ -118,7 +121,8 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
 
     @property
     def c(self):
-        """ Settable model parameter: :math:`c`
+        """
+        Settable model parameter: :math:`c`
 
         :rtype: float
         """
@@ -126,7 +130,8 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
 
     @property
     def d(self):
-        """ Settable model parameter: :math:`d`
+        """
+        Settable model parameter: :math:`d`
 
         :rtype: float
         """
@@ -134,7 +139,8 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
 
     @property
     def i_offset(self):
-        """ Settable model parameter: :math:`I_{offset}`
+        """
+        Settable model parameter: :math:`I_{offset}`
 
         :rtype: float
         """
@@ -142,7 +148,8 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
 
     @property
     def v_init(self):
-        """ Settable model parameter: :math:`v_{init}`
+        """
+        Settable model parameter: :math:`v_{init}`
 
         :rtype: float
         """
@@ -150,7 +157,8 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
 
     @property
     def u_init(self):
-        """ Settable model parameter: :math:`u_{init}`
+        """
+        Settable model parameter: :math:`u_{init}`
 
         :rtype: float
         """

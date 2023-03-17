@@ -23,7 +23,8 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
 
 class PushBotEthernetMotorDevice(
         PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex):
-    """ The motor of a PushBot
+    """
+    The motor of a PushBot.
     """
 
     def __init__(self, motor, protocol, timesteps_between_send=None):

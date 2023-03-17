@@ -65,7 +65,8 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @property
     def tau_ca2(self):
-        r""" Settable model parameter: :math:`\tau_{\mathrm{Ca}^{+2}}`
+        r"""
+        Settable model parameter: :math:`\tau_{\mathrm{Ca}^{+2}}`
 
         :rtype: float
         """
@@ -73,7 +74,8 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @property
     def i_ca2(self):
-        r""" Settable model parameter: :math:`I_{\mathrm{Ca}^{+2}}`
+        r"""
+        Settable model parameter: :math:`I_{\mathrm{Ca}^{+2}}`
 
         :rtype: float
         """
@@ -81,7 +83,8 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @property
     def i_alpha(self):
-        r""" Settable model parameter: :math:`I_{\alpha}`
+        r"""
+        Settable model parameter: :math:`I_{\alpha}`
 
         :rtype: float
         """

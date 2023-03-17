@@ -18,7 +18,8 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 
 class SpYNNakerConnectionHolderGenerator(object):
-    """ Sets up connection holders for reports to use.
+    """
+    Sets up connection holders for reports to use.
     """
 
     def __call__(self, application_graph):

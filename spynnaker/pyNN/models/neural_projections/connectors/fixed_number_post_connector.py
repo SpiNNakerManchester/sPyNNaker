@@ -28,8 +28,9 @@ N_GEN_PARAMS = 8
 
 class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
                                AbstractGenerateConnectorOnHost):
-    """ Connects a fixed number of post-synaptic neurons selected at random,\
-        to all pre-synaptic neurons.
+    """
+    Connects a fixed number of post-synaptic neurons selected at random,
+    to all pre-synaptic neurons.
     """
 
     __slots__ = [
@@ -183,8 +184,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             this_post_neuron_array <= post_vertex_slice.hi_atom)]
 
     def _n_post_neurons_in_slice(self, post_vertex_slice, n, synapse_info):
-        """ Count the number of post neurons in the slice. \
-            Faster than ``len(_post_neurons_in_slice(...))``.
+        """
+        Count the number of post neurons in the slice.
+        Faster than ``len(_post_neurons_in_slice(...))``.
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param int n:
@@ -276,7 +278,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return "FixedNumberPostConnector({})".format(self.__n_post)
+        return f"FixedNumberPostConnector({self.__n_post})"
 
     @property
     def allow_self_connections(self):

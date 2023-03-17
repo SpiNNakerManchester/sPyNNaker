@@ -76,7 +76,8 @@ def is_param_generatable(value):
 
 
 def param_generator_params(values):
-    """ Get the parameter generator parameters as a numpy array
+    """
+    Get the parameter generator parameters as a numpy array.
 
     :param values:
     :type values: int or ~pyNN.random.NumpyRNG
@@ -99,7 +100,7 @@ def param_generator_params(values):
             DataType.S1615.encode_as_int(param) for param in parameters]
         return numpy.array(params, dtype=numpy.uint32)
 
-    raise ValueError("Unexpected value {}".format(values))
+    raise ValueError(f"Unexpected value {values}")
 
 
 #: At most, there are 4 words as param generator parameters
@@ -107,7 +108,8 @@ MAX_PARAMS_BYTES = 4 * BYTES_PER_WORD
 
 
 def param_generator_params_size_in_bytes(values):
-    """ Get the size of the parameter generator parameters in bytes
+    """
+    Get the size of the parameter generator parameters in bytes.
 
     :param values:
     :type values: int or ~pyNN.random.NumpyRNG
@@ -120,4 +122,4 @@ def param_generator_params_size_in_bytes(values):
         parameters = available_distributions[values.name]
         return len(parameters) * BYTES_PER_WORD
 
-    raise ValueError("Unexpected value {}".format(values))
+    raise ValueError(f"Unexpected value {values}")

@@ -24,10 +24,10 @@ from spynnaker.pyNN.utilities.constants import (
 _DELAY_PARAM_HEADER_WORDS = 9
 
 
-class DelayExtensionVertex(
-        ApplicationVertex, AbstractHasDelayStages):
-    """ Provide delays to incoming spikes in multiples of the maximum delays\
-        of a neuron (typically 16 or 32)
+class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
+    """
+    Provide delays to incoming spikes in multiples of the maximum delays
+    of a neuron (typically 16 or 32).
     """
     __slots__ = [
         # The parition this Delay is supporting
@@ -88,8 +88,9 @@ class DelayExtensionVertex(
     @property
     @overrides(AbstractHasDelayStages.n_delay_stages)
     def n_delay_stages(self):
-        """ The maximum number of delay stages required by any connection\
-            out of this delay extension vertex
+        """
+        The maximum number of delay stages required by any connection
+        out of this delay extension vertex.
 
         :rtype: int
         """
@@ -117,7 +118,8 @@ class DelayExtensionVertex(
         return self.__partition.pre_vertex
 
     def delay_params_size(self):
-        """ The size of the delay parameters
+        """
+        The size of the delay parameters.
         """
         return BYTES_PER_WORD * _DELAY_PARAM_HEADER_WORDS
 
@@ -126,7 +128,8 @@ class DelayExtensionVertex(
         return self.__partition
 
     def add_outgoing_edge(self, edge):
-        """ Add an outgoing edge to the delay extension
+        """
+        Add an outgoing edge to the delay extension.
 
         :param DelayedApplicationEdge delay_edge: The edge to add
         """
@@ -134,7 +137,8 @@ class DelayExtensionVertex(
 
     @property
     def outgoing_edges(self):
-        """ Get the outgoing edges from this vertex
+        """
+        Get the outgoing edges from this vertex.
 
         :rtype: list(DelayApplicationEdge)
         """

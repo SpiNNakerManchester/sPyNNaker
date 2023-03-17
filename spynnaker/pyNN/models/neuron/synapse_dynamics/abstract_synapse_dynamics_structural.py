@@ -21,9 +21,11 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     @abstractmethod
     def get_structural_parameters_sdram_usage_in_bytes(
             self, incoming_projections, n_neurons):
-        """ Get the size of the structural parameters
+        """
+        Get the size of the structural parameters.
 
-        Note: At the Application level this will be an estimate.
+        .. note::
+            At the Application level this will be an estimate.
 
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
             The projections that target the vertex in question
@@ -37,7 +39,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     def write_structural_parameters(
             self, spec, region, weight_scales, app_vertex, vertex_slice,
             synaptic_matrices):
-        """ Write structural plasticity parameters
+        """
+        Write structural plasticity parameters.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
@@ -54,7 +57,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     @abstractmethod
     def set_connections(
             self, connections, post_vertex_slice, app_edge, synapse_info):
-        """ Set connections for structural plasticity
+        """
+        Set connections for structural plasticity.
 
         :param ~numpy.ndarray connections:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -64,68 +68,78 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractproperty
     def f_rew(self):
-        """ The frequency of rewiring
+        """
+        The frequency of rewiring.
 
         :rtype: float
         """
 
     @abstractproperty
     def s_max(self):
-        """ The maximum number of synapses
+        """
+        The maximum number of synapses.
 
         :rtype: int
         """
 
     @abstractproperty
     def with_replacement(self):
-        """ Whether to allow replacement when creating synapses
+        """
+        Whether to allow replacement when creating synapses.
 
         :rtype: bool
         """
 
     @abstractproperty
     def seed(self):
-        """ The seed to control the randomness
+        """
+        The seed to control the randomness.
         """
 
     @abstractproperty
     def initial_weight(self):
-        """ The weight of a formed connection
+        """
+        The weight of a formed connection.
 
         :rtype: float
         """
 
     @abstractproperty
     def initial_delay(self):
-        """ The delay of a formed connection
+        """
+        The delay of a formed connection.
 
         :rtype: float or (float, float)
         """
 
     @abstractproperty
     def partner_selection(self):
-        """ The partner selection rule
+        """
+        The partner selection rule.
 
         :rtype: AbstractPartnerSelection
         """
 
     @abstractproperty
     def formation(self):
-        """ The formation rule
+        """
+        The formation rule.
 
         :rtype: AbstractFormation
         """
 
     @abstractproperty
     def elimination(self):
-        """ The elimination rule
+        """
+        The elimination rule.
 
         :rtype: AbstractElimination
         """
 
     @abstractmethod
     def check_initial_delay(self, max_delay_ms):
-        """ Check that delays can be done without delay extensions
+        """
+        Check that delays can be done without delay extensions.
 
         :param int max_delay_ms: The maximum delay supported, in milliseconds
         :raises Exception: if the delay is out of range
@@ -133,7 +147,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_max_rewires_per_ts(self):
-        """ Get the max number of rewires per timestep
+        """
+        Get the max number of rewires per timestep.
 
         :rtype: int
         """

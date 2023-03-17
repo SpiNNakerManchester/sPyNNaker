@@ -23,7 +23,8 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
 
 class PushBotEthernetSpeakerDevice(
         PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex):
-    """ The Speaker of a PushBot
+    """
+    The Speaker of a PushBot.
     """
 
     def __init__(
@@ -41,8 +42,8 @@ class PushBotEthernetSpeakerDevice(
         :param start_frequency: The "frequency" to set at the start
         :param start_melody: The "melody" to set at the start
         :param timesteps_between_send:
-            The number of timesteps between sending commands to the device,\
-            or None to use the default
+            The number of timesteps between sending commands to the device,
+            or `None` to use the default
         """
         # pylint: disable=too-many-arguments
         if not isinstance(speaker, PushBotSpeaker):

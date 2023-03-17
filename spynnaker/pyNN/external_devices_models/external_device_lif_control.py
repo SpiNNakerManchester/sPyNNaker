@@ -27,9 +27,9 @@ from .threshold_type_multicast_device_control import (
 
 
 class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
-    """ Abstract control module for the PushBot, based on the LIF neuron,\
-        but without spikes, and using the voltage as the output to the various\
-        devices
+    """
+    Abstract control module for the PushBot, based on the LIF neuron, but
+    without spikes, and using the voltage as the output to the various devices.
     """
     __slots__ = [
         "_create_edges",
@@ -100,8 +100,8 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             n_colour_bits):
         if n_neurons != len(self._devices):
             raise ConfigurationException(
-                "Number of neurons does not match number of devices in {}"
-                .format(label))
+                "Number of neurons does not match number of "
+                f"devices in {label}")
         self._model.n_steps_per_timestep = n_steps_per_timestep
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return ExternalDeviceLifControlVertex(

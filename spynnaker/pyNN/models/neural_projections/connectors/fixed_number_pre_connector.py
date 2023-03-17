@@ -26,8 +26,9 @@ from .abstract_generate_connector_on_host import (
 
 class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
                               AbstractGenerateConnectorOnHost):
-    """ Connects a fixed number of pre-synaptic neurons selected at random,\
-        to all post-synaptic neurons.
+    """
+    Connects a fixed number of pre-synaptic neurons selected at random,
+    to all post-synaptic neurons.
     """
 
     __slots__ = [
@@ -243,7 +244,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return "FixedNumberPreConnector({})".format(self.__n_pre)
+        return f"FixedNumberPreConnector({self.__n_pre})"
 
     @property
     def allow_self_connections(self):

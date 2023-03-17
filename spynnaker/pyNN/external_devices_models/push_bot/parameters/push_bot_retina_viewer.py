@@ -23,11 +23,11 @@ SLEEP_TIME = 0.1
 
 
 class PushBotRetinaViewer():
-    """ Viewer of retina from the PushBot
+    """
+    Viewer of retina from the PushBot.
     """
 
     def __init__(self, retina_resolution, label, sim):
-
         pyplot.ion()
         self.__image_data = numpy.zeros(
             (retina_resolution.value.pixels, retina_resolution.value.pixels),
@@ -52,7 +52,8 @@ class PushBotRetinaViewer():
 
     @property
     def port(self):
-        """ The port the connection is listening on
+        """
+        The port the connection is listening on.
 
         :rtype: int
         """
@@ -88,7 +89,8 @@ class PushBotRetinaViewer():
                 break
 
     def run_until_closed(self):
-        """ Run the viewer and simulation until the viewer is closed.
+        """
+        Run the viewer and simulation until the viewer is closed.
         """
         run_thread = Thread(target=self.__run_sim_forever)
         run_thread.start()
@@ -97,7 +99,8 @@ class PushBotRetinaViewer():
         run_thread.join()
 
     def run(self, run_time):
-        """ Run the viewer and simulation for a fixed time.
+        """
+        Run the viewer and simulation for a fixed time.
         """
         run_thread = Thread(target=self.__run_sim, args=[run_time])
         run_thread.start()

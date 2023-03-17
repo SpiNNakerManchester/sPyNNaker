@@ -35,7 +35,8 @@ _CTYPES_N_BITS_SHIFT = 16
 
 
 def _n_bits(field):
-    """ Get the number of bits in a field (ctypes doesn't do this)
+    """
+    Get the number of bits in a field (ctypes doesn't do this).
 
     :param _ctypes.CField field: a ctype field from a structure
     :return: the number of bits
@@ -53,8 +54,9 @@ def _n_bits(field):
 
 
 def _make_array(ctype, n_items):
-    """ Make an array of ctype items; done separately as the syntax is a
-        little odd!
+    """
+    Make an array of ctype items; done separately as the syntax is a
+    little odd!
 
     :param _ctypes.PyCSimpleType ctype: A ctype
     :param int n_items: The number of items in the array
@@ -66,7 +68,8 @@ def _make_array(ctype, n_items):
 
 
 class _MasterPopEntryCType(ctypes.LittleEndianStructure):
-    """ A Master Population Table Entry; matches the C struct
+    """
+    A Master Population Table Entry; matches the C struct.
     """
     _fields_ = [
         # The key to match against the incoming message
@@ -102,7 +105,8 @@ _MAX_CORE_MASK = (1 << _n_bits(_MasterPopEntryCType.core_mask)) - 1
 
 
 class _AddressListEntryCType(ctypes.LittleEndianStructure):
-    """ An Address and Row Length structure; matches the C struct
+    """
+    An Address and Row Length structure; matches the C struct.
     """
     _fields_ = [
         # the length of the row
@@ -132,10 +136,12 @@ _UINT32_PTR = ctypes.POINTER(ctypes.c_uint32)
 
 
 def _to_numpy(array):
-    """ Convert a ctypes array to a numpy array of uint32
+    """
+    Convert a ctypes array to a numpy array of uint32.
 
-    Note: no data copying is done; it is pure type conversion.  Editing
-    the returned array will result in changes to the original.
+    .. note::
+        No data copying is done; it is pure type conversion.  Editing
+        the returned array will result in changes to the original.
 
     :param _ctypes.PyCArrayType array: The array to convert
     :rtype: numpy.ndarray
@@ -150,7 +156,8 @@ def _to_numpy(array):
 
 
 class _MasterPopEntry(object):
-    """ Internal class that contains a master population table entry
+    """
+    Internal class that contains a master population table entry.
     """
     __slots__ = [
         "__addresses_and_row_lengths",
@@ -188,7 +195,8 @@ class _MasterPopEntry(object):
         self.__addresses_and_row_lengths = list()
 
     def append(self, address, row_length):
-        """ Add a synaptic matrix pointer to the entry
+        """
+        Add a synaptic matrix pointer to the entry.
 
         :param int address: The address of the synaptic matrix
         :param int row_length: The length of each row in the matrix
@@ -198,15 +206,16 @@ class _MasterPopEntry(object):
         index = len(self.__addresses_and_row_lengths)
         if index > _MAX_ADDRESS_COUNT:
             raise SynapticConfigurationException(
-                "{} connections for the same source key (maximum {})".format(
-                    index, _MAX_ADDRESS_COUNT))
+                f"{index} connections for the same source key "
+                f"(maximum {_MAX_ADDRESS_COUNT})")
         self.__addresses_and_row_lengths.append(
             (address, row_length, True))
         return index
 
     def append_invalid(self):
-        """ Add an invalid marker to the entry; used to ensure index alignment
-            between multiple entries when necessary
+        """
+        Add an invalid marker to the entry; used to ensure index alignment
+        between multiple entries when necessary.
 
         :return: The index of the marker within the entry
         :rtype: int
@@ -265,7 +274,8 @@ class _MasterPopEntry(object):
         return self.__addresses_and_row_lengths
 
     def write_to_table(self, entry, address_list, start):
-        """ Write entries to the master population table
+        """
+        Write entries to the master population table.
 
         :param _MasterPopEntryCType entry: The entry to write to
         :param _AddressListEntryCType_Array address_list:
@@ -305,7 +315,8 @@ class _MasterPopEntry(object):
 
 
 class MasterPopTableAsBinarySearch(object):
-    """ Master population table, implemented as binary search master.
+    """
+    Master population table, implemented as binary search master.
     """
     __slots__ = [
         "__entries",
@@ -317,7 +328,8 @@ class MasterPopTableAsBinarySearch(object):
 
     @staticmethod
     def get_master_population_table_size(incoming_projections):
-        """ Get the size of the master population table in SDRAM.
+        """
+        Get the size of the master population table in SDRAM.
 
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
             The projections arriving at the vertex that are to be handled by
@@ -353,7 +365,8 @@ class MasterPopTableAsBinarySearch(object):
 
     @staticmethod
     def get_allowed_row_length(row_length):
-        """ Get the next allowed row length
+        """
+        Get the next allowed row length.
 
         :param int row_length: the row length being considered
         :return: the row length available
@@ -364,13 +377,14 @@ class MasterPopTableAsBinarySearch(object):
         if row_length > POP_TABLE_MAX_ROW_LENGTH:
             raise SynapseRowTooBigException(
                 POP_TABLE_MAX_ROW_LENGTH,
-                "Only rows of up to {} entries are allowed".format(
-                    POP_TABLE_MAX_ROW_LENGTH))
+                f"Only rows of up to {POP_TABLE_MAX_ROW_LENGTH} "
+                "entries are allowed")
         return row_length
 
     @staticmethod
     def get_next_allowed_address(next_address):
-        """ Get the next allowed address.
+        """
+        Get the next allowed address.
 
         :param int next_address: The next address that would be used
         :return: The next address that can be used following next_address
@@ -381,12 +395,13 @@ class MasterPopTableAsBinarySearch(object):
         addr_scaled = (next_address + (_ADDRESS_SCALE - 1)) // _ADDRESS_SCALE
         if addr_scaled > _MAX_ADDRESS:
             raise SynapticConfigurationException(
-                "Address {} is out of range for this population table!".format(
-                    hex(addr_scaled * _ADDRESS_SCALE)))
+                f"Address {hex(addr_scaled * _ADDRESS_SCALE)} is "
+                "out of range for this population table!")
         return addr_scaled * _ADDRESS_SCALE
 
     def initialise_table(self):
-        """ Initialise the master pop data structure.
+        """
+        Initialise the master pop data structure.
         """
         self.__entries = dict()
         self.__n_addresses = 0
@@ -394,7 +409,8 @@ class MasterPopTableAsBinarySearch(object):
     def add_application_entry(
             self, block_start_addr, row_length, key_and_mask, core_mask,
             core_shift, n_neurons, n_colour_bits):
-        """ Add an entry for an application-edge to the population table.
+        """
+        Add an entry for an application-edge to the population table.
 
         :param int block_start_addr: where the synaptic matrix block starts
         :param int row_length: how long in words each row is
@@ -415,14 +431,14 @@ class MasterPopTableAsBinarySearch(object):
         # If there are too many neurons per core, fail
         if n_neurons > _MAX_N_NEURONS:
             raise SynapticConfigurationException(
-                "The parameter n_neurons of {} is too big (maximum {})".format(
-                    n_neurons, _MAX_N_NEURONS))
+                f"The parameter n_neurons of {n_neurons} is too big "
+                f"(maximum {_MAX_N_NEURONS})")
 
         # If the core mask is too big, fail
         if core_mask > _MAX_CORE_MASK:
             raise SynapticConfigurationException(
-                "The core mask of {} is too big (maximum {})".format(
-                    core_mask, _MAX_CORE_MASK))
+                f"The core mask of {core_mask} is too big "
+                f"(maximum {_MAX_CORE_MASK})")
 
         return self.__update_master_population_table(
             block_start_addr, row_length, key_and_mask, core_mask, core_shift,
@@ -431,7 +447,8 @@ class MasterPopTableAsBinarySearch(object):
     def __update_master_population_table(
             self, block_start_addr, row_length, key_and_mask, core_mask,
             core_shift, n_neurons, n_colour_bits):
-        """ Add an entry in the binary search to deal with the synaptic matrix
+        """
+        Add an entry in the binary search to deal with the synaptic matrix.
 
         :param int block_start_addr: where the synaptic matrix block starts
         :param int row_length: how long in words each row is
@@ -451,13 +468,12 @@ class MasterPopTableAsBinarySearch(object):
         # if not single, scale the address
         if block_start_addr % _ADDRESS_SCALE != 0:
             raise SynapticConfigurationException(
-                "Address {} is not compatible with this table".format(
-                    block_start_addr))
+                f"Address {block_start_addr} is not compatible "
+                "with this table")
         start_addr = block_start_addr // _ADDRESS_SCALE
         if start_addr > _MAX_ADDRESS:
             raise SynapticConfigurationException(
-                "Address {} is too big for this table".format(
-                    block_start_addr))
+                f"Address {block_start_addr} is too big for this table")
         row_length = self.get_allowed_row_length(row_length)
 
         entry = self.__add_entry(
@@ -469,10 +485,10 @@ class MasterPopTableAsBinarySearch(object):
     def add_invalid_application_entry(
             self, key_and_mask, core_mask, core_shift, n_neurons,
             n_colour_bits):
-        """ Add an entry to the table from an application vertex that doesn't
-            point to anywhere.  Used to keep indices in synchronisation between
-            e.g. normal and delay entries and between entries on different
-            cores.
+        """
+        Add an entry to the table from an application vertex that doesn't
+        point to anywhere.  Used to keep indices in synchronisation between
+        e.g. normal and delay entries and between entries on different cores.
 
         :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
             a key_and_mask object used as part of describing
@@ -492,23 +508,24 @@ class MasterPopTableAsBinarySearch(object):
         # If there are too many neurons per core, fail
         if n_neurons > _MAX_N_NEURONS:
             raise SynapticConfigurationException(
-                "The parameter n_neurons of {} is too big (maximum {})".format(
-                    n_neurons, _MAX_N_NEURONS))
+                f"The parameter n_neurons of {n_neurons} is too big "
+                f"(maximum {_MAX_N_NEURONS})")
 
         # If the core mask is too big, fail
         if core_mask > _MAX_CORE_MASK:
             raise SynapticConfigurationException(
-                "The core mask of {} is too big (maximum {})".format(
-                    core_mask, _MAX_CORE_MASK))
+                f"The core mask of {core_mask} is too big "
+                f"(maximum {_MAX_CORE_MASK})")
         return self.__add_invalid_entry(
             key_and_mask, core_mask, core_shift, n_neurons, n_colour_bits)
 
     def __add_invalid_entry(
             self, key_and_mask, core_mask, core_shift, n_neurons,
             n_colour_bits):
-        """ Add an entry to the table that doesn't point to anywhere.  Used
-            to keep indices in synchronisation between e.g. normal and delay
-            entries and between entries on different cores.
+        """
+        Add an entry to the table that doesn't point to anywhere.  Used
+        to keep indices in synchronisation between e.g. normal and delay
+        entries and between entries on different cores.
 
         :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
             a key_and_mask object used as part of describing
@@ -536,8 +553,8 @@ class MasterPopTableAsBinarySearch(object):
             n_colour_bits):
         if self.__n_addresses >= _MAX_ADDRESS_START:
             raise SynapticConfigurationException(
-                "The table already contains {} entries;"
-                " adding another is too many".format(self.__n_addresses))
+                f"The table already contains {self.__n_addresses} entries;"
+                " adding another is too many")
         if key_and_mask.key not in self.__entries:
             entry = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
@@ -561,7 +578,8 @@ class MasterPopTableAsBinarySearch(object):
         return entry
 
     def get_pop_table_data(self):
-        """ Get the master pop table data as a numpy array
+        """
+        Get the master pop table data as a numpy array.
 
         :rtype: ~numpy.ndarray
         """
@@ -585,8 +603,9 @@ class MasterPopTableAsBinarySearch(object):
 
     @property
     def max_n_neurons_per_core(self):
-        """ The maximum number of neurons per core supported when a core-mask\
-            is > 0.
+        """
+        The maximum number of neurons per core supported when a core-mask
+        is > 0.
 
         :rtype: int
         """
@@ -594,8 +613,9 @@ class MasterPopTableAsBinarySearch(object):
 
     @property
     def max_core_mask(self):
-        """ The maximum core mask supported when n_neurons is > 0; this is the\
-            maximum number of cores that can be supported in a joined mask.
+        """
+        The maximum core mask supported when n_neurons is > 0; this is the
+        maximum number of cores that can be supported in a joined mask.
 
         :rtype: int
         """
@@ -603,7 +623,8 @@ class MasterPopTableAsBinarySearch(object):
 
     @property
     def max_index(self):
-        """ The maximum index of a synaptic connection
+        """
+        The maximum index of a synaptic connection.
 
         :rtype: int
         """

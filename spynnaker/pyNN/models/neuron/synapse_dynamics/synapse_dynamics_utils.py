@@ -39,7 +39,8 @@ def calculate_stdp_times(pre_spikes, post_spikes, plastic_delay):
 def calculate_spike_pair_additive_stdp_weight(
         pre_spikes, post_spikes, initial_weight, plastic_delay,
         a_plus, a_minus, tau_plus, tau_minus):
-    """ Calculates the expected stdp weight for SpikePair Additive STDP
+    """
+    Calculates the expected stdp weight for SpikePair Additive STDP.
 
     :param pre_spikes:
     :param post_spikes:
@@ -69,7 +70,7 @@ def calculate_spike_pair_multiplicative_stdp_weight(
         pre_spikes, post_spikes, initial_weight, plastic_delay, min_weight,
         max_weight, a_plus, a_minus, tau_plus, tau_minus):
     """
-    Calculates the expected stdp weight for SpikePair Multiplicative STDP
+    Calculates the expected stdp weight for SpikePair Multiplicative STDP.
 
     :param iterable(int) pre_spikes: Spikes going into the model
     :param iterable(int) post_spikes: Spikes recorded on the model

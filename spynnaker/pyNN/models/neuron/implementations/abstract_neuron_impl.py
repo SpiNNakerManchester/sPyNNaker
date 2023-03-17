@@ -17,49 +17,56 @@ from spinn_utilities.abstract_base import (
 
 
 class AbstractNeuronImpl(object, metaclass=AbstractBase):
-    """ An abstraction of a whole neuron model including all parts
+    """
+    An abstraction of a whole neuron model including all parts.
     """
 
     __slots__ = ()
 
     @abstractproperty
     def model_name(self):
-        """ The name of the model
+        """
+        The name of the model.
 
         :rtype: str
         """
 
     @abstractproperty
     def binary_name(self):
-        """ The name of the binary executable of this implementation
+        """
+        The name of the binary executable of this implementation.
 
         :rtype str
         """
 
     @abstractproperty
     def structs(self):
-        """ A list of structs used by the implementation
+        """
+        A list of structs used by the implementation.
 
         :rtype: list(Struct)
         """
 
     @abstractmethod
     def get_global_weight_scale(self):
-        """ Get the weight scaling required by this model
+        """
+        Get the weight scaling required by this model.
 
         :rtype: int
         """
 
     @abstractmethod
     def get_n_synapse_types(self):
-        """ Get the number of synapse types supported by the model
+        """
+        Get the number of synapse types supported by the model.
 
         :rtype: int
         """
 
     @abstractmethod
     def get_synapse_id_by_target(self, target):
-        """ Get the ID of a synapse given the name
+        """
+        Get the ID of a synapse given the name.
 
         :param str target: The name of the synapse
         :rtype: int
@@ -67,35 +74,40 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_synapse_targets(self):
-        """ Get the target names of the synapse type
+        """
+        Get the target names of the synapse type.
 
         :rtype: list(str)
         """
 
     @abstractmethod
     def get_recordable_variables(self):
-        """ Get the names of the variables that can be recorded in this model
+        """
+        Get the names of the variables that can be recorded in this model.
 
         :rtype: list(str)
         """
 
     @abstractmethod
     def get_recordable_units(self, variable):
-        """ Get the units of the given variable that can be recorded
+        """
+        Get the units of the given variable that can be recorded.
 
         :param str variable: The name of the variable
         """
 
     @abstractmethod
     def get_recordable_data_types(self):
-        """ Get the data type of the variables that can be recorded
+        """
+        Get the data type of the variables that can be recorded.
 
         :return: dict of name of variable to DataType of variable
         """
 
     @abstractmethod
     def is_recordable(self, variable):
-        """ Determine if the given variable can be recorded
+        """
+        Determine if the given variable can be recorded.
 
         :param str variable: The name of the variable
         :rtype: bool
@@ -103,8 +115,9 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_recordable_variable_index(self, variable):
-        """ Get the index of the variable in the list of variables that can be\
-            recorded
+        """
+        Get the index of the variable in the list of variables that can be
+        recorded.
 
         :param str variable: The name of the variable
         :rtype: int
@@ -112,7 +125,8 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
     @abstractmethod
     def add_parameters(self, parameters):
-        """ Add the initial values of the parameters to the parameter holder
+        """
+        Add the initial values of the parameters to the parameter holder.
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
             A holder of the parameters
@@ -120,8 +134,9 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
     @abstractmethod
     def add_state_variables(self, state_variables):
-        """ Add the initial values of the state variables to the state\
-            variables holder
+        """
+        Add the initial values of the state variables to the state
+        variables holder.
 
         :param ~spinn_utilities.ranged.RangeDictionary state_variables:
             A holder of the state variables
@@ -129,14 +144,16 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_units(self, variable):
-        """ Get the units of the given variable
+        """
+        Get the units of the given variable.
 
         :param str variable: The name of the variable
         """
 
     @abstractproperty
     def is_conductance_based(self):
-        """ Determine if the model uses conductance
+        """
+        Determine if the model uses conductance.
 
         :rtype: bool
         """
