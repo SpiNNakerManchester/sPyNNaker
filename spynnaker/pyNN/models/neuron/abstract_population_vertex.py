@@ -768,10 +768,10 @@ class AbstractPopulationVertex(
     def get_neurons_recording(self, name, vertex_slice):
         if self.__neuron_recorder.is_recordable(name):
             return self.__neuron_recorder.neurons_recording(
-                name, vertex_slice, self.atoms_shape)
+                name, vertex_slice)
         if self.__synapse_recorder.is_recordable(name):
             return self.__synapse_recorder.neurons_recording(
-                name, vertex_slice, self.atoms_shape)
+                name, vertex_slice)
         raise KeyError(f"It is not possible to record {name}")
 
     @property

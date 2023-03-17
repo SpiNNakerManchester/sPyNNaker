@@ -185,8 +185,7 @@ class NeuronData(object):
             if self.__neuron_recording_data is not None:
                 rec_data = self.__neuron_recording_data
             else:
-                rec_data = neuron_recorder.get_generator_data(
-                    vertex_slice, self.__app_vertex.atoms_shape)
+                rec_data = neuron_recorder.get_generator_data(vertex_slice)
             n_words = len(data) + len(header) + len(rec_data)
             spec.reserve_memory_region(
                 region=neuron_regions.neuron_builder,
@@ -232,8 +231,7 @@ class NeuronData(object):
         """
         if struct.repeat_type == StructRepeat.GLOBAL:
             return struct.get_data(values)
-        return struct.get_data(
-            values, vertex_slice, self.__app_vertex.atoms_shape)
+        return struct.get_data(values, vertex_slice)
 
     def __get_neuron_builder_data(self, vertex_slice):
         """ Get the data to build neuron parameters with
@@ -260,8 +258,7 @@ class NeuronData(object):
         """
         if struct.repeat_type == StructRepeat.GLOBAL:
             return struct.get_generator_data(values)
-        return struct.get_generator_data(
-            values, vertex_slice, self.__app_vertex.atoms_shape)
+        return struct.get_generator_data(values, vertex_slice)
 
     def __get_neuron_builder_header(
             self, vertex_slice, n_structs, neuron_regions):
@@ -326,8 +323,7 @@ class NeuronData(object):
                 offset += struct.get_size_in_whole_words() * BYTES_PER_WORD
             else:
                 struct.read_data(
-                    block, results, offset, vertex_slice,
-                    self.__app_vertex.atoms_shape)
+                    block, results, offset, vertex_slice)
                 offset += (
                     struct.get_size_in_whole_words(vertex_slice.n_atoms) *
                     BYTES_PER_WORD)

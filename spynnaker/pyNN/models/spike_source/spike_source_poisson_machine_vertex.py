@@ -405,7 +405,7 @@ class SpikeSourcePoissonMachineVertex(
         data_items.append([0])
         n_items = 0
         data = self._app_vertex.data
-        ids = self.vertex_slice.get_raster_ids(self.app_vertex.atoms_shape)
+        ids = self.vertex_slice.get_raster_ids()
         for (start, stop, item) in data.iter_ranges_by_ids(ids):
             count = stop - start
             items = numpy.dstack(
