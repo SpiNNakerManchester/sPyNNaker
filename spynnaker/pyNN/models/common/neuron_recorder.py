@@ -1074,16 +1074,13 @@ class NeuronRecorder(object):
                 return False
         return True
 
-    def get_generator_data(self, vertex_slice=None, atoms_shape=None):
+    def get_generator_data(self, vertex_slice=None):
         """ Get the recorded data as a generatable data set
 
         :param vertex_slice:
             The slice to generate the data for, or None to generate for
             all neurons (assuming all the same, otherwise error)
         :type vertex_slice: Slice or None
-        :param atoms_shape:
-            The shape of the atoms in the vertex; if vertex_slice is not None,
-            atoms_shape must be not None
         :rtype: numpy.ndarray
         """
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
@@ -1099,11 +1096,10 @@ class NeuronRecorder(object):
                 data.extend([0, 0])
             else:
                 data.extend(self.__get_generator_indices(
-                    variable, vertex_slice, atoms_shape))
+                    variable, vertex_slice))
         return numpy.array(data, dtype="uint32")
 
-    def __get_generator_indices(
-            self, variable, vertex_slice=None, atoms_shape=None):
+    def __get_generator_indices(self, variable, vertex_slice=None):
         """ Get the indices of the variables to record in run-length-encoded
             form
         """
@@ -1114,12 +1110,6 @@ class NeuronRecorder(object):
             return [_REPEAT_PER_NEURON, 1,
                     _REPEAT_PER_NEURON_RECORDED | _RECORDED_FLAG]
 
-        # This must be non-global data, so we need a slice
-        if vertex_slice is None or atoms_shape is None:
-            raise ValueError(
-                "The parameters vertex_slice and atoms_shape must both not be"
-                " None")
-
         # Generate a run-length-encoded list
         # Initially there are no items, but this will be updated
         # Also keep track of the number recorded, also 0 initially
@@ -1127,7 +1117,7 @@ class NeuronRecorder(object):
         n_items = 0
 
         # Go through the indices and ids, assuming both are in order (they are)
-        id_iter = iter(enumerate(vertex_slice.get_raster_ids(atoms_shape)))
+        id_iter = iter(enumerate(vertex_slice.get_raster_ids()))
         index_iter = iter(index)
         # Keep the id and the position in the id list (as this is a RLE)
         next_id, i = next(id_iter, (None, 0))
