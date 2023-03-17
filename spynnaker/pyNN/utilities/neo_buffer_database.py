@@ -213,7 +213,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def __get_recording_id(
             self, cursor, pop_label, variable, population,
             sampling_interval_ms, data_type, buffered_type, units,
-            atoms_shape, n_colour_bits):
+            n_colour_bits):
         """
         Gets an id for this population and recording label combination.
 
@@ -240,7 +240,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :type data_type: DataType or None
         :param BufferDataType buffered_type:
         :param str units:
-        :param tuple atoms_shape:
         :param int n_colour_bits:
         :return:
         """
@@ -260,11 +259,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             """
             INSERT INTO recording
             (pop_id, variable, data_type, buffered_type, t_start,
-            sampling_interval_ms, units, atoms_shape, n_colour_bits)
-            VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)
+            sampling_interval_ms, units, n_colour_bits)
+            VALUES (?, ?, ?, ?, 0, ?, ?, ?)
             """, (pop_id, variable, data_type_name, str(buffered_type),
-                  sampling_interval_ms, units, str(atoms_shape),
-                  n_colour_bits))
+                  sampling_interval_ms, units, n_colour_bits))
         return cursor.lastrowid
 
     def __get_population_metadata(self, cursor, pop_label):
@@ -460,8 +458,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         for row in cursor.execute(
                 """
                 SELECT rec_id,  data_type, buffered_type,  t_start,
-                       sampling_interval_ms, pop_size, units, atoms_shape,
-                        n_colour_bits
+                       sampling_interval_ms, pop_size, units, n_colour_bits
                 FROM recording_view
                 WHERE label = ? AND variable = ?
                 LIMIT 1
@@ -476,10 +473,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             else:
                 units = None
             buffered_type = BufferDataType[str(row["buffered_type"], 'utf-8')]
-            atoms_shape = self.string_to_array(row["atoms_shape"])
             return (row["rec_id"], data_type, buffered_type, row["t_start"],
                     row["sampling_interval_ms"], row["pop_size"], units,
-                    atoms_shape, row["n_colour_bits"])
+                    row["n_colour_bits"])
         raise ConfigurationException(
             f"No metadata for {variable} on {pop_label}")
 
@@ -586,7 +582,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __get_eieio_spike_by_region(
             self, cursor, region_id, simulation_time_step_ms, base_key,
-            vertex_slice, atoms_shape, n_colour_bits, results):
+            vertex_slice, n_colour_bits, results):
         """
         Adds spike data for this region to the list
 
@@ -595,7 +591,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param float simulation_time_step_ms:
         :param int base_key:
         :param Slice vertex_slice:
-        :param tuple(int) atoms_shape:
         :param int n_colour_bits
         :return: all recording indexes spikes or not
         :rtype: list(int)
@@ -605,7 +600,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         number_of_bytes_written = len(spike_data)
         offset = 0
         indices = get_field_based_index(base_key, vertex_slice, n_colour_bits)
-        slice_ids = vertex_slice.get_raster_ids(atoms_shape)
+        slice_ids = vertex_slice.get_raster_ids()
         colour_mask = (2 ** n_colour_bits) - 1
         inv_colour_mask = ~colour_mask & 0xFFFFFFFF
         while offset < number_of_bytes_written:
@@ -632,13 +627,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         return slice_ids
 
-    def __get_eieio_spikes(self, cursor, rec_id, atoms_shape, n_colour_bits):
+    def __get_eieio_spikes(self, cursor, rec_id, n_colour_bits):
         """
         Gets the spikes for this population/recording id
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
-        :param tuple(int) atoms_shape:
         :param int n_colour_bits
         :return: numpy array of spike ids and spike times, all ids recording
         :rtype  ~numpy.ndarray, lis(int)
@@ -654,8 +648,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     "Unable to handle selective recording")
             indexes.extend(self.__get_eieio_spike_by_region(
                 cursor, region_id, simulation_time_step_ms,
-                base_key, vertex_slice, atoms_shape,
-                n_colour_bits, results))
+                base_key, vertex_slice, n_colour_bits, results))
 
         if not results:
             return numpy.empty(shape=(0, 2)), indexes
@@ -754,7 +747,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         return indexes
 
     def __get_spikes(self, cursor, rec_id, view_indexes, buffer_type,
-                     atoms_shape, n_colour_bits, variable):
+                     n_colour_bits, variable):
         """
         Gets the data as a Numpy array for one opulation and variable
 
@@ -762,7 +755,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param int rec_id:
         :param list(int) view_indexes:
         :param buffer_type:
-        :param tuple(int) atoms_shape:
         :param int n_colour_bits
         :param str variable:
         :raises \
@@ -773,7 +765,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             spikes, data_indexes = self.__get_neuron_spikes(cursor, rec_id)
         elif buffer_type == BufferDataType.EIEIO_SPIKES:
             spikes, data_indexes = self.__get_eieio_spikes(
-                cursor, rec_id, atoms_shape, n_colour_bits)
+                cursor, rec_id, n_colour_bits)
         elif buffer_type == BufferDataType.MULTI_SPIKES:
             spikes, data_indexes = self.__get_multi_spikes(cursor, rec_id)
         else:
@@ -1006,7 +998,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
             (rec_id, data_type, buffered_type, _, sampling_interval_ms,
-             pop_size, _, atoms_shape, n_colour_bits) = \
+             pop_size, _, n_colour_bits) = \
                 self.__get_recording_metadeta(cursor, pop_label, variable)
             if buffered_type == BufferDataType.MATRIX:
                 return self.__get_recorded_pynn7(
@@ -1017,22 +1009,21 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 if as_matrix:
                     logger.warning(f"Ignoring as matrix for {variable}")
                 return self.__get_spikes(
-                    cursor, rec_id, view_indexes, buffered_type, atoms_shape,
+                    cursor, rec_id, view_indexes, buffered_type,
                     n_colour_bits, variable)[0]
 
     def get_spike_counts(self, pop_label, view_indexes=None):
         with self.transaction() as cursor:
             # called to trigger the virtual data warning if applicable
             self.__get_segment_info(cursor)
-            (rec_id, _, buffered_type, _, _, pop_size, _, atoms_shape,
-             n_colour_bits) = \
+            (rec_id, _, buffered_type, _, _, pop_size, _, n_colour_bits) = \
                 self.__get_recording_metadeta(cursor, pop_label, SPIKES)
             if view_indexes is None:
                 view_indexes = range(pop_size)
 
             # get_spike will go boom if buffered_type not spikes
             spikes = self.__get_spikes(
-                cursor, rec_id, view_indexes, buffered_type, atoms_shape,
+                cursor, rec_id, view_indexes, buffered_type,
                 n_colour_bits, SPIKES)[0]
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=pop_size)
@@ -1060,7 +1051,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If the recording metadata not setup correctly
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
-         pop_size, units, atoms_shape, n_colour_bits) = \
+         pop_size, units, n_colour_bits) = \
             self.__get_recording_metadeta(cursor, pop_label, variable)
 
         if buffer_type == BufferDataType.MATRIX:
@@ -1082,7 +1073,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             if view_indexes is None:
                 view_indexes = range(pop_size)
             spikes, indexes = self.__get_spikes(
-                cursor, rec_id, view_indexes, buffer_type, atoms_shape,
+                cursor, rec_id, view_indexes, buffer_type,
                 n_colour_bits, variable)
             sampling_rate = 1000 / sampling_interval_ms * quantities.Hz
             self._insert_spike_data(
@@ -1109,7 +1100,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param float t_stop
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
-         pop_size, units, atoms_shape, n_colour_bits) = \
+         pop_size, units, n_colour_bits) = \
             self.__get_recording_metadeta(cursor, pop_label, variable)
 
         if buffer_type == BufferDataType.MATRIX:
@@ -1134,7 +1125,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 csv_writer, self._SPIKES, variable, t_start, t_stop,
                 sampling_interval_ms, units)
             spikes, indexes = self.__get_spikes(
-                cursor, rec_id, view_indexes, buffer_type, atoms_shape,
+                cursor, rec_id, view_indexes, buffer_type,
                 n_colour_bits, variable)
             self._csv_spike_data(csv_writer, spikes, indexes)
 
@@ -1422,12 +1413,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             app_vertex.get_sampling_interval_ms(variable)
 
         units = app_vertex.get_units(variable)
-        atoms_shape = app_vertex.atoms_shape
         n_colour_bits = app_vertex.n_colour_bits
         rec_id = self.__get_recording_id(
             cursor, app_vertex.label, variable,
             population, sampling_interval_ms, data_type,
-            buffered_data_type, units, atoms_shape, n_colour_bits)
+            buffered_data_type, units, n_colour_bits)
         region = app_vertex.get_recording_region(variable)
         machine_vertices = (
             app_vertex.splitter.machine_vertices_for_recording(
