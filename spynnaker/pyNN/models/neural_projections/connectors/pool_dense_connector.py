@@ -129,7 +129,8 @@ class PoolDenseConnector(AbstractConnector):
             pip_slices = tuple(
                 slice(pip_start, pip_end + 1) for pip_start, pip_end in zip(
                     pre_in_post_start, pre_in_post_end))
-            post_slices = post_vertex_slice.slices
+            # TODO check this is correct
+            post_slices = post_vertex_slice.dimension
             return all_weights[pip_slices + post_slices].flatten()
         elif isinstance(self.__weights, RandomDistribution):
             n_weights = self.__get_n_sub_weights(
