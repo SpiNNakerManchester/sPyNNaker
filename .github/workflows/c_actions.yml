@@ -43,14 +43,14 @@ jobs:
       with:
         # Note: SpiNNUtils needed for spinn_utilities.make_tools
         repositories: spinnaker_tools spinn_common SpiNNFrontEndCommon
-      install: false
+        install: false
 
     - name: "Prepare: Install SpiNNUtils"
       uses: ./support/actions/install-spinn-deps
       with:
         # Note: SpiNNUtils needed for spinn_utilities.make_tools
         repositories: SpiNNUtils
-      install: true
+        install: true
 
     - name: Set environment variables
       run: |
