@@ -201,8 +201,10 @@ def EthernetControlPopulation(
     :type database_notify_port_num: int or None
     :return:
         A pyNN Population which can be used as the target of a Projection.
-        Note that the Population can also be used as the source of a
-        Projection, but it might not send spikes.
+
+        .. note::
+            The Population can also be used as the source of a
+            Projection, but it might not send spikes.
     :rtype: ~spynnaker.pyNN.models.populations.Population
     :raises Exception: If an invalid model class is used.
     """
@@ -268,7 +270,9 @@ def EthernetSensorPopulation(
     :type database_notify_port_num: int or None
     :return:
         A pyNN Population which can be used as the source of a Projection.
-        Note that the Population cannot be used as the target of a Projection.
+
+        .. note::
+            The Population cannot be used as the target of a Projection.
     :rtype: ~spynnaker.pyNN.models.populations.Population
     """
     if not isinstance(device, AbstractEthernetSensor):

@@ -220,7 +220,10 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, key_cache, srcs, incoming, app_edge, app_vertex):
         """
         Get the routing information for sources, merging sources that have
-        the same vertex slice (note this happens in retinas from FPGAs).
+        the same vertex slice.
+
+        .. note::
+            This happens in retinas from FPGAs.
 
         :rtype: list(Source)
         """

@@ -42,7 +42,8 @@ class FromFileConnector(_BaseClass):
 
                 # columns = ["i", "j", "weight", "delay", "U", "tau_rec"]
 
-            Note that the header requires `#` at the beginning of the line.
+            .. note::
+                The header requires `#` at the beginning of the line.
         :type file: str or ~io.FileIO
         :param bool distributed:
             Basic pyNN says:

@@ -25,8 +25,11 @@ from spynnaker.pyNN.data import SpynnakerDataView
 def _all_one_val_gen(rd):
     """
     Determine if all the values of a dictionary are the same,
-    and can be generated.  Note that a random distribution is considered
-    the same if the same distribution is used for all neurons.
+    and can be generated.
+
+    .. note::
+        A random distribution is considered the same if the same distribution
+        is used for all neurons.
 
     :rtype: bool
     """

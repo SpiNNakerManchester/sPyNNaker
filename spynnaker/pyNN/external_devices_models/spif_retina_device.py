@@ -74,7 +74,7 @@ class SPIFRetinaDevice(
             sending
         :param base_key:
             The key that is common over the whole vertex,
-            or None to use the pipe number as the key
+            or `None` to use the pipe number as the key
         :type base_key: int or None
         :param int input_x_shift:
             The shift to get the x coordinate from the input keys sent to SPIF
@@ -82,16 +82,21 @@ class SPIFRetinaDevice(
             The shift to get the y coordinate from the input keys sent to SPIF
         :param board_address:
             The IP address of the board to which the FPGA is connected, or None
-            to use the default board or chip_coords.  Note chip_coords will be
-            used first if both are specified, with board_address then being
-            used if the coordinates don't connect to an FPGA.
+            to use the default board or chip_coords.
+
+            .. note::
+                chip_coords will be used first if both are specified, with
+                board_address then being used if the coordinates don't connect
+                to an FPGA.
         :type board_address: str or None
         :param chip_coords:
             The coordinates of the chip to which the FPGA is connected, or
-            None to use the default board or board_address.   Note chip_coords
-            will be used first if board_address is also specified, with
-            board_address then being used if the coordinates don't connect to
-            an FPGA.
+            `None` to use the default board or board_address.
+
+            .. note::
+                chip_coords will be used first if board_address is also
+                specified, with board_address then being used if the
+                coordinates don't connect to an FPGA.
         :type chip_coords: tuple(int, int) or None
         """
         # Do some checks

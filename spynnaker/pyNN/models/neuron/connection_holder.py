@@ -69,9 +69,11 @@ class ConnectionHolder(object):
             A list of tuples of field names and fixed values to be appended
             to the other fields per connection, formatted as
             `[(field_name, value), ...]`.
-            Note that if the field is to be returned, the name must also
-            appear in data_items_to_return, which determines the order of
-            items in the result
+
+            .. note::
+                If the field is to be returned, the name must also
+                appear in data_items_to_return, which determines the order of
+                items in the result.
         :type fixed_values: list(tuple(str,int)) or None
         :param notify:
             A callback to call when the connections have all been added.

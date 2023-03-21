@@ -191,7 +191,9 @@ class NeuronParameter(object):
         :param int slice_stop: Exclusive end of the range
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to eventually write to.
-            (Note that this does not actually do the write).
+
+            .. note::
+                This does not actually do the write.
         :return: Iterator that produces a command to write to the
             specification for each element in the slice.
         :rtype: iterator(tuple(bytearray, str))
