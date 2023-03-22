@@ -30,6 +30,7 @@ from .threshold_type_multicast_device_control import (
 from .spif_retina_device import SPIFRetinaDevice
 from .icub_retina_device import ICUBRetinaDevice
 from .spif_output_device import SPIFOutputDevice
+from .spif_input_device import SPIFInputDevice
 
 __all__ = ["AbstractEthernetController", "AbstractEthernetSensor",
            "AbstractEthernetTranslator", "ArbitraryFPGADevice",
@@ -38,4 +39,4 @@ __all__ = ["AbstractEthernetController", "AbstractEthernetSensor",
            "MachineMunichMotorDevice",
            "MunichMotorDevice", "MunichRetinaDevice",
            "ThresholdTypeMulticastDeviceControl", "SPIFRetinaDevice",
-           "ICUBRetinaDevice", "SPIFOutputDevice"]
+           "ICUBRetinaDevice", "SPIFOutputDevice", "SPIFInputDevice"]

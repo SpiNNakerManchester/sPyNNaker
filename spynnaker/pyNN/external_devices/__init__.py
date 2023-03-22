@@ -31,7 +31,7 @@ from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
     MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl,
-    SPIFRetinaDevice, ICUBRetinaDevice, SPIFOutputDevice)
+    SPIFRetinaDevice, ICUBRetinaDevice, SPIFOutputDevice, SPIFInputDevice)
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
     EthernetCommandConnection, EthernetControlConnection,
@@ -78,7 +78,7 @@ __all__ = [
     "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
     "MunichRetinaDevice", "MunichMotorDevice", "ArbitraryFPGADevice",
     "PushBotRetinaViewer", "ExternalDeviceLifControl", "SPIFRetinaDevice",
-    "ICUBRetinaDevice", "SPIFOutputDevice",
+    "ICUBRetinaDevice", "SPIFOutputDevice", "SPIFInputDevice",
 
     # PushBot Parameters
     "MunichIoSpiNNakerLinkProtocol",
