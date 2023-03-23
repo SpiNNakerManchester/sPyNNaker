@@ -279,3 +279,17 @@ class SPIFInputDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self):
         return []
+
+    @overrides(PopulationApplicationVertex.get_atom_key_map)
+    def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
+        # Work out which machine vertex
+        start = pre_vertex.vertex_slice.lo_atom
+        key_and_mask = self.get_machine_fixed_key_and_mask(
+            pre_vertex, partition_id)
+        end = pre_vertex.vertex_slice.lo_atom
+        n_key = key_and_mask.key & self.INPUT_MASK
+        neuron_id = pre_vertex.vertex_slice.lo_atom + n_key
+        for n in range(start, end, self.INPUT_MASK + 1):
+            key = key_and_mask.key | n
+            yield (neuron_id, key)
+            neuron_id += self.INPUT_MASK + 1
