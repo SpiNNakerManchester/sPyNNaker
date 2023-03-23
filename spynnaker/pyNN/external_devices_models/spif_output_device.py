@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from functools import partial
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import set_config
 from pacman.model.graphs.application import (
@@ -22,7 +23,8 @@ from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager)
 from .spif_devices import (
-    SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SpiNNFPGARegister)
+    SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SpiNNFPGARegister, set_distiller_key,
+    set_distiller_mask_delayed)
 
 _MAX_INCOMING = 6
 
@@ -30,14 +32,47 @@ _MAX_INCOMING = 6
 class SPIFOutputDevice(
         ApplicationFPGAVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):
-    """ Output (only) to a SPIF device
+    """ Output (only) to a SPIF device.  Each SPIF device can accept up to 6
+        incoming projections.
+        Keys sent from Populations to SPIF will be mapped by removing the
+        SpiNNaker key and adding an index so that the source Population can
+        be identified.  Source Populations must be split into power-of-two
+        sized cores to ensure that keys are contiguous.
+        The keys output by SPIF will be of the form:
+            |projection_index|neuron_id|
+        By default, the projection index will be in the top 8 bits of the
+        packet, but this can be controlled with the output_key_shift parameter.
+
     """
 
-    __slots__ = ["__incoming_partitions", "__create_database"]
+    __slots__ = ["__incoming_partitions", "__create_database",
+                 "__output_key_shift"]
 
     def __init__(self, board_address=None, chip_coords=None, label=None,
                  create_database=True, database_notify_host=None,
-                 database_notify_port_num=None, database_ack_port_num=None):
+                 database_notify_port_num=None, database_ack_port_num=None,
+                 output_key_shift=24):
+        """
+        :param board_address: The board IP address of the SPIF device
+        :type board_address: int or None
+        :param chip_coords: The chip coordinates of the SPIF device
+        :type chip_coords: tuple(int, int) or None
+        :param label: The label to give the SPIF device
+        :type label: int or None
+        :param bool create_database:
+            Whether the database will be used to decode keys or not
+        :param database_notify_host: The host that will read the database
+        :type database_notify_host: str or None
+        :param database_notify_port_num:
+            The port of the host that will read the database
+        :type database_notify_port_num: int or None
+        :param database_ack_port_num:
+            The port to listen on for responses from the host reading the
+            database
+        :type database_ack_port_num: int or None
+        :param int proj_index_shift:
+            The shift to apply to the population indices when added to the key
+        """
         super(SPIFOutputDevice, self).__init__(
             n_atoms=1,
             outgoing_fpga_connection=FPGAConnection(
@@ -52,6 +87,7 @@ class SPIFOutputDevice(
                 database_notify_host, database_notify_port_num,
                 database_ack_port_num)
         self.__create_database = create_database
+        self.__output_key_shift = output_key_shift
 
     def __is_power_of_2(self, v):
         """ Determine if a value is a power of 2
@@ -83,7 +119,7 @@ class SPIFOutputDevice(
             SpynnakerDataView.add_live_output_vertex(
                 partition.pre_vertex, partition.identifier)
 
-    def _get_set_key_payload(self, index):
+    def _get_set_xp_key_payload(self, index):
         """ Get the payload for the command to set the router key
         """
         r_infos = SpynnakerDataView.get_routing_infos()
@@ -91,7 +127,7 @@ class SPIFOutputDevice(
             self.__incoming_partitions[index].pre_vertex,
             self.__incoming_partitions[index].identifier)
 
-    def _get_set_mask_payload(self, index):
+    def _get_set_xp_mask_payload(self, index):
         """ Get the payload for the command to set the router mask
         """
         r_infos = SpynnakerDataView.get_routing_infos()
@@ -99,15 +135,26 @@ class SPIFOutputDevice(
             self.__incoming_partitions[index].pre_vertex,
             self.__incoming_partitions[index].identifier).mask
 
+    def _get_set_dist_mask_payload(self, index):
+        """ Get the payload for the command to set the distiller mask
+        """
+        r_infos = SpynnakerDataView.get_routing_infos()
+        return ~r_infos.get_routing_info_from_pre_vertex(
+            self.__incoming_partitions[index].pre_vertex,
+            self.__incoming_partitions[index].identifier).mask & 0xFFFFFFFF
+
     @property
     def start_resume_commands(self):
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
         for i in range(len(self.__incoming_partitions)):
             yield SpiNNFPGARegister.XP_KEY_0.delayed_command(
-                self._get_set_key_payload, index=i)
+                self._get_set_xp_key_payload, index=i)
             yield SpiNNFPGARegister.XP_MASK_0.delayed_command(
-                self._get_set_mask_payload, index=i)
+                self._get_set_xp_mask_payload, index=i)
+            yield set_distiller_key(i, i << self.__output_key_shift)
+            yield set_distiller_mask_delayed(
+                i, partial(self._get_set_dist_mask_payload, index=i))
 
     @property
     def pause_stop_commands(self):
