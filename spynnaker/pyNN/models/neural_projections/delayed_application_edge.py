@@ -59,7 +59,7 @@ class DelayedApplicationEdge(ApplicationEdge):
     @property
     def undelayed_edge(self):
         """
-        Get the edge that for projections without extended delays.
+        The edge for projections without extended delays.
 
         :rtype: ProjectionApplicationEdge
         """

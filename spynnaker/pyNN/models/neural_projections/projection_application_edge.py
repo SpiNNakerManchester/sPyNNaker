@@ -124,7 +124,7 @@ class ProjectionApplicationEdge(
     @property
     def is_neuromodulation(self):
         """
-        Check if this edge is providing neuromodulation.
+        Whether this edge is providing neuromodulation.
 
         :rtype: bool
         """

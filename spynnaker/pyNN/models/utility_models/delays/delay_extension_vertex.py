@@ -43,10 +43,6 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
     SAFETY_FACTOR = 5000
     MAX_DTCM_AVAILABLE = 59756 - SAFETY_FACTOR
 
-    MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE = (
-        "The delay per stage is already set to {}, and therefore {} is not "
-        "yet feasible. Please report it to Spinnaker user mail list.")
-
     def __init__(
             self, partition, delay_per_stage, n_delay_stages, n_colour_bits,
             label="DelayExtension"):
@@ -100,8 +96,10 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
             self, n_delay_stages, delay_per_stage):
         if delay_per_stage != self.__delay_per_stage:
             raise DelayExtensionException(
-                self.MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE.format(
-                    self.__delay_per_stage, delay_per_stage))
+                "The delay per stage is already set to "
+                f"{self.__delay_per_stage}, and therefore {delay_per_stage} "
+                "is not yet feasible. "
+                "Please report it to Spinnaker user mail list.")
 
         if n_delay_stages > self.__n_delay_stages:
             self.__n_delay_stages = n_delay_stages
@@ -138,7 +136,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
     @property
     def outgoing_edges(self):
         """
-        Get the outgoing edges from this vertex.
+        The outgoing edges from this vertex.
 
         :rtype: list(DelayApplicationEdge)
         """

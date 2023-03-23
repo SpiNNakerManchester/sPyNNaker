@@ -248,13 +248,12 @@ def _get_allowed_row_length(n_words, dynamics, in_edge, n_synapses):
         max_synapses = dynamics.get_max_synapses(e.max_size)
         raise SynapseRowTooBigException(
             max_synapses,
-            "The connection between {} and {} has more synapses ({}) than"
-            " can currently be supported on this implementation of PyNN"
-            " ({} for this connection type)."
-            " Please reduce the size of the target population, or reduce"
-            " the number of neurons per core.".format(
-                in_edge.pre_vertex, in_edge.post_vertex, n_synapses,
-                max_synapses)) from e
+            f"The connection between {in_edge.pre_vertex} and "
+            f"{in_edge.post_vertex} has more synapses ({n_synapses}) than "
+            "can currently be supported on this implementation of PyNN "
+            f"({max_synapses} for this connection type). "
+            "Please reduce the size of the target population, or reduce "
+            "the number of neurons per core.") from e
 
 
 def get_synapses(

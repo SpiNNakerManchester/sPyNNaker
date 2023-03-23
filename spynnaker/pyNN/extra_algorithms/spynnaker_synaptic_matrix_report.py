@@ -22,7 +22,6 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _DIRNAME = "synaptic_matrix_reports"
-_TMPL_FILENAME = "synaptic_matrix_for_application_edge_{}"
 
 
 class SpYNNakerSynapticMatrixReport(object):
@@ -59,9 +58,10 @@ class SpYNNakerSynapticMatrixReport(object):
             # only write matrix's for edges which have matrix's
             if isinstance(edge, ProjectionApplicationEdge):
                 # figure new file name
-                file_name = os.path.join(
-                    top_level_folder, _TMPL_FILENAME.format(edge.label))
-                self._write_file(file_name, connection_holder, edge)
+                self._write_file(os.path.join(
+                    top_level_folder,
+                    f"synaptic_matrix_for_application_edge_{edge.label}"),
+                    connection_holder, edge)
 
         # Reset the print options
         numpy.set_printoptions(**print_opts)

@@ -186,7 +186,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
     @property
     def allow_self_connections(self):
         """
-        If the connector is used to connect a Population to itself, this
+        When the connector is used to connect a Population to itself, this
         flag determines whether a neuron is allowed to connect to itself,
         or only to other neurons in the Population.
 
@@ -202,8 +202,8 @@ class IndexBasedProbabilityConnector(AbstractConnector,
     def index_expression(self):
         """
         The right-hand side of a valid python expression for probability,
-        involving the indices of the pre and post populations, that can
-        be parsed by eval(), that computes a probability dist.
+        involving the indices of the pre- and post-populations, that can
+        be parsed by `eval()`, that computes a probability distribution.
 
         :rtype: str
         """

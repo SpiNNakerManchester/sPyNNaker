@@ -193,7 +193,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     @property
     def synaptic_structure(self):
         """
-        Get the synaptic structure of the plastic part of the rows.
+        The synaptic structure of the plastic part of the rows.
 
         :rtype: AbstractSynapseStructure
         """

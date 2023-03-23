@@ -56,16 +56,6 @@ class SplitterAbstractPopulationVertexFixed(
         "__expect_delay_extension"
     ]
 
-    """
-    The message to use when the Population is invalid.
-    """
-    INVALID_POP_ERROR_MESSAGE = (
-        "The vertex {} cannot be supported by the "
-        "SplitterAbstractPopulationVertexFixed as"
-        " the only vertex supported by this splitter is a "
-        "AbstractPopulationVertex. Please use the correct splitter for "
-        "your vertex and try again.")
-
     def __init__(self):
         super().__init__()
         self.__slices = None
@@ -77,7 +67,11 @@ class SplitterAbstractPopulationVertexFixed(
         super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
-                self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+                f"The vertex {app_vertex} cannot be supported by the "
+                "SplitterAbstractPopulationVertexFixed as the only vertex "
+                "supported by this splitter is a AbstractPopulationVertex. "
+                "Please use the correct splitter for your vertex and try "
+                "again.")
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):

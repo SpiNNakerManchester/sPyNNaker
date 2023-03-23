@@ -1086,7 +1086,7 @@ class NeuronRecorder(object):
     @property
     def is_global_generatable(self):
         """
-        Is the data for all neurons the same i.e. all or none of the
+        Whether the data for all neurons the same, i.e., all or none of the
         neurons are recorded for all variables.
 
         :rtype: bool

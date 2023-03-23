@@ -27,17 +27,10 @@ class SplitterPoissonDelegate(SplitterFixedLegacy):
     one-to-one connected to a single Population.
     """
 
-    # Message to display on error
-    INVALID_POP_ERROR_MESSAGE = (
-        "The vertex {} cannot be supported by the SplitterPoissonDelegate as"
-        " the only vertex supported by this splitter is a "
-        "SpikeSourcePoissonVertex. Please use the correct splitter for "
-        "your vertex and try again.")
-
     @property
     def send_over_sdram(self):
         """
-        Determine if this vertex is to be sent using SDRAM.
+        Whether this vertex is to be sent using SDRAM.
 
         :rtype: bool
         """
@@ -59,7 +52,10 @@ class SplitterPoissonDelegate(SplitterFixedLegacy):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, SpikeSourcePoissonVertex):
             raise PacmanConfigurationException(
-                self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+                f"The vertex {app_vertex} cannot be supported by the "
+                "SplitterPoissonDelegate as the only vertex supported by this "
+                "splitter is a SpikeSourcePoissonVertex. Please use the "
+                "correct splitter for your vertex and try again.")
 
     @overrides(SplitterFixedLegacy.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):

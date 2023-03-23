@@ -501,7 +501,7 @@ class _AppKeyInfo(object):
     @property
     def key_and_mask(self):
         """
-        Convenience method to get the key and mask as an object.
+        The key and mask as an object.
 
         :rtype: BaseKeyAndMask
         """

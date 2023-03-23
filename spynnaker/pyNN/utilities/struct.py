@@ -334,7 +334,7 @@ class Struct(object):
     @property
     def is_generatable(self):
         """
-        Determine if the data inside could be generated on machine.
+        Whether the data inside could be generated on machine.
 
         :rtype: bool
         """

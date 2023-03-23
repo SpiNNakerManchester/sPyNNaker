@@ -33,13 +33,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
 
     _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
-    INVALID_POP_ERROR_MESSAGE = (
-        "The vertex {} cannot be supported by the "
-        "SplitterDelayVertexSlice as"
-        " the only vertex supported by this splitter is a "
-        "DelayExtensionVertex. Please use the correct splitter for "
-        "your vertex and try again.")
-
     NEED_EXACT_ERROR_MESSAGE = (
         "DelayExtensionsSplitters need exact incoming slices. Please fix "
         "and try again")
@@ -96,7 +89,10 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, DelayExtensionVertex):
             raise PacmanConfigurationException(
-                self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+                f"The vertex {app_vertex} cannot be supported by the "
+                "SplitterDelayVertexSlice as the only vertex supported by "
+                "this splitter is a DelayExtensionVertex. Please use the "
+                "correct splitter for your vertex and try again.")
 
     def create_machine_vertex(
             self, source_app_vertex, vertex_slice):

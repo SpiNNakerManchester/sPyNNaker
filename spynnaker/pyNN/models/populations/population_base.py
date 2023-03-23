@@ -177,7 +177,7 @@ class PopulationBase(object, metaclass=AbstractBase):
     @property
     def local_size(self):
         """
-        Return the number of cells in the population on the local MPI node.
+        The number of cells in the population on the local MPI node.
 
         :rtype: int
         """

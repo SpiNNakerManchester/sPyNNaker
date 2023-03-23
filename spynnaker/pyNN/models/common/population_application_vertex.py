@@ -210,10 +210,10 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     @property
     def conductance_based(self):
         """
-        Determine whether the vertex models post-synaptic inputs as
+        Whether the vertex models post-synaptic inputs as
         currents or conductance.
 
-        By default this returns False; override if the model accepts
+        By default this is False; override if the model accepts
         conductance based input.
 
         :rtype: bool.

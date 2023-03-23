@@ -227,7 +227,8 @@ class _MasterPopEntry(object):
     @property
     def routing_key(self):
         """
-        :return: the key combo of this entry
+        The key combo of this entry.
+
         :rtype: int
         """
         return self.__routing_key
@@ -235,7 +236,8 @@ class _MasterPopEntry(object):
     @property
     def mask(self):
         """
-        :return: the mask of the key for this entry
+        The mask of the key for this entry.
+
         :rtype: int
         """
         return self.__mask
@@ -243,7 +245,8 @@ class _MasterPopEntry(object):
     @property
     def core_mask(self):
         """
-        :return: the mask of the key once shifted to get the source core ID
+        The mask of the key once shifted to get the source core ID.
+
         :rtype: int
         """
         return self.__core_mask
@@ -251,7 +254,8 @@ class _MasterPopEntry(object):
     @property
     def core_shift(self):
         """
-        :return: the shift of the key to get the source core ID
+        The shift of the key to get the source core ID.
+
         :rtype: int
         """
         return self.__core_shift
@@ -259,7 +263,8 @@ class _MasterPopEntry(object):
     @property
     def n_neurons(self):
         """
-        :return: the number of neurons per source core
+        The number of neurons per source core.
+
         :rtype: int
         """
         return self.__n_neurons
@@ -267,8 +272,9 @@ class _MasterPopEntry(object):
     @property
     def addresses_and_row_lengths(self):
         """
-        :return: the memory address that this master pop entry points at
-            (synaptic matrix)
+        The memory address that this master pop entry points at
+        (in the synaptic matrix).
+
         :rtype: list(tuple(int,int,bool,bool))
         """
         return self.__addresses_and_row_lengths
@@ -567,14 +573,12 @@ class MasterPopTableAsBinarySearch(object):
                 core_shift != entry.core_shift or
                 n_neurons != entry.n_neurons):
             raise SynapticConfigurationException(
-                "Existing entry for key {} doesn't match one being added:"
-                " Existing mask: {} core_mask: {} core_shift: {}"
-                " n_neurons: {}"
-                " Adding mask: {} core_mask: {} core_shift: {}"
-                " n_neurons: {}".format(
-                    key_and_mask.key, entry.mask, entry.core_mask,
-                    entry.core_shift, entry.n_neurons, key_and_mask.mask,
-                    core_mask, core_shift, n_neurons))
+                f"Existing entry for key {key_and_mask.key} doesn't match one "
+                f"being added: Existing mask: {entry.mask} "
+                f"core_mask: {entry.core_mask} core_shift: {entry.core_shift} "
+                f"n_neurons: {entry.n_neurons} "
+                f"Adding mask: {key_and_mask.mask} core_mask: {core_mask} "
+                f"core_shift: {core_shift} n_neurons: {n_neurons}")
         return entry
 
     def get_pop_table_data(self):

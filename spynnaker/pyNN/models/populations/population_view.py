@@ -246,7 +246,7 @@ class PopulationView(PopulationBase):
     @property
     def conductance_based(self):
         """
-        Indicates whether the post-synaptic response is modelled as a
+        Whether the post-synaptic response is modelled as a
         change in conductance or a change in current.
 
         :rtype: bool
@@ -410,7 +410,7 @@ class PopulationView(PopulationBase):
     @property
     def grandparent(self):
         """
-        Returns the parent Population at the root of the tree (since the
+        The parent Population at the root of the tree (since the
         immediate parent may itself be a PopulationView).
 
         The name "grandparent" is of course a little misleading, as it could

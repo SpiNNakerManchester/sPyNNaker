@@ -433,7 +433,7 @@ class Population(PopulationBase):
     @property
     def initial_values(self):
         """
-        Get the initial values of the state variables.
+        The initial values of the state variables.
 
         .. note::
             These values will be the same as the values set with the last call
@@ -491,7 +491,7 @@ class Population(PopulationBase):
     @property
     def positions(self):
         """
-        Return the position array for structured populations.
+        The position array for structured populations.
 
         :return: a 3xN array
         :rtype: ~numpy.ndarray
@@ -565,7 +565,7 @@ class Population(PopulationBase):
     @property
     def conductance_based(self):
         """
-        True if the population uses conductance inputs
+        Whether the population uses conductance inputs
 
         :rtype: bool
         """
@@ -691,7 +691,7 @@ class Population(PopulationBase):
     @property
     def structure(self):
         """
-        Return the structure for the population.
+        The structure for the population.
 
         :rtype: ~pyNN.space.BaseStructure or None
         """

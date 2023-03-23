@@ -113,13 +113,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__neuromodulators"
         ]
 
-    INVALID_POP_ERROR_MESSAGE = (
-        "The vertex {} cannot be supported by the "
-        "SplitterAbstractPopVertexNeuronsSynapses as"
-        " the only vertex supported by this splitter is a "
-        "AbstractPopulationVertex. Please use the correct splitter for "
-        "your vertex and try again.")
-
     def __init__(self, n_synapse_vertices=1,
                  max_delay=None,
                  allow_delay_extension=None):
@@ -175,7 +168,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
-                self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+                f"The vertex {app_vertex} cannot be supported by the "
+                "SplitterAbstractPopVertexNeuronsSynapses as the only vertex "
+                "supported by this splitter is a AbstractPopulationVertex. "
+                "Please use the correct splitter for your vertex and try "
+                "again.")
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
@@ -197,11 +194,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         if (n_atom_bits + get_n_bits(n_synapse_types) +
                 get_n_bits(self.max_support_delay())) > MAX_RING_BUFFER_BITS:
             raise SynapticConfigurationException(
-                "The combination of the number of neurons per core ({}), "
-                "the number of synapse types ({}), and the maximum delay per "
-                "core ({}) will require too much DTCM.  Please reduce one or "
-                "more of these values.".format(
-                    n_atom_bits, n_synapse_types, self.max_support_delay()))
+                "The combination of the number of neurons per core "
+                f"({n_atom_bits}), the number of synapse types "
+                f"({n_synapse_types}), and the maximum delay per core "
+                f"({self.max_support_delay()}) will require too much DTCM. "
+                "Please reduce one or more of these values.")
 
         self.__neuron_vertices = list()
         self.__synapse_vertices = list()
@@ -336,12 +333,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :rtype: PopulationNeuronsMachineVertex
         """
         app_vertex = self._governed_app_vertex
-        neuron_label = "{}_Neurons:{}-{}".format(
-            label, vertex_slice.lo_atom, vertex_slice.hi_atom)
         neuron_vertex = PopulationNeuronsMachineVertex(
-            sdram, neuron_label, app_vertex,
-            vertex_slice, index, rb_shifts, weight_scales, neuron_data,
-            atoms_per_core)
+            sdram,
+            f"{label}_Neurons:{vertex_slice.lo_atom}-{vertex_slice.hi_atom}",
+            app_vertex, vertex_slice, index, rb_shifts, weight_scales,
+            neuron_data, atoms_per_core)
         app_vertex.remember_machine_vertex(neuron_vertex)
         self.__neuron_vertices.append(neuron_vertex)
 
@@ -379,8 +375,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :rtype: tuple(SynapseRegions, str)
         """
         synapse_references = self.__synapse_references
-        syn_label = "{}_Synapses:{}-{}".format(
-            label, vertex_slice.lo_atom, vertex_slice.hi_atom)
+        syn_label = (
+            f"{label}_Synapses:{vertex_slice.lo_atom}-{vertex_slice.hi_atom}")
 
         # Do the lead synapse core
         lead_synapse_vertex = PopulationSynapsesMachineVertexLead(
@@ -494,10 +490,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 # for the Poisson will create any others as needed
                 for vertex_slice in self.__get_fixed_slices():
                     sdram = pre_vertex.get_sdram_used_by_atoms(vertex_slice)
-                    poisson_label = "{}_Poisson:{}-{}".format(
-                        label, vertex_slice.lo_atom, vertex_slice.hi_atom)
                     poisson_m_vertex = pre_vertex.create_machine_vertex(
-                        vertex_slice, sdram, label=poisson_label)
+                        vertex_slice, sdram, label=(
+                            f"{label}_Poisson:"
+                            f"{vertex_slice.lo_atom}-{vertex_slice.hi_atom}"))
                     pre_vertex.remember_machine_vertex(poisson_m_vertex)
                     incoming_direct_poisson[vertex_slice].append(
                         (poisson_m_vertex, proj._projection_edge))
@@ -649,7 +645,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     @property
     def n_synapse_vertices(self):
         """
-        Return the number of synapse vertices per neuron vertex.
+        The number of synapse vertices per neuron vertex.
 
         :rtype: int
         """
@@ -658,7 +654,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     @property
     def __synapse_references(self):
         """
-        Get reference identifiers for the shared synapse regions.
+        The reference identifiers for the shared synapse regions.
 
         :rtype: SynapseRegions
         """

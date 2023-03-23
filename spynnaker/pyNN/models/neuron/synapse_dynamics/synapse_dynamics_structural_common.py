@@ -80,7 +80,6 @@ class SynapseDynamicsStructuralCommon(
         """
         The period of rewiring.
 
-        :return: The period of rewiring
         :rtype: float
         """
         return 1. / self.f_rew

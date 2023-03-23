@@ -343,7 +343,7 @@ class AbstractPopulationVertex(
     @property
     def combined_core_capable(self):
         """
-        Determine if the vertex can manage to operate on a combined
+        Whether the vertex can manage to operate on a combined
         neuron-synapse core, or if a split synapse-core is more
         appropriate.
 
@@ -362,7 +362,7 @@ class AbstractPopulationVertex(
     @property
     def n_synapse_cores_required(self):
         """
-        Get the estimated number of synapse cores required, when using a
+        The estimated number of synapse cores required, when using a
         split synapse-neuron core model.
 
         .. note::
@@ -419,7 +419,7 @@ class AbstractPopulationVertex(
     @property
     def self_projection(self):
         """
-        Get any projection from this vertex to itself.
+        Any projection from this vertex to itself.
 
         :rtype: PyNNProjectionCommon or None
         """
@@ -891,14 +891,14 @@ class AbstractPopulationVertex(
     @property
     def current_sources(self):
         """
-        Current sources need to be available to machine vertex.
+        Current sources needed to be available to machine vertex.
         """
         return self.__current_sources
 
     @property
     def current_source_id_list(self):
         """
-        Current source ID list needs to be available to machine vertex.
+        Current source ID list needed to be available to machine vertex.
         """
         return self.__current_source_id_list
 
@@ -1253,7 +1253,7 @@ class AbstractPopulationVertex(
     @property
     def neuron_recordables(self):
         """
-        Get the names of variables that can be recorded by the neuron.
+        The names of variables that can be recorded by the neuron.
 
         :rtype: list(str)
         """
@@ -1262,7 +1262,7 @@ class AbstractPopulationVertex(
     @property
     def synapse_recordables(self):
         """
-        Get the names of variables that can be recorded by the synapses.
+        The names of variables that can be recorded by the synapses.
 
         :rtype: list(str)
         """
@@ -1382,7 +1382,7 @@ class AbstractPopulationVertex(
 
     def get_incoming_projections_from(self, source_vertex):
         """
-        Get the projections that target this population vertex from
+        The projections that target this population vertex from
         the given source.
         """
         return self.__incoming_projections[source_vertex]
@@ -1400,9 +1400,8 @@ class AbstractPopulationVertex(
     @property
     def pop_seed(self):
         """
-        The seed to use for the population overall.
+        The seed to use for the population overall; a list of four integers.
 
-        :return: A list of 4 integers
         :rtype: list(int)
         """
         return self.__pop_seed
@@ -1438,7 +1437,7 @@ class AbstractPopulationVertex(
     @property
     def read_initial_values(self):
         """
-        Determine if initial values need to be stored.
+        Whether initial values need to be stored.
 
         :rtype: bool
         """

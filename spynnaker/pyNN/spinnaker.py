@@ -200,7 +200,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     @property
     def mpi_rank(self):
         """
-        Gets the MPI rank of the simulator.
+        The MPI rank of the simulator.
 
         .. note::
             Meaningless on SpiNNaker, so we pretend we're the head node.
@@ -221,7 +221,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     @property
     def num_processes(self):
         """
-        Gets the number of MPI worker processes.
+        The number of MPI worker processes.
 
         .. note::
             Meaningless on SpiNNaker, so we pretend there's one MPI process

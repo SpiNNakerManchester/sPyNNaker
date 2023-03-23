@@ -93,7 +93,7 @@ class StepCurrentSource(AbstractCurrentSource):
     @overrides(AbstractCurrentSource.get_parameters)
     def get_parameters(self):
         """
-        Get the parameters of the current source.
+        The parameters of the current source.
 
         :rtype dict(str, Any)
         """
@@ -103,7 +103,7 @@ class StepCurrentSource(AbstractCurrentSource):
     @overrides(AbstractCurrentSource.get_parameter_types)
     def get_parameter_types(self):
         """
-        Get the parameters of the current source.
+        The parameters of the current source.
 
         :rtype dict(str, Any)
         """

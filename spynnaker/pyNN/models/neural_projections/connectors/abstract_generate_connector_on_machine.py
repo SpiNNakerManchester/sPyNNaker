@@ -182,7 +182,7 @@ class AbstractGenerateConnectorOnMachine(
     @property
     def gen_connector_params_size_in_bytes(self):
         """
-        The size of the connector parameters in bytes.
+        The size of the connector parameters, in bytes.
 
         :rtype: int
         """
