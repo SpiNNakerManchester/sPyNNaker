@@ -267,9 +267,11 @@ class SpiNNFPGARegister(IntEnum):
     """
 
     # The base key which identifies packets to send out to the peripheral
+    # (deprecated - use XP_KEY_0)
     P_KEY = 2
 
     # The mask which identifies packets to send out to the peripheral
+    # (deprecated - use XP_MASK_0)
     P_MASK = 3
 
     # The base key which identifies packets to write to the FPGA registers
@@ -293,26 +295,38 @@ class SpiNNFPGARegister(IntEnum):
     # to SpiNNaker
     START = 17
 
-    def cmd(self, payload=None):
+    # The first register (of 6) containing the keys to route to the peripheral
+    XP_KEY_0 = 32
+
+    # The first register (of 6) containing the masks to route to the peripheral
+    XP_MASK_0 = 48
+
+    def cmd(self, payload=None, index=0):
         """ Make a command to send to the FPGA to set a register value
 
         :param payload:
             The payload to use in the command, or None for no payload
         :type payload: int or None
+        :param int index:
+            The index of the register to use when using a multi-indexed
+            register (default is 0 which works for all registers)
         :rtype: MultiCastCommand
         """
         return MultiCastCommand(
-            _LC_KEY + self.value, payload, time=None, repeat=_REPEATS,
+            _LC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
 
-    def delayed_command(self, get_payload):
+    def delayed_command(self, get_payload, index=0):
         """ Make a command to send to the FPGA to set a register value,
             where the value itself is currently unknown
 
         :param func()->int get_payload:
             A function to call to get the payload later
+        :param int index:
+            The index of the register to use when using a multi-indexed
+            register (default is 0 which works for all registers)
         :rtype: MultiCastCommand
         """
         return _DelayedMultiCastCommand(
-            _LC_KEY + self.value, get_payload, repeat=_REPEATS,
+            _LC_KEY + self.value + index, get_payload, repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
