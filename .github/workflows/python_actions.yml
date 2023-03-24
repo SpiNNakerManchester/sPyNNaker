@@ -1,0 +1,100 @@
+# Copyright (c) 2020 The University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This workflow will install Python dependencies, run tests, lint and rat with
+# a variety of Python versions. For more information see:
+# https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+# Note that documentation building is done in parallel (with testing) because
+# that takes a long time in sPyNNaker right now.
+
+name: Python Actions
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Checkout SupportScripts
+      uses: actions/checkout@v3
+      with:
+        repository: SpiNNakerManchester/SupportScripts
+        path: support
+
+    - name: Install Ubuntu dependencies
+      uses: ./support/actions/apt-get-install
+      with:
+        packages: graphviz
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+    - name: Install Spinnaker Dependencies
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: >
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
+          SpiNNFrontEndCommon TestBase
+        install: true
+    - name: Install matplotlib
+      uses: ./support/actions/install-matplotlib
+    - name: Setup
+      uses: ./support/actions/run-setup
+    - name: Setup PyNN
+      uses: ./support/actions/pynn-setup
+    - name: Create a spynnaker.cfg
+      uses: ./support/actions/configure-spynnaker
+      with:
+        board-address: spinn-4.cs.man.ac.uk
+    - name: Test with pytest
+      uses: ./support/actions/pytest
+      with:
+        tests: unittests
+        coverage: ${{ matrix.python-version == 3.8 }}
+        cover-packages: spynnaker
+        coveralls-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Lint with flake8
+      run: flake8 spynnaker spynnaker8 unittests spynnaker_integration_tests
+
+    - name: Lint with pylint
+      uses: ./support/actions/pylint
+      with:
+        package: spynnaker spynnaker8
+        exitcheck: 39
+
+    - name: Run rat copyright enforcement
+      if: matrix.python-version == 3.8
+      uses: ./support/actions/check-copyrights
+      with:
+        config_file: rat_asl20.xml
+
+    #- name: Validate all XML
+    #  if: matrix.python-version == 3.8
+    #  uses: ./support/actions/validate-xml
+    #  with:
+    #    base-path: spynnaker
+
+    - name: Build documentation with sphinx (3.8 only)
+      uses: ./support/actions/sphinx
+      with:
+        directory: doc/source

@@ -1,50 +1,48 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2017 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
+//! \file
+//! \brief Initialisation for timing_pfister_triplet_impl.h
 #include "timing_pfister_triplet_impl.h"
 
 //---------------------------------------
 // Globals
 //---------------------------------------
 // Exponential lookup-tables
-int16_t tau_plus_lookup[TAU_PLUS_SIZE];
-int16_t tau_minus_lookup[TAU_MINUS_SIZE];
-int16_t tau_x_lookup[TAU_X_SIZE];
-int16_t tau_y_lookup[TAU_Y_SIZE];
+//! Lookup table for &tau;<sup>+</sup> exponential decay
+int16_lut *tau_plus_lookup;
+//! Lookup table for &tau;<sup>-</sup> exponential decay
+int16_lut *tau_minus_lookup;
+//! Lookup table for &tau;<sup><i>x</i></sup> exponential decay
+int16_lut *tau_x_lookup;
+//! Lookup table for &tau;<sup><i>y</i></sup> exponential decay
+int16_lut *tau_y_lookup;
 
 //---------------------------------------
 // Functions
 //---------------------------------------
 address_t timing_initialise(address_t address) {
-    log_info("timing_initialise: starting");
-    log_info("\tSTDP triplet rule");
     // **TODO** assert number of neurons is less than max
 
     // Copy LUTs from following memory
-    address_t lut_address = maths_copy_int16_lut(
-            &address[0], TAU_PLUS_SIZE, &tau_plus_lookup[0]);
-    lut_address = maths_copy_int16_lut(
-            lut_address, TAU_MINUS_SIZE, &tau_minus_lookup[0]);
-    lut_address = maths_copy_int16_lut(
-            lut_address, TAU_X_SIZE, &tau_x_lookup[0]);
-    lut_address = maths_copy_int16_lut(
-            lut_address, TAU_Y_SIZE, &tau_y_lookup[0]);
-
-    log_info("timing_initialise: completed successfully");
+    address_t lut_address = address;
+    tau_plus_lookup = maths_copy_int16_lut(&lut_address);
+    tau_minus_lookup = maths_copy_int16_lut(&lut_address);
+    tau_x_lookup = maths_copy_int16_lut(&lut_address);
+    tau_y_lookup = maths_copy_int16_lut(&lut_address);
 
     return lut_address;
 }

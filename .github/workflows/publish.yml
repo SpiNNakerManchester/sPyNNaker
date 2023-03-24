@@ -1,0 +1,82 @@
+# Copyright (c) 2020 The University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Publish
+on:
+  push:
+    branches: [ master ]
+
+env:
+  ROOT_DOC_DIR: doc/global
+  C_DOC_DIR: neural_modelling/html
+  PY_DOC_DIR: doc/source/_build/html
+  DEPLOY_DIR: deploy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Checkout SupportScripts
+        uses: actions/checkout@v3
+        with:
+          repository: SpiNNakerManchester/SupportScripts
+          path: support
+      - name: Set dynamic environment variables
+        run: |
+          echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
+          echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
+      - name: Install pip, etc
+        uses: ./support/actions/python-tools
+      - name: Checkout SpiNNaker Dependencies
+        uses: ./support/actions/checkout-spinn-deps
+        with:
+          repositories: >
+            spinnaker_tools SpiNNUtils SpiNNMachine SpiNNMan PACMAN
+            DataSpecification spalloc SpiNNFrontEndCommon TestBase
+          install: true
+      - name: Install matplotlib
+        uses: ./support/actions/install-matplotlib
+      - name: Read tags
+        run: make doxysetup
+        working-directory: neural_modelling
+      - name: Setup
+        uses: ./support/actions/run-setup
+
+      - name: Build Python Documentation
+        uses: ./support/actions/sphinx
+        with:
+          directory: doc/source
+      - name: Build C documentation
+        uses: mattnotmitt/doxygen-action@v1.3.1
+        with:
+          working-directory: neural_modelling
+
+      - name: Merge documentation trees
+        run: |
+          cp -vaT $ROOT_DOC_DIR $DEPLOY_DIR
+          cp -vaT $C_DOC_DIR $DEPLOY_DIR/c
+          cp -vaT $PY_DOC_DIR $DEPLOY_DIR/python
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: ${{ env.DEPLOY_DIR }}

@@ -1,24 +1,18 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import inspect
-try:
-    from inspect import getfullargspec
-except ImportError:
-    # Python 2.7 hack
-    from inspect import getargspec as getfullargspec
 from spinn_utilities.log import FormatAdapter
 import logging
 
@@ -34,7 +28,16 @@ def _check_args(args_to_find, default_args, init):
 
 
 def get_dict_from_init(init, skip=None, include=None):
-    init_args = getfullargspec(init)
+    """ Get an argument initialisation dictionary by examining an \
+        ``__init__`` method or function.
+
+    :param callable init: The method.
+    :param frozenset(str) skip: The arguments to be skipped, if any
+    :param frozenset(str) include: The arguments that must be present, if any
+    :return: an initialisation dictionary
+    :rtype: dict(str, Any)
+    """
+    init_args = inspect.getfullargspec(init)
     n_defaults = 0 if init_args.defaults is None else len(init_args.defaults)
     n_args = 0 if init_args.args is None else len(init_args.args)
     default_args = ([] if init_args.args is None else
@@ -55,22 +58,23 @@ def get_dict_from_init(init, skip=None, include=None):
 
 
 def default_parameters(parameters):
-    """ Specifies arguments which are parameters.  Only works on the __init__\
-        method of a class that is additionally decorated with\
-        :py:meth:`defaults``
+    """ Specifies arguments which are parameters.  Only works on the \
+        ``__init__`` method of a class that is additionally decorated with\
+        :py:meth:`defaults`
 
-    :param parameters: The names of the arguments that are parameters
-    :type parameters: set of str
+    :param iterable(str) parameters:
+        The names of the arguments that are parameters
     """
     def wrap(method):
+        # pylint: disable=protected-access
         # Find the real method in case we use multiple of these decorators
         wrapped = method
         while hasattr(method, "_method"):
             method = getattr(method, "_method")
 
         # Set the parameters of the method to be used later
-        method._parameters = parameters
-        method_args = getfullargspec(method)
+        method._parameters = frozenset(parameters)
+        method_args = inspect.getfullargspec(method)
 
         def wrapper(*args, **kwargs):
             # Check for state variables that have been specified in cell_params
@@ -92,21 +96,22 @@ def default_parameters(parameters):
 
 def default_initial_values(state_variables):
     """ Specifies arguments which are state variables.  Only works on the\
-        __init__ method of a class that is additionally decorated with\
-        :py:meth:`defaults``
+        ``__init__`` method of a class that is additionally decorated with\
+        :py:meth:`defaults`
 
-    :param state_variables: The names of the arguments that are state variables
-    :type state_variables: set of str
+    :param iterable(str) state_variables:
+        The names of the arguments that are state variables
     """
     def wrap(method):
+        # pylint: disable=protected-access
         # Find the real method in case we use multiple of these decorators
         wrapped = method
         while hasattr(method, "_method"):
             method = getattr(method, "_method")
 
         # Store the state variables of the method to be used later
-        method._state_variables = state_variables
-        method_args = getfullargspec(method)
+        method._state_variables = frozenset(state_variables)
+        method_args = inspect.getfullargspec(method)
 
         def wrapper(*args, **kwargs):
             # Check for state variables that have been specified in cell_params
@@ -128,7 +133,7 @@ def default_initial_values(state_variables):
 
 def defaults(cls):
     """ Get the default parameters and state variables from the arguments to\
-        the __init__ method.  This uses the decorators\
+        the ``__init__`` method.  This uses the decorators\
         :py:func:`default_parameters` and :py:func:`default_initial_values` to\
         determine the parameters and state variables respectively.\
         If only one is specified, the other is assumed to be the remaining\
@@ -137,7 +142,7 @@ def defaults(cls):
         parameters.
     """
     if not inspect.isclass(cls):
-        raise Exception("{} is not a class".format(cls))
+        raise TypeError(f"{cls} is not a class")
     if not hasattr(cls, "__init__"):
         raise AttributeError("No __init__ found in {}".format(cls))
     init = getattr(cls, "__init__")

@@ -1,20 +1,21 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2014 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
+//! \file
+//! \brief Implementation of non-inlined API in synapses.h
 #include "synapses.h"
 #include "spike_processing.h"
 #include "neuron.h"
@@ -27,169 +28,213 @@
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED
-    #include "profile_tags.h"
-#endif
+#include "profile_tags.h"
+#endif //PROFILER_ENABLED
 
-// Globals required for synapse benchmarking to work.
+//! Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
-extern neuron_pointer_t neuron_array;
+//extern neuron_pointer_t neuron_array;
 
-// The number of neurons
+//! The number of neurons
 static uint32_t n_neurons;
 
-// The number of synapse types
+//! The number of synapse types
 static uint32_t n_synapse_types;
 
-// Ring buffers to handle delays between synapses and neurons
+//! Ring buffers to handle delays between synapses and neurons
 static weight_t *ring_buffers;
 
-// Amount to left shift the ring buffer by to make it an input
+//! Ring buffer size
+static uint32_t ring_buffer_size;
+
+//! Ring buffer mask
+static uint32_t ring_buffer_mask;
+
+//! Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
 
-// Count of the number of times the ring buffers have saturated
-static uint32_t saturation_count = 0;
+//! \brief Number of bits needed for the synapse type and index
+//! \details
+//! ```
+//! synapse_index_bits + synapse_type_bits
+//! ```
+uint32_t synapse_type_index_bits;
+//! \brief Mask to pick out the synapse type and index.
+//! \details
+//! ```
+//! synapse_index_mask | synapse_type_mask
+//! ```
+uint32_t synapse_type_index_mask;
+//! Number of bits in the synapse index
+uint32_t synapse_index_bits;
+//! Mask to pick out the synapse index.
+uint32_t synapse_index_mask;
+//! Number of bits in the synapse type
+uint32_t synapse_type_bits;
+//! Mask to pick out the synapse type.
+uint32_t synapse_type_mask;
+//! Number of bits in the delay
+uint32_t synapse_delay_bits;
+//! Mask to pick out the delay
+uint32_t synapse_delay_mask;
 
-static uint32_t synapse_type_index_bits;
-static uint32_t synapse_type_index_mask;
-static uint32_t synapse_index_bits;
-static uint32_t synapse_index_mask;
-static uint32_t synapse_type_bits;
-static uint32_t synapse_type_mask;
+//! Count of the number of times the ring buffers have saturated
+uint32_t synapses_saturation_count = 0;
+
+//! Count of the synapses that have been skipped because the delay wasn't
+//! big enough given how long the spike took to arrive
+uint32_t skipped_synapses = 0;
+
+//! Count of the spikes that are received late
+uint32_t late_spikes = 0;
+
+//! The maximum lateness of a spike
+uint32_t max_late_spike = 0;
+
+//! Number of neurons
+static uint32_t n_neurons_peak;
+
+//! The mask of the delay shifted into position i.e. pre-shift
+static uint32_t synapse_delay_mask_shifted = 0;
 
 
 /* PRIVATE FUNCTIONS */
 
 #if LOG_LEVEL >= LOG_DEBUG
-static const char *get_type_char(uint32_t synapse_type) {
-	return neuron_get_synapse_type_char(synapse_type);
+//! \brief get the synapse type character
+//! \param[in] synapse_type: the synapse type
+//! \return a single character string describing the synapse type
+static inline const char *get_type_char(uint32_t synapse_type) {
+    return neuron_get_synapse_type_char(synapse_type);
 }
 #endif // LOG_LEVEL >= LOG_DEBUG
 
+//! \brief Print a synaptic row.
+//!
+//! Only does anything when debugging.
+//! \param[in] synaptic_row: The synaptic row to print
 static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
-#if LOG_LEVEL >= LOG_DEBUG
-    log_debug("Synaptic row, at address %08x Num plastic words:%u\n",
+    log_debug("Synaptic row, at address %08x, Num plastic words:%u",
             (uint32_t) synaptic_row, synapse_row_plastic_size(synaptic_row));
     if (synaptic_row == NULL) {
         return;
     }
-    log_debug("----------------------------------------\n");
+#if LOG_LEVEL >= LOG_DEBUG
+    io_printf(IO_BUF, "----------------------------------------\n");
 
     // Get details of fixed region
-    address_t fixed_region_address = synapse_row_fixed_region(synaptic_row);
-    address_t fixed_synapses =
-            synapse_row_fixed_weight_controls(fixed_region_address);
-    size_t n_fixed_synapses =
-            synapse_row_num_fixed_synapses(fixed_region_address);
-    log_debug("Fixed region %u fixed synapses (%u plastic control words):\n",
-            n_fixed_synapses,
-            synapse_row_num_plastic_controls(fixed_region_address));
+    synapse_row_fixed_part_t *fixed_region =
+            synapse_row_fixed_region(synaptic_row);
+    address_t fixed_synapses = synapse_row_fixed_weight_controls(fixed_region);
+    size_t n_fixed_synapses = synapse_row_num_fixed_synapses(fixed_region);
+    io_printf(IO_BUF,
+            "Fixed region %u fixed synapses (%u plastic control words):\n",
+            n_fixed_synapses, synapse_row_num_plastic_controls(fixed_region));
 
     for (uint32_t i = 0; i < n_fixed_synapses; i++) {
         uint32_t synapse = fixed_synapses[i];
         uint32_t synapse_type = synapse_row_sparse_type(
                 synapse, synapse_index_bits, synapse_type_mask);
 
-        log_debug("%08x [%3d: (w: %5u (=",
+        io_printf(IO_BUF, "%08x [%3d: (w: %5u (=",
                 synapse, i, synapse_row_sparse_weight(synapse));
         synapses_print_weight(synapse_row_sparse_weight(synapse),
                 ring_buffer_to_input_left_shifts[synapse_type]);
-        log_debug(
-                "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
-                synapse_row_sparse_delay(synapse, synapse_type_index_bits),
-                get_type_char(synapse_type),
+        io_printf(IO_BUF, "nA) d: %2u, %d, n = %3u)] - {%08x %08x}\n",
+                synapse_row_sparse_delay(synapse, synapse_type_index_bits,
+                        synapse_delay_mask),
+                synapse_type,
                 synapse_row_sparse_index(synapse, synapse_index_mask),
-                SYNAPSE_DELAY_MASK, synapse_type_index_bits);
+                synapse_delay_mask, synapse_type_index_bits);
     }
 
     // If there's a plastic region
     if (synapse_row_plastic_size(synaptic_row) > 0) {
-        log_debug("----------------------------------------\n");
-        address_t plastic_region_address =
+        io_printf(IO_BUF, "----------------------------------------\n");
+        synapse_row_plastic_data_t *plastic_data =
                 synapse_row_plastic_region(synaptic_row);
         synapse_dynamics_print_plastic_synapses(
-                plastic_region_address, fixed_region_address,
-                ring_buffer_to_input_left_shifts);
+                plastic_data, fixed_region, ring_buffer_to_input_left_shifts);
     }
 
-    log_debug("----------------------------------------\n");
-#else
-    use(synaptic_row);
+    io_printf(IO_BUF, "----------------------------------------\n");
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+//! \brief Print the contents of the ring buffers.
+//! \details Only does anything when debugging.
+//! \param[in] time: The current timestamp
 static inline void print_ring_buffers(uint32_t time) {
+    log_debug("Ring Buffer at %u", time);
 #if LOG_LEVEL >= LOG_DEBUG
-    io_printf(IO_BUF, "Ring Buffer at %u\n", time);
     io_printf(IO_BUF, "----------------------------------------\n");
+    uint32_t n_delay_bits = (1 << synapse_delay_bits);
     for (uint32_t n = 0; n < n_neurons; n++) {
         for (uint32_t t = 0; t < n_synapse_types; t++) {
-            const char *type_string = get_type_char(t);
-            bool empty = true;
-            for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
-                empty = empty && (ring_buffers[
-                        synapses_get_ring_buffer_index(d + time, t, n,
-                        synapse_type_index_bits, synapse_index_bits)] == 0);
-            }
-            if (!empty) {
-                io_printf(IO_BUF, "%3d(%s):", n, type_string);
-                for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
-                    log_debug(" ");
-                    uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                            d + time, t, n,
-                            synapse_type_index_bits, synapse_index_bits);
-                    synapses_print_weight(ring_buffers[ring_buffer_index],
-                            ring_buffer_to_input_left_shifts[t]);
+            // Determine if this row can be omitted
+            for (uint32_t d = 0; d < n_delay_bits; d++) {
+                if (ring_buffers[synapse_row_get_ring_buffer_index(
+                        d + time, t, n, synapse_type_index_bits,
+                        synapse_index_bits, synapse_delay_mask)] != 0) {
+                    goto doPrint;
                 }
-                io_printf(IO_BUF, "\n");
             }
+            continue;
+        doPrint:
+            // Have to print the row
+            io_printf(IO_BUF, "%3d(%s):", n, get_type_char(t));
+            for (uint32_t d = 0; d < n_delay_bits; d++) {
+                io_printf(IO_BUF, " ");
+                uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index(
+                        d + time, t, n, synapse_type_index_bits,
+                        synapse_index_bits, synapse_delay_mask);
+                synapses_print_weight(ring_buffers[ring_buffer_index],
+                        ring_buffer_to_input_left_shifts[t]);
+            }
+            io_printf(IO_BUF, "\n");
         }
     }
     io_printf(IO_BUF, "----------------------------------------\n");
-#else
-    use(time);
-#endif // LOG_LEVEL >= LOG_DEBUG
-}
-
-static inline void print_inputs(void) {
-#if LOG_LEVEL >= LOG_DEBUG
-    log_debug("Inputs\n");
-    neuron_print_inputs();
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 
-// This is the "inner loop" of the neural simulation.
-// Every spike event could cause up to 256 different weights to
-// be put into the ring buffer.
-static inline void process_fixed_synapses(
-        address_t fixed_region_address, uint32_t time) {
-    register uint32_t *synaptic_words =
-            synapse_row_fixed_weight_controls(fixed_region_address);
-    register uint32_t fixed_synapse =
-            synapse_row_num_fixed_synapses(fixed_region_address);
+//! \brief The "inner loop" of the neural simulation.
+//! \details Every spike event could cause up to 256 different weights to
+//!     be put into the ring buffer.
+//! \param[in] fixed_region: The fixed region of the synaptic matrix
+//! \param[in] time: The current simulation time
+//! \return Always true
+static inline bool process_fixed_synapses(
+        synapse_row_fixed_part_t *fixed_region, uint32_t time,
+        uint32_t colour_delay) {
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
+    uint32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
 
     num_fixed_pre_synaptic_events += fixed_synapse;
+
+    // Pre-mask the time and account for colour delay
+    uint32_t colour_delay_shifted = colour_delay << synapse_type_index_bits;
+    uint32_t masked_time = ((time - colour_delay) & synapse_delay_mask) << synapse_type_index_bits;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row
         // (should auto increment pointer in single instruction)
         uint32_t synaptic_word = *synaptic_words++;
 
-        // Extract components from this word
-        uint32_t delay = 1;
-        uint32_t syn_ind_from_delay =
-        		synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+        // If the (shifted) delay is non zero and too small, skip
+        if (((synaptic_word & synapse_delay_mask_shifted) != 0) &&
+        		((synaptic_word & synapse_delay_mask_shifted) <= colour_delay_shifted)) {
+            skipped_synapses++;
+            continue;
+        }
 
-        uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
-                synaptic_word, synapse_type_index_mask);
+        // The ring buffer index can be found by adding on the time to the delay
+        // in the synaptic word directly, and then masking off the whole index.
+        // The addition of the masked time to the delay even with the mask might
+        // overflow into the weight at worst but can't affect the lower bits.
+        uint32_t ring_buffer_index = (synaptic_word + masked_time) & ring_buffer_mask;
         int32_t weight = synapse_row_sparse_weight(synaptic_word);
-
-        io_printf(IO_BUF, "static signed w: %d \n", weight);
-
-        // Convert into ring buffer offset
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                delay + time, combined_synapse_neuron_index,
-                synapse_type_index_bits);
 
         // Add weight to current ring buffer value
         int32_t accumulation = ring_buffers[ring_buffer_index] + weight; // switch to saturated arithmetic to avoid complicated saturation check, will it check saturation at both ends?
@@ -201,33 +246,46 @@ static inline void process_fixed_synapses(
 //        uint32_t sat_test = accumulation & 0x10000;
 //        if (sat_test) {
 //            accumulation = sat_test - 1;
-//            saturation_count++;
+//            synapses_saturation_count++;
 //        }
 
         // Store saturated value back in ring-buffer
         ring_buffers[ring_buffer_index] = accumulation;
     }
+    return true;
 }
 
-//! private method for doing output debug data on the synapses
-static inline void print_synapse_parameters(void) {
-//! only if the models are compiled in debug mode will this method contain
-//! said lines.
-#if LOG_LEVEL >= LOG_DEBUG
-	// again neuron_synapse_shaping_params has moved to implementation
-	neuron_print_synapse_parameters();
-#endif // LOG_LEVEL >= LOG_DEBUG
-}
+//! The layout of the synapse parameters region
+struct synapse_params {
+    uint32_t n_neurons;
+    uint32_t n_synapse_types;
+    uint32_t log_n_neurons;
+    uint32_t log_n_synapse_types;
+    uint32_t log_max_delay;
+    uint32_t drop_late_packets;
+    uint32_t incoming_spike_buffer_size;
+    uint32_t ring_buffer_shifts[];
+};
 
 /* INTERFACE FUNCTIONS */
 bool synapses_initialise(
-        address_t synapse_params_address, address_t direct_matrix_address,
-        uint32_t n_neurons_value, uint32_t n_synapse_types_value,
+        address_t synapse_params_address,
+        uint32_t *n_neurons_out, uint32_t *n_synapse_types_out,
+        weight_t **ring_buffers_out,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address) {
-    log_debug("synapses_initialise: starting");
-    n_neurons = n_neurons_value;
-    n_synapse_types = n_synapse_types_value;
+        bool* clear_input_buffers_of_late_packets_init,
+        uint32_t *incoming_spike_buffer_size) {
+    struct synapse_params *params = (struct synapse_params *) synapse_params_address;
+    *clear_input_buffers_of_late_packets_init = params->drop_late_packets;
+    *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
+    n_neurons = params->n_neurons;
+    *n_neurons_out = n_neurons;
+    n_synapse_types = params->n_synapse_types;
+    *n_synapse_types_out = n_synapse_types;
+
+    uint32_t log_n_neurons = params->log_n_neurons;
+    uint32_t log_n_synapse_types = params->log_n_synapse_types;
+    uint32_t log_max_delay = params->log_max_delay;
 
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts =
@@ -236,60 +294,13 @@ bool synapses_initialise(
         log_error("Not enough memory to allocate ring buffer");
         return false;
     }
+
+    // read in ring buffer to input left shifts
     spin1_memcpy(
-            ring_buffer_to_input_left_shifts, synapse_params_address,
+            ring_buffer_to_input_left_shifts, params->ring_buffer_shifts,
             n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
             ring_buffer_to_input_left_shifts;
-
-    // Work out the positions of the direct and indirect synaptic matrices
-    // and copy the direct matrix to DTCM
-    uint32_t direct_matrix_size = direct_matrix_address[0];
-    log_debug("Direct matrix malloc size is %d", direct_matrix_size);
-
-    if (direct_matrix_size != 0) {
-        *direct_synapses_address = spin1_malloc(direct_matrix_size);
-        if (*direct_synapses_address == NULL) {
-            log_error("Not enough memory to allocate direct matrix");
-            return false;
-        }
-        log_debug("Copying %u bytes of direct synapses to 0x%08x",
-                direct_matrix_size, *direct_synapses_address);
-        spin1_memcpy(
-                *direct_synapses_address, &direct_matrix_address[1],
-                direct_matrix_size);
-    }
-
-    log_debug("synapses_initialise: completed successfully");
-    print_synapse_parameters();
-
-    uint32_t n_neurons_power_2 = n_neurons;
-    uint32_t log_n_neurons = 1;
-    if (n_neurons != 1) {
-        if (!is_power_of_2(n_neurons)) {
-            n_neurons_power_2 = next_power_of_2(n_neurons);
-        }
-        log_n_neurons = ilog_2(n_neurons_power_2);
-    }
-
-    uint32_t n_synapse_types_power_2 = n_synapse_types;
-    if (!is_power_of_2(n_synapse_types)) {
-        n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
-    }
-    uint32_t log_n_synapse_types = ilog_2(n_synapse_types_power_2);
-
-    uint32_t n_ring_buffer_bits =
-            log_n_neurons + log_n_synapse_types + 1; // SYNAPSE_DELAY_BITS; Fix at delays of 1 timestep, as this means we get memory back, and we don't need delays to prove the concept
-    uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
-
-    ring_buffers = spin1_malloc(ring_buffer_size * sizeof(weight_t));
-    if (ring_buffers == NULL) {
-        log_error("Could not allocate %u entries for ring buffers",
-                ring_buffer_size);
-    }
-    for (uint32_t i = 0; i < ring_buffer_size; i++) {
-        ring_buffers[i] = 0;
-    }
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
@@ -297,202 +308,116 @@ bool synapses_initialise(
     synapse_index_mask = (1 << synapse_index_bits) - 1;
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
+    synapse_delay_bits = log_max_delay;
+    synapse_delay_mask = (1 << synapse_delay_bits) - 1;
+    synapse_delay_mask_shifted = synapse_delay_mask << synapse_type_index_bits;
+
+    n_neurons_peak = 1 << log_n_neurons;
+
+//    uint32_t n_ring_buffer_bits =
+//            log_n_neurons + log_n_synapse_types + synapse_delay_bits; // synapse_delay_bits = 1?
+    uint32_t n_ring_buffer_bits =
+            log_n_neurons + log_n_synapse_types + 1; // synapse_delay_bits = 1?
+    ring_buffer_size = 1 << (n_ring_buffer_bits);
+    ring_buffer_mask = ring_buffer_size - 1;
+
+    ring_buffers = spin1_malloc(ring_buffer_size * sizeof(weight_t));
+    if (ring_buffers == NULL) {
+        log_error("Could not allocate %u entries for ring buffers; Biggest space %u",
+                ring_buffer_size, sark_heap_max(sark.heap, 0));
+        return false;
+    }
+    for (uint32_t i = 0; i < ring_buffer_size; i++) {
+        ring_buffers[i] = 0;
+    }
+    *ring_buffers_out = ring_buffers;
+
+    log_info("Ready to process synapses for %u neurons with %u synapse types",
+            n_neurons, n_synapse_types);
+
     return true;
 }
 
-void synapses_do_timestep_update(timer_t time) {
-    print_ring_buffers(time);
-
-    // Disable interrupts to stop DMAs interfering with the ring buffers
-    uint32_t state = spin1_irq_disable();
-
-    // Transfer the input from the ring buffers into the input buffers
-    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
-            neuron_index++) {
-        // Loop through all synapse types
-        for (uint32_t synapse_type_index = 0;
-                synapse_type_index < n_synapse_types; synapse_type_index++) {
-            // Get index in the ring buffers for the current time slot for
-            // this synapse type and neuron
-            uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                    time, synapse_type_index, neuron_index,
-                    synapse_type_index_bits, synapse_index_bits);
-
-            // Convert ring-buffer entry to input and add on to correct
-            // input for this synapse type and neuron
-//            if (ring_buffers[ring_buffer_index]){
-//                io_printf(IO_BUF, "weight: %u, shift: %u\n", ring_buffers[ring_buffer_index], ring_buffer_to_input_left_shifts[synapse_type_index]);
-//            }
-            neuron_add_inputs(
-                    synapse_type_index, neuron_index,
-                    synapses_convert_weight_to_input(
-                            ring_buffers[ring_buffer_index],
-                            ring_buffer_to_input_left_shifts[synapse_type_index]));
-
-            // Clear ring buffer
+void synapses_flush_ring_buffers(timer_t time) {
+    uint32_t synapse_index = 0;
+    uint32_t ring_buffer_index = synapse_row_get_first_ring_buffer_index(
+            time, synapse_type_index_bits, synapse_delay_mask);;
+    for (uint32_t s_i = n_synapse_types; s_i > 0; s_i--) {
+        uint32_t neuron_index = 0;
+        for (uint32_t n_i = n_neurons_peak; n_i > 0; n_i--) {
             ring_buffers[ring_buffer_index] = 0;
+            ring_buffer_index++;
+            neuron_index++;
         }
+        synapse_index++;
     }
-
-    print_inputs();
-
-    // Re-enable the interrupts
-    spin1_mode_restore(state);
 }
 
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id) {
-    print_synaptic_row(row);
+        uint32_t time, uint32_t spike_colour, uint32_t colour_mask,
+		synaptic_row_t row, bool *write_back) {
+
+    // Work out how much delay takes off or adds on to the actual delay because
+    // of a delayed spike arrival time, or delayed change of time step in the
+    // current core.  Spikes can be as late as the bits in colour_mask dictates.
+	// Masked difference is used to calculate this, which will always be
+	// positive because the mask removes the negative bit.
+	// Example: time colour 8, spike colour 13, colour mask 0xF means time
+	// colour has gone up to 15 and then wrapped since spike was sent.
+    // 8 - 13 = -5; -5 & 0xF = 11, so spike was sent 11 steps ago.
+    uint32_t time_colour = time & colour_mask;
+    int32_t colour_diff = time_colour - spike_colour;
+    uint32_t colour_delay = colour_diff & colour_mask;
+
+    late_spikes += colour_delay & 0x1;
+    if (colour_delay > max_late_spike) {
+        max_late_spike = colour_delay;
+    }
+
+    // By default don't write back
+    *write_back = false;
 
     // Get address of non-plastic region from row
-    address_t fixed_region_address = synapse_row_fixed_region(row);
-//    io_printf(IO_BUF, "Processing Spike...\n");
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
+
     // **TODO** multiple optimised synaptic row formats
     //if (plastic_tag(row) == 0) {
     // If this row has a plastic region
     if (synapse_row_plastic_size(row) > 0) {
         // Get region's address
-        address_t plastic_region_address = synapse_row_plastic_region(row);
+        synapse_row_plastic_data_t *plastic_data =
+                synapse_row_plastic_region(row);
 
         // Process any plastic synapses
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
-        if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
-                fixed_region_address, ring_buffers, time)) {
+        if (!synapse_dynamics_process_plastic_synapses(plastic_data,
+                fixed_region, ring_buffers, time, colour_delay, write_back)) {
             return false;
         }
         profiler_write_entry_disable_fiq(
                 PROFILER_EXIT | PROFILER_PROCESS_PLASTIC_SYNAPSES);
-
-        // Perform DMA write back
-        if (write) {
-            spike_processing_finish_write(process_id);
-        }
     }
 
     // Process any fixed synapses
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
-    process_fixed_synapses(fixed_region_address, time);
+    return process_fixed_synapses(fixed_region, time, colour_delay);
     //}
-    return true;
 }
 
-//! \brief returns the number of times the synapses have saturated their
-//!        weights.
-//! \return the number of times the synapses have saturated.
-uint32_t synapses_get_saturation_count(void) {
-    return saturation_count;
-}
-
-//! \brief returns the counters for plastic and fixed pre synaptic events
-//! based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
-//! returns 0
-//! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events(void) {
     return (num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events());
 }
 
-//! \brief  Searches the synaptic row for the the connection with the
-//!         specified post-synaptic ID
-//! \param[in] id: the (core-local) ID of the neuron to search for in the
-//! synaptic row
-//! \param[in] row: the core-local address of the synaptic row
-//! \param[out] sp_data: the address of a struct through which to return
-//! weight, delay information
-//! \return bool: was the search successful?
-bool find_static_neuron_with_id(
-        uint32_t id, address_t row, structural_plasticity_data_t *sp_data) {
-    address_t fixed_region = synapse_row_fixed_region(row);
-    int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words =
-            synapse_row_fixed_weight_controls(fixed_region);
-
-    uint32_t weight, delay;
-    bool found = false;
-
-    // Loop through plastic synapses
-    for (; fixed_synapse > 0; fixed_synapse--) {
-        // Get next control word (auto incrementing)
-        // Check if index is the one I'm looking for
-        uint32_t synaptic_word = *synaptic_words++;
-        weight = synapse_row_sparse_weight(synaptic_word);
-        delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
-        if (synapse_row_sparse_index(synaptic_word, synapse_index_mask) == id) {
-            found = true;
-            break;
+void synapses_resume(timer_t time) {
+    // If the time has been reset to zero then the ring buffers need to be
+    // flushed in case there is a delayed spike left over from a previous run
+    if (time == 0) {
+        for (uint32_t i = 0; i < ring_buffer_size; i++) {
+            ring_buffers[i] = 0;
         }
     }
-
-    // Making assumptions explicit
-    assert(synapse_row_num_plastic_controls(fixed_region) == 0);
-
-    if (found) {
-        sp_data->weight = weight;
-        sp_data->offset =
-                synapse_row_num_fixed_synapses(fixed_region) - fixed_synapse;
-        sp_data->delay  = delay;
-        return true;
-    } else {
-        sp_data->weight = -1;
-        sp_data->offset = -1;
-        sp_data->delay  = -1;
-        return false;
-    }
-}
-
-//! \brief  Remove the entry at the specified offset in the synaptic row
-//! \param[in] offset: the offset in the row at which to remove the entry
-//! \param[in] row: the core-local address of the synaptic row
-//! \return bool: was the removal successful?
-bool remove_static_neuron_at_offset(uint32_t offset, address_t row) {
-    address_t fixed_region = synapse_row_fixed_region(row);
-    int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words =
-            synapse_row_fixed_weight_controls(fixed_region);
-
-    // Delete control word at offset (contains weight)
-    synaptic_words[offset] = synaptic_words[fixed_synapse - 1];
-
-    // Decrement FF
-    fixed_region[0]--;
-    return true;
-}
-
-//! packing all of the information into the required static control word
-static inline uint32_t fixed_synapse_convert(
-        uint32_t id, uint32_t weight, uint32_t delay, uint32_t type) {
-    uint32_t new_synapse = weight << (32 - SYNAPSE_WEIGHT_BITS);
-    new_synapse |=
-            (delay & ((1 << SYNAPSE_DELAY_BITS) - 1)) <<
-            synapse_type_index_bits;
-    new_synapse |=
-            (type & ((1 << synapse_type_bits) - 1)) << synapse_index_bits;
-    new_synapse |= id & ((1 << synapse_type_index_bits) - 1);
-    return new_synapse;
-}
-
-//! \brief  Add a static entry in the synaptic row
-//! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
-//! \param[in] row: the core-local address of the synaptic row
-//! \param[in] weight: the initial weight associated with the connection
-//! \param[in] delay: the delay associated with the connection
-//! \param[in] type: the type of the connection (e.g. inhibitory)
-//! \return bool: was the addition successful?
-bool add_static_neuron_with_id(
-        uint32_t id, address_t row, uint32_t weight, uint32_t delay, uint32_t type) {
-    address_t fixed_region = synapse_row_fixed_region(row);
-    int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words =
-            synapse_row_fixed_weight_controls(fixed_region);
-    uint32_t new_synapse = fixed_synapse_convert(id, weight, delay, type);
-
-    // Add control word at offset
-    synaptic_words[fixed_synapse] = new_synapse;
-
-    // Increment FF
-    fixed_region[0]++;
-    return true;
 }

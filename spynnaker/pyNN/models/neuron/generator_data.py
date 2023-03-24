@@ -1,66 +1,85 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import decimal
 import numpy
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+# Address to indicate that the synaptic region is unused
+SYN_REGION_UNUSED = 0xFFFFFFFF
 
 
 class GeneratorData(object):
     """ Data for each connection of the synapse generator.
     """
     __slots__ = [
-        "__delayed_synaptic_matrix_offset",
-        "__machine_time_step",
-        "__max_delayed_row_n_synapses",
-        "__max_delayed_row_n_words",
-        "__max_row_n_synapses",
-        "__max_row_n_words",
-        "__max_stage",
-        "__post_slice_index",
-        "__post_slices",
-        "__post_vertex_slice",
-        "__pre_slice_index",
-        "__pre_slices",
-        "__pre_vertex_slice",
-        "__synapse_information",
-        "__synaptic_matrix_offset"]
+        "__data"
+    ]
 
-    BASE_SIZE = 17 * 4
+    BASE_SIZE = 11 * BYTES_PER_WORD
 
     def __init__(
             self, synaptic_matrix_offset, delayed_synaptic_matrix_offset,
-            max_row_n_words, max_delayed_row_n_words, max_row_n_synapses,
-            max_delayed_row_n_synapses, pre_slices, pre_slice_index,
-            post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_information, max_stage, machine_time_step):
-        self.__synaptic_matrix_offset = synaptic_matrix_offset
-        self.__delayed_synaptic_matrix_offset = delayed_synaptic_matrix_offset
-        self.__max_row_n_words = max_row_n_words
-        self.__max_delayed_row_n_words = max_delayed_row_n_words
-        self.__max_row_n_synapses = max_row_n_synapses
-        self.__max_delayed_row_n_synapses = max_delayed_row_n_synapses
-        self.__pre_slices = pre_slices
-        self.__pre_slice_index = pre_slice_index
-        self.__post_slices = post_slices
-        self.__post_slice_index = post_slice_index
-        self.__pre_vertex_slice = pre_vertex_slice
-        self.__post_vertex_slice = post_vertex_slice
-        self.__synapse_information = synapse_information
-        self.__max_stage = max_stage
-        self.__machine_time_step = machine_time_step
+            app_edge, synapse_information, max_row_info,
+            max_pre_atoms_per_core, max_post_atoms_per_core):
+        # Offsets are used in words in the generator, but only
+        # if the values are valid
+        if synaptic_matrix_offset is not None:
+            synaptic_matrix_offset //= BYTES_PER_WORD
+        else:
+            synaptic_matrix_offset = SYN_REGION_UNUSED
+        if delayed_synaptic_matrix_offset is not None:
+            delayed_synaptic_matrix_offset //= BYTES_PER_WORD
+        else:
+            delayed_synaptic_matrix_offset = SYN_REGION_UNUSED
+
+        # Take care of Population views
+        pre_lo = 0
+        pre_hi = synapse_information.n_pre_neurons - 1
+        if synapse_information.prepop_is_view:
+            indexes = synapse_information.pre_population._indexes
+            pre_lo = indexes[0]
+            pre_hi = indexes[-1]
+        post_lo = 0
+        post_hi = synapse_information.n_post_neurons - 1
+        if synapse_information.postpop_is_view:
+            indexes = synapse_information.post_population._indexes
+            post_lo = indexes[0]
+            post_hi = indexes[-1]
+
+        # Get objects needed for the next bit
+        connector = synapse_information.connector
+        synapse_dynamics = synapse_information.synapse_dynamics
+
+        # Create the data needed
+        self.__data = list()
+        self.__data.append(numpy.array([
+            pre_lo, pre_hi, post_lo, post_hi,
+            synapse_information.synapse_type,
+            synapse_dynamics.gen_matrix_id,
+            connector.gen_connector_id,
+            connector.gen_weights_id(synapse_information.weights),
+            connector.gen_delays_id(synapse_information.delays)
+            ], dtype=numpy.uint32))
+        self.__data.append(synapse_dynamics.gen_matrix_params(
+            synaptic_matrix_offset, delayed_synaptic_matrix_offset, app_edge,
+            synapse_information, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core))
+        self.__data.append(connector.gen_connector_params())
+        self.__data.append(connector.gen_weights_params(
+            synapse_information.weights))
+        self.__data.append(connector.gen_delay_params(
+            synapse_information.delays))
 
     @property
     def size(self):
@@ -68,53 +87,12 @@ class GeneratorData(object):
 
         :rtype: int
         """
-        connector = self.__synapse_information.connector
-        dynamics = self.__synapse_information.synapse_dynamics
-
-        return sum((self.BASE_SIZE,
-                    dynamics.gen_matrix_params_size_in_bytes,
-                    connector.gen_connector_params_size_in_bytes,
-                    connector.gen_weight_params_size_in_bytes(
-                        self.__synapse_information.weight),
-                    connector.gen_delay_params_size_in_bytes(
-                        self.__synapse_information.delay)))
+        return sum(len(i) for i in self.__data) * BYTES_PER_WORD
 
     @property
     def gen_data(self):
-        """ Get the data to be written for this connection
+        """ The data to be written for this connection
 
-        :rtype: numpy array of uint32
+        :rtype: list(~numpy.ndarray(~numpy.uint32))
         """
-        connector = self.__synapse_information.connector
-        synapse_dynamics = self.__synapse_information.synapse_dynamics
-        items = list()
-        items.append(numpy.array([
-            self.__synaptic_matrix_offset,
-            self.__delayed_synaptic_matrix_offset,
-            self.__max_row_n_words,
-            self.__max_delayed_row_n_words,
-            self.__max_row_n_synapses,
-            self.__max_delayed_row_n_synapses,
-            self.__pre_vertex_slice.lo_atom,
-            self.__pre_vertex_slice.n_atoms,
-            self.__max_stage,
-            (decimal.Decimal(str(1000.0 / float(self.__machine_time_step))) *
-             DataType.S1615.scale),
-            self.__synapse_information.synapse_type,
-            synapse_dynamics.gen_matrix_id,
-            connector.gen_connector_id,
-            connector.gen_weights_id(self.__synapse_information.weight),
-            connector.gen_delays_id(self.__synapse_information.delay)],
-            dtype="uint32"))
-        items.append(synapse_dynamics.gen_matrix_params)
-        items.append(connector.gen_connector_params(
-            self.__pre_slices, self.__pre_slice_index, self.__post_slices,
-            self.__post_slice_index, self.__pre_vertex_slice,
-            self.__post_vertex_slice, self.__synapse_information.synapse_type))
-        items.append(connector.gen_weights_params(
-            self.__synapse_information.weight, self.__pre_vertex_slice,
-            self.__post_vertex_slice))
-        items.append(connector.gen_delay_params(
-            self.__synapse_information.delay, self.__pre_vertex_slice,
-            self.__post_vertex_slice))
-        return numpy.concatenate(items)
+        return self.__data

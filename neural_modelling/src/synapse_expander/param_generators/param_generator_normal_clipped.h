@@ -1,24 +1,23 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2017 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /**
- *! \file
- *! \brief Normally distributed random redrawn if out of boundary parameter
- *!        generator implementation
+ * \file
+ * \brief Normally distributed random, redrawn if out of boundary, parameter
+ *        generator implementation
  */
 #include <stdfix.h>
 #include <spin1_api.h>
@@ -27,12 +26,13 @@
 #include <synapse_expander/rng.h>
 #include <synapse_expander/generator_types.h>
 
-static initialize_func param_generator_normal_clipped_initialize;
-static free_func param_generator_normal_clipped_free;
-static generate_param_func param_generator_normal_clipped_generate;
+/**
+ * \brief The maximum number of redraws performed before giving up
+ */
+#define MAX_REDRAWS 1000
 
 /**
- *! \brief The parameters that can be copied in from SDRAM
+ * \brief The parameters that can be copied in from SDRAM
  */
 struct normal_clipped_params {
     accum mu;
@@ -42,52 +42,66 @@ struct normal_clipped_params {
 };
 
 /**
- *! \brief The data structure to be passed around for this generator.  This
- *!        includes the parameters and an RNG.
+ * \brief The data structure to be passed around for this generator.  This
+ *        includes the parameters and an RNG.
  */
 struct param_generator_normal_clipped {
     struct normal_clipped_params params;
-    rng_t rng;
 };
 
-static void *param_generator_normal_clipped_initialize(address_t *region) {
+/**
+ * \brief How to initialise the clipped normal RNG parameter generator
+ * \param[in,out] region: Region to read setup from.  Should be updated
+ *                        to position just after parameters after calling.
+ * \return A data item to be passed in to other functions later on
+ */
+static void *param_generator_normal_clipped_initialize(void **region) {
     // Allocate memory for the data
     struct param_generator_normal_clipped *obj =
             spin1_malloc(sizeof(struct param_generator_normal_clipped));
-    struct normal_clipped_params *params_sdram = (void *) *region;
+    struct normal_clipped_params *params_sdram = *region;
 
     // Copy the parameters in
-    obj->params = *params_sdram++;
-    *region = (void *) params_sdram;
+    obj->params = *params_sdram;
+    *region = &params_sdram[1];
 
     log_debug("normal clipped mu = %k, sigma = %k, low = %k, high = %k",
             obj->params.mu, obj->params.sigma, obj->params.low,
             obj->params.high);
-
-    // Initialise the RNG for this generator
-    obj->rng = rng_init(region);
     return obj;
 }
 
-static void param_generator_normal_clipped_free(void *data) {
-    struct param_generator_normal_clipped *obj = data;
-    rng_free(obj->rng);
-    sark_free(data);
+/**
+ * \brief How to free any data for the clipped normal RNG parameter generator
+ * \param[in] generator: The generator to free
+ */
+static void param_generator_normal_clipped_free(void *generator) {
+    sark_free(generator);
 }
 
-static void param_generator_normal_clipped_generate(
-        void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
-        uint16_t *indices, accum *values) {
-    use(pre_neuron_index);
-    use(indices);
-
+/**
+ * \brief How to generate values with the clipped normal RNG parameter generator
+ * \param[in] generator: The generator to use to generate values
+ * \return The generated value
+ */
+static accum param_generator_normal_clipped_generate(void *generator) {
     // For each index, generate a normally distributed random value, redrawing
     // if outside the given range
-    struct param_generator_normal_clipped *obj = data;
-    for (uint32_t i = 0; i < n_synapses; i++) {
-        do {
-            accum value = rng_normal(obj->rng);
-            values[i] = obj->params.mu + (value * obj->params.sigma);
-        } while (values[i] < obj->params.low || values[i] > obj->params.high);
+    struct param_generator_normal_clipped *obj = generator;
+    uint32_t n_draws = 0;
+    accum value = 0k;
+    do {
+        value = rng_normal(core_rng);
+        value = obj->params.mu + (value * obj->params.sigma);
+        n_draws++;
+    } while ((value < obj->params.low || value > obj->params.high)
+            && (n_draws < MAX_REDRAWS));
+    if (n_draws == MAX_REDRAWS) {
+        log_error("Maximum number of redraws (%u) exceeded on clipped normal "
+                "distribution with mu=%k, sigma=%k, low=%k, high=%k",
+                n_draws, obj->params.mu, obj->params.sigma, obj->params.low,
+                obj->params.high);
+        rt_error(RTE_SWERR);
     }
+    return value;
 }

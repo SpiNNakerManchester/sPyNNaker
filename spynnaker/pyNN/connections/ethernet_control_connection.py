@@ -1,55 +1,60 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import logging
 from spinn_front_end_common.utility_models import MultiCastCommand
-from spinnman.messages.eieio.data_messages import (
-    EIEIODataMessage, KeyDataElement, KeyPayloadDataElement)
 from spinn_front_end_common.utilities.connections import LiveEventConnection
-
-logger = logging.getLogger(__name__)
 
 
 class EthernetControlConnection(LiveEventConnection):
     """ A connection that can translate Ethernet control messages received\
         from a Population
     """
-    __slots__ = ["__translator"]
+    __slots__ = ["__translators"]
 
     def __init__(
             self, translator, label, live_packet_gather_label, local_host=None,
             local_port=None):
         """
-        :param translator: The translator of multicast to control commands
-        :param local_host: The optional host to listen on
-        :param local_port: The optional port to listen on
+        :param AbstractEthernetTranslator translator:
+            The translator of multicast to control commands
+        :param str label: The label of the vertex to attach the translator to
+        :param str live_packet_gather_label: The label of the LPG vertex that
+            this control connection will listen to.
+        :param str local_host: The optional host to listen on
+        :param int local_port: The optional port to listen on
         """
-        super(EthernetControlConnection, self).__init__(
+        super().__init__(
             live_packet_gather_label, receive_labels=[label],
             local_host=local_host, local_port=local_port)
-        self.__translator = translator
+        self.__translators = dict()
+        self.__translators[label] = translator
+        self.add_receive_callback(label, self._translate, translate_key=False)
 
-    def _receive_packet_callback(self, packet):
-        if isinstance(packet, EIEIODataMessage):
-            while packet.is_next_element:
-                self._translate(packet.next_element)
+    def add_translator(self, label, translator):
+        """ Add another translator that routes via the LPG.
 
-    def _translate(self, element):
-        if isinstance(element, KeyDataElement):
-            self.__translator.translate_control_packet(
-                MultiCastCommand(element.key))
-        elif isinstance(element, KeyPayloadDataElement):
-            self.__translator.translate_control_packet(
-                MultiCastCommand(element.key, element.payload))
+        :param str label: The label of the vertex to attach the translator to
+        :param AbstractEthernetTranslator translator:
+            The translator of multicast to control commands
+        """
+        super().add_receive_label(label)
+        self.__translators[label] = translator
+        self.add_receive_callback(label, self._translate, translate_key=False)
+
+    def _translate(self, label, key, payload=None):
+        translator = self.__translators[label]
+        if payload is None:
+            translator.translate_control_packet(MultiCastCommand(key))
+        else:
+            translator.translate_control_packet(MultiCastCommand(key, payload))

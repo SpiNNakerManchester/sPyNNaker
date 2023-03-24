@@ -1,34 +1,25 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import logging
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
-from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from pacman.model.routing_info import BaseKeyAndMask
-from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints)
+from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
-from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.exceptions import SpynnakerException
-
-logger = logging.getLogger(__name__)
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 
 def get_y_from_fpga_retina(key, mode):
@@ -68,13 +59,11 @@ def get_spike_value_from_fpga_retina(key, mode):
 
 
 class ExternalFPGARetinaDevice(
-        ApplicationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex,
-        AbstractProvidesOutgoingPartitionConstraints,
-        ProvidesKeyToAtomMappingImpl):
+        ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
+        AbstractSendMeMulticastCommandsVertex):
     __slots__ = [
         "__fixed_key",
-        "__fixed_mask",
-        "__polarity"]
+        "__fixed_mask"]
 
     MODE_128 = "128"
     MODE_64 = "64"
@@ -88,28 +77,31 @@ class ExternalFPGARetinaDevice(
             self, mode, retina_key, spinnaker_link_id, polarity,
             label=None, board_address=None):
         """
-        :param mode: The retina "mode"
-        :param retina_key: The value of the top 16-bits of the key
-        :param spinnaker_link_id: \
+        :param str mode: The retina "mode"
+        :param int retina_key: The value of the top 16-bits of the key
+        :param int spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
-        :param polarity: The "polarity" of the retina data
-        :param label:
-        :param board_address:
+        :param str polarity: The "polarity" of the retina data
+        :param str label:
+        :param str board_address:
         """
         # pylint: disable=too-many-arguments
-        self.__polarity = polarity
+        fixed_n_neurons = self.get_n_neurons(mode, polarity)
+        super().__init__(
+            n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
+            label=label, board_address=board_address, incoming=True,
+            outgoing=True)
+
         self.__fixed_key = (retina_key & 0xFFFF) << 16
         self.__fixed_mask = 0xFFFF8000
         if polarity == self.UP_POLARITY:
             self.__fixed_key |= 0x4000
 
-        fixed_n_neurons = self.get_n_neurons(mode, polarity)
         self.__fixed_mask = self._get_mask(mode)
 
-        super(ExternalFPGARetinaDevice, self).__init__(
-            n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
-            label=label, max_atoms_per_core=fixed_n_neurons,
-            board_address=board_address)
+    @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
+    def get_fixed_key_and_mask(self, partition_id):
+        return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 
     def _get_mask(self, mode):
         if mode == ExternalFPGARetinaDevice.MODE_128:
@@ -164,7 +156,3 @@ class ExternalFPGARetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self):
         return []
-
-    def get_outgoing_partition_constraints(self, partition):
-        return [FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)])]

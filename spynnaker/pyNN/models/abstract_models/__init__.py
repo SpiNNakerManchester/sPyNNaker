@@ -1,29 +1,34 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from .abstract_accepts_incoming_synapses import AbstractAcceptsIncomingSynapses
-from .abstract_contains_units import AbstractContainsUnits
-from .abstract_filterable_edge import AbstractFilterableEdge
-from .abstract_population_initializable import AbstractPopulationInitializable
-from .abstract_population_settable import AbstractPopulationSettable
-from .abstract_read_parameters_before_set import (
-    AbstractReadParametersBeforeSet)
-from .abstract_settable import AbstractSettable
-from .abstract_weight_updatable import AbstractWeightUpdatable
+from .abstract_has_delay_stages import AbstractHasDelayStages
+from .abstract_max_spikes import AbstractMaxSpikes
+from .abstract_synapse_expandable import (
+    AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
+from .sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
+from .receives_synaptic_inputs_over_sdram import (
+    ReceivesSynapticInputsOverSDRAM)
+from .has_synapses import HasSynapses
+from .abstract_neuron_expandable import (
+    AbstractNeuronExpandable, NEURON_EXPANDER_APLX)
+from .supports_structure import SupportsStructure
+from .has_shape_key_fields import HasShapeKeyFields
 
-__all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
-           "AbstractFilterableEdge", "AbstractPopulationInitializable",
-           "AbstractPopulationSettable", "AbstractReadParametersBeforeSet",
-           "AbstractSettable", "AbstractWeightUpdatable"]
+__all__ = ["AbstractAcceptsIncomingSynapses", "AbstractHasDelayStages",
+           "AbstractMaxSpikes", "AbstractSynapseExpandable",
+           "SYNAPSE_EXPANDER_APLX",
+           "SendsSynapticInputsOverSDRAM", "ReceivesSynapticInputsOverSDRAM",
+           "HasSynapses", "AbstractNeuronExpandable", "NEURON_EXPANDER_APLX",
+           "SupportsStructure", "HasShapeKeyFields"]

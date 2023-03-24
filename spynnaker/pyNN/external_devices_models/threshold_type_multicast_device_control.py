@@ -1,95 +1,71 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
+from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
-from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.utilities.struct import Struct
 
 DEVICE = "device"
-TIME_UNTIL_SEND = "time_until_send"
-
-UNITS = {
-    DEVICE: "",
-    TIME_UNTIL_SEND: ""
-}
+KEY = "key"
+SCALE = "scale"
+MIN = "min"
+MAX = "max"
+TS_INTER_SEND = "ts_inter_send"
+TS_NEXT_SEND = "ts_next_send"
+TYPE = "type"
 
 
 class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     """ A threshold type that can send multicast keys with the value of\
         membrane voltage as the payload
     """
-    __slots__ = ["__device"]
+    __slots__ = ["__devices"]
 
-    def __init__(self, device):
-        super(ThresholdTypeMulticastDeviceControl, self).__init__([
-            DataType.UINT32,   # control_key
-            DataType.UINT32,   # control_uses_payload
-            DataType.S1615,    # min_value
-            DataType.S1615,    # max_value
-            DataType.UINT32,   # time steps between sending
-            DataType.UINT32,   # time steps until next send
-            DataType.UINT32])  # type to send
-        self.__device = device
-
-    @overrides(AbstractThresholdType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 10 * n_neurons
+    def __init__(self, devices):
+        """
+        :param list(AbstractMulticastControllableDevice) device:
+        """
+        super().__init__(
+            [Struct([
+                (DataType.UINT32, KEY),
+                (DataType.UINT32, SCALE),
+                (DataType.S1615, MIN),
+                (DataType.S1615, MAX),
+                (DataType.UINT32, TS_INTER_SEND),
+                (DataType.UINT32, TS_NEXT_SEND),
+                (DataType.UINT32, TYPE)])],
+            {KEY: "", SCALE: "", MIN: "mV", MAX: "mV",
+             TS_INTER_SEND: "time steps", TS_NEXT_SEND: "time steps",
+             TYPE: ""})
+        self.__devices = devices
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[DEVICE] = self.__device
+        parameters[KEY] = [
+            d.device_control_key for d in self.__devices]
+        parameters[SCALE] = [
+            d.device_control_scaling_factor for d in self.__devices]
+        parameters[MIN] = [
+            d.device_control_min_value for d in self.__devices]
+        parameters[MAX] = [
+            d.device_control_max_value for d in self.__devices]
+        parameters[TS_INTER_SEND] = [
+            d.device_control_timesteps_between_sending for d in self.__devices]
+        parameters[TYPE] = [
+            d.device_control_send_type.value for d in self.__devices]
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[TIME_UNTIL_SEND] = 0
-
-    @overrides(AbstractThresholdType.get_units)
-    def get_units(self, variable):
-        return UNITS[variable]
-
-    @overrides(AbstractThresholdType.has_variable)
-    def has_variable(self, variable):
-        return variable in UNITS
-
-    @overrides(AbstractThresholdType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice):
-
-        # Add the rest of the data
-        return [parameters[DEVICE].apply_operation(
-                    lambda x: x.device_control_key),
-                parameters[DEVICE].apply_operation(
-                    lambda x: x.device_control_scaling_factor
-                    if x.device_control_uses_payload else 0),
-                parameters[DEVICE].apply_operation(
-                    lambda x: x.device_control_min_value),
-                parameters[DEVICE].apply_operation(
-                    lambda x: x.device_control_max_value),
-                parameters[DEVICE].apply_operation(
-                    lambda x: x.device_control_timesteps_between_sending),
-
-                # This is the "state" variable that keeps track of how many
-                # timesteps to go before a send is done
-                # Set to a different value for each item to avoid being in step
-                [i for i in range(vertex_slice.n_atoms)],
-                parameters[DEVICE].apply_operation(
-                    lambda x: x.device_control_send_type.value)]
-
-    @overrides(AbstractThresholdType.update_values)
-    def update_values(self, values, parameters, state_variables):
-
-        # Read the data
-        (_key, _uses_payload, _min, _max, _between, time_until_send,
-         _send_type) = values
-        state_variables[TIME_UNTIL_SEND] = time_until_send
+        state_variables[TS_NEXT_SEND] = 0

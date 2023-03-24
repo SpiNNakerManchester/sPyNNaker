@@ -1,59 +1,67 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.defaults import (
     defaults, default_parameters, default_initial_values)
 from testfixtures.logcapture import LogCapture
 import re
+# pylint: disable=no-member
 
 
 def test_nothing():
+    unittest_setup()
+
     @defaults
     class _AClass(object):
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
-    assert(_AClass.default_parameters == {
+    assert (_AClass.default_parameters == {
         "param_1": 1, "param_2": 2, "param_3": 3})
-    assert(_AClass.default_initial_values == {})
+    assert _AClass.default_initial_values == {}
 
 
 def test_parameters():
+    unittest_setup()
+
     @defaults
     class _AClass(object):
 
         @default_parameters({"param_1"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
-    assert(_AClass.default_parameters == {"param_1": 1})
-    assert(_AClass.default_initial_values == {"param_2": 2, "param_3": 3})
+    assert _AClass.default_parameters == {"param_1": 1}
+    assert _AClass.default_initial_values == {"param_2": 2, "param_3": 3}
 
 
 def test_state_variables():
+    unittest_setup()
+
     @defaults
     class _AClass(object):
 
         @default_initial_values({"param_1"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
-    assert(_AClass.default_initial_values == {"param_1": 1})
-    assert(_AClass.default_parameters == {"param_2": 2, "param_3": 3})
+    assert _AClass.default_initial_values == {"param_1": 1}
+    assert _AClass.default_parameters == {"param_2": 2, "param_3": 3}
 
 
 def test_both():
+    unittest_setup()
+
     @defaults
     class _AClass(object):
 
@@ -69,15 +77,16 @@ def test_both():
         @default_parameters({"param_2"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
-    assert(_AClass.default_parameters == {"param_1": 1})
-    assert(_AClass.default_initial_values == {"param_2": 2})
-    assert(_AnotherClass.default_parameters == {"param_2": 2})
-    assert(_AnotherClass.default_initial_values == {"param_1": 1})
+    assert _AClass.default_parameters == {"param_1": 1}
+    assert _AClass.default_initial_values == {"param_2": 2}
+    assert _AnotherClass.default_parameters == {"param_2": 2}
+    assert _AnotherClass.default_initial_values == {"param_1": 1}
 
 
 def test_abstract():
-    @add_metaclass(AbstractBase)
-    class BaseClass(object):
+    unittest_setup()
+
+    class BaseClass(object, metaclass=AbstractBase):
 
         @abstractproperty
         @staticmethod
@@ -98,12 +107,13 @@ def test_abstract():
         def __init__(self, param="test"):
             pass
 
-    assert(_AClass.default_parameters == {"param": "test"})
-    assert(_AClass.default_initial_values == {})
+    assert _AClass.default_parameters == {"param": "test"}
+    assert _AClass.default_initial_values == {}
     _AClass()
 
 
 def test_setting_state_variables():
+    unittest_setup()
 
     @defaults
     class _AClass(object):
@@ -151,5 +161,5 @@ def _check_warnings(lc, expected, not_expected):
             warning_variables.add(match.group(1))
 
     print("Found warnings for variables {}".format(warning_variables))
-    assert(all(item in warning_variables for item in expected))
-    assert(all(item not in warning_variables for item in not_expected))
+    assert all(item in warning_variables for item in expected)
+    assert all(item not in warning_variables for item in not_expected)

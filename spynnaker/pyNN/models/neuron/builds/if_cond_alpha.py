@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2015 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults, default_initial_values
@@ -20,6 +19,10 @@ from spynnaker.pyNN.models.defaults import defaults, default_initial_values
 @defaults
 class IFCondAlpha(object):
     """ Leaky integrate and fire neuron with an alpha-shaped current input.
+
+    .. warning::
+
+        Not currently supported by the tool chain.
     """
 
     # noinspection PyPep8Naming
@@ -28,6 +31,6 @@ class IFCondAlpha(object):
             self, tau_m=20, cm=1.0, e_rev_E=0.0, e_rev_I=-70.0, v_rest=-65.0,
             v_reset=-65.0, v_thresh=-50.0, tau_syn_E=0.3, tau_syn_I=0.5,
             tau_refrac=0.1, i_offset=0, v=-65.0, gsyn_exc=0.0, gsyn_inh=0.0):
-        # pylint: disable=too-many-arguments, too-many-locals, unused-argument
+        # pylint: disable=too-many-locals, unused-argument
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

@@ -1,25 +1,26 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-from six import Iterator
 from spinn_utilities.ranged.abstract_list import AbstractList
 from data_specification.enums import DataType, Commands
 from data_specification.exceptions import UnknownTypeException
 
 
-class _Range_Iterator(Iterator):
+class _Range_Iterator(object):
+    """ Iterator over a :py:class:`~spinn_utilities.ranged.RangedList` \
+        which is range based
+    """
     __slots__ = [
         "__cmd_pair",
         "__datatype",
@@ -29,14 +30,15 @@ class _Range_Iterator(Iterator):
         "__stop_range"]
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
-        """ Iterator over a RangedList which is range based
-
-        :param value: The list or Abstract list holding the data
-        :param datatype: The type of each element of data
-        :param slice_start: Inclusive start of the range
-        :param slice_stop: Exclusive end of the range
-        :param spec: The data specification to write to
-        :type spec: DataSpecificationGenerator
+        """
+        :param ~spinn_utilities.ranged.AbstractList value:
+            The abstract list holding the data
+        :param ~data_specification.enums.DataType datatype:
+            The type of each element of data
+        :param int slice_start: Inclusive start of the range
+        :param int slice_stop: Exclusive end of the range
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
         """
         # pylint: disable=too-many-arguments
         self.__iterator = value.iter_ranges_by_slice(slice_start, slice_stop)
@@ -62,7 +64,9 @@ class _Range_Iterator(Iterator):
         return self.__cmd_pair
 
 
-class _Get_Iterator(Iterator):
+class _Get_Iterator(object):
+    """ Iterator over a standard collection that supports ``__getitem__``
+    """
     __slots__ = [
         "__datatype",
         "__index",
@@ -71,14 +75,15 @@ class _Get_Iterator(Iterator):
         "__value"]
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
-        """ Iterator over a standard collection that supports __getitem__
-
-        :param value: The list or Abstract list holding the data
-        :param datatype: The type of each element of data
-        :param slice_start: Inclusive start of the range
-        :param slice_stop: Exclusive end of the range
-        :param spec: The data specification to write to
-        :type spec: DataSpecificationGenerator
+        """
+        :param value: The list holding the data
+        :type value: list(int) or list(float) or list(bool) or ~numpy.ndarray
+        :param ~data_specification.enums.DataType datatype:
+            The type of each element of data
+        :param int slice_start: Inclusive start of the range
+        :param int slice_stop: Exclusive end of the range
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
         """
         # pylint: disable=too-many-arguments
         self.__value = value
@@ -96,26 +101,27 @@ class _Get_Iterator(Iterator):
         return cmd_pair
 
 
-class _SingleValue_Iterator(Iterator):
+class _SingleValue_Iterator(object):
+    """ Iterator that repeats the single values the required number of times.
+
+    Allows a single Value parameter to be treated the same as parameters with
+    len. Caches `cmd_word_list` and `cmd_string` so they are only created once.
+    """
     __slots__ = [
         "__cmd_pair",
         "__index",
         "__stop"]
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
-        """ Iterator that repeats the single values the required number of\
-            times.
-
-        Allows a single Value parameter to be treated the same as parameters\
-        with len. \
-        Caches `cmd_word_list` and `cmd_string` so they are only created once.
-
-        :param value: The list or Abstract list holding the data
-        :param datatype: The type of each element of data
-        :param slice_start: Inclusive start of the range
-        :param slice_stop: Exclusive end of the range
-        :param spec: The data specification to write to
-        :type spec: DataSpecificationGenerator
+        """
+        :param value: The simple value that is the data for each element
+        :type value: int or float or bool
+        :param ~data_specification.enums.DataType datatype:
+            The type of each element of data
+        :param int slice_start: Inclusive start of the range
+        :param int slice_stop: Exclusive end of the range
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
         """
         # pylint: disable=too-many-arguments
         self.__cmd_pair = spec.create_cmd(data=value, data_type=datatype)
@@ -130,11 +136,23 @@ class _SingleValue_Iterator(Iterator):
 
 
 class NeuronParameter(object):
+    """ A settable parameter of a neuron model.
+    """
+
     __slots__ = [
         "__data_type",
         "__value"]
 
     def __init__(self, value, data_type):
+        """
+        :param value: what the value of the parameter is; if a list or array,
+            potentially provides a different value for each neuron
+        :type value: int or float or bool or list(int) or list(float) or
+            list(bool) or ~numpy.ndarray or
+            ~spinn_utilities.ranged.AbstractList
+        :param ~data_specification.enums.DataType data_type:
+            The serialization type of the parameter in the neuron model.
+        """
         self.__value = value
         if data_type not in DataType:
             raise UnknownTypeException(
@@ -142,19 +160,34 @@ class NeuronParameter(object):
         self.__data_type = data_type
 
     def get_value(self):
+        """ What the value of the parameter is; if a list or array,\
+            potentially provides a different value for each neuron.
+
+        :rtype: int or float or bool or list(int) or list(float) or
+            list(bool) or ~numpy.ndarray or
+            ~spinn_utilities.ranged.AbstractList
+        """
         return self.__value
 
     def get_dataspec_datatype(self):
+        """ Get the serialization type of the parameter in the neuron model.
+
+        :rtype: ~data_specification.enums.DataType
+        """
         return self.__data_type
 
     def iterator_by_slice(self, slice_start, slice_stop, spec):
-        """ Creates an Iterator.
+        """ Creates an iterator over the commands to use to write the\
+            parameter to the data specification being generated.
 
-        :param slice_start: Inclusive start of the range
-        :param slice_stop: Exclusive end of the range
-        :param spec: The data specification to write to
-        :type spec: DataSpecificationGenerator
-        :return: Iterator
+        :param int slice_start: Inclusive start of the range
+        :param int slice_stop: Exclusive end of the range
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to eventually write to.
+            (Note that this does not actually do the write).
+        :return: Iterator that produces a command to write to the
+            specification for each element in the slice.
+        :rtype: iterator(tuple(bytearray, str))
         """
         if isinstance(self.__value, AbstractList):
             return _Range_Iterator(

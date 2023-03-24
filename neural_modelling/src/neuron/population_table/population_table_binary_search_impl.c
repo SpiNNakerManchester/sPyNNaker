@@ -1,183 +1,195 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2016 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
+//! \file
+//! \brief Master population table implementation that uses binary search
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
+#include <stdbool.h>
 
-typedef struct master_population_table_entry {
-    uint32_t key;
-    uint32_t mask;
-    uint16_t start;
-    uint16_t count;
-} master_population_table_entry;
 
-typedef uint32_t address_and_row_length;
-
+//! The master population table. This is sorted.
 static master_population_table_entry *master_population_table;
+
+//! The length of ::master_population_table
 static uint32_t master_population_table_length;
-static address_and_row_length *address_list;
-static address_t synaptic_rows_base_address;
-static uint32_t direct_rows_base_address;
 
+//! The array of information that points into the synaptic matrix
+static address_list_entry *address_list;
+
+//! Base address for the synaptic matrix's indirect rows
+static uint32_t synaptic_rows_base_address;
+
+//! \brief The last spike received
+static spike_t last_spike = 0;
+
+//! \brief The last colour received
+static uint32_t last_colour = 0;
+
+//! \brief The last colour mask used
+static uint32_t last_colour_mask = 0;
+
+//! \brief The last neuron id for the key
 static uint32_t last_neuron_id = 0;
+
+//! the index for the next item in the ::address_list
 static uint16_t next_item = 0;
-static uint16_t items_to_go = 0;
 
-static inline uint32_t get_direct_address(address_and_row_length entry) {
-    // Direct row address is just the direct address bit
-    return (entry & 0x7FFFFF00) >> 8;
-}
+//! The number of relevant items remaining in the ::address_list
+//! NOTE: Exported for speed of check
+uint16_t items_to_go = 0;
 
-static inline uint32_t get_address(address_and_row_length entry) {
-    // The address is in words and is the top 23-bits but 1, so this down
-    // shifts by 8 and then multiplies by 16 (= up shifts by 4) = down shift by 4
-    // with the given mask 0x7FFFFF00 to fully remove the row length
-    // NOTE: The mask can be removed given the machine spec says it
-    // hard-codes the bottom 2 bits to zero anyhow. BUT BAD CODE PRACTICE
-    return (entry & 0x7FFFFF00) >> 4;
-}
+//! The bitfield map
+static bit_field_t *connectivity_bit_field = NULL;
 
-static inline uint32_t get_row_length(address_and_row_length entry) {
-    return entry & 0xFF;
-}
+//! \brief the number of times a DMA resulted in 0 entries
+uint32_t ghost_pop_table_searches = 0;
 
-static inline uint32_t is_single(address_and_row_length entry) {
-    return entry & 0x80000000;
-}
+//! \brief the number of times packet isnt in the master pop table at all!
+uint32_t invalid_master_pop_hits = 0;
 
-static inline uint32_t get_neuron_id(
-        master_population_table_entry entry, spike_t spike) {
-    return spike & ~entry.mask;
-}
+//! \brief The number of bit fields which were not able to be read in due to
+//!     DTCM limits.
+uint32_t failed_bit_field_reads = 0;
 
+//! \brief The number of packets dropped because the bitfield filter says
+//!     they don't hit anything
+uint32_t bit_field_filtered_packets = 0;
+
+//! \brief Prints the master pop table.
+//! \details For debugging
 static inline void print_master_population_table(void) {
-    log_info("master_population\n");
-    log_info("------------------------------------------\n");
+#if LOG_LEVEL >= LOG_DEBUG
+    log_info("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
-        for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
-            if (!is_single(address_list[j])) {
-                log_info(
-                    "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
-                    " offset: 0x%.8x, address: 0x%.8x, row_length: %u\n",
-                    i, j, entry.key, entry.mask,
-                    get_address(address_list[j]),
-                    get_address(address_list[j]) +
-                        (uint32_t) synaptic_rows_base_address,
-                    get_row_length(address_list[j]));
+        log_info("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
+        int count = entry.count;
+        int start = entry.start;
+		log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u, n_colour_bits: %u",
+				entry.core_mask, entry.mask_shift, entry.n_neurons, entry.n_words, entry.n_colour_bits);
+        for (uint16_t j = start; j < (start + count); j++) {
+            address_list_entry addr = address_list[j];
+            if (addr.address == INVALID_ADDRESS) {
+                log_info("    index %d: INVALID", j);
             } else {
-                log_info(
-                    "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
-                    " offset: 0x%.8x, address: 0x%.8x, single",
-                    i, j, entry.key, entry.mask,
-                    get_direct_address(address_list[j]),
-                    get_direct_address(address_list[j]) + direct_rows_base_address);
+                log_info("    index %d: offset: %u, address: 0x%08x, row_length: %u",
+                    j, get_offset(addr), get_address(addr, synaptic_rows_base_address),
+                    get_row_length(addr));
             }
         }
     }
-    log_info("------------------------------------------\n");
+    log_info("Population table has %u entries", master_population_table_length);
+#endif
 }
 
-bool population_table_initialise(
-        address_t table_address, address_t synapse_rows_address,
-        address_t direct_rows_address, uint32_t *row_max_n_words) {
-    log_debug("population_table_initialise: starting");
+//! \brief Print bitfields for debugging
+//! \param[in] mp_i: The master population table entry index
+//! \param[in] filters: The bitfields to print
+static inline void print_bitfields(uint32_t mp_i, filter_info_t *filters) {
+#if LOG_LEVEL >= LOG_DEBUG
+    // print out the bit field for debug purposes
+    uint32_t n_words = get_bit_field_size(filters[mp_i].n_atoms);
+    log_info("Bit field(s) for key 0x%08x, %u words for %u atoms:",
+            master_population_table[mp_i].key, n_words, filters[mp_i].n_atoms);
+    for (uint32_t i = 0; i < n_words; i++) {
+        log_info("0x%08x", connectivity_bit_field[mp_i][i]);
+    }
+#else
+    use(mp_i);
+    use(filters);
+#endif
+}
 
-    master_population_table_length = table_address[0];
-    log_debug("master pop table length is %d\n", master_population_table_length);
-    log_debug("master pop table entry size is %d\n",
-            sizeof(master_population_table_entry));
-    uint32_t n_master_pop_bytes =
-            master_population_table_length * sizeof(master_population_table_entry);
-    uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
-    log_debug("pop table size is %d\n", n_master_pop_bytes);
+bool population_table_load_bitfields(filter_region_t *filter_region) {
 
-    // only try to malloc if there's stuff to malloc.
-    if (n_master_pop_bytes != 0) {
-        master_population_table = spin1_malloc(n_master_pop_bytes);
-        if (master_population_table == NULL) {
-            log_error("Could not allocate master population table");
-            return false;
-        }
+    if (master_population_table_length == 0) {
+        return true;
+    }
+    // No filters = nothing to load
+    if (filter_region->n_filters == 0) {
+        return true;
+    }
+    // try allocating DTCM for starting array for bitfields
+    connectivity_bit_field =
+            spin1_malloc(sizeof(bit_field_t) * master_population_table_length);
+    if (connectivity_bit_field == NULL) {
+        log_warning(
+                "Couldn't initialise basic bit field holder. Will end up doing"
+                " possibly more DMA's during the execution than required."
+                " We required %d bytes where %d are available",
+                sizeof(bit_field_t) * master_population_table_length,
+                sark_heap_max(sark.heap, 0));
+        failed_bit_field_reads += filter_region->n_filters;
+        return true;
     }
 
-    uint32_t address_list_length = table_address[1];
-    uint32_t n_address_list_bytes =
-            address_list_length * sizeof(address_and_row_length);
-
-    // only try to malloc if there's stuff to malloc.
-    if (n_address_list_bytes != 0) {
-        address_list = spin1_malloc(n_address_list_bytes);
-        if (address_list == NULL) {
-            log_error("Could not allocate master population address list");
-            return false;
-        }
+    // Go through the population table, and the relevant bitfield list, both
+    // of which are ordered by key...
+    if (filter_region->n_filters != master_population_table_length) {
+        log_error("The number of filters doesn't match the population table");
+        return false;
     }
+    filter_info_t* filters = filter_region->filters;
+    for (uint32_t mp_i = 0; mp_i < master_population_table_length; mp_i++) {
+         connectivity_bit_field[mp_i] = NULL;
 
-    log_debug("pop table size: %u (%u bytes)",
-            master_population_table_length, n_master_pop_bytes);
-    log_debug("address list size: %u (%u bytes)",
-            address_list_length, n_address_list_bytes);
+         // Fail if the key doesn't match
+         if (master_population_table[mp_i].key != filters[mp_i].key) {
+             log_error("Bitfield for %u keys do not match: bf=0x%08x vs mp=0x%08x",
+                     mp_i, filters[mp_i].key, master_population_table[mp_i].key);
+             return false;
+         }
+         uint32_t useful = !(filters[mp_i].merged || filters[mp_i].all_ones);
 
-    // Copy the master population table
-    spin1_memcpy(master_population_table, &table_address[2],
-            n_master_pop_bytes);
-    spin1_memcpy(address_list, &table_address[2 + n_master_pop_words],
-            n_address_list_bytes);
-
-    // Store the base address
-    log_info("the stored synaptic matrix base address is located at: 0x%08x",
-            synapse_rows_address);
-    log_info("the direct synaptic matrix base address is located at: 0x%08x",
-            direct_rows_address);
-    synaptic_rows_base_address = synapse_rows_address;
-    direct_rows_base_address = (uint32_t) direct_rows_address;
-
-    *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
-
-    print_master_population_table();
+         if (useful) {
+             // Try to allocate all the bitfields for this entry
+             uint32_t n_words = get_bit_field_size(filters[mp_i].n_atoms);
+             uint32_t size = sizeof(bit_field_t) * n_words;
+             connectivity_bit_field[mp_i] = spin1_malloc(size);
+             if (connectivity_bit_field[mp_i] == NULL) {
+                 // There might be more than one that has failed
+                 failed_bit_field_reads += 1;
+             } else {
+                 spin1_memcpy(connectivity_bit_field[mp_i], filters[mp_i].data, size);
+                 print_bitfields(mp_i, filters);
+             }
+         }
+    }
     return true;
 }
 
-bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
+//! \brief Get the position in the master population table.
+//! \param[in] spike: The spike received
+//! \param[out] position: The position found (only if returns true)
+//! \return True if there is a matching entry, False otherwise
+static inline bool population_table_position_in_the_master_pop_array(
+        spike_t spike, uint32_t *position) {
     uint32_t imin = 0;
     uint32_t imax = master_population_table_length;
 
     while (imin < imax) {
-        int imid = (imax + imin) >> 1;
+        uint32_t imid = (imax + imin) >> 1;
         master_population_table_entry entry = master_population_table[imid];
         if ((spike & entry.mask) == entry.key) {
-            if (entry.count == 0) {
-                log_debug("spike %u (= %x): population found in master population"
-                        "table but count is 0", spike, spike);
-            }
-
-            last_neuron_id = get_neuron_id(entry, spike);
-            next_item = entry.start;
-            items_to_go = entry.count;
-
-            log_debug("spike = %08x, entry_index = %u, start = %u, count = %u",
-                    spike, imid, next_item, items_to_go);
-
-            return population_table_get_next_address(
-                    row_address, n_bytes_to_transfer);
+            *position = imid;
+            return true;
         } else if (entry.key < spike) {
+
             // Entry must be in upper part of the table
             imin = imid + 1;
         } else {
@@ -185,47 +197,138 @@ bool population_table_get_first_address(
             imax = imid;
         }
     }
-    log_debug("spike %u (= %x): population not found in master population table",
-            spike, spike);
     return false;
 }
 
-bool population_table_get_next_address(
-        address_t *row_address, size_t *n_bytes_to_transfer) {
+bool population_table_setup(address_t table_address, uint32_t *row_max_n_words,
+        uint32_t *master_pop_table_length,
+        master_population_table_entry **master_pop_table,
+        address_list_entry **address_list) {
+    pop_table_config_t *config = (pop_table_config_t *) table_address;
+
+    *master_pop_table_length = config->table_length;
+
+    if (*master_pop_table_length == 0) {
+        return true;
+    }
+
+    uint32_t n_master_pop_bytes =
+            *master_pop_table_length * sizeof(master_population_table_entry);
+
+    // only try to malloc if there's stuff to malloc.
+    *master_pop_table = spin1_malloc(n_master_pop_bytes);
+    if (*master_pop_table == NULL) {
+        log_error("Could not allocate master population table of %u bytes",
+                n_master_pop_bytes);
+        return false;
+    }
+
+    uint32_t address_list_length = config->addr_list_length;
+    uint32_t n_address_list_bytes =
+            address_list_length * sizeof(address_list_entry);
+
+    *address_list = spin1_malloc(n_address_list_bytes);
+    if (*address_list == NULL) {
+        log_error("Could not allocate master population address list of %u bytes",
+                n_address_list_bytes);
+        return false;
+    }
+
+    // Copy the master population table
+    spin1_memcpy(*master_pop_table, config->data, n_master_pop_bytes);
+    spin1_memcpy(*address_list, &config->data[*master_pop_table_length],
+            n_address_list_bytes);
+
+    *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
+    return true;
+}
+//! \}
+
+//! \name API functions
+//! \{
+
+bool population_table_initialise(
+        address_t table_address, address_t synapse_rows_address,
+        uint32_t *row_max_n_words) {
+    population_table_setup(table_address, row_max_n_words,
+            &master_population_table_length,
+            &master_population_table, &address_list);
+
+    // Store the base address
+    synaptic_rows_base_address = (uint32_t) synapse_rows_address;
+
+    print_master_population_table();
+    return true;
+}
+
+bool population_table_get_first_address(spike_t spike, pop_table_lookup_result_t *result) {
+
+    // check we don't have a complete miss
+    uint32_t position;
+    if (!population_table_position_in_the_master_pop_array(spike, &position)) {
+        invalid_master_pop_hits++;
+        return false;
+    }
+
+    master_population_table_entry entry = master_population_table[position];
+
+    last_spike = spike;
+    next_item = entry.start;
+    items_to_go = entry.count;
+	uint32_t local_neuron_id = get_local_neuron_id(entry, spike);
+	if (entry.n_colour_bits) {
+		last_colour_mask = (1 << entry.n_colour_bits) - 1;
+	    last_colour = local_neuron_id & last_colour_mask;
+	    last_neuron_id = (local_neuron_id >> entry.n_colour_bits) + get_core_sum(entry, spike);
+	} else {
+		last_colour = 0;
+		last_colour_mask = 0;
+		last_neuron_id = local_neuron_id + get_core_sum(entry, spike);
+	}
+
+    // check we have a entry in the bit field for this (possible not to due to
+    // DTCM limitations or router table compression). If not, go to DMA check.
+    if (connectivity_bit_field != NULL &&
+            connectivity_bit_field[position] != NULL) {
+        // check that the bit flagged for this neuron id does hit a
+        // neuron here. If not return false and avoid the DMA check.
+        if (!bit_field_test(
+                connectivity_bit_field[position], last_neuron_id)) {
+            bit_field_filtered_packets += 1;
+            items_to_go = 0;
+            return false;
+        }
+    }
+
+    // A local address is used here as the interface requires something
+    // to be passed in but using the address of an argument is odd!
+    uint32_t local_spike_id;
+    bool get_next = population_table_get_next_address(&local_spike_id, result);
+
+    // tracks surplus DMAs
+    if (!get_next) {
+        ghost_pop_table_searches++;
+    }
+    return get_next;
+}
+
+bool population_table_get_next_address(spike_t *spike, pop_table_lookup_result_t *result) {
     // If there are no more items in the list, return false
-    if (items_to_go <= 0) {
+    if (items_to_go == 0) {
         return false;
     }
 
     bool is_valid = false;
     do {
-        address_and_row_length item = address_list[next_item];
+        address_list_entry item = address_list[next_item];
+        if (item.address != INVALID_ADDRESS) {
 
-        // If the row is a direct row, indicate this by specifying the
-        // n_bytes_to_transfer is 0
-        if (is_single(item)) {
-            *row_address = (address_t) (
-                    get_direct_address(item) + direct_rows_base_address +
-                    (last_neuron_id * sizeof(uint32_t)));
-            *n_bytes_to_transfer = 0;
+        	get_row_addr_and_size(item, synaptic_rows_base_address,
+        			last_neuron_id, result);
+            *spike = last_spike;
+            result->colour = last_colour;
+            result->colour_mask = last_colour_mask;
             is_valid = true;
-        } else {
-            uint32_t row_length = get_row_length(item);
-            if (row_length > 0) {
-                uint32_t block_address =
-                        get_address(item) + (uint32_t) synaptic_rows_base_address;
-                uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
-                uint32_t neuron_offset =
-                        last_neuron_id * stride * sizeof(uint32_t);
-
-                *row_address = (address_t) (block_address + neuron_offset);
-                *n_bytes_to_transfer = stride * sizeof(uint32_t);
-                log_debug("neuron_id = %u, block_address = 0x%.8x,"
-                        "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-                        last_neuron_id, block_address, row_length, *row_address,
-                        *n_bytes_to_transfer);
-                is_valid = true;
-            }
         }
 
         next_item++;
@@ -234,3 +337,5 @@ bool population_table_get_next_address(
 
     return is_valid;
 }
+
+//! \}

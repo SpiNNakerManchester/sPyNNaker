@@ -1,81 +1,53 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from .struct import Struct
-from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
 
-class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
-    """ Represents a component of a standard neural model
+class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
+    """ Represents a component of a standard neural model.
     """
 
-    __slots__ = ["__struct"]
+    __slots__ = ["__structs", "__units"]
 
-    def __init__(self, data_types):
+    def __init__(self, structs, units):
         """
-        :param data_types:\
-            A list of data types in the component structure, in the order that\
-            they appear
+        :param list(Struct) structs: The structs of the component
+        :param dict units: The units to use for each parameter
         """
-        self.__struct = Struct(data_types)
+        self.__structs = structs
+        self.__units = units
 
     @property
-    def struct(self):
-        """ The structure of the component
+    def structs(self):
+        """ The structures of the component.  If there are multiple structs,
+            the order is how they will appear in memory; where there are
+            structs that repeat per neuron the repeats will appear adjacent
+            e.g. for non-repeating struct g, followed by repeating structs s1
+            and s2 with 3 neurons the layout will be:
+            [g, s1, s1, s1, s2, s2, s2].
 
-        :rtype:\
-            :py:class:'spynnaker.pyNN.models.neuron.implementations.struct.Struct'
+        :rtype: list(~spynnaker.pyNN.utilities.struct.Struct)
         """
-        return self.__struct
-
-    @abstractmethod
-    def get_n_cpu_cycles(self, n_neurons):
-        """ Get the number of CPU cycles required to update the state
-
-        :param n_neurons: The number of neurons to get the cycles for
-        :type n_neurons: int
-        :rtype: int
-        """
-
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        """ Get the DTCM memory usage required
-
-        :param n_neurons: The number of neurons to get the usage for
-        :type n_neurons: int
-        :rtype: int
-        """
-        return self.struct.get_size_in_whole_words(n_neurons) * 4
-
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        """ Get the SDRAM memory usage required
-
-        :param n_neurons: The number of neurons to get the usage for
-        :type n_neurons: int
-        :rtype: int
-        """
-        return self.struct.get_size_in_whole_words(n_neurons) * 4
+        return self.__structs
 
     @abstractmethod
     def add_parameters(self, parameters):
         """ Add the initial values of the parameters to the parameter holder
 
-        :param parameters: A holder of the parameters
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :param ~spinn_utilities.ranged.RangeDictionary parameters:
+            A holder of the parameters
         """
 
     @abstractmethod
@@ -83,91 +55,21 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         """ Add the initial values of the state variables to the state\
             variables holder
 
-        :param state_variables: A holder of the state variables
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :param ~spinn_utilities.ranged.RangeDictionary state_variables:
+            A holder of the state variables
         """
 
-    @abstractmethod
-    def get_values(self, parameters, state_variables, vertex_slice):
-        """ Get the values to be written to the machine for this model
-
-        :param parameters: The holder of the parameters
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
-        :param state_variables: The holder of the state variables
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
-        :param vertex_slice: The slice of variables being retrieved
-        :return: A list with the same length as self.struct.field_types
-        :rtype: A list of (single value or list of values or RangedList)
-        """
-
-    def get_data(self, parameters, state_variables, vertex_slice):
-        """ Get the data to be written to the machine for this model
-
-        :param parameters: The holder of the parameters
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
-        :param state_variables: The holder of the state variables
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
-        :param vertex_slice: The slice of the vertex to generate parameters for
-        :rtype: numpy array of uint32
-        """
-        values = self.get_values(parameters, state_variables, vertex_slice)
-        return self.struct.get_data(
-            values, vertex_slice.lo_atom, vertex_slice.n_atoms)
-
-    @abstractmethod
-    def update_values(self, values, parameters, state_variables):
-        """ Update the parameters and state variables with the given struct\
-            values that have been read from the machine
-
-        :param values:\
-            The values read from the machine, one for each struct element
-        :type value: A list of lists
-        :param parameters: The holder of the parameters to update
-        :param state_variables: The holder of the state variables to update
-        """
-
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
-        """ Read the parameters and state variables of the model from the\
-            given data
-
-        :param data: The data to be read
-        :param offset: The offset where the data should be read from
-        :param vertex_slice: The slice of the vertex to read parameters for
-        :param parameters: The holder of the parameters to update
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
-        :param state_variables: The holder of the state variables to update
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
-        :return: The offset after reading the data
-        """
-        values = self.struct.read_data(data, offset, vertex_slice.n_atoms)
-        new_offset = offset + (self.struct.get_size_in_whole_words(
-            vertex_slice.n_atoms) * 4)
-        params = RangedDictVertexSlice(parameters, vertex_slice)
-        variables = RangedDictVertexSlice(state_variables, vertex_slice)
-        self.update_values(values, params, variables)
-        return new_offset
-
-    @abstractmethod
     def has_variable(self, variable):
         """ Determine if this component has a variable by the given name
 
-        :param variable: The name of the variable
-        :type variable: str
+        :param str variable: The name of the variable
         :rtype: bool
         """
+        return variable in self.__units
 
-    @abstractmethod
     def get_units(self, variable):
         """ Get the units of the given variable
 
-        :param variable: The name of the variable
-        :type variable: str
+        :param str variable: The name of the variable
         """
+        return self.__units[variable]

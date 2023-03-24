@@ -1,73 +1,51 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2015 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import math
+
+import logging
 import numpy
-from six import add_metaclass
+from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.log import FormatAdapter
+from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
+from spynnaker.pyNN.exceptions import InvalidParameterType
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
-@add_metaclass(AbstractBase)
-class AbstractSynapseDynamics(object):
+class AbstractSynapseDynamics(object, metaclass=AbstractBase):
+    """ How do the dynamics of a synapse interact with the rest of the model.
+    """
 
     __slots__ = ()
 
-    NUMPY_CONNECTORS_DTYPE = [("source", "uint32"), ("target", "uint32"),
-                              ("weight", "float64"), ("delay", "float64")]
-
     @abstractmethod
-    def is_same_as(self, synapse_dynamics):
-        """ Determines if this synapse dynamics is the same as another
-        """
+    def merge(self, synapse_dynamics):
+        """ Merge with the given synapse_dynamics and return the result, or\
+            error if merge is not possible
 
-    @abstractmethod
-    def are_weights_signed(self):
-        """ Determines if the weights are signed values
+        :param AbstractSynapseDynamics synapse_dynamics:
+        :rtype: AbstractSynapseDynamics
         """
 
     @abstractmethod
     def get_vertex_executable_suffix(self):
         """ Get the executable suffix for a vertex for this dynamics
-        """
 
-    @abstractmethod
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
-        """ Get the SDRAM usage of the synapse dynamics parameters in bytes
-        """
-
-    @abstractmethod
-    def write_parameters(self, spec, region, machine_time_step, weight_scales):
-        """ Write the synapse parameters to the spec
-        """
-
-    @abstractmethod
-    def get_parameter_names(self):
-        """ Get the parameter names available from the synapse \
-            dynamics components
-
-        :rtype: iterable(str)
-        """
-
-    @abstractmethod
-    def get_max_synapses(self, n_words):
-        """ Get the maximum number of synapses that can be held in the given\
-            number of words
-
-        :param n_words: The number of words the synapses must fit in
-        :rtype: int
+        :rtype: str
         """
 
     @abstractproperty
@@ -77,61 +55,162 @@ class AbstractSynapseDynamics(object):
         :rtype: bool
         """
 
+    @abstractproperty
+    def weight(self):
+        """ The weight of connections
+        """
+
+    def _round_delay(self, delay):
+        """
+        round the delays to multiples of full timesteps
+
+        (otherwise SDRAM estimation calculations can go wrong)
+
+        :param delay:
+        :return:
+        """
+        if isinstance(delay, RandomDistribution):
+            return delay
+        if isinstance(delay, str):
+            return delay
+        new_delay = (
+                numpy.rint(numpy.array(delay) *
+                           SpynnakerDataView.get_simulation_time_step_per_ms())
+                * SpynnakerDataView.get_simulation_time_step_ms())
+        if not numpy.allclose(delay, new_delay):
+            logger.warning(f"Rounding up delay in f{self} "
+                           f"from {delay} to {new_delay}")
+        return new_delay
+
+    @abstractproperty
+    def delay(self):
+        """ The delay of connections
+        """
+
+    @abstractproperty
+    def is_combined_core_capable(self):
+        """ Determine if the synapse dynamics can run on a core combined with
+            the neuron, or if a separate core is needed.
+
+        :rtype: bool
+        """
+
+    def get_value(self, key):
+        """ Get a property
+
+        :param str key: the name of the property
+        :rtype: Any or float or int or list(float) or list(int)
+        """
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise InvalidParameterType(
+            f"Type {type(self)} does not have parameter {key}")
+
+    def set_value(self, key, value):
+        """ Set a property
+
+        :param str key: the name of the parameter to change
+        :param value: the new value of the parameter to assign
+        :type value: Any or float or int or list(float) or list(int)
+        """
+        if hasattr(self, key):
+            setattr(self, key, value)
+            SpynnakerDataView.set_requires_mapping()
+        else:
+            raise InvalidParameterType(
+                f"Type {type(self)} does not have parameter {key}")
+
+    def get_delay_maximum(self, connector, synapse_info):
+        """ Get the maximum delay for the synapses
+
+        :param AbstractConnector connector:
+        :param ~numpy.ndarray delays:
+        """
+        return connector.get_delay_maximum(synapse_info)
+
+    def get_delay_minimum(self, connector, synapse_info):
+        """ Get the minimum delay for the synapses. \
+            This will support the filtering of the undelayed edge\
+            from the graph, but requires fixes in the synaptic manager to \
+            happen first before this can be utilised fully.
+
+        :param AbstractConnector connector: connector
+        :param ~numpy.ndarray synapse_info: synapse info
+        """
+        return connector.get_delay_minimum(synapse_info)
+
+    def get_delay_variance(self, connector, delays, synapse_info):
+        """ Get the variance in delay for the synapses
+
+        :param AbstractConnector connector:
+        :param ~numpy.ndarray delays:
+        """
+        return connector.get_delay_variance(delays, synapse_info)
+
+    def get_weight_mean(self, connector, synapse_info):
+        """ Get the mean weight for the synapses
+
+        :param AbstractConnector connector:
+        :param ~numpy.ndarray weights:
+        """
+        return connector.get_weight_mean(synapse_info.weights, synapse_info)
+
+    def get_weight_maximum(self, connector, synapse_info):
+        """ Get the maximum weight for the synapses
+
+        :param AbstractConnector connector:
+        :param ~numpy.ndarray weights:
+        """
+        return connector.get_weight_maximum(synapse_info)
+
+    def get_weight_variance(self, connector, weights, synapse_info):
+        """ Get the variance in weight for the synapses
+
+        :param AbstractConnector connector:
+        :param ~numpy.ndarray weights:
+        """
+        return connector.get_weight_variance(weights, synapse_info)
+
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get the provenance data from this synapse dynamics object
-        """
-        return list()
 
-    def get_delay_maximum(self, connector, delays):
-        """ Get the maximum delay for the synapses
+        :param str pre_population_label:
+        :param str post_population_label:
+        :rtype:
+            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
-        return connector.get_delay_maximum(delays)
+        # pylint: disable=unused-argument
+        return []
 
-    def get_delay_variance(self, connector, delays):
-        """ Get the variance in delay for the synapses
-        """
-        # pylint: disable=too-many-arguments
-        return connector.get_delay_variance(delays)
+    def get_synapse_id_by_target(self, target):
+        """ Get the index of the synapse type based on the name, or None
+            if the name is not found.
 
-    def get_weight_mean(self, connector, weights):
-        """ Get the mean weight for the synapses
+        :param str target: The name of the synapse
+        :rtype: int or None
         """
-        # pylint: disable=too-many-arguments
-        return connector.get_weight_mean(weights)
+        # pylint: disable=unused-argument
+        return None
 
-    def get_weight_maximum(self, connector, weights):
-        """ Get the maximum weight for the synapses
-        """
-        # pylint: disable=too-many-arguments
-        return connector.get_weight_maximum(weights)
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        """ Get the machine vertices that are connected to each other with
+            this connector
 
-    def get_weight_variance(self, connector, weights):
-        """ Get the variance in weight for the synapses
+        :param SynapseInformation s_info:
+            The synapse information of the connection
+        :param ApplicationVertex source_vertex: The source of the spikes
+        :param ApplicationVertex target_vertex: The target of the spikes
+        :return: A list of tuples of (target machine vertex, source
+        :rtype: list(tuple(MachineVertex, list(AbstractVertex)))
         """
-        # pylint: disable=too-many-arguments
-        return connector.get_weight_variance(weights)
+        # By default, just ask the connector
+        return s_info.connector.get_connected_vertices(
+            s_info, source_vertex, target_vertex)
 
-    def convert_per_connection_data_to_rows(
-            self, connection_row_indices, n_rows, data):
-        """ Converts per-connection data generated from connections into\
-            row-based data to be returned from get_synaptic_data
+    @property
+    def absolute_max_atoms_per_core(self):
+        """ The absolute maximum number of atoms per core supported by this
+            synapse dynamics object
         """
-        return [
-            data[connection_row_indices == i].reshape(-1)
-            for i in range(n_rows)]
-
-    def get_n_items(self, rows, item_size):
-        """ Get the number of items in each row as 4-byte values, given the\
-            item size
-        """
-        return numpy.array([
-            int(math.ceil(float(row.size) / float(item_size)))
-            for row in rows], dtype="uint32").reshape((-1, 1))
-
-    def get_words(self, rows):
-        """ Convert the row data to words
-        """
-        words = [numpy.pad(
-            row, (0, (4 - (row.size % 4)) & 0x3), mode="constant",
-            constant_values=0).view("uint32") for row in rows]
-        return words
+        # By default, we can only support the maximum row length per core
+        return POP_TABLE_MAX_ROW_LENGTH

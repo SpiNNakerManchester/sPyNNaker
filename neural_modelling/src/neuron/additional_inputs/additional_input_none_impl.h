@@ -1,39 +1,68 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2015 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
+//! \file
+//! \brief Implementation of "no-such-input" additional input
 #ifndef _ADDITIONAL_INPUT_TYPE_NONE_H_
 #define _ADDITIONAL_INPUT_TYPE_NONE_H_
 
 #include "additional_input.h"
 
-typedef struct additional_input_t {
-} additional_input_t;
+//! An empty additional input that makes no contribution
+struct additional_input_params_t {
 
-static input_t additional_input_get_input_value_as_current(
-        additional_input_pointer_t additional_input,
-        state_t membrane_voltage) {
-    use(additional_input);
-    use(membrane_voltage);
+};
+
+//! An empty additional input that makes no contribution
+struct additional_input_t {
+};
+
+static inline void additional_input_initialise(
+		UNUSED additional_input_t *state, UNUSED additional_input_params_t *params,
+		UNUSED uint32_t n_steps_per_timestep) {
+}
+
+static inline void additional_input_save_state(UNUSED additional_input_t *state,
+		UNUSED additional_input_params_t *params) {
+}
+
+//! \brief Gets the value of current provided by the additional input this
+//!     timestep
+//! \details Does nothing
+//! \param[in] additional_input: The additional input type pointer to the
+//!     parameters
+//! \param[in] membrane_voltage: The membrane voltage of the neuron
+//! \return The value of the input after scaling
+static inline input_t additional_input_get_input_value_as_current(
+        UNUSED additional_input_t *additional_input,
+        UNUSED state_t membrane_voltage) {
     return 0;
 }
 
-static void additional_input_has_spiked(
-        additional_input_pointer_t additional_input) {
-    use(additional_input);
+#ifndef SOMETIMES_UNUSED
+#define SOMETIMES_UNUSED __attribute__((unused))
+#endif // !SOMETIMES_UNUSED
+
+SOMETIMES_UNUSED // Marked unused as only used sometimes
+//! \brief Notifies the additional input type that the neuron has spiked
+//! \details Does nothing
+//! \param[in] additional_input: The additional input type pointer to the
+//!     parameters
+static inline void additional_input_has_spiked(
+        UNUSED additional_input_t *additional_input) {
 }
 
 #endif // _ADDITIONAL_INPUT_TYPE_NONE_H_

@@ -1,107 +1,53 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2016 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-/*! \file
- *
- * SUMMARY
- *  \brief This file contains the static impl of synaptogenesis.
- *  No functionality is gained with this class
- *
+/*!
+ * \file
+ * \brief This file contains the static (non-)implementation of synaptogenesis.
+ * \details No functionality is gained with this class.
  */
 #include "synaptogenesis_dynamics.h"
 #include <debug.h>
 
-static const char* sp_error_message = "Non-structurally plastic impl.";
-
-//! \brief Initialisation of synaptic rewiring (synaptogenesis)
-//! parameters (random seed, spread of receptive field etc.)
-//! \param[in] sdram_sp_address Address of the start of the SDRAM region
-//! which contains synaptic rewiring params.
-//! \return address_t Address after the final word read from SDRAM.
-address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
-	use(sdram_sp_address);
-	log_debug("%s", sp_error_message);
-    return sdram_sp_address;
+bool synaptogenesis_dynamics_initialise(
+        UNUSED address_t sdram_sp_address, uint32_t *recording_regions_used) {
+    // The recording region is defined even if unused, so this value needs to
+    // be incremented in order for the recording region IDs to match up
+    *recording_regions_used += 1;
+    return true;
 }
 
-//! \brief Function called (usually on a timer from c_main) to
-//! trigger the process of synaptic rewiring
-//! \param[in] time: the current timestep
-//! \return None
-void synaptogenesis_dynamics_rewire(uint32_t time) {
-    use(time);
-    log_error("%s", sp_error_message);
-}
-
-//! \brief This function is a rewiring DMA callback
-//! \param[in] dma_id: the ID of the DMA
-//! \param[in] dma_tag: the DMA tag, i.e. the tag used for reading row for rew.
-//! \return nothing
-void synaptic_row_restructure(uint dma_id, uint dma_tag) {
-    use(dma_id);
-    use(dma_tag);
-    log_error("%s", sp_error_message);
-}
-
-//!
-//!   Formation and elimination are structurally agnostic, i.e. they don't
-//!   care how synaptic rows are organised in physical memory.
-//!
-//!   As such, they need to call functions that have a knowledge of how the
-//!   memory is physically organised to be able to modify Plastic-Plastic
-//!   synaptic regions.
-//!
-//!   The formation rule calls the add neuron function in the appropriate
-//!   module (STDP or static).
-//!
-bool synaptogenesis_dynamics_formation_rule(void) {
+bool synaptogenesis_dynamics_rewire(
+        UNUSED uint32_t time, UNUSED spike_t *spike,
+        UNUSED pop_table_lookup_result_t *result) {
     return false;
 }
 
-//!
-//!   Formation and elimination are structurally agnostic, i.e. they don't
-//!   care how synaptic rows are organised in physical memory.
-//!
-//!   As such, they need to call functions that have a knowledge of how the
-//!   memory is physically organised to be able to modify Plastic-Plastic
-//!   synaptic regions.
-//!
-//!   The elimination rule calls the remove neuron function in the appropriate
-//!   module (STDP or static).
-//!
-bool synaptogenesis_dynamics_elimination_rule(void) {
+bool synaptogenesis_row_restructure(
+        UNUSED uint32_t time, UNUSED synaptic_row_t row) {
     return false;
 }
 
-//! retrieve the period of rewiring
-//! based on is_fast(), this can either mean how many times rewiring happens
-//! in a timestep, or how many timesteps have to pass until rewiring happens.
-int32_t get_p_rew(void) {
-    return -1;
+void synaptogenesis_spike_received(UNUSED uint32_t time, UNUSED spike_t spike) {
 }
 
-//! controls whether rewiring is attempted multiple times per timstep
-//! or after a number of timesteps.
-bool is_fast(void) {
-    return false;
+uint32_t synaptogenesis_n_updates(void) {
+    return 0;
 }
 
-//! after a set of rewiring attempts, update the indices in the circular buffer
-//! between which we will be looking at the next batch of attempts
-void update_goal_posts(uint32_t time) {
-    use(time);
+void print_post_to_pre_entry(void) {
+    return;
 }

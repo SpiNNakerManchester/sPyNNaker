@@ -1,23 +1,22 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2017 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /**
- *! \file
- *! \brief The implementation of a parameter generator
+ * \file
+ * \brief The implementation of a parameter generator
  */
 #include "param_generator.h"
 #include <spin1_api.h>
@@ -30,20 +29,23 @@
 #include "param_generators/param_generator_normal_clipped.h"
 #include "param_generators/param_generator_normal_clipped_to_boundary.h"
 #include "param_generators/param_generator_exponential.h"
-#include "param_generators/param_generator_kernel.h"
 
+//! The "hashes" for parameter generators
 enum {
+    //! A parameter that is a constant
     CONSTANT,
+    //! A parameter that is a uniformly-distributed random variable
     UNIFORM,
+    //! A parameter that is a normally-distributed random variable
     NORMAL,
+    //! A parameter that is a clipped-normally-distributed random variable
     NORMAL_CLIPPED,
+    //! A parameter that is a clamped-normally-distributed random variable
     NORMAL_CLIPPED_BOUNDARY,
+    //! A parameter that is an exponentially-distributed random variable
     EXPONENTIAL,
-    KERNEL,
-    /**
-     *! \brief The number of known generators
-     */
-    N_PARAM_GENERATORS = 7
+    //! The number of known generators
+    N_PARAM_GENERATORS
 };
 
 /**
@@ -51,38 +53,21 @@ enum {
  */
 typedef struct param_generator_info {
     /**
-     *! \brief The hash of the generator.
-     *! For now, hash is just an index agreed between Python and here.
+     * \brief The hash of the generator.
+     *
+     * For now, hash is just an index agreed between Python and here.
      */
     generator_hash_t hash;
-    /**
-     *! \brief Initialise the generator
-     *! \param[in/out] region Region to read parameters from.  Should be updated
-     *!                       to position just after parameters after calling.
-     *! \return A data item to be passed in to other functions later on
-     */
-    initialize_func *initialize;
-    /**
-     *! \brief Generate values with a parameter generator
-     *! \param[in] data The data for the parameter generator, returned by the
-     *!                 initialise function
-     *! \param[in] n_indices The number of values to generate
-     *! \param[in] pre_neuron_index The index of the neuron in the pre-population
-     *!                             being generated
-     *! \param[in] indices The n_indices post-neuron indices for each connection
-     *! \param[in/out] values An array into which to place the values; will be
-     *!                       n_indices in size
-     */
+    //! Initialise the generator
+    initialize_param_func *initialize;
+    //! Generate values with a parameter generator
     generate_param_func *generate;
-    /**
-     *! \brief Free any data for the generator
-     *! \param[in] data The data to free
-     */
+    //! Free any data for the generator
     free_func *free;
 } param_generator_info;
 
 /**
- *! \brief The data for a parameter generator
+ * \brief The data for a parameter generator
  */
 struct param_generator {
     const param_generator_info *type;
@@ -90,7 +75,7 @@ struct param_generator {
 };
 
 /**
- *! \brief An Array of known generators
+ * \brief An Array of known generators
  */
 static const struct param_generator_info param_generators[] = {
     {CONSTANT,
@@ -116,14 +101,10 @@ static const struct param_generator_info param_generators[] = {
     {EXPONENTIAL,
             param_generator_exponential_initialize,
             param_generator_exponential_generate,
-            param_generator_exponential_free},
-    {KERNEL,
-            param_generator_kernel_initialize,
-            param_generator_kernel_generate,
-            param_generator_kernel_free},
+            param_generator_exponential_free}
 };
 
-param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
+param_generator_t param_generator_init(uint32_t hash, void **in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_PARAM_GENERATORS; i++) {
         const param_generator_info *type = &param_generators[i];
@@ -131,8 +112,8 @@ param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
         // If the hash requested matches the hash of the generator, use it
         if (hash == type->hash) {
             // Prepare a space for the data
-            param_generator_t generator =
-                    spin1_malloc(sizeof(param_generator_t));
+            struct param_generator *generator =
+                    spin1_malloc(sizeof(struct param_generator));
             if (generator == NULL) {
                 log_error("Could not create generator");
                 return NULL;
@@ -150,11 +131,8 @@ param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
     return NULL;
 }
 
-void param_generator_generate(
-        param_generator_t generator, uint32_t n_indices,
-        uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
-    generator->type->generate(
-            generator->data, n_indices, pre_neuron_index, indices, values);
+accum param_generator_generate(param_generator_t generator) {
+    return generator->type->generate(generator->data);
 }
 
 void param_generator_free(param_generator_t generator) {

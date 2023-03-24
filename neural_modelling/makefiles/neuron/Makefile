@@ -1,17 +1,16 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2014 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 MODELS = eprop_adaptive \
          eprop_adaptive_stdp_mad_eprop_reg \
@@ -23,30 +22,29 @@ MODELS = eprop_adaptive \
          IZK_curr_exp \
          IZK_cond_exp \
          IF_curr_exp_dual \
-         IF_curr_exp_stdp_mad_pair_additive \
-         IF_curr_exp_stdp_mad_pair_multiplicative \
-         IF_cond_exp_stdp_mad_pair_additive \
-         external_device_lif_control \
-         IF_cond_exp_stoc \
-         IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
-         IF_curr_exp_stdp_mad_recurrent_dual_fsm_multiplicative \
-         IF_curr_exp_stdp_mad_vogels_2011_additive \
          IF_curr_delta \
-         IF_curr_exp_ca2_adaptive \
-         IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive \
-         IF_curr_exp_stdp_mad_nearest_pair_additive \
-         IF_curr_exp_stdp_mad_nearest_pair_multiplicative \
-         IF_curr_exp_stdp_mad_pfister_triplet_additive \
-         IF_cond_exp_stdp_mad_nearest_pair_additive \
-         IF_curr_alpha \
-         IF_curr_alpha_stdp_mad_pair_additive \
-         IF_cond_exp_structural \
-         IF_curr_exp_stdp_mad_pair_additive_structural \
-         IF_curr_exp_structural \
-         IF_cond_exp_stdp_mad_pair_additive_structural \
-         IF_curr_exp_sEMD \
-         IZK_curr_exp_stdp_mad_pair_additive \
-         IZK_cond_exp_stdp_mad_pair_additive
+         IF_curr_exp_ca2_adaptive
+
+ifneq ($(SPYNNAKER_DEBUG), DEBUG)
+#    MODELS += external_device_lif_control \
+              IF_curr_alpha \
+              IF_cond_exp_stoc \
+              IF_curr_exp_sEMD \
+              IF_curr_exp_stdp_mad_pair_additive \
+              IF_curr_exp_stdp_mad_pair_multiplicative \
+              IF_cond_exp_stdp_mad_pair_additive \
+              IF_curr_exp_stdp_mad_recurrent_dual_fsm_multiplicative \
+              IF_curr_exp_stdp_mad_vogels_2011_additive \
+              IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive \
+              IF_curr_exp_stdp_mad_nearest_pair_additive \
+              IF_curr_exp_stdp_mad_nearest_pair_multiplicative \
+              IF_cond_exp_stdp_mad_nearest_pair_additive \
+              IZK_curr_exp_stdp_mad_pair_additive \
+              IZK_cond_exp_stdp_mad_pair_additive \
+              IF_curr_alpha_stdp_mad_pair_additive \
+              IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
+              IF_curr_exp_stdp_mad_pfister_triplet_additive
+endif
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done

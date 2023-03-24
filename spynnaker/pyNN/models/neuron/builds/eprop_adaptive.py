@@ -26,30 +26,33 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
     """ Adaptive threshold neuron with eprop support
     """
 
-    @default_initial_values({"v",
-                             "isyn_exc", "isyn_exc2", "isyn_inh", "isyn_inh2",
+    @default_initial_values({"v", "isyn_exc", "isyn_exc2",
+                             "isyn_inh", "isyn_inh2",
                              "psi", "target_rate", "tau_err",
                              "B", "small_b",
-                             "l", "w_fb", "eta", "window_size", "number_of_cues"
-                             })
+                             "l", "w_fb", "window_size", "number_of_cues",
+                             "eta"})
     def __init__(
             self,
             # neuron model params
             tau_m=20.0, cm=1.0, v_rest=0, v_reset=0,
-            tau_refrac=5, i_offset=0.0, v=0.0,  psi=0.0,
+            tau_refrac=5.0, i_offset=0.0, v=0.0,  psi=0.0,
 
             #synapse type params
             tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, tau_syn_I2=5.0,
             isyn_exc=0.0, isyn_exc2=0.0, isyn_inh=0.0, isyn_inh2=0.0,
 
             # Regularisation params
-            target_rate=10, tau_err=1000,  #  fits with 1 ms timestep
+            target_rate=10.0, tau_err=1000.0,  #  fits with 1 ms timestep
 
             # Threshold parameters
-            B=10, small_b=0, small_b_0=10, tau_a=500, beta=1.8,
+            B=10.0, small_b=0.0, small_b_0=10.0, tau_a=500.0, beta=1.8,
 
             # Learning signal and weight update constants
-            l=0, w_fb=0.5, eta=1.0, window_size=13000, number_of_cues=0
+            l=0.0, w_fb=0.5, window_size=13000, number_of_cues=0,
+
+            # eprop "global"
+            eta=1.0
 
             ):
         # pylint: disable=too-many-arguments, too-many-locals
@@ -62,9 +65,11 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             tau_a,
             beta,
             # Regularisation params
-            target_rate, tau_err, 
+            target_rate, tau_err,
             # Learning signal params
-            l, w_fb, eta, window_size, number_of_cues
+            l, w_fb, window_size, number_of_cues,
+            # eprop global
+            eta
             )
 
         synapse_type = SynapseTypeEPropAdaptive(
@@ -83,5 +88,3 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
     @classmethod
     def get_max_atoms_per_core(cls):
         return 8
-
-

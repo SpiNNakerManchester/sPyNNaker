@@ -1,30 +1,25 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
-from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints,
     AbstractSendMeMulticastCommandsVertex)
-from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.common import PopulationApplicationVertex
 
 # robot with 7 7 1
 
@@ -42,30 +37,32 @@ def get_spike_value_from_robot_retina(key):
 
 
 class MunichRetinaDevice(
-        ApplicationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex,
-        AbstractProvidesOutgoingPartitionConstraints,
-        ProvidesKeyToAtomMappingImpl):
+        ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
+        AbstractSendMeMulticastCommandsVertex):
+    """ An Omnibot silicon retina device.
+    """
     __slots__ = [
         "__fixed_key",
         "__fixed_mask",
-        "__polarity",
-        "__position"]
+        "__is_right"]
 
     # key codes for the robot retina
-    MANAGEMENT_BIT = 0x400
-    MANAGEMENT_MASK = 0xFFFFF800
-    LEFT_RETINA_ENABLE = 0x45
-    RIGHT_RETINA_ENABLE = 0x46
-    LEFT_RETINA_DISABLE = 0x45
-    RIGHT_RETINA_DISABLE = 0x46
-    LEFT_RETINA_KEY_SET = 0x43
-    RIGHT_RETINA_KEY_SET = 0x44
+    _MANAGEMENT_BIT = 0x400
+    _MANAGEMENT_MASK = 0xFFFFF800
+    _LEFT_RETINA_ENABLE = 0x45
+    _RIGHT_RETINA_ENABLE = 0x46
+    _LEFT_RETINA_DISABLE = 0x45
+    _RIGHT_RETINA_DISABLE = 0x46
+    _LEFT_RETINA_KEY_SET = 0x43
+    _RIGHT_RETINA_KEY_SET = 0x44
 
     UP_POLARITY = "UP"
     DOWN_POLARITY = "DOWN"
     MERGED_POLARITY = "MERGED"
 
+    #: Select the left retina
     LEFT_RETINA = "LEFT"
+    #: Select the right retina
     RIGHT_RETINA = "RIGHT"
     _RETINAS = frozenset((LEFT_RETINA, RIGHT_RETINA))
 
@@ -76,9 +73,19 @@ class MunichRetinaDevice(
 
     def __init__(
             self, retina_key, spinnaker_link_id, position,
-            label=None,
+            label=default_parameters['label'],
             polarity=default_parameters['polarity'],
             board_address=default_parameters['board_address']):
+        """
+        :param int retina_key:
+        :param int spinnaker_link_id:
+            The SpiNNaker link to which the retina is connected
+        :param str position: ``LEFT`` or ``RIGHT``
+        :param str label:
+        :param str polarity: ``UP``, ``DOWN`` or ``MERGED``
+        :param board_address:
+        :type board_address: str or None
+        """
         # pylint: disable=too-many-arguments
         if polarity is None:
             polarity = MunichRetinaDevice.MERGED_POLARITY
@@ -96,21 +103,18 @@ class MunichRetinaDevice(
             fixed_n_neurons = 128 * 128
             self.__fixed_mask = 0xFFFFC000
 
-        self.__polarity = polarity
-        self.__position = position
-
-        super(MunichRetinaDevice, self).__init__(
-            n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
-            max_atoms_per_core=fixed_n_neurons, label=label,
-            board_address=board_address)
-
-        if self.__position not in self._RETINAS:
+        if position not in self._RETINAS:
             raise SpynnakerException(
-                "The external Retina does not recognise this _position")
+                "The external Retina does not recognise this position")
+        self.__is_right = position == self.RIGHT_RETINA
 
-    def get_outgoing_partition_constraints(self, partition):
-        return [FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)])]
+        super().__init__(
+            n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
+            label=label, board_address=board_address)
+
+    @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
+    def get_fixed_key_and_mask(self, partition_id):
+        return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -118,25 +122,22 @@ class MunichRetinaDevice(
         commands = list()
         # change the retina key it transmits with
         # (based off if its right or left)
-        if self.__position == self.RIGHT_RETINA:
-            key_set_command = self.MANAGEMENT_BIT | self.RIGHT_RETINA_KEY_SET
-        else:
-            key_set_command = self.MANAGEMENT_BIT | self.LEFT_RETINA_KEY_SET
+        key_set_command = self._MANAGEMENT_BIT | (
+            self._RIGHT_RETINA_KEY_SET if self.__is_right
+            else self._LEFT_RETINA_KEY_SET)
 
         # to ensure populations receive the correct packets, this needs to be
         # different based on which retina
-        key_set_payload = (self._virtual_chip_x << 24 |
-                           self._virtual_chip_y << 16)
+        key_set_payload = self.__fixed_key if self.__is_right else 0
 
         commands.append(MultiCastCommand(
             key=key_set_command, payload=key_set_payload, repeat=5,
             delay_between_repeats=1000))
 
         # make retina enabled (dependent on if its a left or right retina
-        if self.__position == self.RIGHT_RETINA:
-            enable_command = self.MANAGEMENT_BIT | self.RIGHT_RETINA_ENABLE
-        else:
-            enable_command = self.MANAGEMENT_BIT | self.LEFT_RETINA_ENABLE
+        enable_command = self._MANAGEMENT_BIT | (
+            self._RIGHT_RETINA_ENABLE if self.__is_right
+            else self._LEFT_RETINA_ENABLE)
         commands.append(MultiCastCommand(
             key=enable_command, payload=1, repeat=5,
             delay_between_repeats=1000))
@@ -147,10 +148,9 @@ class MunichRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         # disable retina
-        if self.__position == self.RIGHT_RETINA:
-            disable_command = self.MANAGEMENT_BIT | self.RIGHT_RETINA_DISABLE
-        else:
-            disable_command = self.MANAGEMENT_BIT | self.LEFT_RETINA_DISABLE
+        disable_command = self._MANAGEMENT_BIT | (
+            self._RIGHT_RETINA_DISABLE if self.__is_right
+            else self._LEFT_RETINA_DISABLE)
 
         return [MultiCastCommand(
             disable_command, payload=0, repeat=5, delay_between_repeats=1000)]

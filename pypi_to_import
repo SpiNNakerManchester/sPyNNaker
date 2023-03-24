@@ -1,7 +1,7 @@
 SpiNNUtilities:spinn_utilities
 SpiNNMachine:spinn_machine
 SpiNNMan:spinnman
-SpiNNStorageHandlers:spinn_storage_handlers
 SpiNNaker_PACMAN:pacman
 SpiNNaker_DataSpecification:data_specification
 SpiNNFrontEndCommon:spinn_front_end_common
+pynn:pyNN

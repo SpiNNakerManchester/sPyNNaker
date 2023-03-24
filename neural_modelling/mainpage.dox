@@ -1,0 +1,91 @@
+/*!
+* @cond copright_declaration
+* Copyright (c) 2020 The University of Manchester
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+* @endcond
+*
+* @mainpage sPyNNaker: A PyNN Implementation for SpiNNaker
+*
+* @section intro Introduction
+*
+* sPyNNaker is an implementation of the
+* [PyNN](https://neuralensemble.org/PyNN/)
+* language for SpiNNaker that lets you build spiking neural networks and
+* simulate them in real-time or close to real-time, depending on network
+* complexity and system configuration.
+*
+* This is the documentation of the part of sPyNNaker, implemented in C, that
+* is actually deployed onto SpiNNaker to execute. The
+* [Python parts](http://spinnakermanchester.github.io/sPyNNaker/python/)
+* of the sPyNNaker package are responsible for the user interface, data
+* preparation, execution planning, and runtime control.
+*
+* Note that this code depends on
+* [SpiNNFrontEndCommon](http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/)
+* for many support functions.
+*
+* @section neuron Neuron Simulation Implementation
+*
+* The major part of this code is the implementation of the neuron simulator
+* itself, which is comprised of several pieces.
+*
+* * A main entry point, c_main.c
+* * The core neuron implementation, neuron.c
+* * The core synapse implementation, synapses.c
+* * The main spike processing system, spike_processing.c
+* * The master population table, used to decode a spike and identify which
+*   neurons it is to be delivered to, population_table.h
+* * The neuron models, neuron_model.h, and subclasses
+* * The synaptic input types, input_type.h, and subclasses
+* * The synaptic shaping, synapse_types.h, and subclasses
+* * The neural threshold model, threshold_type.h, and subclasses
+* * The plasticity models, both for STDP (synapse_dynamics_stdp_mad_impl.c) and
+*   structural plasticity (topographic_map_impl.c)
+* * The additional model inputs, such as calcium ion modulation
+*   (additional_input_ca2_adaptive_impl.h)
+*
+* @section support Support Binaries
+*
+* These enable the neuron simulation to work, or to work more efficiently.
+*
+* * Bitfield Expander, which builds inter-core message masks on the machine.
+*   See bit_field_expander.c
+* * Delay Extension, which handles messages that need to be delayed a long time
+*   before delivery. See delay_extension.c
+* * Robot Motor Control, which translates spiking rates of SpiNNaker messages
+*   into activation levels for an motor device (part of integrating with
+*   external peripherals). See robot_motor_control.c
+* * Poisson Spike Source, which injects random spikes (using a Poisson
+*   distribution) into the system. See spike_source_poisson.c
+* * Synapse Expander, which efficiently constructs synaptic connectivity data
+*   on machine from statistical descriptions. (Note that literal descriptions
+*   of connectivity data need to be uploaded directly, which can be a slow
+*   process by comparison to generating the data in parallel on SpiNNaker.)
+*   See synapse_expander.c
+* * Delay Expander, which efficiently constructs synaptic delay data on
+*   machine. This is a reduced versino of the synapse expander that is designed
+*   to support delay extensions. See delay_expander.c
+
+@section cite Preferred Citation
+
+Rhodes, O., Bogdan, P., Brenninkmeijer, C., Davidson, S., Fellows, D.,
+Gait, A., Lester, D., Mikaitis, M., Plana, L., Rowley, A., Stokes, A.,
+Furber, S.
+__sPyNNaker: A Software Package for Running PyNN Simulations on SpiNNaker.__
+_Frontiers in Neuroscience,_
+vol 12, pp 816,
+2018.
+DOI: [10.3389/fnins.2018.00816](https://doi.org/10.3389/fnins.2018.00816)
+
+ */

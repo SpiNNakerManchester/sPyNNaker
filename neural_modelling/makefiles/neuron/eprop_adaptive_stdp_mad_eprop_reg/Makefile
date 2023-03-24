@@ -17,9 +17,7 @@ APP = $(notdir $(CURDIR))
 
 OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_eprop_adaptive_impl.c
 NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_eprop_adaptive.h
-
 SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/stdp/synapse_dynamics_eprop_adaptive_impl.c
-
 TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_eprop_impl.c
 TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_eprop_impl.h
 WEIGHT_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_eprop_reg_impl.c

@@ -1,39 +1,41 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2017 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /**
- *! \file
- *! \brief Common functions for kernel generation
+ * \file
+ * \brief Common functions for kernel generation
  */
 #include "common_kernel.h"
+#include <stdlib.h>
 
-uint16_t uidiv(uint16_t dividend, uint16_t divider, uint16_t *remainder) {
+//! \brief Unsigned integer division.
+//! \param[in] dividend: The value being divided
+//! \param[in] divider: The value doing the dividing
+//! \param[out] remainder: The remainder
+//! \return The quotient
+uint16_t uidiv(uint32_t dividend, uint16_t divider, uint16_t *remainder) {
     if (dividend == 0 || dividend < divider) {
-        *remainder = dividend;
+    	*remainder = (uint16_t) dividend;
         return 0;
     }
 
-    uint16_t d = 0;
-    *remainder = dividend;
-    while (*remainder >= divider) {
-        d++;
-        *remainder -= divider;
-    }
-    return d;
+    // Assumes that the dividend is less than 1<<31
+    div_t results = div((int) dividend, (int) (uint32_t) divider);
+    *remainder = (uint16_t) results.rem;
+    return (uint16_t) results.quot;
 }
 
 void post_in_pre_world(uint16_t in_row, uint16_t in_col,
@@ -53,7 +55,11 @@ void pre_in_post_world(uint16_t in_row, uint16_t in_col, uint16_t start_row,
         *out_row = 1;
     } else if (d < 0) {
         d = (int16_t) uidiv((uint16_t) (-d), step_row, &r);
-        *out_row = -d + 1;
+        if (r == 0) {
+            *out_row = -d + 1;
+        } else {
+        	*out_row = -d; // Note: e.g. ((-1) // 4) is not the same as (- (1 // 4))
+        }
     } else {
         d = (int16_t) uidiv((uint16_t) d, step_row, &r);
         *out_row = d + 1;
@@ -64,7 +70,11 @@ void pre_in_post_world(uint16_t in_row, uint16_t in_col, uint16_t start_row,
         *out_col = 1;
     } else if (d < 0) {
         d = (int16_t) uidiv((uint16_t) (-d), step_col, &r);
-        *out_col = -d + 1;
+        if (r == 0) {
+        	*out_col = -d + 1;
+        } else {
+        	*out_col = -d; // Note: e.g. ((-1) // 4) is not the same as (- (1 // 4))
+        }
     } else {
         d = (int16_t) uidiv((uint16_t) d, step_col, &r);
         *out_col = d + 1;

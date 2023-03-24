@@ -1,56 +1,30 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import decimal
-from distutils.version import StrictVersion
 from enum import Enum
 import numpy
-from six import with_metaclass
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
-from data_specification.enums.data_type import DataType
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
-
-# Travis fix - when sPyNNaker is installed, you will likely always have
-# PyNN installed as well, but sPyNNaker itself doesn't rely on PyNN
-# explicitly as it tries to be version agnostic.  In this case, PyNN 0.7
-# random doesn't give us enough information to load the data, so PyNN >= 0.8
-# is required here...
-try:
-    from pyNN import __version__ as pyNNVersion, random
-except ImportError:
-    pyNNVersion = "0.7"
-
-# Generation on host only works for PyNN >= 0.8
-IS_PYNN_8 = StrictVersion(pyNNVersion) >= StrictVersion("0.8")
-
-# Hash of the constant parameter generator
-PARAM_TYPE_CONSTANT_ID = 0
-
-# Hashes of the parameter generators supported by the synapse expander
-PARAM_TYPE_BY_NAME = {
-    "uniform": 1,
-    "uniform_int": 1,
-    "normal": 2,
-    "normal_clipped": 3,
-    "normal_clipped_to_boundary": 4,
-    "exponential": 5
-}
-
-PARAM_TYPE_KERNEL = 6
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.common.param_generator_data import (
+    param_generator_params, param_generator_params_size_in_bytes,
+    param_generator_id, is_param_generatable)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 
 # Hashes of the connection generators supported by the synapse expander
@@ -64,110 +38,47 @@ class ConnectorIDs(Enum):
     KERNEL_CONNECTOR = 6
 
 
-class AbstractGenerateConnectorOnMachine(with_metaclass(
-        AbstractBase, AbstractConnector)):
+class AbstractGenerateConnectorOnMachine(
+        AbstractConnector, metaclass=AbstractBase):
     """ Indicates that the connectivity can be generated on the machine
     """
 
     __slots__ = [
-        "__delay_seed",
-        "__weight_seed",
         "__connector_seed"
     ]
 
-    def __init__(self, safe=True, verbose=False):
-        AbstractConnector.__init__(self, safe=safe, verbose=verbose)
-        self.__delay_seed = dict()
-        self.__weight_seed = dict()
+    def __init__(self, safe=True, callback=None, verbose=False):
+        """
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        """
+        super().__init__(safe=safe, callback=callback, verbose=verbose)
         self.__connector_seed = dict()
 
-    def _generate_lists_on_machine(self, values):
-        """ Checks if the connector should generate lists on machine rather\
-            than trying to generate the connectivity data on host, based on\
-            the types of the weights and/or delays
-        """
-
-        # Scalars are fine on the machine
-        if numpy.isscalar(values):
-            return True
-
-        # Only certain types of random distributions are supported for\
-        # generation on the machine
-        if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
-            return values.name in PARAM_TYPE_BY_NAME
-
-        return False
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        # If we can't generate on machine, we must be able to generate on host
+        if not self.generate_on_machine(
+                synapse_info.weights, synapse_info.delays):
+            if not isinstance(self, AbstractGenerateConnectorOnHost):
+                raise SynapticConfigurationException(
+                    "The parameters of this connection do not allow it to be"
+                    " generated on the machine, but the connector cannot"
+                    " be generated on host!")
 
     def _get_connector_seed(self, pre_vertex_slice, post_vertex_slice, rng):
         """ Get the seed of the connector for a given pre-post pairing
+
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pyNN.random.NumpyRNG rng:
         """
         key = (id(pre_vertex_slice), id(post_vertex_slice))
         if key not in self.__connector_seed:
-            self.__connector_seed[key] = [
-                int(i * 0xFFFFFFFF) for i in rng.next(n=4)]
+            self.__connector_seed[key] = utility_calls.create_mars_kiss_seeds(
+                rng)
         return self.__connector_seed[key]
-
-    @staticmethod
-    def _generate_param_seed(
-            pre_vertex_slice, post_vertex_slice, values, seeds):
-        """ Get the seed of a parameter generator for a given pre-post pairing
-        """
-        if not get_simulator().is_a_pynn_random(values):
-            return None
-        key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
-        if key not in seeds:
-            seeds[key] = [int(i * 0xFFFFFFFF) for i in values.rng.next(n=4)]
-        return seeds[key]
-
-    @staticmethod
-    def _param_generator_params(values, seed):
-        """ Get the parameter generator parameters as a numpy array
-        """
-        if numpy.isscalar(values):
-            return numpy.array(
-                [round(decimal.Decimal(str(values)) * DataType.S1615.scale)],
-                dtype="uint32")
-
-        if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
-            parameters = random.available_distributions[values.name]
-            params = [
-                values.parameters.get(param, None) for param in parameters]
-            params = [
-                DataType.S1615.max if param == numpy.inf
-                else DataType.S1615.min if param == -numpy.inf else param
-                for param in params if param is not None]
-            params = [
-                round(decimal.Decimal(str(param)) * DataType.S1615.scale)
-                for param in params if param is not None]
-            params.extend(seed)
-            return numpy.array(params, dtype="uint32")
-
-        raise ValueError("Unexpected value {}".format(values))
-
-    @staticmethod
-    def _param_generator_params_size_in_bytes(values):
-        """ Get the size of the parameter generator parameters in bytes
-        """
-        if numpy.isscalar(values):
-            return 4
-
-        if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
-            parameters = random.available_distributions[values.name]
-            return (len(parameters) + 4) * 4
-
-        raise ValueError("Unexpected value {}".format(values))
-
-    @staticmethod
-    def _param_generator_id(values):
-        """ Get the id of the parameter generator
-        """
-        if numpy.isscalar(values):
-            return PARAM_TYPE_CONSTANT_ID
-
-        if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
-            return PARAM_TYPE_BY_NAME[values.name]
-
-        raise ValueError("Unexpected value {}".format(values))
 
     def generate_on_machine(self, weights, delays):
         """ Determine if this instance can generate on the machine.
@@ -175,76 +86,86 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         Default implementation returns True if the weights and delays can\
         be generated on the machine
 
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
+            float or list(int) or list(float)
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
+            float or list(int) or list(float)
         :rtype: bool
         """
-
-        return (IS_PYNN_8 and
-                self._generate_lists_on_machine(weights) and
-                self._generate_lists_on_machine(delays))
+        return (is_param_generatable(weights) and
+                is_param_generatable(delays))
 
     def gen_weights_id(self, weights):
         """ Get the id of the weight generator on the machine
 
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
+            float or list(int) or list(float)
         :rtype: int
         """
-        return self._param_generator_id(weights)
+        return param_generator_id(weights)
 
-    def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
+    def gen_weights_params(self, weights):
         """ Get the parameters of the weight generator on the machine
 
-        :rtype: numpy array of uint32
+        :param weights:
+        :type weights: ~pyNN.random.NumpyRNG or int or float
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
-        seed = self._generate_param_seed(
-            pre_vertex_slice, post_vertex_slice, weights,
-            self.__weight_seed)
-        return self._param_generator_params(weights, seed)
+        return param_generator_params(weights)
 
     def gen_weight_params_size_in_bytes(self, weights):
         """ The size of the weight parameters in bytes
 
+        :param weights:
+        :type weights: ~pyNN.random.NumpyRNG or int or float
         :rtype: int
         """
-        return self._param_generator_params_size_in_bytes(weights)
+        return param_generator_params_size_in_bytes(weights)
 
     def gen_delays_id(self, delays):
         """ Get the id of the delay generator on the machine
 
+        :param delays:
+        :type delays: ~pyNN.random.NumpyRNG or int or float
         :rtype: int
         """
-        return self._param_generator_id(delays)
+        return param_generator_id(delays)
 
-    def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
+    def gen_delay_params(self, delays):
         """ Get the parameters of the delay generator on the machine
 
-        :rtype: numpy array of uint32
+        :param delays:
+        :type delays: ~pyNN.random.NumpyRNG or int or float
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
-        seed = self._generate_param_seed(
-            pre_vertex_slice, post_vertex_slice, delays,
-            self.__delay_seed)
-        return self._param_generator_params(delays, seed)
+        return param_generator_params(delays)
 
     def gen_delay_params_size_in_bytes(self, delays):
         """ The size of the delay parameters in bytes
 
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
+            float or list(int) or list(float)
         :rtype: int
         """
-        return self._param_generator_params_size_in_bytes(delays)
+        return param_generator_params_size_in_bytes(delays)
 
     @abstractproperty
     def gen_connector_id(self):
-        """ Get the id of the connection generator on the machine
+        """ The ID of the connection generator on the machine.
 
         :rtype: int
         """
 
-    def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+    def gen_connector_params(self):
         """ Get the parameters of the on machine generation.
 
-        :rtype: numpy array of uint32
+        :rtype: ~numpy.ndarray(uint32)
         """
+        # pylint: disable=unused-argument
         return numpy.zeros(0, dtype="uint32")
 
     @property

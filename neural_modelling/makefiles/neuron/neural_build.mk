@@ -1,19 +1,18 @@
 # See Notes in sPyNNaker/neural_modelling/CHANGES_April_2018
 
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 # If SPINN_DIRS is not defined, this is an error!
 ifndef SPINN_DIRS
@@ -107,12 +106,6 @@ else
 		    ADDITIONAL_INPUT_H := $(call replace_source_dirs,$(ADDITIONAL_INPUT_H))
 		endif
 		
-		ifndef NEURON_MODEL
-		    $(error NEURON_MODEL is not set.  Please choose a neuron model to compile)
-		else
-		    NEURON_MODEL := $(call strip_source_dirs,$(NEURON_MODEL))
-		endif
-		
 		ifndef NEURON_MODEL_H
 		    $(error NEURON_MODEL_H is not set.  Please select a neuron model header file)
 		else
@@ -137,13 +130,21 @@ else
 		    SYNAPSE_TYPE_H := $(call replace_source_dirs,$(SYNAPSE_TYPE_H))
 		endif
 		
-		NEURON_INCLUDES := \
-	      -include $(NEURON_MODEL_H) \
-	      -include $(SYNAPSE_TYPE_H) \
-	      -include $(INPUT_TYPE_H) \
-	      -include $(THRESHOLD_TYPE_H) \
-	      -include $(ADDITIONAL_INPUT_H) \
-	      -include $(NEURON_IMPL_H)
+		ifndef CURRENT_SOURCE_H
+		    CURRENT_SOURCE_H = $(MODIFIED_DIR)neuron/current_sources/current_source_impl.h
+		else
+		    CURRENT_SOURCE_H := $(call replace_source_dirs,$(CURRENT_SOURCE_H))
+		endif
+		
+		NEURON_INCLUDE_FILES := \
+	      $(NEURON_MODEL_H) \
+	      $(SYNAPSE_TYPE_H) \
+	      $(INPUT_TYPE_H) \
+	      $(THRESHOLD_TYPE_H) \
+	      $(ADDITIONAL_INPUT_H) \
+	      $(CURRENT_SOURCE_H) \
+	      $(NEURON_IMPL_H) 
+		NEURON_INCLUDES := $(NEURON_INCLUDE_FILES:%=-include %)
     endif
 endif
 
@@ -190,20 +191,51 @@ ifndef SYNAPTOGENESIS_DYNAMICS
 else
     SYNAPTOGENESIS_DYNAMICS_C := $(call replace_source_dirs,$(SYNAPTOGENESIS_DYNAMICS))
     SYNAPTOGENESIS_DYNAMICS := $(call strip_source_dirs,$(SYNAPTOGENESIS_DYNAMICS))
+    ifndef PARTNER_SELECTION
+        $(error PARTNER_SELECTION is not set which is required when SYNAPTOGENESIS_DYNAMICS is set)
+    endif
+    ifndef FORMATION
+        $(error FORMATION is not set which is required when SYNAPTOGENESIS_DYNAMICS is set)
+    endif
+    ifndef ELIMINATION
+        $(error ELIMINATION is not set which is required when SYNAPTOGENESIS_DYNAMICS is set)
+    endif
 endif
 SYNAPTOGENESIS_DYNAMICS_O := $(BUILD_DIR)$(SYNAPTOGENESIS_DYNAMICS:%.c=%.o)
+
+ifdef PARTNER_SELECTION
+    PARTNER_SELECTION_H := $(call replace_source_dirs,$(PARTNER_SELECTION_H))
+    PARTNER_SELECTION_C := $(call replace_source_dirs,$(PARTNER_SELECTION))
+    PARTNER_SELECTION := $(call strip_source_dirs,$(PARTNER_SELECTION))
+    PARTNER_SELECTION_O := $(BUILD_DIR)$(PARTNER_SELECTION:%.c=%.o)
+endif
+
+ifdef FORMATION
+    FORMATION_H := $(call replace_source_dirs,$(FORMATION_H))
+    FORMATION_C := $(call replace_source_dirs,$(FORMATION))
+    FORMATION := $(call strip_source_dirs,$(FORMATION))
+    FORMATION_O := $(BUILD_DIR)$(FORMATION:%.c=%.o)
+endif
+
+ifdef ELIMINATION
+    ELIMINATION_H := $(call replace_source_dirs,$(ELIMINATION_H))
+    ELIMINATION_C := $(call replace_source_dirs,$(ELIMINATION))
+    ELIMINATION := $(call strip_source_dirs,$(ELIMINATION))
+    ELIMINATION_O := $(BUILD_DIR)$(ELIMINATION:%.c=%.o)
+endif
+
 
 OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
 # List all the sources relative to one of SOURCE_DIRS
-SOURCES = common/out_spikes.c \
-          neuron/c_main.c \
+SOURCES = neuron/c_main.c \
           neuron/synapses.c \
           neuron/neuron.c \
           neuron/spike_processing.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
-          $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
-          $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) $(OTHER_SOURCES_CONVERTED)
+          $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
+          $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) \
+          $(PARTNER_SELECTION) $(FORMATION) $(ELIMINATION) $(OTHER_SOURCES_CONVERTED)
 
 include $(SPINN_DIRS)/make/local.mk
 
@@ -232,6 +264,11 @@ $(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MOD
 	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
+SYNGEN_INCLUDES:=
+ifeq ($(SYNGEN_ENABLED), 1)
+    SYNGEN_INCLUDES:= -include $(PARTNER_SELECTION_H) -include $(FORMATION_H) -include $(ELIMINATION_H)
+endif
+
 #STDP Build rules If and only if STDP used
 ifeq ($(STDP_ENABLED), 1)
     STDP_INCLUDES:= -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H)
@@ -245,7 +282,7 @@ ifeq ($(STDP_ENABLED), 1)
     $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# SYNAPTOGENESIS_DYNAMICS_O stdp
 	-@mkdir -p $(dir $@)
-	$(STDP_COMPILE) -o $@ $<
+	$(STDP_COMPILE) $(SYNGEN_INCLUDES) -o $@ $<
 
     $(BUILD_DIR)neuron/plasticity/common/post_events.o: $(MODIFIED_DIR)neuron/plasticity/common/post_events.c
 	# plasticity/common/post_events.c
@@ -256,7 +293,7 @@ else
     $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# $(SYNAPTOGENESIS_DYNAMICS) Synapese
 	-@mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+	$(SYNAPSE_TYPE_COMPILE) $(SYNGEN_INCLUDES) -o $@ $<
 
     $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
 	# SYNAPSE_DYNAMICS_O Synapese
@@ -265,21 +302,38 @@ else
 
 endif
 
-$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE_C) $(SYNAPSE_TYPE_H)
+$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE_C) $(SYNAPSE_TYPE_H) $(MAKEFILE_LIST)
 	# WEIGHT_DEPENDENCE_O
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -o $@ $<
 
 $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE_C) $(SYNAPSE_TYPE_H) \
-                        $(WEIGHT_DEPENDENCE_H)
+                        $(WEIGHT_DEPENDENCE_H) $(MAKEFILE_LIST)
 	# TIMING_DEPENDENCE_O
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
-$(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
-                             $(SYNAPSE_TYPE_H)
+$(PARTNER_SELECTION_O): $(PARTNER_SELECTION_C) $(SYNAPSE_TYPE_H) $(MAKEFILE_LIST)
+	# PARTNER_SELECTION_O
+	-mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	        -include $(SYNAPSE_TYPE_H) -o $@ $<
+
+$(FORMATION_O): $(FORMATION_C) $(SYNAPSE_TYPE_H) $(MAKEFILE_LIST)
+	# FORMATION_O
+	-mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	        -include $(SYNAPSE_TYPE_H) -o $@ $<
+
+$(ELIMINATION_O): $(ELIMINATION_C) $(SYNAPSE_TYPE_H) $(MAKEFILE_LIST)
+	# ELIMINATION_O
+	-mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	        -include $(SYNAPSE_TYPE_H) -o $@ $<
+
+$(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_INCLUDE_FILES) $(MAKEFILE_LIST)
 	# neuron.o
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<

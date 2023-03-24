@@ -1,27 +1,30 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2017 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
+//! \file
+//! \brief Recurrent timing rule using finite state machine
 #ifndef _TIMING_RECURRENT_DUAL_FSM_IMPL_H_
 #define _TIMING_RECURRENT_DUAL_FSM_IMPL_H_
 
 //---------------------------------------
 // Typedefines
 //---------------------------------------
+//! The type of post-traces
 typedef uint16_t post_trace_t;
+//! The type of pre-traces
 typedef uint16_t pre_trace_t;
 
 #include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_accumulator_impl.h>
@@ -46,23 +49,28 @@ typedef struct {
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern uint16_t pre_exp_dist_lookup[STDP_FIXED_POINT_ONE];
-extern uint16_t post_exp_dist_lookup[STDP_FIXED_POINT_ONE];
+//! Global plasticity parameter data
 extern plasticity_trace_region_data_t plasticity_trace_region_data;
 
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
+//! \brief Get an initial post-synaptic timing trace
+//! \return the post trace
 static inline post_trace_t timing_get_initial_post_trace(void) {
     return 0;
 }
 
 //---------------------------------------
+//! \brief Add a post spike to the post trace
+//! \param[in] time: the time of the spike
+//! \param[in] last_time: the time of the previous spike update
+//! \param[in] last_trace: the post trace to update
+//! \return the updated post trace
 static inline post_trace_t timing_add_post_spike(
-        uint32_t time, uint32_t last_time, post_trace_t last_trace) {
-    use(&time);
-    use(&last_time);
-    use(&last_trace);
+        UNUSED uint32_t time, UNUSED uint32_t last_time,
+        UNUSED post_trace_t last_trace) {
+    extern uint16_t post_exp_dist_lookup[STDP_FIXED_POINT_ONE];
 
     // Pick random number and use to draw from exponential distribution
     uint32_t random = mars_kiss_fixed_point();
@@ -74,12 +82,21 @@ static inline post_trace_t timing_add_post_spike(
     return window_length;
 }
 
+static inline post_trace_t timing_decay_post(
+        UNUSED uint32_t time, UNUSED uint32_t last_time, post_trace_t last_trace) {
+    return last_trace;
+}
+
 //---------------------------------------
+//! \brief Add a pre spike to the pre trace
+//! \param[in] time: the time of the spike
+//! \param[in] last_time: the time of the previous spike update
+//! \param[in] last_trace: the pre trace to update
+//! \return the updated pre trace
 static inline pre_trace_t timing_add_pre_spike(
-        uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
-    use(&time);
-    use(&last_time);
-    use(&last_trace);
+        UNUSED uint32_t time, UNUSED uint32_t last_time,
+        UNUSED pre_trace_t last_trace) {
+    extern uint16_t pre_exp_dist_lookup[STDP_FIXED_POINT_ONE];
 
     // Pick random number and use to draw from exponential distribution
     uint32_t random = mars_kiss_fixed_point();
@@ -92,39 +109,40 @@ static inline pre_trace_t timing_add_pre_spike(
 }
 
 //---------------------------------------
+//! \brief Apply a pre-spike timing rule state update
+//! \param[in] time: the current time
+//! \param[in] trace: the current pre-spike trace
+//! \param[in] last_pre_time: the time of the last pre-spike
+//! \param[in] last_pre_trace: the trace of the last pre-spike
+//! \param[in] last_post_time: the time of the last post-spike
+//! \param[in] last_post_trace: the trace of the last post-spike
+//! \param[in] previous_state: the state to update
+//! \return the updated state
 static inline update_state_t timing_apply_pre_spike(
-        uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
-        pre_trace_t last_pre_trace, uint32_t last_post_time,
+        uint32_t time, UNUSED pre_trace_t trace, UNUSED uint32_t last_pre_time,
+        UNUSED pre_trace_t last_pre_trace, uint32_t last_post_time,
         post_trace_t last_post_trace, update_state_t previous_state) {
-    use(&trace);
-    use(&last_pre_time);
-    use(&last_pre_trace);
-
     // Get time of event relative to last post-synaptic event
     uint32_t time_since_last_post = time - last_post_time;
 
     log_debug("\t\t\ttime_since_last_post:%u, post_window_length:%u",
             time_since_last_post, last_post_trace);
 
-    // If spikes don't coincide
-    if (time_since_last_post > 0) {
-        // If this pre-spike has arrived within the last post window
-        if (time_since_last_post < last_post_trace) {
-            if (previous_state.accumulator >
-                    plasticity_trace_region_data.accumulator_depression_plus_one) {
-                // If accumulator's not going to hit depression limit,
-                // decrement it
-                previous_state.accumulator--;
-                log_debug("\t\t\t\tDecrementing accumulator=%d",
-                        previous_state.accumulator);
-            } else {
-                // Otherwise, reset accumulator and apply depression
-                log_debug("\t\t\t\tApplying depression");
+    if (time_since_last_post < last_post_trace) {
+        if (previous_state.accumulator >
+                plasticity_trace_region_data.accumulator_depression_plus_one) {
+            // If accumulator's not going to hit depression limit,
+            // decrement it
+            previous_state.accumulator--;
+            log_debug("\t\t\t\tDecrementing accumulator=%d",
+                    previous_state.accumulator);
+        } else {
+            // Otherwise, reset accumulator and apply depression
+            log_debug("\t\t\t\tApplying depression");
 
-                previous_state.accumulator = 0;
-                previous_state.weight_state = weight_one_term_apply_depression(
-                        previous_state.weight_state, STDP_FIXED_POINT_ONE);
-            }
+            previous_state.accumulator = 0;
+            previous_state.weight_state = weight_one_term_apply_depression(
+                    previous_state.weight_state, STDP_FIXED_POINT_ONE);
         }
     }
 
@@ -132,14 +150,19 @@ static inline update_state_t timing_apply_pre_spike(
 }
 
 //---------------------------------------
+//! \brief Apply a post-spike timing rule state update
+//! \param[in] time: the current time
+//! \param[in] trace: the current post-spike trace
+//! \param[in] last_pre_time: the time of the last pre-spike
+//! \param[in] last_pre_trace: the trace of the last pre-spike
+//! \param[in] last_post_time: the time of the last post-spike
+//! \param[in] last_post_trace: the trace of the last post-spike
+//! \param[in] previous_state: the state to update
+//! \return the updated state
 static inline update_state_t timing_apply_post_spike(
-        uint32_t time, post_trace_t trace, uint32_t last_pre_time,
-        pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state) {
-    use(&trace);
-    use(&last_post_time);
-    use(&last_post_trace);
-
+        uint32_t time, UNUSED post_trace_t trace, uint32_t last_pre_time,
+        pre_trace_t last_pre_trace, UNUSED uint32_t last_post_time,
+        UNUSED post_trace_t last_post_trace, update_state_t previous_state) {
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
 

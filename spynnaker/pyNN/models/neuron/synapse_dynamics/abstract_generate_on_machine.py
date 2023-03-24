@@ -1,32 +1,30 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from enum import Enum
-import numpy
-from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty,\
+    abstractmethod
 
 
 class MatrixGeneratorID(Enum):
     STATIC_MATRIX = 0
     STDP_MATRIX = 1
+    NEUROMODULATION_MATRIX = 2
 
 
-@add_metaclass(AbstractBase)
-class AbstractGenerateOnMachine(object):
-    """ A synapse dynamics that can be generated on the machine
+class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
+    """ A synapse dynamics that can be generated on the machine.
     """
     __slots__ = []
 
@@ -41,23 +39,24 @@ class AbstractGenerateOnMachine(object):
 
     @abstractproperty
     def gen_matrix_id(self):
-        """ The ID of the on-machine matrix generator
+        """ The ID of the on-machine matrix generator.
 
         :rtype: int
         """
 
-    @property
-    def gen_matrix_params(self):
-        """ Any parameters required by the matrix generator
+    @abstractmethod
+    def gen_matrix_params(
+            self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
+            synapse_info, max_row_info, max_pre_atoms_per_core,
+            max_post_atoms_per_core):
+        """ Any parameters required by the matrix generator.
 
-        :rtype: numpy array of uint32
+        :rtype: ~numpy.ndarray(uint32)
         """
-        return numpy.zeros(0, dtype="uint32")
 
-    @property
+    @abstractproperty
     def gen_matrix_params_size_in_bytes(self):
-        """ The size of the parameters of the matrix generator in bytes
+        """ The size of the parameters of the matrix generator in bytes.
 
         :rtype: int
         """
-        return 0

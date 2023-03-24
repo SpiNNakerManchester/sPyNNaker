@@ -1,24 +1,20 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017 The University of Manchester
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from enum import Enum
-import logging
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
-logger = logging.getLogger(__name__)
 
 # structure of command is KKKKKKKKKKKKKKKKKKKKK-IIIIIII-F-DDD
 # K = ignored key at the top of the command
@@ -43,27 +39,26 @@ PUSH_BOT_MOTOR_WITHOUT_UART_MASK = 0x7C0
 PUSH_BOT_MOTOR_UART_SHIFT = 0 + _OFFSET_TO_I
 
 
-def munich_key(I, F, D):
-    return (I << _OFFSET_TO_I) | (F << _OFFSET_TO_F) | (D << _OFFSET_TO_D)
-
-
-def munich_key_i_d(I, D):
-    return munich_key(I, 0, D)
-
-
-def munich_key_i(I):
-    return munich_key(I, 0, 0)
+def _munich_key(instr, format_bit=0, device=0):
+    return ((instr << _OFFSET_TO_I) | (format_bit << _OFFSET_TO_F) |
+            (device << _OFFSET_TO_D))
 
 
 def get_munich_i(key):
+    """ Get the instruction field from the key.
+    """
     return key & _I_MASK
 
 
 def get_munich_f(key):
+    """ Get the format field from the key.
+    """
     return key & _F_MASK
 
 
 def get_munich_d(key):
+    """ Get the device field from the key.
+    """
     return key & _D_MASK
 
 
@@ -103,110 +98,128 @@ def GET_RETINA_PAYLOAD_VALUE(payload):
     )
 
 
-# command key for setting up the master key of the board
-CONFIGURE_MASTER_KEY = munich_key_i_d(127, 0)
+#: command key for setting up the master key of the board
+CONFIGURE_MASTER_KEY = _munich_key(127, 0)
 
-# command key for setting up what mode of device running on the board
-CHANGE_MODE = munich_key_i_d(127, 1)
+#: command key for setting up what mode of device running on the board
+CHANGE_MODE = _munich_key(127, 1)
 
-# command for turning off retina output
-DISABLE_RETINA_EVENT_STREAMING = munich_key_i_d(0, 0)
+#: command for turning off retina output
+DISABLE_RETINA_EVENT_STREAMING = _munich_key(0, 0)
 
-# command for retina where payload is events
-ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION = munich_key_i_d(0, 1)
+#: command for retina where payload is events
+ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION = _munich_key(0, 1)
 
-# command for retina where events are the key
-ACTIVE_RETINA_EVENT_STREAMING_SET_KEY = munich_key_i_d(0, 2)
+#: command for retina where events are the key
+ACTIVE_RETINA_EVENT_STREAMING_SET_KEY = _munich_key(0, 2)
 
-# set timer / counter for timestamps
-SET_TIMER_COUNTER_FOR_TIMESTAMPS = munich_key_i_d(0, 3)
+#: set timer / counter for timestamps
+SET_TIMER_COUNTER_FOR_TIMESTAMPS = _munich_key(0, 3)
 
-# handle master / slave time sync
-MASTER_SLAVE_KEY = munich_key_i_d(0, 4)
+#: handle master / slave time sync
+MASTER_SLAVE_KEY = _munich_key(0, 4)
 
-# command for setting bias (whatever the check that is)
-BIAS_KEY = munich_key_i_d(0, 5)
+#: command for setting bias (whatever the check that is)
+BIAS_KEY = _munich_key(0, 5)
 
-# reset retina key.
-RESET_RETINA_KEY = munich_key_i_d(0, 7)
+#: reset retina key.
+RESET_RETINA_KEY = _munich_key(0, 7)
 
-# request on-board sensor data
-SENSOR_REPORTING_OFF_KEY = munich_key_i_d(1, 0)
+#: request on-board sensor data
+SENSOR_REPORTING_OFF_KEY = _munich_key(1, 0)
 
-# poll sensors once
-POLL_SENSORS_ONCE_KEY = munich_key_i_d(1, 1)
+#: poll sensors once
+POLL_SENSORS_ONCE_KEY = _munich_key(1, 1)
 
-# poll sensors continuously
-POLL_SENSORS_CONTINUOUSLY_KEY = munich_key_i_d(1, 2)
+#: poll sensors continuously
+POLL_SENSORS_CONTINUOUSLY_KEY = _munich_key(1, 2)
 
-# disable motor
-ENABLE_DISABLE_MOTOR_KEY = munich_key_i_d(2, 0)
+#: disable motor
+ENABLE_DISABLE_MOTOR_KEY = _munich_key(2, 0)
 
-# run motor for total period
-MOTOR_RUN_FOR_PERIOD_KEY = munich_key_i_d(2, 1)
+#: run motor for total period
+MOTOR_RUN_FOR_PERIOD_KEY = _munich_key(2, 1)
 
-# raw output for motor 0 (permanent)
-MOTOR_0_RAW_PERM_KEY = munich_key_i_d(2, 4)
+#: raw output for motor 0 (permanent)
+MOTOR_0_RAW_PERM_KEY = _munich_key(2, 4)
 
-# raw output for motor 1 (permanent)
-MOTOR_1_RAW_PERM_KEY = munich_key_i_d(2, 5)
+#: raw output for motor 1 (permanent)
+MOTOR_1_RAW_PERM_KEY = _munich_key(2, 5)
 
-# raw output for motor 0 (leak towards 0)
-MOTOR_0_RAW_LEAK_KEY = munich_key_i_d(2, 6)
+#: raw output for motor 0 (leak towards 0)
+MOTOR_0_RAW_LEAK_KEY = _munich_key(2, 6)
 
-# raw output for motor 1 (leak towards 0)
-MOTOR_1_RAW_LEAK_KEY = munich_key_i_d(2, 7)
+#: raw output for motor 1 (leak towards 0)
+MOTOR_1_RAW_LEAK_KEY = _munich_key(2, 7)
 
-# motor output duration timer period
-MOTOR_TIMER_A_TOTAL_PERIOD_KEY = munich_key_i_d(3, 0)
-MOTOR_TIMER_B_TOTAL_PERIOD_KEY = munich_key_i_d(3, 2)
-MOTOR_TIMER_C_TOTAL_PERIOD_KEY = munich_key_i_d(3, 4)
+#: motor output duration timer period
+MOTOR_TIMER_A_TOTAL_PERIOD_KEY = _munich_key(3, 0)
+#: motor output duration timer period
+MOTOR_TIMER_B_TOTAL_PERIOD_KEY = _munich_key(3, 2)
+#: motor output duration timer period
+MOTOR_TIMER_C_TOTAL_PERIOD_KEY = _munich_key(3, 4)
 
-# motor output ratio active period
-MOTOR_TIMER_A_CHANNEL_0_ACTIVE_PERIOD_KEY = munich_key_i_d(4, 0)
-MOTOR_TIMER_A_CHANNEL_1_ACTIVE_PERIOD_KEY = munich_key_i_d(4, 1)
-MOTOR_TIMER_B_CHANNEL_0_ACTIVE_PERIOD_KEY = munich_key_i_d(4, 2)
-MOTOR_TIMER_B_CHANNEL_1_ACTIVE_PERIOD_KEY = munich_key_i_d(4, 3)
-MOTOR_TIMER_C_CHANNEL_0_ACTIVE_PERIOD_KEY = munich_key_i_d(4, 4)
-MOTOR_TIMER_C_CHANNEL_1_ACTIVE_PERIOD_KEY = munich_key_i_d(4, 5)
+#: motor output ratio active period
+MOTOR_TIMER_A_CHANNEL_0_ACTIVE_PERIOD_KEY = _munich_key(4, 0)
+#: motor output ratio active period
+MOTOR_TIMER_A_CHANNEL_1_ACTIVE_PERIOD_KEY = _munich_key(4, 1)
+#: motor output ratio active period
+MOTOR_TIMER_B_CHANNEL_0_ACTIVE_PERIOD_KEY = _munich_key(4, 2)
+#: motor output ratio active period
+MOTOR_TIMER_B_CHANNEL_1_ACTIVE_PERIOD_KEY = _munich_key(4, 3)
+#: motor output ratio active period
+MOTOR_TIMER_C_CHANNEL_0_ACTIVE_PERIOD_KEY = _munich_key(4, 4)
+#: motor output ratio active period
+MOTOR_TIMER_C_CHANNEL_1_ACTIVE_PERIOD_KEY = _munich_key(4, 5)
 
-# digital IO Signals
-QUERY_STATES_LINES_KEY = munich_key_i_d(5, 0)
+#: digital IO Signals
+QUERY_STATES_LINES_KEY = _munich_key(5, 0)
 
-# set output pattern to payload
-SET_OUTPUT_PATTERN_KEY = munich_key_i_d(5, 1)
+#: set output pattern to payload
+SET_OUTPUT_PATTERN_KEY = _munich_key(5, 1)
 
-# add payload (logic or (PL)) to current output
-ADD_PAYLOAD_TO_CURRENT_OUTPUT_KEY = munich_key_i_d(5, 2)
+#: add payload (logic or (PL)) to current output
+ADD_PAYLOAD_TO_CURRENT_OUTPUT_KEY = _munich_key(5, 2)
 
-# remove payload (logic or (PL)) to current output from current output
-REMOVE_PAYLOAD_TO_CURRENT_OUTPUT_KEY = munich_key_i_d(5, 3)
+#: remove payload (logic or (PL)) to current output from current output
+REMOVE_PAYLOAD_TO_CURRENT_OUTPUT_KEY = _munich_key(5, 3)
 
-# set payload pins to high impedance
-SET_PAYLOAD_TO_HIGH_IMPEDANCE_KEY = munich_key_i_d(5, 4)
+#: set payload pins to high impedance
+SET_PAYLOAD_TO_HIGH_IMPEDANCE_KEY = _munich_key(5, 4)
 
-# set laser params for PushBot
-PUSH_BOT_LASER_CONFIG_TOTAL_PERIOD = munich_key_i_d(3, 0)
-PUSH_BOT_LASER_CONFIG_ACTIVE_TIME = munich_key_i_d(4, 0)
-PUSH_BOT_LASER_FREQUENCY = munich_key_i_d(37, 1)
+#: set laser params for PushBot
+PUSH_BOT_LASER_CONFIG_TOTAL_PERIOD = _munich_key(3, 0)
+#: set laser params for PushBot
+PUSH_BOT_LASER_CONFIG_ACTIVE_TIME = _munich_key(4, 0)
+#: set laser params for PushBot
+PUSH_BOT_LASER_FREQUENCY = _munich_key(37, 1)
 
-# set led params for PushBot
-PUSH_BOT_LED_CONFIG_TOTAL_PERIOD = munich_key_i_d(3, 4)
-PUSH_BOT_LED_BACK_CONFIG_ACTIVE_TIME = munich_key_i_d(4, 4)
-PUSH_BOT_LED_FRONT_CONFIG_ACTIVE_TIME = munich_key_i_d(4, 5)
-PUSH_BOT_LED_FREQUENCY = munich_key_i_d(37, 0)
+#: set led params for PushBot
+PUSH_BOT_LED_CONFIG_TOTAL_PERIOD = _munich_key(3, 4)
+#: set led params for PushBot
+PUSH_BOT_LED_BACK_CONFIG_ACTIVE_TIME = _munich_key(4, 4)
+#: set led params for PushBot
+PUSH_BOT_LED_FRONT_CONFIG_ACTIVE_TIME = _munich_key(4, 5)
+#: set led params for PushBot
+PUSH_BOT_LED_FREQUENCY = _munich_key(37, 0)
 
-# set speaker params for PushBot
-PUSH_BOT_SPEAKER_CONFIG_TOTAL_PERIOD = munich_key_i_d(3, 2)
-PUSH_BOT_SPEAKER_CONFIG_ACTIVE_TIME = munich_key_i_d(4, 2)
-PUSH_BOT_SPEAKER_TONE_BEEP = munich_key_i_d(36, 0)
-PUSH_BOT_SPEAKER_TONE_MELODY = munich_key_i_d(36, 1)
+#: set speaker params for PushBot
+PUSH_BOT_SPEAKER_CONFIG_TOTAL_PERIOD = _munich_key(3, 2)
+#: set speaker params for PushBot
+PUSH_BOT_SPEAKER_CONFIG_ACTIVE_TIME = _munich_key(4, 2)
+#: set speaker params for PushBot
+PUSH_BOT_SPEAKER_TONE_BEEP = _munich_key(36, 0)
+#: set speaker params for PushBot
+PUSH_BOT_SPEAKER_TONE_MELODY = _munich_key(36, 1)
 
-# PushBot motor control
-PUSH_BOT_MOTOR_0_PERMANENT_VELOCITY = munich_key_i_d(32, 0)
-PUSH_BOT_MOTOR_1_PERMANENT_VELOCITY = munich_key_i_d(32, 1)
-PUSH_BOT_MOTOR_0_LEAKY_VELOCITY = munich_key_i_d(32, 2)
-PUSH_BOT_MOTOR_1_LEAKY_VELOCITY = munich_key_i_d(32, 3)
+#: PushBot motor control
+PUSH_BOT_MOTOR_0_PERMANENT_VELOCITY = _munich_key(32, 0)
+#: PushBot motor control
+PUSH_BOT_MOTOR_1_PERMANENT_VELOCITY = _munich_key(32, 1)
+#: PushBot motor control
+PUSH_BOT_MOTOR_0_LEAKY_VELOCITY = _munich_key(32, 2)
+#: PushBot motor control
+PUSH_BOT_MOTOR_1_LEAKY_VELOCITY = _munich_key(32, 3)
 
 # payload for master slave
 _PAYLOAD_MASTER_SLAVE_USE_INTERNAL_COUNTER = 0
@@ -257,20 +270,20 @@ class RetinaPayload(Enum):
         return self._n_payload_bytes
 
 
+class MUNICH_MODES(Enum):
+    """types of modes supported by this protocol"""
+    RESET_TO_DEFAULT = 0
+    PUSH_BOT = 1
+    SPOMNIBOT = 2
+    BALL_BALANCER = 3
+    MY_ORO_BOTICS = 4
+    FREE = 5
+
+
 class MunichIoSpiNNakerLinkProtocol(object):
     """ Provides Multicast commands for the Munich SpiNNaker-Link protocol
     """
     __slots__ = ["__instance_key", "__mode", "__uart_id"]
-
-    # types of modes supported by this protocol
-    MODES = Enum(
-        value="MODES",
-        names=[('RESET_TO_DEFAULT', 0),
-               ('PUSH_BOT', 1),
-               ('SPOMNIBOT', 2),
-               ('BALL_BALANCER', 3),
-               ('MY_ORO_BOTICS', 4),
-               ('FREE', 5)])
 
     # The instance of the protocol in use, to ensure that each vertex that is
     # to send commands to the PushBot uses a different outgoing key; the top
@@ -282,10 +295,12 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def __init__(self, mode, instance_key=None, uart_id=0):
         """
-
         :param mode: The mode of operation of the protocol
+        :type modes:
+            ~spynnaker.pyNN.protocols.MUNICH_MODES
         :param instance_key: The optional instance key to use
-        :param uart_id: The ID of the UART when needed
+        :type instance_key: int or None
+        :param int uart_id: The ID of the UART when needed
         """
         self.__mode = mode
 
@@ -304,10 +319,16 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     @property
     def mode(self):
+        """
+        :rtype: ~spynnaker.pyNN.protocols.MUNICH_MODES
+        """
         return self.__mode
 
     @property
     def uart_id(self):
+        """
+        :rtype: int
+        """
         return self.__uart_id
 
     @staticmethod
@@ -319,6 +340,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
     @property
     def instance_key(self):
         """ The key of this instance of the protocol
+
+        :rtype: int
         """
         return self.__instance_key
 
@@ -453,8 +476,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def generic_motor_total_period_key(self):
         return self._get_key(MOTOR_RUN_FOR_PERIOD_KEY, RETINA_UART_SHIFT)
 
-    def generic_motor_total_period(
-            self, time_in_ms, uart_id=0, time=None):
+    def generic_motor_total_period(self, time_in_ms, time=None):
         return MultiCastCommand(
             key=self.generic_motor_total_period_key,
             payload=time_in_ms, time=time)
@@ -542,6 +564,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             key=self.pwm_pin_output_timer_a_channel_1_ratio_key,
             payload=timer_period, time=time)
 
+    @property
     def pwm_pin_output_timer_b_channel_0_ratio_key(self):
         return self._get_key(
             MOTOR_TIMER_B_CHANNEL_0_ACTIVE_PERIOD_KEY, RETINA_UART_SHIFT)
@@ -571,6 +594,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             key=self.pwm_pin_output_timer_c_channel_0_ratio_key,
             payload=timer_period, time=time)
 
+    @property
     def pwm_pin_output_timer_c_channel_1_ratio_key(self):
         return self._get_key(
             MOTOR_TIMER_C_CHANNEL_1_ACTIVE_PERIOD_KEY, RETINA_UART_SHIFT)
@@ -625,7 +649,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             payload=payload, time=time)
 
     def _check_for_pushbot_mode(self):
-        if self.__mode is not self.MODES.PUSH_BOT:
+        if self.__mode is not MUNICH_MODES.PUSH_BOT:
             raise ConfigurationException(
                 "The mode you configured is not the PushBot, and so this "
                 "message is invalid for mode {}".format(self.__mode))
@@ -815,14 +839,14 @@ class MunichIoSpiNNakerLinkProtocol(object):
             retina_payload=None, time=None):
         """ Set the retina transmission key
 
-        :param retina_key: the new key for the retina
-        :param retina_payload: \
+        :param RetinaKey retina_key: the new key for the retina
+        :param retina_payload:
             the new payload for the set retina key command packet
-        :type retina_payload: enum or None
+        :type retina_payload: RetinaPayload or None
         :param time: when to transmit this packet
+        :type time: int or float or None
         :return: the command to send
-        :rtype: \
-            :py:class:`spinn_front_end_common.utility_models.multi_cast_command.MultiCastCommand`
+        :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
 
         if retina_key == RetinaKey.FIXED_KEY and retina_payload is None:

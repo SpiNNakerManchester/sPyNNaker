@@ -1,92 +1,58 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2017 The University of Manchester
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /**
- *! \file
- *! \brief Interface for matrix generation
+ * \file
+ * \brief Interface for matrix generation
  */
 #include <common-typedefs.h>
 
-#include "connection_generator.h"
-#include "param_generator.h"
-
 /**
- *! \brief Data type for matrix generator
+ * \brief Data type for matrix generator
  */
 typedef struct matrix_generator *matrix_generator_t;
 
 /**
- *! \brief Initialise a specific matrix generator
- *! \param[in] hash The identifier of the generator to initialise
- *! \param[in/out] region The address to read data from - updated to position
- *!                       after data has been read
- *! \return An initialised matrix generator that can be used with other
- *!         functions, or NULL if it couldn't be initialised for any reason
+ * \brief Initialise a specific matrix generator
+ * \param[in] hash: The identifier of the generator to initialise
+ * \param[in,out] region: The address to read data from; updated to position
+ *                        after data has been read
+ * \param[in] synaptic_matrix: The address of the base of the synaptic matrix
+ * \return An initialised matrix generator that can be used with other
+ *         functions, or NULL if it couldn't be initialised for any reason
  */
-matrix_generator_t matrix_generator_init(
-        uint32_t hash, address_t *region);
+matrix_generator_t matrix_generator_init(uint32_t hash, void **region,
+        void *synaptic_matrix);
 
 /**
- *! \brief Finish with a matrix generator
- *! \param[in] generator The generator to free
+ * \brief Finish with a matrix generator
+ * \param[in] generator: The generator to free
  */
 void matrix_generator_free(matrix_generator_t generator);
 
 /**
- *! \brief Generate a matrix with a matrix generator
- *! \param[in] generator The generator to use to generate the matrix
- *! \param[in] synaptic_matrix The address of the synaptic matrix to write to
- *! \param[in] delayed_synaptic_matrix The address of the synaptic matrix to
- *!                                    write delayed connections to
- *! \param[in] max_row_n_words The maximum number of words in a normal row
- *! \param[in] max_delayed_row_n_words The maximum number of words in a delayed
- *!                                    row
- *! \param[in] max_row_n_synapses The maximum number of synapses in a normal row
- *! \param[in] max_delayed_row_n_synapses The maximum number of synapses in a
- *!                                       delayed row
- *! \param[in] n_synapse_type_bits The number of bits used for the synapse type
- *! \param[in] n_synapse_index_bits The number of bits used for the neuron id
- *! \param[in] synapse_type The synapse type of each connection
- *! \param[in] weight_scales An array of weight scales, one for each synapse
- *!                          type
- *! \param[in] post_slice_start The start of the slice of the post-population
- *!                             being generated
- *! \param[in] post_slice_count The number of neurons in the slice of the
- *!                             post-population being generated
- *! \param[in] pre_slice_start The start of the slice of the pre-population
- *!                            being generated
- *! \param[in] pre_slice_count The number of neurons in the slice of the
- *!                            pre-population being generated
- *! \param[in] connection_generator The generator of connections
- *! \param[in] delay_generator The generator of delay values
- *! \param[in] weight_generator The generator of weight values
- *! \param[in] max_stage The maximum delay stage to support
- *! \param[in] timestep_per_delay The delay value multiplier to get to timesteps
- *! \return The number of connections generated
+ * \brief Write a synapse with a matrix generator
+ * \param[in] generator: The generator to use to generate the matrix
+ * \param[in] pre_index: The index of the pre-neuron relative to the start of
+ *                       the matrix
+ * \param[in] post_index: The index of the post-neuron on this core
+ * \param[in] weight: The weight of the synapse in raw form
+ * \param[in] delay: The delay of the synapse in time steps
+ * \param[in] weight_scale: The scale to apply to the weight if needed
  */
-bool matrix_generator_generate(
-        matrix_generator_t generator,
-        address_t synaptic_matrix, address_t delayed_synaptic_matrix,
-        uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
-        uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses,
-        uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
-        uint32_t synapse_type, uint32_t *weight_scales,
-        uint32_t post_slice_start, uint32_t post_slice_count,
-        uint32_t pre_slice_start, uint32_t pre_slice_count,
-        connection_generator_t connection_generator,
-        param_generator_t delay_generator, param_generator_t weight_generator,
-        uint32_t max_stage, accum timestep_per_delay);
+bool matrix_generator_write_synapse(matrix_generator_t generator,
+        uint32_t pre_index, uint16_t post_index, accum weight, uint16_t delay,
+		unsigned long accum weight_scale);

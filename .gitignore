@@ -14,4 +14,13 @@ MANIFEST
 .DS_Store
 .coverage
 /.pytest_cache
-/.pylintrc
+*.pkl
+*.pickle
+*.connections
+*.npy
+simple_example.png
+*.log
+*.dat
+*.data
+*.data2
+*.csv
