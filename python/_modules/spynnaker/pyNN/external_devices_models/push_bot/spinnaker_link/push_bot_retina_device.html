@@ -85,12 +85,14 @@
         <span class="n">PopulationApplicationVertex</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__new_key_command&quot;</span><span class="p">]</span>
 
-    <span class="n">default_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;board_address&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+    <span class="n">default_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;board_address&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="s1">&#39;n_machine_vertices&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spinnaker_link_id</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span>
             <span class="n">board_address</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;board_address&#39;</span><span class="p">],</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]):</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">],</span>
+            <span class="n">n_machine_vertices</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;n_machine_vertices&#39;</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param spinnaker_link_id:</span>
 <span class="sd">        :param protocol:</span>
@@ -105,7 +107,8 @@
         <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spinnaker_link_id</span><span class="o">=</span><span class="n">spinnaker_link_id</span><span class="p">,</span>
             <span class="n">n_atoms</span><span class="o">=</span><span class="n">resolution</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">n_neurons</span><span class="p">,</span>
-            <span class="n">board_address</span><span class="o">=</span><span class="n">board_address</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">board_address</span><span class="o">=</span><span class="n">board_address</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">n_machine_vertices</span><span class="o">=</span><span class="n">n_machine_vertices</span><span class="p">)</span>
 
         <span class="c1"># stores for the injection aspects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span> <span class="o">=</span> <span class="kc">None</span>
@@ -120,7 +123,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
-            <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">)),</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">key</span></div>
 
     <span class="nd">@property</span>

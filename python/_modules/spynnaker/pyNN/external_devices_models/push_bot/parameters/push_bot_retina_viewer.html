@@ -49,7 +49,7 @@
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">RLock</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
@@ -82,6 +82,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__height</span> <span class="o">=</span> <span class="n">retina_resolution</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">pixels</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__running</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__image_lock</span> <span class="o">=</span> <span class="n">RLock</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__sim</span> <span class="o">=</span> <span class="n">sim</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__conn</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">external_devices</span><span class="o">.</span><span class="n">SpynnakerLiveSpikesConnection</span><span class="p">(</span>
@@ -100,7 +101,9 @@
     <span class="k">def</span> <span class="nf">__recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">spikes</span><span class="p">):</span>
         <span class="n">np_spikes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__without_polarity_mask</span>
         <span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">divmod</span><span class="p">(</span><span class="n">np_spikes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__height</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__image_lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span><span class="p">[</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__image_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__run_sim_forever</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__sim</span><span class="o">.</span><span class="n">external_devices</span><span class="o">.</span><span class="n">run_forever</span><span class="p">()</span>
@@ -116,10 +119,12 @@
 
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">__running</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fig</span><span class="o">.</span><span class="n">get_visible</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__image_lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__plot</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">flush_events</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__image_data</span> <span class="o">*=</span> <span class="n">DECAY_FACTOR</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__image_lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
                 <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
             <span class="c1"># pylint: disable=broad-except</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
