@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from threading import Thread
+from threading import Thread, RLock
 from time import sleep
 from matplotlib import pyplot
 import numpy
@@ -44,6 +44,7 @@ class PushBotRetinaViewer():
         self.__height = retina_resolution.value.pixels
 
         self.__running = True
+        self.__image_lock = RLock()
 
         self.__sim = sim
         self.__conn = sim.external_devices.SpynnakerLiveSpikesConnection(
@@ -63,7 +64,9 @@ class PushBotRetinaViewer():
     def __recv(self, label, time, spikes):
         np_spikes = numpy.array(spikes) & self.__without_polarity_mask
         x_vals, y_vals = numpy.divmod(np_spikes, self.__height)
+        self.__image_lock.acquire()
         self.__image_data[x_vals, y_vals] += 1.0
+        self.__image_lock.release()
 
     def __run_sim_forever(self):
         self.__sim.external_devices.run_forever()
@@ -79,10 +82,12 @@ class PushBotRetinaViewer():
 
         while self.__running and self.__fig.get_visible():
             try:
+                self.__image_lock.acquire()
                 self.__plot.set_array(self.__image_data)
                 self.__fig.canvas.draw()
                 self.__fig.canvas.flush_events()
                 self.__image_data *= DECAY_FACTOR
+                self.__image_lock.release()
                 sleep(0.1)
             # pylint: disable=broad-except
             except Exception:
