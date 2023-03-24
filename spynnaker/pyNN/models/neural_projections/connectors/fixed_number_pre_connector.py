@@ -71,7 +71,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
                 Not supported by sPyNNaker.
         """
         # :param ~pyNN.space.Space space:
-        # a Space object, needed if you wish to specify distance-dependent\
+        # a Space object, needed if you wish to specify distance-dependent
         # weights or delays - not implemented
         super().__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
@@ -122,9 +122,9 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
 
             # if verbose open a file to output the connectivity
             if self.verbose:
-                filename = synapse_info.pre_population.label + \
-                    '_to_' + synapse_info.post_population.label + \
-                    '_fixednumberpre-conn.csv'
+                filename = "{}_to_{}_fixednumberpre-conn.csv".format(
+                    synapse_info.pre_population.label,
+                    synapse_info.post_population.label)
                 with open(filename, 'w', encoding="utf-8") as file_handle:
                     numpy.savetxt(file_handle,
                                   [(synapse_info.n_pre_neurons,

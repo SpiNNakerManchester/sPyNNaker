@@ -57,7 +57,7 @@ def param_generator_id(value):
     if numpy.isscalar(value):
         return PARAM_TYPE_CONSTANT_ID
 
-    # Only certain types of random distributions are supported for\
+    # Only certain types of random distributions are supported for
     # generation on the machine
     if isinstance(value, RandomDistribution):
         if value.name in PARAM_TYPE_BY_NAME:
