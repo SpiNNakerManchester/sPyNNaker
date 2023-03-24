@@ -24,7 +24,7 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager)
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SpiNNFPGARegister, set_distiller_key,
-    set_distiller_mask_delayed)
+    set_distiller_mask_delayed, set_distiller_shift)
 
 _MAX_INCOMING = 6
 
@@ -155,6 +155,8 @@ class SPIFOutputDevice(
             yield set_distiller_key(i, i << self.__output_key_shift)
             yield set_distiller_mask_delayed(
                 i, partial(self._get_set_dist_mask_payload, index=i))
+            yield set_distiller_shift(
+                i, self.__incoming_partitions[i].pre_vertex.n_colour_bits)
 
     @property
     def pause_stop_commands(self):

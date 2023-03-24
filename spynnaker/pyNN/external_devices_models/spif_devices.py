@@ -99,6 +99,9 @@ class SPIFRegister(IntEnum):
     # The distiller key mask register (6 distillers)
     DIST_MASK_BASE = 224
 
+    # The distiller key shift register (6 distillers)
+    DIST_SHIFT_BASE = 240
+
     def cmd(self, payload=None, index=0):
         """ Make a command to send to a SPIF device to set a register value
 
@@ -278,6 +281,18 @@ def set_distiller_mask_delayed(index, mask_func):
     :rtype: MulticastCommand
     """
     return SPIFRegister.DIST_MASK_BASE.delayed_command(mask_func, index)
+
+
+def set_distiller_shift(index, shift):
+    """ Get a command to set the shift of the distiller of the output via SPIF.
+        This tells SPIF how much to shift the key after masking but before
+        applying the distiller key.
+
+    :param int index: The index of the channel to set (0-5)
+    :param int shift: The shift to set
+    :rtype: MulticastCommand
+    """
+    return SPIFRegister.DIST_SHIFT_BASE.cmd(shift, index)
 
 
 class _DelayedMultiCastCommand(MultiCastCommand):
