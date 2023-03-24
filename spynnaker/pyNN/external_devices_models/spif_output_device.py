@@ -39,7 +39,7 @@ class SPIFOutputDevice(
         be identified.  Source Populations must be split into power-of-two
         sized cores to ensure that keys are contiguous.
         The keys output by SPIF will be of the form:
-            |projection_index|neuron_id|
+        |projection_index|neuron_id|
         By default, the projection index will be in the top 8 bits of the
         packet, but this can be controlled with the output_key_shift parameter.
 
