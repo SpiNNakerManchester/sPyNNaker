@@ -47,12 +47,14 @@ class PushBotSpiNNakerLinkRetinaDevice(
         PopulationApplicationVertex):
     __slots__ = ["__new_key_command"]
 
-    default_parameters = {'label': None, 'board_address': None}
+    default_parameters = {'label': None, 'board_address': None,
+                          'n_machine_vertices': 1}
 
     def __init__(
             self, spinnaker_link_id, protocol, resolution,
             board_address=default_parameters['board_address'],
-            label=default_parameters['label']):
+            label=default_parameters['label'],
+            n_machine_vertices=default_parameters['n_machine_vertices']):
         """
         :param spinnaker_link_id:
         :param protocol:
@@ -67,7 +69,8 @@ class PushBotSpiNNakerLinkRetinaDevice(
         ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id,
             n_atoms=resolution.value.n_neurons,
-            board_address=board_address, label=label)
+            board_address=board_address, label=label,
+            n_machine_vertices=n_machine_vertices)
 
         # stores for the injection aspects
         self.__new_key_command = None
@@ -82,7 +85,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
         """
         routing_info = SpynnakerDataView.get_routing_infos()
         key = routing_info.get_first_key_from_pre_vertex(
-            next(iter(self.machine_vertices)), SPIKE_PARTITION_ID)
+            self, SPIKE_PARTITION_ID)
         return key
 
     @property
