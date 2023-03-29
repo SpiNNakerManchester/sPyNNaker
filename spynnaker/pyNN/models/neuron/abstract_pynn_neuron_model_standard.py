@@ -58,6 +58,9 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             ring_buffer_sigma, incoming_spike_buffer_size,
             n_steps_per_timestep, drop_late_spikes, splitter, seed,
             n_colour_bits):
+        """
+        :param int n_steps_per_timestep:
+        """
         # pylint: disable=arguments-differ
         self._model.n_steps_per_timestep = n_steps_per_timestep
         return super().create_vertex(

@@ -132,11 +132,8 @@ class MachineMunichMotorDevice(
                     "Please increase the timer_tic or time_scale_factor "
                     "or decrease the number of neurons per core.")
 
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification)
+    @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        # pylint: disable=too-many-arguments, arguments-differ
-
         # reserve regions
         self.reserve_memory_regions(spec)
 

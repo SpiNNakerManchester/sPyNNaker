@@ -249,7 +249,6 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
         rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
@@ -284,11 +283,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
         spec.write_value(int(self._app_vertex.drop_late_spikes))
 
-    @overrides(
-        AbstractRewritesDataSpecification.regenerate_data_specification)
+    @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # pylint: disable=too-many-arguments, arguments-differ
-
         self._rewrite_neuron_data_spec(spec)
 
         # close spec

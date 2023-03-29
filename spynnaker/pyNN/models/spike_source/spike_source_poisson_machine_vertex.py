@@ -277,7 +277,6 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
-        # pylint: disable=arguments-differ
         if self.__rate_changed:
             return True
         return SpynnakerDataView.get_first_machine_time_step() == 0
@@ -286,11 +285,8 @@ class SpikeSourcePoissonMachineVertex(
     def set_reload_required(self, new_value):
         self.__rate_changed = new_value
 
-    @overrides(
-        AbstractRewritesDataSpecification.regenerate_data_specification)
+    @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # pylint: disable=too-many-arguments, arguments-differ
-
         # write rates
         self._write_poisson_rates(spec)
 
@@ -299,13 +295,6 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        """
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param int data_n_time_steps:
-        :param int first_machine_time_step:
-        """
-        # pylint: disable=too-many-arguments, arguments-differ
-
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
         # write setup data
@@ -443,10 +432,9 @@ class SpikeSourcePoissonMachineVertex(
         :param ~data_specification.DataSpecification spec:
             the data specification writer
         """
-        # pylint: disable=too-many-arguments
         spec.comment(
-            f"\nWriting Parameters for {self.vertex_slice.n_atoms} "
-            "poisson sources:\n")
+            f"\nWriting parameters for {self.vertex_slice.n_atoms} "
+            "Poisson sources:\n")
 
         spec.reserve_memory_region(
             region=(
@@ -522,11 +510,9 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value)
 
     def read_parameters_from_machine(self, placement):
-
         # It is only worth updating the rates when there is a control edge
         # that can change them
         if self._app_vertex.incoming_control_edge is not None:
-
             # locate SDRAM address where the rates are stored
             poisson_rate_region_sdram_address = (
                 self.__poisson_rate_region_address(placement))

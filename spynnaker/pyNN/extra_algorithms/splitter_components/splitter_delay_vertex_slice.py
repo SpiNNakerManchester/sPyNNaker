@@ -62,8 +62,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
             for m_vertex in source_vertex.splitter.get_out_going_vertices(
                 partition_id)]
 
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
-        # pylint: disable=arguments-differ
         source_app_vertex = self._governed_app_vertex.source_vertex
         slices = source_app_vertex.splitter.get_out_going_slices()
 

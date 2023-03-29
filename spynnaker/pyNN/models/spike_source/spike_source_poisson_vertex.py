@@ -99,12 +99,17 @@ class SpikeSourcePoissonVertex(
         :param float seed:
         :param int max_atoms_per_core:
         :param ~spynnaker.pyNN.models.spike_source.SpikeSourcePoisson model:
-        :param iterable(float) rate:
-        :param iterable(int) start:
-        :param iterable(int) duration:
+        :param float rate:
+        :param int start:
+        :param int duration:
+        :param iterable(float) rates:
+        :param iterable(int) starts:
+        :param iterable(int) durations:
+        :param float max_rate:
         :param splitter:
         :type splitter:
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+        :param int n_colour_bits:
         """
         # pylint: disable=too-many-arguments
         super().__init__(label, max_atoms_per_core, splitter)
@@ -478,9 +483,7 @@ class SpikeSourcePoissonVertex(
         return super(SpikeSourcePoissonVertex, self).atoms_shape
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
-    def create_machine_vertex(
-            self, vertex_slice, sdram, label=None):
-        # pylint: disable=arguments-differ
+    def create_machine_vertex(self, vertex_slice, sdram, label=None):
         return SpikeSourcePoissonMachineVertex(
             sdram, self.__spike_recorder.record,
             label, self, vertex_slice)
@@ -511,7 +514,7 @@ class SpikeSourcePoissonVertex(
 
     def update_kiss_seed(self, vertex_slice, seed):
         """
-        Updates a kiss seed from the machine.
+        Updates a KISS seed from the machine.
 
         :param vertex_slice: the vertex slice to update seed of
         :param seed: the seed
@@ -554,7 +557,7 @@ class SpikeSourcePoissonVertex(
     def set_live_poisson_control_edge(self, edge):
         if self.__incoming_control_edge is not None:
             raise ValueError(
-                "The Poisson can only be controlled by one source")
+                "The Poisson generator can only be controlled by one source")
         self.__incoming_control_edge = edge
 
     @property
