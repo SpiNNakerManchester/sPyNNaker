@@ -26,7 +26,7 @@ class PopulationSynapsesMachineVertexLead(
         AbstractGeneratesDataSpecification,
         AbstractRewritesDataSpecification):
     """
-    A synaptic machine vertex that leads other Synaptic machine vertices,
+    A synaptic machine vertex that leads other synaptic machine vertices,
     writing shared areas.
     """
 

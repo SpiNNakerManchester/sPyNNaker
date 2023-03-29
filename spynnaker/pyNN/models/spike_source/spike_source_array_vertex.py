@@ -139,13 +139,13 @@ class SpikeSourceArrayVertex(
                     "Danger of SpikeSourceArray sending too many spikes "
                     "at the same time. "
                     f"This is because ({self.n_atoms}) neurons "
-                    f"share the same spike list")
+                    "share the same spike list")
             else:
                 logger.warning(
                     "Danger of SpikeSourceArray sending too many spikes "
                     "at the same time. "
                     f"For example at time {val} {count * self.n_atoms} "
-                    f"spikes will be sent")
+                    "spikes will be sent")
 
     def _check_density_double_list(self, spike_times):
         counter = Counter()
@@ -323,7 +323,7 @@ class SpikeSourceArrayVertex(
         together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template
+        If template is `None`, then a dictionary containing the template
         context will be returned.
         """
         parameters = self.get_parameter_values(self.__model.default_parameters)

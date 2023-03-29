@@ -386,7 +386,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __get_recording_variables(self, pop_label, cursor):
         """
-
         :param ~sqlite3.Cursor cursor:
         :param str pop_label: The label for the population of interest
 
@@ -799,10 +798,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param int region_id: Region data came from
         :param array(int) neurons: mapping of local id to global id
         :param DataType data_type: type of data to extract
-        :return:  neurons, times, data
-        :rtype: (list(int), list(float ), numpy.array
+        :return: times, data
+        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
-
         # for buffering output info is taken form the buffer manager
         record_raw = self._read_contents(cursor, region_id)
         record_length = len(record_raw)
@@ -839,7 +837,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param int pop_size:
         :param str variable:
         :return: numpy array of the data, neurons
-        :rtype: tuple(~numpy.ndarray, list(int))
+        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray or list(int))
         """
         signal_array = None
         pop_times = None

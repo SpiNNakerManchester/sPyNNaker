@@ -440,7 +440,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             A synapse vertex to feed the spikes back to
         :rtype: MulticastEdgePartition
         """
-
         # If synapse dynamics is not simply static, link the neuron vertex
         # back to the synapse vertex
         app_vertex = self._governed_app_vertex

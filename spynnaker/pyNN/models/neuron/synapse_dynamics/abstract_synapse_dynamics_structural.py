@@ -33,6 +33,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :return: the size of the parameters, in bytes
         :rtype: int
         :raises PacmanInvalidParameterException:
+            If the parameters make no sense.
         """
 
     @abstractmethod

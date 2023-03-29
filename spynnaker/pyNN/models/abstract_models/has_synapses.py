@@ -30,4 +30,5 @@ class HasSynapses(object):
             The edge for which the data is being read
         :param SynapseInformation synapse_info:
             The specific projection within the edge
+        :rtype: ¬numpy.ndarray
         """

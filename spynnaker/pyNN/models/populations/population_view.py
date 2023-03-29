@@ -466,7 +466,6 @@ class PopulationView(PopulationBase):
             p.initialize(v=rand_distr, gsyn_exc=0.0)
             p.initialize(v=lambda i: -65 + i / 10.0)
         """
-
         for variable, value in initial_values.items():
             self.__vertex.set_initial_state_values(
                 variable, value, self.__indexes)

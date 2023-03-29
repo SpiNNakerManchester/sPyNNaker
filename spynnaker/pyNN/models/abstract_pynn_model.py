@@ -137,7 +137,7 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
     @abstractproperty
     def default_population_parameters(self):
         """
-        Get the default values for the parameters at the population level.
+        The default values for the parameters at the population level.
         These are parameters that can be passed in to the Population
         constructor in addition to the standard PyNN options.
 

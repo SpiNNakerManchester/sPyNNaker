@@ -276,8 +276,6 @@ class PopulationSynapsesMachineVertexCommon(
         :param int y: y coordinate of the core where this core
         :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
-        :return: a list of provenance data items
-        :rtype: iterator of ProvenanceDataItem
         """
 
     def _parse_spike_processing_fast_provenance(
@@ -290,8 +288,6 @@ class PopulationSynapsesMachineVertexCommon(
         :param int y: y coordinate of the core where this core
         :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
-        :return: a list of provenance data items
-        :rtype: iterator of ProvenanceDataItem
         """
         prov = SpikeProcessingFastProvenance(*provenance_data)
 

@@ -38,7 +38,6 @@ class PushBotEthernetMotorDevice(
             The number of timesteps between sending commands to the device,
             or None to use the default
         """
-
         if not isinstance(motor, PushBotMotor):
             raise ConfigurationException(
                 "motor parameter must be a PushBotMotor value")

@@ -48,6 +48,6 @@ class AbstractSynapseType(
         """
         Get the target names of the synapse type.
 
-        :return: an array of strings
-        :rtype: array(str)
+        :return: an array of strings (usually a list or tuple)
+        :rtype: iterable(str)
         """

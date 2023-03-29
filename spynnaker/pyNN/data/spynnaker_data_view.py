@@ -89,7 +89,8 @@ class SpynnakerDataView(FecDataView):
     """
     Adds the extra Methods to the View for PyNN level.
 
-    See UtilsDataView for a more detailed description.
+    See :py:class:`spinn_utilities.data.UtilsDataView` for a more detailed
+    description.
 
     Use this class wherever possible as it inherits all methods from all View
     classes.
@@ -103,9 +104,10 @@ class SpynnakerDataView(FecDataView):
     @classmethod
     def get_min_delay(cls):
         """
-        The minimum supported delay, in milliseconds if available.
+        The minimum supported delay if available, in milliseconds.
 
-        Typically simulation_time_step_per_ms but may be a positive multiple
+        Typically `simulation_time_step_per_ms` but may be a positive multiple
+        of it.
 
         :rtype: float
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -201,8 +203,8 @@ class SpynnakerDataView(FecDataView):
 
         :param ~spynnaker.pyNN.models.populations.Population population:
             Population to add
-        :rtype: (int, int)
         :return: The first and last global ids for this Population
+        :rtype: (int, int)
         :raises SimulatorRunningException: If sim.run is currently running
         :raises SimulatorNotSetupException: If called before sim.setup
         :raises SimulatorShutdownException: If called after sim.end

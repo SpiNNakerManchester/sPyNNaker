@@ -106,7 +106,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
             raise ConfigurationException(
                 f'invalid min_delay {min_delay} '
                 f'must be a multiple of simulation time step in microseconds '
-                f' {self.get_simulation_time_step_ms()}')
+                f'{self.get_simulation_time_step_ms()}')
 
         self.__spy_data._min_delay = min_delay
 

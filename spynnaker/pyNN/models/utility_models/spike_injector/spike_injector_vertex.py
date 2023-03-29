@@ -148,10 +148,9 @@ class SpikeInjectorVertex(
         together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template context
-        will be returned.
+        If template is `None`, then a dictionary containing the template
+        context will be returned.
         """
-
         context = {
             "name": "SpikeInjector",
             "default_parameters": self.default_parameters,

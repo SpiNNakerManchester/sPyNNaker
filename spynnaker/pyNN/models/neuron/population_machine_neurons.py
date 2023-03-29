@@ -150,8 +150,6 @@ class PopulationMachineNeurons(
         :param int y: y coordinate of the core where this core
         :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
-        :return: a list of provenance data items
-        :rtype: iterator of ProvenanceDataItem
         """
         neuron_prov = NeuronProvenance(*provenance_data)
         with ProvenanceWriter() as db:

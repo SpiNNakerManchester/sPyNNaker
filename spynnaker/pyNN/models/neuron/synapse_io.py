@@ -695,8 +695,8 @@ def _rescale_connections(
 
 
 def __convert_delayed_data(
-            n_synapses, n_pre_atoms, delayed_connections,
-            post_vertex_max_delay_ticks):
+        n_synapses, n_pre_atoms, delayed_connections,
+        post_vertex_max_delay_ticks):
     """
     Take the delayed_connections and convert the source ids and delay
     values back to global values.

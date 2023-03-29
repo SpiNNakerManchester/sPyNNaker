@@ -33,24 +33,24 @@ REDUNDANCY_BY_CORE = f"""
     FROM
         (SELECT x, y, p, total as received, core_name
             FROM core_stats_view
-            WHERE description = "{PopulationMachineVertex.SPIKES_PROCESSED}")
+            WHERE description = '{PopulationMachineVertex.SPIKES_PROCESSED}')
         AS pro
     LEFT JOIN
         (SELECT x, y, p, total AS filtered
             FROM core_stats_view
             WHERE description =
-                "{PopulationMachineVertex.BIT_FIELD_FILTERED_PACKETS}")
+                '{PopulationMachineVertex.BIT_FIELD_FILTERED_PACKETS}')
         AS bit
     LEFT JOIN
        (SELECT x, y, p, total AS invalid
            FROM core_stats_view
            WHERE description =
-               "{PopulationMachineVertex.INVALID_MASTER_POP_HITS}")
+               '{PopulationMachineVertex.INVALID_MASTER_POP_HITS}')
         AS inv
     LEFT JOIN
         (SELECT x, y, p, total AS failed
             FROM core_stats_view
-            WHERE description = "{PopulationMachineVertex.GHOST_SEARCHES}")
+            WHERE description = '{PopulationMachineVertex.GHOST_SEARCHES}')
         AS fai
     WHERE pro.x = bit.x AND pro.y = bit.y AND pro.p = bit.p
         AND pro.x = inv.x AND pro.y = inv.y AND pro.p = inv.p
@@ -81,8 +81,8 @@ def redundant_packet_count_report():
         with open(file_name, "w", encoding="utf-8") as f:
             _write_report(f)
     except Exception as e:  # pylint: disable=broad-except
-        logger.exception(f"Error {e} doing redundant_packet_count_report"
-                         f" {file_name}:")
+        logger.exception(
+            f"Error {e} doing redundant_packet_count_report {file_name}:")
 
 
 def _create_views():
@@ -98,36 +98,36 @@ def _write_report(output):
             (_, _, _, source, _, filtered, invalid, _,
              redundant, total, percent) = data
             output.write(f"\ncore {source} \n")
-            output.write(f"    {total} packets received. \n")
-            output.write(f"    {redundant} were detected as "
-                         "redundant packets by the bitfield filter. \n")
+            output.write(f"    {total} packets received.\n")
+            output.write(
+                f"    {redundant} were detected as redundant packets by the "
+                "bitfield filter.\n")
             output.write(
                 f"    {filtered} were detected as having no targets "
-                f"after the DMA stage. \n")
+                "after the DMA stage.\n")
             output.write(
                 f"    {invalid} were detected as packets which "
-                f"we should not have received in the first place. \n")
-            output.write(f"    Overall this makes a redundant percentage of "
-                         f"{percent}\n")
+                "we should not have received in the first place.\n")
+            output.write(
+                "    Overall this makes a redundant percentage of "
+                f"{percent}\n")
         data = db.run_query("select * from redundancy_summary")
         (sum_total, max_total, min_total, avg_total,
             sum_reduant, max_redundant, min_redundant, avg_redundant,
             max_percent, min_percent, avg_percent, global_percent) = data[0]
-    output.write(f"\nThe total packets flown in system was "
-                 f"{sum_total}\n")
+    output.write(f"\nThe total packets flown in system was {sum_total}.\n")
     output.write(f"    The max, min and avergae per core was {max_total}, "
                  f"{min_total}, {avg_total} packets.\n")
-    output.write(f"The total redundant packets was "
-                 f"{sum_reduant}\n")
-    output.write(f"    The max, min and avergae per core was "
+    output.write(f"The total redundant packets was {sum_reduant}.\n")
+    output.write("    The max, min and avergae per core was "
                  f"{max_redundant}, {min_redundant}, {avg_redundant} "
-                 f"packets.\n")
+                 "packets.\n")
     output.write(
-        f"The percentages of redundant packets was {global_percent}\n")
-    output.write(f"    The max and min percentages of redundant "
-                 f"packets are {max_percent} and {min_percent}. \n")
+        f"The percentages of redundant packets was {global_percent}.\n")
+    output.write("    The max and min percentages of redundant "
+                 f"packets are {max_percent} and {min_percent}.\n")
     output.write(
-        f"    The average redundant percentages from each "
+        "    The average redundant percentages from each "
         f"core were {avg_percent} accordingly.\n")
 
 

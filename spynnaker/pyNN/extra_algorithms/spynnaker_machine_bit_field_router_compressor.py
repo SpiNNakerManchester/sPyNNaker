@@ -44,7 +44,6 @@ def _locate_expander_rerun_targets(bitfield_targets):
     :return: new targets for synaptic expander
     :rtype: ~.ExecutableTargets
     """
-
     # locate expander executable path
     expander_executable_path = SpynnakerDataView.get_executable_path(
         SYNAPSE_EXPANDER_APLX)
@@ -99,7 +98,7 @@ def _rerun_synaptic_cores(
 
 def spynnaker_machine_bitfield_ordered_covering_compressor():
     """
-    Entrance for routing table compression with bit field.
+    Perform routing table compression using ordered coverings with bit fields.
     """
     compressor_executable_targets = \
         machine_bit_field_ordered_covering_compressor()
@@ -114,7 +113,7 @@ def spynnaker_machine_bitfield_ordered_covering_compressor():
 
 def spynnaker_machine_bitField_pair_router_compressor():
     """
-    Entrance for routing table compression with bit field.
+    Perform routing table compression using pairs with bit fields.
     """
     compressor_executable_targets = \
         machine_bit_field_pair_router_compressor()

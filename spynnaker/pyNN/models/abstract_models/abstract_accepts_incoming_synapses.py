@@ -55,6 +55,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
             The edge for which the data is being read
         :param SynapseInformation synapse_info:
             The specific projection within the edge
+        :rtype: ¬numpy.ndarray
         """
 
     @abstractmethod
@@ -68,8 +69,8 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         Check that the splitter implements the API(s) expected by the
         SynapticMatrices
 
-        Any Vertex that implements this api should override
-        ApplicationVertex.splitter method to also call this function
+        Any Vertex that implements this API should override
+        `ApplicationVertex.splitter` method to also call this function.
 
         :param splitter: the splitter
         :type splitter:

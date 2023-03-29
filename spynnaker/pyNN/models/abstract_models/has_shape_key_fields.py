@@ -30,6 +30,5 @@ class HasShapeKeyFields(object, metaclass=AbstractBase):
         values in the order of the fields.
 
         :param Slice vertex_slice: The slice of the source vertex
-
         :rtype: list(tuple(int, int, int, int))
         """

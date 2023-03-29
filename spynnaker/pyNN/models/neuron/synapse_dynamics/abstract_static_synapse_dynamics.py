@@ -95,4 +95,5 @@ class AbstractStaticSynapseDynamics(
         :param ~numpy.ndarray ff_size:
         :param list(~numpy.ndarray) ff_data:
         :param int max_atoms_per_core:
+        :rtype: ~numpy.ndarray
         """

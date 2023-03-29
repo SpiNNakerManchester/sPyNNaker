@@ -195,7 +195,6 @@ class AbstractPopulationVertex(
             on each run.
         :param int n_colour_bits: The number of colour bits to use
         """
-
         # pylint: disable=too-many-arguments
         super().__init__(label, max_atoms_per_core, splitter)
 

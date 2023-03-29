@@ -192,7 +192,7 @@ class SplitterAbstractPopulationVertexFixed(
 
     def __get_variable_sdram(self, n_atoms):
         """
-        Returns the variable sdram from the recorders.
+        Returns the variable SDRAM from the recorders.
 
         :param int n_atoms: The number of atoms to account for
         :return: the variable sdram used by the neuron recorder
@@ -210,7 +210,7 @@ class SplitterAbstractPopulationVertexFixed(
 
     def __get_constant_sdram(self, n_atoms, all_syn_block_sz, structural_sz):
         """
-        Returns the constant sdram used by the atoms.
+        Returns the constant SDRAM used by the atoms.
 
         :param int n_atoms: The number of atoms to account for
         :rtype: ~pacman.model.resources.MultiRegionSDRAM

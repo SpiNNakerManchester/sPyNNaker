@@ -55,7 +55,7 @@ class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
     @abstractproperty
     def device_control_uses_payload(self):
         """
-        True if the control of the device accepts an arbitrary valued
+        Whether the control of the device accepts an arbitrary valued
         payload, the value of which will change the devices behaviour.
 
         :rtype: bool

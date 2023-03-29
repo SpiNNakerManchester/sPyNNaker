@@ -43,7 +43,6 @@ class EthernetCommandConnection(DatabaseConnection):
         :param int local_port:
             The optional port to listen on for the stop/pause message
         """
-
         super().__init__(
             start_resume_callback_function=self._start_resume_callback,
             stop_pause_callback_function=self._stop_pause_callback,

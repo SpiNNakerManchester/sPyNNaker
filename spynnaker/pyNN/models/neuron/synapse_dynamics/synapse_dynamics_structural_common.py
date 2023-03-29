@@ -432,7 +432,7 @@ class SynapseDynamicsStructuralCommon(
         Check that delays can be done without delay extensions.
 
         :param float max_delay_ms: The maximum delay supported, in milliseconds
-        :raises Exception: if the delay is out of range
+        :raises ValueError: if the delay is out of range
         """
         if isinstance(self.initial_delay, Iterable):
             # pylint: disable=unsubscriptable-object

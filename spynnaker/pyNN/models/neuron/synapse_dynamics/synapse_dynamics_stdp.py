@@ -308,9 +308,8 @@ class SynapseDynamicsSTDP(
     def __get_n_connections(self, n_connections, check_length_padded=True):
         """
         :param int n_connections:
-        :rtype: int
         :param bool check_length_padded:
-        :rtype: bool
+        :rtype: int
         """
         synapse_structure = self.__timing_dependence.synaptic_structure
         if self.__pad_to_length is not None and check_length_padded:

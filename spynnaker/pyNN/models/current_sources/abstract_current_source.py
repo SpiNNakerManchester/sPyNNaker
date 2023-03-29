@@ -95,18 +95,20 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
     @abstractproperty
     def get_parameters(self):
         """
-        Get the parameters of the current source.
+        The parameters of the current source.
 
-        :rtype dict(str, Any)
+        :rtype: dict(str, Any)
         """
+        # TODO: Wrong naming for a property!
 
     @abstractproperty
     def get_parameter_types(self):
         """
-        Get the parameter types for the current source.
+        The parameter types for the current source.
 
-        :rtype dict(str, Any)
+        :rtype: dict(str, Any)
         """
+        # TODO: Wrong naming for a property!
 
     @abstractproperty
     def current_source_id(self):

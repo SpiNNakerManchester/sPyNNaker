@@ -856,7 +856,6 @@ class MunichIoSpiNNakerLinkProtocol(object):
         :return: the command to send
         :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
-
         retina_key_value = 0
         if retina_key is not None:
             retina_key_value = retina_key.value

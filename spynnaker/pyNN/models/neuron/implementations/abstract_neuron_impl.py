@@ -153,7 +153,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     @abstractproperty
     def is_conductance_based(self):
         """
-        Determine if the model uses conductance.
+        Whether the model uses conductance.
 
         :rtype: bool
         """

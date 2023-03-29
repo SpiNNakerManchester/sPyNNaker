@@ -81,10 +81,8 @@ def convert_param_to_numpy(param, no_atoms):
     :return: the converted param as an array of floats
     :rtype: ~numpy.ndarray(float)
     """
-
     # Deal with random distributions by generating values
     if isinstance(param, RandomDistribution):
-
         # numpy reduces a single valued array to a single value, so enforce
         # that it is an array
         param_value = param.next(n=no_atoms)

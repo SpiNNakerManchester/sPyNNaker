@@ -73,7 +73,8 @@ class PopulationMachineSynapsesProvenance(object):
         The application vertex of the machine vertex.
 
         .. note::
-            This is likely to be available via the MachineVertex.
+            This is likely to be available via the
+            :py:class:`~pacman.model.graphs.machine.MachineVertex`.
 
         :rtype: AbstractPopulationVertex
         """
@@ -87,8 +88,6 @@ class PopulationMachineSynapsesProvenance(object):
         :param int y: y coordinate of the core where this core
         :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
-        :return: a list of provenance data items
-        :rtype: iterator of ProvenanceDataItem
         """
         synapse_prov = SynapseProvenance(*provenance_data)
 

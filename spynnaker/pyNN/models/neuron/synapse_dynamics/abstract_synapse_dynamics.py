@@ -54,7 +54,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     @abstractproperty
     def changes_during_run(self):
         """
-        Determine if the synapses change during a run.
+        Whether the synapses change during a run.
 
         :rtype: bool
         """
@@ -63,6 +63,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     def weight(self):
         """
         The weight of connections.
+
+        :rtype: float
         """
 
     def _round_delay(self, delay):
@@ -72,7 +74,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         (otherwise SDRAM estimation calculations can go wrong)
 
         :param delay:
-        :return:
+        :return: Rounded delay
         """
         if isinstance(delay, RandomDistribution):
             return delay
@@ -91,12 +93,14 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     def delay(self):
         """
         The delay of connections.
+
+        :rtype: float
         """
 
     @abstractproperty
     def is_combined_core_capable(self):
         """
-        Determine if the synapse dynamics can run on a core combined with
+        Whether the synapse dynamics can run on a core combined with
         the neuron, or if a separate core is needed.
 
         :rtype: bool
@@ -230,6 +234,8 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         The absolute maximum number of atoms per core supported by this
         synapse dynamics object.
+
+        :rtype: int
         """
         # By default, we can only support the maximum row length per core
         return POP_TABLE_MAX_ROW_LENGTH
