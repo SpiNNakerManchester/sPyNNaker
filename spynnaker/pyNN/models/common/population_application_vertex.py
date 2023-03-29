@@ -287,11 +287,12 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         Get the type of data recorded by the buffer manager.
 
-        The BufferDatabase value controls how data returned by the cores is
+        The buffer data type controls how data returned by the cores is
         handled in NeoBufferDatabase.
 
         :param str name: The name of the variable recorded
-        :rtype: ~spynnaker.pyNN.utilities.neo_buffer_database.BufferDatabase
+        :rtype: \
+            ~spinn_front_end_common.interface.buffer_management.storage_objects.BufferDatabase
         :raises KeyError: if the variable isn't being recorded
         """
         if name not in self.get_recordable_variables():
@@ -305,7 +306,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         Get the sampling interval of the recording for the given variable.
 
         The values is in ms and unless selective recording is used will be
-        SpynnakerDataView.get_simulation_time_step_us()
+        `SpynnakerDataView.get_simulation_time_step_us()`
 
         :rtype: float
         :raises KeyError: If the variable isn't being recorded
@@ -351,7 +352,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         Gets the neurons being recorded on the core with this slice.
 
-        Typically vertex_slice.get_raster_ids(atoms_shape)
+        Typically `vertex_slice.get_raster_ids(atoms_shape)`
         but may be a sublist if doing selective recording.
 
         :param str name: The name of the variable to get the region of
