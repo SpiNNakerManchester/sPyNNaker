@@ -120,7 +120,7 @@ be provided if the dev is to be controlled over Ethernet.</p></li>
 <li><p><strong>ring_buffer_sigma</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
 <li><p><strong>incoming_spike_buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>splitter</strong> (<em>None</em><em> or
-</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_splitters.abstract_splitters/#pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon" title="(in PACMAN v6.0)"><em>AbstractSplitterCommon</em></a>) – splitter from app to machine</p></li>
+</em><em>AbstractSplitterCommon</em>) – splitter from app to machine</p></li>
 <li><p><strong>n_colour_bits</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of colour bits to use</p></li>
 </ul>
 </dd>
@@ -131,7 +131,7 @@ be provided if the dev is to be controlled over Ethernet.</p></li>
 <dd><p>Return the vertices which this vertex depends upon</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>)</p>
+<dd class="field-odd"><p>iterable(<em>ApplicationVertex</em>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -142,7 +142,7 @@ be provided if the dev is to be controlled over Ethernet.</p></li>
 <dd><p>Return the dependent edge identifiers for a particular dependent            vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – </p>
+<dd class="field-odd"><p><strong>vertex</strong> (<em>ApplicationVertex</em>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -1108,7 +1108,7 @@ conditions.</p>
 <dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the connection, for when n_machine_vertices &gt; 1</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a></p>
+<dd class="field-even"><p><em>Slice</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1195,7 +1195,7 @@ values in the order of the fields</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The data specification to write to</p></li>
-<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a>) – The placement the vertex is located at</p></li>
+<li><p><strong>placement</strong> (<em>Placement</em>) – The placement the vertex is located at</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1287,7 +1287,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>The sdram required by the vertex</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a></p>
+<dd class="field-odd"><p><em>AbstractSDRAM</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1330,7 +1330,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>Return the vertices which this vertex depends upon</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>)</p>
+<dd class="field-odd"><p>iterable(<em>ApplicationVertex</em>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1341,7 +1341,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>Return the dependent edge identifiers for a particular dependent            vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – </p>
+<dd class="field-odd"><p><strong>vertex</strong> (<em>ApplicationVertex</em>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -1615,7 +1615,7 @@ n_machine_vertices_per_link &gt; 1</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a></p>
+<dd class="field-even"><p><em>Slice</em></p>
 </dd>
 </dl>
 </dd></dl>
