@@ -47,11 +47,12 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
             self, partition, delay_per_stage, n_delay_stages, n_colour_bits,
             label="DelayExtension"):
         """
-        :param partition: The parition this Delay is supporting
+        :param partition: The partition that this delay is supporting
         :type partition:
             ~pacman.mode.graph.application.ApplicationEdgePartition
         :param int delay_per_stage: the delay per stage
         :param int n_delay_stages: the (initial) number of delay stages needed
+        :param int n_colour_bits: the number of bits for event colouring
         :param str label: the vertex label
         """
         # pylint: disable=too-many-arguments
@@ -71,10 +72,20 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
 
     @property
     def n_atoms(self):
+        """
+        The number of atoms in this vertex.
+
+        :rtype: int
+        """
         return self.__partition.pre_vertex.n_atoms
 
     @property
     def drop_late_spikes(self):
+        """
+        Whether to drop late spikes.
+
+        :rtype: bool
+        """
         return self.__drop_late_spikes
 
     @staticmethod
@@ -84,12 +95,6 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
     @property
     @overrides(AbstractHasDelayStages.n_delay_stages)
     def n_delay_stages(self):
-        """
-        The maximum number of delay stages required by any connection
-        out of this delay extension vertex.
-
-        :rtype: int
-        """
         return self.__n_delay_stages
 
     def set_new_n_delay_stages_and_delay_per_stage(
@@ -106,6 +111,11 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
 
     @property
     def delay_per_stage(self):
+        """
+        The delay per stage, in timesteps.
+
+        :rtype: int
+        """
         return self.__delay_per_stage
 
     @property
@@ -118,11 +128,16 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
     def delay_params_size(self):
         """
         The size of the delay parameters.
+
+        :rtype: int
         """
         return BYTES_PER_WORD * _DELAY_PARAM_HEADER_WORDS
 
     @property
     def partition(self):
+        """
+        The partition that this delay is supporting.
+        """
         return self.__partition
 
     def add_outgoing_edge(self, edge):
@@ -144,4 +159,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
 
     @property
     def n_colour_bits(self):
+        """
+        The number of bits for event colouring.
+        """
         return self.__n_colour_bits
