@@ -55,7 +55,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
             The edge for which the data is being read
         :param SynapseInformation synapse_info:
             The specific projection within the edge
-        :rtype: ¬numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
 
     @abstractmethod

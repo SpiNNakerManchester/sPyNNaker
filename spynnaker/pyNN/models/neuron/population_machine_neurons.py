@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
-from collections import namedtuple
+from dataclasses import dataclass
 
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
@@ -47,11 +47,17 @@ class NeuronProvenance(ctypes.LittleEndianStructure):
     N_ITEMS = len(_fields_)
 
 
-#: Identifiers for neuron regions
-NeuronRegions = namedtuple(
-    "NeuronRegions",
-    ["core_params", "neuron_params", "current_source_params",
-     "neuron_recording", "neuron_builder", "initial_values"])
+@dataclass
+class NeuronRegions:
+    """
+    Identifiers for neuron regions.
+    """
+    core_params: int
+    neuron_params: int
+    current_source_params: int
+    neuron_recording: int
+    neuron_builder: int
+    initial_values: int
 
 
 class PopulationMachineNeurons(

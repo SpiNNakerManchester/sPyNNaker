@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from collections import namedtuple
+from dataclasses import dataclass
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 
@@ -35,10 +35,19 @@ from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 
 
-# Identifiers for common regions
-CommonRegions = namedtuple(
-    "CommonRegions",
-    ["system", "provenance", "profile", "recording"])
+@dataclass
+class CommonRegions:
+    """
+    Identifiers for common regions.
+    """
+    #: System control region
+    system: int
+    #: Provenance collection region
+    provenance: int
+    #: Profiling data region
+    profile: int
+    #: Recording channels region
+    recording: int
 
 
 class PopulationMachineCommon(
