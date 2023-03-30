@@ -275,7 +275,7 @@ def get_synapses(
         The number of synapse types in total to be represented
     :param list(float) weight_scales:
         The scaling of the weights for each synapse type
-    :param ~pacman.model.graphs.appplication.ApplicationEdge app_edge:
+    :param ~pacman.model.graphs.application.ApplicationEdge app_edge:
         The incoming machine edge that the synapses are on
     :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         The slice of the post-vertex to get the synapses for
