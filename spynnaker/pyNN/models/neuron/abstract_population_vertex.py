@@ -1409,7 +1409,8 @@ class AbstractPopulationVertex(
         """
         The seed to use for a core.
 
-        :param Slice vertex_slice: The machine vertex that the seed is for
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The machine vertex that the seed is for
         :return: A list of 4 integers
         :rtype: list(int)
         """
@@ -1422,7 +1423,8 @@ class AbstractPopulationVertex(
         """
         Copies the state variables into the initial state variables.
 
-        :param Slice vertex_slice: The slice to copy now
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice to copy now
         """
         for key in self.__state_variables.keys():
             value = self.__state_variables[key][vertex_slice.as_slice]

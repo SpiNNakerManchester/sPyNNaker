@@ -578,10 +578,15 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         :param SynapseInformation s_info:
             The synapse information of the connection
-        :param ApplicationVertex source_vertex: The source of the spikes
-        :param ApplicationVertex target_vertex: The target of the spikes
-        :return: A list of tuples of (target machine vertex, source
-        :rtype: list(tuple(MachineVertex, list(AbstractVertex)))
+        :param source_vertex: The source of the spikes
+        :type source_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param target_vertex: The target of the spikes
+        :type target_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :return: A list of tuples of (target machine vertex, list of sources)
+        :rtype: list(tuple(~pacman.model.graphs.machine.MachineVertex,
+            list(~pacman.model.graphs.AbstractVertex)))
         """
         # By default, just return that the whole target connects to the
         # whole source
@@ -632,7 +637,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
         connector has rules that need to be checked.  Returns nothing; it
         is assumed that an Exception will be raised if anything is wrong.
 
-        :param ApplicationEdge application_edge: The edge of the connection
+        :param application_edge: The edge of the connection
+        :type application_edge:
+            ~pacman.model.graphs.application.ApplicationEdge
         :param SynapseInformation synapse_info: The synaptic information
         """
         return

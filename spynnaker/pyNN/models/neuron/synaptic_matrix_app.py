@@ -353,7 +353,8 @@ class SynapticMatrixApp(object):
         """
         Read connections from an address on the machine.
 
-        :param Placement placement: Where the matrix is on the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where the matrix is on the machine
         :param int synapses_address:
             The base address of the synaptic matrix region
         :return: A list of arrays of connections, each with dtype
@@ -403,7 +404,8 @@ class SynapticMatrixApp(object):
         """
         Get a block of data for delayed synapses.
 
-        :param Placement placement: Where the matrix is on the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where the matrix is on the machine
         :param int synapses_address:
             The base address of the synaptic matrix region
         :rtype: bytearray

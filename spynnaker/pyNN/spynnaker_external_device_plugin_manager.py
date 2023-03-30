@@ -200,7 +200,9 @@ class SpynnakerExternalDevicePluginManager(object):
         :type vertex_to_record_from:
             ~pacman.model.graphs.application.ApplicationVertex or
             ~pacman.model.graphs.machine.MachineVertex
-        :param LivePacketGatherParameters params:
+        :param params:
+        :type params:
+             ~spinn_front_end_common.utilities.utility_objs.LivePacketGatherParameters
         :param list(str) partition_ids:
         :param bool translate_keys:
         """

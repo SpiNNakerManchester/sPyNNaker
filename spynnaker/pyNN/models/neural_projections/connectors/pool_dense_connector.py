@@ -248,8 +248,9 @@ class PoolDenseConnector(AbstractConnector):
         """
         Write pre coords as post coords.
 
-        :param Iterable pre_coords: An iterable of (x, y) coordinates
-        :rtype: numpy.ndarray
+        :param ~collections.abc.Iterable pre_coords:
+            An iterable of (x, y) coordinates
+        :rtype: ~numpy.ndarray
         """
         coords = numpy.array(pre_coords)
         if self.__pool_stride is not None:

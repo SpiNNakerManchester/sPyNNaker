@@ -220,10 +220,15 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
         :param SynapseInformation s_info:
             The synapse information of the connection
-        :param ApplicationVertex source_vertex: The source of the spikes
-        :param ApplicationVertex target_vertex: The target of the spikes
-        :return: A list of tuples of (target machine vertex, source
-        :rtype: list(tuple(MachineVertex, list(AbstractVertex)))
+        :param source_vertex: The source of the spikes
+        :type source_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param target_vertex: The target of the spikes
+        :type target_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :return: A list of tuples of (target machine vertex, list of sources)
+        :rtype: list(tuple(~pacman.model.graphs.machine.MachineVertex,
+            list(~pacman.model.graphs.AbstractVertex)))
         """
         # By default, just ask the connector
         return s_info.connector.get_connected_vertices(

@@ -43,7 +43,8 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
         :param ~data_specification.DataSpecificationGenerator spec:
             The specification to write to
         :param int region: region ID to write to
-        :param MachineVertex machine_vertex: The machine vertex being targeted
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+            The machine vertex being targeted
         :param list(float) weight_scales: Scale factors to apply to the weights
         """
 

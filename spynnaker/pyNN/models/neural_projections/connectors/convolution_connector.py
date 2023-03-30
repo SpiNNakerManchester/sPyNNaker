@@ -353,7 +353,8 @@ class ConvolutionConnector(AbstractConnector):
         """
         Write pre coords as post coords.
 
-        :param Iterable pre_coords: An iterable of (x, y) coordinates
+        :param ~collections.abc.Iterable pre_coords:
+            An iterable of (x, y) coordinates
         :rtype: numpy.ndarray
         """
         coords = numpy.array(pre_coords)

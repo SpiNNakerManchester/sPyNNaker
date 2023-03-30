@@ -592,7 +592,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param int region_id: Region data came from
         :param float simulation_time_step_ms:
         :param int base_key:
-        :param Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param tuple(int) atoms_shape:
         :param int n_colour_bits
         :return: all recording indexes spikes or not
@@ -894,7 +894,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
-        :param Slice vertex_slice: slice of this region
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            slice of this region
         :param list(int) rewire_values:
         :param list(int) rewire_postids:
         :param list(int) rewire_preids:

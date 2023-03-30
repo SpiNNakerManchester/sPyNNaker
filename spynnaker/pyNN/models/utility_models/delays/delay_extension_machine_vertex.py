@@ -93,7 +93,8 @@ class DelayExtensionMachineVertex(
         :param ~pacman.model.resources.AbstractSDRAM sdram:
             The sdram required by the vertex
         :param str label: The name of the vertex
-        :param Slice vertex_slice: The slice of the vertex
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the vertex
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             The application vertex that caused this machine vertex to be
             created. If None, there is no such application vertex.

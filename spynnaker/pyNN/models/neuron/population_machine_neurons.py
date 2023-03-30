@@ -47,7 +47,7 @@ class NeuronProvenance(ctypes.LittleEndianStructure):
     N_ITEMS = len(_fields_)
 
 
-# Identifiers for neuron regions
+#: Identifiers for neuron regions
 NeuronRegions = namedtuple(
     "NeuronRegions",
     ["core_params", "neuron_params", "current_source_params",
@@ -373,7 +373,8 @@ class PopulationMachineNeurons(
         Read the parameters and state of the neurons from the machine
         at the current time.
 
-        :param Placement placement: Where to read the data from
+        :param ~pacman.model.placements.Placement placement:
+            Where to read the data from
         """
         self._neuron_data.read_data(placement, self._neuron_regions)
 
@@ -382,7 +383,8 @@ class PopulationMachineNeurons(
         Read the parameters and state of the neurons from the machine
         as they were at the last time 0.
 
-        :param Placement placement: Where to read the data from
+        :param ~pacman.model.placements.Placement placement:
+            Where to read the data from
         """
         self._neuron_data.read_initial_data(placement, self._neuron_regions)
 

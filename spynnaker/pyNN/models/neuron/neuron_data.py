@@ -164,8 +164,10 @@ class NeuronData(object):
         """
         Write the generated data.
 
-        :param DataSpecificationGenerator spec: The spec to write to
-        :param Slice vertex_slice: The vertex_slice to generate for
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The spec to write to
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The vertex slice to generate for
         :param NeuronRegions neuron_regions: The regions to write to
         :param bool gen_on_machine: Whether to allow generation on machine
         """
@@ -220,8 +222,9 @@ class NeuronData(object):
         """
         Get neuron parameter data for a slice.
 
-        :param Slice vertex_slice: The slice to get the data for
-        :rtype: numpy.ndarray
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice to get the data for
+        :rtype: ~numpy.ndarray
         """
         structs = self.__app_vertex.neuron_impl.structs
         params = self.__app_vertex.parameters
@@ -298,7 +301,8 @@ class NeuronData(object):
         Read the current state of the data from the machine into the
         application vertex.
 
-        :param Placement placement: The placement of the vertex to read
+        :param ~pacman.model.placements.Placement placement:
+            The placement of the vertex to read
         :param NeuronRegions neuron_regions: The regions to read from
         """
         params = self.__app_vertex.parameters
@@ -312,7 +316,8 @@ class NeuronData(object):
         Read the initial state of the data from the machine into the
         application vertex.
 
-        :param Placement placement: The placement of the vertex to read
+        :param ~pacman.model.placements.Placement placement:
+            The placement of the vertex to read
         :param NeuronRegions neuron_regions: The regions to read from
         """
         params = self.__app_vertex.parameters
@@ -325,7 +330,8 @@ class NeuronData(object):
         """
         Perform the reading of data.
 
-        :param Placement placement: Where the vertex is on the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where the vertex is on the machine
         :param int region: The region to read from
         :param MergedDict results: Where to write the results to
         """

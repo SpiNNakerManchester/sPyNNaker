@@ -335,7 +335,9 @@ class NeuronRecorder(object):
         """
         Get the indices being recorded for a given variable.
 
-        :param ApplicationVertex application_vertex: The vertex being recorded
+        :param application_vertex: The vertex being recorded
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
         :param str variable: The name of the variable to get the indices of
         :rtype: list(int)
         """

@@ -99,7 +99,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         """
         Creates a delay extension machine vertex and adds to the tracker.
 
-        :param MachineVertex source_vertex: The source of the delay
+        :param ~pacman.model.graphs.machine.MachineVertex source_vertex:
+            The source of the delay
         :return: machine vertex
         :rtype: DelayExtensionMachineVertex
         """
@@ -116,7 +117,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         """
         Gets the amount of SDRAM used by the delay extension.
 
-        :rtype: ConstantSDRAM
+        :rtype: ~pacman.model.resources.ConstantSDRAM
         """
         return ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
@@ -137,7 +138,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         """
         Get a delay extension machine vertex for a given vertex slice.
 
-        :param Slice vertex_slice: The slice to get the data for
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice to get the data for
         :rtype: DelayExtensionMachineVertex
         """
         return self._machine_vertex_by_slice[vertex_slice]

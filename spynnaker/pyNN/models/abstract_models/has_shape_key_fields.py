@@ -29,6 +29,7 @@ class HasShapeKeyFields(object, metaclass=AbstractBase):
         given source vertex slice, as a list of start, size, mask, shift
         values in the order of the fields.
 
-        :param Slice vertex_slice: The slice of the source vertex
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the source vertex
         :rtype: list(tuple(int, int, int, int))
         """

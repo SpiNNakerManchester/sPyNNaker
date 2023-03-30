@@ -127,9 +127,9 @@ class _DelaySupportAdder(object):
         Creates the delay extension app vertex and the edge from the src
         vertex to this delay extension. Adds to the graph, as safe to do so.
 
-        :param OutgoingEdgePartition app_outgoing_edge_partition:
+        :param ApplicationEdgePartition app_outgoing_edge_partition:
             the original outgoing edge partition.
-        :param AppEdge app_edge: the undelayed app edge.
+        :param ApplicationEdge app_edge: the undelayed app edge.
         :param int delay_per_stage: delay for each delay stage
         :param int n_delay_stages: the number of delay stages needed
         :return: the DelayExtensionAppVertex
