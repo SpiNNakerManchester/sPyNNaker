@@ -518,7 +518,6 @@ class SpikeSourcePoissonVertex(
 
         :param vertex_slice: the vertex slice to update seed of
         :param seed: the seed
-        :rtype: None
         """
         self.__kiss_seed[vertex_slice] = seed
 

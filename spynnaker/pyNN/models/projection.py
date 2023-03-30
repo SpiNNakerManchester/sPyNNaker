@@ -410,7 +410,7 @@ class Projection(object):
         :param post_synaptic_vertex: The destination vertex of the multapse
         :type post_synaptic_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
-        :return: None or the edge going to these vertices.
+        :return: `None` or the edge going to these vertices.
         :rtype: ~.ApplicationEdge
         """
         # Find edges ending at the postsynaptic vertex

@@ -92,7 +92,7 @@ class ConvolutionConnector(AbstractConnector):
             value is provided, the same padding will be used for rows and
             columns.  If two values are provided it will be assumed to be
             (padding_rows, padding_columns).  If True, automatic padding will
-            be used based on the kernel shape.  If False or None, no padding
+            be used based on the kernel shape.  If False or `None`, no padding
             will be used.
         :type padding: bool or int or tuple(int, int) or None
         :param pool_shape:

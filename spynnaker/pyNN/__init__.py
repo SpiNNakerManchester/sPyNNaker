@@ -292,10 +292,9 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     Needs to be called before any other function
 
     :param timestep:
-        the time step of the simulations in micro seconds
-        if None the cfg value is used
-    :type timestep:
-        float or None
+        the time step of the simulations in microseconds;
+        if `None`, the cfg value is used
+    :type timestep: float or None
     :param min_delay: the min delay of the simulation
     :type min_delay: float or str
     :param max_delay: Ignored and logs a warning if provided
@@ -309,7 +308,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :type time_scale_factor: int or None
     :param n_chips_required:
         Deprecated! Use n_boards_required instead.
-        Must be None if n_boards_required specified.
+        Must be `None` if n_boards_required specified.
     :type n_chips_required: int or None
     :param n_boards_required:
         if you need to be allocated a machine (for spalloc) before building
@@ -317,7 +316,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         boards you need so that the spalloc system can allocate you a machine
         big enough for your needs.
     :type n_boards_required: int or None
-    :param extra_params: other keyword argumets used to configure PyNN
+    :param extra_params: other keyword arguments used to configure PyNN
     :return: MPI rank (always 0 on SpiNNaker)
     :rtype: int
     :raises ConfigurationException: if both ``n_chips_required`` and
@@ -469,7 +468,6 @@ def record_v(source, filename):
     :type source: ~spynnaker.pyNN.models.populations.Population or
         ~spynnaker.pyNN.models.populations.PopulationView
     :param str filename: the neo file to write to
-    :rtype: None
     """
     logger.warning(
         "Using record_v is deprecated.  Use record('v') function instead")
@@ -514,12 +512,12 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     placed on a single core.
     This can be overridden by the individual Population.
 
-    The new value can be None, meaning that the maximum is the same as
+    The new value can be `None`, meaning that the maximum is the same as
     the number of atoms, an int, meaning all Populations of this model
     must have one dimension, or a tuple of n integers, meaning all
     Populations of this model must have n dimensions.
     If not all Populations of this model have the same number of
-    dimensions, it is recommended to set this to None here and then
+    dimensions, it is recommended to set this to `None` here and then
     set the maximum on each Population.
 
     :param type(AbstractPopulationVertex) neuron_type: neuron type
@@ -708,7 +706,6 @@ def reset(annotations=None):
 
     :param annotations: the annotations to the data objects
     :type annotations: dict(str, ...)
-    :rtype: None
     """
     if annotations is None:
         annotations = {}

@@ -36,7 +36,7 @@ class PushBotEthernetMotorDevice(
         :type protocol: MunichIoEthernetProtocol
         :param timesteps_between_send:
             The number of timesteps between sending commands to the device,
-            or None to use the default
+            or `None` to use the default
         """
         if not isinstance(motor, PushBotMotor):
             raise ConfigurationException(

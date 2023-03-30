@@ -75,7 +75,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param min_delay:
         :param n_chips_required:
             Deprecated! Use n_boards_required instead.
-            Must be None if n_boards_required specified.
+            Must be `None` if n_boards_required specified.
         :type n_chips_required: int or None
         :param n_boards_required:
             if you need to be allocated a machine (for spalloc) before
@@ -84,8 +84,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             allocate you a machine big enough for your needs.
         :type n_boards_required: int or None
         :param timestep:
-            the time step of the simulations in micro seconds
-            if None the cfg value is used
+            the time step of the simulations in microseconds;
+            if `None` the cfg value is used
         :type timestep: float or None
         """
         # pylint: disable=too-many-arguments, too-many-locals

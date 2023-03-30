@@ -127,7 +127,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :param allow_delay_extension:
             Whether delay extensions are allowed in the network. If max_delay
             is provided, this will default to True.  If max_delay is not
-            provided, and this is given as None, it will be computed based on
+            provided, and this is given as `None`, it will be computed based on
             whether delay extensions should be needed.
         :type allow_delay_extension: bool or None
         """

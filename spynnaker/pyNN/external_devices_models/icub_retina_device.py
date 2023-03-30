@@ -44,7 +44,7 @@ class ICUBRetinaDevice(
             The ID of the SpiNNaker link that the device is connected to
         :param board_address:
             The board to which the device is connected,
-            or None for the first board
+            or `None` for the first board
         :type board_address: str or None
         """
         # Call the super

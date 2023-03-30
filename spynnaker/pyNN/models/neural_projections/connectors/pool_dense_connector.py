@@ -76,7 +76,7 @@ class PoolDenseConnector(AbstractConnector):
             Jumps between pooling regions. If a single value is provided, the
             same stride will be used for all dimensions, otherwise must be
             the same number of values as there are dimensions in the source.
-            If None, and pool_shape is provided, pool_stride will be set to
+            If `None`, and pool_shape is provided, pool_stride will be set to
             pool_shape.
         :type pool_stride: int or tuple(int) or None
         :param str positive_receptor_type:

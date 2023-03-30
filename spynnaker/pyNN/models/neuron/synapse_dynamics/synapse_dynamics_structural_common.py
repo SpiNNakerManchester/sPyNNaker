@@ -419,7 +419,7 @@ class SynapseDynamicsStructuralCommon(
 
         It should be different between application vertices
         but the same for the same app_vertex.
-        It should be different every time called with None.
+        It should be different every time called with `None`.
 
         :param app_vertex:
         :type app_vertex: ApplicationVertex or None

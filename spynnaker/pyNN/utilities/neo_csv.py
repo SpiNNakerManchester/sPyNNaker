@@ -174,7 +174,7 @@ class NeoCsv(object):
 
             .. note::
                 This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                Typical the Population label corrected for `None` or
                 duplicate values
 
         :param list(int) view_indexes:

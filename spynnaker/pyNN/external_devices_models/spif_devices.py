@@ -99,7 +99,7 @@ class SPIFRegister(IntEnum):
         Make a command to send to a SPIF device to set a register value.
 
         :param payload:
-            The payload to use in the command, or None for no payload
+            The payload to use in the command, or `None` for no payload
         :type payload: int or None
         :param int index:
             The index of the register to send to when there are multiple
@@ -311,7 +311,7 @@ class SpiNNFPGARegister(IntEnum):
         Make a command to send to the FPGA to set a register value.
 
         :param payload:
-            The payload to use in the command, or None for no payload
+            The payload to use in the command, or `None` for no payload
         :type payload: int or None
         :rtype: MultiCastCommand
         """

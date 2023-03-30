@@ -36,15 +36,15 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         """
         Set the default maximum number of atoms per dimension per core for
         this model.  This can be overridden by the individual Population.
-        The new value can be None, meaning that the maximum is the same as
+        The new value can be `None`, meaning that the maximum is the same as
         the number of atoms, an int, meaning all Populations of this model
         must have one dimension, or a tuple of n integers, meaning all
         Populations of this model must have n dimensions.
         If not all Populations of this model have the same number of
-        dimensions, it is recommended to set this to None here and then
+        dimensions, it is recommended to set this to `None `here and then
         set the maximum on each Population.
 
-        :param n_atoms: The new maximum, or None for the largest possible
+        :param n_atoms: The new maximum, or `None` for the largest possible
         :type n_atoms: int or tuple or None
         """
         abs_max = cls.absolute_max_atoms_per_core

@@ -139,7 +139,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         Receive data from the connection
 
-        :param timeout: The timeout, or None to wait forever
+        :param timeout: The timeout, or `None` to wait forever
         :type timeout: float or None
         :return: The data received
         :rtype: bytes

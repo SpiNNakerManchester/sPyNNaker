@@ -114,13 +114,14 @@ class Struct(object):
         :param values: The values to fill in the data with
         :type values: dict(str->one of int, float or AbstractList)
         :param vertex_slice:
-            The vertex slice to get the data for, or None if the struct is
+            The vertex slice to get the data for, or `None` if the struct is
             global.
         :type vertex_slice: Slice or None
         :param atoms_shape:
             The shape of the atoms in the whole application vertex.
-            When vertex_slice is not None, atoms_shape must not be not None.
-            When vertex_slice is None, atoms_shape is ignored.
+            When vertex_slice is not `None`, atoms_shape must not be not
+            `None`.
+            When vertex_slice is `None`, atoms_shape is ignored.
         :rtype: ~numpy.ndarray(dtype="uint32")
         """
         n_items = 1
@@ -203,14 +204,15 @@ class Struct(object):
         :param ~dict-like values:
             The values to fill in the data with
         :param vertex_slice:
-            The vertex slice or None for a struct with repeat_type global, or
+            The vertex slice or `None` for a struct with repeat_type global, or
             where a single value repeats for every neuron.  If this is not the
-            case and vertex_slice is None, an error will be raised!
+            case and vertex_slice is `None`, an error will be raised!
         :type vertex_slice: Slice or None
         :param atoms_shape:
             The shape of the atoms in the whole application vertex.
-            When vertex_slice is not None, atoms_shape must not be not None.
-            When vertex_slice is None, atoms_shape is ignored.
+            When vertex_slice is not `None`, atoms_shape must not be not
+            `None`.
+            When vertex_slice is `None`, atoms_shape is ignored.
         :type atoms_shape: tuple(int) or None
         :rtype: ~numpy.ndarray(dtype="uint32")
         """
@@ -356,7 +358,7 @@ class Struct(object):
         :param int offset:
             The first index into values to write to.
         :param array_size:
-            The number of struct copies to read, or None if this is a
+            The number of struct copies to read, or `None` if this is a
             non-repeating struct.
         :type array_size: int or None
         """

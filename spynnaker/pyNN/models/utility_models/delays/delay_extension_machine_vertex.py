@@ -97,7 +97,7 @@ class DelayExtensionMachineVertex(
             The slice of the vertex
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             The application vertex that caused this machine vertex to be
-            created. If None, there is no such application vertex.
+            created. If `None`, there is no such application vertex.
         """
         super().__init__(
             label, app_vertex=app_vertex, vertex_slice=vertex_slice)

@@ -64,7 +64,6 @@ def spynakker_vertex_selector(app_vertex):
 
     :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         app vertex to give a splitter object to
-    :rtype: None
     """
     if app_vertex.splitter is None:
         if isinstance(app_vertex, AbstractPopulationVertex):

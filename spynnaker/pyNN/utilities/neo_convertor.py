@@ -72,7 +72,7 @@ def convert_data_list(data, name, runs=None):
     :param str name: Name of the data to be extracted.
         Same values as used in getData()
     :param runs: List of Zero based index of the run to extract data for.
-        Or None to extract all runs
+        Or `None` to extract all runs
     :type runs: list(int) or None
     :rtype: list(~numpy.ndarray)
     """
@@ -91,7 +91,7 @@ def convert_v_list(data, runs=None):
 
     :param ~neo.core.Block data: The data to convert; it must have V data in it
     :param runs: List of Zero based index of the run to extract data for.
-        Or None to extract all runs
+        Or `None` to extract all runs
     :type runs: list(int) or None
     :rtype: list(~numpy.ndarray)
     """
@@ -106,7 +106,7 @@ def convert_gsyn_exc_list(data, runs=None):
     :param ~neo.core.Block data:
         The data to convert; it must have Gsyn_exc data in it
     :param runs: List of Zero based index of the run to extract data for.
-        Or None to extract all runs
+        Or `None` to extract all runs
     :type runs: list(int) or None
     :rtype: list(~numpy.ndarray)
     """
@@ -121,7 +121,7 @@ def convert_gsyn_inh_list(data, runs=None):
     :param ~neo.core.Block data:
         The data to convert; it must have Gsyn_inh data in it
     :param runs: List of Zero based index of the run to extract data for.
-        Or None to extract all runs
+        Or `None` to extract all runs
     :type runs: list(int) or None
     :rtype: list(~numpy.ndarray)
     """

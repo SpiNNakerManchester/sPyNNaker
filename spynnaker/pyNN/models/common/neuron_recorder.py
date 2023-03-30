@@ -1104,12 +1104,12 @@ class NeuronRecorder(object):
         Get the recorded data as a generatable data set.
 
         :param vertex_slice:
-            The slice to generate the data for, or None to generate for
+            The slice to generate the data for, or `None` to generate for
             all neurons (assuming all the same, otherwise error)
         :type vertex_slice: Slice or None
         :param atoms_shape:
-            The shape of the atoms in the vertex; if vertex_slice is not None,
-            atoms_shape must be not None
+            The shape of the atoms in the vertex;
+            if vertex_slice is not `None`, atoms_shape must be not `None`
         :rtype: numpy.ndarray
         """
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)

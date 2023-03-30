@@ -61,7 +61,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             Whether to output extra information about the connectivity to a
             CSV file
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or `None` to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.

@@ -1048,7 +1048,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
             .. note::
                 This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                Typical the Population label corrected for `None` or
                 duplicate values
 
         :param str variable:
@@ -1099,7 +1099,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
             .. note::
                 This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                Typical the Population label corrected for `None` or
                 duplicate values
 
         :param str variable:
@@ -1144,12 +1144,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
             .. note::
                 This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                Typical the Population label corrected for `None` or
                 duplicate values
 
-        :param variables: One or more variable names or None for all available
+        :param variables:
+            One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or None for all
+        :param view_indexes: List of neurons ids to include or `None` for all
         :type view_indexes: None or list(int)
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
@@ -1174,12 +1175,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
             .. note::
                 This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                Typical the Population label corrected for `None` or
                 duplicate values
 
-        :param variables: One or more variable names or None for all available
+        :param variables:
+            One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or None for all
+        :param view_indexes: List of neurons ids to include or `None` for all
         :type view_indexes: None or list(int)
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
@@ -1202,12 +1204,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
             .. note::
                 This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                Typical the Population label corrected for `None` or
                 duplicate values
 
-        :param variables: One or more variable names or None for all available
+        :param variables:
+            One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or None for all
+        :param view_indexes: List of neurons ids to include or `None` for all
         :type view_indexes: None or list(int)
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
@@ -1233,9 +1236,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 Typical the Population label corrected for `None` or
                 duplicate values
 
-        :param variables: One or more variable names or None for all available
+        :param variables:
+            One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or None for all
+        :param view_indexes: List of neurons ids to include or `None` for all
         :type view_indexes: None or list(int)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -1271,7 +1275,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
             .. note::
                 This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                Typical the Population label corrected for `None` or
                 duplicate values
 
         :param annotations: annotations to put on the neo block
@@ -1300,12 +1304,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
             .. note::
                 This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                Typical the Population label corrected for `None` or
                 duplicate values
 
-        :param variables: One or more variable names or None for all available
+        :param variables:
+            One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or None for all
+        :param view_indexes: List of neurons ids to include or `None` for all
         :type view_indexes: None or list(int)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -1334,12 +1339,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
             .. note::
                 This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                Typical the Population label corrected for `None` or
                 duplicate values
 
-        :param variables: One or more variable names or None for all available
+        :param variables:
+            One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or None for all
+        :param view_indexes: List of neurons ids to include or `None` for all
         :type view_indexes: None or list(int)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -1363,7 +1369,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
             .. note::
                 This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                Typical the Population label corrected for `None` or
                 duplicate values
 
         :param list(str) variables: names of variable to get data for

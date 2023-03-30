@@ -81,8 +81,8 @@ class SPIFRetinaDevice(
         :param int input_y_shift:
             The shift to get the y coordinate from the input keys sent to SPIF
         :param board_address:
-            The IP address of the board to which the FPGA is connected, or None
-            to use the default board or chip_coords.
+            The IP address of the board to which the FPGA is connected,
+            or `None` to use the default board or chip_coords.
 
             .. note::
                 chip_coords will be used first if both are specified, with

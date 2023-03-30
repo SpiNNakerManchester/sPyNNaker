@@ -62,7 +62,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             pre-synaptic neuron has been connected to a post-neuron, it
             can't be connected again.
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or `None` to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.

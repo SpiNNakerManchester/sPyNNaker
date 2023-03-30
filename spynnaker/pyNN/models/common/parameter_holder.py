@@ -41,8 +41,8 @@ class ParameterHolder(object):
         :type data_items_to_return: list(str) or tuple(str)
         :param get_call: A function to call to read a value
         :type get_call: function(str, selector=None)->list
-        :param selector: a description of the subrange to accept, or None for
-            all. See:
+        :param selector: a description of the subrange to accept,
+            or `None` for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
         """

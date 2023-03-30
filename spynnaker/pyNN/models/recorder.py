@@ -121,7 +121,7 @@ class Recorder(object):
         :param int sampling_interval: the interval to record them
         :param to_file: If set, a file to write to (by handle or name)
         :type to_file: neo.io.baseio.BaseIO or str or None
-        :param indexes: List of indexes to record or None for all
+        :param indexes: List of indexes to record or `None` for all
         :type indexes: list(int) or None
         :raises SimulatorRunningException: If sim.run is currently running
         :raises SimulatorNotSetupException: If called before sim.setup
@@ -146,7 +146,7 @@ class Recorder(object):
         :param int sampling_interval: the interval to record them
         :param to_file: If set, a file to write to (by handle or name)
         :type to_file: neo.io.baseio.BaseIO or str or None
-        :param indexes: List of indexes to record or None for all
+        :param indexes: List of indexes to record or `None` for all
         :type indexes: list(int) or None
         :raises SimulatorRunningException: If sim.run is currently running
         :raises SimulatorNotSetupException: If called before sim.setup
