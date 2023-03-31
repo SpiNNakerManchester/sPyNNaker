@@ -270,6 +270,19 @@ def set_distiller_key(index, key):
     return SPIFRegister.DIST_KEY_BASE.cmd(key, index)
 
 
+def set_distiller_mask(index, mask):
+    """ Get a command to set the mask of the distiller of the output via SPIF.
+        This tells SPIF which bits to use from the key in the 32-bit output for
+        each spike received on the given distiller channel, defined by the
+        peripheral routes in the SpiNNaker FPGA.
+
+    :param int index: The index of the channel to set (0-5)
+    :param int mask: The mask to set
+    :rtype: MulticastCommand
+    """
+    return SPIFRegister.DIST_MASK_BASE.cmd(mask, index)
+
+
 def set_distiller_mask_delayed(index, mask_func):
     """ Get a command to set the mask of the distiller of the output via SPIF.
         This tells SPIF which bits to use from the key in the 32-bit output for
@@ -277,7 +290,7 @@ def set_distiller_mask_delayed(index, mask_func):
         peripheral routes in the SpiNNaker FPGA.
 
     :param int index: The index of the channel to set (0-5)
-    :param func()->int mask: The function to call to set the mask
+    :param func()->int mask_func: The function to call to set the mask
     :rtype: MulticastCommand
     """
     return SPIFRegister.DIST_MASK_BASE.delayed_command(mask_func, index)

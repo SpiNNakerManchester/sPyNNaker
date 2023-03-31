@@ -24,7 +24,7 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager)
 from .spif_devices import (
     SPIF_FPGA_ID, SPIF_OUTPUT_FPGA_LINK, SpiNNFPGARegister, set_distiller_key,
-    set_distiller_mask_delayed, set_distiller_shift)
+    set_distiller_mask, set_distiller_mask_delayed, set_distiller_shift)
 
 _MAX_INCOMING = 6
 
@@ -48,7 +48,7 @@ class SPIFOutputDevice(
     """
 
     __slots__ = ["__incoming_partitions", "__create_database",
-                 "__output_key_shift"]
+                 "__output_key_shift", "__output_key_and_mask"]
 
     def __init__(self, board_address=None, chip_coords=None, label=None,
                  create_database=True, database_notify_host=None,
@@ -90,6 +90,7 @@ class SPIFOutputDevice(
                 database_ack_port_num)
         self.__create_database = create_database
         self.__output_key_shift = output_key_shift
+        self.__output_key_and_mask = dict()
 
     def __is_power_of_2(self, v):
         """ Determine if a value is a power of 2
@@ -98,6 +99,22 @@ class SPIFOutputDevice(
         :rtype: bool
         """
         return (v & (v - 1) == 0) and (v != 0)
+
+    def set_output_key_and_mask(self, population, key, mask):
+        """ Set the output key to be written into packets when received by
+            SPIF, and the mask to apply before adding the key.  The key should
+            be the exact value that will be "or'ed" with the packet after
+            masking.  The mask should be the mask to apply to the incoming
+            SpiNNaker key to extract the neuron id bits.  The key and mask
+            will not be checked; please make sure you are using values that
+            make sense!
+
+        :param Population population: The PyNN source Population
+        :param int key: The key to "or" with the incoming key *after* masking
+        :param int mask: The mask to "and" with the incoming SpiNNaker key
+        """
+        # pylint: disable=protected-access
+        self.__output_key_and_mask[population._vertex] = (key, mask)
 
     @overrides(ApplicationFPGAVertex.add_incoming_edge)
     def add_incoming_edge(self, edge, partition):
@@ -149,14 +166,19 @@ class SPIFOutputDevice(
     def start_resume_commands(self):
         # The commands here are delayed, as at the time of providing them,
         # we don't know the key or mask of the incoming link...
-        for i in range(len(self.__incoming_partitions)):
+        for i, part in enumerate(self.__incoming_partitions):
             yield SpiNNFPGARegister.XP_KEY_0.delayed_command(
-                self._get_set_xp_key_payload, index=i)
+                partial(self._get_set_xp_key_payload, index=i), index=i)
             yield SpiNNFPGARegister.XP_MASK_0.delayed_command(
-                self._get_set_xp_mask_payload, index=i)
-            yield set_distiller_key(i, i << self.__output_key_shift)
-            yield set_distiller_mask_delayed(
-                i, partial(self._get_set_dist_mask_payload, index=i))
+                partial(self._get_set_xp_mask_payload, index=i), index=i)
+            if part.pre_vertex in self.__output_key_and_mask:
+                key, mask = self.__output_key_and_mask[part.pre_vertex]
+                yield set_distiller_key(i, key)
+                yield set_distiller_mask(i, mask)
+            else:
+                yield set_distiller_key(i, i << self.__output_key_shift)
+                yield set_distiller_mask_delayed(
+                    i, partial(self._get_set_dist_mask_payload, index=i))
             yield set_distiller_shift(
                 i, self.__incoming_partitions[i].pre_vertex.n_colour_bits)
 
