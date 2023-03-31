@@ -51,10 +51,11 @@ class PushBotSpiNNakerLinkLaserDevice(
         :param board_address:
             The IP address of the board that the device is connected to
         :type board_address: str or None
-        :param start_active_time: The "active time" value to send at the start
-        :param start_total_period:
+        :param int start_active_time:
+            The "active time" value to send at the start
+        :param int start_total_period:
             The "total period" value to send at the start
-        :param start_frequency: The "frequency" to send at the start
+        :param int start_frequency: The "frequency" to send at the start
         """
         # pylint: disable=too-many-arguments
         super().__init__(

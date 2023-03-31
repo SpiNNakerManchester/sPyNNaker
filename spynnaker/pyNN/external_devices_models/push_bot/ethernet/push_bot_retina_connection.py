@@ -115,7 +115,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         Receive retina packets from the PushBot and converts them into
         neuron spikes within the spike injector system.
 
-        :param data: Data to be processed
+        :param bytearray data: Data to be processed
         """
         with self.__lock:
             if not self.__ready:

@@ -52,46 +52,46 @@ class SPIFRegister(IntEnum):
     """
     The register offsets on a SPIF device.
     """
-    # The key to send messages back when requested
+    #: The key to send messages back when requested
     REPLY_KEY = 2
 
-    # The input key register base (8 inputs per pipe)
+    #: The input key register base (8 inputs per pipe)
     IR_KEY_BASE = 16
 
-    # The input mask register base (8 inputs per pipe)
+    #: The input mask register base (8 inputs per pipe)
     IR_MASK_BASE = 32
 
-    # The input route register base (8 inputs per pipe)
+    #: The input route register base (8 inputs per pipe)
     IR_ROUTE_BASE = 48
 
-    # The output peripheral packet count register
+    #: The output peripheral packet count register
     OUT_PERIPH_PKT_CNT = 64
 
-    # The configuration packet count register
+    #: The configuration packet count register
     CONFIG_PKT_CNT = 65
 
-    # The dropped packet count register
+    #: The dropped packet count register
     DROPPED_PKT_CNT = 66
 
-    # The input peripheral packet count register
+    #: The input peripheral packet count register
     IN_PERIPH_PKT_CNT = 67
 
-    # The output mapper key base register (2 pipes)
+    #: The output mapper key base register (2 pipes)
     MP_KEY_BASE = 80
 
-    # The output mapper field mask base register (4 fields per pipe)
+    #: The output mapper field mask base register (4 fields per pipe)
     MP_FLD_MASK_BASE = 96
 
-    # The output mapper field shift base register (4 fields per pipe)
+    #: The output mapper field shift base register (4 fields per pipe)
     MP_FLD_SHIFT_BASE = 112
 
-    # The output mapper field limit base register (4 fields per pipe)
+    #: The output mapper field limit base register (4 fields per pipe)
     MP_FLD_LIMIT_BASE = 128
 
-    # The filter value base register (8 filters per pipe)
+    #: The filter value base register (8 filters per pipe)
     FL_VALUE_BASE = 144
 
-    # The filter mask base register (8 filters per pipe)
+    #: The filter mask base register (8 filters per pipe)
     FL_MASK_BASE = 176
 
     def cmd(self, payload=None, index=0):
@@ -279,31 +279,31 @@ class SpiNNFPGARegister(IntEnum):
     The register offsets on the SpiNNaker FPGAs for devices.
     """
 
-    # The base key which identifies packets to send out to the peripheral
+    #: The base key which identifies packets to send out to the peripheral
     P_KEY = 2
 
-    # The mask which identifies packets to send out to the peripheral
+    #: The mask which identifies packets to send out to the peripheral
     P_MASK = 3
 
-    # The base key which identifies packets to write to the FPGA registers
+    #: The base key which identifies packets to write to the FPGA registers
     LC_KEY = 12
 
-    # The mask which identifies packets to write to the FPGA registers
+    #: The mask which identifies packets to write to the FPGA registers
     LC_MASK = 13
 
-    # The base key which identifies packets to write to the peripheral
-    # registers
+    #: The base key which identifies packets to write to the peripheral
+    #: registers
     RC_KEY = 14
 
-    # The mask which identifies packets to write to the peripheral registers
+    #: The mask which identifies packets to write to the peripheral registers
     RC_MASK = 15
 
-    # The register to write to to stop the sending of data from the peripheral
-    # to SpiNNaker
+    #: The register to write to to stop the sending of data from the peripheral
+    #: to SpiNNaker
     STOP = 16
 
-    # The register to write to to start the sending of data from the peripheral
-    # to SpiNNaker
+    #: The register to write to to start the sending of data from the
+    #: peripheral to SpiNNaker
     START = 17
 
     def cmd(self, payload=None):

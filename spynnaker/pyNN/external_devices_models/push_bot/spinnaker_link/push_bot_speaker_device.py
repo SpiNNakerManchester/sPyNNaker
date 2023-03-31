@@ -55,10 +55,10 @@ class PushBotSpiNNakerLinkSpeakerDevice(
         :param board_address:
             The IP address of the board that the device is connected to
         :type board_address: str or None
-        :param start_active_time: The "active time" to set at the start
-        :param start_total_period: The "total period" to set at the start
-        :param start_frequency: The "frequency" to set at the start
-        :param start_melody: The "melody" to set at the start
+        :param int start_active_time: The "active time" to set at the start
+        :param int start_total_period: The "total period" to set at the start
+        :param int start_frequency: The "frequency" to set at the start
+        :param int start_melody: The "melody" to set at the start
         """
         # pylint: disable=too-many-arguments
         super().__init__(

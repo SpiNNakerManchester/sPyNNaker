@@ -20,11 +20,17 @@ class SendType(Enum):
     """
     The data type to be sent in the payload of the multicast packet.
     """
+    #: Signed integer
     SEND_TYPE_INT = 0
+    #: Unsigned integer
     SEND_TYPE_UINT = 1
+    #: Signed accum (s15.16)
     SEND_TYPE_ACCUM = 2
+    #: Unsigned accum (u16.16)
     SEND_TYPE_UACCUM = 3
+    #: Signed fract (s0.31)
     SEND_TYPE_FRACT = 4
+    #: Unsigned fract (u0.32)
     SEND_TYPE_UFRACT = 5
 
 

@@ -59,7 +59,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         :param str remote_host: The IP address of the PushBot
         :param int remote_port: The port number of the PushBot (default 56000)
-        :raise SpinnmanIOException:
+        :raise ~spinnman.exceptions.SpinnmanIOException:
             If there is an error setting up the communication channel
         """
         # Create a TCP Socket
@@ -145,7 +145,8 @@ class PushBotWIFIConnection(Connection, Listenable):
         :rtype: bytes
         :raise SpinnmanTimeoutException:
             If a timeout occurs before any data is received
-        :raise SpinnmanIOException: If an error occurs receiving the data
+        :raise ~spinnman.exceptions.SpinnmanIOException:
+            If an error occurs receiving the data
         """
         return receive_message(self.__socket, timeout, self.RECV_SIZE)
 
@@ -154,7 +155,8 @@ class PushBotWIFIConnection(Connection, Listenable):
         Send data down this connection
 
         :param bytearray data: The data to be sent
-        :raise SpinnmanIOException: If there is an error sending the data
+        :raise ~spinnman.exceptions.SpinnmanIOException:
+            If there is an error sending the data
         """
         send_message(self.__socket, data)
 

@@ -34,7 +34,7 @@ class PushBotEthernetDevice(
         """
         :param MunichIoEthernetProtocol protocol:
             The protocol instance to get commands from
-        :param AbstractPushBotOutputDevicedevice:
+        :param AbstractPushBotOutputDevice device:
             The Enum instance of the device to control
         :param bool uses_payload:
             True if the device uses a payload for control

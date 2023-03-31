@@ -24,5 +24,5 @@ class SupportsStructure(object, metaclass=AbstractBase):
         """
         Set the structure of the object.
 
-        :param pynn.space.BaseStructure structure: The structure to set
+        :param ~pynn.space.BaseStructure structure: The structure to set
         """

@@ -62,8 +62,9 @@ class PushBotSpiNNakerLinkRetinaDevice(
         :param resolution:
         :type resolution:
             ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
-        :param board_address:
-        :param label:
+        :param str board_address:
+        :param str label:
+        :param int n_machine_vertices:
         """
         super().__init__(protocol, resolution)
         ApplicationSpiNNakerLinkVertex.__init__(

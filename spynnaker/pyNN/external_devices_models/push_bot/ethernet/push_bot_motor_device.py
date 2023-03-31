@@ -34,7 +34,7 @@ class PushBotEthernetMotorDevice(
             ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor
         :param protocol: The protocol used to control the device
         :type protocol: MunichIoEthernetProtocol
-        :param timesteps_between_send:
+        :param int timesteps_between_send:
             The number of timesteps between sending commands to the device,
             or `None` to use the default
         """

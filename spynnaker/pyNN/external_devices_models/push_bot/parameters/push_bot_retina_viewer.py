@@ -15,7 +15,10 @@ from threading import Thread, RLock
 from time import sleep
 from matplotlib import pyplot
 import numpy
+import logging
+from spinn_utilities.log import FormatAdapter
 
+_logger = FormatAdapter(logging.getLogger(__name__))
 MAX_VALUE = 33.0
 ADD_VALUE = 1.0
 DECAY_FACTOR = 0.5
@@ -26,6 +29,11 @@ class PushBotRetinaViewer():
     """
     Viewer of retina from the PushBot.
     """
+    __slots__ = (
+        "__image_data", "__image_lock",
+        "__without_polarity_mask", "__height",
+        "__fig", "__plot",
+        "__running", "__sim", "__conn")
 
     def __init__(self, retina_resolution, label, sim):
         pyplot.ion()
@@ -69,19 +77,28 @@ class PushBotRetinaViewer():
         self.__image_lock.release()
 
     def __run_sim_forever(self):
-        self.__sim.external_devices.run_forever()
-        self.__running = False
-        self.__sim.end()
+        try:
+            self.__sim.external_devices.run_forever()
+            self.__running = False
+            self.__sim.end()
+        except KeyboardInterrupt:
+            pass
+        except Exception:  # pylint: disable=broad-except
+            _logger.exception("unexpected exception in simulation thread")
 
     def __run_sim(self, run_time):
-        self.__sim.run(run_time)
-        self.__running = False
-        self.__sim.end()
+        try:
+            self.__sim.run(run_time)
+            self.__running = False
+            self.__sim.end()
+        except KeyboardInterrupt:
+            pass
+        except Exception:  # pylint: disable=broad-except
+            _logger.exception("unexpected exception in simulation thread")
 
     def __run(self, run_thread):
-
-        while self.__running and self.__fig.get_visible():
-            try:
+        try:
+            while self.__running and self.__fig.get_visible():
                 self.__image_lock.acquire()
                 self.__plot.set_array(self.__image_data)
                 self.__fig.canvas.draw()
@@ -89,9 +106,10 @@ class PushBotRetinaViewer():
                 self.__image_data *= DECAY_FACTOR
                 self.__image_lock.release()
                 sleep(0.1)
-            # pylint: disable=broad-except
-            except Exception:
-                break
+        except KeyboardInterrupt:
+            pass
+        except Exception:  # pylint: disable=broad-except
+            _logger.exception("unexpected exception in drawing thread")
 
     def run_until_closed(self):
         """
@@ -99,9 +117,11 @@ class PushBotRetinaViewer():
         """
         run_thread = Thread(target=self.__run_sim_forever)
         run_thread.start()
-        self.__run(run_thread)
-        self.__sim.external_devices.request_stop()
-        run_thread.join()
+        try:
+            self.__run(run_thread)
+        finally:
+            self.__sim.external_devices.request_stop()
+            run_thread.join()
 
     def run(self, run_time):
         """
@@ -109,5 +129,7 @@ class PushBotRetinaViewer():
         """
         run_thread = Thread(target=self.__run_sim, args=[run_time])
         run_thread.start()
-        self.__run(run_thread)
-        run_thread.join()
+        try:
+            self.__run(run_thread)
+        finally:
+            run_thread.join()

@@ -37,11 +37,11 @@ class PushBotEthernetSpeakerDevice(
             ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker
         :param protocol: The protocol instance to get commands from
         :type protocol: MunichIoEthernetProtocol
-        :param start_active_time: The "active time" to set at the start
-        :param start_total_period: The "total period" to set at the start
-        :param start_frequency: The "frequency" to set at the start
-        :param start_melody: The "melody" to set at the start
-        :param timesteps_between_send:
+        :param int start_active_time: The "active time" to set at the start
+        :param int start_total_period: The "total period" to set at the start
+        :param int start_frequency: The "frequency" to set at the start
+        :param int start_melody: The "melody" to set at the start
+        :param int timesteps_between_send:
             The number of timesteps between sending commands to the device,
             or `None` to use the default
         """
