@@ -380,4 +380,5 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             base_key = 0
         vertex_slice = pre_vertex.vertex_slice
         keys = get_field_based_keys(base_key, vertex_slice, self.n_colour_bits)
-        return enumerate(keys, vertex_slice.lo_atom)
+        ids = vertex_slice.get_raster_ids(pre_vertex.app_vertex.atoms_shape)
+        return zip(ids, keys)
