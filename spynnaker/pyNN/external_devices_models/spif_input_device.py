@@ -288,6 +288,7 @@ class SPIFInputDevice(
             pre_vertex, partition_id)
         end = pre_vertex.vertex_slice.hi_atom
         n_key = key_and_mask.key & self.INPUT_MASK
+        start += n_key
         neuron_id = pre_vertex.vertex_slice.lo_atom + n_key
         for n in range(start, end, self.INPUT_MASK + 1):
             key = key_and_mask.key | n
