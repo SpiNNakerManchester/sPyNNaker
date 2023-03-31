@@ -58,13 +58,9 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
             resolution=PushBotRetinaResolution.NATIVE_128_X_128,
             local_host=None, local_port=None):
         """
-        :param retina_injector_label:
-        :type retina_injector_label: str
-        :param pushbot_wifi_connection:
-        :type pushbot_wifi_connection: PushBotWIFIConnection
-        :param resolution:
-        :type resolution:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
+        :param str retina_injector_label:
+        :param PushBotWIFIConnection pushbot_wifi_connection:
+        :param PushBotRetinaResolution resolution:
         :param local_host:
         :type local_host: str or None
         :param local_port:

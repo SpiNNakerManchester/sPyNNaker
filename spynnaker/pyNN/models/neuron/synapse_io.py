@@ -464,7 +464,7 @@ def convert_to_connections(
     :param int max_atoms_per_core:
         The maximum number of atoms on a core
     :return: The connections read from the data; the dtype is
-        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
     :rtype: ~numpy.ndarray
     """
     # If there is no data, return nothing
@@ -529,7 +529,7 @@ def read_all_synapses(
     :param int max_atoms_per_core:
         The maximum number of atoms on a core
     :return: The connections read from the data; the dtype is
-        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
     :rtype: ~numpy.ndarray
     """
     connections = []
@@ -589,7 +589,7 @@ def _read_static_data(
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :param int max_atoms_per_core: The maximum number of atoms on a core
     :return: the connections read with dtype
-        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
     :rtype: list(~numpy.ndarray)
     """
     if row_data is None or not row_data.size:
@@ -656,7 +656,7 @@ def _read_plastic_data(
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :param int max_atoms_per_core: The maximum number of atoms on a core
     :return: the connections read with dtype
-        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
     :rtype: list(~numpy.ndarray)
     """
     if row_data is None or not row_data.size:
@@ -705,7 +705,7 @@ def __convert_delayed_data(
     :param int n_pre_atoms: number of atoms in the pre-vertex
     :param ~numpy.ndarray delayed_connections:
         The connections to convert of dtype
-        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :return: The converted connection with the same dtype
     :rtype: ~numpy.ndarray

@@ -395,7 +395,7 @@ class MasterPopTableAsBinarySearch(object):
         :param int next_address: The next address that would be used
         :return: The next address that can be used following next_address
         :rtype: int
-        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
+        :raises SynapticConfigurationException:
             if the address is out of range
         """
         addr_scaled = (next_address + (_ADDRESS_SCALE - 1)) // _ADDRESS_SCALE
@@ -431,7 +431,7 @@ class MasterPopTableAsBinarySearch(object):
             The number of bits to use for colour
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
-        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
+        :raises SynapticConfigurationException:
             If a bad address is used.
         """
         # If there are too many neurons per core, fail
@@ -468,7 +468,7 @@ class MasterPopTableAsBinarySearch(object):
         :param int n_colour_bits: The number of bits to use for colour
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
-        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
+        :raises SynapticConfigurationException:
             If a bad address is used.
         """
         # if not single, scale the address

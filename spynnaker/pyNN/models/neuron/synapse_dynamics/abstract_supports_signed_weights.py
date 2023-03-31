@@ -24,8 +24,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         """
         Get the synapse type that positive weights will arrive at.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: int
         """
 
@@ -34,8 +34,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         """
         Get the synapse type that negative weights will arrive at.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: int
         """
 
@@ -47,8 +47,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         .. note::
             This must be a value >= 0.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
 
@@ -60,8 +60,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         .. note::
             This must be a value <= 0.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: int
         """
 
@@ -73,8 +73,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         .. note::
             This must be a value >= 0.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
 
@@ -86,8 +86,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         .. note::
             This must be a value <= 0.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
 
@@ -99,8 +99,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         .. note::
             This must be a value >= 0.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
 
@@ -112,7 +112,7 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         .. note::
             This must be a value <= 0.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """

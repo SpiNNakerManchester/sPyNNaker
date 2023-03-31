@@ -229,7 +229,7 @@ class PopulationMachineSynapses(
         """
         Get the connections from the machine for this vertex.
 
-        :param ~pacman.model.placement.Placement placements:
+        :param ~pacman.model.placements.Placement placements:
             Where the connection data is on the machine
         :param ProjectionApplicationEdge app_edge:
             The edge for which the data is being read

@@ -422,7 +422,8 @@ class SynapseDynamicsStructuralCommon(
         It should be different every time called with `None`.
 
         :param app_vertex:
-        :type app_vertex: ApplicationVertex or None
+        :type app_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex or None
         :return: list of random seed (4 words), generated randomly
         :rtype: list(int)
         """

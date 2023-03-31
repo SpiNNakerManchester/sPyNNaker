@@ -320,7 +320,7 @@ def SpikeInjector(
     :type database_notify_port_num: int or None
     :return: The spike injector model object that can be placed in a pyNN
         :py:class:`~spynnaker.pyNN.models.populations.Population`.
-    :rtype: ~spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel
+    :rtype: AbstractPyNNModel
     """
     # pylint: disable=too-many-arguments
     if notify:

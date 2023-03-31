@@ -77,7 +77,7 @@ class MachineMunichMotorDevice(
         :param int delta_threshold:
         :param bool continue_if_not_different:
         :param str label:
-        :param app_vertex:
+        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         """
         super().__init__(
             label=label, app_vertex=app_vertex,

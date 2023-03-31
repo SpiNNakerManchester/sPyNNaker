@@ -107,7 +107,6 @@ class PushBotEthernetDevice(
         Set the protocol use to send setup and shutdown commands,
         separately from the protocol used to control the device.
 
-        :param command_protocol: The protocol to use for this device
-        :type command_protocol:
-            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
+        :param MunichIoSpiNNakerLinkProtocol command_protocol:
+            The protocol to use for this device
         """

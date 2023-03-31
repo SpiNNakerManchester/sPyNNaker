@@ -225,7 +225,7 @@ class SynapticMatrixApp(object):
         next_addr = block_addr + size
         if next_addr > self.__all_syn_block_sz:
             raise ValueError(
-                f"Too much synaptic memory has been written: "
+                "Too much synaptic memory has been written: "
                 f"{next_addr} of {self.__all_syn_block_sz} ")
         return next_addr
 
@@ -280,7 +280,7 @@ class SynapticMatrixApp(object):
                 self.__synapse_info)
         if self.__app_edge.delay_edge is None and len(delayed_row_data) != 0:
             raise ValueError(
-                f"Found delayed source IDs but no delay "
+                "Found delayed source IDs but no delay "
                 f"edge for {self.__app_edge.label}")
 
         return row_data, delayed_row_data
@@ -328,7 +328,7 @@ class SynapticMatrixApp(object):
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
         :return: A list of arrays of connections, each with dtype
-            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+            :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
         :rtype: ~numpy.ndarray
         """
         synapses_address = locate_memory_region_for_placement(
@@ -358,7 +358,7 @@ class SynapticMatrixApp(object):
         :param int synapses_address:
             The base address of the synaptic matrix region
         :return: A list of arrays of connections, each with dtype
-            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+            :py:attr:`~.AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE`
         :rtype: ~numpy.ndarray
         """
         connections = list()

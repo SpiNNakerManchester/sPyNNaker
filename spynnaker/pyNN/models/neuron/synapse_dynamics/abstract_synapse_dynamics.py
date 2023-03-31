@@ -200,6 +200,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         # pylint: disable=unused-argument
+        # TODO: is this a meaningful method any more; if so, what does it do?
         return []
 
     def get_synapse_id_by_target(self, target):

@@ -39,11 +39,9 @@ class PushBotSpiNNakerLinkLaserDevice(
             start_total_period=default_parameters['start_total_period'],
             start_frequency=default_parameters['start_frequency']):
         """
-        :param laser: Which laser device to control
-        :type laser:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser
-        :param protocol: The protocol instance to get commands from
-        :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
+        :param PushBotLaser laser: Which laser device to control
+        :param MunichIoSpiNNakerLinkProtocol protocol:
+            The protocol instance to get commands from
         :param int spinnaker_link_id:
             The SpiNNakerLink that the PushBot is connected to
         :param int n_neurons: The number of neurons in the device

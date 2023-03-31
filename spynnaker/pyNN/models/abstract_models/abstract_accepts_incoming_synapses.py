@@ -72,9 +72,7 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         Any Vertex that implements this API should override
         `ApplicationVertex.splitter` method to also call this function.
 
-        :param splitter: the splitter
-        :type splitter:
-            ~spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay
+        :param AbstractSpynnakerSplitterDelay splitter: the splitter
         :raises PacmanConfigurationException: if the splitter is not an
             instance of AbstractSpynnakerSplitterDelay
         """

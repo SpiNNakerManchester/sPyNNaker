@@ -112,7 +112,11 @@ class SynapticMatrices(object):
             self, app_vertex, regions, max_atoms_per_core, weight_scales,
             all_syn_block_sz):
         """
+        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         :param SynapseRegions regions: The synapse regions to use
+        :param int max_atoms_per_core:
+        :param list(float) weight_scales:
+        :param int all_syn_block_sz:
         """
         self.__app_vertex = app_vertex
         self.__regions = regions
@@ -503,6 +507,6 @@ class _AppKeyInfo(object):
         """
         The key and mask as an object.
 
-        :rtype: BaseKeyAndMask
+        :rtype: ~pacman.model.routing_info.BaseKeyAndMask
         """
         return BaseKeyAndMask(self.app_key, self.app_mask)
