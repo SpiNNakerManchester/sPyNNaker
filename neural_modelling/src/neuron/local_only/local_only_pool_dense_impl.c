@@ -171,7 +171,7 @@ static inline bool key_to_index_lookup(uint32_t spike, uint32_t *start, uint32_t
 
 bool get_conn_weights(uint32_t spike, uint32_t i, lc_weight_t **weights) {
 	connector *c = connectors[i];
-	uint32_t local_spike = (spike & ~c->key_info.mask) & c->key_info.n_colour_bits;
+	uint32_t local_spike = spike >> c->key_info.n_colour_bits;
 
 	// Now work out the index into the weights from the coordinates
 	uint32_t last_extent = 1;

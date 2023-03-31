@@ -248,7 +248,7 @@ static inline bool key_to_index_lookup(uint32_t spike, uint32_t *start_index,
 static inline void get_row_col(uint32_t spike, uint32_t index,
 		uint32_t *core_local_col, uint32_t *core_local_row) {
 	connector *c = &(config->connectors[index]);
-	uint32_t local_spike = (spike & ~c->key_info.mask) >> c->key_info.n_colour_bits;
+	uint32_t local_spike = spike >> c->key_info.n_colour_bits;
 	*core_local_col = (local_spike & c->key_info.col_mask) >> c->key_info.col_shift;
 	*core_local_row = (local_spike & c->key_info.row_mask) >> c->key_info.row_shift;
 }
