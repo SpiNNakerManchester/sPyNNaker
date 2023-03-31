@@ -337,9 +337,11 @@ class MasterPopTableAsBinarySearch(object):
         """
         Get the size of the master population table in SDRAM.
 
-        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+        :param incoming_projections:
             The projections arriving at the vertex that are to be handled by
             this table
+        :type incoming_projections:
+            list(~spynnaker.pyNN.models.projection Projection)
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int
         """

@@ -159,7 +159,7 @@ class PopulationBase(object, metaclass=AbstractBase):
 
         :param current_source:
         :type current_source:
-            pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
+            ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
         """
 
     def is_local(self,

@@ -510,7 +510,7 @@ class Population(PopulationBase):
     @property
     def all_cells(self):
         """
-        :rtype: list(~spynnaker.pyNN.models.populations.IDMixin)
+        :rtype: list(IDMixin)
         """
         cells = []
         for _id in range(self.__size):

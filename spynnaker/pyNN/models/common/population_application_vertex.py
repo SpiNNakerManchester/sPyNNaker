@@ -126,7 +126,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         or a subset if the selector is used.
 
         :param names: The name or names of the variable to get
-        :type name: str or list
+        :type names: str or list(str)
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -160,7 +160,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         or a subset if the selector is used.
 
         :param names: The name or names of the variable to get
-        :type name: str or list
+        :type names: str or list(str)
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -291,7 +291,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         handled in NeoBufferDatabase.
 
         :param str name: The name of the variable recorded
-        :rtype: \
+        :rtype:
             ~spinn_front_end_common.interface.buffer_management.storage_objects.BufferDatabase
         :raises KeyError: if the variable isn't being recorded
         """
@@ -356,9 +356,10 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         but may be a sublist if doing selective recording.
 
         :param str name: The name of the variable to get the region of
-        :param vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :return: A list of the global raster IDs of the atoms in recording
             named variable within this slice
+        :rtype: list(int)
         """
         # pylint: disable=unused-argument
         if name not in self.get_recordable_variables():
@@ -373,8 +374,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         Inject a current source into this population.
 
-        :param ~pyNN.standardmodels.electrodes.StandardCurrentSource\
-            current_source: the Current Source to be injected
+        :param current_source: the Current Source to be injected
+        :type current_source:
+            ~pyNN.standardmodels.electrodes.StandardCurrentSource
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`

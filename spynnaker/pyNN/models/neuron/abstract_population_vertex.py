@@ -999,8 +999,10 @@ class AbstractPopulationVertex(
         Get the shift of the ring buffers for transfer of values into the
         input buffers for this model.
 
-        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+        :param incoming_projections:
             The projections to consider in the calculations
+        :type incoming_projections:
+            list(~spynnaker.pyNN.models.projection.Projection)
         :rtype: list(int)
         """
         stats = _Stats(self.__neuron_impl, self.__spikes_per_second,
@@ -1113,10 +1115,8 @@ class AbstractPopulationVertex(
         """
         Get the size of the structural dynamics region, in bytes.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the vertex to get the usage of
-        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
-            The projections to consider in the calculations
+        :param int n_atoms:
+            The number of atoms in the slice
         """
         if not isinstance(
                 self.__synapse_dynamics, AbstractSynapseDynamicsStructural):
@@ -1131,8 +1131,10 @@ class AbstractPopulationVertex(
         Get the maximum SDRAM usage for the synapses on a vertex slice.
 
         :param int n_post_atoms: The number of atoms projected to
-        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+        :param incoming_projections:
             The projections to consider in the calculations
+        :type incoming_projections:
+            list(~spynnaker.pyNN.models.projection.Projection)
         """
         if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
             return 0
@@ -1147,7 +1149,8 @@ class AbstractPopulationVertex(
         the vertex slice.
 
         :param int addr: The address to start from
-        :param ~spynnaker.pyNN.models.Projection: The projection to add
+        :param ~spynnaker.pyNN.models.projection.Projection:
+            The projection to add
         :param int n_post_atoms: The number of atoms projected to
         :rtype: int
         """

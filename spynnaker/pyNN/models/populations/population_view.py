@@ -203,7 +203,7 @@ class PopulationView(PopulationBase):
             ``p[2]`` is equivalent to ``p.__getitem__(2)``, and
             ``p[3:6]`` is equivalent to ``p.__getitem__(slice(3, 6))``
 
-        :rtype: ~.IDMixin or ~.PopulationView
+        :rtype: IDMixin or ~.PopulationView
         """
         if isinstance(index, int):
             return IDMixin(self.__population, index)
@@ -213,7 +213,7 @@ class PopulationView(PopulationBase):
         """
         Iterator over cell IDs (on the local node).
 
-        :rtype: iterable(~.IDMixin)
+        :rtype: iterable(IDMixin)
         """
         for idx in self.__indexes:
             yield IDMixin(self.__population, idx)
@@ -230,7 +230,7 @@ class PopulationView(PopulationBase):
         """
         Iterator over cell IDs (on all MPI nodes).
 
-        :rtype: iterable(~.IDMixin)
+        :rtype: iterable(IDMixin)
         """
         for idx in self.__indexes:
             yield IDMixin(self.__population, idx)
