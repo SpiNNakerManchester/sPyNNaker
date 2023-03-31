@@ -40,7 +40,7 @@ class ParameterHolder(object):
         :param data_items_to_return: A list of data fields to be returned
         :type data_items_to_return: list(str) or tuple(str)
         :param get_call: A function to call to read a value
-        :type get_call: function(str, selector=None)->list
+        :type get_call: callable(str, selector=None)->list
         :param selector: a description of the subrange to accept,
             or `None` for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`

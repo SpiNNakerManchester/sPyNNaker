@@ -271,7 +271,7 @@ class SpikeSourcePoissonVertex(
         """
         Get the rates.
 
-        :rtype: RangedList
+        :rtype: spinn_utilities.ranged.RangedList
         """
         return self.__data["rates"]
 
@@ -279,7 +279,7 @@ class SpikeSourcePoissonVertex(
         """
         Add an outgoing projection from this vertex.
 
-        :param PyNNProjectionCommon projection: The projection to add
+        :param Projection projection: The projection to add
         """
         self.__outgoing_projections.append(projection)
 
@@ -288,7 +288,7 @@ class SpikeSourcePoissonVertex(
         """
         The projections outgoing from this vertex.
 
-        :rtype: list(PyNNProjectionCommon)
+        :rtype: list(Projection)
         """
         return self.__outgoing_projections
 
@@ -516,8 +516,9 @@ class SpikeSourcePoissonVertex(
         """
         Updates a KISS seed from the machine.
 
-        :param vertex_slice: the vertex slice to update seed of
-        :param seed: the seed
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the vertex slice to update seed of
+        :param list(int) seed: the seed
         """
         self.__kiss_seed[vertex_slice] = seed
 

@@ -19,9 +19,9 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
     """
     Defines that a splitter is able to handle delays in some way.
 
-    Ideally the splitter and therefore the vertices it creates are able to
+    Ideally the splitter, and therefore the vertices it creates, are able to
     handle some delay themselves and if more is needed have the ability to
-    accept spikes from a :py:class:`DelayExtensionMachineVertex`
+    accept spikes from a :py:class:`DelayExtensionMachineVertex`.
     """
 
     __slots__ = []

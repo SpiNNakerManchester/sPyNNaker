@@ -71,7 +71,7 @@ class Projection(object):
                 post_synaptic_population:
         :param AbstractConnector connector:
         :param AbstractSynapseDynamics synapse_type:
-        :param None source: Unsupported; must be None
+        :param None source: Unsupported; must be `None`
         :param str receptor_type:
         :param ~pyNN.space.Space space:
         :param str label:

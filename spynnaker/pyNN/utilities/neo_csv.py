@@ -173,8 +173,8 @@ class NeoCsv(object):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param list(int) view_indexes:
@@ -182,7 +182,7 @@ class NeoCsv(object):
         :param ~numpy.ndarray spikes:
         :param float t_start:
         :param float t_stop:
-        :param ~quantities.Quantity sampling_rate: Arte a neuron is recorded
+        :param ~quantities.Quantity sampling_rate: Rate a neuron is recorded
         """
         block = segment.block
         first_id = block.annotations[self._FIRST_ID]
@@ -267,7 +267,6 @@ class NeoCsv(object):
         :param ~quantities.Quantity sampling_rate: Arte a neuron is recorded
         :param units: the units of the recorded value
         :type units: quantities.quantity.Quantity or str
-
         """
         # pylint: disable=too-many-arguments, no-member, c-extension-no-member
         block = segment.block
@@ -470,7 +469,7 @@ class NeoCsv(object):
 
         Unless other insert methods are called the segment will hold no data.
 
-        :param _neo.Block block:
+        :param ~neo.core.Block block:
         :param int segment_number:
         :param datetime rec_datetime:
         """
@@ -513,7 +512,7 @@ class NeoCsv(object):
         Unless other read methods are called the segment will hold no data
 
         :param ~csv.reader csv_reader: Open csv writer to read from
-        :param _neo.Block block:
+        :param ~neo.core.Block block:
         :param str segment_number_st:
         """
         row = next(csv_reader)
@@ -542,7 +541,7 @@ class NeoCsv(object):
         :param str simulator:
         :param dict annotations:
         :return: a block with just metadata
-        ;rtype: ~neo.Block
+        :rtype: ~neo.core.Block
         """
         block = neo.Block()
         block.name = pop_label
@@ -593,8 +592,8 @@ class NeoCsv(object):
         Reads block metadata and uses it to create an empty block.
 
         :param ~csv.reader csv_reader: Open csv writer to read from
-        :return: empty Block
-        ;rtype: ~neo.Block
+        :return: empty block
+        :rtype: ~neo.core.Block
         """
         metadata = self.__read_metadata(csv_reader)
         return self._insert_empty_block(
@@ -627,10 +626,11 @@ class NeoCsv(object):
 
     def read_csv(self, csv_file):
         """
-        Reads a whole csv_file and creates a block with data.
+        Reads a whole CSV file and creates a block with data.
 
-        :param str csv_file: Path of file to reads
-        :return: a Block with all the data in the csv file.
+        :param str csv_file: Path of file to read
+        :return: a block with all the data in the CSV file.
+        :rtype: ~neo.core.Block
         """
         with open(csv_file, newline='',  encoding="utf-8") as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')

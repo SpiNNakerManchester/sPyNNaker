@@ -25,7 +25,8 @@ from spynnaker.pyNN.models.utility_models.delays import (
 
 class SplitterDelayVertexSlice(AbstractSplitterCommon):
     """
-    Handles the splitting of the DelayExtensionVertex via slice logic.
+    Handles the splitting of the :py:class:`DelayExtensionVertex`
+    via slice logic.
     """
 
     __slots__ = [

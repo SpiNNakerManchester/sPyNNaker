@@ -46,7 +46,8 @@ MAX_RING_BUFFER_BITS = 14
 class SplitterAbstractPopulationVertexFixed(
         AbstractSplitterCommon, AbstractSpynnakerSplitterDelay):
     """
-    Handles the splitting of the AbstractPopulationVertex using fixed slices.
+    Handles the splitting of the :py:class:`AbstractPopulationVertex`
+    using fixed slices.
     """
 
     __slots__ = [
@@ -174,7 +175,7 @@ class SplitterAbstractPopulationVertexFixed(
         """
         Gets the resources of a slice of atoms.
 
-        :param int n_atoms
+        :param int n_atoms:
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         # pylint: disable=arguments-differ

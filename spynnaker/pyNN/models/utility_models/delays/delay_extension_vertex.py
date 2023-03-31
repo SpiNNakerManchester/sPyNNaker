@@ -49,7 +49,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         """
         :param partition: The partition that this delay is supporting
         :type partition:
-            ~pacman.mode.graph.application.ApplicationEdgePartition
+            ~pacman.model.graphs.application.ApplicationEdgePartition
         :param int delay_per_stage: the delay per stage
         :param int n_delay_stages: the (initial) number of delay stages needed
         :param int n_colour_bits: the number of bits for event colouring
@@ -144,7 +144,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         """
         Add an outgoing edge to the delay extension.
 
-        :param DelayedApplicationEdge delay_edge: The edge to add
+        :param DelayedApplicationEdge edge: The edge to add
         """
         self.__outgoing_edges.append(edge)
 
@@ -153,7 +153,7 @@ class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
         """
         The outgoing edges from this vertex.
 
-        :rtype: list(DelayApplicationEdge)
+        :rtype: list(DelayedApplicationEdge)
         """
         return self.__outgoing_edges
 

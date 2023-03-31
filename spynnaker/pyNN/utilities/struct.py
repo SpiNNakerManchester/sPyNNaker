@@ -58,7 +58,7 @@ class Struct(object):
         :param default_values:
             Dict of field name -> value to use when values doesn't contain the
             field
-        :type default_values: dict(str->int or float) or None
+        :type default_values: dict(str, int or float) or None
         """
         self.__fields = fields
         self.__repeat_type = repeat_type
@@ -112,7 +112,7 @@ class Struct(object):
         Get a numpy array of uint32 of data for the given values.
 
         :param values: The values to fill in the data with
-        :type values: dict(str->one of int, float or AbstractList)
+        :type values: dict(str, int or float or AbstractList)
         :param vertex_slice:
             The vertex slice to get the data for, or `None` if the struct is
             global.

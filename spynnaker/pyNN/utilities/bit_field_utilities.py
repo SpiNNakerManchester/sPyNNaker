@@ -35,8 +35,10 @@ def get_sdram_for_bit_field_region(incoming_projections):
     """
     The SDRAM for the bit field filter region.
 
-    :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
+    :param incoming_projections:
         The projections that target the vertex in question
+    :type incoming_projections:
+        iterable(~spynnaker.pyNN.models.projection.Projection)
     :return: the estimated number of bytes used by the bit field region
     :rtype: int
     """
@@ -60,8 +62,10 @@ def get_sdram_for_keys(incoming_projections):
     """
     Gets the space needed for keys.
 
-    :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
+    :param incoming_projections:
         The projections that target the vertex in question
+    :type incoming_projections:
+        iterable(~spynnaker.pyNN.models.projection.Projection)
     :return: SDRAM needed
     :rtype: int
     """
@@ -83,8 +87,10 @@ def get_bitfield_key_map_data(incoming_projections):
     """
     Get data for the key map region.
 
-    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+    :param incoming_projections:
         The projections to generate bitfields for
+    :type incoming_projections:
+        iterable(~spynnaker.pyNN.models.projection.Projection)
     :rtype: ~numpy.ndarray
     """
     # Gather the source vertices that target this core

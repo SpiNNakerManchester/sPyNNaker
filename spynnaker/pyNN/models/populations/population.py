@@ -436,7 +436,7 @@ class Population(PopulationBase):
             to initialize rather than the actual initial values if this call
             has been made.
 
-        :rtype: InitialValuesHolder
+        :rtype: ParameterHolder
         """
         SpynnakerDataView.check_user_can_act()
         return self.__vertex.get_initial_state_values(
@@ -475,7 +475,7 @@ class Population(PopulationBase):
         """
         Get the current values of the state variables.
 
-        :rtype: InitialValuesHolder
+        :rtype: ParameterHolder
         """
         SpynnakerDataView.check_user_can_act()
         warn_once(

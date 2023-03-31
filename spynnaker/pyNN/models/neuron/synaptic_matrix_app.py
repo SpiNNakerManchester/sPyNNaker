@@ -419,7 +419,7 @@ class SynapticMatrixApp(object):
         """
         Get the index in the master population table of the matrix.
 
-        :param ~pacman.model.graph.machine.MachineVertex m_vertex:
+        :param ~pacman.model.graphs.machine.MachineVertex m_vertex:
             The source machine vertex
         :rtype: int
         """

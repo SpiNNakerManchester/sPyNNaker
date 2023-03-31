@@ -73,9 +73,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         AbstractSplitterCommon, AbstractSpynnakerSplitterDelay,
         AbstractSupportsOneToOneSDRAMInput):
     """
-    Splits an AbstractPopulationVertex so that there are separate neuron
-    cores each being fed by one or more synapse cores.  Incoming one-to-one
-    Poisson cores are also added here if they meet the criteria.
+    Splits an :py:class:`AbstractPopulationVertex` so that there are separate
+    neuron cores each being fed by one or more synapse cores.  Incoming
+    one-to-one Poisson cores are also added here if they meet the criteria.
     """
 
     __slots__ = [
@@ -520,12 +520,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
             The vertex sending into the Projection
-        :param ~spynnaker.pyNN.models.neural_projections.connectors\
-                .AbstractConnector:
+        :param connector:
             The connector in use in the Projection
-        :param ~spynnaker.pyNN.models.neuron.synapse_dynamics\
-                .AbstractSynapseDynamics:
+        :type connector:
+            ~spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector
+        :param dynamics:
             The synapse dynamics in use in the Projection
+        :type dynamics:
+            ~spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics
         :rtype: bool
         """
         return (isinstance(pre_vertex, SpikeSourcePoissonVertex) and

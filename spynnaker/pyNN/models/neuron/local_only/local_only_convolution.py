@@ -194,7 +194,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         :param AbstractPopulationVertex app_vertex:
             The vertex being targeted
-        :rtype: dict(MachineVertex, list(Sources))
+        :rtype: dict(~.MachineVertex, list(Sources))
         """
         sources_for_target = self.__cached_2d_overlaps.get(app_vertex)
         if sources_for_target is None:

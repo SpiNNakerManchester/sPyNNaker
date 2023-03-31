@@ -41,6 +41,12 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class NeoBufferDatabase(BufferDatabase, NeoCsv):
+    """
+    Extra support for Neo on top of the Database for SQLite 3.
+
+    This is the same database as used by BufferManager but with
+    extra tables and access methods added.
+    """
     # pylint: disable=c-extension-no-member
 
     __N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
@@ -56,20 +62,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __init__(self, database_file=None, read_only=None):
         """
-        Extra support for Neo on top of the Database for SQLite 3.
-
-        This is the same database as used by BufferManager but with
-        extra tables and access methods added.
-
         :param database_file:
             The name of a file that contains (or will contain) an SQLite
             database holding the data.
             If omitted the default location will be used.
         :type database_file: None or str
-        :param read_only:
-            By default the database is readonly if given a databas file.
-            This allows to overwire that (mainly for clear)
-        :type read_only: None or bool
+        :param bool read_only:
+            By default the database is readonly if given a database file.
+            This allows to override that (mainly for clear)
         """
         if database_file is None:
             database_file = self.default_database_file()
@@ -92,6 +92,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         This writes information held in SpynnakerDataView so that the database
         is usable standalone.
+
+        .. note::
+            The database must be writable for this to work!
         """
         with self.transaction() as cursor:
             # t_stop intentionally left None to show no run data
@@ -113,6 +116,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         This writes information held in SpynnakerDataView so that the database
         is usable standalone
+
+        .. note::
+            The database must be writable for this to work!
         """
         t_stop = SpynnakerDataView.get_current_run_time_ms()
         with self.transaction() as cursor:
@@ -176,7 +182,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self, cursor, pop_label, population):
         """
         Gets an id for this population label.
-
         Will create a new population if required.
 
         For speed does not verify the additional fields if a record already
@@ -186,8 +191,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param ~spynnaker.pyNN.models.populations.Population population:
@@ -215,8 +220,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             sampling_interval_ms, data_type, buffered_type, units,
             atoms_shape, n_colour_bits):
         """
-        Gets an id for this population and recording label combination.
-
+        Gets an ID for this population and recording label combination.
         Will create a new population/recording record if required.
 
         For speed does not verify the additional fields if a record already
@@ -226,8 +230,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param str variable:
@@ -275,8 +279,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :return: population size, first id and description
@@ -303,8 +307,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :return: population size, first id and description
@@ -319,12 +323,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def get_recording_populations(self):
         """
         Gets a list of the labels of Populations recording.
-
         Or to be exact the ones with metadata saved so likely to be recording.
 
             .. note::
-                These are actually the labels of the Application Vertices
-                Typical the Population label corrected for None or
+                These are actually the labels of the Application Vertices.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :return: List of population labels
@@ -344,17 +347,18 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         Gets an Object with the same data retrieval API as a Population.
 
-        Retrievable is limited to recorded data and a little metadata needed to
-        create a single Neo Segment wrapped in a neo Block
+        Retrieval is limited to recorded data and a little metadata needed to
+        create a single Neo Segment wrapped in a Neo Block.
 
             .. note::
-                As each database only includes
+                As each database only includes data for one run (with resets
+                creating another database) the structure is relatively simple.
 
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :return: An Object which acts like a Population for getting neo data
@@ -367,16 +371,15 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def get_recording_variables(self, pop_label):
         """
-        List of the names of variables recording
-
-        Or to be exact list of the names of variables with metadata so likely
-        to be recording
+        List of the names of variables recording.
+        Or, to be exact, list of the names of variables with metadata so likely
+        to be recording.
 
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :return: List of variable names
@@ -390,8 +393,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :return: List of variable registered as recording.
@@ -411,14 +414,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def get_recording_metadeta(self, pop_label, variable):
         """
-        Gets the metadata id for this population and recording label
+        Gets the metadata ID for this population and recording label
         combination.
 
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param str variable:
@@ -443,8 +446,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for None or
+                This is actually the label of the Application Vertex.
+                Typical the Population label, corrected for `None` or
                 duplicate values
 
         :param str variable:
@@ -561,7 +564,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __get_neuron_spikes(self, cursor, rec_id):
         """
-        Gets the spikes for this population/recording id.
+        Gets the spikes for this population/recording ID.
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
@@ -632,7 +635,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __get_eieio_spikes(self, cursor, rec_id, atoms_shape, n_colour_bits):
         """
-        Gets the spikes for this population/recording id.
+        Gets the spikes for this population/recording ID.
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
@@ -664,7 +667,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self, cursor, region_id, neurons, simulation_time_step_ms,
             spike_times, spike_ids):
         """
-        Adds spike data for this region to the lists
+        Adds spike data for this region to the lists.
 
         :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
@@ -701,7 +704,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def __get_multi_spikes(self, cursor, rec_id):
         """
-        Gets the spikes for this population/recording id.
+        Gets the spikes for this population/recording ID.
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
@@ -754,7 +757,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def __get_spikes(self, cursor, rec_id, view_indexes, buffer_type,
                      atoms_shape, n_colour_bits, variable):
         """
-        Gets the data as a Numpy array for one opulation and variable
+        Gets the data as a Numpy array for one population and variable.
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
@@ -832,7 +835,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param int rec_id:
         :param DataType data_type: type of data to extract
         :param view_indexes:
-            The indexes for which data should be returned. Or None for all
+            The indexes for which data should be returned. Or `None` for all
         :type view_indexes: list(int) or None
         :param int pop_size:
         :param str variable:
@@ -971,7 +974,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param float sampling_interval_ms:
         :param bool as_matrix:
         :param view_indexes:
-            The indexes for which data should be returned. Or None for all
+            The indexes for which data should be returned. Or `None` for all
         :type view_indexes: list(int) or None
         :param int pop_size:
         :param str variable:
@@ -1047,8 +1050,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param str variable:
@@ -1098,8 +1101,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param str variable:
@@ -1143,8 +1146,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param variables:
@@ -1174,8 +1177,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param variables:
@@ -1197,14 +1200,13 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def get_full_block(self, pop_label, variables, view_indexes, annotations):
         """
         Creates a block with metadata and data for this segment.
-
-        Any previous segments will be empty
+        Any previous segments will be empty.
 
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param variables:
@@ -1232,8 +1234,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typical the Population label, corrected for `None` or
                 duplicate values
 
         :param variables:
@@ -1267,15 +1269,14 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def csv_block_metadata(self, csv_file, pop_label, annotations=None):
         """
         Writes the data including metadata to a CSV file.
-
-        Overwrites and previous data in the file
+        Overwrites any previous data in the file.
 
         :param str csvfile: Path to file to write block metadata to
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param annotations: annotations to put on the neo block
@@ -1303,8 +1304,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param variables:
@@ -1338,8 +1339,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typically the Population label, corrected for `None` or
                 duplicate values
 
         :param variables:
@@ -1363,13 +1364,16 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def clear_data(self, pop_label, variables):
         """
-        Gets the data as a Numpy array for one population and variable.
+        Clears the data for one population and given variables.
+
+        .. note:::
+            The database must be writable for this to work!
 
         :param str pop_label: The label for the population of interest
 
             .. note::
-                This is actually the label of the Application Vertex
-                Typical the Population label corrected for `None` or
+                This is actually the label of the Application Vertex.
+                Typical the Population label, corrected for `None` or
                 duplicate values
 
         :param list(str) variables: names of variable to get data for
@@ -1407,6 +1411,12 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                     """, (pop_label, variable))
 
     def write_metadata(self):
+        """
+        Write the current metadata to the database.
+
+        .. note::
+            The database must be writable for this to work!
+        """
         with self.transaction() as cursor:
             for population in SpynnakerDataView.iterate_populations():
                 # pylint: disable=protected-access
@@ -1468,10 +1478,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def array_to_string(indexes):
         """
         Converts a list of ints into a compact string.
-
         Works best if the list is sorted.
 
-        Ids are comma separated except when a series of ids is sequential then
+        IDs are comma separated, except when a series of IDs is sequential then
         the start:end is used.
 
         :param list(int) indexes:
@@ -1503,8 +1512,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def string_to_array(string):
         """
         Converts a string into a list of ints.
-
-        Assumes the string was created by array_to_string
+        Assumes the string was created by :py:meth:`array_to_string`
 
         :param str string:
         :rtype: list(int)

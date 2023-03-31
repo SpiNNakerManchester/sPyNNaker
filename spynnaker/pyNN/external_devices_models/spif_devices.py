@@ -104,7 +104,7 @@ class SPIFRegister(IntEnum):
         :param int index:
             The index of the register to send to when there are multiple
             registers starting from a base
-        :rtype: MultiCastCommand
+        :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
         return MultiCastCommand(
             _RC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
@@ -118,7 +118,7 @@ def set_mapper_key(pipe, key):
 
     :param int pipe: The SPIF pipe to set the key of (0-1)
     :param int key: The output key to set
-    :rtype: MultiCastCommand
+    :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
     """
     return SPIFRegister.MP_KEY_BASE.cmd(key, pipe)
 
@@ -132,7 +132,7 @@ def set_field_mask(pipe, index, mask):
     :param int pipe: The SPIF pipe to set the mask of (0-1)
     :param int index: The index of the field to set (0-3)
     :param int mask: The mask to set
-    :rtype: MultiCastCommand
+    :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
     """
     return SPIFRegister.MP_FLD_MASK_BASE.cmd(mask, (pipe * N_FIELDS) + index)
 
@@ -147,7 +147,7 @@ def set_field_shift(pipe, index, shift):
     :param int index: The index of the field to set (0-3)
     :param int shift:
         The shift value to set (0-31); positive = right, negative = left
-    :rtype: MultiCastCommand
+    :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
     """
     return SPIFRegister.MP_FLD_SHIFT_BASE.cmd(
         shift, (pipe * N_FIELDS) + index)
@@ -161,7 +161,7 @@ def set_field_limit(pipe, index, limit):
     :param int pipe: The SPIF pipe to set the limit of (0-1)
     :param int index: The index of the field to set (0-3)
     :param int limit: The maximum value of the field
-    :rtype: MultiCastCommand
+    :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
     """
     return SPIFRegister.MP_FLD_LIMIT_BASE.cmd(
         limit, (pipe * N_FIELDS) + index)
@@ -176,7 +176,7 @@ def set_filter_value(pipe, index, value):
     :param int pipe: The SPIF pipe to set the filter of (0-1)
     :param int index: The index of the filter to set (0-7)
     :param int value: The filter value to set
-    :rtype: MultiCastCommand
+    :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
     """
     return SPIFRegister.FL_VALUE_BASE.cmd(
         value, (pipe * N_FILTERS) + index)
@@ -191,7 +191,7 @@ def set_filter_mask(pipe, index, mask):
     :param int pipe: The SPIF pipe to set the filter of (0-1)
     :param int index: The index of the filter to set (0-7)
     :param int mask: The filter mask to set
-    :rtype: MultiCastCommand
+    :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
     """
     return SPIFRegister.FL_MASK_BASE.cmd(
         mask, (pipe * N_FILTERS) + index)
@@ -207,7 +207,7 @@ def set_input_key(pipe, index, key):
     :param int pipe: The SPIF pipe to set the input of (0-1)
     :param int index: The index of the input to set (0-7)
     :param int key: The key to set
-    :rtype: MultiCastCommand
+    :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
     """
     return SPIFRegister.IR_KEY_BASE.cmd(key, (pipe * N_INPUTS) + index)
 
@@ -222,7 +222,7 @@ def set_input_mask(pipe, index, mask):
     :param int pipe: The SPIF pipe to set the input of (0-1)
     :param int index: The index of the input to set (0-7)
     :param int mask: The mask to set
-    :rtype: MultiCastCommand
+    :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
     """
     return SPIFRegister.IR_MASK_BASE.cmd(mask, (pipe * N_INPUTS) + index)
 
@@ -240,7 +240,7 @@ def set_input_route(pipe, index, route):
     :param int pipe: The SPIF pipe to set the input of (0-1)
     :param int index: The index of the input to set (0-7)
     :param int route: The route to set
-    :rtype: MultiCastCommand
+    :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
     """
     return SPIFRegister.IR_ROUTE_BASE.cmd(route, (pipe * N_INPUTS) + index)
 
@@ -254,7 +254,7 @@ class _DelayedMultiCastCommand(MultiCastCommand):
     def __init__(self, key, get_payload, repeat, delay_between_repeats):
         """
         :param int key: The key to send
-        :param func()->int get_payload:
+        :param callable()->int get_payload:
             A function to call that returns a payload
         :param int repeat: The number of times to repeat the command
         :param int delay_between_repeats: The delay between the repeats
@@ -313,7 +313,7 @@ class SpiNNFPGARegister(IntEnum):
         :param payload:
             The payload to use in the command, or `None` for no payload
         :type payload: int or None
-        :rtype: MultiCastCommand
+        :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
         return MultiCastCommand(
             _LC_KEY + self.value, payload, time=None, repeat=_REPEATS,
@@ -324,9 +324,9 @@ class SpiNNFPGARegister(IntEnum):
         Make a command to send to the FPGA to set a register value,
         where the value itself is currently unknown.
 
-        :param func()->int get_payload:
+        :param callable()->int get_payload:
             A function to call to get the payload later
-        :rtype: MultiCastCommand
+        :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """
         return _DelayedMultiCastCommand(
             _LC_KEY + self.value, get_payload, repeat=_REPEATS,

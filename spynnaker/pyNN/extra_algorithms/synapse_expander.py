@@ -63,7 +63,8 @@ def _plan_expansion():
 
     :return: The places to load the synapse expander and delay expander
         executables, and the target machine vertices to read synapses back from
-    :rtype: tuple(ExecutableTargets, list(tuple(MachineVertex, Placement)))
+    :rtype:
+        tuple(~.ExecutableTargets, list(tuple(~.MachineVertex, ~.Placement)))
     """
     synapse_bin = SpynnakerDataView.get_executable_path(SYNAPSE_EXPANDER_APLX)
     expander_cores = ExecutableTargets()
@@ -97,7 +98,7 @@ def _fill_in_connection_data(expanded_pop_vertices):
     """
     Once expander has run, fill in the connection data.
 
-    :param list(MachineVertex, Placement) expanded_pop_vertices:
+    :param list(tuple(~.MachineVertex, ~.Placement)) expanded_pop_vertices:
         List of machine vertices to read data from
     """
     for vertex, placement in expanded_pop_vertices:
