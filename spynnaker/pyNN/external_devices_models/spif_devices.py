@@ -11,6 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+Devices connected to the SpiNNaker peripheral interface (`SPIF`_).
+
+.. _SPIF: https://github.com/SpiNNakerManchester/spif
+
+"""
+
 from enum import IntEnum
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_utilities.overrides import overrides
