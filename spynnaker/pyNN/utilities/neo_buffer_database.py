@@ -135,7 +135,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param ~sqlite3.Cursor cursor:
         :return: segment number, record time, last run time recorded,
             simulator timesteup in ms, simulator name
-        :rtype int, datatime, float, float, str
+        :rtype: tuple(int, datatime, float, float, str)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly

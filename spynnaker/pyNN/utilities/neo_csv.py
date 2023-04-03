@@ -85,7 +85,7 @@ class NeoCsv(object):
 
         :param str as_str: String representation of a quantity.
         :return: A Quantities object
-        :rtype ~quantities.Quantity
+        :rtype: ~quantities.Quantity
         """
         parts = as_str.split(" ")
         return quantities.Quantity(float(parts[0]), units=parts[1])
@@ -99,7 +99,7 @@ class NeoCsv(object):
 
         :param ~csv.reader csv_reader: Open csv writer to read from
         :return: t_start, t_stop, sampling_period, units
-        :rtype (~quantities.Quantity, ~quantities.Quantity,
+        :rtype: tuple(~quantities.Quantity, ~quantities.Quantity,
             ~quantities.Quantity, str)
         """
         metadata = self.__read_metadata(csv_reader)

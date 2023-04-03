@@ -258,6 +258,6 @@ class SpynnakerDataView(FecDataView):
         """
         Gets the name to be returned by `pyNN.spiNNaker.name`.
 
-        :rtype str
+        :rtype: str
         """
         return _version._NAME   # pylint: disable=protected-access

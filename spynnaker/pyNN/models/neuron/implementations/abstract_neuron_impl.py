@@ -36,7 +36,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
         The name of the binary executable of this implementation.
 
-        :rtype str
+        :rtype: str
         """
 
     @abstractproperty
