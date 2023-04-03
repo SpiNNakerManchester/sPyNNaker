@@ -269,7 +269,6 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
     :param tgt:
     :param ~numpy.ndarray mask:
         allows only certain dimensions to be considered, e.g.:
-
             * to ignore the z-dimension, use ``mask=array([0,1])``
             * to ignore y, ``mask=array([0,2])``
             * to just consider z-distance, ``mask=array([2])``
