@@ -374,9 +374,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         """
         Inject a current source into this population.
 
-        :param current_source: the Current Source to be injected
-        :type current_source:
-            ~pyNN.standardmodels.electrodes.StandardCurrentSource
+        :param AbstractCurrentSource current_source:
+            the current source to be injected
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`

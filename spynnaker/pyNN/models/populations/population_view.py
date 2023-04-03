@@ -257,8 +257,8 @@ class PopulationView(PopulationBase):
         """
         Injects the specified current_source into this PopulationView.
 
-        :param ~pyNN.standardmodels.electrodes.StandardCurrentSource\
-            current_source: the CurrentSource to be injected
+        :param AbstractCurrentSource current_source:
+            the current source to be injected
         """
         self.__vertex.inject(current_source, self.__indexes)
 

@@ -908,7 +908,7 @@ class AbstractPopulationVertex(
         """
         Current sources needed to be available to machine vertex.
 
-        :rtype: list(~pyNN.standardmodels.electrodes.StandardCurrentSource)
+        :rtype: list(AbstractCurrentSource)
         """
         return self.__current_sources
 
@@ -917,7 +917,7 @@ class AbstractPopulationVertex(
         """
         Current source ID list needed to be available to machine vertex.
 
-        :rtype: dict(~pyNN.standardmodels.electrodes.StandardCurrentSource,any)
+        :rtype: dict(AbstractCurrentSource,any)
         """
         return self.__current_source_id_list
 
