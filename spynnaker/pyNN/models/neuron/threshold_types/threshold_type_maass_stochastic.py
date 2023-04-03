@@ -41,14 +41,13 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     def __init__(self, du_th, tau_th, v_thresh):
         r"""
         :param du_th: :math:`du_{thresh}`
-        :type du_th: float, iterable(float), ~pyNN.random.RandomDistribution
+        :type du_th: float, iterable(float), RandomDistribution
             or (mapping) function
         :param tau_th: :math:`\tau_{thresh}`
-        :type tau_th: float, iterable(float), ~pyNN.random.RandomDistribution
+        :type tau_th: float, iterable(float), RandomDistribution
             or (mapping) function
         :param v_thresh: :math:`V_{thresh}`
-        :type v_thresh:
-            float, iterable(float), ~pyNN.random.RandomDistribution
+        :type v_thresh: float, iterable(float), RandomDistribution
             or (mapping) function
         """
         super().__init__(

@@ -32,12 +32,10 @@ class SynapseTypeDelta(AbstractSynapseType):
     def __init__(self, isyn_exc, isyn_inh):
         """
         :param isyn_exc: :math:`I^{syn}_e`
-        :type isyn_exc:
-            float, iterable(float), ~pyNN.random.RandomDistribution
+        :type isyn_exc: float, iterable(float), RandomDistribution
             or (mapping) function
         :param isyn_inh: :math:`I^{syn}_i`
-        :type isyn_inh:
-            float, iterable(float), ~pyNN.random.RandomDistribution
+        :type isyn_inh: float, iterable(float), RandomDistribution
             or (mapping) function
         """
         super().__init__(

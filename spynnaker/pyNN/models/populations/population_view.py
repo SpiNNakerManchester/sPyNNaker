@@ -451,7 +451,7 @@ class PopulationView(PopulationBase):
         Values passed to ``initialize()`` may be:
 
         * single numeric values (all neurons set to the same value), or
-        * :py:class:`~pyNN.random.RandomDistribution` objects, or
+        * :py:class:`RandomDistribution` objects, or
         * lists / arrays of numbers of the same size as the population
           mapping functions, where a mapping function accepts a single
           argument (the cell index) and returns a single number.
@@ -476,7 +476,7 @@ class PopulationView(PopulationBase):
         Values passed to ``initialize()`` may be:
 
         * single numeric values (all neurons set to the same value), or
-        * :py:class:`~pyNN.random.RandomDistribution` objects, or
+        * :py:class:`RandomDistribution` objects, or
         * lists / arrays of numbers of the same size as the population
           mapping functions, where a mapping function accepts a single
           argument (the cell index) and returns a single number.
@@ -543,7 +543,7 @@ class PopulationView(PopulationBase):
         Values passed to `set()` may be:
 
         * single values,
-        * :py:class:`~pyNN.random.RandomDistribution` objects, or
+        * :py:class:`RandomDistribution` objects, or
         * lists / arrays of values of the same size as the population
           mapping functions, where a mapping function accepts a single
           argument (the cell index) and returns a single value.

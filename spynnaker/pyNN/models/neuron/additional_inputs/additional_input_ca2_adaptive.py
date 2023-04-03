@@ -34,13 +34,13 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         r"""
         :param tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`
         :type tau_ca2: float, iterable(float),
-            ~pyNN.random.RandomDistribution or (mapping) function
+            RandomDistribution or (mapping) function
         :param i_ca2: :math:`I_{\mathrm{Ca}^{+2}}`
         :type i_ca2: float, iterable(float),
-            ~pyNN.random.RandomDistribution or (mapping) function
+            RandomDistribution or (mapping) function
         :param i_alpha: :math:`I_{\alpha}`
         :type i_alpha: float, iterable(float),
-            ~pyNN.random.RandomDistribution or (mapping) function
+            RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([

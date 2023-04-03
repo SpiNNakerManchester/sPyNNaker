@@ -269,12 +269,14 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
     :param tgt:
     :param ~numpy.ndarray mask:
         allows only certain dimensions to be considered, e.g.:
+
         * to ignore the z-dimension, use ``mask=array([0,1])``
         * to ignore y, ``mask=array([0,2])``
         * to just consider z-distance, ``mask=array([2])``
-    :param float scale_factor: allows for different units in the pre- and
-        post-position (the post-synaptic position is multiplied by this
-        quantity).
+
+    :param float scale_factor:
+        allows for different units in the pre- and post-position
+        (the post-synaptic position is multiplied by this quantity).
     :param float offset:
     :param periodic_boundaries:
     """
@@ -320,7 +322,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :return: MPI rank (always 0 on SpiNNaker)
     :rtype: int
     :raises \
-        ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
         if both ``n_chips_required`` and ``n_boards_required`` are used.
     """
     # pylint: disable=global-statement
@@ -571,7 +573,7 @@ def create(cellclass, cellparams=None, n=1):
     :param cellclass: population class
     :type cellclass: type or AbstractPyNNModel
     :param cellparams: population params.
-    :param int n: n neurons
+    :param int n: number of neurons
     :rtype: ~spynnaker.pyNN.models.populations.Population
     """
     SpynnakerDataView.check_user_can_act()
