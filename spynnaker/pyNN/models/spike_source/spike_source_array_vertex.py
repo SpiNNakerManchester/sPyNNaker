@@ -138,14 +138,14 @@ class SpikeSourceArrayVertex(
                 logger.warning(
                     "Danger of SpikeSourceArray sending too many spikes "
                     "at the same time. "
-                    f"This is because ({self.n_atoms}) neurons "
-                    "share the same spike list")
+                    "This is because ({}) neurons share the same spike list",
+                    self.n_atoms)
             else:
                 logger.warning(
                     "Danger of SpikeSourceArray sending too many spikes "
                     "at the same time. "
-                    f"For example at time {val} {count * self.n_atoms} "
-                    "spikes will be sent")
+                    "For example at time {}, {} spikes will be sent",
+                    val, count * self.n_atoms)
 
     def _check_density_double_list(self, spike_times):
         counter = Counter()
@@ -157,7 +157,8 @@ class SpikeSourceArrayVertex(
             logger.warning(
                 "Danger of SpikeSourceArray sending too many spikes "
                 "at the same time. "
-                f"For example at time {val} {count} spikes will be sent")
+                "For example at time {}, {} spikes will be sent",
+                val, count)
 
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure):

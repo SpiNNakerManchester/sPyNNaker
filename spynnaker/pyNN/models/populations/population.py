@@ -850,8 +850,7 @@ class Population(PopulationBase):
             if key in population_parameters:
                 population_parameters[key] = additional_parameters[key]
             else:
-                logger.warning(
-                    "additional_parameter {} will be ignored", key)
+                logger.warning("additional_parameter {} will be ignored", key)
         return population_parameters
 
     @staticmethod

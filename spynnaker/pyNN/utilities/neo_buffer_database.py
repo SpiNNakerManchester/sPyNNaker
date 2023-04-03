@@ -750,8 +750,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         if missing:
             missing_list = list(missing)
             missing_list.sort()
-            logger.warning(
-                f"No {variable} available for neurons {missing_list}")
+            logger.warning("No {} available for neurons {}",
+                           variable, missing_list)
         return indexes
 
     def __get_spikes(self, cursor, rec_id, view_indexes, buffer_type,
@@ -1018,7 +1018,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             # NO BufferedDataType.REWIRES get_spike will go boom
             else:
                 if as_matrix:
-                    logger.warning(f"Ignoring as matrix for {variable}")
+                    logger.warning("Ignoring as matrix for {}", variable)
                 return self.__get_spikes(
                     cursor, rec_id, view_indexes, buffered_type, atoms_shape,
                     n_colour_bits, variable)[0]

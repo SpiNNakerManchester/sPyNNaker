@@ -544,7 +544,7 @@ class NeuronRecorder(object):
             else:
                 found = True
             if warning is not None:
-                logger.warning(warning)
+                logger.warning("{}", warning)
         if not found:
             raise ConfigurationException(
                 "All indexes larger than population size")

@@ -34,8 +34,10 @@ N_FIELDS = 4
 N_FILTERS = 8
 
 #: The number of FPGA inputs per pipe
-#: NOTE: the 16 inputs are not actually separated in the hardware,
-#: but a logical separation per pipe is useful
+#:
+#: .. note::
+#:     The 16 inputs are not actually separated in the hardware,
+#:     but a logical separation per pipe is useful.
 N_INPUTS = 8
 
 #: SPIF is always connected to FPGA 0

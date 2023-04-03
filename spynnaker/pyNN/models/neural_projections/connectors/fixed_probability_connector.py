@@ -74,9 +74,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         if p_connect == 1.0:
             p_connect = float(DataType.U032.max)
             logger.warning(
-                "Probability of 1.0 in the FixedProbabilityConnector will use"
-                f" {p_connect} instead.  If this is a problem, use the"
-                " AllToAllConnector instead.")
+                "Probability of 1.0 in the FixedProbabilityConnector will use "
+                "{} instead.  If this is a problem, use the AllToAllConnector "
+                "instead.", p_connect)
         if not 0.0 <= p_connect < 1.0:
             raise ConfigurationException(
                 "The probability must be >= 0 and < 1")

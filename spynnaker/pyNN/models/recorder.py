@@ -254,9 +254,9 @@ class Recorder(object):
         with NeoBufferDatabase() as db:
             if SpynnakerDataView.is_reset_last():
                 logger.warning(
-                    "Due to the call directly after reset. "
-                    "The data will only contain "
-                    f"{SpynnakerDataView.get_segment_counter()-1} segments")
+                    "Due to the call directly after reset, "
+                    "the data will only contain {} segments",
+                    SpynnakerDataView.get_segment_counter() - 1)
             else:
                 db.csv_segment(
                     csv_file, pop_label, variables, view_indexes)
@@ -286,9 +286,9 @@ class Recorder(object):
         with NeoBufferDatabase() as db:
             if SpynnakerDataView.is_reset_last():
                 logger.warning(
-                    "Due to the call directly after reset. "
-                    "The data will only contain "
-                    f"{SpynnakerDataView.get_segment_counter()-1} segments")
+                    "Due to the call directly after reset, "
+                    "the data will only contain {} segments",
+                    SpynnakerDataView.get_segment_counter() - 1)
             else:
                 db.add_segment(
                     block, self.__population.label, variables, view_indexes)

@@ -403,7 +403,7 @@ def moved_in_v7_warning(message):
     """
     if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
         raise NotImplementedError(message)
-    logger.warning(f"{message} In version 8 old call will fail completely.")
+    logger.warning("{} In version 8 old call will fail completely.", message)
 
 
 def get_time_to_write_us(n_bytes, n_cores):

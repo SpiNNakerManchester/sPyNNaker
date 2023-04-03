@@ -535,8 +535,8 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
         m_int = int(m)
         if (m_int - m) != 0:
             logger.warning(
-                f"The number of neurons per core requested {m} is not an "
-                f"integer; the value has been set to {m_int}")
+                "The number of neurons per core requested {} is not an "
+                "integer; the value has been set to {}", m, m_int)
 
     SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
         neuron_type, max_neurons)

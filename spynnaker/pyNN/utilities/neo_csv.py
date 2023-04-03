@@ -232,8 +232,8 @@ class NeoCsv(object):
             self._insert_spike_data(
                 indexes, segment, spikes, t_start, t_stop, sampling_rate)
         except KeyError as ex:
-            logger.exception(f"Metadata for {variable} is missing {ex}. "
-                             f"So this data will be skipped")
+            logger.exception("Metadata for {} is missing {}. "
+                             "So this data will be skipped", variable, ex)
             return
 
     def __get_channel_index(self, ids, block):
@@ -642,8 +642,8 @@ class NeoCsv(object):
                         row = next(csv_reader)
                         category = row[0]
                     except IndexError:
-                        logger.warning(
-                            f"Ignoring extra blank line after {category}")
+                        logger.warning("Ignoring extra blank line after {}",
+                                       category)
                         row = next(csv_reader)
                         while len(row) == 0:
                             row = next(csv_reader)
@@ -662,8 +662,8 @@ class NeoCsv(object):
                         self.__read_rewirings(
                             csv_reader, segment, row[1])
                     else:
-                        logger.error(
-                            f"ignoring csv block starting with {row[0]}")
+                        logger.error("ignoring csv block starting with {}",
+                                     row[0])
                         # ignore a block
                         row = next(csv_reader)
                         while len(row) > 0:
