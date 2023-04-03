@@ -375,7 +375,8 @@ state_t neuron_model_state_update(
 //    neuron->psi = neuron->psi << 10;
 
 //    REAL rho = neuron->rho;//expk(-1.k / 1500.k); // adpt
-    REAL rho = (accum)decay_s1615(1.k, neuron->e_to_dt_on_tau_a);
+    // CHECK: but I think this has already been calculated above... ?
+    REAL rho = neuron->e_to_dt_on_tau_a; // decay_s1615(1.k, neuron->e_to_dt_on_tau_a);
 //    REAL rho_3 = (accum)decay_s1615(1000.k, neuron->e_to_dt_on_tau_a);
 //    io_printf(IO_BUF, "1:%k, 2:%k, 3:%k, 4:%k\n", rho, rho_2, rho_3, neuron->rho);
 
@@ -484,7 +485,7 @@ state_t neuron_model_state_update(
             neuron->syn_state[syn_ind].el_a = 0.k;
             neuron->syn_state[syn_ind].e_bar = 0.k;
         }
-		// ******************************************************************
+    	// ******************************************************************
 		// Low-pass filter incoming spike train
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
@@ -499,7 +500,7 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].el_a =
     			(neuron->psi * neuron->syn_state[syn_ind].z_bar) +
-    		(rho - neuron->psi * neuron->beta) *
+	    	(rho - neuron->psi * neuron->beta) *
 			neuron->syn_state[syn_ind].el_a;
 //    		(rho) * neuron->syn_state[syn_ind].el_a;
 
