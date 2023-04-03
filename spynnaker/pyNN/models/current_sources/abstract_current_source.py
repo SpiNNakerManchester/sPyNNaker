@@ -45,7 +45,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         """
         Inject this source into the specified population cells.
 
-        :param pop/pop_base/view cells: The cells to inject the source into
+        :param PopulationBase cells: The cells to inject the source into
         """
         # Call the population method to pass the source in
         cells.inject(self)
@@ -63,7 +63,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         """
         The application vertex associated with the current source.
 
-        :param AbstractPopulationVertex
+        :rtype: AbstractPopulationVertex
         """
         return self.__app_vertex
 
@@ -80,7 +80,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         """
         The population associated with the current source.
 
-        :rtype ~spynnaker.pyNN.models.populations.Population
+        :rtype: ~spynnaker.pyNN.models.populations.Population
         """
         return self.__population
 

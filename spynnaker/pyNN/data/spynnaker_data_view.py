@@ -89,7 +89,7 @@ class SpynnakerDataView(FecDataView):
     """
     Adds the extra Methods to the View for PyNN level.
 
-    See :py:class:`spinn_utilities.data.UtilsDataView` for a more detailed
+    See :py:class:`~spinn_utilities.data.UtilsDataView` for a more detailed
     description.
 
     Use this class wherever possible as it inherits all methods from all View
@@ -156,8 +156,8 @@ class SpynnakerDataView(FecDataView):
         Usage other than from `Projection.__init__` is not supported and likely
         to raise an exception
 
-        :param projection: Projection to add
-        :type projection: ~spynnaker.pyNN.models.projectionProjection
+        :param ~spynnaker.pyNN.models.projection.Projection projection:
+            Projection to add
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If projections should not be added in the current state
         """
@@ -196,18 +196,21 @@ class SpynnakerDataView(FecDataView):
         """
         Called by each population to add itself to the list.
 
-        Usage other than from Population.__init__ is not supported and likely
+        Usage other than from `Population.__init__` is not supported and likely
         to raise an exception
 
-        Increments the all population id counter by the size of the population.
+        Increments the all population ID counter by the size of the population.
 
         :param ~spynnaker.pyNN.models.populations.Population population:
             Population to add
-        :return: The first and last global ids for this Population
-        :rtype: (int, int)
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
+        :return: The first and last global IDs for this Population
+        :rtype: tuple(int, int)
+        :raises ~spinn_utilites.exceptions.SimulatorRunningException:
+            If `sim.run` is currently running
+        :raises ~spinn_utilites.exceptions.SimulatorNotSetupException:
+            If called before `sim.setup`
+        :raises ~spinn_utilites.exceptions.SimulatorShutdownException:
+            If called after `sim.end`
         """
         # UGLY but needed to avoid circular import
         from spynnaker.pyNN.models.populations.population import Population

@@ -27,19 +27,32 @@ _GENERATOR_TYPES = {
 
 
 def get_generator_type(data_type):
+    """
+    :param ~data_specification.enums.DataType data_type:
+    :return: The generator parameter type code for the given data type.
+    :rtype: int
+    :raises TypeError: If an unsupported data type is given
+    """
     if data_type in _GENERATOR_TYPES:
         return _GENERATOR_TYPES[data_type]
     raise TypeError(f"Ungeneratable type {data_type}")
 
 
 def type_has_generator(data_type):
+    """
+    :param ~data_specification.enums.DataType data_type:
+    :return:
+        Whether there is a generator parameter type code for the given data
+        type.
+    :rtype: bool
+    """
     return data_type in _GENERATOR_TYPES
 
 
-# Hash of the constant parameter generator
+#: ID of the constant parameter generator.
 PARAM_TYPE_CONSTANT_ID = 0
 
-# Hashes of the parameter generators supported by the synapse expander
+#: IDs of the random parameter generators supported by the synapse expander.
 PARAM_TYPE_BY_NAME = {
     "uniform": 1,
     "uniform_int": 1,
@@ -49,10 +62,17 @@ PARAM_TYPE_BY_NAME = {
     "exponential": 5
 }
 
+#: ID for the convolution kernel generator.
 PARAM_TYPE_KERNEL = 6
 
 
 def param_generator_id(value):
+    """
+    :param value: The value to examine the type of.
+    :return: The ID of the on-chip generator that handles the value.
+    :rtype: int
+    :raises TypeError: If an value of an unsupported data type is given
+    """
     # Scalars are fine on the machine
     if numpy.isscalar(value):
         return PARAM_TYPE_CONSTANT_ID
@@ -67,6 +87,11 @@ def param_generator_id(value):
 
 
 def is_param_generatable(value):
+    """
+    :param value: The value to examine the type of.
+    :return: Whether the value is of a type that can be generated on chip.
+    :rtype: bool
+    """
     if isinstance(value, str):
         return False
     if numpy.isscalar(value):
@@ -114,6 +139,7 @@ def param_generator_params_size_in_bytes(values):
     :param values:
     :type values: int or ~pyNN.random.NumpyRNG
     :rtype: int
+    :raises TypeError: If `values` is of an unsupported data type
     """
     if numpy.isscalar(values):
         return BYTES_PER_WORD

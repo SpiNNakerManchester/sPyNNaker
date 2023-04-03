@@ -319,8 +319,9 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :param extra_params: other keyword arguments used to configure PyNN
     :return: MPI rank (always 0 on SpiNNaker)
     :rtype: int
-    :raises ConfigurationException: if both ``n_chips_required`` and
-        ``n_boards_required`` are used.
+    :raises \
+        ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
+        if both ``n_chips_required`` and ``n_boards_required`` are used.
     """
     # pylint: disable=global-statement
     global __simulator

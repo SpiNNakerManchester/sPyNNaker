@@ -128,6 +128,9 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.__error_keys = set()
 
     def add_receive_label(self, label):
+        """
+        :param str label:
+        """
         if self.__receive_labels is None:
             self.__receive_labels = list()
         if label not in self.__receive_labels:
@@ -185,7 +188,9 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             or resume message has been received. This function should take
             the label of the referenced vertex, and an instance of this
             class, which can be used to send events.
-        :type start_resume_callback: callable(str, LiveEventConnection) -> None
+        :type start_resume_callback: callable(str,
+            ~spinn_front_end_common.utilities.connections.LiveEventConnection)
+            -> None
         """
         self.__start_resume_callbacks[label].append(start_resume_callback)
 
@@ -198,7 +203,9 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             or stop message has been received. This function should take the
             label of the referenced  vertex, and an instance of this class,
             which can be used to send events.
-        :type pause_stop_callback: callable(str, LiveEventConnection) -> None
+        :type pause_stop_callback: callable(str,
+            ~spinn_front_end_common.utilities.connections.LiveEventConnection)
+            -> None
         """
         self.__pause_stop_callbacks[label].append(pause_stop_callback)
 

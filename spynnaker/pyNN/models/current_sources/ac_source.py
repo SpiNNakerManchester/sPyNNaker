@@ -25,7 +25,6 @@ class ACSource(AbstractCurrentSource):
     """
     AC current source (i.e. sine wave) turned on at "start" and off at
     "stop", given (y-)offset, amplitude, frequency and phase.
-
     """
     __slots__ = [
         "__start",
@@ -39,6 +38,14 @@ class ACSource(AbstractCurrentSource):
 
     def __init__(self, start=0.0, stop=0.0, amplitude=0.0, offset=0.0,
                  frequency=0.0, phase=0.0):
+        """
+        :param float start:
+        :param float stop:
+        :param float amplitude:
+        :param float offset:
+        :param float frequency:
+        :param float phase:
+        """
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
         time_convert_ms = SpynnakerDataView.get_simulation_time_step_per_ms()
@@ -67,12 +74,8 @@ class ACSource(AbstractCurrentSource):
 
         super().__init__()
 
+    @overrides(AbstractCurrentSource.set_parameters)
     def set_parameters(self, **parameters):
-        """
-        Set the current source parameters.
-
-        :param parameters: the parameters to set
-        """
         for key, value in parameters.items():
             if key not in self.__parameters.keys():
                 # throw an exception
@@ -93,40 +96,20 @@ class ACSource(AbstractCurrentSource):
     @property
     @overrides(AbstractCurrentSource.get_parameters)
     def get_parameters(self):
-        """
-        The parameters of the current source.
-
-        :rtype dict(str, Any)
-        """
         return self.__parameters
 
     @property
     @overrides(AbstractCurrentSource.get_parameter_types)
     def get_parameter_types(self):
-        """
-        The parameters of the current source.
-
-        :rtype dict(str, Any)
-        """
         return self.__parameter_types
 
     @property
     @overrides(AbstractCurrentSource.current_source_id)
     def current_source_id(self):
-        """
-        The ID of the current source.
-
-        :rtype: int
-        """
         return CurrentSourceIDs.AC_SOURCE.value
 
     @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self):
-        """
-        The SDRAM usage of the current source.
-
-        :rtype: int
-        """
         return len(self.__parameters) * BYTES_PER_WORD
 
     def _get_frequency(self, frequency):

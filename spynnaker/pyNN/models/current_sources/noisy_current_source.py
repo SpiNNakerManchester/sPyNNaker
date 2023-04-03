@@ -41,6 +41,14 @@ class NoisyCurrentSource(AbstractCurrentSource):
 
     def __init__(self, mean=0.0, stdev=0.0, start=0.0, stop=0.0, dt=1.0,
                  rng=None):
+        """
+        :param float mean:
+        :param float stdev:
+        :param float start:
+        :param float stop:
+        :param float dt:
+        :param rng:
+        """
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
         time_convert_ms = SpynnakerDataView.get_simulation_time_step_per_ms()
@@ -52,6 +60,7 @@ class NoisyCurrentSource(AbstractCurrentSource):
         if rng is None:
             seed = None
             self.__rng = numpy.random.RandomState(seed)
+        # TODO: What happens if we pass a non-None rng?
 
         # Error if dt is not the same as machine time step
         if dt != (1 / time_convert_ms):
@@ -78,12 +87,8 @@ class NoisyCurrentSource(AbstractCurrentSource):
 
         super().__init__()
 
+    @overrides(AbstractCurrentSource.set_parameters)
     def set_parameters(self, **parameters):
-        """
-        Set the current source parameters.
-
-        :param parameters: the parameters to set
-        """
         for key, value in parameters.items():
             if key not in self.__parameters.keys():
                 # throw an exception
@@ -99,39 +104,19 @@ class NoisyCurrentSource(AbstractCurrentSource):
     @property
     @overrides(AbstractCurrentSource.get_parameters)
     def get_parameters(self):
-        """
-        The parameters of the current source.
-
-        :rtype dict(str, Any)
-        """
         return self.__parameters
 
     @property
     @overrides(AbstractCurrentSource.get_parameter_types)
     def get_parameter_types(self):
-        """
-        The parameters of the current source.
-
-        :rtype dict(str, Any)
-        """
         return self.__parameter_types
 
     @property
     @overrides(AbstractCurrentSource.current_source_id)
     def current_source_id(self):
-        """
-        The ID of the current source.
-
-        :rtype: int
-        """
         return CurrentSourceIDs.NOISY_CURRENT_SOURCE.value
 
     @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self):
-        """
-        The SDRAM usage of the current source.
-
-        :rtype: int
-        """
         # 3 because the seed parameter has length 4
         return (len(self.__parameters) + 3) * BYTES_PER_WORD

@@ -60,6 +60,7 @@ class PoolDenseConnector(AbstractConnector):
         :param weights:
             The synaptic strengths.
             Can be:
+
             * single value: the same value will be used for all weights
             * list: the total number of elements must be\
                     (num after pooling * num post)
@@ -104,14 +105,23 @@ class PoolDenseConnector(AbstractConnector):
 
     @property
     def positive_receptor_type(self):
+        """
+        :rtype: str
+        """
         return self.__positive_receptor_type
 
     @property
     def negative_receptor_type(self):
+        """
+        :rtype: str
+        """
         return self.__negative_receptor_type
 
     @property
     def weights(self):
+        """
+        :rtype: ~numpy.ndarray
+        """
         return self.__weights
 
     def __decode_weights(
@@ -258,6 +268,11 @@ class PoolDenseConnector(AbstractConnector):
         return coords
 
     def local_only_n_bytes(self, incoming_slices, n_post_atoms):
+        """
+        :param iterable(~pacman.model.graphs.common.Slice) incoming_slices:
+        :param int n_post_atoms:
+        :rtype: int
+        """
         n_weights = [self.__get_n_sub_weights(s, n_post_atoms)
                      for s in incoming_slices]
         n_weights = [n + 1 if n % 2 != 0 else n for n in n_weights]
@@ -270,7 +285,16 @@ class PoolDenseConnector(AbstractConnector):
     def write_local_only_data(
             self, spec, app_edge, pre_vertex_slice, post_vertex_slice,
             key, mask, n_colour_bits, weight_scales):
-
+        """
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~pacman.model.graphs.application.ApplicationEdge app_edge:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int key:
+        :param int mask
+        :param int n_colour_bits:
+        :param weight_scales:
+        """
         # Write source key info
         spec.write_value(key, data_type=DataType.UINT32)
         spec.write_value(mask, data_type=DataType.UINT32)

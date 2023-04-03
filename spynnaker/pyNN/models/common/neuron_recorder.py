@@ -133,9 +133,17 @@ class NeuronRecorder(object):
             events_per_core_variables, events_per_core_datatypes):
         """
         :param list(str) allowed_variables:
-        :param list(str) data_types:
+        :param dict(str,~data_specification.enums.DataType) data_types:
         :param list(str) bitfield_variables:
         :param int n_neurons:
+        :param list(str) per_timestep_variables:
+        :param per_timestep_datatypes:
+        :type per_timestep_datatypes:
+            dict(str,~data_specification.enums.DataType)
+        :param list(str) events_per_core_variables:
+        :param events_per_core_datatypes:
+        :type events_per_core_datatypes:
+            dict(str,~data_specification.enums.DataType)
         """
         self.__sampling_rates = dict()
         self.__indexes = dict()
@@ -205,6 +213,8 @@ class NeuronRecorder(object):
 
     def _max_recording_per_slice(self, variable, n_atoms):
         """
+        :param str variable:
+        :param int n_atoms:
         """
         if variable not in self.__sampling_rates:
             return None
@@ -361,6 +371,10 @@ class NeuronRecorder(object):
         return get_sampling_interval(self.__sampling_rates[variable])
 
     def get_buffer_data_type(self, variable):
+        """
+        :param str variable:
+        :rtype: BufferDataType
+        """
         if variable == self.SPIKES:
             return BufferDataType.NEURON_SPIKES
         elif variable == self.REWIRING:
@@ -372,6 +386,10 @@ class NeuronRecorder(object):
             return BufferDataType.MATRIX
 
     def get_data_type(self, variable):
+        """
+        :param str variable:
+        :rtype: ~data_specification.enums.DataType
+        """
         if variable in self.__per_timestep_variables:
             return self.__per_timestep_datatypes[variable]
         if variable in self.__data_types:
@@ -732,7 +750,7 @@ class NeuronRecorder(object):
         Get the sizes of the regions for the variables, whether they are
         recorded or not, with those that are not having a size of 0.
 
-        :param ~pacman.model.graphs.commmon.Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: list(int)
         """
         values = list()
@@ -1106,10 +1124,11 @@ class NeuronRecorder(object):
         :param vertex_slice:
             The slice to generate the data for, or `None` to generate for
             all neurons (assuming all the same, otherwise error)
-        :type vertex_slice: Slice or None
+        :type vertex_slice: ~pacman.model.graphs.common.Slice or None
         :param atoms_shape:
             The shape of the atoms in the vertex;
-            if vertex_slice is not `None`, atoms_shape must be not `None`
+            if `vertex_slice` is not `None`, atoms_shape must be not `None`
+        :type atoms_shape: tuple(int) or None
         :rtype: numpy.ndarray
         """
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)

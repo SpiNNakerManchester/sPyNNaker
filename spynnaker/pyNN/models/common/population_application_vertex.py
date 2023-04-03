@@ -380,7 +380,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
-        :raise ConfigurationException:
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             if the population doesn't support injection
         """
         raise ConfigurationException(

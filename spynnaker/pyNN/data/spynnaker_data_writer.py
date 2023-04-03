@@ -25,7 +25,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
     """
-    See UtilsDataWriter.
+    See :py:class:`~spinn_utilities.data.utils_data_writer.UtilsDataWriter`.
 
     This class is designed to only be used directly by AbstractSpinnakerBase
     and its subclasses and within the PyNN repositories unittests.

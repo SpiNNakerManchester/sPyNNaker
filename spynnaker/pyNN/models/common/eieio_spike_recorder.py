@@ -46,8 +46,8 @@ class EIEIOSpikeRecorder(object):
 
     def set_recording(self, new_state, sampling_interval=None):
         """
-        :param new_state: bool
-        :param sampling_interval: not supported functionality
+        :param bool new_state:
+        :param None sampling_interval: not supported functionality
         """
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
