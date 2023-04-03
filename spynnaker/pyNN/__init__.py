@@ -268,7 +268,7 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
     :param src: Measure from this cell
     :param tgt: To this cell
     :param ~numpy.ndarray mask:
-        allows only certain dimensions to be considered, e.g.:
+        allows only certain dimensions to be considered, e.g.,
         to ignore the z-dimension, use ``mask=array([0,1])``,
         to ignore y, use ``mask=array([0,2])``, and
         to just consider z-distance, use ``mask=array([2])``

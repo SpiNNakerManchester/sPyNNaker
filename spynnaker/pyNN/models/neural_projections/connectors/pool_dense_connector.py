@@ -58,14 +58,12 @@ class PoolDenseConnector(AbstractConnector):
                  verbose=False, callback=None):
         """
         :param weights:
-            The synaptic strengths.
-            Can be:
-                * single value: the same value will be used for all weights
-                * list: the total number of elements must be\
-                    (num after pooling * num post)
-                * :py:class:`~numpy.ndarray`: As above for list
-                * :py:class:`RandomDistribution`: \
-                    weights will be drawn at random
+            The synaptic strengths. Can be:
+            * single value: the same value will be used for all weights
+            * list: the total number of elements must be\
+                (num after pooling * num post)
+            * :py:class:`~numpy.ndarray`: As above for list
+            * :py:class:`RandomDistribution`: weights will be drawn at random
         :type weights:
             int or float or list or ~numpy.ndarray or RandomDistribution
         :param pool_shape:
