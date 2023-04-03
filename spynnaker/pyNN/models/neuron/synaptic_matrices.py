@@ -385,7 +385,7 @@ class SynapticMatrices(object):
         n_atoms = min(max_atoms_per_core, pre.n_atoms)
 
         return AppKeyInfo(r_info.key, r_info.mask, core_mask,
-                           mask_size, n_atoms * n_stages, n_colour_bits)
+                          mask_size, n_atoms * n_stages, n_colour_bits)
 
     def __app_key_and_mask(self, app_edge):
         """
