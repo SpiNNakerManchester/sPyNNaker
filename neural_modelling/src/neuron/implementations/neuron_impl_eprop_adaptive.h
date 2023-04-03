@@ -71,10 +71,10 @@ enum bitfield_recording_indices {
 //extern uint32_t time;
 extern REAL learning_signal;
 //uint32_t neurons_in_pop;
-uint32_t syn_dynamics_neurons_in_partition;
+uint32_t neuron_impl_neurons_in_partition;
 
 //! Array of neuron states
-static neuron_t *neuron_array;
+neuron_t *neuron_array;
 
 //! Input states array
 static input_type_t *input_type_array;
@@ -180,7 +180,7 @@ static void neuron_impl_load_neuron_parameters(
             next, n_neurons);
 
     // get number of neurons running on this core for use during execution
-    syn_dynamics_neurons_in_partition = n_neurons;
+    neuron_impl_neurons_in_partition = n_neurons;
 
     // Read the number of steps per timestep
     n_steps_per_timestep = address[next++];
@@ -340,7 +340,7 @@ static void neuron_impl_do_timestep_update(
 
 	for (uint32_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
-		log_info("neuron_index %u time %u ", neuron_index, time);
+//		log_info("neuron_index %u time %u ", neuron_index, time);
 
 		// Get the neuron itself
 		neuron_t *neuron = &neuron_array[neuron_index];
@@ -485,7 +485,7 @@ static void neuron_impl_do_timestep_update(
 //	//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].el_a;
 //	//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->B;
 
-		log_info("Updating neuron parameters B_t = %k ", B_t);
+//		log_info("Updating neuron parameters B_t = %k ", B_t);
 
 		// update neuron parameters
 		state_t result = neuron_model_state_update(
@@ -501,12 +501,12 @@ static void neuron_impl_do_timestep_update(
 	////                                    / ((accum)(time%1300)
 	////                                    / (1.225k
 	//                                    / (accum_time
-	//                                    * (accum)syn_dynamics_neurons_in_partition))
+	//                                    * (accum)neuron_impl_neurons_in_partition))
 	//                                    - global_parameters->core_target_rate;
-	//    REAL reg_learning_signal = global_parameters->core_target_rate - (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition);
-	//    REAL reg_learning_signal = (global_parameters->core_pop_rate / syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
+	//    REAL reg_learning_signal = global_parameters->core_target_rate - (global_parameters->core_pop_rate / neuron_impl_neurons_in_partition);
+	//    REAL reg_learning_signal = (global_parameters->core_pop_rate / neuron_impl_neurons_in_partition) - global_parameters->core_target_rate;
 		REAL reg_learning_signal = (
-				neuron->core_pop_rate / syn_dynamics_neurons_in_partition) - neuron->core_target_rate;
+				neuron->core_pop_rate / neuron_impl_neurons_in_partition) - neuron->core_target_rate;
 //		recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = reg_learning_signal;//global_parameters->core_pop_rate;
 		neuron_recording_record_accum(
 				GSYN_EXC_RECORDING_INDEX, neuron_index, reg_learning_signal);
@@ -515,7 +515,7 @@ static void neuron_impl_do_timestep_update(
 		// TODO: there's quite a few divides lurking in this code, it may
 		//       be worth looking to see if any of them can be replaced
 
-		log_info("Check: voltage %k neuron->B %k time %u", voltage, neuron->B, time);
+//		log_info("Check: voltage %k neuron->B %k time %u", voltage, neuron->B, time);
 
 		state_t nu = (voltage - neuron->B)/neuron->B;
 

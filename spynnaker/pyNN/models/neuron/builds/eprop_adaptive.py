@@ -39,7 +39,7 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             tau_refrac=5.0, i_offset=0.0, v=0.0,  psi=0.0,
 
             #synapse type params
-            tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, tau_syn_I2=5.0,
+            # tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, tau_syn_I2=5.0,
             isyn_exc=0.0, isyn_exc2=0.0, isyn_inh=0.0, isyn_inh2=0.0,
 
             # Regularisation params
@@ -73,7 +73,7 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             )
 
         synapse_type = SynapseTypeEPropAdaptive(
-            tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2,
+            # tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2,
             isyn_exc, isyn_exc2, isyn_inh, isyn_inh2)
 
         input_type = InputTypeCurrent()

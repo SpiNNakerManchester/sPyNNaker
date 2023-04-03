@@ -6,15 +6,15 @@ from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.data import SpynnakerDataView
 
-TAU_SYN_E = 'tau_syn_E'
-TAU_SYN_E2 = 'tau_syn_E2'
-TAU_SYN_I = 'tau_syn_I'
-TAU_SYN_I2 = 'tau_syn_I2'
+# TAU_SYN_E = 'tau_syn_E'
+# TAU_SYN_E2 = 'tau_syn_E2'
+# TAU_SYN_I = 'tau_syn_I'
+# TAU_SYN_I2 = 'tau_syn_I2'
 ISYN_EXC = "isyn_exc"
 ISYN_EXC2 = "isyn_exc2"
 ISYN_INH = "isyn_inh"
 ISYN_INH2 = "isyn_inh2"
-TIMESTEP_MS = "timestep_ms"
+# TIMESTEP_MS = "timestep_ms"
 
 # UNITS = {
 #     TAU_SYN_E: "mV",
@@ -28,38 +28,38 @@ TIMESTEP_MS = "timestep_ms"
 
 class SynapseTypeEPropAdaptive(AbstractSynapseType):
     __slots__ = [
-        "_tau_syn_E",
-        "_tau_syn_E2",
-        "_tau_syn_I",
-        "_tau_syn_I2",
+        # "_tau_syn_E",
+        # "_tau_syn_E2",
+        # "_tau_syn_I",
+        # "_tau_syn_I2",
         "_isyn_exc",
         "_isyn_exc2",
         "_isyn_inh",
         "_isyn_inh2"]
 
     def __init__(
-            self, tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2,
-            isyn_exc, isyn_exc2, isyn_inh, isyn_inh2
+            self, isyn_exc, isyn_exc2, isyn_inh, isyn_inh2
             ):
         super().__init__(
             [Struct([
-                (DataType.S1615, TAU_SYN_E),
+                # (DataType.S1615, TAU_SYN_E),
                 (DataType.S1615, ISYN_EXC),
-                (DataType.S1615, TAU_SYN_E2),
+                # (DataType.S1615, TAU_SYN_E2),
                 (DataType.S1615, ISYN_EXC2),
-                (DataType.S1615, TAU_SYN_I),
+                # (DataType.S1615, TAU_SYN_I),
                 (DataType.S1615, ISYN_INH),
-                (DataType.S1615, TAU_SYN_I2),
-                (DataType.S1615, ISYN_INH2),
-                (DataType.S1615, TIMESTEP_MS)])],
-            {TAU_SYN_E: "mV", TAU_SYN_E2: "mV", TAU_SYN_I: "mV",
-             TAU_SYN_I2: "mV", ISYN_EXC: "", ISYN_EXC2: "",
+                # (DataType.S1615, TAU_SYN_I2),
+                (DataType.S1615, ISYN_INH2)])],
+            {ISYN_EXC: "", ISYN_EXC2: "",
              ISYN_INH: "", ISYN_INH2: ""})
+            # {TAU_SYN_E: "mV", TAU_SYN_E2: "mV", TAU_SYN_I: "mV",
+            #  TAU_SYN_I2: "mV", ISYN_EXC: "", ISYN_EXC2: "",
+            #  ISYN_INH: "", ISYN_INH2: ""})
 
-        self._tau_syn_E = tau_syn_E
-        self._tau_syn_E2 = tau_syn_E2
-        self._tau_syn_I = tau_syn_I
-        self._tau_syn_I2 = tau_syn_I2
+        # self._tau_syn_E = tau_syn_E
+        # self._tau_syn_E2 = tau_syn_E2
+        # self._tau_syn_I = tau_syn_I
+        # self._tau_syn_I2 = tau_syn_I2
         self._isyn_exc = isyn_exc
         self._isyn_exc2 = isyn_exc2
         self._isyn_inh = isyn_inh
@@ -71,12 +71,7 @@ class SynapseTypeEPropAdaptive(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[TAU_SYN_E] = self._tau_syn_E
-        parameters[TAU_SYN_E2] = self._tau_syn_E2
-        parameters[TAU_SYN_I] = self._tau_syn_I
-        parameters[TAU_SYN_I2] = self._tau_syn_I2
-        parameters[TIMESTEP_MS] = (
-            SpynnakerDataView.get_simulation_time_step_ms())
+        pass
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -147,37 +142,37 @@ class SynapseTypeEPropAdaptive(AbstractSynapseType):
     def get_synapse_targets(self):
         return "input_connections", "recurrent_connections", "learning_signal", "unused"
 
-    @property
-    def tau_syn_E(self):
-        return self._tau_syn_E
-
-    @tau_syn_E.setter
-    def tau_syn_E(self, tau_syn_E):
-        self._tau_syn_E = tau_syn_E
-
-    @property
-    def tau_syn_E2(self):
-        return self._tau_syn_E2
-
-    @tau_syn_E2.setter
-    def tau_syn_E2(self, tau_syn_E2):
-        self._tau_syn_E2 = tau_syn_E2
-
-    @property
-    def tau_syn_I(self):
-        return self._tau_syn_I
-
-    @tau_syn_I.setter
-    def tau_syn_I(self, tau_syn_I):
-        self._tau_syn_I = tau_syn_I
-
-    @property
-    def tau_syn_I2(self):
-        return self._tau_syn_I2
-
-    @tau_syn_I2.setter
-    def tau_syn_I2(self, tau_syn_I2):
-        self._tau_syn_I2 = tau_syn_I2
+    # @property
+    # def tau_syn_E(self):
+    #     return self._tau_syn_E
+    #
+    # @tau_syn_E.setter
+    # def tau_syn_E(self, tau_syn_E):
+    #     self._tau_syn_E = tau_syn_E
+    #
+    # @property
+    # def tau_syn_E2(self):
+    #     return self._tau_syn_E2
+    #
+    # @tau_syn_E2.setter
+    # def tau_syn_E2(self, tau_syn_E2):
+    #     self._tau_syn_E2 = tau_syn_E2
+    #
+    # @property
+    # def tau_syn_I(self):
+    #     return self._tau_syn_I
+    #
+    # @tau_syn_I.setter
+    # def tau_syn_I(self, tau_syn_I):
+    #     self._tau_syn_I = tau_syn_I
+    #
+    # @property
+    # def tau_syn_I2(self):
+    #     return self._tau_syn_I2
+    #
+    # @tau_syn_I2.setter
+    # def tau_syn_I2(self, tau_syn_I2):
+    #     self._tau_syn_I2 = tau_syn_I2
 
     @property
     def isyn_exc(self):
@@ -199,8 +194,8 @@ class SynapseTypeEPropAdaptive(AbstractSynapseType):
     def isyn_inh2(self):
         return self._isyn_inh2
 
-    @isyn_inh.setter
-    def isyn_inh(self, isyn_inh2):
+    @isyn_inh2.setter
+    def isyn_inh2(self, isyn_inh2):
         self._isyn_inh2 = isyn_inh2
 
     @property

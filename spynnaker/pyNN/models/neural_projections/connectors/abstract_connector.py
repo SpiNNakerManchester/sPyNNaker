@@ -143,6 +143,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
+        elif hasattr(delays, "__getitem__"):
+            return numpy.max(delays)
         raise SpynnakerException(f"Unrecognised delay format: {type(delays)}")
 
     @abstractmethod
@@ -177,6 +179,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return 0.0
+        elif hasattr(delays, "__getitem__"):
+            return numpy.var(delays)
         raise SpynnakerException("Unrecognised delay format")
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
@@ -266,6 +270,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.mean(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
+        elif hasattr(weights, "__getitem__"):
+            return numpy.mean(weights)
         raise SpynnakerException("Unrecognised weight format")
 
     def _get_weight_maximum(self, weights, n_connections, synapse_info):
@@ -297,6 +303,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return abs(weights)
+        elif hasattr(weights, "__getitem__"):
+            return numpy.amax(numpy.abs(weights))
         raise SpynnakerException("Unrecognised weight format")
 
     @abstractmethod
@@ -321,6 +329,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.var(_expr_context.eval(weights, d=d))
         elif numpy.isscalar(weights):
             return 0.0
+        elif hasattr(weights, "__getitem__"):
+            return numpy.var(weights)
         raise SpynnakerException("Unrecognised weight format")
 
     def _expand_distances(self, d_expression):
@@ -418,6 +428,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return values(d)
         elif numpy.isscalar(values):
             return numpy.repeat([values], n_connections).astype("float64")
+        elif hasattr(values, "__getitem__"):
+            return numpy.array(values).astype("float64")
         raise SpynnakerException("Unrecognised values {}".format(values))
 
     def _generate_weights(

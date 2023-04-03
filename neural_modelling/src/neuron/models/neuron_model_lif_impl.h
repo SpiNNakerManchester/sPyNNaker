@@ -146,6 +146,7 @@ static inline state_t neuron_model_state_update(
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
+    	REAL total_exc = ZERO;
     	REAL total_inh = ZERO;
 
         for (int i=0; i < num_excitatory_inputs; i++) {

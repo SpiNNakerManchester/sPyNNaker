@@ -346,6 +346,9 @@ class SynapseDynamicsSTDP(
         n_neuron_id_bits = get_n_bits(max_atoms_per_core)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
+        dendritic_delays = (
+            connections["delay"] * self.__dendritic_delay_fraction)
+
         # Get the fixed data
         fixed_plastic = (
             ((dendritic_delays.astype("uint16") & 0xFF) <<

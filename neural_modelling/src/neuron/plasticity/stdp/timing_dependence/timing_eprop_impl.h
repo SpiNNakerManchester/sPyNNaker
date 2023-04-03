@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _TIMING_PAIR_IMPL_H_
-#define _TIMING_PAIR_IMPL_H_
+#ifndef _TIMING_EPROP_IMPL_H_
+#define _TIMING_EPROP_IMPL_H_
 
 //---------------------------------------
 // Typedefines
@@ -24,7 +24,7 @@
 typedef int16_t post_trace_t;
 typedef int16_t pre_trace_t;
 
-#include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h>
+#include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_eprop_impl.h>
 #include "timing.h"
 #include <neuron/plasticity/stdp/weight_dependence/weight_one_term.h>
 
@@ -48,10 +48,10 @@ typedef int16_t pre_trace_t;
 // Helper macros for looking up decays
 #define DECAY_LOOKUP_TAU_PLUS(time) \
     maths_lut_exponential_decay( \
-	        time, TAU_PLUS_TIME_SHIFT, TAU_PLUS_SIZE, tau_plus_lookup)
+	        time, tau_plus_lookup)
 #define DECAY_LOOKUP_TAU_MINUS(time) \
     maths_lut_exponential_decay( \
-            time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
+            time, tau_minus_lookup)
 
 //---------------------------------------
 // Externals
@@ -157,4 +157,4 @@ static inline update_state_t timing_apply_post_spike(
     }
 }
 
-#endif // _TIMING_PAIR_IMPL_H_
+#endif // _TIMING_EPROP_IMPL_H_

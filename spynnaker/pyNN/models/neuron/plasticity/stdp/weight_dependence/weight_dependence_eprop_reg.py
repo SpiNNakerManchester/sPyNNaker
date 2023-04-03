@@ -19,6 +19,7 @@ from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
 
 
+# TODO: this doesn't have Aplus and Aminus?
 class WeightDependenceEpropReg(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
     __slots__ = [
@@ -27,7 +28,7 @@ class WeightDependenceEpropReg(
         "__reg_rate"]
 
     def __init__(self, w_min=0.0, w_max=1.0, reg_rate=0.0):
-        super(WeightDependenceEpropReg, self).__init__()
+        super().__init__()
         self.__w_min = w_min
         self.__w_max = w_max
         self.__reg_rate = reg_rate
@@ -39,7 +40,7 @@ class WeightDependenceEpropReg(
     @property
     def w_max(self):
         return self.__w_max
-    
+
     @property
     def reg_rate(self):
         return self.__reg_rate
@@ -64,29 +65,34 @@ class WeightDependenceEpropReg(
             self, n_synapse_types, n_weight_terms):
         if n_weight_terms != 1:
             raise NotImplementedError(
-                "Multiplicative weight dependence only supports single terms")
+                "Eprop_reg weight dependence only supports single terms")
 
-        return (3  # Number of 32-bit parameters
+        return (5  # Number of 32-bit parameters
                 * 4) * n_synapse_types
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, global_weight_scale, synapse_weight_scales,
+            n_weight_terms):
         if n_weight_terms != 1:
             raise NotImplementedError(
-                "Multiplicative weight dependence only supports single terms")
+                "Eprop_reg weight dependence only supports single terms")
 
         # Loop through each synapse type's weight scale
-        for w in weight_scales:
+        for w in synapse_weight_scales:
             spec.write_value(
-                data=int(round(self.__w_min * w)), data_type=DataType.INT32)
+                data=self.__w_min * global_weight_scale,
+                data_type=DataType.S1615)
             spec.write_value(
-                data=int(round(self.__w_max * w)), data_type=DataType.INT32)
+                data=self.__w_max * global_weight_scale,
+                data_type=DataType.S1615)
 
-#             spec.write_value(
-#                 data=int(round(self.A_plus * w)), data_type=DataType.INT32)
-#             spec.write_value(
-#                 data=int(round(self.A_minus * w)), data_type=DataType.INT32)
+            spec.write_value(
+                data=self.A_plus * global_weight_scale,
+                data_type=DataType.S1615)
+            spec.write_value(
+                data=self.A_minus * global_weight_scale,
+                data_type=DataType.S1615)
 
             spec.write_value(self.__reg_rate, data_type=DataType.S1615)
 

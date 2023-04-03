@@ -24,7 +24,7 @@
 #include <debug.h>
 #include <spin1_api.h>
 #include <utils.h>
-#include "models/neuron_model_eprop_adaptive_impl.h"
+//#include "models/neuron_model_eprop_adaptive_impl.h"
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED
@@ -33,7 +33,7 @@
 
 //! Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
-//extern neuron_pointer_t neuron_array;
+//extern neuron_t *neuron_array;
 
 //! The number of neurons
 static uint32_t n_neurons;
@@ -239,6 +239,10 @@ static inline bool process_fixed_synapses(
         // Add weight to current ring buffer value
         int32_t accumulation = ring_buffers[ring_buffer_index] + weight; // switch to saturated arithmetic to avoid complicated saturation check, will it check saturation at both ends?
 
+//        int32_t test = -22;
+//        log_info("Check weight: %d accumulation %d test %d buffer %d", weight, accumulation, test,
+//        		ring_buffers[ring_buffer_index]);
+
         // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
         // **NOTE** 0x10000 can be expressed as an ARM literal,
         //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
@@ -308,16 +312,16 @@ bool synapses_initialise(
     synapse_index_mask = (1 << synapse_index_bits) - 1;
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
-    synapse_delay_bits = log_max_delay;
+    synapse_delay_bits = 1; // log_max_delay;
     synapse_delay_mask = (1 << synapse_delay_bits) - 1;
     synapse_delay_mask_shifted = synapse_delay_mask << synapse_type_index_bits;
 
     n_neurons_peak = 1 << log_n_neurons;
 
-//    uint32_t n_ring_buffer_bits =
-//            log_n_neurons + log_n_synapse_types + synapse_delay_bits; // synapse_delay_bits = 1?
     uint32_t n_ring_buffer_bits =
-            log_n_neurons + log_n_synapse_types + 1; // synapse_delay_bits = 1?
+            log_n_neurons + log_n_synapse_types + synapse_delay_bits; // synapse_delay_bits = 1?
+//    uint32_t n_ring_buffer_bits =
+//            log_n_neurons + log_n_synapse_types + 1; // synapse_delay_bits = 1?
     ring_buffer_size = 1 << (n_ring_buffer_bits);
     ring_buffer_mask = ring_buffer_size - 1;
 

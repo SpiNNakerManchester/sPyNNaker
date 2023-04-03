@@ -16,8 +16,8 @@
 
 //! \file
 //! \brief Synapses just hold weight
-#ifndef _SYNAPSE_STRUCUTRE_WEIGHT_IMPL_H_
-#define _SYNAPSE_STRUCUTRE_WEIGHT_IMPL_H_
+#ifndef _SYNAPSE_STRUCUTRE_WEIGHT_EPROP_IMPL_H_
+#define _SYNAPSE_STRUCUTRE_WEIGHT_EPROP_IMPL_H_
 
 //---------------------------------------
 // Structures
@@ -51,8 +51,8 @@ static inline update_state_t synapse_structure_get_update_state(
 //! \param[in] state: the update state
 //! \return the final state
 static inline final_state_t synapse_structure_get_final_state(
-        update_state_t state) {
-    return weight_get_final(state);
+        update_state_t state, REAL reg_error) {
+    return weight_get_final(state, reg_error);
 }
 
 //---------------------------------------
@@ -100,4 +100,4 @@ static inline accum synapse_structure_get_update_weight(update_state_t state) {
     return weight_get_update(state);
 }
 
-#endif  // _SYNAPSE_STRUCUTRE_WEIGHT_IMPL_H_
+#endif  // _SYNAPSE_STRUCUTRE_WEIGHT_EPROP_IMPL_H_

@@ -800,8 +800,6 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         record_raw = self._read_contents(cursor, region_id)
         record_length = len(record_raw)
 
-        print("record_length, region_id: ", record_length, region_id)
-
         # There is one column for time and one for each neuron recording
         data_row_length = len(neurons) * data_type.size
         full_row_length = data_row_length + self.__N_BYTES_FOR_TIMESTAMP

@@ -20,7 +20,9 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsNeuromodulation as Neuromodulation)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceAdditiveTriplet)
+    WeightDependenceAdditiveTriplet, WeightDependenceEpropReg)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceEprop)
 from spynnaker.pyNN.models.neuron.builds import (
     IFCondExpStoc,
     IFCurrDelta as IFCurDelta,
@@ -47,6 +49,9 @@ __all__ = [
     'PfisterSpikeTriplet',
     'SpikeNearestPairRule',
     'RecurrentRule', 'Vogels2011Rule',
+    # eprop plastic stuff
+    'TimingDependenceEprop',
+    'WeightDependenceEprop',
 
     # Variable rate Poisson
     'SpikeSourcePoissonVariable']

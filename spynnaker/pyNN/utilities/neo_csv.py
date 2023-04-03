@@ -285,14 +285,11 @@ class NeoCsv(object):
             source_population=block.name,
             source_ids=ids)
 
-        print("insert_matrix_data variable, segment, block, source_ids, t_start, sampling_rate ",
-              variable, segment, block, ids, t_start, sampling_rate)
         channel_index = self.__get_channel_index(indexes, segment.block)
         data_array.channel_index = channel_index
         data_array.shape = (data_array.shape[0], data_array.shape[1])
         segment.analogsignals.append(data_array)
         channel_index.analogsignals.append(data_array)
-        print("data_array shape: ", data_array.shape)
 
     def _csv_matrix_data(self, csv_writer, signal_array, indexes):
         """ Writes data to a csv file

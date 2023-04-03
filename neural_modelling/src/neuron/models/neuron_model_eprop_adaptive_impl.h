@@ -33,6 +33,7 @@ extern uint32_t time;
 //extern global_neuron_params_pointer_t global_parameters;
 extern uint32_t syn_dynamics_neurons_in_partition;
 
+
 typedef struct eprop_syn_state_t {
 	REAL delta_w; // weight change to apply
 	REAL z_bar_inp;
@@ -178,6 +179,8 @@ struct neuron_t {
 
 };
 
+//neuron_t *neuron_array;
+
 //typedef struct global_neuron_params_t {
 //	REAL core_pop_rate;
 //	REAL core_target_rate;
@@ -239,9 +242,9 @@ static inline void neuron_model_initialise(
 	state->V_reset = params->V_reset;
 	state->T_refract = lif_ceil_accum(kdivk(params->T_refract_ms, ts));
 
-	log_info("V_membrane %k V_rest %k R_membrane %k exp_TC %k I_offset %k refract_timer %k V_reset %k T_refract %k",
-			state->V_membrane, state->V_rest, state->R_membrane, state->exp_TC, state->I_offset,
-			state->refract_timer, state->V_reset, state->T_refract);
+//	log_info("V_membrane %k V_rest %k R_membrane %k exp_TC %k I_offset %k refract_timer %k V_reset %k T_refract %k",
+//			state->V_membrane, state->V_rest, state->R_membrane, state->exp_TC, state->I_offset,
+//			state->refract_timer, state->V_reset, state->T_refract);
 
 	// for everything else just copy across for now
 	state->z = params->z;
@@ -259,16 +262,16 @@ static inline void neuron_model_initialise(
 	state->window_size = params->window_size;
 	state->number_of_cues = params->number_of_cues;
 
-	log_info("Check: z %k A %k psi %k B %k b %k b_0 %k window_size %u",
-			state->z, state->A, state->psi, state->B, state->b, state->b_0, state->window_size);
+//	log_info("Check: z %k A %k psi %k B %k b %k b_0 %k window_size %u",
+//			state->z, state->A, state->psi, state->B, state->b, state->b_0, state->window_size);
 
 	state->core_pop_rate = 0.0k;
 	state->core_target_rate = params->target_rate;
 	state->rate_exp_TC = expk(-kdivk(ts, params->tau_err));
 	state->eta = params->eta;
 
-	log_info("Check: core_pop_rate %k core_target_rate %k rate_exp_TC %k eta %k",
-			state->core_pop_rate, state->core_target_rate, state->rate_exp_TC, state->eta);
+//	log_info("Check: core_pop_rate %k core_target_rate %k rate_exp_TC %k eta %k",
+//			state->core_pop_rate, state->core_target_rate, state->rate_exp_TC, state->eta);
 
 	for (uint32_t n_syn = 0; n_syn < SYNAPSES_PER_NEURON; n_syn++) {
 		state->syn_state[n_syn] = params->syn_state[n_syn];
@@ -289,9 +292,14 @@ static inline void lif_neuron_closed_form(
 
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 
+//    log_info("alpha %k input %k R_membrane %k V_rest %k",
+//    		alpha, input_this_timestep, neuron->R_membrane, neuron->V_rest);
+
     // update membrane voltage
     neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev))
     		- neuron->z * B_t; // this line achieves reset
+
+//    log_info("neuron->V_membrane is %k neuron_z %k B_t %k", neuron->V_membrane, neuron->z, B_t);
 }
 
 //void neuron_model_set_global_neuron_params(
@@ -327,6 +335,8 @@ state_t neuron_model_state_update(
     // Get the input in nA
     input_t input_this_timestep =
     		exc_input[0] + exc_input[1] + neuron->I_offset + external_bias + current_offset;
+
+//    log_info("exc input 0 %k exc input 1 %k I_offset %k", exc_input[0], exc_input[1], neuron->I_offset);
 
     lif_neuron_closed_form(
             neuron, neuron->V_membrane, input_this_timestep, B_t);
@@ -400,8 +410,8 @@ state_t neuron_model_state_update(
 //                                    * (accum)syn_dynamics_neurons_in_partition))
 //                                    - global_parameters->core_target_rate;
 
-    log_info("update learning signal syn_dynamics_neurons_in_partition %u ",
-    		syn_dynamics_neurons_in_partition);
+//    log_info("update learning signal syn_dynamics_neurons_in_partition %u ",
+//    		syn_dynamics_neurons_in_partition);
 
     REAL reg_learning_signal = (neuron->core_pop_rate // make it work for different ts
 //                                    / ((accum)(time%1300)

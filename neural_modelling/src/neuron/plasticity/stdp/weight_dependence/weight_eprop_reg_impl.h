@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _WEIGHT_ADDITIVE_ONE_TERM_IMPL_H_
-#define _WEIGHT_ADDITIVE_ONE_TERM_IMPL_H_
+#ifndef _WEIGHT_EPROPREG_ONE_TERM_IMPL_H_
+#define _WEIGHT_EPROPREG_ONE_TERM_IMPL_H_
 
 // Include generic plasticity maths functions
 #include <neuron/plasticity/stdp/maths.h>
@@ -29,18 +29,18 @@
 // Structures
 //---------------------------------------
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
+    accum min_weight;
+    accum max_weight;
+    accum a2_plus;
+    accum a2_minus;
+
     REAL reg_rate;
-//    int32_t a2_plus;
-//    int32_t a2_minus;
 } plasticity_weight_region_data_t;
 
 typedef struct {
-    int32_t initial_weight;
+    accum weight;
 
-    int32_t a2_plus;
-    int32_t a2_minus;
+    uint32_t weight_shift;
 
     const plasticity_weight_region_data_t *weight_region;
 } weight_state_t;
@@ -50,17 +50,21 @@ typedef struct {
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern plasticity_weight_region_data_t *plasticity_weight_region_data;
+//extern plasticity_weight_region_data_t *plasticity_weight_region_data;
 
 //---------------------------------------
-// STDP weight dependance functions
+// STDP weight dependence functions
 //---------------------------------------
 static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
+    extern plasticity_weight_region_data_t *plasticity_weight_region_data;
+    extern uint32_t *weight_shift;
+
+	accum s1615_weight = kbits(weight << weight_shift[synapse_type]);
+
     return (weight_state_t) {
-        .initial_weight = (int32_t) weight,
-        .a2_plus = 0,
-        .a2_minus = 0,
+        .weight = s1615_weight,
+        .weight_shift = weight_shift[synapse_type],
         .weight_region = &plasticity_weight_region_data[synapse_type]
     };
 }
@@ -73,18 +77,25 @@ static inline weight_state_t weight_one_term_apply_depression(
 	if (PRINT_PLASTICITY){
 		io_printf(IO_BUF, "depressing: %d\n", a2_minus);
 	}
-    state.a2_minus += a2_minus;
+    state.weight -= mul_accum_fixed(state.weight_region->a2_minus, a2_minus);
+    state.weight = kbits(MAX(bitsk(state.weight), bitsk(state.weight_region->min_weight)));
     return state;
+//    state.a2_minus += a2_minus;
+//    return state;
 }
 
 //---------------------------------------
 static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t a2_plus) {
+
 	if (PRINT_PLASTICITY){
 		io_printf(IO_BUF, "potentiating: %d\n", a2_plus);
 	}
-    state.a2_plus += a2_plus;
+    state.weight += mul_accum_fixed(state.weight_region->a2_plus, a2_plus);
+    state.weight = kbits(MIN(bitsk(state.weight), bitsk(state.weight_region->max_weight)));
     return state;
+//    state.a2_plus += a2_plus;
+//    return state;
 }
 
 //---------------------------------------
@@ -98,11 +109,12 @@ static inline weight_t weight_get_final(weight_state_t new_state,
 //            new_state.a2_minus, new_state.weight_region->a2_minus);
 
     // Apply eprop plasticity updates to initial weight
-    int32_t new_weight =
-            new_state.initial_weight + new_state.a2_plus + new_state.a2_minus;
-    int32_t reg_weight = new_weight;
-    int32_t reg_change = 0;
-    REAL reg_boundary = 1k;
+	accum new_weight = bitsk(new_state.weight) >> new_state.weight_shift;
+//    int32_t new_weight =
+//            new_state.initial_weight + new_state.a2_plus + new_state.a2_minus;
+    accum reg_weight = new_weight;
+    accum reg_change = 0.0k;
+    REAL reg_boundary = 1.0k;
 
     // Calculate regularisation
     if (new_state.weight_region->reg_rate > 0.0k && (reg_error > reg_boundary || reg_error < -reg_boundary)){ // if reg rate is zero or error small, regularisation is turned off
@@ -119,15 +131,15 @@ static inline weight_t weight_get_final(weight_state_t new_state,
 	if (PRINT_PLASTICITY){
         io_printf(IO_BUF, "\tbefore minmax reg_w:%d, reg_shift:%d, max:%d", reg_weight, reg_change, new_state.weight_region->max_weight);
     }
-    // Clamp new weight to bounds
-    reg_weight = MIN(new_state.weight_region->max_weight,
-            MAX(reg_weight, new_state.weight_region->min_weight));
+    // Clamp new weight to bounds (not sure this is needed now?)
+//    reg_weight = MIN(new_state.weight_region->max_weight,
+//            MAX(reg_weight, new_state.weight_region->min_weight));
 
 	if (PRINT_PLASTICITY){
 		io_printf(IO_BUF, "\told_weight:%d, a2+:%d, a2-:%d, "
 				//    		"scaled a2+:%d, scaled a2-:%d,"
             " new_weight:%d, reg_weight:%d, reg_l_rate:%k, reg_error:%k\n",
-            new_state.initial_weight, new_state.a2_plus, new_state.a2_minus,
+            new_state.weight, new_state.weight_region->a2_plus, new_state.weight_region->a2_minus,
 			//            scaled_a2_plus, scaled_a2_minus,
 			new_weight, reg_weight, new_state.weight_region->reg_rate, reg_error);
 	}
@@ -135,4 +147,4 @@ static inline weight_t weight_get_final(weight_state_t new_state,
     return (weight_t) reg_weight;
 }
 
-#endif // _WEIGHT_ADDITIVE_ONE_TERM_IMPL_H_
+#endif // _WEIGHT_EPROPREG_ONE_TERM_IMPL_H_

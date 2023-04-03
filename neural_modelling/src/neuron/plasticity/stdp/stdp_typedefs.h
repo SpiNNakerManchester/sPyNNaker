@@ -45,5 +45,6 @@
 //! \brief Multiply an accum by an STDP fixed point and return an accum
 static inline accum mul_accum_fixed(accum a, int32_t stdp_fixed) {
     return a * kbits(stdp_fixed << S1615_TO_STDP_RIGHT_SHIFT);
+}
 
 #endif  // _STDP_TYPEDEFS_H_

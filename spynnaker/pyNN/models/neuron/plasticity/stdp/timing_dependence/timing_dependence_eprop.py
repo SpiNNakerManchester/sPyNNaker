@@ -15,8 +15,8 @@
 
 import logging
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    plasticity_helpers)
+# from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+#     plasticity_helpers)
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightOnly)
@@ -32,15 +32,13 @@ logger = logging.getLogger(__name__)
 class TimingDependenceEprop(AbstractTimingDependence):
     __slots__ = [
         "__synapse_structure",
-#         "__tau_minus",
-#         "__tau_minus_last_entry",
-#         "__tau_plus",
-#         "__tau_plus_last_entry"
-        ]
+        "__a_plus",
+        "__a_minus"]
 
-    def __init__(self): #, tau_plus=20.0, tau_minus=20.0):
-#         self.__tau_plus = tau_plus
-#         self.__tau_minus = tau_minus
+    def __init__(self, A_plus=0.01, A_minus=0.01):
+
+        self.__a_plus = A_plus
+        self.__a_minus = A_minus
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
@@ -48,13 +46,21 @@ class TimingDependenceEprop(AbstractTimingDependence):
 #         self.__tau_plus_last_entry = None
 #         self.__tau_minus_last_entry = None
 
-#     @property
-#     def tau_plus(self):
-#         return self.__tau_plus
-#
-#     @property
-#     def tau_minus(self):
-#         return self.__tau_minus
+    @property
+    def A_plus(self):
+        return self.__a_plus
+
+    @A_plus.setter
+    def A_plus(self, new_value):
+        self.__a_plus = new_value
+
+    @property
+    def A_minus(self):
+        return self.__a_minus
+
+    @A_minus.setter
+    def A_minus(self, new_value):
+        self.__a_minus = new_value
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
@@ -83,8 +89,8 @@ class TimingDependenceEprop(AbstractTimingDependence):
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
-    def write_parameters(self, spec, machine_time_step, weight_scales):
-
+    def write_parameters(
+            self, spec, global_weight_scale, synapse_weight_scales):
         # There are currently no parameters to write for this rule
         pass
 
