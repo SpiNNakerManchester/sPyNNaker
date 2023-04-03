@@ -14,8 +14,8 @@
 
 import pyNN.spiNNaker as sim
 import spynnaker
-from spalloc.job import Job
-from spalloc.states import JobState
+from spalloc_client.job import Job
+from spalloc_client.states import JobState
 import pytest
 import tempfile
 import os
