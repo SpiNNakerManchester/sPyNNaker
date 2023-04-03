@@ -270,10 +270,9 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
     :param ~numpy.ndarray mask:
         allows only certain dimensions to be considered, e.g.:
 
-        * to ignore the z-dimension, use ``mask=array([0,1])``
-        * to ignore y, ``mask=array([0,2])``
-        * to just consider z-distance, ``mask=array([2])``
-
+            * to ignore the z-dimension, use ``mask=array([0,1])``
+            * to ignore y, ``mask=array([0,2])``
+            * to just consider z-distance, ``mask=array([2])``
     :param float scale_factor:
         allows for different units in the pre- and post-position
         (the post-synaptic position is multiplied by this quantity).
