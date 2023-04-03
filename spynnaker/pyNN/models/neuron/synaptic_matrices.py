@@ -371,10 +371,10 @@ class SynapticMatrices(object):
         Get a key and mask for an incoming application vertex as a whole.
 
         :param RoutingInfo r_info: The routing information for the vertex
-        :param n_stages: The number of delay stages
-        :param max_atoms_per_core: The max atoms per core
-        :param n_colour_bits: The number of colour bits sent
-        :rtype: None or _AppKeyInfo
+        :param int n_stages: The number of delay stages
+        :param int max_atoms_per_core: The max atoms per core
+        :param int n_colour_bits: The number of colour bits sent
+        :rtype: AppKeyInfo
         """
         # Find the part that is just for the core
         mask_size = r_info.n_bits_atoms
@@ -384,7 +384,7 @@ class SynapticMatrices(object):
         pre = r_info.vertex
         n_atoms = min(max_atoms_per_core, pre.n_atoms)
 
-        return _AppKeyInfo(r_info.key, r_info.mask, core_mask,
+        return AppKeyInfo(r_info.key, r_info.mask, core_mask,
                            mask_size, n_atoms * n_stages, n_colour_bits)
 
     def __app_key_and_mask(self, app_edge):
@@ -475,7 +475,7 @@ class SynapticMatrices(object):
         return matrix.get_index()
 
 
-class _AppKeyInfo(object):
+class AppKeyInfo(object):
     """
     An object which holds an application key and mask along with the other
     details.

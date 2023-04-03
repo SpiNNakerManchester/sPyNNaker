@@ -401,7 +401,7 @@ class AbstractPopulationVertex(
         """
         Add a projection incoming to this vertex.
 
-        :param PyNNProjectionCommon projection:
+        :param ~spynnaker.pyNN.models.projection.Projection projection:
             The new projection to add
         """
         # Reset the ring buffer shifts as a projection has been added
@@ -420,7 +420,7 @@ class AbstractPopulationVertex(
         """
         Any projection from this vertex to itself.
 
-        :rtype: PyNNProjectionCommon or None
+        :rtype: ~spynnaker.pyNN.models.projection.Projection or None
         """
         return self.__self_projection
 
@@ -459,7 +459,7 @@ class AbstractPopulationVertex(
         """
         The parameters of the neurons in the population.
 
-        :rtype: RangeDictionary
+        :rtype: ~spinn_utilities.ranged.RangeDictionary
         """
         return self.__parameters
 
@@ -468,7 +468,7 @@ class AbstractPopulationVertex(
         """
         The state variables of the neuron in the population.
 
-        :rtype: RangeDicationary
+        :rtype: ~spinn_utilities.ranged.RangeDicationary
         """
         return self.__state_variables
 
@@ -477,7 +477,7 @@ class AbstractPopulationVertex(
         """
         The initial values of the state variables of the neurons.
 
-        :rtype: RangeDictionary
+        :rtype: ~spinn_utilities.ranged.RangeDictionary
         """
         return self.__initial_state_variables
 
@@ -527,6 +527,11 @@ class AbstractPopulationVertex(
         return self.__drop_late_spikes
 
     def get_sdram_usage_for_core_neuron_params(self, n_atoms):
+        """
+        :param int n_atoms: The number of atoms per core
+        :return: The SDRAM required for the core neuron parameters
+        :rtype: int
+        """
         return (
             self.CORE_PARAMS_BASE_SIZE +
             (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
@@ -539,6 +544,7 @@ class AbstractPopulationVertex(
 
         :param int n_atoms: The number of atoms per core
         :return: The SDRAM required for the neuron region
+        :rtype: int
         """
         return sum(s.get_size_in_whole_words(n_atoms)
                    if s.repeat_type == StructRepeat.PER_NEURON
@@ -551,6 +557,7 @@ class AbstractPopulationVertex(
 
         :param int n_atoms: The number of atoms per core
         :return: The SDRAM required for the neuron generator region
+        :rtype: int
         """
         return (self.__get_sdram_usage_for_neuron_struct_generation(n_atoms) +
                 self.__neuron_recorder.get_generator_sdram_usage_in_bytes(
@@ -562,6 +569,7 @@ class AbstractPopulationVertex(
 
         :param int n_atoms: The number of atoms per core
         :return: The SDRAM required for the neuron generator region
+        :rtype: int
         """
         # Uses nothing if not generatable
         structs = self.__neuron_impl.structs
@@ -586,6 +594,7 @@ class AbstractPopulationVertex(
 
         :param int n_atoms: The number of atoms to account for
         :return: The SDRAM required for the current source region
+        :rtype: int
         """
         # If non at all, just output size of 0 declaration
         if not self.__current_sources:
@@ -816,6 +825,9 @@ class AbstractPopulationVertex(
 
     @property
     def ring_buffer_sigma(self):
+        """
+        :rtype: float
+        """
         return self.__ring_buffer_sigma
 
     @ring_buffer_sigma.setter
@@ -824,6 +836,9 @@ class AbstractPopulationVertex(
 
     @property
     def spikes_per_second(self):
+        """
+        :rtype: float
+        """
         return self.__spikes_per_second
 
     @spikes_per_second.setter
@@ -856,7 +871,7 @@ class AbstractPopulationVertex(
         If template is `None`, then a dictionary containing the template
         context will be returned.
 
-        :rtype: dict(str, ...)
+        :rtype: dict(str, any)
         """
         parameters = dict(self.get_parameter_values(
             self.__pynn_model.default_parameters.keys()))
@@ -874,6 +889,7 @@ class AbstractPopulationVertex(
         Get the id of synapse using its target name.
 
         :param str target: The synapse to get the id of
+        :rtype: int
         """
         return self.__neuron_impl.get_synapse_id_by_target(target)
 
@@ -891,6 +907,8 @@ class AbstractPopulationVertex(
     def current_sources(self):
         """
         Current sources needed to be available to machine vertex.
+
+        :rtype: list(~pyNN.standardmodels.electrodes.StandardCurrentSource)
         """
         return self.__current_sources
 
@@ -898,6 +916,8 @@ class AbstractPopulationVertex(
     def current_source_id_list(self):
         """
         Current source ID list needed to be available to machine vertex.
+
+        :rtype: dict(~pyNN.standardmodels.electrodes.StandardCurrentSource,any)
         """
         return self.__current_source_id_list
 
@@ -1117,6 +1137,7 @@ class AbstractPopulationVertex(
 
         :param int n_atoms:
             The number of atoms in the slice
+        :rtype: int
         """
         if not isinstance(
                 self.__synapse_dynamics, AbstractSynapseDynamicsStructural):
@@ -1135,6 +1156,7 @@ class AbstractPopulationVertex(
             The projections to consider in the calculations
         :type incoming_projections:
             list(~spynnaker.pyNN.models.projection.Projection)
+        :rtype: int
         """
         if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
             return 0
@@ -1188,6 +1210,7 @@ class AbstractPopulationVertex(
         :param SynapseInformation synapse_info: Information about synapses
         :param int n_post_atoms: The number of atoms projected to
         :param ProjectionApplicationEdge app_edge: The edge of the projection
+        :rtype: MaxRowInfo
         """
         key = (app_edge, synapse_info, n_post_atoms)
         if key in self.__max_row_info:
@@ -1386,6 +1409,8 @@ class AbstractPopulationVertex(
         """
         The projections that target this population vertex from
         the given source.
+
+        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)
         """
         return self.__incoming_projections[source_vertex]
 
@@ -1468,7 +1493,7 @@ class AbstractPopulationVertex(
         :return:
             Tuple of the maximum delay supported on the core and whether
             a delay extension is needed to support delays
-        :rtype: (int, bool)
+        :rtype: tuple(int, bool)
         """
         # Find the maximum delay from incoming synapses
         max_delay_ms = 0
@@ -1493,6 +1518,9 @@ class AbstractPopulationVertex(
         return 2 ** final_n_delay_bits, max_delay_bits > final_n_delay_bits
 
     def get_n_atom_bits(self):
+        """
+        :rtype: int
+        """
         field_sizes = [
             min(max_atoms, n) for max_atoms, n in zip(
                 self.get_max_atoms_per_dimension_per_core(), self.atoms_shape)]

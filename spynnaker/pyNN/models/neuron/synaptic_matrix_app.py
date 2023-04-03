@@ -80,9 +80,9 @@ class SynapticMatrixApp(object):
             The region where synaptic matrices are stored
         :param int all_syn_block_sz:
             The space available for all synaptic matrices on the core
-        :param _AppKeyInfo app_key_info:
+        :param AppKeyInfo app_key_info:
             Application-level routing key information for undelayed vertices
-        :param _AppKeyInfo delay_app_key_info:
+        :param AppKeyInfo delay_app_key_info:
             Application-level routing key information for delayed vertices
         :param list(float) weight_scales:
             Weight scale for each synapse edge

@@ -216,7 +216,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         By default this is False; override if the model accepts
         conductance based input.
 
-        :rtype: bool.
+        :rtype: bool
         """
         return False
 

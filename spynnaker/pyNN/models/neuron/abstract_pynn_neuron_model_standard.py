@@ -37,7 +37,8 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
         """
         :param str model_name: Name of the model.
         :param str binary: Name of the implementation executable.
-        :param AbstractNeuronModel neuron_model: The model of the neuron soma
+        :param AbstractPyNNNeuronModel neuron_model:
+            The model of the neuron soma
         :param AbstractInputType input_type: The model of synaptic input types
         :param AbstractSynapseType synapse_type:
             The model of the synapses' dynamics
