@@ -63,6 +63,7 @@ class ConvolutionConnector(AbstractConnector):
         :param kernel_weights:
             The synaptic strengths, shared by neurons in the post population.
             Can be:
+
             * single value: `kernel_shape` must be provided;
               the same value will be used for all weights
             * simple list: `kernel_shape` must be provided; the list must
