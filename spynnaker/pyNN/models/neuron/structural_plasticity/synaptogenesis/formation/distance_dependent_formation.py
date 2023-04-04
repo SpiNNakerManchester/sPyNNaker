@@ -24,7 +24,8 @@ _PARAMS_SIZE_IN_BYTES = 6 * BYTES_PER_WORD
 
 
 class DistanceDependentFormation(AbstractFormation):
-    """ Formation rule that depends on the physical distance between neurons
+    """
+    Formation rule that depends on the physical distance between neurons.
     """
 
     __slots__ = [
@@ -47,12 +48,12 @@ class DistanceDependentFormation(AbstractFormation):
         :param float p_form_forward:
             The peak probability of formation on feed-forward connections
         :param float sigma_form_forward:
-            The spread of probability with distance of formation on\
+            The spread of probability with distance of formation on
             feed-forward connections
         :param float p_form_lateral:
             The peak probability of formation on lateral connections
         :param float sigma_form_lateral:
-            The spread of probability with distance of formation on\
+            The spread of probability with distance of formation on
             lateral connections
         """
         self.__grid = numpy.asarray(grid, dtype=int)
@@ -80,7 +81,8 @@ class DistanceDependentFormation(AbstractFormation):
                 len(self.__lat_distance_probabilities) * 2)
 
     def generate_distance_probability_array(self, probability, sigma):
-        """ Generate the exponentially decaying probability LUTs.
+        """
+        Generate the exponentially decaying probability LUTs.
 
         :param float probability: peak probability
         :param float sigma: spread
@@ -119,8 +121,9 @@ class DistanceDependentFormation(AbstractFormation):
         return filtered_probabilities
 
     def distance(self, x0, x1, metric):
-        """ Compute the distance between points x0 and x1 place on the grid\
-            using periodic boundary conditions.
+        """
+        Compute the distance between points x0 and x1 place on the grid
+        using periodic boundary conditions.
 
         :param ~numpy.ndarray(int) x0: first point in space
         :param ~numpy.ndarray(int) x1: second point in space

@@ -26,8 +26,9 @@ from .abstract_generate_connector_on_host import (
 
 class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
                               AbstractGenerateConnectorOnHost):
-    """ Connects a fixed number of pre-synaptic neurons selected at random,\
-        to all post-synaptic neurons.
+    """
+    Connects a fixed number of pre-synaptic neurons selected at random,
+    to all post-synaptic neurons.
     """
 
     __slots__ = [
@@ -61,7 +62,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             pre-synaptic neuron has been connected to a post-neuron, it
             can't be connected again.
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or `None` to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.
@@ -70,7 +71,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
                 Not supported by sPyNNaker.
         """
         # :param ~pyNN.space.Space space:
-        # a Space object, needed if you wish to specify distance-dependent\
+        # a Space object, needed if you wish to specify distance-dependent
         # weights or delays - not implemented
         super().__init__(safe, callback, verbose)
         # We absolutely require an integer at this point!
@@ -121,9 +122,9 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
 
             # if verbose open a file to output the connectivity
             if self.verbose:
-                filename = synapse_info.pre_population.label + \
-                    '_to_' + synapse_info.post_population.label + \
-                    '_fixednumberpre-conn.csv'
+                filename = "{}_to_{}_fixednumberpre-conn.csv".format(
+                    synapse_info.pre_population.label,
+                    synapse_info.post_population.label)
                 with open(filename, 'w', encoding="utf-8") as file_handle:
                     numpy.savetxt(file_handle,
                                   [(synapse_info.n_pre_neurons,
@@ -243,7 +244,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return "FixedNumberPreConnector({})".format(self.__n_pre)
+        return f"FixedNumberPreConnector({self.__n_pre})"
 
     @property
     def allow_self_connections(self):

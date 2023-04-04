@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsScipyImpl(AbstractRandomStats):
-    """ A Random Statistics object that uses scipy directly
+    """
+    A Random Statistics object that uses scipy directly.
     """
 
     def __init__(self, distribution_type):

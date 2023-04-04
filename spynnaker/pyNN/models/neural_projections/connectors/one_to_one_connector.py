@@ -33,9 +33,10 @@ _expr_context = SafeEval(
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,
                         AbstractGenerateConnectorOnHost):
-    """ Where the pre- and postsynaptic populations have the same size,\
-        connect cell *i* in the presynaptic population to cell *i* in\
-        the postsynaptic population, for all *i*.
+    """
+    Where the pre- and postsynaptic populations have the same size,
+    connect cell *i* in the presynaptic population to cell *i* in
+    the postsynaptic population, for all *i*.
     """
     __slots__ = []
 

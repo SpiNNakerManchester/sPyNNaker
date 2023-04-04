@@ -22,8 +22,9 @@ _population_parameters["n_steps_per_timestep"] = 1
 
 
 class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
-    """ A neuron model that follows the sPyNNaker standard composed model \
-        pattern for point neurons.
+    """
+    A neuron model that follows the sPyNNaker standard composed model
+    pattern for point neurons.
     """
 
     __slots__ = []
@@ -36,7 +37,8 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
         """
         :param str model_name: Name of the model.
         :param str binary: Name of the implementation executable.
-        :param AbstractNeuronModel neuron_model: The model of the neuron soma
+        :param AbstractPyNNNeuronModel neuron_model:
+            The model of the neuron soma
         :param AbstractInputType input_type: The model of synaptic input types
         :param AbstractSynapseType synapse_type:
             The model of the synapses' dynamics
@@ -57,6 +59,9 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
             ring_buffer_sigma, incoming_spike_buffer_size,
             n_steps_per_timestep, drop_late_spikes, splitter, seed,
             n_colour_bits):
+        """
+        :param int n_steps_per_timestep:
+        """
         # pylint: disable=arguments-differ
         self._model.n_steps_per_timestep = n_steps_per_timestep
         return super().create_vertex(

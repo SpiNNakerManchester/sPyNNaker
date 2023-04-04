@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsGammaImpl(AbstractRandomStats):
-    """ An implementation of AbstractRandomStats for gamma distributions
+    """
+    An implementation of AbstractRandomStats for gamma distributions.
     """
 
     def _get_params(self, dist):

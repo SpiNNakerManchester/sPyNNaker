@@ -26,9 +26,9 @@ class ExternalDeviceLifControlVertex(
         AbstractEthernetController,
         AbstractVertexWithEdgeToDependentVertices,
         HasCustomAtomKeyMap):
-    """ Abstract control module for the pushbot, based on the LIF neuron,\
-        but without spikes, and using the voltage as the output to the various\
-        devices
+    """
+    Abstract control module for the pushbot, based on the LIF neuron, but
+    without spikes, and using the voltage as the output to the various devices.
     """
     __slots__ = [
         "__dependent_vertices",
@@ -54,7 +54,7 @@ class ExternalDeviceLifControlVertex(
             to False if using the dev over Ethernet using a translator)
         :param int max_atoms_per_core:
         :param AbstractNeuronImpl neuron_impl:
-        :param pynn_model:
+        :param AbstractPyNNNeuronModel pynn_model:
         :param translator:
             Translator to be used when used for Ethernet communication.  Must
             be provided if the dev is to be controlled over Ethernet.

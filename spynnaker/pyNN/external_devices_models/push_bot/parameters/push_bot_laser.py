@@ -19,7 +19,8 @@ from spynnaker.pyNN.external_devices_models.push_bot import (
 
 
 class PushBotLaser(AbstractPushBotOutputDevice):
-    """ The properties of the laser device that may be set.
+    """
+    The properties of the laser device that may be set.
     """
 
     #: The total period for the laser

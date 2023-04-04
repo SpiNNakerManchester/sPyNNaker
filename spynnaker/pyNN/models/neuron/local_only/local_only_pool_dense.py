@@ -27,7 +27,8 @@ from .abstract_local_only import AbstractLocalOnly
 
 
 class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
-    """ A convolution synapse dynamics that can process spikes with only DTCM
+    """
+    A convolution synapse dynamics that can process spikes with only DTCM.
     """
 
     __slots__ = ["__delay"]
