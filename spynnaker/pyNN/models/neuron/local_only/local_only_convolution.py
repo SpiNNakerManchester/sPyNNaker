@@ -36,7 +36,8 @@ CONV_CONFIG_N_WORDS = 2
 
 
 class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
-    """ A convolution synapse dynamics that can process spikes with only DTCM
+    """
+    A convolution synapse dynamics that can process spikes with only DTCM.
     """
 
     __slots__ = [
@@ -187,12 +188,13 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return key, mask
 
     def __get_sources_for_target(self, app_vertex):
-        """ Get all the machine vertex sources that will hit the given
-            application vertex
+        """
+        Get all the machine vertex sources that will hit the given
+        application vertex.
 
         :param AbstractPopulationVertex app_vertex:
             The vertex being targeted
-        :rtype: dict(MachineVertex, list(Sources))
+        :rtype: dict(~.MachineVertex, list(Sources))
         """
         sources_for_target = self.__cached_2d_overlaps.get(app_vertex)
         if sources_for_target is None:
@@ -216,8 +218,12 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     def __get_rinfo_for_sources(
             self, key_cache, srcs, incoming, app_edge, app_vertex):
-        """ Get the routing information for sources, merging sources that have
-            the same vertex slice (note this happens in retinas from FPGAs).
+        """
+        Get the routing information for sources, merging sources that have
+        the same vertex slice.
+
+        .. note::
+            This happens in retinas from FPGAs.
 
         :rtype: list(Source)
         """

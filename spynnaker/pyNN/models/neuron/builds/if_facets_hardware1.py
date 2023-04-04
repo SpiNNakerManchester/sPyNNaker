@@ -18,11 +18,11 @@ from spynnaker.pyNN.models.defaults import defaults, default_initial_values
 
 @defaults
 class IFFacetsConductancePopulation(object):
-    """ Leaky integrate and fire neuron with conductance-based synapses and\
-        fixed threshold as it is resembled by the FACETS Hardware Stage 1
+    """
+    Leaky integrate and fire neuron with conductance-based synapses and
+    fixed threshold as it is resembled by the FACETS Hardware Stage 1.
 
     .. warning::
-
         Not currently supported by the tool chain.
     """
 

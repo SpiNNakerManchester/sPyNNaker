@@ -23,7 +23,8 @@ _SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
 class WeightDependenceAdditiveTriplet(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
-    """ An triplet-based additive weight dependence STDP rule.
+    """
+    An triplet-based additive weight dependence STDP rule.
     """
     __slots__ = [
         "__a3_minus",
@@ -55,7 +56,8 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def w_min(self):
-        """ :math:`w^{min}`
+        """
+        :math:`w^{min}`
 
         :rtype: float
         """
@@ -63,7 +65,8 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def w_max(self):
-        """ :math:`w^{max}`
+        """
+        :math:`w^{max}`
 
         :rtype: float
         """
@@ -71,7 +74,8 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def A3_plus(self):
-        """ :math:`A_3^+`
+        """
+        :math:`A_3^+`
 
         :rtype: float
         """
@@ -79,7 +83,8 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def A3_minus(self):
-        """ :math:`A_3^-`
+        """
+        :math:`A_3^-`
 
         :rtype: float
         """
@@ -99,7 +104,8 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
@@ -145,8 +151,9 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def weight_maximum(self):
-        """ The maximum weight that will ever be set in a synapse as a result\
-            of this rule
+        """
+        The maximum weight that will ever be set in a synapse as a result
+        of this rule.
 
         :rtype: float
         """

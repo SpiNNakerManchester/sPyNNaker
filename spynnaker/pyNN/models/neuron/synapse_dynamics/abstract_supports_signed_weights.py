@@ -15,83 +15,104 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
-    """ A synapse dynamics object that supports signed weights
+    """
+    A synapse dynamics object that supports signed weights.
     """
 
     @abstractmethod
     def get_positive_synapse_index(self, incoming_projection):
-        """ Get the synapse type that positive weights will arrive at
+        """
+        Get the synapse type that positive weights will arrive at.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: int
         """
 
     @abstractmethod
     def get_negative_synapse_index(self, incoming_projection):
-        """ Get the synapse type that negative weights will arrive at
+        """
+        Get the synapse type that negative weights will arrive at.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: int
         """
 
     @abstractmethod
     def get_maximum_positive_weight(self, incoming_projection):
-        """ Get the maximum likely positive weight.
-            Note this must be a value >= 0.
+        """
+        Get the maximum likely positive weight.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        .. note::
+            This must be a value >= 0.
+
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
 
     @abstractmethod
     def get_minimum_negative_weight(self, incoming_projection):
-        """ Get the minimum likely negative weight.
-            Note this must be a value <= 0.
+        """
+        Get the minimum likely negative weight.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        .. note::
+            This must be a value <= 0.
+
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: int
         """
 
     @abstractmethod
     def get_mean_positive_weight(self, incoming_projection):
-        """ Get the mean of the positive weights.
-            Note this must be a value >= 0.
+        """
+        Get the mean of the positive weights.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        .. note::
+            This must be a value >= 0.
+
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
 
     @abstractmethod
     def get_mean_negative_weight(self, incoming_projection):
-        """ Get the mean of the negative weights.
-            Note this must be a value <= 0.
+        """
+        Get the mean of the negative weights.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        .. note::
+            This must be a value <= 0.
+
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
 
     @abstractmethod
     def get_variance_positive_weight(self, incoming_projection):
-        """ Get the variance of the positive weights.
-            Note this must be a value >= 0.
+        """
+        Get the variance of the positive weights.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        .. note::
+            This must be a value >= 0.
+
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """
 
     @abstractmethod
     def get_variance_negative_weight(self, incoming_projection):
-        """ Get the variance of the negative weights.
-            Note this must be a value <= 0.
+        """
+        Get the variance of the negative weights.
 
-        :param ~spynnaker.pyNN.models.projection.Projection\
-            incoming_projection: The projection targeted
+        .. note::
+            This must be a value <= 0.
+
+        :param incoming_projection: The projection targeted
+        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection
         :rtype: float
         """

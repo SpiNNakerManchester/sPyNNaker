@@ -16,29 +16,32 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class AbstractEthernetController(object, metaclass=AbstractBase):
-    """ A controller that can send multicast packets which can be received\
-        over Ethernet and translated to control an external device
+    """
+    A controller that can send multicast packets which can be received
+    over Ethernet and translated to control an external device.
     """
     __slots__ = ()
 
     @abstractmethod
     def get_message_translator(self):
-        """ Get the translator of messages
+        """
+        Get the translator of messages.
 
         :rtype: AbstractEthernetTranslator
         """
 
     @abstractmethod
     def get_external_devices(self):
-        """ Get the external devices that are to be controlled by the\
-            controller
+        """
+        Get the external devices that are to be controlled by the controller.
 
         :rtype: iterable(AbstractMulticastControllableDevice)
         """
 
     @abstractmethod
     def get_outgoing_partition_ids(self):
-        """ Get the partition IDs of messages coming out of the controller
+        """
+        Get the partition IDs of messages coming out of the controller.
 
         :rtype: list(str)
         """

@@ -117,6 +117,11 @@ class ExternalFPGARetinaDevice(
 
     @staticmethod
     def get_n_neurons(mode, polarity):
+        """
+        :param str mode: ``128`` or ``64`` or ``32`` or ``16``
+        :param str parity: ``UP`` or ``DOWN`` or ``MERGED``
+        :rtype: int
+        """
         if mode == ExternalFPGARetinaDevice.MODE_128:
             if (polarity == ExternalFPGARetinaDevice.UP_POLARITY or
                     polarity == ExternalFPGARetinaDevice.DOWN_POLARITY):

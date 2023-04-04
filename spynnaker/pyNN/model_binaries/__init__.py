@@ -13,5 +13,6 @@
 # limitations under the License.
 
 """
-This module contains no python code.
+.. note::
+    This module contains no Python code.
 """

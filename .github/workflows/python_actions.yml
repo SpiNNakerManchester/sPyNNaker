@@ -86,14 +86,50 @@ jobs:
         package: spynnaker spynnaker8
         exitcheck: 39
 
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8"]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Checkout SupportScripts
+      uses: actions/checkout@v3
+      with:
+        repository: SpiNNakerManchester/SupportScripts
+        path: support
+
+    - name: Install Ubuntu dependencies
+      uses: ./support/actions/apt-get-install
+      with:
+        packages: graphviz
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+    - name: Install Spinnaker Dependencies
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: >
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
+          SpiNNFrontEndCommon TestBase
+        install: true
+    - name: Install matplotlib
+      uses: ./support/actions/install-matplotlib
+    - name: Setup
+      uses: ./support/actions/run-setup
+    - name: Setup PyNN
+      uses: ./support/actions/pynn-setup
+
     - name: Run rat copyright enforcement
-      if: matrix.python-version == 3.8
       uses: ./support/actions/check-copyrights
       with:
         config_file: rat_asl20.xml
 
     #- name: Validate all XML
-    #  if: matrix.python-version == 3.8
     #  uses: ./support/actions/validate-xml
     #  with:
     #    base-path: spynnaker
@@ -104,9 +140,5 @@ jobs:
         directory: doc/source
 
     - name: Validate CITATION.cff
-      if: matrix.python-version == 3.8
       uses: dieghernan/cff-validator@main
 
-    - name: Validate CITATION.cff
-      if: matrix.python-version == 3.8
-      uses: dieghernan/cff-validator@main

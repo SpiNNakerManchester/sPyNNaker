@@ -21,6 +21,10 @@ import functools
 
 
 class SpynnakerPoissonControlConnection(LiveEventConnection):
+    """
+    A connection used to control a Poisson-distributed random event source's
+    firing rate at runtime.
+    """
     __slots__ = [
         "__control_label_extension",
         "__control_label_to_label",
@@ -72,7 +76,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         self.add_send_label(control)
 
     def __convert_to_control_label(self, label):
-        return "{}{}".format(label, self.__control_label_extension)
+        return f"{label}{self.__control_label_extension}"
 
     def __control_label(self, label):
         # Try to get a control label, but if not just use the label
@@ -124,7 +128,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
                 self._stop_callback_wrapper, pause_stop_callback))
 
     def set_rate(self, label, neuron_id, rate):
-        """ Set the rate of a Poisson neuron within a Poisson source
+        """
+        Set the rate of a Poisson neuron within a Poisson source.
 
         :param str label: The label of the Population to set the rates of
         :param int neuron_id: The neuron ID to set the rate of
@@ -133,7 +138,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         self.set_rates(label, [(neuron_id, rate)])
 
     def set_rates(self, label, neuron_id_rates):
-        """ Set the rates of multiple Poisson neurons within a Poisson source
+        """
+        Set the rates of multiple Poisson neurons within a Poisson source.
 
         :param str label: The label of the Population to set the rates of
         :param list(tuple(int,float)) neuron_id_rates:

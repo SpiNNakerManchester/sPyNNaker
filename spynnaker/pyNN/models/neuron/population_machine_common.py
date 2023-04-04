@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from collections import namedtuple
+from dataclasses import dataclass
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 
@@ -35,10 +35,19 @@ from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 
 
-# Identifiers for common regions
-CommonRegions = namedtuple(
-    "CommonRegions",
-    ["system", "provenance", "profile", "recording"])
+@dataclass
+class CommonRegions:
+    """
+    Identifiers for common regions.
+    """
+    #: System control region
+    system: int
+    #: Provenance collection region
+    provenance: int
+    #: Profiling data region
+    profile: int
+    #: Recording channels region
+    recording: int
 
 
 class PopulationMachineCommon(
@@ -47,7 +56,8 @@ class PopulationMachineCommon(
         AbstractReceiveBuffersToHost,
         AbstractHasProfileData,
         AbstractHasAssociatedBinary):
-    """ A common machine vertex for all population binaries
+    """
+    A common machine vertex for all population binaries.
     """
 
     __slots__ = [
@@ -77,7 +87,7 @@ class PopulationMachineCommon(
         :param .CommonRegions regions: The regions to be assigned
         :param int n_provenance_items:
             The number of additional provenance items to be read
-        :param dict(int-->str) profile_tags:
+        :param dict(int,str) profile_tags:
             A mapping of profile identifiers to names
         :param str binary_file_name: The name of the binary file
         """
@@ -119,7 +129,8 @@ class PopulationMachineCommon(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     def _write_common_data_spec(self, spec, rec_regions):
-        """ Write the data specification for the common regions
+        """
+        Write the data specification for the common regions.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to

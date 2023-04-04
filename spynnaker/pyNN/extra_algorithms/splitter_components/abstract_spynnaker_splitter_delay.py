@@ -19,9 +19,9 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
     """
     Defines that a splitter is able to handle delays in some way.
 
-    Ideally the splitter and therefore the vertices it creates are able to
+    Ideally the splitter, and therefore the vertices it creates, are able to
     handle some delay themselves and if more is needed have the ability to
-    accept spikes from a :py:class:`DelayExtensionMachineVertex`
+    accept spikes from a :py:class:`DelayExtensionMachineVertex`.
     """
 
     __slots__ = []
@@ -37,7 +37,7 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
 
     def accepts_edges_from_delay_vertex(self):
         """
-        Confirms that the splitter's vertices can handle spikes coming from a \
+        Confirms that the splitter's vertices can handle spikes coming from a
         :py:class:`DelayExtensionMachineVertex`.
 
         If this method returns False and the users ask for a delay larger than

@@ -18,7 +18,8 @@ from spinn_utilities.helpful_functions import is_singleton
 
 
 class RangedDictVertexSlice(object):
-    """ A slice of a ranged dict to be used to update values
+    """
+    A slice of a ranged dict to be used to update values.
     """
     __slots__ = [
         "__ranged_dict", "__vertex_slice"]
@@ -44,7 +45,8 @@ class RangedDictVertexSlice(object):
 
 
 class _RangedListVertexSlice(object):
-    """ A slice of ranged list to be used to update values
+    """
+    A slice of ranged list to be used to update values.
     """
     __slots__ = [
         "__ranged_list", "__vertex_slice"]

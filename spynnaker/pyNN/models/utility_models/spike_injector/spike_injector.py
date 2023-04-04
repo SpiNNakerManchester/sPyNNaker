@@ -34,6 +34,14 @@ class SpikeInjector(AbstractPyNNModel):
     def create_vertex(
             self, n_neurons, label, port, virtual_key,
             reserve_reverse_ip_tag, splitter):
+        """
+        :param int port:
+        :param int virtual_key:
+        :param bool reserve_reverse_ip_tag:
+        :param splitter:
+        :type splitter:
+            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+        """
         # pylint: disable=arguments-differ
         return SpikeInjectorVertex(
             n_neurons, label, port, virtual_key,

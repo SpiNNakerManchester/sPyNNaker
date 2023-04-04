@@ -22,7 +22,8 @@ TIME_STEP = "time_step"
 
 
 class InputTypeDelta(AbstractInputType):
-    """ The delta input type
+    """
+    The delta input type.
     """
     __slots__ = []
 
