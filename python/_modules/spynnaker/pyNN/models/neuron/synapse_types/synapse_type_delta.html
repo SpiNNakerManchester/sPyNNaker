@@ -60,7 +60,8 @@
 
 
 <span class="k">class</span> <span class="nc">SynapseTypeDelta</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; This represents a synapse type with two delta synapses</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This represents a synapse type with two delta synapses.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__isyn_exc&quot;</span><span class="p">,</span>
@@ -69,13 +70,11 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isyn_exc</span><span class="p">,</span> <span class="n">isyn_inh</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param isyn_exc: :math:`I^{syn}_e`</span>
-<span class="sd">        :type isyn_exc:</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
-<span class="sd">            or (mapping) function</span>
+<span class="sd">        :type isyn_exc: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param isyn_inh: :math:`I^{syn}_i`</span>
-<span class="sd">        :type isyn_inh:</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
-<span class="sd">            or (mapping) function</span>
+<span class="sd">        :type isyn_inh: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="p">[</span><span class="n">Struct</span><span class="p">([</span>
@@ -155,7 +154,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

@@ -55,11 +55,10 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.spynnaker_data_writer.SpynnakerDataWriter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.data.spynnaker_data_writer.</span></span><span class="sig-name descname"><span class="pre">SpynnakerDataWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_writer.html#SpynnakerDataWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.spynnaker_data_writer.SpynnakerDataWriter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.data.html#spinn_front_end_common.data.fec_data_writer.FecDataWriter" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FecDataWriter</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.data.SpynnakerDataView" title="spynnaker.pyNN.SpynnakerDataView"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpynnakerDataView</span></code></a></p>
-<p>See UtilsDataWriter</p>
+<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.data/#spinn_front_end_common.data.fec_data_writer.FecDataWriter" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FecDataWriter</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.data.SpynnakerDataView" title="spynnaker.pyNN.SpynnakerDataView"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpynnakerDataView</span></code></a></p>
+<p>See <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.data/#spinn_utilities.data.utils_data_writer.UtilsDataWriter" title="(in SpiNNUtils v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UtilsDataWriter</span></code></a>.</p>
 <p>This class is designed to only be used directly by AbstractSpinnakerBase
 and its subclasses and within the PyNN repositories unittests.</p>
-<p>Creates a new writer clearing all previous data and sets the state</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>state</strong> (<em>Data_Status</em>) – State writer should be in</p>
@@ -73,10 +72,10 @@ and its subclasses and within the PyNN repositories unittests.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>simulation_time_step_us</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – An explicitly specified time step for the simulation in
 microseconds.
-If None, the value is read from the config</p></li>
+If <cite>None</cite>, the value is read from the config</p></li>
 <li><p><strong>time_scale_factor</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – An explicitly specified time scale factor for the simulation.
-If None, the value is read from the config</p></li>
-<li><p><strong>min_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – new value or None to say use simulation_time_step_ms</p></li>
+If <cite>None</cite>, the value is read from the config</p></li>
+<li><p><strong>min_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – new value or <cite>None</cite> to say use simulation_time_step_ms</p></li>
 </ul>
 </dd>
 </dl>
@@ -85,7 +84,7 @@ If None, the value is read from the config</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.spynnaker_data_writer.SpynnakerDataWriter.shut_down">
 <span class="sig-name descname"><span class="pre">shut_down</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_writer.html#SpynnakerDataWriter.shut_down"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.spynnaker_data_writer.SpynnakerDataWriter.shut_down" title="Permalink to this definition">¶</a></dt>
-<dd><p>Puts all data into the state expected after sim.end</p>
+<dd><p>Puts all data into the state expected after <cite>sim.end</cite>.</p>
 <p>Most methods that change data, or state will raise an exception after
 this call.</p>
 <p>Most data however will still be available.</p>
@@ -101,31 +100,32 @@ this call.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.data.</span></span><span class="sig-name descname"><span class="pre">SpynnakerDataView</span></span><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FecDataView</span></code></p>
 <p>Adds the extra Methods to the View for PyNN level.</p>
-<p>See UtilsDataView for a more detailed description.</p>
-<p>Use this class weherever possible as it inherits all methods from all View
+<p>See <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.data/#spinn_utilities.data.UtilsDataView" title="(in SpiNNUtils v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UtilsDataView</span></code></a> for a more detailed
+description.</p>
+<p>Use this class wherever possible as it inherits all methods from all View
 classes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.add_population">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.add_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.add_population" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called by each population to add itself to the list.</p>
-<p>Usage other than from Population.__init__ is not supported and likely
+<p>Usage other than from <cite>Population.__init__</cite> is not supported and likely
 to raise an exception</p>
-<p>Increments the all population id counter by the size of the population.</p>
+<p>Increments the all population ID counter by the size of the population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – Population to add</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The first and last global IDs for this Population</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The first and last global ids for this Population</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
-<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
-<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+<li><p><strong>SimulatorRunningException</strong> – If <cite>sim.run</cite> is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before <cite>sim.setup</cite></p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after <cite>sim.end</cite></p></li>
 </ul>
 </dd>
 </dl>
@@ -135,11 +135,11 @@ to raise an exception</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.add_projection">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.add_projection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.add_projection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called by each projection to add itself to the list.</p>
-<p>Usage other than from Projection.__init__ is not supported and likely
+<p>Usage other than from <cite>Projection.__init__</cite> is not supported and likely
 to raise an exception</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>projection</strong> (<em>projectionProjection</em>) – Projection to add</p>
+<dd class="field-odd"><p><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><em>Projection</em></a>) – Projection to add</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities/#spinn_utilities.exceptions.SpiNNUtilsException" title="(in SpiNNUtils v6.0)"><strong>SpiNNUtilsException</strong></a> – If projections should not be added in the current state</p>
@@ -150,8 +150,9 @@ to raise an exception</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.get_min_delay">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_min_delay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.get_min_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.get_min_delay" title="Permalink to this definition">¶</a></dt>
-<dd><p>The minimum supported delay, in milliseconds if available</p>
-<p>Typically simulation_time_step_per_ms but may be a positive multiple</p>
+<dd><p>The minimum supported delay if available, in milliseconds.</p>
+<p>Typically <cite>simulation_time_step_per_ms</cite> but may be a positive multiple
+of it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
@@ -165,10 +166,10 @@ to raise an exception</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.get_n_populations">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_n_populations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.get_n_populations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.get_n_populations" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of populations previously added</p>
+<dd><p>The number of populations previously added.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Rtpye<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -176,7 +177,7 @@ to raise an exception</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.get_n_projections">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_n_projections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.get_n_projections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.get_n_projections" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of projections previously added</p>
+<dd><p>The number of projections previously added.</p>
 <p>rtype: int</p>
 </dd></dl>
 
@@ -197,14 +198,18 @@ to raise an exception</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.get_sim_name">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_sim_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.get_sim_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.get_sim_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the name to be returned by pyNN.spiNNaker.name</p>
-<p>:rtype str</p>
+<dd><p>Gets the name to be returned by <cite>pyNN.spiNNaker.name</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.has_min_delay">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_min_delay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.has_min_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.has_min_delay" title="Permalink to this definition">¶</a></dt>
-<dd><p>report if the minimum supported delay, in milliseconds if available</p>
+<dd><p>Report if there is a minimum supported delay available.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
@@ -215,11 +220,11 @@ to raise an exception</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.iterate_populations">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">iterate_populations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.iterate_populations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.iterate_populations" title="Permalink to this definition">¶</a></dt>
-<dd><p>An iteration of the populations previously added</p>
+<dd><p>An iteration of the populations previously added.</p>
 <p>The iteration will be empty if no populations added.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Rtpye<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(~spynnaker.pyNN.models.populations.Population)</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable(<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -227,11 +232,11 @@ to raise an exception</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.iterate_projections">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">iterate_projections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.iterate_projections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.iterate_projections" title="Permalink to this definition">¶</a></dt>
-<dd><p>An iteration of the projections previously added</p>
+<dd><p>An iteration of the projections previously added.</p>
 <p>The iteration will be empty if no projections added.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Rtpye<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(Projection)</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable(<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection">Projection</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -239,16 +244,14 @@ to raise an exception</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.set_number_of_neurons_per_dimension_per_core">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_number_of_neurons_per_dimension_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neuron_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_permitted</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.set_number_of_neurons_per_dimension_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.set_number_of_neurons_per_dimension_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets a ceiling on the number of neurons of a given type that can be        placed on a single core for each dimension.</p>
+<dd><p>Sets a ceiling on the number of neurons of a given type that can be
+placed on a single core for each dimension.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>neuron_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – neuron type</p></li>
 <li><p><strong>max_permitted</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em> or </em><em>None</em>) – the number to set to</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
 </dd>
 </dl>
 </dd></dl>
@@ -354,7 +357,7 @@ to raise an exception</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

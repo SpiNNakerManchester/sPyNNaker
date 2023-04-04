@@ -66,7 +66,8 @@
 
 
 <span class="k">def</span> <span class="nf">_handle_options</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Handles options that can not be passed to axes.plot</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles options that can not be passed to axes.plot.</span>
 
 <span class="sd">    Removes the ones it has handled</span>
 
@@ -94,7 +95,8 @@
 
 
 <span class="k">def</span> <span class="nf">_plot_spikes</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plots the spikes based on two lists</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the spikes based on two lists.</span>
 
 <span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
 <span class="sd">    :param list(~neo.core.SpikeTrain) spike_times: List of Spiketimes</span>
@@ -114,7 +116,8 @@
 
 
 <div class="viewcode-block" id="plot_spiketrains"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.plot_spiketrains">[docs]</a><span class="k">def</span> <span class="nf">plot_spiketrains</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spiketrains</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plot all spike trains in a Segment in a raster plot.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot all spike trains in a Segment in a raster plot.</span>
 
 <span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
 <span class="sd">    :param list(~neo.core.SpikeTrain) spiketrains: List of spiketimes</span>
@@ -132,10 +135,11 @@
 
 
 <div class="viewcode-block" id="plot_spikes_numpy"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.plot_spikes_numpy">[docs]</a><span class="k">def</span> <span class="nf">plot_spikes_numpy</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plot all spikes</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot all spikes.</span>
 
 <span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
-<span class="sd">    :param ~numpy.ndarray spikes: spynakker7 format nparray of spikes</span>
+<span class="sd">    :param ~numpy.ndarray spikes: sPyNNaker7 format nparray of spikes</span>
 <span class="sd">    :param str label: Label for the graph</span>
 <span class="sd">    :param options: plotting options</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -146,7 +150,8 @@
 
 
 <span class="k">def</span> <span class="nf">_heat_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plots three lists of neurons, times and values into a heatmap</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots three lists of neurons, times and values into a heatmap.</span>
 
 <span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
 <span class="sd">    :param neurons: List of neuron IDs</span>
@@ -169,7 +174,8 @@
 
 
 <div class="viewcode-block" id="heat_plot_numpy"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.heat_plot_numpy">[docs]</a><span class="k">def</span> <span class="nf">heat_plot_numpy</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plots neurons, times and values into a heatmap</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots neurons, times and values into a heatmap.</span>
 
 <span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
 <span class="sd">    :param ~numpy.ndarray data: nparray of values in spynnaker7 format</span>
@@ -183,7 +189,8 @@
 
 
 <div class="viewcode-block" id="heat_plot_neo"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.heat_plot_neo">[docs]</a><span class="k">def</span> <span class="nf">heat_plot_neo</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">signal_array</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plots neurons, times and values into a heatmap</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots neurons, times and values into a heatmap.</span>
 
 <span class="sd">    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure</span>
 <span class="sd">    :param ~neo.core.AnalogSignal signal_array: Neo Signal array Object</span>
@@ -204,13 +211,14 @@
 
 
 <div class="viewcode-block" id="plot_segment"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.plot_segment">[docs]</a><span class="k">def</span> <span class="nf">plot_segment</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Plots a segment into a plot of spikes or a heatmap</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots a segment into a plot of spikes or a heatmap.</span>
 
-<span class="sd">        If there is more than ode type of Data in the segment options must\</span>
-<span class="sd">        include the name of the data to plot</span>
+<span class="sd">    If there is more than ode type of Data in the segment options must</span>
+<span class="sd">    include the name of the data to plot</span>
 
 <span class="sd">    .. note::</span>
-<span class="sd">        method signature defined by pynn plotting.\</span>
+<span class="sd">        Method signature defined by pynn plotting.</span>
 <span class="sd">        This allows mixing of this plotting tool and pynn&#39;s</span>
 
 <span class="sd">    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure</span>
@@ -239,22 +247,23 @@
 
 
 <div class="viewcode-block" id="SpynnakerPanel"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.SpynnakerPanel">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerPanel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Represents a single panel in a multi-panel figure.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a single panel in a multi-panel figure.</span>
 
-<span class="sd">    Compatible with :py:class:`pyNN.utility.plotting.Frame` and\</span>
-<span class="sd">        can be mixed with :py:class:`pyNN.utility.plotting.Panel`</span>
+<span class="sd">    Compatible with :py:class:`pyNN.utility.plotting.Frame` and</span>
+<span class="sd">    can be mixed with :py:class:`pyNN.utility.plotting.Panel`</span>
 
-<span class="sd">    Unlike :py:class:`pyNN.utility.plotting.Panel`,\</span>
-<span class="sd">        Spikes are plotted faster,\</span>
-<span class="sd">        other data is plotted as a heatmap</span>
+<span class="sd">    Unlike :py:class:`pyNN.utility.plotting.Panel`,</span>
+<span class="sd">    Spikes are plotted faster,</span>
+<span class="sd">    other data is plotted as a heatmap.</span>
 
-<span class="sd">    A panel is a Matplotlib Axes or Subplot instance. A data item may be an\</span>
-<span class="sd">    :py:class:`~neo.core.AnalogSignal`, or a list of \</span>
-<span class="sd">    :py:class:`~neo.core.SpikeTrain`\\ s. The Panel will\</span>
-<span class="sd">    automatically choose an appropriate representation. Multiple data items\</span>
+<span class="sd">    A panel is a Matplotlib Axes or Subplot instance. A data item may be an</span>
+<span class="sd">    :py:class:`~neo.core.AnalogSignal`, or a list of</span>
+<span class="sd">    :py:class:`~neo.core.SpikeTrain`\\ s. The Panel will</span>
+<span class="sd">    automatically choose an appropriate representation. Multiple data items</span>
 <span class="sd">    may be plotted in the same panel.</span>
 
-<span class="sd">    Valid options are any valid Matplotlib formatting options that should be\</span>
+<span class="sd">    Valid options are any valid Matplotlib formatting options that should be</span>
 <span class="sd">    applied to the Axes/Subplot, plus in addition:</span>
 
 <span class="sd">        `data_labels`:</span>
@@ -263,16 +272,16 @@
 <span class="sd">            a list of dicts containing Matplotlib formatting options, of the\</span>
 <span class="sd">            same length as the number of data items.</span>
 
-<span class="sd">    Whole Neo Objects can be passed in as long as they\</span>
-<span class="sd">        contain a single Segment/run\</span>
-<span class="sd">        and only contain one type of data</span>
-<span class="sd">    Whole Segments can be passed in only if they only contain one type of data</span>
+<span class="sd">    Whole Neo Objects can be passed in as long as they</span>
+<span class="sd">    contain a single Segment/run</span>
+<span class="sd">    and only contain one type of data.</span>
+<span class="sd">    Whole Segments can be passed in only if they only contain one type of data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param data: One or more data series to be plotted.</span>
-<span class="sd">        :type data: list(~neo.core.SpikeTrain) or ~neo.core.AnalogSignal \</span>
+<span class="sd">        :type data: list(~neo.core.SpikeTrain) or ~neo.core.AnalogSignal</span>
 <span class="sd">            or ~numpy.ndarray or ~neo.core.Block or ~neo.core.Segment</span>
 <span class="sd">        :param options: Any additional information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -284,7 +293,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">line_properties</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;line_properties&quot;</span><span class="p">,</span> <span class="n">repeat</span><span class="p">({}))</span>
 
 <div class="viewcode-block" id="SpynnakerPanel.plot"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.spynnaker_plotting.SpynnakerPanel.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Plot the Panel&#39;s data in the provided Axes/Subplot instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the Panel&#39;s data in the provided Axes/Subplot instance.</span>
 
 <span class="sd">        :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -338,10 +348,10 @@
             <span class="n">run</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">properties</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;run&quot;</span><span class="p">))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">run</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Block only has {len(datum.segments)} segments&quot;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;Block only has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span><span class="si">}</span><span class="s2"> segments&quot;</span><span class="p">)</span>
             <span class="n">segment</span> <span class="o">=</span> <span class="n">datum</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">run</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Block has {len(datum.segments)} segments &quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Block has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">datum</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span><span class="si">}</span><span class="s2"> segments &quot;</span>
                              <span class="s2">&quot;please specify one to plot using run=&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">segment</span> <span class="o">=</span> <span class="n">datum</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -383,7 +393,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

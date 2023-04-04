@@ -64,8 +64,9 @@
 
 <span class="k">class</span> <span class="nc">FixedNumberPreConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span>
                               <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Connects a fixed number of pre-synaptic neurons selected at random,\</span>
-<span class="sd">        to all post-synaptic neurons.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Connects a fixed number of pre-synaptic neurons selected at random,</span>
+<span class="sd">    to all post-synaptic neurons.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -99,7 +100,7 @@
 <span class="sd">            pre-synaptic neuron has been connected to a post-neuron, it</span>
 <span class="sd">            can&#39;t be connected again.</span>
 <span class="sd">        :param rng:</span>
-<span class="sd">            Seeded random number generator, or None to make one when needed</span>
+<span class="sd">            Seeded random number generator, or `None` to make one when needed</span>
 <span class="sd">        :type rng: ~pyNN.random.NumpyRNG or None</span>
 <span class="sd">        :param callable callback:</span>
 <span class="sd">            if given, a callable that display a progress bar on the terminal.</span>
@@ -108,7 +109,7 @@
 <span class="sd">                Not supported by sPyNNaker.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># :param ~pyNN.space.Space space:</span>
-        <span class="c1"># a Space object, needed if you wish to specify distance-dependent\</span>
+        <span class="c1"># a Space object, needed if you wish to specify distance-dependent</span>
         <span class="c1"># weights or delays - not implemented</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="c1"># We absolutely require an integer at this point!</span>
@@ -159,9 +160,9 @@
 
             <span class="c1"># if verbose open a file to output the connectivity</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-                <span class="n">filename</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> \
-                    <span class="s1">&#39;_to_&#39;</span> <span class="o">+</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> \
-                    <span class="s1">&#39;_fixednumberpre-conn.csv&#39;</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_to_</span><span class="si">{}</span><span class="s2">_fixednumberpre-conn.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                    <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
                     <span class="n">numpy</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">file_handle</span><span class="p">,</span>
                                   <span class="p">[(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">,</span>
@@ -281,7 +282,7 @@
         <span class="k">return</span> <span class="n">block</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;FixedNumberPreConnector(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_pre</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;FixedNumberPreConnector(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_pre</span><span class="si">}</span><span class="s2">)&quot;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">allow_self_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -346,7 +347,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

@@ -45,6 +45,14 @@ spynnaker.pyNN.exceptions module
    :undoc-members:
    :show-inheritance:
 
+spynnaker.pyNN.random\_distribution module
+------------------------------------------
+
+.. automodule:: spynnaker.pyNN.random_distribution
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 spynnaker.pyNN.setup\_pynn module
 ---------------------------------
 

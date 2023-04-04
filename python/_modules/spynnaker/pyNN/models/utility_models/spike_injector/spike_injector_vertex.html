@@ -68,8 +68,9 @@
 <div class="viewcode-block" id="SpikeInjectorVertex"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.spike_injector.html#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex">[docs]</a><span class="k">class</span> <span class="nc">SpikeInjectorVertex</span><span class="p">(</span>
         <span class="n">ReverseIpTagMultiCastSource</span><span class="p">,</span> <span class="n">PopulationApplicationVertex</span><span class="p">,</span>
         <span class="n">SupportsStructure</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; An Injector of Spikes for PyNN populations.  This only allows the user\</span>
-<span class="sd">        to specify the virtual_key of the population to identify the population</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An Injector of Spikes for PyNN populations.  This only allows the user</span>
+<span class="sd">    to specify the virtual_key of the population to identify the population.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__spike_recorder&quot;</span><span class="p">,</span>
@@ -84,7 +85,6 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">virtual_key</span><span class="p">,</span>
             <span class="n">reserve_reverse_ip_tag</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">n_keys</span><span class="o">=</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">receive_port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
             <span class="n">virtual_key</span><span class="o">=</span><span class="n">virtual_key</span><span class="p">,</span>
@@ -94,7 +94,6 @@
 
         <span class="c1"># Set up for recording</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span> <span class="o">=</span> <span class="n">EIEIOSpikeRecorder</span><span class="p">()</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="SpikeInjectorVertex.set_structure"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.spike_injector.html#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_structure">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SupportsStructure</span><span class="o">.</span><span class="n">set_structure</span><span class="p">)</span>
@@ -185,10 +184,9 @@
 <span class="sd">        together with an associated template engine</span>
 <span class="sd">        (see :py:mod:`pyNN.descriptions`).</span>
 
-<span class="sd">        If template is None, then a dictionary containing the template context</span>
-<span class="sd">        will be returned.</span>
+<span class="sd">        If template is `None`, then a dictionary containing the template</span>
+<span class="sd">        context will be returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;SpikeInjector&quot;</span><span class="p">,</span>
             <span class="s2">&quot;default_parameters&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_parameters</span><span class="p">,</span>
@@ -236,7 +234,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

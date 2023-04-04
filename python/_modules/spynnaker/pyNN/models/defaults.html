@@ -61,13 +61,14 @@
     <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args_to_find</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">default_args</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
-                <span class="s2">&quot;Argument </span><span class="si">{}</span><span class="s2"> not found, or no default value provided in </span><span class="si">{}</span><span class="s2">&quot;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">init</span><span class="p">))</span>
+                <span class="sa">f</span><span class="s2">&quot;Argument </span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2"> not found, or &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;no default value provided in </span><span class="si">{</span><span class="n">init</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_dict_from_init"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.defaults.get_dict_from_init">[docs]</a><span class="k">def</span> <span class="nf">get_dict_from_init</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get an argument initialisation dictionary by examining an \</span>
-<span class="sd">        ``__init__`` method or function.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get an argument initialisation dictionary by examining an</span>
+<span class="sd">    ``__init__`` method or function.</span>
 
 <span class="sd">    :param callable init: The method.</span>
 <span class="sd">    :param frozenset(str) skip: The arguments to be skipped, if any</span>
@@ -96,9 +97,10 @@
 
 
 <div class="viewcode-block" id="default_parameters"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.defaults.default_parameters">[docs]</a><span class="k">def</span> <span class="nf">default_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Specifies arguments which are parameters.  Only works on the \</span>
-<span class="sd">        ``__init__`` method of a class that is additionally decorated with\</span>
-<span class="sd">        :py:meth:`defaults`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Specifies arguments which are parameters.  Only works on the</span>
+<span class="sd">    ``__init__`` method of a class that is additionally decorated with</span>
+<span class="sd">    :py:meth:`defaults`</span>
 
 <span class="sd">    :param iterable(str) parameters:</span>
 <span class="sd">        The names of the arguments that are parameters</span>
@@ -123,7 +125,7 @@
                 <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">method</span><span class="o">.</span><span class="n">_parameters</span> <span class="ow">and</span> <span class="n">arg</span> <span class="o">!=</span> <span class="s2">&quot;self&quot;</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                         <span class="s2">&quot;Formal PyNN specifies that </span><span class="si">{}</span><span class="s2"> should be set using &quot;</span>
-                        <span class="s2">&quot;initial_values not cell_params&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+                        <span class="s2">&quot;initial_values not cell_params&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
             <span class="n">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Store the real method in the returned object</span>
@@ -133,9 +135,10 @@
 
 
 <div class="viewcode-block" id="default_initial_values"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.defaults.default_initial_values">[docs]</a><span class="k">def</span> <span class="nf">default_initial_values</span><span class="p">(</span><span class="n">state_variables</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Specifies arguments which are state variables.  Only works on the\</span>
-<span class="sd">        ``__init__`` method of a class that is additionally decorated with\</span>
-<span class="sd">        :py:meth:`defaults`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Specifies arguments which are state variables.  Only works on the</span>
+<span class="sd">    ``__init__`` method of a class that is additionally decorated with</span>
+<span class="sd">    :py:meth:`defaults`</span>
 
 <span class="sd">    :param iterable(str) state_variables:</span>
 <span class="sd">        The names of the arguments that are state variables</span>
@@ -160,7 +163,7 @@
                 <span class="k">if</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">method</span><span class="o">.</span><span class="n">_state_variables</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                         <span class="s2">&quot;Formal PyNN specifies that </span><span class="si">{}</span><span class="s2"> should be set using &quot;</span>
-                        <span class="s2">&quot;initial_values not cell_params&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+                        <span class="s2">&quot;initial_values not cell_params&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
             <span class="n">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Store the real method in the returned object</span>
@@ -170,19 +173,20 @@
 
 
 <span class="k">def</span> <span class="nf">defaults</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the default parameters and state variables from the arguments to\</span>
-<span class="sd">        the ``__init__`` method.  This uses the decorators\</span>
-<span class="sd">        :py:func:`default_parameters` and :py:func:`default_initial_values` to\</span>
-<span class="sd">        determine the parameters and state variables respectively.\</span>
-<span class="sd">        If only one is specified, the other is assumed to be the remaining\</span>
-<span class="sd">        arguments.\</span>
-<span class="sd">        If neither are specified, it is assumed that all default arguments are\</span>
-<span class="sd">        parameters.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the default parameters and state variables from the arguments to</span>
+<span class="sd">    the ``__init__`` method.  This uses the decorators</span>
+<span class="sd">    :py:func:`default_parameters` and :py:func:`default_initial_values` to</span>
+<span class="sd">    determine the parameters and state variables respectively.</span>
+<span class="sd">    If only one is specified, the other is assumed to be the remaining</span>
+<span class="sd">    arguments.</span>
+<span class="sd">    If neither are specified, it is assumed that all default arguments are</span>
+<span class="sd">    parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2"> is not a class&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;No __init__ found in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No __init__ found in </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">init</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">)</span>
     <span class="k">while</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="s2">&quot;_method&quot;</span><span class="p">):</span>
         <span class="n">init</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="s2">&quot;_method&quot;</span><span class="p">)</span>
@@ -243,7 +247,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

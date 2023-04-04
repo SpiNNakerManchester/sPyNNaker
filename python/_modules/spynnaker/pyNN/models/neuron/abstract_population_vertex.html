@@ -134,7 +134,8 @@
 
 
 <span class="k">def</span> <span class="nf">_prod</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Finds the product of the iterable</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the product of the iterable.</span>
 
 <span class="sd">    :param iterable iterable: Things to multiply together</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -144,8 +145,9 @@
 <span class="k">class</span> <span class="nc">AbstractPopulationVertex</span><span class="p">(</span>
         <span class="n">PopulationApplicationVertex</span><span class="p">,</span> <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">,</span>
         <span class="n">AbstractCanReset</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Underlying vertex model for Neural Populations.\</span>
-<span class="sd">        Not actually abstract.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Underlying vertex model for Neural Populations.</span>
+<span class="sd">    Not actually abstract.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -231,7 +233,6 @@
 <span class="sd">            on each run.</span>
 <span class="sd">        :param int n_colour_bits: The number of colour bits to use</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span>
 
@@ -378,11 +379,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">combined_core_capable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if the vertex can manage to operate on a combined</span>
-<span class="sd">            neuron-synapse core, or if a split synapse-core is more</span>
-<span class="sd">            appropriate.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Whether the vertex can manage to operate on a combined</span>
+<span class="sd">        neuron-synapse core, or if a split synapse-core is more</span>
+<span class="sd">        appropriate.</span>
 
-<span class="sd">            Note that this is currently based only on the ITCM available, not</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This is currently based only on the ITCM available, not</span>
 <span class="sd">            on the incoming synapses, but could be combined with</span>
 <span class="sd">            n_synapse_cores_required to determine if, and how-many, synapse</span>
 <span class="sd">            cores are needed.</span>
@@ -395,11 +398,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_synapse_cores_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the estimated number of synapse cores required, when using a</span>
-<span class="sd">            split synapse-neuron core model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The estimated number of synapse cores required, when using a</span>
+<span class="sd">        split synapse-neuron core model.</span>
 
-<span class="sd">            Note this is currently hard-coded but could be updated to work</span>
-<span class="sd">            this out based on the number of incoming synapses</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This is currently hard-coded but could be updated to work</span>
+<span class="sd">            this out based on the number of incoming synapses.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -407,8 +412,9 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The synapse dynamics used by the synapses e.g. plastic or static.</span>
-<span class="sd">            Settable.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The synapse dynamics used by the synapses e.g. plastic or static.</span>
+<span class="sd">        Settable.</span>
 
 <span class="sd">        :rtype: AbstractSynapseDynamics or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -416,9 +422,12 @@
 
     <span class="nd">@synapse_dynamics</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">synapse_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the synapse dynamics.  Note that after setting, the dynamics</span>
-<span class="sd">            might not be the type set as it can be combined with the existing</span>
-<span class="sd">            dynamics in exciting ways.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the synapse dynamics.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            After setting, the dynamics might not be the type set as it can</span>
+<span class="sd">            be combined with the existing dynamics in exciting ways.</span>
 
 <span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
 <span class="sd">            The synapse dynamics to set</span>
@@ -427,9 +436,10 @@
             <span class="n">synapse_dynamics</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.add_incoming_projection"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.add_incoming_projection">[docs]</a>    <span class="k">def</span> <span class="nf">add_incoming_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add a projection incoming to this vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a projection incoming to this vertex.</span>
 
-<span class="sd">        :param PyNNProjectionCommon projection:</span>
+<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection projection:</span>
 <span class="sd">            The new projection to add</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Reset the ring buffer shifts as a projection has been added</span>
@@ -445,9 +455,10 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">self_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get any projection from this vertex to itself</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Any projection from this vertex to itself.</span>
 
-<span class="sd">        :rtype: PyNNProjectionCommon or None</span>
+<span class="sd">        :rtype: ~spynnaker.pyNN.models.projection.Projection or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__self_projection</span>
 
@@ -465,7 +476,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The number of neurons in the vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of neurons in the vertex.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -473,7 +485,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">incoming_spike_buffer_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size of the incoming spike buffer to be used on the cores</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The size of the incoming spike buffer to be used on the cores.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -481,31 +494,35 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The parameters of the neurons in the population</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The parameters of the neurons in the population.</span>
 
-<span class="sd">        :rtype: RangeDictionary</span>
+<span class="sd">        :rtype: ~spinn_utilities.ranged.RangeDictionary</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parameters</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The state variables of the neuron in the population</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The state variables of the neuron in the population.</span>
 
-<span class="sd">        :rtype: RangeDicationary</span>
+<span class="sd">        :rtype: ~spinn_utilities.ranged.RangeDicationary</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__state_variables</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">initial_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The initial values of the state variables of the neurons</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The initial values of the state variables of the neurons.</span>
 
-<span class="sd">        :rtype: RangeDictionary</span>
+<span class="sd">        :rtype: ~spinn_utilities.ranged.RangeDictionary</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_state_variables</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">neuron_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The neuron implementation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The neuron implementation.</span>
 
 <span class="sd">        :rtype: AbstractNeuronImpl</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -513,7 +530,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_profile_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum number of profile samples to report</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The maximum number of profile samples to report.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -521,7 +539,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">neuron_recorder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The recorder for neurons</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The recorder for neurons.</span>
 
 <span class="sd">        :rtype: NeuronRecorder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -529,7 +548,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_recorder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The recorder for synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The recorder for synapses.</span>
 
 <span class="sd">        :rtype: SynapseRecorder</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -537,13 +557,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">drop_late_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Whether spikes should be dropped if not processed in a timestep</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Whether spikes should be dropped if not processed in a timestep.</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_sdram_usage_for_core_neuron_params"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_core_neuron_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_for_core_neuron_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int n_atoms: The number of atoms per core</span>
+<span class="sd">        :return: The SDRAM required for the core neuron parameters</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">CORE_PARAMS_BASE_SIZE</span> <span class="o">+</span>
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">()</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span>
@@ -551,10 +577,12 @@
             <span class="n">n_atoms</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_sdram_usage_for_neuron_params"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_neuron_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_for_neuron_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Calculate the SDRAM usage for just the neuron parameters region.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the SDRAM usage for just the neuron parameters region.</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms per core</span>
 <span class="sd">        :return: The SDRAM required for the neuron region</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">get_size_in_whole_words</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span>
                    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">repeat_type</span> <span class="o">==</span> <span class="n">StructRepeat</span><span class="o">.</span><span class="n">PER_NEURON</span>
@@ -562,20 +590,24 @@
                    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">structs</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_sdram_usage_for_neuron_generation"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_neuron_generation">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_for_neuron_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Calculate the SDRAM usage for the neuron generation region.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the SDRAM usage for the neuron generation region.</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms per core</span>
 <span class="sd">        :return: The SDRAM required for the neuron generator region</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_sdram_usage_for_neuron_struct_generation</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_generator_sdram_usage_in_bytes</span><span class="p">(</span>
                     <span class="n">n_atoms</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">__get_sdram_usage_for_neuron_struct_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Calculate the SDRAM usage for the neuron struct generation region.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the SDRAM usage for the neuron struct generation region.</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms per core</span>
 <span class="sd">        :return: The SDRAM required for the neuron generator region</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Uses nothing if not generatable</span>
         <span class="n">structs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">structs</span>
@@ -595,10 +627,12 @@
         <span class="p">])</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_sdram_usage_for_current_source_params"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_current_source_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_for_current_source_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Calculate the SDRAM usage for the current source parameters region.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the SDRAM usage for the current source parameters region.</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms to account for</span>
 <span class="sd">        :return: The SDRAM required for the current source region</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If non at all, just output size of 0 declaration</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_sources</span><span class="p">:</span>
@@ -829,6 +863,9 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ring_buffer_sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_sigma</span>
 
     <span class="nd">@ring_buffer_sigma</span><span class="o">.</span><span class="n">setter</span>
@@ -837,6 +874,9 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">spikes_per_second</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spikes_per_second</span>
 
     <span class="nd">@spikes_per_second</span><span class="o">.</span><span class="n">setter</span>
@@ -844,7 +884,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__spikes_per_second</span> <span class="o">=</span> <span class="n">spikes_per_second</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.set_synapse_dynamics"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_synapse_dynamics">[docs]</a>    <span class="k">def</span> <span class="nf">set_synapse_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the synapse dynamics of this population</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the synapse dynamics of this population.</span>
 
 <span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
 <span class="sd">            The synapse dynamics to set</span>
@@ -852,21 +893,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">synapse_dynamics</span> <span class="o">=</span> <span class="n">synapse_dynamics</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.clear_connection_cache"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_connection_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_connection_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Flush the cache of connection information; needed for a second run</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Flush the cache of connection information; needed for a second run.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__connection_cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.describe"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a human-readable description of the cell or synapse type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a human-readable description of the cell or synapse type.</span>
 
 <span class="sd">        The output may be customised by specifying a different template</span>
 <span class="sd">        together with an associated template engine</span>
 <span class="sd">        (see :py:mod:`pyNN.descriptions`).</span>
 
-<span class="sd">        If template is None, then a dictionary containing the template context</span>
-<span class="sd">        will be returned.</span>
+<span class="sd">        If template is `None`, then a dictionary containing the template</span>
+<span class="sd">        context will be returned.</span>
 
-<span class="sd">        :rtype: dict(str, ...)</span>
+<span class="sd">        :rtype: dict(str, any)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">parameters</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_parameter_values</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__pynn_model</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
@@ -880,9 +923,11 @@
         <span class="k">return</span> <span class="n">context</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_id_by_target">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the id of synapse using its target name</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the id of synapse using its target name.</span>
 
 <span class="sd">        :param str target: The synapse to get the id of</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">(</span><span class="n">target</span><span class="p">)</span></div>
 
@@ -898,20 +943,24 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">current_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Current sources need to be available to machine vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Current sources needed to be available to machine vertex.</span>
 
+<span class="sd">        :rtype: list(AbstractCurrentSource)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_sources</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">current_source_id_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Current source ID list needs to be available to machine vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Current source ID list needed to be available to machine vertex.</span>
 
+<span class="sd">        :rtype: dict(AbstractCurrentSource,any)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_source_id_list</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> with </span><span class="si">{}</span><span class="s2"> atoms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="si">}</span><span class="s2"> atoms&quot;</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
@@ -934,25 +983,26 @@
     <span class="k">def</span> <span class="nf">_ring_buffer_expected_upper_bound</span><span class="p">(</span>
             <span class="n">weight_mean</span><span class="p">,</span> <span class="n">weight_std_dev</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
             <span class="n">n_synapses_in</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Provides expected upper bound on accumulated values in a ring\</span>
-<span class="sd">            buffer element.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides expected upper bound on accumulated values in a ring</span>
+<span class="sd">        buffer element.</span>
 
 <span class="sd">        Requires an assessment of maximum Poisson input rate.</span>
 
-<span class="sd">        Assumes knowledge of mean and SD of weight distribution, fan-in\</span>
+<span class="sd">        Assumes knowledge of mean and SD of weight distribution, fan-in</span>
 <span class="sd">        and timestep.</span>
 
-<span class="sd">        All arguments should be assumed real values except n_synapses_in\</span>
+<span class="sd">        All arguments should be assumed real values except n_synapses_in</span>
 <span class="sd">        which will be an integer.</span>
 
-<span class="sd">        :param float weight_mean: Mean of weight distribution (in either nA or\</span>
+<span class="sd">        :param float weight_mean: Mean of weight distribution (in either nA or</span>
 <span class="sd">            microSiemens as required)</span>
 <span class="sd">        :param float weight_std_dev: SD of weight distribution</span>
 <span class="sd">        :param float spikes_per_second: Maximum expected Poisson rate in Hz</span>
 <span class="sd">        :param int machine_timestep: in us</span>
 <span class="sd">        :param int n_synapses_in: No of connected synapses</span>
-<span class="sd">        :param float sigma: How many SD above the mean to go for upper bound;\</span>
-<span class="sd">            a good starting choice is 5.0. Given length of simulation we can\</span>
+<span class="sd">        :param float sigma: How many SD above the mean to go for upper bound;</span>
+<span class="sd">            a good starting choice is 5.0. Given length of simulation we can</span>
 <span class="sd">            set this for approximate number of saturation events.</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1003,11 +1053,14 @@
                 <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">poisson_variance</span> <span class="o">+</span> <span class="n">weight_variance</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_ring_buffer_shifts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_ring_buffer_shifts">[docs]</a>    <span class="k">def</span> <span class="nf">get_ring_buffer_shifts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the shift of the ring buffers for transfer of values into the</span>
-<span class="sd">            input buffers for this model.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the shift of the ring buffers for transfer of values into the</span>
+<span class="sd">        input buffers for this model.</span>
 
-<span class="sd">        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
+<span class="sd">        :param incoming_projections:</span>
 <span class="sd">            The projections to consider in the calculations</span>
+<span class="sd">        :type incoming_projections:</span>
+<span class="sd">            list(~spynnaker.pyNN.models.projection.Projection)</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">stats</span> <span class="o">=</span> <span class="n">_Stats</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spikes_per_second</span><span class="p">,</span>
@@ -1042,10 +1095,11 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__get_weight_scale</span><span class="p">(</span><span class="n">ring_buffer_to_input_left_shift</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the amount to scale the weights by to convert them from \</span>
-<span class="sd">            floating point values to 16-bit fixed point numbers which can be \</span>
-<span class="sd">            shifted left by ring_buffer_to_input_left_shift to produce an\</span>
-<span class="sd">            s1615 fixed point number</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the amount to scale the weights by to convert them from</span>
+<span class="sd">        floating point values to 16-bit fixed point numbers which can be</span>
+<span class="sd">        shifted left by ring_buffer_to_input_left_shift to produce an</span>
+<span class="sd">        s1615 fixed point number.</span>
 
 <span class="sd">        :param int ring_buffer_to_input_left_shift:</span>
 <span class="sd">        :rtype: float</span>
@@ -1053,7 +1107,8 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">16</span> <span class="o">-</span> <span class="p">(</span><span class="n">ring_buffer_to_input_left_shift</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_weight_scales"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_weight_scales">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_scales</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ring_buffer_shifts</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the weight scaling to apply to weights in synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the weight scaling to apply to weights in synapses.</span>
 
 <span class="sd">        :param list(int) ring_buffer_shifts:</span>
 <span class="sd">            The shifts to convert to weight scales</span>
@@ -1076,8 +1131,8 @@
                 <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSDRAMSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)]</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">),</span>
-            <span class="s2">&quot;Getting synaptic data between </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
+            <span class="sa">f</span><span class="s2">&quot;Getting synaptic data between </span><span class="si">{</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;and </span><span class="si">{</span><span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">post_vertex</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">HasSynapses</span><span class="p">):</span>
                 <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
@@ -1089,7 +1144,8 @@
         <span class="k">return</span> <span class="n">all_connections</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_params_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_params_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_params_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the size of the synapse parameters in bytes</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the size of the synapse parameters, in bytes.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1099,13 +1155,13 @@
                 <span class="p">(</span><span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">()))</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_dynamics_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_dynamics_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_dynamics_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the size of the synapse dynamics region</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the size of the synapse dynamics region, in bytes.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of the vertex to get the usage of</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractLocalOnly</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">get_parameters_usage_in_bytes</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">)</span>
@@ -1114,14 +1170,13 @@
             <span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_structural_dynamics_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_structural_dynamics_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_structural_dynamics_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the size of the structural dynamics region</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the size of the structural dynamics region, in bytes.</span>
 
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">            The slice of the vertex to get the usage of</span>
-<span class="sd">        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
-<span class="sd">            The projections to consider in the calculations</span>
+<span class="sd">        :param int n_atoms:</span>
+<span class="sd">            The number of atoms in the slice</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
             <span class="k">return</span> <span class="mi">0</span>
@@ -1131,11 +1186,15 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_synapses_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapses_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapses_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the maximum SDRAM usage for the synapses on a vertex slice</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the maximum SDRAM usage for the synapses on a vertex slice.</span>
 
 <span class="sd">        :param int n_post_atoms: The number of atoms projected to</span>
-<span class="sd">        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
+<span class="sd">        :param incoming_projections:</span>
 <span class="sd">            The projections to consider in the calculations</span>
+<span class="sd">        :type incoming_projections:</span>
+<span class="sd">            list(~spynnaker.pyNN.models.projection.Projection)</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractLocalOnly</span><span class="p">):</span>
             <span class="k">return</span> <span class="mi">0</span>
@@ -1145,11 +1204,13 @@
         <span class="k">return</span> <span class="n">addr</span></div>
 
     <span class="k">def</span> <span class="nf">__add_matrix_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add to the address the size of the matrices for the projection to</span>
-<span class="sd">            the vertex slice</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add to the address the size of the matrices for the projection to</span>
+<span class="sd">        the vertex slice.</span>
 
 <span class="sd">        :param int addr: The address to start from</span>
-<span class="sd">        :param ~spynnaker.pyNN.models.Projection: The projection to add</span>
+<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection:</span>
+<span class="sd">            The projection to add</span>
 <span class="sd">        :param int n_post_atoms: The number of atoms projected to</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1181,11 +1242,13 @@
         <span class="k">return</span> <span class="n">addr</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_max_row_info"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_row_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_row_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get maximum row length data</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get maximum row length data.</span>
 
 <span class="sd">        :param SynapseInformation synapse_info: Information about synapses</span>
 <span class="sd">        :param int n_post_atoms: The number of atoms projected to</span>
 <span class="sd">        :param ProjectionApplicationEdge app_edge: The edge of the projection</span>
+<span class="sd">        :rtype: MaxRowInfo</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="p">:</span>
@@ -1196,7 +1259,8 @@
         <span class="k">return</span> <span class="n">max_row_info</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_expander_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_expander_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_expander_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the size of the synapse expander region in bytes</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the size of the synapse expander region, in bytes.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1220,10 +1284,10 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__generator_info_size</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The number of bytes required by the generator information</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of bytes required by the generator information.</span>
 
 <span class="sd">        :param SynapseInformation synapse_info: The synapse information to use</span>
-
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">may_generate_on_machine</span><span class="p">():</span>
@@ -1242,8 +1306,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The suffix of the executable name due to the type of synapses \</span>
-<span class="sd">            in use.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The suffix of the executable name due to the type of synapses in use.</span>
 
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1251,7 +1315,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">neuron_recordables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the names of variables that can be recorded by the neuron</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The names of variables that can be recorded by the neuron.</span>
 
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1259,7 +1324,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_recordables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the names of variables that can be recorded by the synapses</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The names of variables that can be recorded by the synapses.</span>
 
 <span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1267,7 +1333,8 @@
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_common_constant_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_common_constant_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_common_constant_sdram</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_record</span><span class="p">,</span> <span class="n">n_provenance</span><span class="p">,</span> <span class="n">common_regions</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the amount of SDRAM used by common parts</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the amount of SDRAM used by common parts.</span>
 
 <span class="sd">        :param int n_record: The number of recording regions</span>
 <span class="sd">        :param int n_provenance: The number of provenance items</span>
@@ -1290,32 +1357,31 @@
         <span class="k">return</span> <span class="n">sdram</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_neuron_variable_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_variable_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the amount of SDRAM per timestep used by neuron parts</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the amount of SDRAM per timestep used by neuron parts.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of neurons to get the size of</span>
-
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_variable_sdram_usage</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_max_neuron_variable_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_neuron_variable_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_neuron_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the amount of SDRAM per timestep used by neuron parts</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the amount of SDRAM per timestep used by neuron parts.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of neurons to get the size of</span>
-
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_max_variable_sdram_usage</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_variable_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_variable_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the amount of SDRAM per timestep used by synapse parts</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the amount of SDRAM per timestep used by synapse parts.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of neurons to get the size of</span>
-
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="p">,</span>
@@ -1325,12 +1391,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">get_variable_sdram_usage</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_max_synapse_variable_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_synapse_variable_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_synapse_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the amount of SDRAM per timestep used by synapse parts</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the amount of SDRAM per timestep used by synapse parts.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of neurons to get the size of</span>
-
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="p">,</span>
@@ -1340,8 +1405,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">get_max_variable_sdram_usage</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_neuron_constant_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_constant_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_constant_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">neuron_regions</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the amount of fixed SDRAM used by neuron parts</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the amount of fixed SDRAM used by neuron parts.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of neurons to get the size of</span>
@@ -1369,7 +1434,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">incoming_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The projections that target this population vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The projections that target this population vertex.</span>
 
 <span class="sd">        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1378,15 +1444,19 @@
                 <span class="k">yield</span> <span class="n">proj</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_incoming_projections_from"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_incoming_projections_from">[docs]</a>    <span class="k">def</span> <span class="nf">get_incoming_projections_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_vertex</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the projections that target this population vertex from</span>
-<span class="sd">            the given source</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The projections that target this population vertex from</span>
+<span class="sd">        the given source.</span>
+
+<span class="sd">        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_projections</span><span class="p">[</span><span class="n">source_vertex</span><span class="p">]</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">incoming_poisson_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The projections that target this population vertex which</span>
-<span class="sd">            originate from a Poisson source</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The projections that target this population vertex which</span>
+<span class="sd">        originate from a Poisson source.</span>
 
 <span class="sd">        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1394,18 +1464,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pop_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The seed to use for the population overall</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The seed to use for the population overall; a list of four integers.</span>
 
-<span class="sd">        :return: A list of 4 integers</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pop_seed</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.core_seed"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.core_seed">[docs]</a>    <span class="k">def</span> <span class="nf">core_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The seed to use for a core</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The seed to use for a core.</span>
 
-<span class="sd">        :param Slice vertex_slice: The machine vertex that the seed is for</span>
-
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The machine vertex that the seed is for</span>
 <span class="sd">        :return: A list of 4 integers</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1415,9 +1486,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__core_seeds</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.copy_initial_state_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.copy_initial_state_variables">[docs]</a>    <span class="k">def</span> <span class="nf">copy_initial_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Copies the state variables into the initial state variables</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copies the state variables into the initial state variables.</span>
 
-<span class="sd">        :param Slice vertex_slice: The slice to copy now</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice to copy now</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__state_variables</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__state_variables</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">as_slice</span><span class="p">]</span>
@@ -1430,7 +1503,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">read_initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if initial values need to be stored</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Whether initial values need to be stored.</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1447,8 +1521,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_max_delay"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_delay">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_ring_buffer_bits</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the maximum delay and whether a delay extension is needed</span>
-<span class="sd">            for a given maximum number of ring buffer bits</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the maximum delay and whether a delay extension is needed</span>
+<span class="sd">        for a given maximum number of ring buffer bits.</span>
 
 <span class="sd">        :param int max_ring_buffer_bits:</span>
 <span class="sd">            The maximum number of bits that can be used for the ring buffer</span>
@@ -1456,7 +1531,7 @@
 <span class="sd">        :return:</span>
 <span class="sd">            Tuple of the maximum delay supported on the core and whether</span>
 <span class="sd">            a delay extension is needed to support delays</span>
-<span class="sd">        :rtype: (int, bool)</span>
+<span class="sd">        :rtype: tuple(int, bool)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Find the maximum delay from incoming synapses</span>
         <span class="n">max_delay_ms</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1481,6 +1556,9 @@
         <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">final_n_delay_bits</span><span class="p">,</span> <span class="n">max_delay_bits</span> <span class="o">&gt;</span> <span class="n">final_n_delay_bits</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_n_atom_bits"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_n_atom_bits">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_atom_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">field_sizes</span> <span class="o">=</span> <span class="p">[</span>
             <span class="nb">min</span><span class="p">(</span><span class="n">max_atoms</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_max_atoms_per_dimension_per_core</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">)]</span>
@@ -1488,7 +1566,8 @@
 
 
 <span class="k">class</span> <span class="nc">_Stats</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Object to keep hold of and process statistics for ring buffer scaling</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Object to keep hold of and process statistics for ring buffer scaling.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;w_scale&quot;</span><span class="p">,</span>
@@ -1645,7 +1724,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

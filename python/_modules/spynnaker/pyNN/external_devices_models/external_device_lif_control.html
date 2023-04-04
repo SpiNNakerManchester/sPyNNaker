@@ -65,9 +65,9 @@
 
 
 <span class="k">class</span> <span class="nc">ExternalDeviceLifControl</span><span class="p">(</span><span class="n">AbstractPyNNNeuronModelStandard</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Abstract control module for the PushBot, based on the LIF neuron,\</span>
-<span class="sd">        but without spikes, and using the voltage as the output to the various\</span>
-<span class="sd">        devices</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract control module for the PushBot, based on the LIF neuron, but</span>
+<span class="sd">    without spikes, and using the voltage as the output to the various devices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;_create_edges&quot;</span><span class="p">,</span>
@@ -138,8 +138,8 @@
             <span class="n">n_colour_bits</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">n_neurons</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_devices</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;Number of neurons does not match number of devices in </span><span class="si">{}</span><span class="s2">&quot;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+                <span class="s2">&quot;Number of neurons does not match number of &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;devices in </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">n_steps_per_timestep</span> <span class="o">=</span> <span class="n">n_steps_per_timestep</span>
         <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_max_atoms_per_dimension_per_core</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">ExternalDeviceLifControlVertex</span><span class="p">(</span>
@@ -185,7 +185,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

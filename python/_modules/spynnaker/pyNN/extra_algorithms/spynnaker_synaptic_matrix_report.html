@@ -60,15 +60,16 @@
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 <span class="n">_DIRNAME</span> <span class="o">=</span> <span class="s2">&quot;synaptic_matrix_reports&quot;</span>
-<span class="n">_TMPL_FILENAME</span> <span class="o">=</span> <span class="s2">&quot;synaptic_matrix_for_application_edge_</span><span class="si">{}</span><span class="s2">&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">SpYNNakerSynapticMatrixReport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Generate the synaptic matrices for reporting purposes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the synaptic matrices for reporting purposes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SpYNNakerSynapticMatrixReport.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpYNNakerSynapticMatrixReport.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Convert synaptic matrix for every application edge.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert synaptic matrix for every application edge.</span>
 
 <span class="sd">        :param connection_holder: where the synaptic matrices are stored</span>
 <span class="sd">            (possibly after retrieval from the machine)</span>
@@ -76,7 +77,6 @@
 <span class="sd">            dict(tuple(ProjectionApplicationEdge, SynapseInformation),</span>
 <span class="sd">            ConnectionHolder)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># Update the print options to display everything</span>
         <span class="n">print_opts</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">get_printoptions</span><span class="p">()</span>
         <span class="n">numpy</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
@@ -96,9 +96,10 @@
             <span class="c1"># only write matrix&#39;s for edges which have matrix&#39;s</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">):</span>
                 <span class="c1"># figure new file name</span>
-                <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">top_level_folder</span><span class="p">,</span> <span class="n">_TMPL_FILENAME</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_write_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">top_level_folder</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;synaptic_matrix_for_application_edge_</span><span class="si">{</span><span class="n">edge</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
+                    <span class="n">connection_holder</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
 
         <span class="c1"># Reset the print options</span>
         <span class="n">numpy</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="o">**</span><span class="n">print_opts</span><span class="p">)</span></div>
@@ -109,10 +110,11 @@
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="c1"># write all data for all synapse_information&#39;s in same file</span>
                 <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">connection_holder</span><span class="p">[</span><span class="n">edge</span><span class="p">,</span> <span class="n">info</span><span class="p">]))</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">connection_holder</span><span class="p">[</span><span class="n">edge</span><span class="p">,</span><span class="w"> </span><span class="n">info</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Generate_placement_reports: Can&#39;t open file&quot;</span>
-                             <span class="s2">&quot; </span><span class="si">{}</span><span class="s2"> for writing.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+                <span class="s2">&quot;Generate_placement_reports: Can&#39;t open file </span><span class="si">{}</span><span class="s2"> for writing.&quot;</span><span class="p">,</span>
+                <span class="n">file_name</span><span class="p">)</span>
 </pre></div>
 
             <div class="clearer"></div>
@@ -151,7 +153,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

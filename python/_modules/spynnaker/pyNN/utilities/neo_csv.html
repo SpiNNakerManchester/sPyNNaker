@@ -123,7 +123,7 @@
 
 <span class="sd">        :param str as_str: String representation of a quantity.</span>
 <span class="sd">        :return: A Quantities object</span>
-<span class="sd">        :rtype ~quantities.Quantity</span>
+<span class="sd">        :rtype: ~quantities.Quantity</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">parts</span> <span class="o">=</span> <span class="n">as_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">quantities</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">units</span><span class="o">=</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -137,7 +137,7 @@
 
 <span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
 <span class="sd">        :return: t_start, t_stop, sampling_period, units</span>
-<span class="sd">        :rtype (~quantities.Quantity, ~quantities.Quantity,</span>
+<span class="sd">        :rtype: tuple(~quantities.Quantity, ~quantities.Quantity,</span>
 <span class="sd">            ~quantities.Quantity, str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_metadata</span><span class="p">(</span><span class="n">csv_reader</span><span class="p">)</span>
@@ -211,8 +211,8 @@
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :param list(int) view_indexes:</span>
@@ -220,7 +220,7 @@
 <span class="sd">        :param ~numpy.ndarray spikes:</span>
 <span class="sd">        :param float t_start:</span>
 <span class="sd">        :param float t_stop:</span>
-<span class="sd">        :param ~quantities.Quantity sampling_rate: Arte a neuron is recorded</span>
+<span class="sd">        :param ~quantities.Quantity sampling_rate: Rate a neuron is recorded</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">block</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">block</span>
         <span class="n">first_id</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">annotations</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_FIRST_ID</span><span class="p">]</span>
@@ -243,7 +243,7 @@
 
     <span class="k">def</span> <span class="nf">_csv_spike_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes the spikes to the csv file</span>
+<span class="sd">        Writes the spikes to the csv file.</span>
 
 <span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
 <span class="sd">        :param ~numpy.ndarray spikes:</span>
@@ -255,7 +255,7 @@
 
     <span class="k">def</span> <span class="nf">__read_spike_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads spikes from the csv file and add SpikeTrains to the segment</span>
+<span class="sd">        Reads spikes from the csv file and add SpikeTrains to the segment.</span>
 
 <span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
 <span class="sd">        :param Segment segment:</span>
@@ -270,13 +270,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_insert_spike_data</span><span class="p">(</span>
                 <span class="n">indexes</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">t_start</span><span class="p">,</span> <span class="n">t_stop</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Metadata for </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> is missing </span><span class="si">{</span><span class="n">ex</span><span class="si">}</span><span class="s2">. &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;So this data will be skipped&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Metadata for </span><span class="si">{}</span><span class="s2"> is missing </span><span class="si">{}</span><span class="s2">. &quot;</span>
+                             <span class="s2">&quot;So this data will be skipped&quot;</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
             <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">__get_channel_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a Channel Index object</span>
+<span class="sd">        Creates a Channel Index object.</span>
 
 <span class="sd">        :param list(int) ids:</span>
 <span class="sd">        :param ~neo.core.Block block: neo block</span>
@@ -287,14 +287,15 @@
                 <span class="k">return</span> <span class="n">channel_index</span>
         <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">channel_indexes</span><span class="p">)</span>
         <span class="n">channel_index</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">ChannelIndex</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Index </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">ids</span><span class="p">)</span>
+            <span class="n">fname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Index </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">ids</span><span class="p">)</span>
         <span class="n">block</span><span class="o">.</span><span class="n">channel_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">channel_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">channel_index</span>
 
     <span class="k">def</span> <span class="nf">_insert_matrix_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">signal_array</span><span class="p">,</span>
             <span class="n">indexes</span><span class="p">,</span> <span class="n">t_start</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Adds a data item that is an analog signal to a neo segment</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a data item that is an analog signal to a neo segment.</span>
 
 <span class="sd">        :param str variable: the variable name</span>
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
@@ -304,7 +305,6 @@
 <span class="sd">        :param ~quantities.Quantity sampling_rate: Arte a neuron is recorded</span>
 <span class="sd">        :param units: the units of the recorded value</span>
 <span class="sd">        :type units: quantities.quantity.Quantity or str</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, no-member, c-extension-no-member</span>
         <span class="n">block</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">block</span>
@@ -329,7 +329,8 @@
         <span class="n">channel_index</span><span class="o">.</span><span class="n">analogsignals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_array</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_csv_matrix_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">signal_array</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Writes data to a csv file</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes data to a CSV file.</span>
 
 <span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
 <span class="sd">        :param ~numpy.ndarray signal_array: the raw signal data</span>
@@ -342,7 +343,7 @@
 
     <span class="k">def</span> <span class="nf">__read_matrix_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads matrix data and adds it to the segment</span>
+<span class="sd">        Reads matrix data and adds it to the segment.</span>
 
 <span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
 <span class="sd">        :param Segment segment:</span>
@@ -359,7 +360,8 @@
 
     <span class="k">def</span> <span class="nf">_insert_formation_events</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">formation_times</span><span class="p">,</span> <span class="n">formation_labels</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Adds formation data to a neo segment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds formation data to a neo segment.</span>
 
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
 <span class="sd">        :param str variable: the variable name</span>
@@ -378,7 +380,8 @@
 
     <span class="k">def</span> <span class="nf">_insert_elimination_events</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">elimination_times</span><span class="p">,</span> <span class="n">elimination_labels</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Adds elimination data to a neo segment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds elimination data to a neo segment.</span>
 
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
 <span class="sd">        :param str variable: the variable name</span>
@@ -397,7 +400,8 @@
 
     <span class="k">def</span> <span class="nf">_insert_neo_rewirings</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">event_array</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Adds data that represent rewirings events to a neo segment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds data that represent rewirings events to a neo segment.</span>
 
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
 <span class="sd">        :param ~numpy.ndarray event_array: the raw &quot;event&quot; data</span>
@@ -428,7 +432,8 @@
             <span class="n">segment</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">elimination_times</span><span class="p">,</span> <span class="n">elimination_labels</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_csv_rewirings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">event_array</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Adds data that represent rewirings events to a csv file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds data that represent rewirings events to a csv file.</span>
 
 <span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
 <span class="sd">        :param ~numpy.ndarray event_array: the raw &quot;event&quot; data</span>
@@ -460,7 +465,7 @@
 
     <span class="k">def</span> <span class="nf">__read_times_and_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads formation or elimination data from the csv file</span>
+<span class="sd">        Reads formation or elimination data from the csv file.</span>
 
 <span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
 <span class="sd">        :return: A list of times and a list of labels</span>
@@ -478,7 +483,7 @@
 
     <span class="k">def</span> <span class="nf">__read_rewirings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads rewiring data from a csv file and adds it to the segment</span>
+<span class="sd">        Reads rewiring data from a csv file and adds it to the segment.</span>
 
 <span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
@@ -502,17 +507,17 @@
 
 <span class="sd">        Unless other insert methods are called the segment will hold no data.</span>
 
-<span class="sd">        :param _neo.Block block:</span>
+<span class="sd">        :param ~neo.core.Block block:</span>
 <span class="sd">        :param int segment_number:</span>
 <span class="sd">        :param datetime rec_datetime:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">segment</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;segment</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">segment_number</span><span class="p">),</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;segment</span><span class="si">{</span><span class="n">segment_number</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="n">block</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
             <span class="n">rec_datetime</span><span class="o">=</span><span class="n">rec_datetime</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="p">),</span> <span class="n">segment_number</span><span class="p">):</span>
             <span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neo</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;segment</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span>
+                <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;segment</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">description</span><span class="o">=</span><span class="s2">&quot;empty&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">segment_number</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
             <span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">segment_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">segment</span>
@@ -526,7 +531,7 @@
 
     <span class="k">def</span> <span class="nf">_csv_segment_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">segment_number</span><span class="p">,</span> <span class="n">rec_datetime</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes only the segment&#39;s metadata to csv</span>
+<span class="sd">        Writes only the segment&#39;s metadata to csv.</span>
 
 <span class="sd">        Unless other csv methods are called the csv will hold no data.</span>
 
@@ -540,12 +545,12 @@
 
     <span class="k">def</span> <span class="nf">__read_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">segment_number_st</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads only segments metadata and inserts an empty segment</span>
+<span class="sd">        Reads only segments metadata and inserts an empty segment.</span>
 
 <span class="sd">        Unless other read methods are called the segment will hold no data</span>
 
 <span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
-<span class="sd">        :param _neo.Block block:</span>
+<span class="sd">        :param ~neo.core.Block block:</span>
 <span class="sd">        :param str segment_number_st:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">row</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">csv_reader</span><span class="p">)</span>
@@ -559,7 +564,7 @@
     <span class="k">def</span> <span class="nf">_insert_empty_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">first_id</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span>
                             <span class="n">simulator</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates and empty Noe block object with just metedata</span>
+<span class="sd">        Creates and empty Noe block object with just metedata.</span>
 
 <span class="sd">        Unless other insert methods are called this block will hold no data</span>
 
@@ -574,7 +579,7 @@
 <span class="sd">        :param str simulator:</span>
 <span class="sd">        :param dict annotations:</span>
 <span class="sd">        :return: a block with just metadata</span>
-<span class="sd">        ;rtype: ~neo.Block</span>
+<span class="sd">        :rtype: ~neo.core.Block</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">block</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">Block</span><span class="p">()</span>
         <span class="n">block</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">pop_label</span>
@@ -597,7 +602,6 @@
     <span class="k">def</span> <span class="nf">_csv_block_metadat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">t_stop</span><span class="p">,</span>
                            <span class="n">pop_size</span><span class="p">,</span> <span class="n">first_id</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
 <span class="sd">        :param str pop_label:</span>
 <span class="sd">        :param float t_stop:</span>
@@ -623,11 +627,11 @@
 
     <span class="k">def</span> <span class="nf">__read_empty_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads block metadata and uses it to create an empty block</span>
+<span class="sd">        Reads block metadata and uses it to create an empty block.</span>
 
 <span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
-<span class="sd">        :return: empty Block</span>
-<span class="sd">        ;rtype: ~neo.Block</span>
+<span class="sd">        :return: empty block</span>
+<span class="sd">        :rtype: ~neo.core.Block</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_metadata</span><span class="p">(</span><span class="n">csv_reader</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_insert_empty_block</span><span class="p">(</span>
@@ -641,7 +645,7 @@
 
     <span class="k">def</span> <span class="nf">__read_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads a block of metadata and converts it to a dict</span>
+<span class="sd">        Reads a block of metadata and converts it to a dict.</span>
 
 <span class="sd">        A metadata block is zero or more lines of two columns followed by an</span>
 <span class="sd">        empty line. the first column will be the keys the second the data</span>
@@ -660,10 +664,11 @@
 
 <div class="viewcode-block" id="NeoCsv.read_csv"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_csv.NeoCsv.read_csv">[docs]</a>    <span class="k">def</span> <span class="nf">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_file</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads a whole csv_file and creates a block with data.</span>
+<span class="sd">        Reads a whole CSV file and creates a block with data.</span>
 
-<span class="sd">        :param str csv_file: Path of file to reads</span>
-<span class="sd">        :return: a Block with all the data in the csv file.</span>
+<span class="sd">        :param str csv_file: Path of file to read</span>
+<span class="sd">        :return: a block with all the data in the CSV file.</span>
+<span class="sd">        :rtype: ~neo.core.Block</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csv_file</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>  <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
             <span class="n">csv_reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
@@ -675,8 +680,8 @@
                         <span class="n">row</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">csv_reader</span><span class="p">)</span>
                         <span class="n">category</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;Ignoring extra blank line after </span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring extra blank line after </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                       <span class="n">category</span><span class="p">)</span>
                         <span class="n">row</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">csv_reader</span><span class="p">)</span>
                         <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">row</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">csv_reader</span><span class="p">)</span>
@@ -695,8 +700,8 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">__read_rewirings</span><span class="p">(</span>
                             <span class="n">csv_reader</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;ignoring csv block starting with </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ignoring csv block starting with </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                     <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                         <span class="c1"># ignore a block</span>
                         <span class="n">row</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">csv_reader</span><span class="p">)</span>
                         <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -741,7 +746,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

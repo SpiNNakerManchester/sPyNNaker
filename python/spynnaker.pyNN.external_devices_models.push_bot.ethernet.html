@@ -55,12 +55,12 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uses_payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_between_send</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_send_timestep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractMulticastControllableDevice</span></code></a></p>
-<p>An arbitrary PushBot device</p>
+<p>An arbitrary PushBot device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – The protocol instance to get commands from</p></li>
-<li><p><strong>AbstractPushBotOutputDevicedevice</strong> – The Enum instance of the device to control</p></li>
+<li><p><strong>device</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice" title="spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice"><em>AbstractPushBotOutputDevice</em></a>) – The Enum instance of the device to control</p></li>
 <li><p><strong>uses_payload</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – True if the device uses a payload for control</p></li>
 <li><p><strong>time_between_send</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The timesteps between sending</p></li>
 <li><p><strong>first_send_timestep</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The first timestep to send</p></li>
@@ -81,7 +81,7 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_key">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_control_key</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_key" title="Permalink to this definition">¶</a></dt>
-<dd><p>The key that must be sent to the device to control it</p>
+<dd><p>The key that must be sent to the device to control it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -92,7 +92,7 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_max_value">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_control_max_value</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_max_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>The maximum value to send to the device</p>
+<dd><p>The maximum value to send to the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
@@ -103,7 +103,7 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_min_value">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_control_min_value</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_min_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>The minimum value to send to the device</p>
+<dd><p>The minimum value to send to the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
@@ -114,7 +114,8 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_partition_id">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_control_partition_id</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_partition_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A partition ID to give to an outgoing edge partition that will            control this device</p>
+<dd><p>A partition ID to give to an outgoing edge partition that will
+control this device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
@@ -128,7 +129,7 @@
 <dd><p>The type of data to be sent.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>SendType</p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.SendType" title="spynnaker.pyNN.external_devices_models.SendType">SendType</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -136,7 +137,8 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_timesteps_between_sending">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_control_timesteps_between_sending</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_timesteps_between_sending" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of timesteps between sending commands to the device.            This defines the “sampling interval” for the device.</p>
+<dd><p>The number of timesteps between sending commands to the device.
+This defines the “sampling interval” for the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -147,7 +149,8 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_uses_payload">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">device_control_uses_payload</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.device_control_uses_payload" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if the control of the device accepts an arbitrary valued            payload, the value of which will change the devices behaviour</p>
+<dd><p>Whether the control of the device accepts an arbitrary valued
+payload, the value of which will change the devices behaviour.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
@@ -158,7 +161,7 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.protocol">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">protocol</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.protocol" title="Permalink to this definition">¶</a></dt>
-<dd><p>The protocol instance, for use in the subclass</p>
+<dd><p>The protocol instance, for use in the subclass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol">MunichIoEthernetProtocol</a></p>
@@ -169,7 +172,8 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.set_command_protocol">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_command_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_protocol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_device.html#PushBotEthernetDevice.set_command_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.set_command_protocol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the protocol use to send setup and shutdown commands,            separately from the protocol used to control the device.</p>
+<dd><p>Set the protocol use to send setup and shutdown commands,
+separately from the protocol used to control the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command_protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol to use for this device</p>
@@ -183,27 +187,28 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetLEDDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">led</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time_front</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time_back</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
-<p>The LED of a PushBot</p>
+<p>The LED of a PushBot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>led</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED"><em>PushBotLED</em></a>) – The PushBotLED parameter to control</p></li>
+<li><p><strong>led</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED"><em>PushBotLED</em></a>) – The LED to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – The protocol instance to get commands from</p></li>
-<li><p><strong>start_active_time_front</strong> – The “active time” to set for the front LED at the start</p></li>
-<li><p><strong>start_active_time_back</strong> – The “active time” to set for the back LED at the start</p></li>
-<li><p><strong>start_total_period</strong> – The “total period” to set at the start</p></li>
-<li><p><strong>start_frequency</strong> – The “frequency” to set at the start</p></li>
-<li><p><strong>timesteps_between_send</strong> – The number of timesteps between sending commands to the device,            or None to use the default</p></li>
+<li><p><strong>start_active_time_front</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “active time” to set for the front LED at the start</p></li>
+<li><p><strong>start_active_time_back</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “active time” to set for the back LED at the start</p></li>
+<li><p><strong>start_total_period</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “total period” to set at the start</p></li>
+<li><p><strong>start_frequency</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “frequency” to set at the start</p></li>
+<li><p><strong>timesteps_between_send</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of timesteps between sending commands to the device,
+or <cite>None</cite> to use the default</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.pause_stop_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands needed when pausing or stopping simulation</p>
+<dd><p>The commands needed when pausing or stopping simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -211,7 +216,8 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.set_command_protocol">
 <span class="sig-name descname"><span class="pre">set_command_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_protocol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_led_device.html#PushBotEthernetLEDDevice.set_command_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.set_command_protocol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the protocol use to send setup and shutdown commands,            separately from the protocol used to control the device.</p>
+<dd><p>Set the protocol use to send setup and shutdown commands,
+separately from the protocol used to control the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command_protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol to use for this device</p>
@@ -222,10 +228,10 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.start_resume_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands needed when starting or resuming simulation</p>
+<dd><p>The commands needed when starting or resuming simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -233,10 +239,10 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.timed_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands to be sent at given times in the simulation</p>
+<dd><p>The commands to be sent at given times in the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -247,26 +253,27 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetLaserDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">laser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
-<p>The Laser of a PushBot</p>
+<p>The Laser of a PushBot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>laser</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser"><em>PushBotLaser</em></a>) – The PushBotLaser value to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – The protocol instance to get commands from</p></li>
-<li><p><strong>start_active_time</strong> – The “active time” value to send at the start</p></li>
-<li><p><strong>start_total_period</strong> – The “total period” value to send at the start</p></li>
-<li><p><strong>start_frequency</strong> – The “frequency” to send at the start</p></li>
-<li><p><strong>timesteps_between_send</strong> – The number of timesteps between sending commands to the device,            or None to use the default</p></li>
+<li><p><strong>start_active_time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “active time” value to send at the start</p></li>
+<li><p><strong>start_total_period</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “total period” value to send at the start</p></li>
+<li><p><strong>start_frequency</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “frequency” to send at the start</p></li>
+<li><p><strong>timesteps_between_send</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of timesteps between sending commands to the device,
+or <cite>None</cite> to use the default</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.pause_stop_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands needed when pausing or stopping simulation</p>
+<dd><p>The commands needed when pausing or stopping simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -274,7 +281,8 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.set_command_protocol">
 <span class="sig-name descname"><span class="pre">set_command_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_protocol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_laser_device.html#PushBotEthernetLaserDevice.set_command_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.set_command_protocol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the protocol use to send setup and shutdown commands,            separately from the protocol used to control the device.</p>
+<dd><p>Set the protocol use to send setup and shutdown commands,
+separately from the protocol used to control the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command_protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol to use for this device</p>
@@ -285,10 +293,10 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.start_resume_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands needed when starting or resuming simulation</p>
+<dd><p>The commands needed when starting or resuming simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -296,10 +304,10 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.timed_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands to be sent at given times in the simulation</p>
+<dd><p>The commands to be sent at given times in the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -310,24 +318,24 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetMotorDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
-<p>The motor of a PushBot</p>
+<p>The motor of a PushBot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>motor</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor"><em>PushBotMotor</em></a>) – a PushBotMotor value to indicate the motor to control</p></li>
+<li><p><strong>motor</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor"><em>PushBotMotor</em></a>) – indicates which motor to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – The protocol used to control the device</p></li>
-<li><p><strong>timesteps_between_send</strong> – The number of timesteps between sending commands to the device,
-or None to use the default</p></li>
+<li><p><strong>timesteps_between_send</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of timesteps between sending commands to the device,
+or <cite>None</cite> to use the default</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.pause_stop_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands needed when pausing or stopping simulation</p>
+<dd><p>The commands needed when pausing or stopping simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -335,7 +343,8 @@ or None to use the default</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.set_command_protocol">
 <span class="sig-name descname"><span class="pre">set_command_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_protocol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_motor_device.html#PushBotEthernetMotorDevice.set_command_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.set_command_protocol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the protocol use to send setup and shutdown commands,            separately from the protocol used to control the device.</p>
+<dd><p>Set the protocol use to send setup and shutdown commands,
+separately from the protocol used to control the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command_protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol to use for this device</p>
@@ -346,10 +355,10 @@ or None to use the default</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.start_resume_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands needed when starting or resuming simulation</p>
+<dd><p>The commands needed when starting or resuming simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -357,10 +366,10 @@ or None to use the default</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.timed_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands to be sent at given times in the simulation</p>
+<dd><p>The commands to be sent at given times in the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -376,22 +385,23 @@ or None to use the default</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – </p></li>
 <li><p><strong>resolution</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution"><em>PushBotRetinaResolution</em></a>) – </p></li>
-<li><p><strong>pushbot_ip_address</strong> – </p></li>
-<li><p><strong>pushbot_port</strong> – </p></li>
-<li><p><strong>injector_port</strong> – </p></li>
-<li><p><strong>local_host</strong> – </p></li>
-<li><p><strong>local_port</strong> – </p></li>
-<li><p><strong>retina_injector_label</strong> – </p></li>
+<li><p><strong>pushbot_ip_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
+<li><p><strong>pushbot_port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>injector_port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>local_host</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
+<li><p><strong>local_port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>retina_injector_label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_database_connection">
 <span class="sig-name descname"><span class="pre">get_database_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_retina_device.html#PushBotEthernetRetinaDevice.get_database_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_database_connection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a Database Connection instance that this device uses            to inject packets</p>
+<dd><p>Get a Database Connection instance that this device uses to inject
+packets.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection" title="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection"><em>SpynnakerLiveSpikesConnection</em></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection" title="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection">SpynnakerLiveSpikesConnection</a></p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotRetinaConnection" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotRetinaConnection">PushBotRetinaConnection</a></p>
@@ -402,7 +412,7 @@ or None to use the default</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_injector_label">
 <span class="sig-name descname"><span class="pre">get_injector_label</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_retina_device.html#PushBotEthernetRetinaDevice.get_injector_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_injector_label" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the label to give to the Spike Injector</p>
+<dd><p>Get the label to give to the Spike Injector.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
@@ -413,7 +423,7 @@ or None to use the default</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_injector_parameters">
 <span class="sig-name descname"><span class="pre">get_injector_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_retina_device.html#PushBotEthernetRetinaDevice.get_injector_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_injector_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the parameters of the Spike Injector to use with this device</p>
+<dd><p>Get the parameters of the Spike Injector to use with this device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>,Any)</p>
@@ -424,7 +434,7 @@ or None to use the default</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_n_neurons">
 <span class="sig-name descname"><span class="pre">get_n_neurons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_retina_device.html#PushBotEthernetRetinaDevice.get_n_neurons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_n_neurons" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of neurons that will be sent out by the device</p>
+<dd><p>Get the number of neurons that will be sent out by the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -435,7 +445,7 @@ or None to use the default</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_translator">
 <span class="sig-name descname"><span class="pre">get_translator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_retina_device.html#PushBotEthernetRetinaDevice.get_translator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_translator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a translator of multicast commands to Ethernet commands</p>
+<dd><p>Get a translator of multicast commands to Ethernet commands.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator" title="spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator">AbstractEthernetTranslator</a></p>
@@ -449,27 +459,28 @@ or None to use the default</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetSpeakerDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">speaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_melody</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
-<p>The Speaker of a PushBot</p>
+<p>The Speaker of a PushBot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>speaker</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker"><em>PushBotSpeaker</em></a>) – The PushBotSpeaker value to control</p></li>
+<li><p><strong>speaker</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker"><em>PushBotSpeaker</em></a>) – The speaker to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – The protocol instance to get commands from</p></li>
-<li><p><strong>start_active_time</strong> – The “active time” to set at the start</p></li>
-<li><p><strong>start_total_period</strong> – The “total period” to set at the start</p></li>
-<li><p><strong>start_frequency</strong> – The “frequency” to set at the start</p></li>
-<li><p><strong>start_melody</strong> – The “melody” to set at the start</p></li>
-<li><p><strong>timesteps_between_send</strong> – The number of timesteps between sending commands to the device,            or None to use the default</p></li>
+<li><p><strong>start_active_time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “active time” to set at the start</p></li>
+<li><p><strong>start_total_period</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “total period” to set at the start</p></li>
+<li><p><strong>start_frequency</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “frequency” to set at the start</p></li>
+<li><p><strong>start_melody</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The “melody” to set at the start</p></li>
+<li><p><strong>timesteps_between_send</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of timesteps between sending commands to the device,
+or <cite>None</cite> to use the default</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.pause_stop_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands needed when pausing or stopping simulation</p>
+<dd><p>The commands needed when pausing or stopping simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -477,7 +488,8 @@ or None to use the default</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.set_command_protocol">
 <span class="sig-name descname"><span class="pre">set_command_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_protocol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_speaker_device.html#PushBotEthernetSpeakerDevice.set_command_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.set_command_protocol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the protocol use to send setup and shutdown commands,            separately from the protocol used to control the device.</p>
+<dd><p>Set the protocol use to send setup and shutdown commands,
+separately from the protocol used to control the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command_protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol to use for this device</p>
@@ -488,10 +500,10 @@ or None to use the default</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.start_resume_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands needed when starting or resuming simulation</p>
+<dd><p>The commands needed when starting or resuming simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -499,10 +511,10 @@ or None to use the default</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.timed_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>The commands to be sent at given times in the simulation</p>
+<dd><p>The commands to be sent at given times in the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -513,7 +525,12 @@ or None to use the default</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotRetinaConnection">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.</span></span><span class="sig-name descname"><span class="pre">PushBotRetinaConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retina_injector_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pushbot_wifi_connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PushBotRetinaResolution.NATIVE_128_X_128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotRetinaConnection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection" title="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpynnakerLiveSpikesConnection</span></code></a></p>
-<p>A connection that sends spikes from the PushBot retina to a        spike injector in SpiNNaker.  Note that this assumes a packet format        of 16-bits per retina event.</p>
+<p>A connection that sends spikes from the PushBot retina to a spike injector
+in SpiNNaker.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This assumes a packet format of 16-bits per retina event.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -531,7 +548,8 @@ or None to use the default</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotTranslator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.</span></span><span class="sig-name descname"><span class="pre">PushBotTranslator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pushbot_wifi_connection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotTranslator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator" title="spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractEthernetTranslator</span></code></a></p>
-<p>Translates packets between PushBot Multicast packets and PushBot        Wi-Fi Commands</p>
+<p>Translates packets between PushBot Multicast packets and PushBot
+Wi-Fi Commands.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -543,13 +561,11 @@ or None to use the default</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotTranslator.translate_control_packet">
 <span class="sig-name descname"><span class="pre">translate_control_packet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multicast_packet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_translator.html#PushBotTranslator.translate_control_packet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotTranslator.translate_control_packet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Translate a multicast packet received over Ethernet and send            appropriate messages to the external device.</p>
+<dd><p>Translate a multicast packet received over Ethernet and send
+appropriate messages to the external device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>multicast_packet</strong> (<em>AbstractEIEIODataElement</em>) – A received multicast packet</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dd class="field-odd"><p><strong>multicast_packet</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman.messages.eieio.data_messages/#spinnman.messages.eieio.data_messages.AbstractDataElement" title="(in SpiNNMan v6.0)"><em>AbstractDataElement</em></a>) – A received multicast packet</p>
 </dd>
 </dl>
 </dd></dl>
@@ -569,7 +585,7 @@ or None to use the default</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>SpinnmanIOException</strong> – If there is an error setting up the communication channel</p>
+<dd class="field-even"><p><a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.exceptions.SpinnmanIOException" title="(in SpiNNMan v6.0)"><strong>SpinnmanIOException</strong></a> – If there is an error setting up the communication channel</p>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -580,7 +596,8 @@ or None to use the default</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_wifi_connection.html#PushBotWIFIConnection.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>See            <code class="xref py py-meth docutils literal notranslate"><span class="pre">spinnman.connections.Connection.close()</span></code></p>
+<dd><p>See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">spinnman.connections.Connection.close()</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -592,7 +609,8 @@ or None to use the default</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.is_connected">
 <span class="sig-name descname"><span class="pre">is_connected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_wifi_connection.html#PushBotWIFIConnection.is_connected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.is_connected" title="Permalink to this definition">¶</a></dt>
-<dd><p>See            <code class="xref py py-meth docutils literal notranslate"><span class="pre">is_connected()</span></code></p>
+<dd><p>See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">is_connected()</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -615,7 +633,8 @@ or None to use the default</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.local_ip_address">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">local_ip_address</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.local_ip_address" title="Permalink to this definition">¶</a></dt>
-<dd><p>The local IP address to which the connection is bound,             as a dotted string, e.g. <cite>0.0.0.0</cite></p>
+<dd><p>The local IP address to which the connection is bound,
+as a dotted string, e.g. <cite>0.0.0.0</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
@@ -640,7 +659,7 @@ or None to use the default</p></li>
 <dd><p>Receive data from the connection</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – The timeout, or None to wait forever</p>
+<dd class="field-odd"><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – The timeout, or <cite>None</cite> to wait forever</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The data received</p>
@@ -651,7 +670,7 @@ or None to use the default</p></li>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>SpinnmanTimeoutException</strong> – If a timeout occurs before any data is received</p></li>
-<li><p><strong>SpinnmanIOException</strong> – If an error occurs receiving the data</p></li>
+<li><p><a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.exceptions.SpinnmanIOException" title="(in SpiNNMan v6.0)"><strong>SpinnmanIOException</strong></a> – If an error occurs receiving the data</p></li>
 </ul>
 </dd>
 </dl>
@@ -660,7 +679,8 @@ or None to use the default</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.remote_ip_address">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">remote_ip_address</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.remote_ip_address" title="Permalink to this definition">¶</a></dt>
-<dd><p>The remote IP address to which the connection is connected,             as a dotted string, or None if not connected remotely</p>
+<dd><p>The remote IP address to which the connection is connected,
+as a dotted string, or <cite>None</cite> if not connected remotely.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a> or None</p>
@@ -671,7 +691,8 @@ or None to use the default</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.remote_port">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">remote_port</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotWIFIConnection.remote_port" title="Permalink to this definition">¶</a></dt>
-<dd><p>The remote port to which the connection is connected,             or None if not connected remotely</p>
+<dd><p>The remote port to which the connection is connected,
+or <cite>None</cite> if not connected remotely.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or None</p>
@@ -688,7 +709,7 @@ or None to use the default</p></li>
 <dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytearray" title="(in Python v3.8)"><em>bytearray</em></a>) – The data to be sent</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>SpinnmanIOException</strong> – If there is an error sending the data</p>
+<dd class="field-even"><p><a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.exceptions.SpinnmanIOException" title="(in SpiNNMan v6.0)"><strong>SpinnmanIOException</strong></a> – If there is an error sending the data</p>
 </dd>
 </dl>
 </dd></dl>
@@ -856,7 +877,7 @@ or None to use the default</p></li>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

@@ -49,7 +49,7 @@
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
 
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">SIMULATION_N_BYTES</span>
@@ -72,24 +72,42 @@
         <span class="s2">&quot;__sdram&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">]</span>
 
-    <span class="k">class</span> <span class="nc">_DELAY_EXTENSION_REGIONS</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">_DELAY_EXTENSION_REGIONS</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Region indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">SYSTEM</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">DELAY_PARAMS</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">PROVENANCE_REGION</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">TDMA_REGION</span> <span class="o">=</span> <span class="mi">3</span>
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES">[docs]</a>    <span class="k">class</span> <span class="nc">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Indices into raw provenance data about delay extension vertices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#: The number of packets received</span>
         <span class="n">N_PACKETS_RECEIVED</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1">#: The number of packets processed</span>
         <span class="n">N_PACKETS_PROCESSED</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1">#: The number of packets added to a send queue</span>
         <span class="n">N_PACKETS_ADDED</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="c1">#: The number of packets sent</span>
         <span class="n">N_PACKETS_SENT</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="c1">#: The number of times a buffer overflowed</span>
         <span class="n">N_BUFFER_OVERFLOWS</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="c1">#: The number of delays</span>
         <span class="n">N_DELAYS</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="c1">#: The number of packets lost due to saturation</span>
         <span class="n">N_PACKETS_LOST_DUE_TO_COUNT_SATURATION</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="c1">#: The number of packets with bad neuron IDs</span>
         <span class="n">N_PACKETS_WITH_INVALID_NEURON_IDS</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="c1">#: The number of packets lost due to an invalid key</span>
         <span class="n">N_PACKETS_DROPPED_DUE_TO_INVALID_KEY</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="c1">#: The number of packets that arrived too late</span>
         <span class="n">N_LATE_SPIKES</span> <span class="o">=</span> <span class="mi">9</span>
+        <span class="c1">#: The maximum number of packets queued for background processing</span>
         <span class="n">MAX_BACKGROUND_QUEUED</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="c1">#: The number of times the background queue overflowed</span>
         <span class="n">N_BACKGROUND_OVERLOADS</span> <span class="o">=</span> <span class="mi">11</span></div>
 
     <span class="n">N_EXTRA_PROVENANCE_DATA_ENTRIES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span>
@@ -113,10 +131,11 @@
 <span class="sd">        :param ~pacman.model.resources.AbstractSDRAM sdram:</span>
 <span class="sd">            The sdram required by the vertex</span>
 <span class="sd">        :param str label: The name of the vertex</span>
-<span class="sd">        :param Slice vertex_slice: The slice of the vertex</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice of the vertex</span>
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:</span>
 <span class="sd">            The application vertex that caused this machine vertex to be</span>
-<span class="sd">            created. If None, there is no such application vertex.</span>
+<span class="sd">            created. If `None`, there is no such application vertex.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">label</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="n">vertex_slice</span><span class="p">)</span>
@@ -125,7 +144,7 @@
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_provenance_region_id</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_provenance_region_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">PROVENANCE_REGION</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">PROVENANCE_REGION</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span>
@@ -258,11 +277,8 @@
     <span class="k">def</span> <span class="nf">get_binary_start_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ExecutableType</span><span class="o">.</span><span class="n">USES_SIMULATION_INTERFACE</span></div>
 
-<div class="viewcode-block" id="DelayExtensionMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.generate_data_specification">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span>
-        <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">)</span>
+<div class="viewcode-block" id="DelayExtensionMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.generate_data_specification">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=arguments-differ</span>
-
         <span class="n">vertex</span> <span class="o">=</span> <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span>
 
         <span class="c1"># Reserve memory:</span>
@@ -273,11 +289,11 @@
         <span class="n">delay_params_sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">delay_params_size</span><span class="p">()</span>
 
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
 
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">DELAY_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">DELAY_PARAMS</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="n">delay_params_sz</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;delay_params&#39;</span><span class="p">)</span>
 
         <span class="c1"># reserve region for provenance</span>
@@ -313,13 +329,14 @@
 <span class="sd">        :param str binary_name: the binary name</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Write this to the system region (to be picked up by the simulation):</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
             <span class="n">binary_name</span><span class="p">))</span>
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.write_delay_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.write_delay_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_delay_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">incoming_key</span><span class="p">,</span> <span class="n">incoming_mask</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Generate Delay Parameter data</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate Delay Parameter data.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -330,12 +347,11 @@
         <span class="c1"># pylint: disable=too-many-arguments</span>
 
         <span class="c1"># Write spec with commands to construct required delay region:</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing Delay Parameters for </span><span class="si">{}</span><span class="s2"> Neurons:</span><span class="se">\n</span><span class="s2">&quot;</span>
-                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Writing Delay Parameters for </span><span class="si">{</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="si">}</span><span class="s2"> Neurons:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Set the focus to the memory region 2 (delay parameters):</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">DELAY_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">DELAY_PARAMS</span><span class="p">)</span>
 
         <span class="c1"># Write header info to the memory region:</span>
         <span class="c1"># Write Key info for this core and the incoming key and mask:</span>
@@ -400,7 +416,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

@@ -80,7 +80,8 @@ potentially provides a different value for each neuron</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_properties.NeuronParameter.get_value">
 <span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_properties/neural_parameter.html#NeuronParameter.get_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_properties.NeuronParameter.get_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>What the value of the parameter is; if a list or array,            potentially provides a different value for each neuron.</p>
+<dd><p>What the value of the parameter is; if a list or array,
+potentially provides a different value for each neuron.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
@@ -93,14 +94,19 @@ potentially provides a different value for each neuron</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_properties.NeuronParameter.iterator_by_slice">
 <span class="sig-name descname"><span class="pre">iterator_by_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_properties/neural_parameter.html#NeuronParameter.iterator_by_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_properties.NeuronParameter.iterator_by_slice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates an iterator over the commands to use to write the            parameter to the data specification being generated.</p>
+<dd><p>Creates an iterator over the commands to use to write the
+parameter to the data specification being generated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>slice_start</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Inclusive start of the range</p></li>
 <li><p><strong>slice_stop</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Exclusive end of the range</p></li>
-<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The data specification to eventually write to.
-(Note that this does not actually do the write).</p></li>
+<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – <p>The data specification to eventually write to.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This does not actually do the write.</p>
+</div>
+</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -198,7 +204,7 @@ specification for each element in the slice.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

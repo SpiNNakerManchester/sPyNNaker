@@ -54,21 +54,22 @@
 
 
 <span class="k">class</span> <span class="nc">AbstractEthernetTranslator</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; A module that can translate packets received over Ethernet into\</span>
-<span class="sd">        control of an external device</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A module that can translate packets received over Ethernet into</span>
+<span class="sd">    control of an external device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="AbstractEthernetTranslator.translate_control_packet"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator.translate_control_packet">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">translate_control_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multicast_packet</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Translate a multicast packet received over Ethernet and send\</span>
-<span class="sd">            appropriate messages to the external device.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Translate a multicast packet received over Ethernet and send</span>
+<span class="sd">        appropriate messages to the external device.</span>
 
 <span class="sd">        :param multicast_packet: A received multicast packet</span>
 <span class="sd">        :type multicast_packet:</span>
-<span class="sd">            ~spinnman.messages.eieio.data_messages.AbstractEIEIODataElement</span>
-<span class="sd">        :rtype: None</span>
+<span class="sd">            ~spinnman.messages.eieio.data_messages.AbstractDataElement</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 </pre></div>
 
@@ -108,7 +109,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

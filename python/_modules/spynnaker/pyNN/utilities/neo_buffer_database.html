@@ -79,6 +79,12 @@
 
 
 <div class="viewcode-block" id="NeoBufferDatabase"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase">[docs]</a><span class="k">class</span> <span class="nc">NeoBufferDatabase</span><span class="p">(</span><span class="n">BufferDatabase</span><span class="p">,</span> <span class="n">NeoCsv</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extra support for Neo on top of the Database for SQLite 3.</span>
+
+<span class="sd">    This is the same database as used by BufferManager but with</span>
+<span class="sd">    extra tables and access methods added.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=c-extension-no-member</span>
 
     <span class="n">__N_BYTES_FOR_TIMESTAMP</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span>
@@ -94,20 +100,14 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extra support for Neo on top of the Database for SQLite 3.</span>
-
-<span class="sd">        This is the same database as used by BufferManager but with</span>
-<span class="sd">        extra tables and access methods added.</span>
-
 <span class="sd">        :param database_file:</span>
 <span class="sd">            The name of a file that contains (or will contain) an SQLite</span>
 <span class="sd">            database holding the data.</span>
 <span class="sd">            If omitted the default location will be used.</span>
 <span class="sd">        :type database_file: None or str</span>
-<span class="sd">        :param read_only:</span>
-<span class="sd">            By default the database is readonly if given a databas file.</span>
-<span class="sd">            This allows to overwire that (mainly for clear)</span>
-<span class="sd">        :type read_only: None or bool</span>
+<span class="sd">        :param bool read_only:</span>
+<span class="sd">            By default the database is readonly if given a database file.</span>
+<span class="sd">            This allows to override that (mainly for clear)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">database_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">database_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_database_file</span><span class="p">()</span>
@@ -117,8 +117,7 @@
             <span class="k">if</span> <span class="n">read_only</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">read_only</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">BufferDatabase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">database_file</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="n">read_only</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">database_file</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="n">read_only</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__NEO_DDL_FILE</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">sql</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
@@ -127,11 +126,13 @@
 
 <div class="viewcode-block" id="NeoBufferDatabase.write_segment_metadata"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.write_segment_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">write_segment_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes the global information from the Views</span>
+<span class="sd">        Writes the global information from the Views.</span>
 
 <span class="sd">        This writes information held in SpynnakerDataView so that the database</span>
-<span class="sd">        is usable standalone</span>
+<span class="sd">        is usable standalone.</span>
 
+<span class="sd">        .. note::</span>
+<span class="sd">            The database must be writable for this to work!</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
             <span class="c1"># t_stop intentionally left None to show no run data</span>
@@ -149,10 +150,13 @@
 
 <div class="viewcode-block" id="NeoBufferDatabase.write_t_stop"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.write_t_stop">[docs]</a>    <span class="k">def</span> <span class="nf">write_t_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Records the current run time as t_Stop</span>
+<span class="sd">        Records the current run time as `t_Stop`.</span>
 
 <span class="sd">        This writes information held in SpynnakerDataView so that the database</span>
 <span class="sd">        is usable standalone</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            The database must be writable for this to work!</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">t_stop</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_current_run_time_ms</span><span class="p">()</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
@@ -164,12 +168,12 @@
 
     <span class="k">def</span> <span class="nf">__get_segment_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the metadata for the segment</span>
+<span class="sd">        Gets the metadata for the segment.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :return: segment number, record time, last run time recorded,</span>
 <span class="sd">            simulator timesteup in ms, simulator name</span>
-<span class="sd">        :rtype int, datatime, float, float, str</span>
+<span class="sd">        :rtype: tuple(int, datatime, float, float, str)</span>
 <span class="sd">        :raises \</span>
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
 <span class="sd">            If the recording metadata not setup correctly</span>
@@ -194,13 +198,14 @@
 
     <span class="k">def</span> <span class="nf">__get_simulation_time_step_ms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The simulation time step, in milliseconds</span>
+<span class="sd">        The simulation time step, in milliseconds.</span>
 
 <span class="sd">        The value that would be/have been returned by</span>
 <span class="sd">        SpynnakerDataView.get_simulation_time_step_ms()</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
-<span class="sd">        :type: Float</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        :return: The timestep</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
@@ -215,7 +220,6 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets an id for this population label.</span>
-
 <span class="sd">        Will create a new population if required.</span>
 
 <span class="sd">        For speed does not verify the additional fields if a record already</span>
@@ -225,12 +229,13 @@
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :param ~spynnaker.pyNN.models.populations.Population population:</span>
 <span class="sd">            the population to record for</span>
+<span class="sd">        :return: The ID</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
@@ -253,8 +258,7 @@
             <span class="n">sampling_interval_ms</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">buffered_type</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span>
             <span class="n">atoms_shape</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets an id for this population and recording label combination.</span>
-
+<span class="sd">        Gets an ID for this population and recording label combination.</span>
 <span class="sd">        Will create a new population/recording record if required.</span>
 
 <span class="sd">        For speed does not verify the additional fields if a record already</span>
@@ -264,8 +268,8 @@
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :param str variable:</span>
@@ -280,7 +284,7 @@
 <span class="sd">        :param str units:</span>
 <span class="sd">        :param tuple atoms_shape:</span>
 <span class="sd">        :param int n_colour_bits:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :return: The ID</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
@@ -313,8 +317,8 @@
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :return: population size, first id and description</span>
@@ -341,8 +345,8 @@
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :return: population size, first id and description</span>
@@ -357,12 +361,11 @@
 <div class="viewcode-block" id="NeoBufferDatabase.get_recording_populations"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.get_recording_populations">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_populations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets a list of the labels of Populations recording.</span>
-
 <span class="sd">        Or to be exact the ones with metadata saved so likely to be recording.</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                These are actually the labels of the Application Vertices</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                These are actually the labels of the Application Vertices.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :return: List of population labels</span>
@@ -380,19 +383,20 @@
 
 <div class="viewcode-block" id="NeoBufferDatabase.get_population"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.get_population">[docs]</a>    <span class="k">def</span> <span class="nf">get_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets an Object with the same data retrieval API as a Population</span>
+<span class="sd">        Gets an Object with the same data retrieval API as a Population.</span>
 
-<span class="sd">        Retrievable is limited to recorded data and a little metadata needed to</span>
-<span class="sd">        create a single Neo Segment wrapped in a neo Block</span>
+<span class="sd">        Retrieval is limited to recorded data and a little metadata needed to</span>
+<span class="sd">        create a single Neo Segment wrapped in a Neo Block.</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                As each database only includes</span>
+<span class="sd">                As each database only includes data for one run (with resets</span>
+<span class="sd">                creating another database) the structure is relatively simple.</span>
 
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :return: An Object which acts like a Population for getting neo data</span>
@@ -405,16 +409,15 @@
 
 <div class="viewcode-block" id="NeoBufferDatabase.get_recording_variables"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.get_recording_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        List of the names of variables recording</span>
-
-<span class="sd">        Or to be exact list of the names of variables with metadata so likely</span>
-<span class="sd">        to be recording</span>
+<span class="sd">        List of the names of variables recording.</span>
+<span class="sd">        Or, to be exact, list of the names of variables with metadata so likely</span>
+<span class="sd">        to be recording.</span>
 
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :return: List of variable names</span>
@@ -424,13 +427,12 @@
 
     <span class="k">def</span> <span class="nf">__get_recording_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">cursor</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :return: List of variable registered as recording.</span>
@@ -450,14 +452,14 @@
 
 <div class="viewcode-block" id="NeoBufferDatabase.get_recording_metadeta"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.get_recording_metadeta">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_metadeta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the metadata id for this population and recording label</span>
+<span class="sd">        Gets the metadata ID for this population and recording label</span>
 <span class="sd">        combination.</span>
 
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :param str variable:</span>
@@ -473,8 +475,7 @@
             <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">datatype</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">sampling_interval_ms</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span> <span class="o">=</span> <span class="n">info</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="n">sampling_interval_ms</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">__get_recording_metadeta</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_recording_metadeta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the metadata id for this population and recording label</span>
 <span class="sd">        combination.</span>
@@ -483,14 +484,16 @@
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typical the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :param str variable:</span>
-<span class="sd">        :return: id, datatype, buffered_type,  t_start,</span>
-<span class="sd">                 sampling_interval_ms, first_id, pop_size, units</span>
-<span class="sd">        :rtype: (int, DataType, BufferedDataType, float, float, int, int, str)</span>
+<span class="sd">        :return:</span>
+<span class="sd">            id, datatype, buffered_type,  t_start,</span>
+<span class="sd">            sampling_interval_ms, first_id, pop_size, units</span>
+<span class="sd">        :rtype:</span>
+<span class="sd">            tuple(int, DataType, BufferedDataType, float, float, int, int, str)</span>
 <span class="sd">        :raises \</span>
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
 <span class="sd">            If the recording metadata not setup correctly</span>
@@ -523,12 +526,11 @@
 
     <span class="k">def</span> <span class="nf">__get_region_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int rec_id:</span>
-<span class="sd">        :return: region_id, neurons, vertex_slice, selective_recording,</span>
-<span class="sd">            base_key</span>
-<span class="sd">        :rtype: int, ~numpy.ndarray, Slice, bool, int</span>
+<span class="sd">        :return:</span>
+<span class="sd">            region_id, neurons, vertex_slice, selective_recording, base_key</span>
+<span class="sd">        :rtype: iterable(tuple(int, ~numpy.ndarray, Slice, bool, int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
@@ -556,7 +558,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">region_id</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">simulation_time_step_ms</span><span class="p">,</span>
             <span class="n">selective_recording</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds spike data for this region to the lists</span>
+<span class="sd">        Adds spike data for this region to the lists.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int region_id: Region data came from</span>
@@ -600,12 +602,12 @@
 
     <span class="k">def</span> <span class="nf">__get_neuron_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the spikes for this population/recording id</span>
+<span class="sd">        Gets the spikes for this population/recording ID.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int rec_id:</span>
 <span class="sd">        :return: numpy array of spike ids and spike times, all ids recording</span>
-<span class="sd">        :rtype  ~numpy.ndarray, list(int)</span>
+<span class="sd">        :rtype: tuple(~numpy.ndarray, list(int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spike_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">spike_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -625,15 +627,15 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">region_id</span><span class="p">,</span> <span class="n">simulation_time_step_ms</span><span class="p">,</span> <span class="n">base_key</span><span class="p">,</span>
             <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds spike data for this region to the list</span>
+<span class="sd">        Adds spike data for this region to the list.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int region_id: Region data came from</span>
 <span class="sd">        :param float simulation_time_step_ms:</span>
 <span class="sd">        :param int base_key:</span>
-<span class="sd">        :param Slice vertex_slice:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :param tuple(int) atoms_shape:</span>
-<span class="sd">        :param int n_colour_bits</span>
+<span class="sd">        :param int n_colour_bits:</span>
 <span class="sd">        :return: all recording indexes spikes or not</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -659,7 +661,7 @@
             <span class="n">timestamps</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="n">time</span><span class="p">],</span> <span class="n">eieio_header</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
             <span class="n">key_bytes</span> <span class="o">=</span> <span class="n">eieio_header</span><span class="o">.</span><span class="n">eieio_type</span><span class="o">.</span><span class="n">key_bytes</span>
             <span class="n">keys</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
-                <span class="n">spike_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&lt;u</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">),</span>
+                <span class="n">spike_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&lt;u</span><span class="si">{</span><span class="n">key_bytes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">count</span><span class="o">=</span><span class="n">eieio_header</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">data_offset</span><span class="p">)</span>
             <span class="n">keys</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">inv_colour_mask</span><span class="p">)</span>
             <span class="n">local_ids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">indices</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">])</span>
@@ -671,14 +673,14 @@
 
     <span class="k">def</span> <span class="nf">__get_eieio_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the spikes for this population/recording id</span>
+<span class="sd">        Gets the spikes for this population/recording ID.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int rec_id:</span>
 <span class="sd">        :param tuple(int) atoms_shape:</span>
-<span class="sd">        :param int n_colour_bits</span>
+<span class="sd">        :param int n_colour_bits:</span>
 <span class="sd">        :return: numpy array of spike ids and spike times, all ids recording</span>
-<span class="sd">        :rtype  ~numpy.ndarray, lis(int)</span>
+<span class="sd">        :rtype: tuple(~numpy.ndarray, list(int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">simulation_time_step_ms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_simulation_time_step_ms</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
@@ -703,7 +705,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">region_id</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">simulation_time_step_ms</span><span class="p">,</span>
             <span class="n">spike_times</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds spike data for this region to the lists</span>
+<span class="sd">        Adds spike data for this region to the lists.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int region_id: Region data came from</span>
@@ -740,12 +742,12 @@
 
     <span class="k">def</span> <span class="nf">__get_multi_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the spikes for this population/recording id</span>
+<span class="sd">        Gets the spikes for this population/recording ID.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int rec_id:</span>
 <span class="sd">        :return: numpy array of spike ids and spike times, all ids recording</span>
-<span class="sd">        :rtype  ~numpy.ndarray, list(int)</span>
+<span class="sd">        :rtype: tuple(~numpy.ndarray, list(int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spike_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">spike_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -771,11 +773,11 @@
 
     <span class="k">def</span> <span class="nf">__combine_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">data_indexes</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        :param view_indexes:</span>
 <span class="sd">        :param data_indexes:</span>
 <span class="sd">        :param str variable:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :return: indices</span>
+<span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># keep just the view indexes in the data</span>
         <span class="n">data_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">)</span>
@@ -786,25 +788,26 @@
         <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
             <span class="n">missing_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
             <span class="n">missing_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;No </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> available for neurons </span><span class="si">{</span><span class="n">missing_list</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No </span><span class="si">{}</span><span class="s2"> available for neurons </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                           <span class="n">variable</span><span class="p">,</span> <span class="n">missing_list</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">indexes</span>
 
     <span class="k">def</span> <span class="nf">__get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">buffer_type</span><span class="p">,</span>
                      <span class="n">atoms_shape</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the data as a Numpy array for one opulation and variable</span>
+<span class="sd">        Gets the data as a Numpy array for one population and variable.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int rec_id:</span>
 <span class="sd">        :param list(int) view_indexes:</span>
 <span class="sd">        :param buffer_type:</span>
 <span class="sd">        :param tuple(int) atoms_shape:</span>
-<span class="sd">        :param int n_colour_bits</span>
+<span class="sd">        :param int n_colour_bits:</span>
 <span class="sd">        :param str variable:</span>
 <span class="sd">        :raises \</span>
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
 <span class="sd">            If the recording metadata not setup correctly</span>
+<span class="sd">        :rtype: tuple(~numpy.ndarray, list(int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">buffer_type</span> <span class="o">==</span> <span class="n">BufferDataType</span><span class="o">.</span><span class="n">NEURON_SPIKES</span><span class="p">:</span>
             <span class="n">spikes</span><span class="p">,</span> <span class="n">data_indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_neuron_spikes</span><span class="p">(</span><span class="n">cursor</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">)</span>
@@ -830,16 +833,15 @@
     <span class="k">def</span> <span class="nf">__get_matrix_data_by_region</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">region_id</span><span class="p">,</span> <span class="n">neurons</span><span class="p">,</span> <span class="n">data_type</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extracts data for this region</span>
+<span class="sd">        Extracts data for this region.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int region_id: Region data came from</span>
 <span class="sd">        :param array(int) neurons: mapping of local id to global id</span>
 <span class="sd">        :param DataType data_type: type of data to extract</span>
-<span class="sd">        :return:  neurons, times, data</span>
-<span class="sd">        :rtype: (list(int), list(float ), numpy.array</span>
+<span class="sd">        :return: times, data</span>
+<span class="sd">        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># for buffering output info is taken form the buffer manager</span>
         <span class="n">record_raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_contents</span><span class="p">(</span><span class="n">cursor</span><span class="p">,</span> <span class="n">region_id</span><span class="p">)</span>
         <span class="n">record_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">record_raw</span><span class="p">)</span>
@@ -865,18 +867,18 @@
     <span class="k">def</span> <span class="nf">__get_matrix_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">pop_size</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the matrix data  for this population/recording id</span>
+<span class="sd">        Gets the matrix data  for this population/recording id.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int rec_id:</span>
 <span class="sd">        :param DataType data_type: type of data to extract</span>
 <span class="sd">        :param view_indexes:</span>
-<span class="sd">            The indexes for which data should be returned. Or None for all</span>
+<span class="sd">            The indexes for which data should be returned. Or `None` for all</span>
 <span class="sd">        :type view_indexes: list(int) or None</span>
 <span class="sd">        :param int pop_size:</span>
 <span class="sd">        :param str variable:</span>
 <span class="sd">        :return: numpy array of the data, neurons</span>
-<span class="sd">        :rtype: tuple(~numpy.ndarray, list(int))</span>
+<span class="sd">        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray or list(int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">signal_array</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">pop_times</span> <span class="o">=</span> <span class="kc">None</span>
@@ -929,11 +931,12 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">region_id</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">rewire_values</span><span class="p">,</span>
             <span class="n">rewire_postids</span><span class="p">,</span> <span class="n">rewire_preids</span><span class="p">,</span> <span class="n">rewire_times</span><span class="p">,</span> <span class="n">sampling_interval_ms</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extracts rewires data for this region and adds it to the lists</span>
+<span class="sd">        Extracts rewires data for this region and adds it to the lists.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int region_id: Region data came from</span>
-<span class="sd">        :param Slice vertex_slice: slice of this region</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            slice of this region</span>
 <span class="sd">        :param list(int) rewire_values:</span>
 <span class="sd">        :param list(int) rewire_postids:</span>
 <span class="sd">        :param list(int) rewire_preids:</span>
@@ -968,7 +971,7 @@
 
     <span class="k">def</span> <span class="nf">__get_rewires</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">,</span> <span class="n">sampling_interval_ms</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extracts rewires data for this region a</span>
+<span class="sd">        Extracts rewires data for this region.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int rec_id:</span>
@@ -1000,7 +1003,8 @@
     <span class="k">def</span> <span class="nf">__get_recorded_pynn7</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">sampling_interval_ms</span><span class="p">,</span>
             <span class="n">as_matrix</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">pop_size</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get recorded data in PyNN 0.7 format. Must not be spikes.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get recorded data in PyNN 0.7 format. Must not be spikes.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param int rec_id:</span>
@@ -1008,7 +1012,7 @@
 <span class="sd">        :param float sampling_interval_ms:</span>
 <span class="sd">        :param bool as_matrix:</span>
 <span class="sd">        :param view_indexes:</span>
-<span class="sd">            The indexes for which data should be returned. Or None for all</span>
+<span class="sd">            The indexes for which data should be returned. Or `None` for all</span>
 <span class="sd">        :type view_indexes: list(int) or None</span>
 <span class="sd">        :param int pop_size:</span>
 <span class="sd">        :param str variable:</span>
@@ -1052,7 +1056,7 @@
             <span class="c1"># NO BufferedDataType.REWIRES get_spike will go boom</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">as_matrix</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ignoring as matrix for </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring as matrix for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_spikes</span><span class="p">(</span>
                     <span class="n">cursor</span><span class="p">,</span> <span class="n">rec_id</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">buffered_type</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">,</span>
                     <span class="n">n_colour_bits</span><span class="p">,</span> <span class="n">variable</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
@@ -1078,20 +1082,20 @@
     <span class="k">def</span> <span class="nf">__add_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">t_stop</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the data as a Numpy array for one population and variable</span>
+<span class="sd">        Gets the data as a Numpy array for one population and variable.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :param str variable:</span>
 <span class="sd">        :param ~neo.core.Block block: neo block</span>
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
-<span class="sd">        :param float t_stop</span>
+<span class="sd">        :param float t_stop:</span>
 <span class="sd">        :raises \</span>
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
 <span class="sd">            If the recording metadata not setup correctly</span>
@@ -1129,21 +1133,21 @@
     <span class="k">def</span> <span class="nf">__read_and_csv_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span>
                             <span class="n">view_indexes</span><span class="p">,</span> <span class="n">t_stop</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads the data for one variable and adds it to the csv file</span>
+<span class="sd">        Reads the data for one variable and adds it to the CSV file.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :param str variable:</span>
 <span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
 <span class="sd">        :param view_indexes:</span>
 <span class="sd">        :type view_indexes: None, ~numpy.array or list(int)</span>
-<span class="sd">        :param float t_stop</span>
+<span class="sd">        :param float t_stop:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="p">(</span><span class="n">rec_id</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">buffer_type</span><span class="p">,</span> <span class="n">t_start</span><span class="p">,</span> <span class="n">sampling_interval_ms</span><span class="p">,</span>
          <span class="n">pop_size</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">)</span> <span class="o">=</span> \
@@ -1177,17 +1181,17 @@
 
     <span class="k">def</span> <span class="nf">__get_empty_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
-<span class="sd">        :param variables: One or more variable names or None for all available</span>
+<span class="sd">        :param variables:</span>
+<span class="sd">            One or more variable names or `None` for all available</span>
 <span class="sd">        :type variables: str, list(str) or None</span>
-<span class="sd">        :param view_indexes: List of neurons ids to include or None for all</span>
+<span class="sd">        :param view_indexes: List of neurons ids to include or `None` for all</span>
 <span class="sd">        :type view_indexes: None or list(int)</span>
 <span class="sd">        :param annotations: annotations to put on the neo block</span>
 <span class="sd">        :type annotations: None or dict(str, ...)</span>
@@ -1206,18 +1210,19 @@
 
 <div class="viewcode-block" id="NeoBufferDatabase.get_empty_block"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.get_empty_block">[docs]</a>    <span class="k">def</span> <span class="nf">get_empty_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a block with just metadata but not data segments</span>
+<span class="sd">        Creates a block with just metadata but not data segments.</span>
 
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
-<span class="sd">        :param variables: One or more variable names or None for all available</span>
+<span class="sd">        :param variables:</span>
+<span class="sd">            One or more variable names or `None` for all available</span>
 <span class="sd">        :type variables: str, list(str) or None</span>
-<span class="sd">        :param view_indexes: List of neurons ids to include or None for all</span>
+<span class="sd">        :param view_indexes: List of neurons ids to include or `None` for all</span>
 <span class="sd">        :type view_indexes: None or list(int)</span>
 <span class="sd">        :param annotations: annotations to put on the neo block</span>
 <span class="sd">        :type annotations: None or dict(str, ...)</span>
@@ -1232,26 +1237,25 @@
 
 <div class="viewcode-block" id="NeoBufferDatabase.get_full_block"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.get_full_block">[docs]</a>    <span class="k">def</span> <span class="nf">get_full_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">         Creates a block with metadata and data for this segment</span>
+<span class="sd">        Creates a block with metadata and data for this segment.</span>
+<span class="sd">        Any previous segments will be empty.</span>
 
-<span class="sd">         Any previous segments will be empty</span>
-
-<span class="sd">         :param str pop_label: The label for the population of interest</span>
+<span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
-<span class="sd">        :param variables: One or more variable names or None for all available</span>
+<span class="sd">        :param variables:</span>
+<span class="sd">            One or more variable names or `None` for all available</span>
 <span class="sd">        :type variables: str, list(str) or None</span>
-<span class="sd">        :param view_indexes: List of neurons ids to include or None for all</span>
+<span class="sd">        :param view_indexes: List of neurons ids to include or `None` for all</span>
 <span class="sd">        :type view_indexes: None or list(int)</span>
 <span class="sd">        :param annotations: annotations to put on the neo block</span>
 <span class="sd">        :type annotations: None or dict(str, ...)</span>
 <span class="sd">        :return: The Neo block</span>
 <span class="sd">        :rtype: ~neo.core.Block</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
             <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_empty_block</span><span class="p">(</span><span class="n">cursor</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span>
@@ -1262,19 +1266,20 @@
 <div class="viewcode-block" id="NeoBufferDatabase.csv_segment"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.csv_segment">[docs]</a>    <span class="k">def</span> <span class="nf">csv_segment</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>  <span class="n">csv_file</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes the data including metadata to a csv file</span>
+<span class="sd">        Writes the data including metadata to a CSV file.</span>
 
-<span class="sd">        :param str csvfile: Path to file write block metdtadat to</span>
+<span class="sd">        :param str csvfile: Path to file to write block metadata to</span>
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typical the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
-<span class="sd">        :param variables: One or more variable names or None for all available</span>
+<span class="sd">        :param variables:</span>
+<span class="sd">            One or more variable names or `None` for all available</span>
 <span class="sd">        :type variables: str, list(str) or None</span>
-<span class="sd">        :param view_indexes: List of neurons ids to include or None for all</span>
+<span class="sd">        :param view_indexes: List of neurons ids to include or `None` for all</span>
 <span class="sd">        :type view_indexes: None or list(int)</span>
 <span class="sd">        :raises \</span>
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
@@ -1301,21 +1306,19 @@
 
 <div class="viewcode-block" id="NeoBufferDatabase.csv_block_metadata"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.csv_block_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">csv_block_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_file</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes the data including metadata to a csv file</span>
+<span class="sd">        Writes the data including metadata to a CSV file.</span>
+<span class="sd">        Overwrites any previous data in the file.</span>
 
-<span class="sd">        Overwrites and previous data in the file</span>
-
-<span class="sd">        :param str csvfile: Path to file write block metdtadat to</span>
+<span class="sd">        :param str csvfile: Path to file to write block metadata to</span>
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :param annotations: annotations to put on the neo block</span>
 <span class="sd">        :type annotations: None or dict(str, ...)</span>
-
 <span class="sd">        :raises \</span>
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
 <span class="sd">            If the recording metadata not setup correctly</span>
@@ -1334,20 +1337,20 @@
 
 <div class="viewcode-block" id="NeoBufferDatabase.add_segment"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.add_segment">[docs]</a>    <span class="k">def</span> <span class="nf">add_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds a segment to the block</span>
+<span class="sd">        Adds a segment to the block.</span>
 
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
-<span class="sd">        :param variables: One or more variable names or None for all available</span>
+<span class="sd">        :param variables:</span>
+<span class="sd">            One or more variable names or `None` for all available</span>
 <span class="sd">        :type variables: str, list(str) or None</span>
-<span class="sd">        :param view_indexes: List of neurons ids to include or None for all</span>
+<span class="sd">        :param view_indexes: List of neurons ids to include or `None` for all</span>
 <span class="sd">        :type view_indexes: None or list(int)</span>
-<span class="sd">        :return: Segment with the requested data</span>
 <span class="sd">        :raises \</span>
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
 <span class="sd">            If the recording metadata not setup correctly</span>
@@ -1367,20 +1370,21 @@
 
     <span class="k">def</span> <span class="nf">__add_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds a segment to the block</span>
+<span class="sd">        Adds a segment to the block.</span>
 
 <span class="sd">        :param ~sqlite3.Cursor cursor:</span>
 <span class="sd">        :param  ~neo.core.Block block:</span>
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typically the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
-<span class="sd">        :param variables: One or more variable names or None for all available</span>
+<span class="sd">        :param variables:</span>
+<span class="sd">            One or more variable names or `None` for all available</span>
 <span class="sd">        :type variables: str, list(str) or None</span>
-<span class="sd">        :param view_indexes: List of neurons ids to include or None for all</span>
+<span class="sd">        :param view_indexes: List of neurons ids to include or `None` for all</span>
 <span class="sd">        :type view_indexes: None or list(int)</span>
 <span class="sd">        :raises \</span>
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
@@ -1398,13 +1402,16 @@
 
 <div class="viewcode-block" id="NeoBufferDatabase.clear_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.clear_data">[docs]</a>    <span class="k">def</span> <span class="nf">clear_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the data as a Numpy array for one population and variable</span>
+<span class="sd">        Clears the data for one population and given variables.</span>
+
+<span class="sd">        .. note:::</span>
+<span class="sd">            The database must be writable for this to work!</span>
 
 <span class="sd">        :param str pop_label: The label for the population of interest</span>
 
 <span class="sd">            .. note::</span>
-<span class="sd">                This is actually the label of the Application Vertex</span>
-<span class="sd">                Typical the Population label corrected for None or</span>
+<span class="sd">                This is actually the label of the Application Vertex.</span>
+<span class="sd">                Typical the Population label, corrected for `None` or</span>
 <span class="sd">                duplicate values</span>
 
 <span class="sd">        :param list(str) variables: names of variable to get data for</span>
@@ -1442,6 +1449,12 @@
 <span class="sd">                    &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">pop_label</span><span class="p">,</span> <span class="n">variable</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="NeoBufferDatabase.write_metadata"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.write_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">write_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the current metadata to the database.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            The database must be writable for this to work!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">population</span> <span class="ow">in</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">iterate_populations</span><span class="p">():</span>
                 <span class="c1"># pylint: disable=protected-access</span>
@@ -1502,15 +1515,14 @@
 <div class="viewcode-block" id="NeoBufferDatabase.array_to_string"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.array_to_string">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">array_to_string</span><span class="p">(</span><span class="n">indexes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Converts a list of ints into a compact string</span>
-
+<span class="sd">        Converts a list of ints into a compact string.</span>
 <span class="sd">        Works best if the list is sorted.</span>
 
-<span class="sd">        Ids are comma separated except when a series of ids is sequential then</span>
+<span class="sd">        IDs are comma separated, except when a series of IDs is sequential then</span>
 <span class="sd">        the start:end is used.</span>
 
 <span class="sd">        :param list(int) indexes:</span>
-<span class="sd">        :rtype str:</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;</span>
@@ -1537,12 +1549,11 @@
 <div class="viewcode-block" id="NeoBufferDatabase.string_to_array"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.string_to_array">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">string_to_array</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Converts a string into a list of ints</span>
-
-<span class="sd">        Assumes the string was created by array_to_string</span>
+<span class="sd">        Converts a string into a list of ints.</span>
+<span class="sd">        Assumes the string was created by :py:meth:`array_to_string`</span>
 
 <span class="sd">        :param str string:</span>
-<span class="sd">        :rtype: list(int</span>
+<span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">string</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
@@ -1604,7 +1615,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

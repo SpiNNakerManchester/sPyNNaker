@@ -83,19 +83,22 @@
 
 
 <span class="k">def</span> <span class="nf">get_munich_i</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the instruction field from the key.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the instruction field from the key.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="n">_I_MASK</span>
 
 
 <span class="k">def</span> <span class="nf">get_munich_f</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the format field from the key.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the format field from the key.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="n">_F_MASK</span>
 
 
 <span class="k">def</span> <span class="nf">get_munich_d</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the device field from the key.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the device field from the key.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="n">_D_MASK</span>
 
@@ -309,7 +312,9 @@
 
 
 <span class="k">class</span> <span class="nc">MUNICH_MODES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;types of modes supported by this protocol&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Types of modes supported by this protocol.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">RESET_TO_DEFAULT</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">PUSH_BOT</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">SPOMNIBOT</span> <span class="o">=</span> <span class="mi">2</span>
@@ -319,7 +324,8 @@
 
 
 <span class="k">class</span> <span class="nc">MunichIoSpiNNakerLinkProtocol</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Provides Multicast commands for the Munich SpiNNaker-Link protocol</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provides Multicast commands for the Munich SpiNNaker-Link protocol.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__instance_key&quot;</span><span class="p">,</span> <span class="s2">&quot;__mode&quot;</span><span class="p">,</span> <span class="s2">&quot;__uart_id&quot;</span><span class="p">]</span>
 
@@ -333,9 +339,8 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">instance_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">uart_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param mode: The mode of operation of the protocol</span>
-<span class="sd">        :type modes:</span>
-<span class="sd">            ~spynnaker.pyNN.protocols.MUNICH_MODES</span>
+<span class="sd">        :param ~spynnaker.pyNN.protocols.MUNICH_MODES mode:</span>
+<span class="sd">            The mode of operation of the protocol</span>
 <span class="sd">        :param instance_key: The optional instance key to use</span>
 <span class="sd">        :type instance_key: int or None</span>
 <span class="sd">        :param int uart_id: The ID of the UART when needed</span>
@@ -371,13 +376,15 @@
 
 <div class="viewcode-block" id="MunichIoSpiNNakerLinkProtocol.sent_mode_command"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.sent_mode_command">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">sent_mode_command</span><span class="p">():</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; True if the mode command has ever been requested by any instance</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        True if the mode command has ever been requested by any instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">MunichIoSpiNNakerLinkProtocol</span><span class="o">.</span><span class="n">__sent_mode_command</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">instance_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The key of this instance of the protocol</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The key of this instance of the protocol.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -690,7 +697,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">MUNICH_MODES</span><span class="o">.</span><span class="n">PUSH_BOT</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;The mode you configured is not the PushBot, and so this &quot;</span>
-                <span class="s2">&quot;message is invalid for mode </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mode</span><span class="p">))</span>
+                <span class="sa">f</span><span class="s2">&quot;message is invalid for mode </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">push_bot_laser_config_total_period_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -875,7 +882,8 @@
 <div class="viewcode-block" id="MunichIoSpiNNakerLinkProtocol.set_retina_transmission"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_retina_transmission">[docs]</a>    <span class="k">def</span> <span class="nf">set_retina_transmission</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">retina_key</span><span class="o">=</span><span class="n">RetinaKey</span><span class="o">.</span><span class="n">NATIVE_128_X_128</span><span class="p">,</span>
             <span class="n">retina_payload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the retina transmission key</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the retina transmission key.</span>
 
 <span class="sd">        :param RetinaKey retina_key: the new key for the retina</span>
 <span class="sd">        :param retina_payload:</span>
@@ -886,7 +894,6 @@
 <span class="sd">        :return: the command to send</span>
 <span class="sd">        :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">retina_key_value</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">retina_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">retina_key_value</span> <span class="o">=</span> <span class="n">retina_key</span><span class="o">.</span><span class="n">value</span>
@@ -945,7 +952,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

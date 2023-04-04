@@ -62,11 +62,11 @@
 
 <span class="k">class</span> <span class="nc">_SpynnakerDataModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Singleton data model</span>
+<span class="sd">    Singleton data model.</span>
 
 <span class="sd">    This class should not be accessed directly please use the DataView and</span>
 <span class="sd">    DataWriter classes.</span>
-<span class="sd">    Accessing or editing the data held here directly is NOT SUPPORTED</span>
+<span class="sd">    Accessing or editing the data held here directly is *not supported!*</span>
 
 <span class="sd">    There are other DataModel classes which sit next to this one and hold</span>
 <span class="sd">    additional data. The DataView and DataWriter classes will combine these</span>
@@ -98,7 +98,7 @@
 
     <span class="k">def</span> <span class="nf">_clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Clears out all data</span>
+<span class="sd">        Clears out all data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id_counter</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_min_delay</span> <span class="o">=</span> <span class="kc">None</span>
@@ -111,14 +111,14 @@
     <span class="k">def</span> <span class="nf">_hard_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Puts all data back into the state expected at graph changed and</span>
-<span class="sd">            sim.reset</span>
+<span class="sd">        `sim.reset`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_soft_reset</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_soft_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Puts all data back into the state expected at sim.reset but not</span>
-<span class="sd">        graph changed</span>
+<span class="sd">        Puts all data back into the state expected at `sim.reset` but not</span>
+<span class="sd">        graph changed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># segment_counter is increased by the writer</span>
 
@@ -127,9 +127,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds the extra Methods to the View for PyNN level.</span>
 
-<span class="sd">    See UtilsDataView for a more detailed description.</span>
+<span class="sd">    See :py:class:`~spinn_utilities.data.UtilsDataView` for a more detailed</span>
+<span class="sd">    description.</span>
 
-<span class="sd">    Use this class weherever possible as it inherits all methods from all View</span>
+<span class="sd">    Use this class wherever possible as it inherits all methods from all View</span>
 <span class="sd">    classes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=attribute-defined-outside-init</span>
@@ -140,9 +141,11 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.get_min_delay"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_min_delay">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_min_delay</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The minimum supported delay, in milliseconds if available</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The minimum supported delay if available, in milliseconds.</span>
 
-<span class="sd">        Typically simulation_time_step_per_ms but may be a positive multiple</span>
+<span class="sd">        Typically `simulation_time_step_per_ms` but may be a positive multiple</span>
+<span class="sd">        of it.</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:</span>
@@ -155,7 +158,7 @@
 <div class="viewcode-block" id="SpynnakerDataView.has_min_delay"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.has_min_delay">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">has_min_delay</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        report if the minimum supported delay, in milliseconds if available</span>
+<span class="sd">        Report if there is a minimum supported delay available.</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -166,18 +169,18 @@
 <div class="viewcode-block" id="SpynnakerDataView.iterate_projections"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.iterate_projections">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">iterate_projections</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        An iteration of the projections previously added</span>
+<span class="sd">        An iteration of the projections previously added.</span>
 
 <span class="sd">        The iteration will be empty if no projections added.</span>
 
-<span class="sd">        :rtpye: iterable(Projection)</span>
+<span class="sd">        :rtype: iterable(Projection)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_projections</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpynnakerDataView.get_n_projections"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_n_projections">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_n_projections</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The number of projections previously added</span>
+<span class="sd">        The number of projections previously added.</span>
 
 <span class="sd">        rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -188,11 +191,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Called by each projection to add itself to the list.</span>
 
-<span class="sd">        Usage other than from Projection.__init__ is not supported and likely</span>
+<span class="sd">        Usage other than from `Projection.__init__` is not supported and likely</span>
 <span class="sd">        to raise an exception</span>
 
-<span class="sd">        :param projection: Projection to add</span>
-<span class="sd">        :type projection: ~spynnaker.pyNN.models.projectionProjection</span>
+<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection projection:</span>
+<span class="sd">            Projection to add</span>
 <span class="sd">        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:</span>
 <span class="sd">            If projections should not be added in the current state</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -209,20 +212,20 @@
 <div class="viewcode-block" id="SpynnakerDataView.iterate_populations"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.iterate_populations">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">iterate_populations</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        An iteration of the populations previously added</span>
+<span class="sd">        An iteration of the populations previously added.</span>
 
 <span class="sd">        The iteration will be empty if no populations added.</span>
 
-<span class="sd">        :rtpye: iterable(~spynnaker.pyNN.models.populations.Population)</span>
+<span class="sd">        :rtype: iterable(~spynnaker.pyNN.models.populations.Population)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_populations</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpynnakerDataView.get_n_populations"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_n_populations">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_n_populations</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The number of populations previously added</span>
+<span class="sd">        The number of populations previously added.</span>
 
-<span class="sd">        :rtpye: int</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_populations</span><span class="p">)</span></div>
 
@@ -231,18 +234,21 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Called by each population to add itself to the list.</span>
 
-<span class="sd">        Usage other than from Population.__init__ is not supported and likely</span>
+<span class="sd">        Usage other than from `Population.__init__` is not supported and likely</span>
 <span class="sd">        to raise an exception</span>
 
-<span class="sd">        Increments the all population id counter by the size of the population.</span>
+<span class="sd">        Increments the all population ID counter by the size of the population.</span>
 
-<span class="sd">        :param population: Population to add</span>
-<span class="sd">        :type population: ~spynnaker.pyNN.models.populations.Population</span>
-<span class="sd">        :rtype: (int, int)</span>
-<span class="sd">        :return: The first and last global ids for this Population</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
+<span class="sd">        :param ~spynnaker.pyNN.models.populations.Population population:</span>
+<span class="sd">            Population to add</span>
+<span class="sd">        :return: The first and last global IDs for this Population</span>
+<span class="sd">        :rtype: tuple(int, int)</span>
+<span class="sd">        :raises ~spinn_utilites.exceptions.SimulatorRunningException:</span>
+<span class="sd">            If `sim.run` is currently running</span>
+<span class="sd">        :raises ~spinn_utilites.exceptions.SimulatorNotSetupException:</span>
+<span class="sd">            If called before `sim.setup`</span>
+<span class="sd">        :raises ~spinn_utilites.exceptions.SimulatorShutdownException:</span>
+<span class="sd">            If called after `sim.end`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># UGLY but needed to avoid circular import</span>
         <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.populations.population</span> <span class="kn">import</span> <span class="n">Population</span>
@@ -261,13 +267,12 @@
     <span class="k">def</span> <span class="nf">set_number_of_neurons_per_dimension_per_core</span><span class="p">(</span>
             <span class="bp">cls</span><span class="p">,</span> <span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sets a ceiling on the number of neurons of a given type that can be\</span>
+<span class="sd">        Sets a ceiling on the number of neurons of a given type that can be</span>
 <span class="sd">        placed on a single core for each dimension.</span>
 
 <span class="sd">        :param AbstractPopulationVertex neuron_type: neuron type</span>
 <span class="sd">        :param max_permitted: the number to set to</span>
 <span class="sd">        :type max_permitted: int or tuple or None</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">check_valid_simulator</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="n">AbstractPyNNModel</span><span class="p">):</span>
@@ -278,7 +283,8 @@
 
 <div class="viewcode-block" id="SpynnakerDataView.get_segment_counter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_segment_counter">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_segment_counter</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The number of the current recording segment being generated.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of the current recording segment being generated.</span>
 
 <span class="sd">        :return: the segment counter</span>
 <span class="sd">        :rtype: int</span>
@@ -288,11 +294,10 @@
 <div class="viewcode-block" id="SpynnakerDataView.get_sim_name"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_sim_name">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_sim_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the name to be returned by pyNN.spiNNaker.name</span>
+<span class="sd">        Gets the name to be returned by `pyNN.spiNNaker.name`.</span>
 
-<span class="sd">        :rtype str</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">return</span> <span class="n">_version</span><span class="o">.</span><span class="n">_NAME</span>   <span class="c1"># pylint: disable=protected-access</span></div>
 </pre></div>
 
@@ -332,7 +337,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

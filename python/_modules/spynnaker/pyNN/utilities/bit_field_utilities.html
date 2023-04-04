@@ -70,10 +70,13 @@
 
 
 <div class="viewcode-block" id="get_sdram_for_bit_field_region"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_sdram_for_bit_field_region">[docs]</a><span class="k">def</span> <span class="nf">get_sdram_for_bit_field_region</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; the SDRAM for the bit field filter region</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The SDRAM for the bit field filter region.</span>
 
-<span class="sd">    :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
+<span class="sd">    :param incoming_projections:</span>
 <span class="sd">        The projections that target the vertex in question</span>
+<span class="sd">    :type incoming_projections:</span>
+<span class="sd">        iterable(~spynnaker.pyNN.models.projection.Projection)</span>
 <span class="sd">    :return: the estimated number of bytes used by the bit field region</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -94,14 +97,16 @@
 
 
 <div class="viewcode-block" id="get_sdram_for_keys"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_sdram_for_keys">[docs]</a><span class="k">def</span> <span class="nf">get_sdram_for_keys</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; gets the space needed for keys</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the space needed for keys.</span>
 
-<span class="sd">    :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
+<span class="sd">    :param incoming_projections:</span>
 <span class="sd">        The projections that target the vertex in question</span>
+<span class="sd">    :type incoming_projections:</span>
+<span class="sd">        iterable(~spynnaker.pyNN.models.projection.Projection)</span>
 <span class="sd">    :return: SDRAM needed</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="c1"># basic sdram</span>
     <span class="n">sdram</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">seen_app_edges</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -117,10 +122,13 @@
 
 
 <div class="viewcode-block" id="get_bitfield_key_map_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_bitfield_key_map_data">[docs]</a><span class="k">def</span> <span class="nf">get_bitfield_key_map_data</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get data for the key map region</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get data for the key map region.</span>
 
-<span class="sd">    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
+<span class="sd">    :param incoming_projections:</span>
 <span class="sd">        The projections to generate bitfields for</span>
+<span class="sd">    :type incoming_projections:</span>
+<span class="sd">        iterable(~spynnaker.pyNN.models.projection.Projection)</span>
 <span class="sd">    :rtype: ~numpy.ndarray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Gather the source vertices that target this core</span>
@@ -156,7 +164,8 @@
 
 <div class="viewcode-block" id="write_bitfield_init_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data">[docs]</a><span class="k">def</span> <span class="nf">write_bitfield_init_data</span><span class="p">(</span>
         <span class="n">spec</span><span class="p">,</span> <span class="n">bit_field_region</span><span class="p">,</span> <span class="n">n_bit_field_bytes</span><span class="p">,</span> <span class="n">bit_field_region_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; writes the init data needed for the bitfield generator</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Writes the init data needed for the bitfield generator.</span>
 
 <span class="sd">    :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">        data spec writer</span>
@@ -210,7 +219,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

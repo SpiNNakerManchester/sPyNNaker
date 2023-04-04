@@ -85,15 +85,15 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeConductance">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.input_types.</span></span><span class="sig-name descname"><span class="pre">InputTypeConductance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_rev_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_rev_I</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractInputType</span></code></a></p>
-<p>The conductance input type</p>
+<p>The conductance input type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>e_rev_E</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.10)"><em>RandomDistribution</em></a><em>
-or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal potential for excitatory input;
+<li><p><strong>e_rev_E</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or
+</em><em>RandomDistribution</em><em> or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal potential for excitatory input;
 <span class="math notranslate nohighlight">\(E^{rev}_e\)</span></p></li>
-<li><p><strong>e_rev_I</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.10)"><em>RandomDistribution</em></a><em>
-or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal potential for inhibitory input;
+<li><p><strong>e_rev_I</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or
+</em><em>RandomDistribution</em><em> or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal potential for inhibitory input;
 <span class="math notranslate nohighlight">\(E^{rev}_i\)</span></p></li>
 </ul>
 </dd>
@@ -101,7 +101,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal pot
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.add_parameters">
 <span class="sig-name descname"><span class="pre">add_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_conductance.html#InputTypeConductance.add_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
+<dd><p>Add the initial values of the parameters to the parameter holder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
@@ -112,7 +112,8 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal pot
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.add_state_variables">
 <span class="sig-name descname"><span class="pre">add_state_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_conductance.html#InputTypeConductance.add_state_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
+<dd><p>Add the initial values of the state variables to the state
+variables holder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
@@ -156,7 +157,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal pot
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.add_parameters">
 <span class="sig-name descname"><span class="pre">add_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current.html#InputTypeCurrent.add_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
+<dd><p>Add the initial values of the parameters to the parameter holder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
@@ -167,7 +168,8 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal pot
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.add_state_variables">
 <span class="sig-name descname"><span class="pre">add_state_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_current.html#InputTypeCurrent.add_state_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrent.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
+<dd><p>Add the initial values of the state variables to the state
+variables holder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
@@ -195,11 +197,11 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal pot
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeDelta">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.input_types.</span></span><span class="sig-name descname"><span class="pre">InputTypeDelta</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractInputType</span></code></a></p>
-<p>The delta input type</p>
+<p>The delta input type.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.add_parameters">
 <span class="sig-name descname"><span class="pre">add_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_delta.html#InputTypeDelta.add_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
+<dd><p>Add the initial values of the parameters to the parameter holder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the parameters</p>
@@ -210,7 +212,8 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal pot
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.add_state_variables">
 <span class="sig-name descname"><span class="pre">add_state_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/input_types/input_type_delta.html#InputTypeDelta.add_state_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
+<dd><p>Add the initial values of the state variables to the state
+variables holder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – A holder of the state variables</p>
@@ -336,7 +339,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – Reversal pot
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

@@ -59,25 +59,82 @@
 <dd><p>At most, there are 4 words as param generator parameters</p>
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.common.param_generator_data.PARAM_TYPE_BY_NAME">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.param_generator_data.</span></span><span class="sig-name descname"><span class="pre">PARAM_TYPE_BY_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'exponential':</span> <span class="pre">5,</span> <span class="pre">'normal':</span> <span class="pre">2,</span> <span class="pre">'normal_clipped':</span> <span class="pre">3,</span> <span class="pre">'normal_clipped_to_boundary':</span> <span class="pre">4,</span> <span class="pre">'uniform':</span> <span class="pre">1,</span> <span class="pre">'uniform_int':</span> <span class="pre">1}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.common.param_generator_data.PARAM_TYPE_BY_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>IDs of the random parameter generators supported by the synapse expander.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.common.param_generator_data.PARAM_TYPE_CONSTANT_ID">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.param_generator_data.</span></span><span class="sig-name descname"><span class="pre">PARAM_TYPE_CONSTANT_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#spynnaker.pyNN.models.common.param_generator_data.PARAM_TYPE_CONSTANT_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID of the constant parameter generator.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.common.param_generator_data.PARAM_TYPE_KERNEL">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.param_generator_data.</span></span><span class="sig-name descname"><span class="pre">PARAM_TYPE_KERNEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#spynnaker.pyNN.models.common.param_generator_data.PARAM_TYPE_KERNEL" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID for the convolution kernel generator.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.param_generator_data.get_generator_type">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.param_generator_data.</span></span><span class="sig-name descname"><span class="pre">get_generator_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/param_generator_data.html#get_generator_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.param_generator_data.get_generator_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_type</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a>) – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generator parameter type code for the given data type.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If an unsupported data type is given</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.param_generator_data.is_param_generatable">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.param_generator_data.</span></span><span class="sig-name descname"><span class="pre">is_param_generatable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/param_generator_data.html#is_param_generatable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.param_generator_data.is_param_generatable" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – The value to examine the type of.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the value is of a type that can be generated on chip.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.param_generator_data.param_generator_id">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.param_generator_data.</span></span><span class="sig-name descname"><span class="pre">param_generator_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/param_generator_data.html#param_generator_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.param_generator_data.param_generator_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – The value to examine the type of.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The ID of the on-chip generator that handles the value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If an value of an unsupported data type is given</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.param_generator_data.param_generator_params">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.param_generator_data.</span></span><span class="sig-name descname"><span class="pre">param_generator_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/param_generator_data.html#param_generator_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.param_generator_data.param_generator_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the parameter generator parameters as a numpy array</p>
+<dd><p>Get the parameter generator parameters as a numpy array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.10)"><em>NumpyRNG</em></a>) – </p>
@@ -91,7 +148,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.param_generator_data.param_generator_params_size_in_bytes">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.param_generator_data.</span></span><span class="sig-name descname"><span class="pre">param_generator_params_size_in_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/param_generator_data.html#param_generator_params_size_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.param_generator_data.param_generator_params_size_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the size of the parameter generator parameters in bytes</p>
+<dd><p>Get the size of the parameter generator parameters in bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.10)"><em>NumpyRNG</em></a>) – </p>
@@ -99,13 +156,28 @@
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If <cite>values</cite> is of an unsupported data type</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.param_generator_data.type_has_generator">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.param_generator_data.</span></span><span class="sig-name descname"><span class="pre">type_has_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/param_generator_data.html#type_has_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.param_generator_data.type_has_generator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_type</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a>) – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether there is a generator parameter type code for the given data
+type.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-spynnaker.pyNN.models.common.recording_utils">
@@ -115,7 +187,7 @@
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.recording_utils.</span></span><span class="sig-name descname"><span class="pre">make_missing_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">missing</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#make_missing_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.make_missing_string" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>missing</strong> (<em>iterable</em><em>(</em><em>Placement</em><em>)</em>) – </p>
+<dd class="field-odd"><p><strong>missing</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a><em>)</em>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
@@ -130,7 +202,7 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.EIEIOSpikeRecorder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.</span></span><span class="sig-name descname"><span class="pre">EIEIOSpikeRecorder</span></span><a class="headerlink" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Records spikes using EIEIO format</p>
+<p>Records spikes using EIEIO format.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.EIEIOSpikeRecorder.record">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">record</span></span><a class="headerlink" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.record" title="Permalink to this definition">¶</a></dt>
@@ -147,8 +219,8 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>new_state</strong> – bool</p></li>
-<li><p><strong>sampling_interval</strong> – not supported functionality</p></li>
+<li><p><strong>new_state</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+<li><p><strong>sampling_interval</strong> (<em>None</em>) – not supported functionality</p></li>
 </ul>
 </dd>
 </dl>
@@ -164,8 +236,14 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.MultiSpikeRecorder.get_sdram_usage_in_bytes">
 <span class="sig-name descname"><span class="pre">get_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes_per_timestep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder.get_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><em>AbstractSDRAM</em></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>spikes_per_timestep</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -190,9 +268,13 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>allowed_variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – </p></li>
-<li><p><strong>data_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – </p></li>
+<li><p><strong>data_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a><em>)</em>) – </p></li>
 <li><p><strong>bitfield_variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – </p></li>
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>per_timestep_variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – </p></li>
+<li><p><strong>per_timestep_datatypes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a><em>)</em>) – </p></li>
+<li><p><strong>events_per_core_variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – </p></li>
+<li><p><strong>events_per_core_datatypes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a><em>)</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -229,7 +311,8 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.add_region_offset">
 <span class="sig-name descname"><span class="pre">add_region_offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.add_region_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.add_region_offset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add an offset to the regions.  Used when there are multiple            recorders on a single core</p>
+<dd><p>Add an offset to the regions.
+Used when there are multiple recorders on a single core.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The offset to add</p>
@@ -250,18 +333,26 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_buffer_data_type">
 <span class="sig-name descname"><span class="pre">get_buffer_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_buffer_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_buffer_data_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.buffer_data_type.BufferDataType" title="spynnaker.pyNN.utilities.buffer_data_type.BufferDataType">BufferDataType</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram">
 <span class="sig-name descname"><span class="pre">get_buffered_sdram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_buffered_sdram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the SDRAM used for this many time steps for a variable</p>
-<p>If required the total is rounded up so the space will always fit</p>
+<dd><p>Returns the SDRAM used for this many time steps for a variable.</p>
+<p>If required the total is rounded up so the space will always fit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The PyNN variable name to get buffered sdram of</p></li>
-<li><p><strong>vertex_slice</strong> (<em>Slice</em>) – </p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -276,12 +367,12 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram_per_record">
 <span class="sig-name descname"><span class="pre">get_buffered_sdram_per_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_buffered_sdram_per_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram_per_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the SDRAM used per record</p>
+<dd><p>Return the SDRAM used per record.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – PyNN variable name</p></li>
-<li><p><strong>vertex_slice</strong> (<em>Slice</em>) – </p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -297,12 +388,13 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram_per_timestep">
 <span class="sig-name descname"><span class="pre">get_buffered_sdram_per_timestep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_buffered_sdram_per_timestep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram_per_timestep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the SDRAM used per timestep.</p>
-<p>In the case where sampling is used it returns the average        for recording and none recording based on the recording rate</p>
+<p>In the case where sampling is used it returns the average
+for recording and none recording based on the recording rate</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – PyNN variable name</p></li>
-<li><p><strong>vertex_slice</strong> (<em>Slice</em>) – </p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -317,7 +409,15 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_data_type">
 <span class="sig-name descname"><span class="pre">get_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_data_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_event_recordable_variables">
@@ -332,14 +432,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_generator_data">
 <span class="sig-name descname"><span class="pre">get_generator_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_generator_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_generator_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the recorded data as a generatable data set</p>
+<dd><p>Get the recorded data as a generatable data set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex_slice</strong> (<em>Slice</em><em> or </em><em>None</em>) – The slice to generate the data for, or None to generate for
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a><em> or </em><em>None</em>) – The slice to generate the data for, or <cite>None</cite> to generate for
 all neurons (assuming all the same, otherwise error)</p></li>
-<li><p><strong>atoms_shape</strong> – The shape of the atoms in the vertex; if vertex_slice is not None,
-atoms_shape must be not None</p></li>
+<li><p><strong>atoms_shape</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The shape of the atoms in the vertex;
+if <cite>vertex_slice</cite> is not <cite>None</cite>, atoms_shape must be not <cite>None</cite></p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -351,7 +451,7 @@ atoms_shape must be not None</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_generator_sdram_usage_in_bytes">
 <span class="sig-name descname"><span class="pre">get_generator_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_generator_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_generator_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the SDRAM usage of the generator data for recording metadata</p>
+<dd><p>Get the SDRAM usage of the generator data for recording metadata.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of atoms to be recorded</p>
@@ -365,12 +465,12 @@ atoms_shape must be not None</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_max_buffered_sdram_per_record">
 <span class="sig-name descname"><span class="pre">get_max_buffered_sdram_per_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_max_buffered_sdram_per_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_max_buffered_sdram_per_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the SDRAM used per record</p>
+<dd><p>Return the SDRAM used per record.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – PyNN variable name</p></li>
-<li><p><strong>vertex_slice</strong> (<em>Slice</em>) – </p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -387,10 +487,10 @@ atoms_shape must be not None</p></li>
 <span class="sig-name descname"><span class="pre">get_max_variable_sdram_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_max_variable_sdram_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_max_variable_sdram_usage" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<em>Slice</em>) – </p>
+<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>VariableSDRAM</em></p>
+<dd class="field-even"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.VariableSDRAM" title="(in PACMAN v6.0)"><em>VariableSDRAM</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -398,7 +498,7 @@ atoms_shape must be not None</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_metadata_sdram_usage_in_bytes">
 <span class="sig-name descname"><span class="pre">get_metadata_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_metadata_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_metadata_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the SDRAM usage of the metadata for recording</p>
+<dd><p>Get the SDRAM usage of the metadata for recording.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of atoms to record</p>
@@ -422,11 +522,11 @@ atoms_shape must be not None</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_recorded_indices">
 <span class="sig-name descname"><span class="pre">get_recorded_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_recorded_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_recorded_indices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the indices being recorded for a given variable</p>
+<dd><p>Get the indices being recorded for a given variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>application_vertex</strong> (<em>ApplicationVertex</em>) – The vertex being recorded</p></li>
+<li><p><strong>application_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – The vertex being recorded</p></li>
 <li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the indices of</p></li>
 </ul>
 </dd>
@@ -439,7 +539,7 @@ atoms_shape must be not None</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_region">
 <span class="sig-name descname"><span class="pre">get_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the region of a variable</p>
+<dd><p>Get the region of a variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The variable to get the region of</p>
@@ -453,13 +553,11 @@ atoms_shape must be not None</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_region_sizes">
 <span class="sig-name descname"><span class="pre">get_region_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_region_sizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_region_sizes" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Get the sizes of the regions for the variables, whether they are</dt><dd><p>recorded or not, with those that are not having a size of 0</p>
-</dd>
-</dl>
+<dd><p>Get the sizes of the regions for the variables, whether they are
+recorded or not, with those that are not having a size of 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<em>Slice</em>) – </p>
+<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
@@ -470,7 +568,7 @@ atoms_shape must be not None</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_sampling_interval_ms">
 <span class="sig-name descname"><span class="pre">get_sampling_interval_ms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_sampling_interval_ms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_sampling_interval_ms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the sampling interval of a variable</p>
+<dd><p>Get the sampling interval of a variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The variable to get the sampling interval of</p>
@@ -484,12 +582,16 @@ atoms_shape must be not None</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.get_sampling_overflow_sdram">
 <span class="sig-name descname"><span class="pre">get_sampling_overflow_sdram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_sampling_overflow_sdram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_sampling_overflow_sdram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the extra SDRAM that should be reserved if using per_timestep</p>
-<p>This is the extra that must be reserved if per_timestep is an average        rather than fixed for every timestep.</p>
-<p>When sampling the average * time_steps may not be quite enough.        This returns the extra space in the worst case        where time_steps is a multiple of sampling rate + 1,        and recording is done in the first and last time_step</p>
+<dd><p>Get the extra SDRAM that should be reserved if using per_timestep.</p>
+<p>This is the extra that must be reserved if per_timestep is an average
+rather than fixed for every timestep.</p>
+<p>When sampling the average * time_steps may not be quite enough.
+This returns the extra space in the worst case
+where time_steps is a multiple of sampling rate + 1,
+and recording is done in the first and last time_step</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<em>Slice</em>) – </p>
+<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Highest possible overflow needed</p>
@@ -505,10 +607,10 @@ atoms_shape must be not None</p></li>
 <span class="sig-name descname"><span class="pre">get_variable_sdram_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_variable_sdram_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_variable_sdram_usage" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<em>Slice</em>) – </p>
+<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>VariableSDRAM</em></p>
+<dd class="field-even"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.VariableSDRAM" title="(in PACMAN v6.0)"><em>VariableSDRAM</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -516,10 +618,8 @@ atoms_shape must be not None</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.is_global_generatable">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_global_generatable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.is_global_generatable" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Is the data for all neurons the same i.e. all or none of the</dt><dd><p>neurons are recorded for all variables</p>
-</dd>
-</dl>
+<dd><p>Whether the data for all neurons the same, i.e., all or none of the
+neurons are recorded for all variables.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
@@ -530,7 +630,7 @@ atoms_shape must be not None</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.is_recordable">
 <span class="sig-name descname"><span class="pre">is_recordable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.is_recordable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.is_recordable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Identify if the given variable can be recorded</p>
+<dd><p>Identify if the given variable can be recorded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The variable to check for</p>
@@ -561,7 +661,7 @@ atoms_shape must be not None</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
-<li><p><strong>vertex_slice</strong> (<em>Slice</em>) – </p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 <li><p><strong>atoms_shape</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – </p></li>
 </ul>
 </dd>
@@ -576,7 +676,7 @@ atoms_shape must be not None</p></li>
 <span class="sig-name descname"><span class="pre">recorded_ids_by_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.recorded_ids_by_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.recorded_ids_by_slice" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<em>Slice</em>) – </p>
+<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
@@ -632,17 +732,14 @@ atoms_shape must be not None</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.NeuronRecorder.write_neuron_recording_region">
 <span class="sig-name descname"><span class="pre">write_neuron_recording_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neuron_recording_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.write_neuron_recording_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.write_neuron_recording_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>recording data specification</p>
+<dd><p>Recording data specification.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – dsg spec</p></li>
 <li><p><strong>neuron_recording_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the recording region</p></li>
-<li><p><strong>vertex_slice</strong> (<em>Slice</em>) – the vertex slice</p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – the vertex slice</p></li>
 </ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -654,14 +751,14 @@ atoms_shape must be not None</p></li>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.</span></span><span class="sig-name descname"><span class="pre">ParameterHolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_items_to_return</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.common.ParameterHolder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Holds a set of parameters and state variables to be returned in a
-PyNN-specific format</p>
+PyNN-specific format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data_items_to_return</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – A list of data fields to be returned</p></li>
-<li><p><strong>get_call</strong> (<em>function</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>selector=None</em><em>)</em><em>-&gt;list</em>) – A function to call to read a value</p></li>
-<li><p><strong>selector</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#slice" title="(in Python v3.8)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – a description of the subrange to accept, or None for
-all. See:
+<li><p><strong>get_call</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>selector=None</em><em>)</em><em>-&gt;list</em>) – A function to call to read a value</p></li>
+<li><p><strong>selector</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#slice" title="(in Python v3.8)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – a description of the subrange to accept,
+or <cite>None</cite> for all. See:
 <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p></li>
 </ul>
 </dd>
@@ -686,7 +783,7 @@ all. See:
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.common.</span></span><span class="sig-name descname"><span class="pre">PopulationApplicationVertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationVertex</span></code>, <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models.html#spinn_front_end_common.abstract_models.HasCustomAtomKeyMap" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">HasCustomAtomKeyMap</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationVertex</span></code>, <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models/#spinn_front_end_common.abstract_models.HasCustomAtomKeyMap" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">HasCustomAtomKeyMap</span></code></a></p>
 <p>A vertex that can be used in a Population.</p>
 <p>Provides some default functions that can be overridden if the vertex
 supports these.</p>
@@ -694,29 +791,27 @@ supports these.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The optional name of the vertex.</p></li>
-<li><p><strong>max_atoms_per_core</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>tuple.</em>) – The max number of atoms that can be
+<li><p><strong>max_atoms_per_core</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><em>...</em><em>)</em>) – The max number of atoms that can be
 placed on a core for each dimension, used in partitioning.
 If the vertex is n-dimensional, with n &gt; 1, the value must be a
 tuple with a value for each dimension.  If it is single-dimensional
 the value can be a 1-tuple or an int.</p></li>
 <li><p><strong>splitter</strong> (<em>None</em><em> or
-</em><em>AbstractSplitterPartitioner</em>) – The splitter object needed for this vertex.
-Leave as None to delegate the choice of splitter to the selector.</p></li>
+</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_interfaces/#pacman.model.partitioner_interfaces.AbstractSplitterPartitioner" title="(in PACMAN v6.0)"><em>AbstractSplitterPartitioner</em></a>) – The splitter object needed for this vertex.
+Leave as <cite>None</cite> to delegate the choice of splitter to the selector.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.conductance_based">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conductance_based</span></span><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.conductance_based" title="Permalink to this definition">¶</a></dt>
-<dd><dl>
-<dt>Determine whether the vertex models post-synaptic inputs as</dt><dd><p>currents or conductance.</p>
-<p>By default this returns False; override if the model accepts
+<dd><p>Whether the vertex models post-synaptic inputs as
+currents or conductance.</p>
+<p>By default this is False; override if the model accepts
 conductance based input.</p>
-</dd>
-</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool.</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -724,16 +819,14 @@ conductance based input.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_atom_key_map">
 <span class="sig-name descname"><span class="pre">get_atom_key_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_atom_key_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_atom_key_map" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Get the mapping between atoms and keys for the given partition id,</dt><dd><p>and for the given machine pre-vertex</p>
-</dd>
-</dl>
+<dd><p>Get the mapping between atoms and keys for the given partition id,
+and for the given machine pre-vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pre_vertex</strong> (<em>MachineVertex</em>) – The machine vertex to get the map for</p></li>
+<li><p><strong>pre_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – The machine vertex to get the map for</p></li>
 <li><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The partition to get the map for</p></li>
-<li><p><strong>routing_info</strong> (<em>RoutingInfo</em>) – Routing information</p></li>
+<li><p><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v6.0)"><em>RoutingInfo</em></a>) – Routing information</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -748,15 +841,15 @@ conductance based input.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_buffer_data_type">
 <span class="sig-name descname"><span class="pre">get_buffer_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_buffer_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_buffer_data_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the type of data recorded by the buffer manager</p>
-<p>The BufferDatabase value controls how data returned by the cores is
-handled in NeoBufferDatabase</p>
+<dd><p>Get the type of data recorded by the buffer manager.</p>
+<p>The buffer data type controls how data returned by the cores is
+handled in NeoBufferDatabase.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable recorded</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>BufferDatabase</em></p>
+<dd class="field-even"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.buffer_management.storage_objects/#spinn_front_end_common.interface.buffer_management.storage_objects.BufferDatabase" title="(in SpiNNFrontEndCommon v6.0)"><em>BufferDatabase</em></a></p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – if the variable isn’t being recorded</p>
@@ -767,14 +860,12 @@ handled in NeoBufferDatabase</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_current_state_values">
 <span class="sig-name descname"><span class="pre">get_current_state_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_current_state_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_current_state_values" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Get the current values of a state variable for the whole Population</dt><dd><p>or a subset if the selector is used</p>
-</dd>
-</dl>
+<dd><p>Get the current values of a state variable for the whole Population
+or a subset if the selector is used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>names</strong> – The name or names of the variable to get</p></li>
+<li><p><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The name or names of the variable to get</p></li>
 <li><p><strong>selector</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#slice" title="(in Python v3.8)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – a description of the subrange to accept, or <code class="docutils literal notranslate"><span class="pre">None</span></code>
 for all. See:
 <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p></li>
@@ -792,9 +883,9 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_data_type">
 <span class="sig-name descname"><span class="pre">get_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_data_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the type data returned by a recording of the variable</p>
+<dd><p>Get the type data returned by a recording of the variable.</p>
 <p>This is the type of data the C code is returning.
-For instance dta such as spikes this will be None</p>
+For instance data such as spikes this will be <cite>None</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the type of</p>
@@ -811,14 +902,12 @@ For instance dta such as spikes this will be None</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_initial_state_values">
 <span class="sig-name descname"><span class="pre">get_initial_state_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_initial_state_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_initial_state_values" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Get the initial values of a state variable for the whole Population</dt><dd><p>or a subset if the selector is used</p>
-</dd>
-</dl>
+<dd><p>Get the initial values of a state variable for the whole Population
+or a subset if the selector is used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>names</strong> – The name or names of the variable to get</p></li>
+<li><p><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The name or names of the variable to get</p></li>
 <li><p><strong>selector</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#slice" title="(in Python v3.8)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – a description of the subrange to accept, or <code class="docutils literal notranslate"><span class="pre">None</span></code>
 for all. See:
 <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p></li>
@@ -836,19 +925,22 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_neurons_recording">
 <span class="sig-name descname"><span class="pre">get_neurons_recording</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_neurons_recording"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_neurons_recording" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the neurons being recorded on the core with this slice</p>
-<p>Typically vertex_slice.get_raster_ids(atoms_shape)
-But may be a sublist if doing selective recording</p>
+<dd><p>Gets the neurons being recorded on the core with this slice.</p>
+<p>Typically <cite>vertex_slice.get_raster_ids(atoms_shape)</cite>
+but may be a sublist if doing selective recording.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the region of</p></li>
-<li><p><strong>vertex_slice</strong> – </p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A list of the global raster IDs of the atoms in recording
 named variable within this slice</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -856,10 +948,8 @@ named variable within this slice</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_parameter_values">
 <span class="sig-name descname"><span class="pre">get_parameter_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_parameter_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_parameter_values" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Get the values of a parameter or parameters for the whole</dt><dd><p>Population or a subset if the selector is used</p>
-</dd>
-</dl>
+<dd><p>Get the values of a parameter or parameters for the whole
+Population or a subset if the selector is used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -892,8 +982,8 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recordable_variables">
 <span class="sig-name descname"><span class="pre">get_recordable_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_recordable_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a list of the names and types of things that can be recorded</p>
-<p>This methods list the variable recorded via the Population</p>
+<dd><p>Get a list of the names and types of things that can be recorded.</p>
+<p>This methods list the variable recorded via the Population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -904,7 +994,7 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_region">
 <span class="sig-name descname"><span class="pre">get_recording_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_recording_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the recording region for the named variable</p>
+<dd><p>Gets the recording region for the named variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the region of</p>
@@ -921,7 +1011,7 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_variables">
 <span class="sig-name descname"><span class="pre">get_recording_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_recording_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_recording_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a list of variables that are currently being recorded</p>
+<dd><p>Get a list of variables that are currently being recorded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -932,9 +1022,9 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_sampling_interval_ms">
 <span class="sig-name descname"><span class="pre">get_sampling_interval_ms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_sampling_interval_ms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_sampling_interval_ms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the sampling interval of the recording for the given variable</p>
+<dd><p>Get the sampling interval of the recording for the given variable.</p>
 <p>The values is in ms and unless selective recording is used will be
-SpynnakerDataView.get_simulation_time_step_us()</p>
+<cite>SpynnakerDataView.get_simulation_time_step_us()</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
@@ -948,7 +1038,7 @@ SpynnakerDataView.get_simulation_time_step_us()</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_state_variables">
 <span class="sig-name descname"><span class="pre">get_state_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_state_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a list of supported state variables</p>
+<dd><p>Get a list of supported state variables.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -959,7 +1049,7 @@ SpynnakerDataView.get_simulation_time_step_us()</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.get_units">
 <span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given parameter or state variable</p>
+<dd><p>Get the units of the given parameter or state variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the name of the parameter to get the units of</p>
@@ -976,18 +1066,18 @@ SpynnakerDataView.get_simulation_time_step_us()</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.inject">
 <span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.inject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inject a current source into this population</p>
+<dd><p>Inject a current source into this population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>current_source</strong> (<em>StandardCurrentSource</em>) – the Current Source to be injected</p></li>
+<li><p><strong>current_source</strong> (<a class="reference internal" href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource" title="spynnaker.pyNN.models.current_sources.AbstractCurrentSource"><em>AbstractCurrentSource</em></a>) – the current source to be injected</p></li>
 <li><p><strong>selector</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#slice" title="(in Python v3.8)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – a description of the subrange to accept, or <code class="docutils literal notranslate"><span class="pre">None</span></code>
 for all. See:
 <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">selector_to_ids()</span></code></a></p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ConfigurationException</strong> – if the population doesn’t support injection</p>
+<dd class="field-even"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities/#spinn_front_end_common.utilities.exceptions.ConfigurationException" title="(in SpiNNFrontEndCommon v6.0)"><strong>ConfigurationException</strong></a> – if the population doesn’t support injection</p>
 </dd>
 </dl>
 </dd></dl>
@@ -996,9 +1086,7 @@ for all. See:
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.n_colour_bits">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_colour_bits</span></span><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.n_colour_bits" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of colour bits sent by this vertex.</p>
-<blockquote>
-<div><p>Assumed 0 unless overridden</p>
-</div></blockquote>
+<p>Assumed 0 unless overridden</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -1009,10 +1097,8 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.set_current_state_values">
 <span class="sig-name descname"><span class="pre">set_current_state_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.set_current_state_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_current_state_values" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Set the current values of a state variable for the whole Population</dt><dd><p>or a subset if the selector is used</p>
-</dd>
-</dl>
+<dd><p>Set the current values of a state variable for the whole Population
+or a subset if the selector is used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1031,10 +1117,8 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.set_initial_state_values">
 <span class="sig-name descname"><span class="pre">set_initial_state_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.set_initial_state_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_initial_state_values" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Set the initial values of a state variable for the whole Population</dt><dd><p>or a subset if the selector is used</p>
-</dd>
-</dl>
+<dd><p>Set the initial values of a state variable for the whole Population
+or a subset if the selector is used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1053,12 +1137,12 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.set_not_recording">
 <span class="sig-name descname"><span class="pre">set_not_recording</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.set_not_recording"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_not_recording" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set a variable not recording</p>
+<dd><p>Set a variable not recording.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to not record</p></li>
-<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The list of neuron indices to not record or None for all</p></li>
+<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The list of neuron indices to not record or <cite>None</cite> for all</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -1070,10 +1154,8 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.set_parameter_values">
 <span class="sig-name descname"><span class="pre">set_parameter_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.set_parameter_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_parameter_values" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Set the values of a parameter for the whole Population or a subset</dt><dd><p>if the selector is used</p>
-</dd>
-</dl>
+<dd><p>Set the values of a parameter for the whole Population or a subset
+if the selector is used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1092,14 +1174,14 @@ for all. See:
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.common.PopulationApplicationVertex.set_recording">
 <span class="sig-name descname"><span class="pre">set_recording</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/population_application_vertex.html#PopulationApplicationVertex.set_recording"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.PopulationApplicationVertex.set_recording" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set a variable recording</p>
+<dd><p>Set a variable recording.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to set the status of</p></li>
-<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – How often the variable should be recorded or None for every
+<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – How often the variable should be recorded or <cite>None</cite> for every
 time step, in milliseconds</p></li>
-<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The list of neuron indices to record or None for all</p></li>
+<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The list of neuron indices to record or <cite>None</cite> for all</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -1127,6 +1209,9 @@ time step, in milliseconds</p></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.param_generator_data">spynnaker.pyNN.models.common.param_generator_data module</a><ul>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.param_generator_data.MAX_PARAMS_BYTES"><code class="docutils literal notranslate"><span class="pre">MAX_PARAMS_BYTES</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.param_generator_data.PARAM_TYPE_BY_NAME"><code class="docutils literal notranslate"><span class="pre">PARAM_TYPE_BY_NAME</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.param_generator_data.PARAM_TYPE_CONSTANT_ID"><code class="docutils literal notranslate"><span class="pre">PARAM_TYPE_CONSTANT_ID</span></code></a></li>
+<li><a class="reference internal" href="#spynnaker.pyNN.models.common.param_generator_data.PARAM_TYPE_KERNEL"><code class="docutils literal notranslate"><span class="pre">PARAM_TYPE_KERNEL</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.param_generator_data.get_generator_type"><code class="docutils literal notranslate"><span class="pre">get_generator_type()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.param_generator_data.is_param_generatable"><code class="docutils literal notranslate"><span class="pre">is_param_generatable()</span></code></a></li>
 <li><a class="reference internal" href="#spynnaker.pyNN.models.common.param_generator_data.param_generator_id"><code class="docutils literal notranslate"><span class="pre">param_generator_id()</span></code></a></li>
@@ -1282,7 +1367,7 @@ time step, in milliseconds</p></li>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

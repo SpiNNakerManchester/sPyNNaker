@@ -57,7 +57,8 @@
 
 
 <span class="k">class</span> <span class="nc">AbstractSDRAMSynapseDynamics</span><span class="p">(</span><span class="n">AbstractSynapseDynamics</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; How do the dynamics of a synapse interact with the rest of the model.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    How do the dynamics of a synapse interact with the rest of the model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
@@ -68,7 +69,8 @@
 
 <div class="viewcode-block" id="AbstractSDRAMSynapseDynamics.is_same_as"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSDRAMSynapseDynamics.is_same_as">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determines if this synapse dynamics is the same as another</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines if this synapse dynamics is the same as another.</span>
 
 <span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
 <span class="sd">        :rtype: bool</span>
@@ -76,7 +78,8 @@
 
 <div class="viewcode-block" id="AbstractSDRAMSynapseDynamics.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSDRAMSynapseDynamics.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the SDRAM usage of the synapse dynamics parameters in bytes</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the SDRAM usage of the synapse dynamics parameters in bytes.</span>
 
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">        :param int n_synapse_types:</span>
@@ -86,7 +89,8 @@
 <div class="viewcode-block" id="AbstractSDRAMSynapseDynamics.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSDRAMSynapseDynamics.write_parameters">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span>
                          <span class="n">synapse_weight_scales</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the synapse parameters to the spec</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the synapse parameters to the spec.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The specification to write to</span>
@@ -99,16 +103,17 @@
 
 <div class="viewcode-block" id="AbstractSDRAMSynapseDynamics.get_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSDRAMSynapseDynamics.get_parameter_names">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the parameter names available from the synapse \</span>
-<span class="sd">            dynamics components</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the parameter names available from the synapse dynamics components.</span>
 
 <span class="sd">        :rtype: iterable(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSDRAMSynapseDynamics.get_max_synapses"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSDRAMSynapseDynamics.get_max_synapses">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_max_synapses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_words</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the maximum number of synapses that can be held in the given\</span>
-<span class="sd">            number of words</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the maximum number of synapses that can be held in the given</span>
+<span class="sd">        number of words.</span>
 
 <span class="sd">        :param int n_words: The number of words the synapses must fit in</span>
 <span class="sd">        :rtype: int</span>
@@ -116,13 +121,15 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">pad_to_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The amount each row should pad to, or None if not specified</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The amount each row should pad to, or `None` if not specified.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractSDRAMSynapseDynamics.convert_per_connection_data_to_rows"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSDRAMSynapseDynamics.convert_per_connection_data_to_rows">[docs]</a>    <span class="k">def</span> <span class="nf">convert_per_connection_data_to_rows</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Converts per-connection data generated from connections into\</span>
-<span class="sd">            row-based data to be returned from get_synaptic_data</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts per-connection data generated from connections into</span>
+<span class="sd">        row-based data to be returned from get_synaptic_data.</span>
 
 <span class="sd">        :param ~numpy.ndarray connection_row_indices:</span>
 <span class="sd">            The index of the row that each item should go into</span>
@@ -139,8 +146,9 @@
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="AbstractSDRAMSynapseDynamics.get_n_items"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSDRAMSynapseDynamics.get_n_items">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">item_size</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the number of items in each row as 4-byte values, given the\</span>
-<span class="sd">            item size</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the number of items in each row as 4-byte values, given the</span>
+<span class="sd">        item size.</span>
 
 <span class="sd">        :param ~numpy.ndarray rows:</span>
 <span class="sd">        :param int item_size:</span>
@@ -151,7 +159,8 @@
             <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="AbstractSDRAMSynapseDynamics.get_words"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSDRAMSynapseDynamics.get_words">[docs]</a>    <span class="k">def</span> <span class="nf">get_words</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Convert the row data to words</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the row data to words.</span>
 
 <span class="sd">        :param ~numpy.ndarray rows:</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
@@ -198,7 +207,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

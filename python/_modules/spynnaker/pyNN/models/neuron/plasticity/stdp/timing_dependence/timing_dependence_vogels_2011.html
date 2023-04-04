@@ -64,7 +64,8 @@
 
 
 <span class="k">class</span> <span class="nc">TimingDependenceVogels2011</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; A timing dependence STDP rule due to Vogels (2011).</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A timing dependence STDP rule due to Vogels (2011).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__alpha&quot;</span><span class="p">,</span>
@@ -96,7 +97,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">alpha</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`\alpha`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :math:`\alpha`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -104,7 +106,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`\tau`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :math:`\tau`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -112,7 +115,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">A_plus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`A^+`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :math:`A^+`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -124,7 +128,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">A_minus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; :math:`A^-`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :math:`A^-`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -143,7 +148,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The suffix to be appended to the vertex executable for this rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The suffix to be appended to the vertex executable for this rule.</span>
 
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -151,7 +157,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pre_trace_n_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The number of bytes used by the pre-trace of the rule per neuron</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of bytes used by the pre-trace of the rule per neuron.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -164,7 +171,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_weight_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The number of weight terms expected by this timing rule</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of weight terms expected by this timing rule.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -183,7 +191,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synaptic_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the synaptic structure of the plastic part of the rows</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The synaptic structure of the plastic part of the rows.</span>
 
 <span class="sd">        :rtype: AbstractSynapseStructure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -230,7 +239,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

@@ -62,7 +62,8 @@
 
 <span class="k">class</span> <span class="nc">PushBotEthernetDevice</span><span class="p">(</span>
         <span class="n">AbstractMulticastControllableDevice</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; An arbitrary PushBot device</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An arbitrary PushBot device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -71,7 +72,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param MunichIoEthernetProtocol protocol:</span>
 <span class="sd">            The protocol instance to get commands from</span>
-<span class="sd">        :param AbstractPushBotOutputDevicedevice:</span>
+<span class="sd">        :param AbstractPushBotOutputDevice device:</span>
 <span class="sd">            The Enum instance of the device to control</span>
 <span class="sd">        :param bool uses_payload:</span>
 <span class="sd">            True if the device uses a payload for control</span>
@@ -94,7 +95,7 @@
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMulticastControllableDevice</span><span class="o">.</span><span class="n">device_control_partition_id</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">device_control_partition_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_PARTITION_ID&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__device</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__device</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_PARTITION_ID&quot;</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMulticastControllableDevice</span><span class="o">.</span><span class="n">device_control_uses_payload</span><span class="p">)</span>
@@ -131,7 +132,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">protocol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The protocol instance, for use in the subclass</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The protocol instance, for use in the subclass.</span>
 
 <span class="sd">        :rtype: MunichIoEthernetProtocol</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -139,12 +141,12 @@
 
 <div class="viewcode-block" id="PushBotEthernetDevice.set_command_protocol"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetDevice.set_command_protocol">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">set_command_protocol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_protocol</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the protocol use to send setup and shutdown commands,\</span>
-<span class="sd">            separately from the protocol used to control the device.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the protocol use to send setup and shutdown commands,</span>
+<span class="sd">        separately from the protocol used to control the device.</span>
 
-<span class="sd">        :param command_protocol: The protocol to use for this device</span>
-<span class="sd">        :type command_protocol:</span>
-<span class="sd">            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol</span>
+<span class="sd">        :param MunichIoSpiNNakerLinkProtocol command_protocol:</span>
+<span class="sd">            The protocol to use for this device</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 </pre></div>
 
@@ -184,7 +186,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

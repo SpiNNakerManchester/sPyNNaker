@@ -59,6 +59,10 @@
 
 
 <span class="k">class</span> <span class="nc">SpynnakerPoissonControlConnection</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A connection used to control a Poisson-distributed random event source&#39;s</span>
+<span class="sd">    firing rate at runtime.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__control_label_extension&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__control_label_to_label&quot;</span><span class="p">,</span>
@@ -110,7 +114,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_send_label</span><span class="p">(</span><span class="n">control</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__convert_to_control_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__control_label_extension</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">__control_label_extension</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">def</span> <span class="nf">__control_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
         <span class="c1"># Try to get a control label, but if not just use the label</span>
@@ -162,7 +166,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_stop_callback_wrapper</span><span class="p">,</span> <span class="n">pause_stop_callback</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="SpynnakerPoissonControlConnection.set_rate"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.set_rate">[docs]</a>    <span class="k">def</span> <span class="nf">set_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">neuron_id</span><span class="p">,</span> <span class="n">rate</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the rate of a Poisson neuron within a Poisson source</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the rate of a Poisson neuron within a Poisson source.</span>
 
 <span class="sd">        :param str label: The label of the Population to set the rates of</span>
 <span class="sd">        :param int neuron_id: The neuron ID to set the rate of</span>
@@ -171,7 +176,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">set_rates</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="p">[(</span><span class="n">neuron_id</span><span class="p">,</span> <span class="n">rate</span><span class="p">)])</span></div>
 
 <div class="viewcode-block" id="SpynnakerPoissonControlConnection.set_rates"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.set_rates">[docs]</a>    <span class="k">def</span> <span class="nf">set_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">neuron_id_rates</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the rates of multiple Poisson neurons within a Poisson source</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the rates of multiple Poisson neurons within a Poisson source.</span>
 
 <span class="sd">        :param str label: The label of the Population to set the rates of</span>
 <span class="sd">        :param list(tuple(int,float)) neuron_id_rates:</span>
@@ -220,7 +226,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

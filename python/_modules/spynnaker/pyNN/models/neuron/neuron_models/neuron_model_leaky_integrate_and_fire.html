@@ -69,7 +69,8 @@
 
 
 <span class="k">class</span> <span class="nc">NeuronModelLeakyIntegrateAndFire</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Classic leaky integrate and fire neuron model.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Classic leaky integrate and fire neuron model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__v_init&quot;</span><span class="p">,</span>
@@ -84,32 +85,26 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">v_init</span><span class="p">,</span> <span class="n">v_rest</span><span class="p">,</span> <span class="n">tau_m</span><span class="p">,</span> <span class="n">cm</span><span class="p">,</span> <span class="n">i_offset</span><span class="p">,</span> <span class="n">v_reset</span><span class="p">,</span> <span class="n">tau_refrac</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param v_init: :math:`V_{init}`</span>
-<span class="sd">        :type v_init:</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or</span>
-<span class="sd">            (mapping) function</span>
+<span class="sd">        :type v_init: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param v_rest: :math:`V_{rest}`</span>
-<span class="sd">        :type v_rest:</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or</span>
-<span class="sd">            (mapping) function</span>
+<span class="sd">        :type v_rest: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param tau_m: :math:`\tau_{m}`</span>
-<span class="sd">        :type tau_m:</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or</span>
-<span class="sd">            (mapping) function</span>
+<span class="sd">        :type tau_m: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param cm: :math:`C_m`</span>
-<span class="sd">        :type cm: float, iterable(float), ~pyNN.random.RandomDistribution or</span>
-<span class="sd">            (mapping) function</span>
+<span class="sd">        :type cm: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param i_offset: :math:`I_{offset}`</span>
-<span class="sd">        :type i_offset:</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or</span>
-<span class="sd">            (mapping) function</span>
+<span class="sd">        :type i_offset: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param v_reset: :math:`V_{reset}`</span>
-<span class="sd">        :type v_reset:</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or</span>
-<span class="sd">            (mapping) function</span>
+<span class="sd">        :type v_reset: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param tau_refrac: :math:`\tau_{refrac}`</span>
-<span class="sd">        :type tau_refrac:</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution or</span>
-<span class="sd">            (mapping) function</span>
+<span class="sd">        :type tau_refrac: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="p">[</span><span class="n">Struct</span><span class="p">([</span>
@@ -152,7 +147,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">v_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`V_{init}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Settable model parameter: :math:`V_{init}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -160,7 +156,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">v_rest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`V_{rest}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Settable model parameter: :math:`V_{rest}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -168,7 +165,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`\tau_{m}`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Settable model parameter: :math:`\tau_{m}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -176,7 +174,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`C_m`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Settable model parameter: :math:`C_m`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -184,7 +183,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">i_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`I_{offset}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Settable model parameter: :math:`I_{offset}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -192,7 +192,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">v_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`V_{reset}`</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Settable model parameter: :math:`V_{reset}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -200,7 +201,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_refrac</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`\tau_{refrac}`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Settable model parameter: :math:`\tau_{refrac}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -243,7 +245,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

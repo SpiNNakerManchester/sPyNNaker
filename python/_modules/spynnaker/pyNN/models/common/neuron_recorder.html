@@ -92,7 +92,8 @@
 
 
 <span class="k">def</span> <span class="nf">get_sampling_interval</span><span class="p">(</span><span class="n">sampling_rate</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Return the current sampling interval given a sampling rate</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the current sampling interval given a sampling rate.</span>
 
 <span class="sd">    :param float sampling_rate: The sampling rate in time steps</span>
 <span class="sd">    :return: Sampling interval in microseconds</span>
@@ -170,9 +171,17 @@
             <span class="n">events_per_core_variables</span><span class="p">,</span> <span class="n">events_per_core_datatypes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list(str) allowed_variables:</span>
-<span class="sd">        :param list(str) data_types:</span>
+<span class="sd">        :param dict(str,~data_specification.enums.DataType) data_types:</span>
 <span class="sd">        :param list(str) bitfield_variables:</span>
 <span class="sd">        :param int n_neurons:</span>
+<span class="sd">        :param list(str) per_timestep_variables:</span>
+<span class="sd">        :param per_timestep_datatypes:</span>
+<span class="sd">        :type per_timestep_datatypes:</span>
+<span class="sd">            dict(str,~data_specification.enums.DataType)</span>
+<span class="sd">        :param list(str) events_per_core_variables:</span>
+<span class="sd">        :param events_per_core_datatypes:</span>
+<span class="sd">        :type events_per_core_datatypes:</span>
+<span class="sd">            dict(str,~data_specification.enums.DataType)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -205,8 +214,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__offset_added</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="NeuronRecorder.add_region_offset"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.add_region_offset">[docs]</a>    <span class="k">def</span> <span class="nf">add_region_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add an offset to the regions.  Used when there are multiple\</span>
-<span class="sd">            recorders on a single core</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an offset to the regions.</span>
+<span class="sd">        Used when there are multiple recorders on a single core.</span>
 
 <span class="sd">        :param int offset: The offset to add</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -218,7 +228,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__offset_added</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_region"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_region">[docs]</a>    <span class="k">def</span> <span class="nf">get_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the region of a variable</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the region of a variable.</span>
 
 <span class="sd">        :param str variable: The variable to get the region of</span>
 <span class="sd">        :rtype: int</span>
@@ -240,6 +251,8 @@
 
     <span class="k">def</span> <span class="nf">_max_recording_per_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str variable:</span>
+<span class="sd">        :param int n_atoms:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -288,8 +301,7 @@
     <span class="k">def</span> <span class="nf">_process_missing_data</span><span class="p">(</span>
             <span class="n">missing_str</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span>
             <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">placement_data</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
-        <span class="n">missing_str</span> <span class="o">+=</span> <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">); &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">missing_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="si">}</span><span class="s2">); &quot;</span>
         <span class="c1"># Start the fragment for this slice empty</span>
         <span class="n">fragment</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">expected_rows</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">):</span>
@@ -311,7 +323,8 @@
     <span class="k">def</span> <span class="nf">_get_placement_matrix_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span>
             <span class="n">missing_str</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">n_per_timestep</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; processes a placement for matrix data</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes a placement for matrix data.</span>
 
 <span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
 <span class="sd">            the placements object</span>
@@ -367,9 +380,12 @@
         <span class="k">return</span> <span class="n">placement_data</span>
 
 <div class="viewcode-block" id="NeuronRecorder.get_recorded_indices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_recorded_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the indices being recorded for a given variable</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the indices being recorded for a given variable.</span>
 
-<span class="sd">        :param ApplicationVertex application_vertex: The vertex being recorded</span>
+<span class="sd">        :param application_vertex: The vertex being recorded</span>
+<span class="sd">        :type application_vertex:</span>
+<span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        :param str variable: The name of the variable to get the indices of</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -380,7 +396,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_sampling_interval_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_sampling_interval_ms">[docs]</a>    <span class="k">def</span> <span class="nf">get_sampling_interval_ms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the sampling interval of a variable</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the sampling interval of a variable.</span>
 
 <span class="sd">        :param str variable: The variable to get the sampling interval of</span>
 <span class="sd">        :rtype: float</span>
@@ -392,6 +409,10 @@
         <span class="k">return</span> <span class="n">get_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_buffer_data_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_buffer_data_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_buffer_data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str variable:</span>
+<span class="sd">        :rtype: BufferDataType</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPIKES</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">BufferDataType</span><span class="o">.</span><span class="n">NEURON_SPIKES</span>
         <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">REWIRING</span><span class="p">:</span>
@@ -403,6 +424,10 @@
             <span class="k">return</span> <span class="n">BufferDataType</span><span class="o">.</span><span class="n">MATRIX</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_data_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_data_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str variable:</span>
+<span class="sd">        :rtype: ~data_specification.enums.DataType</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_datatypes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_types</span><span class="p">:</span>
@@ -439,7 +464,8 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.is_recordable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.is_recordable">[docs]</a>    <span class="k">def</span> <span class="nf">is_recordable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Identify if the given variable can be recorded</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Identify if the given variable can be recorded.</span>
 
 <span class="sd">        :param str variable: The variable to check for</span>
 <span class="sd">        :rtype: bool</span>
@@ -530,8 +556,9 @@
         <span class="k">return</span> <span class="n">variables</span></div>
 
     <span class="k">def</span> <span class="nf">_compute_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Convert a sampling interval into a rate. \</span>
-<span class="sd">            Remember, machine time step is in nanoseconds</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a sampling interval into a rate.</span>
+<span class="sd">        Remember, machine time step is in nanoseconds</span>
 
 <span class="sd">        :param int sampling_interval: interval between samples in microseconds</span>
 <span class="sd">        :return: rate</span>
@@ -543,13 +570,13 @@
         <span class="n">step</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span>
         <span class="n">rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sampling_interval</span> <span class="o">/</span> <span class="n">step</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sampling_interval</span> <span class="o">!=</span> <span class="n">rate</span> <span class="o">*</span> <span class="n">step</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;sampling_interval </span><span class="si">{}</span><span class="s2"> is not an an integer multiple of the &quot;</span>\
-                  <span class="s2">&quot;simulation timestep </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampling_interval</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;sampling_interval </span><span class="si">{</span><span class="n">sampling_interval</span><span class="si">}</span><span class="s2"> is not an an &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;integer multiple of the simulation timestep </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">rate</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_RATE</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;sampling_interval </span><span class="si">{}</span><span class="s2"> higher than max allowed which is </span><span class="si">{}</span><span class="s2">&quot;</span> \
-                  <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampling_interval</span><span class="p">,</span> <span class="n">step</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_RATE</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;sampling_interval </span><span class="si">{</span><span class="n">sampling_interval</span><span class="si">}</span><span class="s2"> higher than &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;max allowed which is </span><span class="si">{</span><span class="n">step</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">_MAX_RATE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rate</span>
 
 <div class="viewcode-block" id="NeuronRecorder.check_indexes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.check_indexes">[docs]</a>    <span class="k">def</span> <span class="nf">check_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
@@ -573,15 +600,16 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="n">warning</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;All indexes larger than population size&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__check_per_timestep_params</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check if certain parameters have been provided for a per-timestep</span>
-<span class="sd">            variable and if so, raise an Exception</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if certain parameters have been provided for a per-timestep</span>
+<span class="sd">        variable and if so, raise an Exception.</span>
 
 <span class="sd">        :param str variable:</span>
 <span class="sd">        :param int sampling_interval:</span>
@@ -591,13 +619,15 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> does not support a sampling interval&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> can only be recorded &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;on the whole population&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> can only be recorded &quot;</span>
+                <span class="s2">&quot;on the whole population&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__check_events_per_core_params</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check if certain parameters have been provided for an</span>
-<span class="sd">            events-per-core variable and if so, raise an Exception</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if certain parameters have been provided for an</span>
+<span class="sd">        events-per-core variable and if so, raise an Exception.</span>
 
 <span class="sd">        :param str variable:</span>
 <span class="sd">        :param int sampling_interval:</span>
@@ -607,8 +637,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> does not support a sampling interval&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> can only be recorded &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;on the whole population&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> can only be recorded &quot;</span>
+                <span class="s2">&quot;on the whole population&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_turn_off_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">remove_indexes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -652,9 +683,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_neurons</span><span class="p">)</span>
 
         <span class="c1"># remove the indexes not recording</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="p">[</span><span class="n">index</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">index</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">remove_indexes</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">index</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">remove_indexes</span><span class="p">]</span>
 
         <span class="c1"># Check is at least one index still recording</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">variable</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -679,8 +711,7 @@
                 <span class="k">return</span>
         <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
             <span class="s2">&quot;Current implementation does not support multiple &quot;</span>
-            <span class="s2">&quot;sampling_intervals for </span><span class="si">{}</span><span class="s2"> on one population.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">variable</span><span class="p">))</span>
+            <span class="sa">f</span><span class="s2">&quot;sampling_intervals for </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> on one population.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_turn_on_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -749,14 +780,15 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_turn_off_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="s2">&quot;Variable </span><span class="si">{}</span><span class="s2"> is not supported&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">variable</span><span class="p">))</span></div>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> is not supported&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_region_sizes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_region_sizes">[docs]</a>    <span class="k">def</span> <span class="nf">get_region_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the sizes of the regions for the variables, whether they are</span>
-<span class="sd">            recorded or not, with those that are not having a size of 0</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the sizes of the regions for the variables, whether they are</span>
+<span class="sd">        recorded or not, with those that are not having a size of 0.</span>
 
-<span class="sd">        :param ~pacman.model.graphs.commmon.Slice vertex_slice:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -769,13 +801,13 @@
 
 <div class="viewcode-block" id="NeuronRecorder.write_neuron_recording_region"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.write_neuron_recording_region">[docs]</a>    <span class="k">def</span> <span class="nf">write_neuron_recording_region</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">neuron_recording_region</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; recording data specification</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recording data specification.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec: dsg spec</span>
 <span class="sd">        :param int neuron_recording_region: the recording region</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            the vertex slice</span>
-<span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">neuron_recording_region</span><span class="p">)</span>
 
@@ -789,7 +821,8 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">recording_data</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_buffered_sdram_per_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the SDRAM used per record</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the SDRAM used per record.</span>
 
 <span class="sd">        :param str variable: PyNN variable name</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -820,7 +853,8 @@
 
 <div class="viewcode-block" id="NeuronRecorder.get_buffered_sdram_per_record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram_per_record">[docs]</a>    <span class="k">def</span> <span class="nf">get_buffered_sdram_per_record</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the SDRAM used per record</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the SDRAM used per record.</span>
 
 <span class="sd">        :param str variable: PyNN variable name</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -831,7 +865,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_buffered_sdram_per_record</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_max_buffered_sdram_per_record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_max_buffered_sdram_per_record">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_buffered_sdram_per_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the SDRAM used per record</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the SDRAM used per record.</span>
 
 <span class="sd">        :param str variable: PyNN variable name</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -843,9 +878,10 @@
 
 <div class="viewcode-block" id="NeuronRecorder.get_buffered_sdram_per_timestep"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram_per_timestep">[docs]</a>    <span class="k">def</span> <span class="nf">get_buffered_sdram_per_timestep</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the SDRAM used per timestep.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the SDRAM used per timestep.</span>
 
-<span class="sd">        In the case where sampling is used it returns the average\</span>
+<span class="sd">        In the case where sampling is used it returns the average</span>
 <span class="sd">        for recording and none recording based on the recording rate</span>
 
 <span class="sd">        :param str variable: PyNN variable name</span>
@@ -873,14 +909,15 @@
             <span class="k">return</span> <span class="n">data_size</span> <span class="o">//</span> <span class="n">rate</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_sampling_overflow_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_sampling_overflow_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_sampling_overflow_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the extra SDRAM that should be reserved if using per_timestep</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the extra SDRAM that should be reserved if using per_timestep.</span>
 
-<span class="sd">        This is the extra that must be reserved if per_timestep is an average\</span>
+<span class="sd">        This is the extra that must be reserved if per_timestep is an average</span>
 <span class="sd">        rather than fixed for every timestep.</span>
 
-<span class="sd">        When sampling the average * time_steps may not be quite enough.\</span>
-<span class="sd">        This returns the extra space in the worst case\</span>
-<span class="sd">        where time_steps is a multiple of sampling rate + 1,\</span>
+<span class="sd">        When sampling the average * time_steps may not be quite enough.</span>
+<span class="sd">        This returns the extra space in the worst case</span>
+<span class="sd">        where time_steps is a multiple of sampling rate + 1,</span>
 <span class="sd">        and recording is done in the first and last time_step</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -901,9 +938,10 @@
 
 <div class="viewcode-block" id="NeuronRecorder.get_buffered_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_buffered_sdram</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the SDRAM used for this many time steps for a variable</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the SDRAM used for this many time steps for a variable.</span>
 
-<span class="sd">        If required the total is rounded up so the space will always fit</span>
+<span class="sd">        If required the total is rounded up so the space will always fit.</span>
 
 <span class="sd">        :param str variable: The PyNN variable name to get buffered sdram of</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -932,7 +970,8 @@
         <span class="k">return</span> <span class="n">data_size</span> <span class="o">*</span> <span class="n">records</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_metadata_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_metadata_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the SDRAM usage of the metadata for recording</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the SDRAM usage of the metadata for recording.</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms to record</span>
 <span class="sd">        :rtype: int</span>
@@ -953,7 +992,8 @@
                 <span class="n">bitfield_bytes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_generator_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_generator_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_generator_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the SDRAM usage of the generator data for recording metadata</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the SDRAM usage of the generator data for recording metadata.</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms to be recorded</span>
 <span class="sd">        :rtype: int</span>
@@ -1034,7 +1074,8 @@
         <span class="k">return</span> <span class="n">VariableSDRAM</span><span class="p">(</span><span class="n">fixed_sdram</span><span class="p">,</span> <span class="n">per_timestep_sdram</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__ceil_n_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The number of indices rounded up to a whole number of words</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of indices rounded up to a whole number of words.</span>
 
 <span class="sd">        :param int n_neurons: The number of neurons to account for</span>
 <span class="sd">        :rtype: int</span>
@@ -1103,8 +1144,9 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_global_generatable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Is the data for all neurons the same i.e. all or none of the</span>
-<span class="sd">            neurons are recorded for all variables</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Whether the data for all neurons the same, i.e., all or none of the</span>
+<span class="sd">        neurons are recorded for all variables.</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1114,15 +1156,17 @@
         <span class="k">return</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="NeuronRecorder.get_generator_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_generator_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_generator_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the recorded data as a generatable data set</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the recorded data as a generatable data set.</span>
 
 <span class="sd">        :param vertex_slice:</span>
-<span class="sd">            The slice to generate the data for, or None to generate for</span>
+<span class="sd">            The slice to generate the data for, or `None` to generate for</span>
 <span class="sd">            all neurons (assuming all the same, otherwise error)</span>
-<span class="sd">        :type vertex_slice: Slice or None</span>
+<span class="sd">        :type vertex_slice: ~pacman.model.graphs.common.Slice or None</span>
 <span class="sd">        :param atoms_shape:</span>
-<span class="sd">            The shape of the atoms in the vertex; if vertex_slice is not None,</span>
-<span class="sd">            atoms_shape must be not None</span>
+<span class="sd">            The shape of the atoms in the vertex;</span>
+<span class="sd">            if `vertex_slice` is not `None`, atoms_shape must be not `None`</span>
+<span class="sd">        :type atoms_shape: tuple(int) or None</span>
 <span class="sd">        :rtype: numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">n_vars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_variables</span><span class="p">)</span>
@@ -1143,8 +1187,8 @@
 
     <span class="k">def</span> <span class="nf">__get_generator_indices</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the indices of the variables to record in run-length-encoded</span>
-<span class="sd">            form</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the indices of the variables to record in run-length-encoded form.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
 
@@ -1250,7 +1294,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

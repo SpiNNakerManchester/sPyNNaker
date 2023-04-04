@@ -62,7 +62,8 @@
 
 
 <div class="viewcode-block" id="Recorder"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder">[docs]</a><span class="k">class</span> <span class="nc">Recorder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Object to hold recording behaviour, used by populations.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Object to hold recording behaviour, used by populations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -91,15 +92,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">write_to_files_indicators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; What variables should be written to files, and where should they\</span>
-<span class="sd">            be written.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        What variables should be written to files, and where should they</span>
+<span class="sd">        be written.</span>
 
 <span class="sd">        :rtype: dict(str, neo.io.baseio.BaseIO or str or None)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_to_files_indicators</span>
 
 <div class="viewcode-block" id="Recorder.record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Turns on (or off) recording</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Turns on (or off) recording.</span>
 
 <span class="sd">        :param variables: either a single variable name or a list of variable</span>
 <span class="sd">            names. For a given celltype class, ``celltype.recordable`` contains</span>
@@ -153,11 +156,10 @@
 
     <span class="k">def</span> <span class="nf">__turn_on_all_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        :param int sampling_interval: the interval to record them</span>
 <span class="sd">        :param to_file: If set, a file to write to (by handle or name)</span>
 <span class="sd">        :type to_file: neo.io.baseio.BaseIO or str or None</span>
-<span class="sd">        :param indexes: List of indexes to record or None for all</span>
+<span class="sd">        :param indexes: List of indexes to record or `None` for all</span>
 <span class="sd">        :type indexes: list(int) or None</span>
 <span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
 <span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
@@ -174,20 +176,20 @@
 
 <div class="viewcode-block" id="Recorder.turn_on_record"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.turn_on_record">[docs]</a>    <span class="k">def</span> <span class="nf">turn_on_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Tell the vertex to record data.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tell the vertex to record data.</span>
 
 <span class="sd">        :param str variable: The variable to record, supported variables to</span>
 <span class="sd">            record are: ``gsyn_exc``, ``gsyn_inh``, ``v``, ``spikes``.</span>
 <span class="sd">        :param int sampling_interval: the interval to record them</span>
 <span class="sd">        :param to_file: If set, a file to write to (by handle or name)</span>
 <span class="sd">        :type to_file: neo.io.baseio.BaseIO or str or None</span>
-<span class="sd">        :param indexes: List of indexes to record or None for all</span>
+<span class="sd">        :param indexes: List of indexes to record or `None` for all</span>
 <span class="sd">        :type indexes: list(int) or None</span>
 <span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
 <span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
 <span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
 
         <span class="c1"># update file writer</span>
@@ -215,7 +217,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">label</span>
 
 <div class="viewcode-block" id="Recorder.turn_off_all_recording"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.turn_off_all_recording">[docs]</a>    <span class="k">def</span> <span class="nf">turn_off_all_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Turns off recording, is used by a pop saying ``.record()``</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Turns off recording, is used by a pop saying ``.record()``.</span>
 
 <span class="sd">        :param indexes:</span>
 <span class="sd">        :type indexes: list or None</span>
@@ -224,7 +227,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_not_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.extract_neo_block"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.extract_neo_block">[docs]</a>    <span class="k">def</span> <span class="nf">extract_neo_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Extracts block from the vertices and puts them into a Neo block</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts block from the vertices and puts them into a Neo block.</span>
 
 <span class="sd">        :param list(str) variables: the variables to extract</span>
 <span class="sd">        :param slice view_indexes: the indexes to be included in the view</span>
@@ -255,7 +259,8 @@
 
 <div class="viewcode-block" id="Recorder.csv_neo_block"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.csv_neo_block">[docs]</a>    <span class="k">def</span> <span class="nf">csv_neo_block</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">csv_file</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Extracts block from the vertices and puts them into a Neo block</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts block from the vertices and puts them into a Neo block.</span>
 
 <span class="sd">        :param str variables: the variables to extract</span>
 <span class="sd">        :param list(str) variables: the variables to extract</span>
@@ -287,15 +292,16 @@
         <span class="k">with</span> <span class="n">NeoBufferDatabase</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_reset_last</span><span class="p">():</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;Due to the call directly after reset. &quot;</span>
-                    <span class="s2">&quot;The data will only contain &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2"> segments&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot;Due to the call directly after reset, &quot;</span>
+                    <span class="s2">&quot;the data will only contain </span><span class="si">{}</span><span class="s2"> segments&quot;</span><span class="p">,</span>
+                    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">db</span><span class="o">.</span><span class="n">csv_segment</span><span class="p">(</span>
                     <span class="n">csv_file</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.cache_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.cache_data">[docs]</a>    <span class="k">def</span> <span class="nf">cache_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Store data for later extraction</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store data for later extraction.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_recording_variables</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">variables</span><span class="p">:</span>
@@ -305,12 +311,10 @@
 
     <span class="k">def</span> <span class="nf">__append_current_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        :param block:</span>
 <span class="sd">        :param variables:</span>
 <span class="sd">        :param view_indexes:</span>
 <span class="sd">        :param clear:</span>
-<span class="sd">        :return:</span>
 <span class="sd">        :raises \</span>
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
 <span class="sd">            If the recording not setup correctly</span>
@@ -320,9 +324,9 @@
         <span class="k">with</span> <span class="n">NeoBufferDatabase</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_reset_last</span><span class="p">():</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;Due to the call directly after reset. &quot;</span>
-                    <span class="s2">&quot;The data will only contain &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2"> segments&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot;Due to the call directly after reset, &quot;</span>
+                    <span class="s2">&quot;the data will only contain </span><span class="si">{}</span><span class="s2"> segments&quot;</span><span class="p">,</span>
+                    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">db</span><span class="o">.</span><span class="n">add_segment</span><span class="p">(</span>
                     <span class="n">block</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span>
@@ -332,13 +336,11 @@
     <span class="k">def</span> <span class="nf">__append_previous_segment</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">segment_number</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        :param block:</span>
 <span class="sd">        :param segment_number:</span>
 <span class="sd">        :param variables:</span>
 <span class="sd">        :param view_indexes:</span>
 <span class="sd">        :param bool clear:</span>
-<span class="sd">        :return:</span>
 <span class="sd">        :raises \</span>
 <span class="sd">            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:</span>
 <span class="sd">            If the recording not setup correctly</span>
@@ -346,7 +348,7 @@
         <span class="k">if</span> <span class="n">segment_number</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_cache</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No Data available for Segment </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">segment_number</span><span class="p">)</span>
             <span class="n">segment</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;segment</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">segment_number</span><span class="p">),</span>
+                <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;segment</span><span class="si">{</span><span class="n">segment_number</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Empty&quot;</span><span class="p">,</span>
                 <span class="n">rec_datetime</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
             <span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
@@ -396,7 +398,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

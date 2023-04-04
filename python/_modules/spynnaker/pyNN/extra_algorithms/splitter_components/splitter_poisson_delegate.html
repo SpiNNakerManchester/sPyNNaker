@@ -60,20 +60,15 @@
 
 
 <span class="k">class</span> <span class="nc">SplitterPoissonDelegate</span><span class="p">(</span><span class="n">SplitterFixedLegacy</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; A splitter for Poisson sources that will ignore sources that are</span>
-<span class="sd">        one-to-one connected to a single Population</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A splitter for Poisson sources that will ignore sources that are</span>
+<span class="sd">    one-to-one connected to a single Population.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># Message to display on error</span>
-    <span class="n">INVALID_POP_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The vertex </span><span class="si">{}</span><span class="s2"> cannot be supported by the SplitterPoissonDelegate as&quot;</span>
-        <span class="s2">&quot; the only vertex supported by this splitter is a &quot;</span>
-        <span class="s2">&quot;SpikeSourcePoissonVertex. Please use the correct splitter for &quot;</span>
-        <span class="s2">&quot;your vertex and try again.&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">send_over_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if this vertex is to be sent using SDRAM</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Whether this vertex is to be sent using SDRAM.</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -95,7 +90,10 @@
         <span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">SpikeSourcePoissonVertex</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">PacmanConfigurationException</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POP_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span></div>
+                <span class="sa">f</span><span class="s2">&quot;The vertex </span><span class="si">{</span><span class="n">app_vertex</span><span class="si">}</span><span class="s2"> cannot be supported by the &quot;</span>
+                <span class="s2">&quot;SplitterPoissonDelegate as the only vertex supported by this &quot;</span>
+                <span class="s2">&quot;splitter is a SpikeSourcePoissonVertex. Please use the &quot;</span>
+                <span class="s2">&quot;correct splitter for your vertex and try again.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SplitterPoissonDelegate.create_machine_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.create_machine_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SplitterFixedLegacy</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_machine_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chip_counter</span><span class="p">):</span>
@@ -175,7 +173,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

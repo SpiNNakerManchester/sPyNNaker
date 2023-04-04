@@ -57,8 +57,9 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.</span></span><span class="sig-name descname"><span class="pre">SpikeInjectorVertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtual_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reserve_reverse_ip_tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.ReverseIpTagMultiCastSource" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReverseIpTagMultiCastSource</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="spynnaker.pyNN.models.common.PopulationApplicationVertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.SupportsStructure" title="spynnaker.pyNN.models.abstract_models.SupportsStructure"><code class="xref py py-class docutils literal notranslate"><span class="pre">SupportsStructure</span></code></a></p>
-<p>An Injector of Spikes for PyNN populations.  This only allows the user        to specify the virtual_key of the population to identify the population</p>
+<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.ReverseIpTagMultiCastSource" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReverseIpTagMultiCastSource</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="spynnaker.pyNN.models.common.PopulationApplicationVertex"><code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationApplicationVertex</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.SupportsStructure" title="spynnaker.pyNN.models.abstract_models.SupportsStructure"><code class="xref py py-class docutils literal notranslate"><span class="pre">SupportsStructure</span></code></a></p>
+<p>An Injector of Spikes for PyNN populations.  This only allows the user
+to specify the virtual_key of the population to identify the population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -90,9 +91,10 @@ should be sent (one array for each key, default disabled)</p></li>
 <li><p><strong>send_buffer_partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – The ID of the partition containing
 the edges down which the events are to be sent</p></li>
 <li><p><strong>reserve_reverse_ip_tag</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Extra flag for input without a reserved port</p></li>
-<li><p><strong>injection_partition</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – If not None, will enable injection and specify the partition to
+<li><p><strong>injection_partition</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – If not <cite>None</cite>, will enable injection and specify the partition to
 send injected keys with</p></li>
-<li><p><strong>splitter</strong> (<em>None</em><em> or </em><em>AbstractSplitterCommon</em>) – the splitter object needed for this vertex</p></li>
+<li><p><strong>splitter</strong> (<em>None</em><em> or
+</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_splitters.abstract_splitters/#pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon" title="(in PACMAN v6.0)"><em>AbstractSplitterCommon</em></a>) – the splitter object needed for this vertex</p></li>
 </ul>
 </dd>
 </dl>
@@ -104,12 +106,10 @@ send injected keys with</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.atoms_shape">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">atoms_shape</span></span><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.atoms_shape" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>The “shape” of the atoms in the vertex i.e. how the atoms are split</dt><dd><p>between the dimensions of the vertex.  By default everything is
-1-dimensional, so the return will be a 1-tuple but can be
+<dd><p>The “shape” of the atoms in the vertex i.e. how the atoms are split
+between the dimensions of the vertex.  By default everything is
+1-dimensional, so the value will be a 1-tuple but can be
 overridden by a vertex that supports multiple dimensions.</p>
-</dd>
-</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, …)</p>
@@ -129,22 +129,22 @@ overridden by a vertex that supports multiple dimensions.</p>
 <p>The output may be customised by specifying a different template
 together with an associated template engine
 (see <code class="xref py py-mod docutils literal notranslate"><span class="pre">pyNN.descriptions</span></code>).</p>
-<p>If template is None, then a dictionary containing the template context
-will be returned.</p>
+<p>If template is <cite>None</cite>, then a dictionary containing the template
+context will be returned.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_buffer_data_type">
 <span class="sig-name descname"><span class="pre">get_buffer_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_buffer_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_buffer_data_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the type of data recorded by the buffer manager</p>
-<p>The BufferDatabase value controls how data returned by the cores is
-handled in NeoBufferDatabase</p>
+<dd><p>Get the type of data recorded by the buffer manager.</p>
+<p>The buffer data type controls how data returned by the cores is
+handled in NeoBufferDatabase.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable recorded</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>BufferDatabase</em></p>
+<dd class="field-even"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.buffer_management.storage_objects/#spinn_front_end_common.interface.buffer_management.storage_objects.BufferDatabase" title="(in SpiNNFrontEndCommon v6.0)"><em>BufferDatabase</em></a></p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – if the variable isn’t being recorded</p>
@@ -155,9 +155,9 @@ handled in NeoBufferDatabase</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_data_type">
 <span class="sig-name descname"><span class="pre">get_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_data_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_data_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the type data returned by a recording of the variable</p>
+<dd><p>Get the type data returned by a recording of the variable.</p>
 <p>This is the type of data the C code is returning.
-For instance dta such as spikes this will be None</p>
+For instance data such as spikes this will be <cite>None</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the type of</p>
@@ -174,19 +174,22 @@ For instance dta such as spikes this will be None</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_neurons_recording">
 <span class="sig-name descname"><span class="pre">get_neurons_recording</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_neurons_recording"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_neurons_recording" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the neurons being recorded on the core with this slice</p>
-<p>Typically vertex_slice.get_raster_ids(atoms_shape)
-But may be a sublist if doing selective recording</p>
+<dd><p>Gets the neurons being recorded on the core with this slice.</p>
+<p>Typically <cite>vertex_slice.get_raster_ids(atoms_shape)</cite>
+but may be a sublist if doing selective recording.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the region of</p></li>
-<li><p><strong>vertex_slice</strong> – </p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A list of the global raster IDs of the atoms in recording
 named variable within this slice</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -194,8 +197,8 @@ named variable within this slice</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_recordable_variables">
 <span class="sig-name descname"><span class="pre">get_recordable_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_recordable_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a list of the names and types of things that can be recorded</p>
-<p>This methods list the variable recorded via the Population</p>
+<dd><p>Get a list of the names and types of things that can be recorded.</p>
+<p>This methods list the variable recorded via the Population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -206,7 +209,7 @@ named variable within this slice</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_recording_region">
 <span class="sig-name descname"><span class="pre">get_recording_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_recording_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_recording_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the recording region for the named variable</p>
+<dd><p>Gets the recording region for the named variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get the region of</p>
@@ -223,7 +226,7 @@ named variable within this slice</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_recording_variables">
 <span class="sig-name descname"><span class="pre">get_recording_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_recording_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_recording_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a list of variables that are currently being recorded</p>
+<dd><p>Get a list of variables that are currently being recorded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -234,9 +237,9 @@ named variable within this slice</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_sampling_interval_ms">
 <span class="sig-name descname"><span class="pre">get_sampling_interval_ms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_sampling_interval_ms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_sampling_interval_ms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the sampling interval of the recording for the given variable</p>
+<dd><p>Get the sampling interval of the recording for the given variable.</p>
 <p>The values is in ms and unless selective recording is used will be
-SpynnakerDataView.get_simulation_time_step_us()</p>
+<cite>SpynnakerDataView.get_simulation_time_step_us()</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
@@ -250,7 +253,7 @@ SpynnakerDataView.get_simulation_time_step_us()</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_units">
 <span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given parameter or state variable</p>
+<dd><p>Get the units of the given parameter or state variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the name of the parameter to get the units of</p>
@@ -267,12 +270,12 @@ SpynnakerDataView.get_simulation_time_step_us()</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_not_recording">
 <span class="sig-name descname"><span class="pre">set_not_recording</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.set_not_recording"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_not_recording" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set a variable not recording</p>
+<dd><p>Set a variable not recording.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to not record</p></li>
-<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The list of neuron indices to not record or None for all</p></li>
+<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The list of neuron indices to not record or <cite>None</cite> for all</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -284,14 +287,14 @@ SpynnakerDataView.get_simulation_time_step_us()</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_recording">
 <span class="sig-name descname"><span class="pre">set_recording</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.set_recording"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_recording" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set a variable recording</p>
+<dd><p>Set a variable recording.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to set the status of</p></li>
-<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – How often the variable should be recorded or None for every
+<li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – How often the variable should be recorded or <cite>None</cite> for every
 time step, in milliseconds</p></li>
-<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The list of neuron indices to record or None for all</p></li>
+<li><p><strong>indices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The list of neuron indices to record or <cite>None</cite> for all</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -303,10 +306,10 @@ time step, in milliseconds</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_structure">
 <span class="sig-name descname"><span class="pre">set_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.set_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the structure of the object</p>
+<dd><p>Set the structure of the object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>structure</strong> (<em>pynn.space.BaseStructure</em>) – The structure to set</p>
+<dd class="field-odd"><p><strong>structure</strong> (<em>BaseStructure</em>) – The structure to set</p>
 </dd>
 </dl>
 </dd></dl>
@@ -323,19 +326,23 @@ time step, in milliseconds</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.spike_injector.SpikeInjector.create_vertex">
 <span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtual_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reserve_reverse_ip_tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector.html#SpikeInjector.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.SpikeInjector.create_vertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a vertex for a population of the model</p>
+<dd><p>Create a vertex for a population of the model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label to give to the vertex</p></li>
+<li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>virtual_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>reserve_reverse_ip_tag</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
+<li><p><strong>splitter</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_splitters.abstract_splitters/#pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon" title="(in PACMAN v6.0)"><em>AbstractSplitterCommon</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="spynnaker.pyNN.models.common.PopulationApplicationVertex"><em>PopulationApplicationVertex</em></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.PopulationApplicationVertex" title="spynnaker.pyNN.models.common.PopulationApplicationVertex">PopulationApplicationVertex</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -452,7 +459,7 @@ time step, in milliseconds</p></li>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

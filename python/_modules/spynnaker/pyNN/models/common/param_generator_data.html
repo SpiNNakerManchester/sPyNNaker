@@ -65,19 +65,32 @@
 
 
 <div class="viewcode-block" id="get_generator_type"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.param_generator_data.get_generator_type">[docs]</a><span class="k">def</span> <span class="nf">get_generator_type</span><span class="p">(</span><span class="n">data_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param ~data_specification.enums.DataType data_type:</span>
+<span class="sd">    :return: The generator parameter type code for the given data type.</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    :raises TypeError: If an unsupported data type is given</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="n">_GENERATOR_TYPES</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_GENERATOR_TYPES</span><span class="p">[</span><span class="n">data_type</span><span class="p">]</span>
     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ungeneratable type </span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="type_has_generator"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.param_generator_data.type_has_generator">[docs]</a><span class="k">def</span> <span class="nf">type_has_generator</span><span class="p">(</span><span class="n">data_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param ~data_specification.enums.DataType data_type:</span>
+<span class="sd">    :return:</span>
+<span class="sd">        Whether there is a generator parameter type code for the given data</span>
+<span class="sd">        type.</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="n">_GENERATOR_TYPES</span></div>
 
 
-<span class="c1"># Hash of the constant parameter generator</span>
+<span class="c1">#: ID of the constant parameter generator.</span>
 <span class="n">PARAM_TYPE_CONSTANT_ID</span> <span class="o">=</span> <span class="mi">0</span>
 
-<span class="c1"># Hashes of the parameter generators supported by the synapse expander</span>
+<span class="c1">#: IDs of the random parameter generators supported by the synapse expander.</span>
 <span class="n">PARAM_TYPE_BY_NAME</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;uniform&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
     <span class="s2">&quot;uniform_int&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
@@ -87,15 +100,22 @@
     <span class="s2">&quot;exponential&quot;</span><span class="p">:</span> <span class="mi">5</span>
 <span class="p">}</span>
 
+<span class="c1">#: ID for the convolution kernel generator.</span>
 <span class="n">PARAM_TYPE_KERNEL</span> <span class="o">=</span> <span class="mi">6</span>
 
 
 <div class="viewcode-block" id="param_generator_id"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.param_generator_data.param_generator_id">[docs]</a><span class="k">def</span> <span class="nf">param_generator_id</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param value: The value to examine the type of.</span>
+<span class="sd">    :return: The ID of the on-chip generator that handles the value.</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    :raises TypeError: If an value of an unsupported data type is given</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Scalars are fine on the machine</span>
     <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">PARAM_TYPE_CONSTANT_ID</span>
 
-    <span class="c1"># Only certain types of random distributions are supported for\</span>
+    <span class="c1"># Only certain types of random distributions are supported for</span>
     <span class="c1"># generation on the machine</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">PARAM_TYPE_BY_NAME</span><span class="p">:</span>
@@ -105,6 +125,11 @@
 
 
 <div class="viewcode-block" id="is_param_generatable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.param_generator_data.is_param_generatable">[docs]</a><span class="k">def</span> <span class="nf">is_param_generatable</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param value: The value to examine the type of.</span>
+<span class="sd">    :return: Whether the value is of a type that can be generated on chip.</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -114,7 +139,8 @@
 
 
 <div class="viewcode-block" id="param_generator_params"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.param_generator_data.param_generator_params">[docs]</a><span class="k">def</span> <span class="nf">param_generator_params</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the parameter generator parameters as a numpy array</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the parameter generator parameters as a numpy array.</span>
 
 <span class="sd">    :param values:</span>
 <span class="sd">    :type values: int or ~pyNN.random.NumpyRNG</span>
@@ -137,7 +163,7 @@
             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="o">.</span><span class="n">encode_as_int</span><span class="p">(</span><span class="n">param</span><span class="p">)</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
 
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected value </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">))</span></div>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected value </span><span class="si">{</span><span class="n">values</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <span class="c1">#: At most, there are 4 words as param generator parameters</span>
@@ -145,11 +171,13 @@
 
 
 <div class="viewcode-block" id="param_generator_params_size_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.param_generator_data.param_generator_params_size_in_bytes">[docs]</a><span class="k">def</span> <span class="nf">param_generator_params_size_in_bytes</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the size of the parameter generator parameters in bytes</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the size of the parameter generator parameters in bytes.</span>
 
 <span class="sd">    :param values:</span>
 <span class="sd">    :type values: int or ~pyNN.random.NumpyRNG</span>
 <span class="sd">    :rtype: int</span>
+<span class="sd">    :raises TypeError: If `values` is of an unsupported data type</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">BYTES_PER_WORD</span>
@@ -158,7 +186,7 @@
         <span class="n">parameters</span> <span class="o">=</span> <span class="n">available_distributions</span><span class="p">[</span><span class="n">values</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected value </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">values</span><span class="p">))</span></div>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected value </span><span class="si">{</span><span class="n">values</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -197,7 +225,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

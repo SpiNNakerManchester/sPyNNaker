@@ -152,6 +152,7 @@
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.html#spynnaker.pyNN.exceptions.SynapticMaxIncomingAtomsSupportException"><code class="docutils literal notranslate"><span class="pre">SynapticMaxIncomingAtomsSupportException</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.html#module-spynnaker.pyNN.random_distribution">spynnaker.pyNN.random_distribution module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.html#module-spynnaker.pyNN.setup_pynn">spynnaker.pyNN.setup_pynn module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.html#spynnaker.pyNN.setup_pynn.install_sPyNNaker_into"><code class="docutils literal notranslate"><span class="pre">install_sPyNNaker_into()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.html#spynnaker.pyNN.setup_pynn.version_satisfies"><code class="docutils literal notranslate"><span class="pre">version_satisfies()</span></code></a></li>
@@ -202,7 +203,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.gsyn_tools.check_path_gysn">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.gsyn_tools.</span></span><span class="sig-name descname"><span class="pre">check_path_gysn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsyn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/gsyn_tools.html#check_path_gysn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.gsyn_tools.check_path_gysn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compare an arrays of conductances with baseline data from a file.         For testing.</p>
+<dd><p>Compare an arrays of conductances with baseline data from a file.
+For testing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -221,7 +223,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.gsyn_tools.check_sister_gysn">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.gsyn_tools.</span></span><span class="sig-name descname"><span class="pre">check_sister_gysn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sister</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gsyn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/gsyn_tools.html#check_sister_gysn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.gsyn_tools.check_sister_gysn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compare an arrays of conductances with baseline data from a file next        to a specified module. For testing.</p>
+<dd><p>Compare an arrays of conductances with baseline data from a file next
+to a specified module. For testing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -332,10 +335,18 @@ adjacent to this module.</p></li>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">SpynnakerPanel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#SpynnakerPanel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.SpynnakerPanel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Represents a single panel in a multi-panel figure.</p>
-<p>Compatible with <code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.utility.plotting.Frame</span></code> and        can be mixed with <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/utility.html#pyNN.utility.plotting.Panel" title="(in PyNN v0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.utility.plotting.Panel</span></code></a></p>
-<p>Unlike <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/utility.html#pyNN.utility.plotting.Panel" title="(in PyNN v0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.utility.plotting.Panel</span></code></a>,        Spikes are plotted faster,        other data is plotted as a heatmap</p>
-<p>A panel is a Matplotlib Axes or Subplot instance. A data item may be an    <a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalogSignal</span></code></a>, or a list of     <a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpikeTrain</span></code></a>s. The Panel will    automatically choose an appropriate representation. Multiple data items    may be plotted in the same panel.</p>
-<p>Valid options are any valid Matplotlib formatting options that should be    applied to the Axes/Subplot, plus in addition:</p>
+<p>Compatible with <code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.utility.plotting.Frame</span></code> and
+can be mixed with <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/utility.html#pyNN.utility.plotting.Panel" title="(in PyNN v0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.utility.plotting.Panel</span></code></a></p>
+<p>Unlike <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/utility.html#pyNN.utility.plotting.Panel" title="(in PyNN v0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.utility.plotting.Panel</span></code></a>,
+Spikes are plotted faster,
+other data is plotted as a heatmap.</p>
+<p>A panel is a Matplotlib Axes or Subplot instance. A data item may be an
+<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalogSignal</span></code></a>, or a list of
+<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpikeTrain</span></code></a>s. The Panel will
+automatically choose an appropriate representation. Multiple data items
+may be plotted in the same panel.</p>
+<p>Valid options are any valid Matplotlib formatting options that should be
+applied to the Axes/Subplot, plus in addition:</p>
 <blockquote>
 <div><dl class="simple">
 <dt><cite>data_labels</cite>:</dt><dd><p>a list of strings of the same length as the number of data items.</p>
@@ -344,12 +355,15 @@ adjacent to this module.</p></li>
 </dd>
 </dl>
 </div></blockquote>
-<p>Whole Neo Objects can be passed in as long as they        contain a single Segment/run        and only contain one type of data
-Whole Segments can be passed in only if they only contain one type of data</p>
+<p>Whole Neo Objects can be passed in as long as they
+contain a single Segment/run
+and only contain one type of data.
+Whole Segments can be passed in only if they only contain one type of data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a><em>) or </em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.12)"><em>AnalogSignal</em></a><em>             or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em> or </em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.12)"><em>Block</em></a><em> or </em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Segment" title="(in Neo v0.12)"><em>Segment</em></a>) – One or more data series to be plotted.</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a><em>) or </em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.12)"><em>AnalogSignal</em></a><em>
+or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em> or </em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.12)"><em>Block</em></a><em> or </em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Segment" title="(in Neo v0.12)"><em>Segment</em></a>) – One or more data series to be plotted.</p></li>
 <li><p><strong>options</strong> – Any additional information.</p></li>
 </ul>
 </dd>
@@ -370,7 +384,7 @@ Whole Segments can be passed in only if they only contain one type of data</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.spynnaker_plotting.heat_plot_neo">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">heat_plot_neo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#heat_plot_neo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.heat_plot_neo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots neurons, times and values into a heatmap</p>
+<dd><p>Plots neurons, times and values into a heatmap.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -386,7 +400,7 @@ Whole Segments can be passed in only if they only contain one type of data</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.spynnaker_plotting.heat_plot_numpy">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">heat_plot_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#heat_plot_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.heat_plot_numpy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots neurons, times and values into a heatmap</p>
+<dd><p>Plots neurons, times and values into a heatmap.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -402,13 +416,13 @@ Whole Segments can be passed in only if they only contain one type of data</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.spynnaker_plotting.plot_segment">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">plot_segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#plot_segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.plot_segment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots a segment into a plot of spikes or a heatmap</p>
-<blockquote>
-<div><p>If there is more than ode type of Data in the segment options must        include the name of the data to plot</p>
-</div></blockquote>
+<dd><p>Plots a segment into a plot of spikes or a heatmap.</p>
+<p>If there is more than ode type of Data in the segment options must
+include the name of the data to plot</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>method signature defined by pynn plotting.        This allows mixing of this plotting tool and pynn’s</p>
+<p>Method signature defined by pynn plotting.
+This allows mixing of this plotting tool and pynn’s</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -425,12 +439,12 @@ Whole Segments can be passed in only if they only contain one type of data</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.spynnaker_plotting.plot_spikes_numpy">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">plot_spikes_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#plot_spikes_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.plot_spikes_numpy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot all spikes</p>
+<dd><p>Plot all spikes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.7.1)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
-<li><p><strong>spikes</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – spynakker7 format nparray of spikes</p></li>
+<li><p><strong>spikes</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – sPyNNaker7 format nparray of spikes</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the graph</p></li>
 <li><p><strong>options</strong> – plotting options</p></li>
 </ul>
@@ -560,7 +574,7 @@ Whole Segments can be passed in only if they only contain one type of data</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

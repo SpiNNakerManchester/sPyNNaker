@@ -63,7 +63,7 @@
 
 <div class="viewcode-block" id="SpynnakerDataWriter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.spynnaker_data_writer.SpynnakerDataWriter">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerDataWriter</span><span class="p">(</span><span class="n">FecDataWriter</span><span class="p">,</span> <span class="n">SpynnakerDataView</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    See UtilsDataWriter</span>
+<span class="sd">    See :py:class:`~spinn_utilities.data.utils_data_writer.UtilsDataWriter`.</span>
 
 <span class="sd">    This class is designed to only be used directly by AbstractSpinnakerBase</span>
 <span class="sd">    and its subclasses and within the PyNN repositories unittests.</span>
@@ -98,17 +98,17 @@
 <div class="viewcode-block" id="SpynnakerDataWriter.set_up_timings_and_delay"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.spynnaker_data_writer.SpynnakerDataWriter.set_up_timings_and_delay">[docs]</a>    <span class="k">def</span> <span class="nf">set_up_timings_and_delay</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">simulation_time_step_us</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        :param simulation_time_step_us:</span>
 <span class="sd">            An explicitly specified time step for the simulation in</span>
 <span class="sd">            microseconds.</span>
-<span class="sd">            If None, the value is read from the config</span>
+<span class="sd">            If `None`, the value is read from the config</span>
 <span class="sd">        :type simulation_time_step_us: int or None</span>
 <span class="sd">        :param time_scale_factor:</span>
 <span class="sd">            An explicitly specified time scale factor for the simulation.</span>
-<span class="sd">            If None, the value is read from the config</span>
+<span class="sd">            If `None`, the value is read from the config</span>
 <span class="sd">        :type time_scale_factor: float or None</span>
-<span class="sd">        :param min_delay: new value or None to say use simulation_time_step_ms</span>
+<span class="sd">        :param min_delay:</span>
+<span class="sd">            new value or `None` to say use simulation_time_step_ms</span>
 <span class="sd">        :type min_delay: int, float or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -120,9 +120,10 @@
 
     <span class="k">def</span> <span class="nf">_set_min_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sets a min delay or accepts None to use simulation_time_step_ms</span>
+<span class="sd">        Sets a min delay or accepts `None` to use simulation_time_step_ms.</span>
 
-<span class="sd">        :param min_delay: new value or None to say use simulation_time_step_ms</span>
+<span class="sd">        :param min_delay:</span>
+<span class="sd">            new value or `None` to say use simulation_time_step_ms</span>
 <span class="sd">        :type min_delay: int, float or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">min_delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -143,7 +144,7 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;invalid min_delay </span><span class="si">{</span><span class="n">min_delay</span><span class="si">}</span><span class="s1"> &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;must be a multiple of simulation time step in microseconds &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_min_delay</span> <span class="o">=</span> <span class="n">min_delay</span>
 
@@ -190,7 +191,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

@@ -54,8 +54,9 @@
 
 
 <div class="viewcode-block" id="RunningStats"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.running_stats.RunningStats">[docs]</a><span class="k">class</span> <span class="nc">RunningStats</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Keeps running statistics.</span>
-<span class="sd">        From: https://www.johndcook.com/blog/skewness_kurtosis/</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Keeps running statistics.</span>
+<span class="sd">    From: https://www.johndcook.com/blog/skewness_kurtosis/</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__mean&quot;</span><span class="p">,</span> <span class="s2">&quot;__mean_2&quot;</span><span class="p">,</span> <span class="s2">&quot;__n_items&quot;</span><span class="p">]</span>
 
@@ -65,7 +66,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_items</span> <span class="o">=</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="RunningStats.add_item"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.running_stats.RunningStats.add_item">[docs]</a>    <span class="k">def</span> <span class="nf">add_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Adds an item to the running statistics.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds an item to the running statistics.</span>
 
 <span class="sd">        :param x: The item to add</span>
 <span class="sd">        :type x: int or float</span>
@@ -81,7 +83,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__mean_2</span> <span class="o">+=</span> <span class="n">term_1</span></div>
 
 <div class="viewcode-block" id="RunningStats.add_items"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.running_stats.RunningStats.add_items">[docs]</a>    <span class="k">def</span> <span class="nf">add_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span> <span class="n">n_items</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add a bunch of items (via their statistics).</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a bunch of items (via their statistics).</span>
 
 <span class="sd">        :param float mean: The mean of the items to add.</span>
 <span class="sd">        :param float variance: The variance of the items to add.</span>
@@ -104,7 +107,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The number of items seen.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of items seen.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -112,7 +116,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The mean of the items seen.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The mean of the items seen.</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -120,7 +125,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The variance of the items seen.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The variance of the items seen.</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -130,7 +136,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">standard_deviation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The population standard deviation of the items seen.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The population standard deviation of the items seen.</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -173,7 +180,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

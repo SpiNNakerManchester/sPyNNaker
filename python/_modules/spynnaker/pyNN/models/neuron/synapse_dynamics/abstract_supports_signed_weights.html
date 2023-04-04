@@ -53,84 +53,105 @@
 
 
 <span class="k">class</span> <span class="nc">AbstractSupportsSignedWeights</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; A synapse dynamics object that supports signed weights</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A synapse dynamics object that supports signed weights.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractSupportsSignedWeights.get_positive_synapse_index"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSupportsSignedWeights.get_positive_synapse_index">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_positive_synapse_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the synapse type that positive weights will arrive at</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the synapse type that positive weights will arrive at.</span>
 
-<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection\</span>
-<span class="sd">            incoming_projection: The projection targeted</span>
+<span class="sd">        :param incoming_projection: The projection targeted</span>
+<span class="sd">        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSupportsSignedWeights.get_negative_synapse_index"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSupportsSignedWeights.get_negative_synapse_index">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_negative_synapse_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the synapse type that negative weights will arrive at</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the synapse type that negative weights will arrive at.</span>
 
-<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection\</span>
-<span class="sd">            incoming_projection: The projection targeted</span>
+<span class="sd">        :param incoming_projection: The projection targeted</span>
+<span class="sd">        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSupportsSignedWeights.get_maximum_positive_weight"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSupportsSignedWeights.get_maximum_positive_weight">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_maximum_positive_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the maximum likely positive weight.</span>
-<span class="sd">            Note this must be a value &gt;= 0.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the maximum likely positive weight.</span>
 
-<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection\</span>
-<span class="sd">            incoming_projection: The projection targeted</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This must be a value &gt;= 0.</span>
+
+<span class="sd">        :param incoming_projection: The projection targeted</span>
+<span class="sd">        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSupportsSignedWeights.get_minimum_negative_weight"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSupportsSignedWeights.get_minimum_negative_weight">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_minimum_negative_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the minimum likely negative weight.</span>
-<span class="sd">            Note this must be a value &lt;= 0.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the minimum likely negative weight.</span>
 
-<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection\</span>
-<span class="sd">            incoming_projection: The projection targeted</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This must be a value &lt;= 0.</span>
+
+<span class="sd">        :param incoming_projection: The projection targeted</span>
+<span class="sd">        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSupportsSignedWeights.get_mean_positive_weight"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSupportsSignedWeights.get_mean_positive_weight">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_mean_positive_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the mean of the positive weights.</span>
-<span class="sd">            Note this must be a value &gt;= 0.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the mean of the positive weights.</span>
 
-<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection\</span>
-<span class="sd">            incoming_projection: The projection targeted</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This must be a value &gt;= 0.</span>
+
+<span class="sd">        :param incoming_projection: The projection targeted</span>
+<span class="sd">        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSupportsSignedWeights.get_mean_negative_weight"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSupportsSignedWeights.get_mean_negative_weight">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_mean_negative_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the mean of the negative weights.</span>
-<span class="sd">            Note this must be a value &lt;= 0.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the mean of the negative weights.</span>
 
-<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection\</span>
-<span class="sd">            incoming_projection: The projection targeted</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This must be a value &lt;= 0.</span>
+
+<span class="sd">        :param incoming_projection: The projection targeted</span>
+<span class="sd">        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSupportsSignedWeights.get_variance_positive_weight"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSupportsSignedWeights.get_variance_positive_weight">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_variance_positive_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the variance of the positive weights.</span>
-<span class="sd">            Note this must be a value &gt;= 0.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the variance of the positive weights.</span>
 
-<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection\</span>
-<span class="sd">            incoming_projection: The projection targeted</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This must be a value &gt;= 0.</span>
+
+<span class="sd">        :param incoming_projection: The projection targeted</span>
+<span class="sd">        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSupportsSignedWeights.get_variance_negative_weight"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSupportsSignedWeights.get_variance_negative_weight">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_variance_negative_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projection</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the variance of the negative weights.</span>
-<span class="sd">            Note this must be a value &lt;= 0.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the variance of the negative weights.</span>
 
-<span class="sd">        :param ~spynnaker.pyNN.models.projection.Projection\</span>
-<span class="sd">            incoming_projection: The projection targeted</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This must be a value &lt;= 0.</span>
+
+<span class="sd">        :param incoming_projection: The projection targeted</span>
+<span class="sd">        :type incoming_projection: ~spynnaker.pyNN.models.projection.Projection</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 </pre></div>
@@ -171,7 +192,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

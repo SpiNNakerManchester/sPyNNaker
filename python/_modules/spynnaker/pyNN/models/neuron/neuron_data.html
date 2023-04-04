@@ -61,9 +61,13 @@
 
 
 <span class="k">def</span> <span class="nf">_all_one_val_gen</span><span class="p">(</span><span class="n">rd</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Determine if all the values of a dictionary are the same,</span>
-<span class="sd">        and can be generated.  Note that a random distribution is considered</span>
-<span class="sd">        the same if the same distribution is used for all neurons.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine if all the values of a dictionary are the same,</span>
+<span class="sd">    and can be generated.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        A random distribution is considered the same if the same distribution</span>
+<span class="sd">        is used for all neurons.</span>
 
 <span class="sd">    :rtype: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -83,7 +87,8 @@
 
 
 <span class="k">def</span> <span class="nf">_all_gen</span><span class="p">(</span><span class="n">rd</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Determine if all the values of a ranged dictionary can be generated.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine if all the values of a ranged dictionary can be generated.</span>
 
 <span class="sd">    :rtype: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -101,11 +106,11 @@
 
 
 <div class="viewcode-block" id="NeuronData"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.neuron_data.NeuronData">[docs]</a><span class="k">class</span> <span class="nc">NeuronData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Holds and creates the data for a group of neurons</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Holds and creates the data for a group of neurons.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-
         <span class="c1"># The application vertex</span>
         <span class="s2">&quot;__app_vertex&quot;</span><span class="p">,</span>
 
@@ -135,7 +140,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Whether the neuron data can be generated on the machine or not</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Whether the neuron data can be generated on the machine or not.</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -152,7 +158,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gen_on_machine</span>
 
 <div class="viewcode-block" id="NeuronData.generate_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.neuron_data.NeuronData.generate_data">[docs]</a>    <span class="k">def</span> <span class="nf">generate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Do the data generation internally</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Do the data generation internally.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generation_done</span><span class="p">:</span>
             <span class="k">return</span>
@@ -192,10 +199,13 @@
 
 <div class="viewcode-block" id="NeuronData.write_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.neuron_data.NeuronData.write_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">neuron_regions</span><span class="p">,</span> <span class="n">gen_on_machine</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the generated data</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the generated data.</span>
 
-<span class="sd">        :param DataSpecificationGenerator spec: The spec to write to</span>
-<span class="sd">        :param Slice vertex_slice: The vertex_slice to generate for</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            The spec to write to</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The vertex slice to generate for</span>
 <span class="sd">        :param NeuronRegions neuron_regions: The regions to write to</span>
 <span class="sd">        :param bool gen_on_machine: Whether to allow generation on machine</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -247,10 +257,12 @@
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;initial_values&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__get_neuron_param_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get neuron parameter data for a slice</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get neuron parameter data for a slice.</span>
 
-<span class="sd">        :param Slice vertex_slice: The slice to get the data for</span>
-<span class="sd">        :rtype: numpy.ndarray</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice to get the data for</span>
+<span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">structs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">structs</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">parameters</span>
@@ -262,7 +274,8 @@
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_struct_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the data for a struct</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the data for a struct.</span>
 
 <span class="sd">        :param Struct struct: The struct to get the data for</span>
 <span class="sd">        :param RangeDictionary values: The values to fill in the struct with</span>
@@ -274,7 +287,8 @@
             <span class="n">values</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_neuron_builder_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the data to build neuron parameters with</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the data to build neuron parameters with.</span>
 
 <span class="sd">        :param Slice vertex_slice: The slice to get the parameters for</span>
 <span class="sd">        :return: The number of structs and the data</span>
@@ -290,7 +304,8 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">structs</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_builder_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the builder data for a struct</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the builder data for a struct.</span>
 
 <span class="sd">        :param Struct struct: The struct to get the data for</span>
 <span class="sd">        :param RangeDictionary values: The values to fill in the struct with</span>
@@ -303,7 +318,8 @@
 
     <span class="k">def</span> <span class="nf">__get_neuron_builder_header</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">n_structs</span><span class="p">,</span> <span class="n">neuron_regions</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the header of the neuron builder region</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the header of the neuron builder region.</span>
 
 <span class="sd">        :param Slice vertex_slice: The slice to put in the header</span>
 <span class="sd">        :param int n_structs: The number of structs to generate</span>
@@ -319,10 +335,12 @@
         <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="NeuronData.read_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.neuron_data.NeuronData.read_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">neuron_regions</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Read the current state of the data from the machine into the</span>
-<span class="sd">            application vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the current state of the data from the machine into the</span>
+<span class="sd">        application vertex.</span>
 
-<span class="sd">        :param Placement placement: The placement of the vertex to read</span>
+<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
+<span class="sd">            The placement of the vertex to read</span>
 <span class="sd">        :param NeuronRegions neuron_regions: The regions to read from</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">parameters</span>
@@ -332,10 +350,12 @@
             <span class="n">placement</span><span class="p">,</span> <span class="n">neuron_regions</span><span class="o">.</span><span class="n">neuron_params</span><span class="p">,</span> <span class="n">merged_dict</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="NeuronData.read_initial_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.neuron_data.NeuronData.read_initial_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_initial_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">neuron_regions</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Read the initial state of the data from the machine into the</span>
-<span class="sd">            application vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the initial state of the data from the machine into the</span>
+<span class="sd">        application vertex.</span>
 
-<span class="sd">        :param Placement placement: The placement of the vertex to read</span>
+<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
+<span class="sd">            The placement of the vertex to read</span>
 <span class="sd">        :param NeuronRegions neuron_regions: The regions to read from</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">parameters</span>
@@ -345,9 +365,11 @@
             <span class="n">placement</span><span class="p">,</span> <span class="n">neuron_regions</span><span class="o">.</span><span class="n">initial_values</span><span class="p">,</span> <span class="n">merged_dict</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__do_read_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Perform the reading of data</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform the reading of data.</span>
 
-<span class="sd">        :param Placement placement: Where the vertex is on the machine</span>
+<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
+<span class="sd">            Where the vertex is on the machine</span>
 <span class="sd">        :param int region: The region to read from</span>
 <span class="sd">        :param MergedDict results: Where to write the results to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -371,7 +393,8 @@
                     <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
 
 <div class="viewcode-block" id="NeuronData.reset_generation"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.neuron_data.NeuronData.reset_generation">[docs]</a>    <span class="k">def</span> <span class="nf">reset_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Reset generation so it is done again</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reset generation so it is done again.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_data</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recording_data</span> <span class="o">=</span> <span class="kc">None</span>
@@ -443,7 +466,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

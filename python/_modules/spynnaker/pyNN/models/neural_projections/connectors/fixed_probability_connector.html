@@ -73,8 +73,8 @@
 
 <span class="k">class</span> <span class="nc">FixedProbabilityConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span>
                                 <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; For each pair of pre-post cells, the connection probability is \</span>
-<span class="sd">        constant.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For each pair of pre-post cells, the connection probability is constant.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -99,7 +99,7 @@
 <span class="sd">            Whether to output extra information about the connectivity to a</span>
 <span class="sd">            CSV file</span>
 <span class="sd">        :param rng:</span>
-<span class="sd">            Seeded random number generator, or None to make one when needed</span>
+<span class="sd">            Seeded random number generator, or `None` to make one when needed</span>
 <span class="sd">        :type rng: ~pyNN.random.NumpyRNG or None</span>
 <span class="sd">        :param callable callback:</span>
 <span class="sd">            if given, a callable that display a progress bar on the terminal.</span>
@@ -112,9 +112,9 @@
         <span class="k">if</span> <span class="n">p_connect</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="n">p_connect</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Probability of 1.0 in the FixedProbabilityConnector will use&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">p_connect</span><span class="si">}</span><span class="s2"> instead.  If this is a problem, use the&quot;</span>
-                <span class="s2">&quot; AllToAllConnector instead.&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;Probability of 1.0 in the FixedProbabilityConnector will use &quot;</span>
+                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> instead.  If this is a problem, use the AllToAllConnector &quot;</span>
+                <span class="s2">&quot;instead.&quot;</span><span class="p">,</span> <span class="n">p_connect</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">p_connect</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;The probability must be &gt;= 0 and &lt; 1&quot;</span><span class="p">)</span>
@@ -207,7 +207,7 @@
         <span class="k">return</span> <span class="n">block</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;FixedProbabilityConnector(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;FixedProbabilityConnector(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_p_connect</span><span class="si">}</span><span class="s2">)&quot;</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_id</span><span class="p">)</span>
@@ -274,7 +274,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

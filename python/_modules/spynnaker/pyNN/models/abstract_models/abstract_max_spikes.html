@@ -57,26 +57,29 @@
 
 <span class="nd">@require_subclass</span><span class="p">(</span><span class="n">MachineVertex</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">AbstractMaxSpikes</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Indicates a class (a \</span>
-<span class="sd">        :py:class:`~pacman.model.graphs.machine.MachineVertex`) \</span>
-<span class="sd">        that can describe the maximum rate that it sends spikes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Indicates a class (a</span>
+<span class="sd">    :py:class:`~pacman.model.graphs.machine.MachineVertex`)</span>
+<span class="sd">    that can describe the maximum rate that it sends spikes.</span>
 
-<span class="sd">        The :py:class:`~.SynapticManager` assumes that all machine vertexes</span>
-<span class="sd">        share the same synapse_information will have the same rates.</span>
+<span class="sd">    The :py:class:`~.SynapticManager` assumes that all machine vertexes</span>
+<span class="sd">    share the same synapse_information will have the same rates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
 <div class="viewcode-block" id="AbstractMaxSpikes.max_spikes_per_ts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">max_spikes_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get maximum expected number of spikes per timestep</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get maximum expected number of spikes per timestep.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractMaxSpikes.max_spikes_per_second"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">max_spikes_per_second</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get maximum expected number of spikes per second</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get maximum expected number of spikes per second.</span>
 
 <span class="sd">        :param str variable: the variable to find units from</span>
 <span class="sd">        :return: the units as a string.</span>
@@ -120,7 +123,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

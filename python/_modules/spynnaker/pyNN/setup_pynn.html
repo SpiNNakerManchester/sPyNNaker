@@ -64,14 +64,16 @@
 
 
 <div class="viewcode-block" id="version_satisfies"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.setup_pynn.version_satisfies">[docs]</a><span class="k">def</span> <span class="nf">version_satisfies</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">requirement</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Perform a version check. This code could be smarter...</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform a version check. This code could be smarter...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Version</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">Version</span><span class="p">(</span><span class="n">requirement</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="install_sPyNNaker_into"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.setup_pynn.install_sPyNNaker_into">[docs]</a><span class="k">def</span> <span class="nf">install_sPyNNaker_into</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Do the actual installation by creating a package within the given\</span>
-<span class="sd">        module&#39;s implementation. This is very nasty!</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Do the actual installation by creating a package within the given</span>
+<span class="sd">    module&#39;s implementation. This is very nasty!</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">spinnaker_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;spiNNaker&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">spinnaker_dir</span><span class="p">):</span>
@@ -136,7 +138,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

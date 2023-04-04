@@ -71,14 +71,14 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_ca2</span><span class="p">,</span> <span class="n">i_ca2</span><span class="p">,</span> <span class="n">i_alpha</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`</span>
-<span class="sd">        :type tau_ca2: float, iterable(float),</span>
-<span class="sd">            ~pyNN.random.RandomDistribution or (mapping) function</span>
+<span class="sd">        :type tau_ca2: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param i_ca2: :math:`I_{\mathrm{Ca}^{+2}}`</span>
-<span class="sd">        :type i_ca2: float, iterable(float),</span>
-<span class="sd">            ~pyNN.random.RandomDistribution or (mapping) function</span>
+<span class="sd">        :type i_ca2: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        :param i_alpha: :math:`I_{\alpha}`</span>
-<span class="sd">        :type i_alpha: float, iterable(float),</span>
-<span class="sd">            ~pyNN.random.RandomDistribution or (mapping) function</span>
+<span class="sd">        :type i_alpha: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="p">[</span><span class="n">Struct</span><span class="p">([</span>
@@ -103,7 +103,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tau_ca2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`\tau_{\mathrm{Ca}^{+2}}`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Settable model parameter: :math:`\tau_{\mathrm{Ca}^{+2}}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -111,7 +112,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">i_ca2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`I_{\mathrm{Ca}^{+2}}`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Settable model parameter: :math:`I_{\mathrm{Ca}^{+2}}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -119,7 +121,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">i_alpha</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`I_{\alpha}`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Settable model parameter: :math:`I_{\alpha}`</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -162,7 +165,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

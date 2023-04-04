@@ -64,8 +64,9 @@
 
 
 <span class="k">class</span> <span class="nc">CSAConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Make connections using a Connection Set Algebra (Djurfeldt 2012)\</span>
-<span class="sd">        description between the neurons in the pre- and post-populations.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make connections using a Connection Set Algebra (Djurfeldt 2012)</span>
+<span class="sd">    description between the neurons in the pre- and post-populations.</span>
 
 <span class="sd">    .. note::</span>
 <span class="sd">        If you get TypeError in Python 3 see:</span>
@@ -209,8 +210,7 @@
         <span class="n">csa</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__full_connection_set</span><span class="p">,</span> <span class="n">n_pre_neurons</span><span class="p">,</span> <span class="n">n_post_neurons</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;CSAConnector(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__full_cset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;CSAConnector(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__full_cset</span><span class="si">}</span><span class="s2">)&quot;</span>
 </pre></div>
 
             <div class="clearer"></div>
@@ -249,7 +249,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

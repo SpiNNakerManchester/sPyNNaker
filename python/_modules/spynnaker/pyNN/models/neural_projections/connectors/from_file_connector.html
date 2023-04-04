@@ -57,7 +57,8 @@
 
 
 <span class="k">class</span> <span class="nc">FromFileConnector</span><span class="p">(</span><span class="n">FromListConnector</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Make connections according to a list read from a file.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make connections according to a list read from a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_file&quot;</span><span class="p">]</span>
 
@@ -74,7 +75,8 @@
 
 <span class="sd">                # columns = [&quot;i&quot;, &quot;j&quot;, &quot;weight&quot;, &quot;delay&quot;, &quot;U&quot;, &quot;tau_rec&quot;]</span>
 
-<span class="sd">            Note that the header requires `#` at the beginning of the line.</span>
+<span class="sd">            .. note::</span>
+<span class="sd">                The header requires `#` at the beginning of the line.</span>
 <span class="sd">        :type file: str or ~io.FileIO</span>
 <span class="sd">        :param bool distributed:</span>
 <span class="sd">            Basic pyNN says:</span>
@@ -122,7 +124,7 @@
     <span class="k">def</span> <span class="nf">_read_conn_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_file</span><span class="p">,</span> <span class="n">distributed</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">distributed</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">the_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">the_file</span><span class="o">.</span><span class="n">file</span><span class="p">))</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">the_file</span><span class="o">.</span><span class="n">file</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
 
         <span class="c1"># This assumes it finds the files in the right order!</span>
         <span class="n">conns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -136,10 +138,11 @@
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">conns</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;FromFileConnector(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;FromFileConnector(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 <div class="viewcode-block" id="FromFileConnector.get_reader"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromFileConnector.get_reader">[docs]</a>    <span class="k">def</span> <span class="nf">get_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>  <span class="c1"># @ReservedAssignment</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a file reader object using the PyNN methods.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a file reader object using the PyNN methods.</span>
 
 <span class="sd">        :return: A pynn StandardTextFile or similar</span>
 <span class="sd">        :rtype: ~pynn.recording.files.StandardTextFile</span>
@@ -183,7 +186,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

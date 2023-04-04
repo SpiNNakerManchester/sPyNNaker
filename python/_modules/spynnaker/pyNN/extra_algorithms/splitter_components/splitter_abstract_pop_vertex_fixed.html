@@ -83,8 +83,9 @@
 
 <span class="k">class</span> <span class="nc">SplitterAbstractPopulationVertexFixed</span><span class="p">(</span>
         <span class="n">AbstractSplitterCommon</span><span class="p">,</span> <span class="n">AbstractSpynnakerSplitterDelay</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; handles the splitting of the AbstractPopulationVertex using fixed</span>
-<span class="sd">        slices</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles the splitting of the :py:class:`AbstractPopulationVertex`</span>
+<span class="sd">    using fixed slices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -93,14 +94,6 @@
         <span class="s2">&quot;__max_delay&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__expect_delay_extension&quot;</span>
     <span class="p">]</span>
-
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The message to use when the Population is invalid &quot;&quot;&quot;</span>
-    <span class="n">INVALID_POP_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The vertex </span><span class="si">{}</span><span class="s2"> cannot be supported by the &quot;</span>
-        <span class="s2">&quot;SplitterAbstractPopulationVertexFixed as&quot;</span>
-        <span class="s2">&quot; the only vertex supported by this splitter is a &quot;</span>
-        <span class="s2">&quot;AbstractPopulationVertex. Please use the correct splitter for &quot;</span>
-        <span class="s2">&quot;your vertex and try again.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -113,7 +106,11 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">AbstractPopulationVertex</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">PacmanConfigurationException</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POP_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span></div>
+                <span class="sa">f</span><span class="s2">&quot;The vertex </span><span class="si">{</span><span class="n">app_vertex</span><span class="si">}</span><span class="s2"> cannot be supported by the &quot;</span>
+                <span class="s2">&quot;SplitterAbstractPopulationVertexFixed as the only vertex &quot;</span>
+                <span class="s2">&quot;supported by this splitter is a AbstractPopulationVertex. &quot;</span>
+                <span class="s2">&quot;Please use the correct splitter for your vertex and try &quot;</span>
+                <span class="s2">&quot;again.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexFixed.create_machine_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_machine_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chip_counter</span><span class="p">):</span>
@@ -170,7 +167,6 @@
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexFixed.get_source_specific_in_coming_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_source_specific_in_coming_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">get_source_specific_in_coming_vertices</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_source_specific_in_coming_vertices</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">source_vertex</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
-
         <span class="c1"># Determine the real pre-vertex</span>
         <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">source_vertex</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source_vertex</span><span class="p">,</span> <span class="n">DelayExtensionVertex</span><span class="p">):</span>
@@ -197,7 +193,6 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span>
             <span class="n">structural_sz</span><span class="p">,</span> <span class="n">ring_buffer_shifts</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span>
             <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">,</span> <span class="n">neuron_data</span><span class="p">):</span>
-
         <span class="c1"># If using local-only create a local-only vertex</span>
         <span class="n">s_dynamics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_dynamics</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s_dynamics</span><span class="p">,</span> <span class="n">AbstractLocalOnly</span><span class="p">):</span>
@@ -215,9 +210,10 @@
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_used_by_atoms</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">structural_sz</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;  Gets the resources of a slice of atoms</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the resources of a slice of atoms.</span>
 
-<span class="sd">        :param int n_atoms</span>
+<span class="sd">        :param int n_atoms:</span>
 <span class="sd">        :rtype: ~pacman.model.resources.MultiRegionSDRAM</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
@@ -232,7 +228,8 @@
         <span class="k">return</span> <span class="n">sdram</span></div>
 
     <span class="k">def</span> <span class="nf">__get_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; returns the variable sdram from the recorders</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the variable SDRAM from the recorders.</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms to account for</span>
 <span class="sd">        :return: the variable sdram used by the neuron recorder</span>
@@ -249,7 +246,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_max_synapse_variable_sdram</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__get_constant_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">structural_sz</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; returns the constant sdram used by the atoms</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the constant SDRAM used by the atoms.</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms to account for</span>
 <span class="sd">        :rtype: ~pacman.model.resources.MultiRegionSDRAM</span>
@@ -301,8 +299,8 @@
 
     <span class="k">def</span> <span class="nf">__get_synapse_constant_sdram</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">structural_sz</span><span class="p">):</span>
-
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the amount of fixed SDRAM used by synapse parts</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the amount of fixed SDRAM used by synapse parts.</span>
 
 <span class="sd">        :param int n_atoms: The number of atoms to account for</span>
 
@@ -336,7 +334,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="o">=</span> <span class="kc">None</span></div>
 
     <span class="k">def</span> <span class="nf">__create_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Create slices if not already done</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create slices if not already done.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
@@ -401,7 +400,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

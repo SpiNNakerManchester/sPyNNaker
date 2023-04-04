@@ -72,8 +72,9 @@
 
 <span class="k">class</span> <span class="nc">IndexBasedProbabilityConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">,</span>
                                      <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Make connections using a probability distribution which varies\</span>
-<span class="sd">        dependent upon the indices of the pre- and post-populations.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make connections using a probability distribution which varies</span>
+<span class="sd">    dependent upon the indices of the pre- and post-populations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__slots</span> <span class="o">=</span> <span class="p">[</span>
@@ -218,14 +219,14 @@
         <span class="k">return</span> <span class="n">block</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;IndexBasedProbabilityConnector(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__index_expression</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;IndexBasedProbabilityConnector(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__index_expression</span><span class="si">}</span><span class="s2">)&quot;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">allow_self_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; If the connector is used to connect a Population to itself, this\</span>
-<span class="sd">            flag determines whether a neuron is allowed to connect to itself,\</span>
-<span class="sd">            or only to other neurons in the Population.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        When the connector is used to connect a Population to itself, this</span>
+<span class="sd">        flag determines whether a neuron is allowed to connect to itself,</span>
+<span class="sd">        or only to other neurons in the Population.</span>
 
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -237,9 +238,10 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">index_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The right-hand side of a valid python expression for probability,\</span>
-<span class="sd">            involving the indices of the pre and post populations, that can\</span>
-<span class="sd">            be parsed by eval(), that computes a probability dist.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The right-hand side of a valid python expression for probability,</span>
+<span class="sd">        involving the indices of the pre- and post-populations, that can</span>
+<span class="sd">        be parsed by `eval()`, that computes a probability distribution.</span>
 
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -286,7 +288,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

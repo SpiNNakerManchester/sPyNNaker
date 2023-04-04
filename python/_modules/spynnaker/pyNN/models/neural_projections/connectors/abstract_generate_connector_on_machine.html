@@ -78,7 +78,8 @@
 
 <span class="k">class</span> <span class="nc">AbstractGenerateConnectorOnMachine</span><span class="p">(</span>
         <span class="n">AbstractConnector</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Indicates that the connectivity can be generated on the machine</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Indicates that the connectivity can be generated on the machine.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -106,7 +107,8 @@
                     <span class="s2">&quot; be generated on host!&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_connector_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the seed of the connector for a given pre-post pairing</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the seed of the connector for a given pre-post pairing.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
@@ -119,9 +121,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connector_seed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.generate_on_machine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.generate_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">generate_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Determine if this instance can generate on the machine.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine if this instance can generate on the machine.</span>
 
-<span class="sd">        Default implementation returns True if the weights and delays can\</span>
+<span class="sd">        Default implementation returns True if the weights and delays can</span>
 <span class="sd">        be generated on the machine</span>
 
 <span class="sd">        :param weights:</span>
@@ -136,7 +139,8 @@
                 <span class="n">is_param_generatable</span><span class="p">(</span><span class="n">delays</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_weights_id"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_weights_id">[docs]</a>    <span class="k">def</span> <span class="nf">gen_weights_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the id of the weight generator on the machine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the id of the weight generator on the machine.</span>
 
 <span class="sd">        :param weights:</span>
 <span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
@@ -146,7 +150,8 @@
         <span class="k">return</span> <span class="n">param_generator_id</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_weights_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_weights_params">[docs]</a>    <span class="k">def</span> <span class="nf">gen_weights_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the parameters of the weight generator on the machine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the parameters of the weight generator on the machine.</span>
 
 <span class="sd">        :param weights:</span>
 <span class="sd">        :type weights: ~pyNN.random.NumpyRNG or int or float</span>
@@ -155,7 +160,8 @@
         <span class="k">return</span> <span class="n">param_generator_params</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">gen_weight_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size of the weight parameters in bytes</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The size of the weight parameters in bytes.</span>
 
 <span class="sd">        :param weights:</span>
 <span class="sd">        :type weights: ~pyNN.random.NumpyRNG or int or float</span>
@@ -164,7 +170,8 @@
         <span class="k">return</span> <span class="n">param_generator_params_size_in_bytes</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_delays_id"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_delays_id">[docs]</a>    <span class="k">def</span> <span class="nf">gen_delays_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the id of the delay generator on the machine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the id of the delay generator on the machine.</span>
 
 <span class="sd">        :param delays:</span>
 <span class="sd">        :type delays: ~pyNN.random.NumpyRNG or int or float</span>
@@ -173,7 +180,8 @@
         <span class="k">return</span> <span class="n">param_generator_id</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_delay_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_delay_params">[docs]</a>    <span class="k">def</span> <span class="nf">gen_delay_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the parameters of the delay generator on the machine</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the parameters of the delay generator on the machine.</span>
 
 <span class="sd">        :param delays:</span>
 <span class="sd">        :type delays: ~pyNN.random.NumpyRNG or int or float</span>
@@ -182,7 +190,8 @@
         <span class="k">return</span> <span class="n">param_generator_params</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_delay_params_size_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_delay_params_size_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">gen_delay_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delays</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size of the delay parameters in bytes</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The size of the delay parameters in bytes.</span>
 
 <span class="sd">        :param delays:</span>
 <span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or</span>
@@ -193,13 +202,15 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">gen_connector_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The ID of the connection generator on the machine.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The ID of the connection generator on the machine.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.gen_connector_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.gen_connector_params">[docs]</a>    <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the parameters of the on machine generation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the parameters of the on machine generation.</span>
 
 <span class="sd">        :rtype: ~numpy.ndarray(uint32)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -208,7 +219,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">gen_connector_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size of the connector parameters in bytes.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The size of the connector parameters, in bytes.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -251,7 +263,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

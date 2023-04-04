@@ -62,10 +62,10 @@
 <span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">=</span> <span class="mi">9</span>
 
 
-<span class="k">class</span> <span class="nc">DelayExtensionVertex</span><span class="p">(</span>
-        <span class="n">ApplicationVertex</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Provide delays to incoming spikes in multiples of the maximum delays\</span>
-<span class="sd">        of a neuron (typically 16 or 32)</span>
+<span class="k">class</span> <span class="nc">DelayExtensionVertex</span><span class="p">(</span><span class="n">ApplicationVertex</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provide delays to incoming spikes in multiples of the maximum delays</span>
+<span class="sd">    of a neuron (typically 16 or 32).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># The parition this Delay is supporting</span>
@@ -81,19 +81,16 @@
     <span class="n">SAFETY_FACTOR</span> <span class="o">=</span> <span class="mi">5000</span>
     <span class="n">MAX_DTCM_AVAILABLE</span> <span class="o">=</span> <span class="mi">59756</span> <span class="o">-</span> <span class="n">SAFETY_FACTOR</span>
 
-    <span class="n">MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The delay per stage is already set to </span><span class="si">{}</span><span class="s2">, and therefore </span><span class="si">{}</span><span class="s2"> is not &quot;</span>
-        <span class="s2">&quot;yet feasible. Please report it to Spinnaker user mail list.&quot;</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;DelayExtension&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param partition: The parition this Delay is supporting</span>
+<span class="sd">        :param partition: The partition that this delay is supporting</span>
 <span class="sd">        :type partition:</span>
-<span class="sd">            ~pacman.mode.graph.application.ApplicationEdgePartition</span>
+<span class="sd">            ~pacman.model.graphs.application.ApplicationEdgePartition</span>
 <span class="sd">        :param int delay_per_stage: the delay per stage</span>
 <span class="sd">        :param int n_delay_stages: the (initial) number of delay stages needed</span>
+<span class="sd">        :param int n_colour_bits: the number of bits for event colouring</span>
 <span class="sd">        :param str label: the vertex label</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
@@ -113,10 +110,20 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of atoms in this vertex.</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partition</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">drop_late_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Whether to drop late spikes.</span>
+
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span>
 
 <div class="viewcode-block" id="DelayExtensionVertex.get_max_delay_ticks_supported"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_max_delay_ticks_supported">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -126,25 +133,27 @@
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasDelayStages</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">n_delay_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum number of delay stages required by any connection\</span>
-<span class="sd">            out of this delay extension vertex</span>
-
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span>
 
 <div class="viewcode-block" id="DelayExtensionVertex.set_new_n_delay_stages_and_delay_per_stage"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.set_new_n_delay_stages_and_delay_per_stage">[docs]</a>    <span class="k">def</span> <span class="nf">set_new_n_delay_stages_and_delay_per_stage</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">delay_per_stage</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DelayExtensionException</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">))</span>
+                <span class="s2">&quot;The delay per stage is already set to &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="si">}</span><span class="s2">, and therefore </span><span class="si">{</span><span class="n">delay_per_stage</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;is not yet feasible. &quot;</span>
+                <span class="s2">&quot;Please report it to Spinnaker user mail list.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">n_delay_stages</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span> <span class="o">=</span> <span class="n">n_delay_stages</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delay_per_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The delay per stage, in timesteps.</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span>
 
     <span class="nd">@property</span>
@@ -155,31 +164,42 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partition</span><span class="o">.</span><span class="n">pre_vertex</span>
 
 <div class="viewcode-block" id="DelayExtensionVertex.delay_params_size"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_params_size">[docs]</a>    <span class="k">def</span> <span class="nf">delay_params_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size of the delay parameters</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The size of the delay parameters.</span>
+
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="n">_DELAY_PARAM_HEADER_WORDS</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The partition that this delay is supporting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partition</span>
 
 <div class="viewcode-block" id="DelayExtensionVertex.add_outgoing_edge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_outgoing_edge">[docs]</a>    <span class="k">def</span> <span class="nf">add_outgoing_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add an outgoing edge to the delay extension</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an outgoing edge to the delay extension.</span>
 
-<span class="sd">        :param DelayedApplicationEdge delay_edge: The edge to add</span>
+<span class="sd">        :param DelayedApplicationEdge edge: The edge to add</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">outgoing_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the outgoing edges from this vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The outgoing edges from this vertex.</span>
 
-<span class="sd">        :rtype: list(DelayApplicationEdge)</span>
+<span class="sd">        :rtype: list(DelayedApplicationEdge)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_edges</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_colour_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of bits for event colouring.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_colour_bits</span>
 </pre></div>
 
@@ -219,7 +239,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

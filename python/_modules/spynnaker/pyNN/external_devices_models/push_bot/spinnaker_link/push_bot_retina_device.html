@@ -94,14 +94,12 @@
             <span class="n">label</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">],</span>
             <span class="n">n_machine_vertices</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;n_machine_vertices&#39;</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param spinnaker_link_id:</span>
-<span class="sd">        :param protocol:</span>
-<span class="sd">        :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol</span>
-<span class="sd">        :param resolution:</span>
-<span class="sd">        :type resolution:</span>
-<span class="sd">            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution</span>
-<span class="sd">        :param board_address:</span>
-<span class="sd">        :param label:</span>
+<span class="sd">        :param int spinnaker_link_id:</span>
+<span class="sd">        :param MunichIoSpiNNakerLinkProtocol protocol:</span>
+<span class="sd">        :param PushBotRetinaResolution resolution:</span>
+<span class="sd">        :param str board_address:</span>
+<span class="sd">        :param str label:</span>
+<span class="sd">        :param int n_machine_vertices:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">resolution</span><span class="p">)</span>
         <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -177,7 +175,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

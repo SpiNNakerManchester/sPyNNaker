@@ -87,6 +87,17 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">ring_buffer_sigma</span><span class="p">,</span>
             <span class="n">incoming_spike_buffer_size</span><span class="p">,</span> <span class="n">drop_late_spikes</span><span class="p">,</span> <span class="n">splitter</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span>
             <span class="n">n_colour_bits</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param float spikes_per_second:</span>
+<span class="sd">        :param float ring_buffer_sigma:</span>
+<span class="sd">        :param int incoming_spike_buffer_size:</span>
+<span class="sd">        :param bool drop_late_spikes:</span>
+<span class="sd">        :param splitter:</span>
+<span class="sd">        :type splitter:</span>
+<span class="sd">            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon</span>
+<span class="sd">        :param float seed:</span>
+<span class="sd">        :param int n_colour_bits:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_max_atoms_per_dimension_per_core</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">AbstractPopulationVertex</span><span class="p">(</span>
@@ -136,7 +147,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

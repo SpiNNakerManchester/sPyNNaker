@@ -55,8 +55,9 @@
 
 
 <span class="k">class</span> <span class="nc">EthernetControlConnection</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; A connection that can translate Ethernet control messages received\</span>
-<span class="sd">        from a Population</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A connection that can translate Ethernet control messages received</span>
+<span class="sd">    from a Population.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__translators&quot;</span><span class="p">]</span>
 
@@ -80,7 +81,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_receive_callback</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate</span><span class="p">,</span> <span class="n">translate_key</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EthernetControlConnection.add_translator"><a class="viewcode-back" href="../../../../spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.EthernetControlConnection.add_translator">[docs]</a>    <span class="k">def</span> <span class="nf">add_translator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">translator</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add another translator that routes via the LPG.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add another translator that routes via the LPG.</span>
 
 <span class="sd">        :param str label: The label of the vertex to attach the translator to</span>
 <span class="sd">        :param AbstractEthernetTranslator translator:</span>
@@ -134,7 +136,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

@@ -54,8 +54,9 @@
 
 
 <span class="k">class</span> <span class="nc">ParameterHolder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Holds a set of parameters and state variables to be returned in a</span>
-<span class="sd">        PyNN-specific format</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Holds a set of parameters and state variables to be returned in a</span>
+<span class="sd">    PyNN-specific format.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span>
@@ -77,9 +78,9 @@
 <span class="sd">        :param data_items_to_return: A list of data fields to be returned</span>
 <span class="sd">        :type data_items_to_return: list(str) or tuple(str)</span>
 <span class="sd">        :param get_call: A function to call to read a value</span>
-<span class="sd">        :type get_call: function(str, selector=None)-&gt;list</span>
-<span class="sd">        :param selector: a description of the subrange to accept, or None for</span>
-<span class="sd">            all. See:</span>
+<span class="sd">        :type get_call: callable(str, selector=None)-&gt;list</span>
+<span class="sd">        :param selector: a description of the subrange to accept,</span>
+<span class="sd">            or `None` for all. See:</span>
 <span class="sd">            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`</span>
 <span class="sd">        :type selector: None or slice or int or list(bool) or list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -96,7 +97,7 @@
         <span class="c1"># if a random distribution we must not have generated yet!</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Although it is possible to request the values&quot;</span>
+                <span class="s2">&quot;Although it is possible to request the values&quot;</span>
                 <span class="s2">&quot; before the simulation has run, it is not possible to read&quot;</span>
                 <span class="s2">&quot; those values until after the simulation has run.  Please run&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot; the simulation before reading </span><span class="si">{</span><span class="n">parameter</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
@@ -106,7 +107,8 @@
         <span class="k">return</span> <span class="n">values</span>
 
     <span class="k">def</span> <span class="nf">_get_data_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Merges the parameters and values in to the final data items</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merges the parameters and values in to the final data items</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If there are already merged connections cached, return those</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_items</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -210,7 +212,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

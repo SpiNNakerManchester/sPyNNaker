@@ -66,17 +66,14 @@
             <span class="n">injector_port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">retina_injector_label</span><span class="o">=</span><span class="s2">&quot;PushBotRetinaInjector&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param protocol:</span>
-<span class="sd">        :type protocol: MunichIoEthernetProtocol</span>
-<span class="sd">        :param resolution:</span>
-<span class="sd">        :type resolution:</span>
-<span class="sd">            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution</span>
-<span class="sd">        :param pushbot_ip_address:</span>
-<span class="sd">        :param pushbot_port:</span>
-<span class="sd">        :param injector_port:</span>
-<span class="sd">        :param local_host:</span>
-<span class="sd">        :param local_port:</span>
-<span class="sd">        :param retina_injector_label:</span>
+<span class="sd">        :param MunichIoEthernetProtocol protocol:</span>
+<span class="sd">        :param PushBotRetinaResolution resolution:</span>
+<span class="sd">        :param str pushbot_ip_address:</span>
+<span class="sd">        :param int pushbot_port:</span>
+<span class="sd">        :param int injector_port:</span>
+<span class="sd">        :param str local_host:</span>
+<span class="sd">        :param int local_port:</span>
+<span class="sd">        :param str retina_injector_label:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -152,7 +149,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

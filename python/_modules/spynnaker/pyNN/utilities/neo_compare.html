@@ -54,7 +54,8 @@
 
 
 <div class="viewcode-block" id="compare_spiketrain"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_spiketrain">[docs]</a><span class="k">def</span> <span class="nf">compare_spiketrain</span><span class="p">(</span><span class="n">spiketrain1</span><span class="p">,</span> <span class="n">spiketrain2</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Checks two Spiketrains have the exact same data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks two Spiketrains have the exact same data</span>
 
 <span class="sd">    :param ~neo.core.SpikeTrain spiketrain1: first spiketrain</span>
 <span class="sd">    :param ~neo.core.SpikeTrain spiketrain2: second spiketrain</span>
@@ -62,30 +63,28 @@
 <span class="sd">        held, i.e., all spikes up to the same time. If False allows one trains</span>
 <span class="sd">        to have additional spikes after the first ends. This is used to</span>
 <span class="sd">        compare data extracted part way with data extracted at the end.</span>
-<span class="sd">    :rtype: None</span>
 <span class="sd">    :raises AssertionError: If the spiketrains are not equal</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">id1</span> <span class="o">=</span> <span class="n">spiketrain1</span><span class="o">.</span><span class="n">annotations</span><span class="p">[</span><span class="s1">&#39;source_index&#39;</span><span class="p">]</span>
     <span class="n">id2</span> <span class="o">=</span> <span class="n">spiketrain2</span><span class="o">.</span><span class="n">annotations</span><span class="p">[</span><span class="s1">&#39;source_index&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">id1</span> <span class="o">!=</span> <span class="n">id2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-            <span class="s2">&quot;Different annotations[&#39;source_index&#39;] found </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">))</span>
+            <span class="sa">f</span><span class="s2">&quot;Different annotations[&#39;source_index&#39;] found </span><span class="si">{</span><span class="n">id1</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">id2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">same_length</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">spiketrain1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spiketrain2</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-            <span class="s2">&quot;spiketrains1 has </span><span class="si">{}</span><span class="s2"> spikes while spiketrains2 as </span><span class="si">{}</span><span class="s2"> for ID </span><span class="si">{}</span><span class="s2">&quot;</span>
-            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spiketrain1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">spiketrain2</span><span class="p">),</span> <span class="n">id1</span><span class="p">))</span>
+            <span class="sa">f</span><span class="s2">&quot;spiketrains1 has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">spiketrain1</span><span class="p">)</span><span class="si">}</span><span class="s2"> spikes while spiketrains2 &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">spiketrain2</span><span class="p">)</span><span class="si">}</span><span class="s2"> for ID </span><span class="si">{</span><span class="n">id1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">spike1</span><span class="p">,</span> <span class="n">spike2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">spiketrain1</span><span class="p">,</span> <span class="n">spiketrain2</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">spike1</span> <span class="o">!=</span> <span class="n">spike2</span><span class="p">:</span>
             <span class="c1"># print(id1, spiketrain1, spiketrain2)</span>
             <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-                <span class="s2">&quot;spike1 is </span><span class="si">{}</span><span class="s2"> while spike2 is </span><span class="si">{}</span><span class="s2"> for ID </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">spike1</span><span class="p">,</span> <span class="n">spike2</span><span class="p">,</span> <span class="n">id1</span><span class="p">))</span></div>
+                <span class="sa">f</span><span class="s2">&quot;spike1 is </span><span class="si">{</span><span class="n">spike1</span><span class="si">}</span><span class="s2"> while spike2 is </span><span class="si">{</span><span class="n">spike2</span><span class="si">}</span><span class="s2"> for ID </span><span class="si">{</span><span class="n">id1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="compare_spiketrains"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_spiketrains">[docs]</a><span class="k">def</span> <span class="nf">compare_spiketrains</span><span class="p">(</span>
         <span class="n">spiketrains1</span><span class="p">,</span> <span class="n">spiketrains2</span><span class="p">,</span> <span class="n">same_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Check two Lists of SpikeTrains have the exact same data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check two Lists of SpikeTrains have the exact same data</span>
 
 <span class="sd">    :param list(~neo.core.SpikeTrain) spiketrains1:</span>
 <span class="sd">        First list SpikeTrains to compare</span>
@@ -105,15 +104,15 @@
         <span class="k">return</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spiketrains1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spiketrains2</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-            <span class="s2">&quot;spiketrains1 has </span><span class="si">{}</span><span class="s2"> spiketrains while spiketrains2 as </span><span class="si">{}</span><span class="s2"> &quot;</span>
-            <span class="s2">&quot;analogsignalarrays&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">spiketrains1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">spiketrains2</span><span class="p">)))</span>
+            <span class="sa">f</span><span class="s2">&quot;spiketrains1 has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">spiketrains1</span><span class="p">)</span><span class="si">}</span><span class="s2"> spiketrains while &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;spiketrains2 fas </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">spiketrains2</span><span class="p">)</span><span class="si">}</span><span class="s2"> analogsignalarrays&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">spiketrain1</span><span class="p">,</span> <span class="n">spiketrain2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">spiketrains1</span><span class="p">,</span> <span class="n">spiketrains2</span><span class="p">):</span>
         <span class="n">compare_spiketrain</span><span class="p">(</span><span class="n">spiketrain1</span><span class="p">,</span> <span class="n">spiketrain2</span><span class="p">,</span> <span class="n">same_length</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="compare_analogsignal"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_analogsignal">[docs]</a><span class="k">def</span> <span class="nf">compare_analogsignal</span><span class="p">(</span><span class="n">as1</span><span class="p">,</span> <span class="n">as2</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Compares two analogsignal Objects to see if they are the same</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compares two analogsignal Objects to see if they are the same.</span>
 
 <span class="sd">    :param ~neo.core.AnalogSignal as1:</span>
 <span class="sd">        first analogsignal holding list of individual analogsignal Objects</span>
@@ -130,47 +129,45 @@
 
     <span class="k">if</span> <span class="n">as1</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">as2</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-            <span class="s2">&quot;analogsignalarray1 has name </span><span class="si">{}</span><span class="s2"> while analogsignalarray1 has </span><span class="si">{}</span><span class="s2">&quot;</span>
-            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">as2</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="sa">f</span><span class="s2">&quot;analogsignalarray1 has name </span><span class="si">{</span><span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> while &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;analogsignalarray1 has </span><span class="si">{</span><span class="n">as2</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">same_length</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">as1_index</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">as2_index</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-            <span class="s2">&quot;channel_index 1 has len </span><span class="si">{}</span><span class="s2"> while channel_index 2 has </span><span class="si">{}</span><span class="s2"> for </span><span class="si">{}</span><span class="s2">&quot;</span>
-            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">as1_index</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">as2_index</span><span class="p">),</span> <span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="sa">f</span><span class="s2">&quot;channel_index 1 has len </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">as1_index</span><span class="p">)</span><span class="si">}</span><span class="s2"> while &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;channel_index 2 has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">as2_index</span><span class="p">)</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">id1</span><span class="p">,</span> <span class="n">id2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">as1_index</span><span class="p">,</span> <span class="n">as2_index</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">id1</span> <span class="o">!=</span> <span class="n">id2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-                <span class="s2">&quot;ID 1 is </span><span class="si">{}</span><span class="s2"> while ID 2 is </span><span class="si">{}</span><span class="s2"> for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">id1</span><span class="p">,</span> <span class="n">id2</span><span class="p">,</span> <span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                <span class="sa">f</span><span class="s2">&quot;ID 1 is </span><span class="si">{</span><span class="n">id1</span><span class="si">}</span><span class="s2"> while ID 2 is </span><span class="si">{</span><span class="n">id2</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">same_length</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">as1</span><span class="o">.</span><span class="n">times</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">as2</span><span class="o">.</span><span class="n">times</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-            <span class="s2">&quot;times 1 has len </span><span class="si">{}</span><span class="s2"> while times 2 has </span><span class="si">{}</span><span class="s2"> for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">as1</span><span class="o">.</span><span class="n">times</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">as2</span><span class="o">.</span><span class="n">times</span><span class="p">),</span> <span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="sa">f</span><span class="s2">&quot;times 1 has len </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">as1</span><span class="o">.</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s2"> while &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;times 2 has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">as2</span><span class="o">.</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">time1</span><span class="p">,</span> <span class="n">time2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">as1</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">as2</span><span class="o">.</span><span class="n">times</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">time1</span> <span class="o">!=</span> <span class="n">time2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-                <span class="s2">&quot;time 1 is </span><span class="si">{}</span><span class="s2"> while time 2 is </span><span class="si">{}</span><span class="s2"> for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">time1</span><span class="p">,</span> <span class="n">time2</span><span class="p">,</span> <span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                <span class="sa">f</span><span class="s2">&quot;time 1 is </span><span class="si">{</span><span class="n">time1</span><span class="si">}</span><span class="s2"> while time 2 is </span><span class="si">{</span><span class="n">time2</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">same_length</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">as1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">as2</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-            <span class="s2">&quot;analogsignal 1 has len </span><span class="si">{}</span><span class="s2"> while analogsignal 2 has </span><span class="si">{}</span><span class="s2"> for </span><span class="si">{}</span><span class="s2">&quot;</span>
-            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">as1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">as2</span><span class="p">),</span> <span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="sa">f</span><span class="s2">&quot;analogsignal 1 has len </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">as1</span><span class="p">)</span><span class="si">}</span><span class="s2"> while &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;analogsignal 2 has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">as2</span><span class="p">)</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">signal1</span><span class="p">,</span> <span class="n">signal2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">as1</span><span class="p">,</span> <span class="n">as2</span><span class="p">):</span>
         <span class="c1"># print(signal1, signal2)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal2</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-                <span class="s2">&quot;signal 1 has len </span><span class="si">{}</span><span class="s2"> while signal 2 has </span><span class="si">{}</span><span class="s2"> for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="nb">len</span><span class="p">(</span><span class="n">signal1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal2</span><span class="p">),</span> <span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                <span class="sa">f</span><span class="s2">&quot;signal 1 has len </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">signal1</span><span class="p">)</span><span class="si">}</span><span class="s2"> while &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;signal 2 has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">signal2</span><span class="p">)</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">value1</span><span class="p">,</span> <span class="n">value2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">signal1</span><span class="p">,</span> <span class="n">signal2</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">value1</span> <span class="o">!=</span> <span class="n">value2</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-                    <span class="s2">&quot;value 1 is </span><span class="si">{}</span><span class="s2"> while value2 is </span><span class="si">{}</span><span class="s2"> for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">value1</span><span class="p">,</span> <span class="n">value2</span><span class="p">,</span> <span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="p">))</span></div>
+                    <span class="sa">f</span><span class="s2">&quot;value 1 is </span><span class="si">{</span><span class="n">value1</span><span class="si">}</span><span class="s2"> while &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;value 2 is </span><span class="si">{</span><span class="n">value1</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">as1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="compare_segments"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_segments">[docs]</a><span class="k">def</span> <span class="nf">compare_segments</span><span class="p">(</span><span class="n">seg1</span><span class="p">,</span> <span class="n">seg2</span><span class="p">,</span> <span class="n">same_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -193,26 +190,23 @@
 
     <span class="k">if</span> <span class="n">same_data</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">seg1_analogsignals</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seg2_analogsignals</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-            <span class="s2">&quot;Segment1 has </span><span class="si">{}</span><span class="s2"> analogsignalarrays while Segment2 as </span><span class="si">{}</span><span class="s2"> &quot;</span>
-            <span class="s2">&quot;analogsignalarrays&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">seg1_analogsignals</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">seg1_analogsignals</span><span class="p">)))</span>
+            <span class="sa">f</span><span class="s2">&quot;Segment1 has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">seg1_analogsignals</span><span class="p">)</span><span class="si">}</span><span class="s2"> analogsignalarrays while &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Segment2 has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">seg1_analogsignals</span><span class="p">)</span><span class="si">}</span><span class="s2"> analogsignalarrays&quot;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">analogsignal1</span> <span class="ow">in</span> <span class="n">seg1_analogsignals</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">analogsignal1</span><span class="o">.</span><span class="n">name</span>
         <span class="n">filtered</span> <span class="o">=</span> <span class="n">seg2</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">filtered</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">same_data</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-                    <span class="s2">&quot;Segment1 has </span><span class="si">{}</span><span class="s2"> data while Segment2 does not&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">name</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">analogsignal2</span> <span class="o">=</span> <span class="n">seg2</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">compare_analogsignal</span><span class="p">(</span><span class="n">analogsignal1</span><span class="p">,</span> <span class="n">analogsignal2</span><span class="p">,</span> <span class="n">same_length</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">filtered</span><span class="p">)</span> <span class="ow">and</span> <span class="n">same_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Segment1 has </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> data while Segment2 does not&quot;</span><span class="p">)</span>
+        <span class="n">analogsignal2</span> <span class="o">=</span> <span class="n">seg2</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">compare_analogsignal</span><span class="p">(</span><span class="n">analogsignal1</span><span class="p">,</span> <span class="n">analogsignal2</span><span class="p">,</span> <span class="n">same_length</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="compare_blocks"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_blocks">[docs]</a><span class="k">def</span> <span class="nf">compare_blocks</span><span class="p">(</span>
         <span class="n">neo1</span><span class="p">,</span> <span class="n">neo2</span><span class="p">,</span> <span class="n">same_runs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">same_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Compares two neo Blocks to see if they hold the same data.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compares two neo Blocks to see if they hold the same data.</span>
 
 <span class="sd">    :param ~neo.core.Block neo1: First block to check</span>
 <span class="sd">    :param ~neo.core.Block neo2: Second block to check</span>
@@ -229,8 +223,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">same_runs</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">neo1</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">neo2</span><span class="o">.</span><span class="n">segments</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-            <span class="s2">&quot;Block1 has </span><span class="si">{}</span><span class="s2"> segments while block2 as </span><span class="si">{}</span><span class="s2"> segments&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">neo1</span><span class="o">.</span><span class="n">segments</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">neo2</span><span class="o">.</span><span class="n">segments</span><span class="p">)))</span>
+            <span class="sa">f</span><span class="s2">&quot;Block1 has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">neo1</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span><span class="si">}</span><span class="s2"> segments while &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;block2 has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">neo2</span><span class="o">.</span><span class="n">segments</span><span class="p">)</span><span class="si">}</span><span class="s2"> segments&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">seg1</span><span class="p">,</span> <span class="n">seg2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">neo1</span><span class="o">.</span><span class="n">segments</span><span class="p">,</span> <span class="n">neo2</span><span class="o">.</span><span class="n">segments</span><span class="p">):</span>
         <span class="n">compare_segments</span><span class="p">(</span><span class="n">seg1</span><span class="p">,</span> <span class="n">seg2</span><span class="p">,</span> <span class="n">same_data</span><span class="p">,</span> <span class="n">same_length</span><span class="p">)</span></div>
 </pre></div>
@@ -271,7 +265,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

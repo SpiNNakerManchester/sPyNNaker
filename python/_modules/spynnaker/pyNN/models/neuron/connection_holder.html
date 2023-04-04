@@ -55,7 +55,8 @@
 
 
 <span class="k">class</span> <span class="nc">ConnectionHolder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Holds a set of connections to be returned in a PyNN-specific format</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Holds a set of connections to be returned in a PyNN-specific format.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span>
@@ -106,9 +107,11 @@
 <span class="sd">            A list of tuples of field names and fixed values to be appended</span>
 <span class="sd">            to the other fields per connection, formatted as</span>
 <span class="sd">            `[(field_name, value), ...]`.</span>
-<span class="sd">            Note that if the field is to be returned, the name must also</span>
-<span class="sd">            appear in data_items_to_return, which determines the order of</span>
-<span class="sd">            items in the result</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                If the field is to be returned, the name must also</span>
+<span class="sd">                appear in data_items_to_return, which determines the order of</span>
+<span class="sd">                items in the result.</span>
 <span class="sd">        :type fixed_values: list(tuple(str,int)) or None</span>
 <span class="sd">        :param notify:</span>
 <span class="sd">            A callback to call when the connections have all been added.</span>
@@ -127,7 +130,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_values</span> <span class="o">=</span> <span class="n">fixed_values</span>
 
 <div class="viewcode-block" id="ConnectionHolder.add_connections"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder.add_connections">[docs]</a>    <span class="k">def</span> <span class="nf">add_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Add connections to the holder to be returned</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add connections to the holder to be returned.</span>
 
 <span class="sd">        :param ~numpy.ndarray connections:</span>
 <span class="sd">            The connection to add, as a numpy structured array of</span>
@@ -139,20 +143,23 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The connections stored</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The connections stored.</span>
 
 <span class="sd">        :rtype: list(~numpy.ndarray)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span>
 
 <div class="viewcode-block" id="ConnectionHolder.finish"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder.finish">[docs]</a>    <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Finish adding connections</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finish adding connections.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__notify</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__notify</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_data_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Merges the connections into the result data format</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merges the connections into the result data format.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If there are already merged connections cached, return those</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_items</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -182,7 +189,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_values</span><span class="p">:</span>
             <span class="c1"># Generate a numpy type for the fixed values</span>
             <span class="n">fixed_dtypes</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">field</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_values</span><span class="p">]</span>
 
             <span class="c1"># Get the actual data as a record array</span>
@@ -315,7 +322,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

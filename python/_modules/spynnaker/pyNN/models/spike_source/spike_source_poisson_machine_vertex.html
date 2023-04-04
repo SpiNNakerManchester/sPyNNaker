@@ -50,7 +50,7 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 <span class="kn">import</span> <span class="nn">struct</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
@@ -96,14 +96,16 @@
 
 
 <span class="k">def</span> <span class="nf">get_n_rates</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">rate_data</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; How many rates there are to be stored in total</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    How many rates there are to be stored in total.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rate_data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
         <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">get_params_bytes</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Gets the size of the Poisson parameters in bytes</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the size of the Poisson parameters in bytes.</span>
 
 <span class="sd">    :param int n_atoms: How many atoms to account for</span>
 <span class="sd">    :rtype: int</span>
@@ -112,7 +114,8 @@
 
 
 <span class="k">def</span> <span class="nf">get_rates_bytes</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">n_rates</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Gets the size of the Poisson rates in bytes</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the size of the Poisson rates in bytes.</span>
 
 <span class="sd">    :param int n_atoms: How many atoms to account for</span>
 <span class="sd">    :param int n_rates: How many rates to account for</span>
@@ -123,7 +126,8 @@
 
 
 <span class="k">def</span> <span class="nf">get_expander_rates_bytes</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">n_rates</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Gets the size of the Poisson rates in bytes</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the size of the Poisson rates in bytes.</span>
 
 <span class="sd">    :param int n_atoms: How many atoms to account for</span>
 <span class="sd">    :param int n_rates: How many rates to account for</span>
@@ -134,7 +138,9 @@
 
 
 <span class="k">def</span> <span class="nf">get_sdram_edge_params_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Gets the size of the Poisson SDRAM region in bytes</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the size of the Poisson SDRAM region in bytes.</span>
+
 <span class="sd">    :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -143,7 +149,8 @@
 
 
 <span class="k">def</span> <span class="nf">_u3232_to_uint64</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Convert data to be written in U3232 to uint64 array</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert data to be written in U3232 to uint64 array.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">array</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">U3232</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
         <span class="n">DataType</span><span class="o">.</span><span class="n">U3232</span><span class="o">.</span><span class="n">numpy_typename</span><span class="p">)</span>
@@ -200,23 +207,34 @@
         <span class="s2">&quot;__sdram_partition&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__rate_changed&quot;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS">[docs]</a>    <span class="k">class</span> <span class="nc">POISSON_SPIKE_SOURCE_REGIONS</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS">[docs]</a>    <span class="k">class</span> <span class="nc">POISSON_SPIKE_SOURCE_REGIONS</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Memory region IDs for the the Poisson source code.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#: System control information (simulation timestep, etc.)</span>
         <span class="n">SYSTEM_REGION</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1">#: The parameters for the Poisson generator.</span>
         <span class="n">POISSON_PARAMS_REGION</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1">#: Spike rates (and the times at which they apply).</span>
         <span class="n">RATES_REGION</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="c1">#: Record of when spikes were actually sent.</span>
         <span class="n">SPIKE_HISTORY_REGION</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="c1">#: Provenance data.</span>
         <span class="n">PROVENANCE_REGION</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="c1">#: Profiler data.</span>
         <span class="n">PROFILER_REGION</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="c1">#: Parameters for an SDRAM edge.</span>
         <span class="n">SDRAM_EDGE_PARAMS</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="c1">#: Data for the on-chip connection generator binaries.</span>
         <span class="n">EXPANDER_REGION</span> <span class="o">=</span> <span class="mi">7</span></div>
 
     <span class="n">PROFILE_TAG_LABELS</span> <span class="o">=</span> <span class="p">{</span>
         <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;TIMER&quot;</span><span class="p">,</span>
         <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;PROB_FUNC&quot;</span><span class="p">}</span>
 
-<div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES">[docs]</a>    <span class="k">class</span> <span class="nc">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Entries for the provenance data generated by standard neuron \</span>
-<span class="sd">            models.</span>
+<div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES">[docs]</a>    <span class="k">class</span> <span class="nc">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Entries for the provenance data generated by standard neuron models.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#: The number of pre-synaptic events</span>
         <span class="n">TDMA_MISSED_SLOTS</span> <span class="o">=</span> <span class="mi">0</span></div>
@@ -256,7 +274,7 @@
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_provenance_region_id</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_provenance_region_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">PROVENANCE_REGION</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">PROVENANCE_REGION</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_n_additional_data_items</span><span class="p">)</span>
@@ -272,20 +290,19 @@
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.get_recording_region_base_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.get_recording_region_base_address">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReceiveBuffersToHost</span><span class="o">.</span><span class="n">get_recording_region_base_address</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_recording_region_base_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
-            <span class="n">placement</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SPIKE_HISTORY_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+            <span class="n">placement</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SPIKE_HISTORY_REGION</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.get_profile_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.get_profile_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasProfileData</span><span class="o">.</span><span class="n">get_profile_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_profile_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">get_profiling_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">PROFILER_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">PROFILER_REGION</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">PROFILE_TAG_LABELS</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.parse_extra_provenance_items"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.parse_extra_provenance_items">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
                <span class="n">parse_extra_provenance_items</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">parse_extra_provenance_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
         <span class="n">n_times_tdma_fell_behind</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">TDMA_MISSED_SLOTS</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">TDMA_MISSED_SLOTS</span><span class="p">]</span>
 
         <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_tdma_provenance_item</span><span class="p">(</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">n_times_tdma_fell_behind</span><span class="p">)</span></div>
@@ -308,7 +325,6 @@
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.reload_required"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.reload_required">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">reload_required</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">reload_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rate_changed</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_first_machine_time_step</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span></div>
@@ -317,11 +333,8 @@
     <span class="k">def</span> <span class="nf">set_reload_required</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__rate_changed</span> <span class="o">=</span> <span class="n">new_value</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.regenerate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.regenerate_data_specification">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span>
-        <span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">regenerate_data_specification</span><span class="p">)</span>
+<div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.regenerate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.regenerate_data_specification">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">regenerate_data_specification</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">regenerate_data_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
-
         <span class="c1"># write rates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_rates</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
@@ -330,33 +343,24 @@
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.generate_data_specification">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
-<span class="sd">        :param int data_n_time_steps:</span>
-<span class="sd">        :param int first_machine_time_step:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
-
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">*** Spec for SpikeSourcePoisson Instance ***</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># write setup data</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SYSTEM_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="n">SIMULATION_N_BYTES</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SYSTEM_REGION</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SYSTEM_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SYSTEM_REGION</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">()))</span>
 
         <span class="c1"># write recording data</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SPIKE_HISTORY_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SPIKE_HISTORY_REGION</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="n">recording_utilities</span><span class="o">.</span><span class="n">get_recording_header_size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Recording&quot;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SPIKE_HISTORY_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SPIKE_HISTORY_REGION</span><span class="p">)</span>
         <span class="n">sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_recording_sdram_usage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">recorded_region_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="n">sdram</span><span class="o">.</span><span class="n">get_total_sdram</span><span class="p">(</span>
             <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_max_run_time_steps</span><span class="p">())]</span>
@@ -374,19 +378,19 @@
 
         <span class="c1"># write profile data</span>
         <span class="n">profile_utils</span><span class="o">.</span><span class="n">reserve_profile_region</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">PROFILER_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">PROFILER_REGION</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">n_profile_samples</span><span class="p">)</span>
         <span class="n">profile_utils</span><span class="o">.</span><span class="n">write_profile_region_data</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">PROFILER_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">PROFILER_REGION</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">n_profile_samples</span><span class="p">)</span>
 
         <span class="c1"># write SDRAM edge parameters</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SDRAM_EDGE_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SDRAM_EDGE_PARAMS</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;sdram edge params&quot;</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="n">get_sdram_edge_params_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SDRAM_EDGE_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SDRAM_EDGE_PARAMS</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
@@ -422,18 +426,20 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_write_poisson_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Generate Rate data for Poisson spike sources</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate Rate data for Poisson spike sources.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecification spec:</span>
 <span class="sd">            the data specification writer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing Rates for </span><span class="si">{}</span><span class="s2"> poisson sources:</span><span class="se">\n</span><span class="s2">&quot;</span>
-                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing Rates for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="s2">&quot;poisson sources:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">n_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
         <span class="n">n_rates</span> <span class="o">=</span> <span class="n">n_atoms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">max_n_rates</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">RATES_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">RATES_REGION</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="n">get_rates_bytes</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">n_rates</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;PoissonRates&#39;</span><span class="p">)</span>
 
         <span class="c1"># List starts with n_items, so start with 0.  Use arrays to allow</span>
@@ -457,31 +463,31 @@
         <span class="n">data_items</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_items</span><span class="p">]</span>
         <span class="n">data_to_write</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">data_items</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">EXPANDER_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">EXPANDER_REGION</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data_to_write</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Expander&#39;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">EXPANDER_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">EXPANDER_REGION</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">data_to_write</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__rate_changed</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">_write_poisson_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Generate Parameter data for Poisson spike sources</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate Parameter data for Poisson spike sources.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecification spec:</span>
 <span class="sd">            the data specification writer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing Parameters for </span><span class="si">{}</span><span class="s2"> poisson sources:</span><span class="se">\n</span><span class="s2">&quot;</span>
-                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing parameters for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="s2">&quot;Poisson sources:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
-            <span class="n">region</span><span class="o">=</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">POISSON_PARAMS_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">POISSON_PARAMS_REGION</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="n">get_params_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">),</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;PoissonParams&quot;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">POISSON_PARAMS_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">POISSON_PARAMS_REGION</span><span class="p">)</span>
 
         <span class="c1"># Write Key info for this core:</span>
         <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
@@ -545,15 +551,12 @@
 
     <span class="k">def</span> <span class="nf">__poisson_rate_region_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">helpful_functions</span><span class="o">.</span><span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
-            <span class="n">placement</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">RATES_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">placement</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">RATES_REGION</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.read_parameters_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.read_parameters_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">read_parameters_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
-
         <span class="c1"># It is only worth updating the rates when there is a control edge</span>
         <span class="c1"># that can change them</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">incoming_control_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-
             <span class="c1"># locate SDRAM address where the rates are stored</span>
             <span class="n">poisson_rate_region_sdram_address</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__poisson_rate_region_address</span><span class="p">(</span><span class="n">placement</span><span class="p">))</span>
@@ -589,7 +592,7 @@
                       <span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">sdram_machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">n_bytes_for_transfer</span>
         <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
-            <span class="s2">&quot;Unknown post vertex type in edge </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sdram_machine_edge</span><span class="p">))</span></div>
+            <span class="sa">f</span><span class="s2">&quot;Unknown post vertex type in edge </span><span class="si">{</span><span class="n">sdram_machine_edge</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.get_n_keys_for_partition"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonMachineVertex.get_n_keys_for_partition">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_keys_for_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
@@ -633,7 +636,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

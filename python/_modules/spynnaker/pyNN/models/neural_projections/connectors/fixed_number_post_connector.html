@@ -66,8 +66,9 @@
 
 <span class="k">class</span> <span class="nc">FixedNumberPostConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span>
                                <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Connects a fixed number of post-synaptic neurons selected at random,\</span>
-<span class="sd">        to all pre-synaptic neurons.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Connects a fixed number of post-synaptic neurons selected at random,</span>
+<span class="sd">    to all pre-synaptic neurons.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -157,9 +158,9 @@
 
             <span class="c1"># if verbose open a file to output the connectivity</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-                <span class="n">filename</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> \
-                    <span class="s1">&#39;_to_&#39;</span> <span class="o">+</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span> <span class="o">+</span> \
-                    <span class="s1">&#39;_fixednumberpost-conn.csv&#39;</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_to_</span><span class="si">{}</span><span class="s2">_fixednumberpost-conn.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                    <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Output post-connectivity to &#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
                     <span class="n">numpy</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">file_handle</span><span class="p">,</span>
@@ -221,8 +222,9 @@
             <span class="n">this_post_neuron_array</span> <span class="o">&lt;=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">)]</span>
 
     <span class="k">def</span> <span class="nf">_n_post_neurons_in_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Count the number of post neurons in the slice. \</span>
-<span class="sd">            Faster than ``len(_post_neurons_in_slice(...))``.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Count the number of post neurons in the slice.</span>
+<span class="sd">        Faster than ``len(_post_neurons_in_slice(...))``.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        :param int n:</span>
@@ -314,7 +316,7 @@
         <span class="k">return</span> <span class="n">block</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;FixedNumberPostConnector(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_post</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;FixedNumberPostConnector(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_post</span><span class="si">}</span><span class="s2">)&quot;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">allow_self_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -379,7 +381,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

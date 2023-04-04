@@ -115,9 +115,9 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">p_rew</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The period of rewiring.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The period of rewiring.</span>
 
-<span class="sd">        :return: The period of rewiring</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">1.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_rew</span>
@@ -154,13 +154,11 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing partner selection parameters&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">partner_selection</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">structural_projections</span><span class="p">:</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing formation parameters for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">proj</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Writing formation parameters for </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">dynamics</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">synapse_dynamics</span>
             <span class="n">dynamics</span><span class="o">.</span><span class="n">formation</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">structural_projections</span><span class="p">:</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing elimination parameters for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">proj</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Writing elimination parameters for </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">dynamics</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">synapse_dynamics</span>
             <span class="n">dynamics</span><span class="o">.</span><span class="n">elimination</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
                 <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">[</span><span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">])</span></div>
@@ -189,7 +187,8 @@
 
     <span class="k">def</span> <span class="nf">__write_common_rewiring_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">n_pre_pops</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the non-sub-population synapse parameters to the spec.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the non-sub-population synapse parameters to the spec.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            the data spec</span>
@@ -198,8 +197,6 @@
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of the target vertex to generate for</span>
 <span class="sd">        :param int n_pre_pops: the number of pre-populations</span>
-<span class="sd">        :return: None</span>
-<span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">time_step_us</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_us</span><span class="p">()</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing common rewiring data&quot;</span><span class="p">)</span>
@@ -245,9 +242,9 @@
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:</span>
 <span class="sd">            the vertex for which data specs are being prepared</span>
-<span class="sd">        :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \</span>
-<span class="sd">                structural_projections:</span>
-<span class="sd">            Projections that are structural</span>
+<span class="sd">        :param structural_projections: Projections that are structural</span>
+<span class="sd">        :type structural_projections:</span>
+<span class="sd">            list(tuple(ProjectionApplicationEdge,SynapseInformation))</span>
 <span class="sd">        :param machine_edges_by_app:</span>
 <span class="sd">            map of app edge to associated machine edges</span>
 <span class="sd">        :type machine_edges_by_app:</span>
@@ -264,8 +261,7 @@
         <span class="n">lo_atom_index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">structural_projections</span><span class="p">:</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing pre-population info for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">proj</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Writing pre-population info for </span><span class="si">{</span><span class="n">proj</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">app_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
             <span class="n">synapse_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
@@ -321,12 +317,13 @@
     <span class="k">def</span> <span class="nf">__write_post_to_pre_table</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">subpop_index</span><span class="p">,</span> <span class="n">lo_atom_index</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span>
             <span class="n">vertex_slice</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Post to pre table is basically the transpose of the synaptic\</span>
-<span class="sd">            matrix.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Post to pre table is basically the transpose of the synaptic matrix.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
-<span class="sd">        :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \</span>
-<span class="sd">                pop_index:</span>
+<span class="sd">        :param pop_index:</span>
+<span class="sd">        :type pop_index:</span>
+<span class="sd">            dict(tuple(AbstractPopulationVertex,SynapseInformation), int)</span>
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:</span>
 <span class="sd">            the vertex for which data specs are being prepared</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -381,8 +378,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Wrong size of pre-to-pop tables: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">post_to_pre</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Found, </span><span class="si">{</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">s_max</span><span class="si">}</span><span class="s2"> Expected&quot;</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing post-to-pre table of </span><span class="si">{}</span><span class="s2"> words&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_max</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span>
+            <span class="s2">&quot;Writing post-to-pre table of &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">s_max</span><span class="si">}</span><span class="s2"> words&quot;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">post_to_pre</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_structural_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_structural_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span>
@@ -446,31 +444,35 @@
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; initial connectivity as defined via connector</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initial connectivity as defined via connector.</span>
 
 <span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_seeds"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_seeds">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_seeds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Generate a seed for the RNG on chip that is the same for all\</span>
-<span class="sd">            of the cores that have perform structural updates.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a seed for the RNG on chip that is the same for all</span>
+<span class="sd">        of the cores that have perform structural updates.</span>
 
 <span class="sd">        It should be different between application vertices</span>
 <span class="sd">        but the same for the same app_vertex.</span>
-<span class="sd">        It should be different every time called with None.</span>
+<span class="sd">        It should be different every time called with `None`.</span>
 
 <span class="sd">        :param app_vertex:</span>
-<span class="sd">        :type app_vertex: ApplicationVertex or None</span>
+<span class="sd">        :type app_vertex:</span>
+<span class="sd">            ~pacman.model.graphs.application.ApplicationVertex or None</span>
 <span class="sd">        :return: list of random seed (4 words), generated randomly</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.check_initial_delay"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.check_initial_delay">[docs]</a>    <span class="k">def</span> <span class="nf">check_initial_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check that delays can be done without delay extensions</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that delays can be done without delay extensions.</span>
 
 <span class="sd">        :param float max_delay_ms: The maximum delay supported, in milliseconds</span>
-<span class="sd">        :raises Exception: if the delay is out of range</span>
+<span class="sd">        :raises ValueError: if the delay is out of range</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
             <span class="c1"># pylint: disable=unsubscriptable-object</span>
@@ -532,7 +534,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

@@ -74,7 +74,8 @@
 
 
 <span class="k">class</span> <span class="nc">LocalOnlyConvolution</span><span class="p">(</span><span class="n">AbstractLocalOnly</span><span class="p">,</span> <span class="n">AbstractSupportsSignedWeights</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; A convolution synapse dynamics that can process spikes with only DTCM</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A convolution synapse dynamics that can process spikes with only DTCM.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -225,12 +226,13 @@
         <span class="k">return</span> <span class="n">key</span><span class="p">,</span> <span class="n">mask</span>
 
     <span class="k">def</span> <span class="nf">__get_sources_for_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get all the machine vertex sources that will hit the given</span>
-<span class="sd">            application vertex</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all the machine vertex sources that will hit the given</span>
+<span class="sd">        application vertex.</span>
 
 <span class="sd">        :param AbstractPopulationVertex app_vertex:</span>
 <span class="sd">            The vertex being targeted</span>
-<span class="sd">        :rtype: dict(MachineVertex, list(Sources))</span>
+<span class="sd">        :rtype: dict(~.MachineVertex, list(Sources))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sources_for_target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_2d_overlaps</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sources_for_target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -254,8 +256,12 @@
 
     <span class="k">def</span> <span class="nf">__get_rinfo_for_sources</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">key_cache</span><span class="p">,</span> <span class="n">srcs</span><span class="p">,</span> <span class="n">incoming</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the routing information for sources, merging sources that have</span>
-<span class="sd">            the same vertex slice (note this happens in retinas from FPGAs).</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the routing information for sources, merging sources that have</span>
+<span class="sd">        the same vertex slice.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            This happens in retinas from FPGAs.</span>
 
 <span class="sd">        :rtype: list(Source)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -416,7 +422,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

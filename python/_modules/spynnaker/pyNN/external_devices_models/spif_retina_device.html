@@ -70,7 +70,8 @@
 <span class="k">class</span> <span class="nc">SPIFRetinaDevice</span><span class="p">(</span>
         <span class="n">Application2DFPGAVertex</span><span class="p">,</span> <span class="n">PopulationApplicationVertex</span><span class="p">,</span>
         <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">,</span> <span class="n">HasShapeKeyFields</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; A retina device connected to SpiNNaker using a SPIF board.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A retina device connected to SpiNNaker using a SPIF board.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1">#: SPIF outputs to 8 FPGA output links, so we split into (2 x 4), meaning</span>
@@ -100,7 +101,6 @@
                  <span class="n">base_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_x_shift</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">input_y_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">board_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chip_coords</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
 <span class="sd">        :param int pipe: Which pipe on SPIF the retina is connected to</span>
 <span class="sd">        :param int width: The width of the retina in pixels</span>
 <span class="sd">        :param int height: The height of the retina in pixels</span>
@@ -112,24 +112,29 @@
 <span class="sd">            sending</span>
 <span class="sd">        :param base_key:</span>
 <span class="sd">            The key that is common over the whole vertex,</span>
-<span class="sd">            or None to use the pipe number as the key</span>
+<span class="sd">            or `None` to use the pipe number as the key</span>
 <span class="sd">        :type base_key: int or None</span>
 <span class="sd">        :param int input_x_shift:</span>
 <span class="sd">            The shift to get the x coordinate from the input keys sent to SPIF</span>
 <span class="sd">        :param int input_y_shift:</span>
 <span class="sd">            The shift to get the y coordinate from the input keys sent to SPIF</span>
 <span class="sd">        :param board_address:</span>
-<span class="sd">            The IP address of the board to which the FPGA is connected, or None</span>
-<span class="sd">            to use the default board or chip_coords.  Note chip_coords will be</span>
-<span class="sd">            used first if both are specified, with board_address then being</span>
-<span class="sd">            used if the coordinates don&#39;t connect to an FPGA.</span>
+<span class="sd">            The IP address of the board to which the FPGA is connected,</span>
+<span class="sd">            or `None` to use the default board or chip_coords.</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                chip_coords will be used first if both are specified, with</span>
+<span class="sd">                board_address then being used if the coordinates don&#39;t connect</span>
+<span class="sd">                to an FPGA.</span>
 <span class="sd">        :type board_address: str or None</span>
 <span class="sd">        :param chip_coords:</span>
 <span class="sd">            The coordinates of the chip to which the FPGA is connected, or</span>
-<span class="sd">            None to use the default board or board_address.   Note chip_coords</span>
-<span class="sd">            will be used first if board_address is also specified, with</span>
-<span class="sd">            board_address then being used if the coordinates don&#39;t connect to</span>
-<span class="sd">            an FPGA.</span>
+<span class="sd">            `None` to use the default board or board_address.</span>
+
+<span class="sd">            .. note::</span>
+<span class="sd">                chip_coords will be used first if board_address is also</span>
+<span class="sd">                specified, with board_address then being used if the</span>
+<span class="sd">                coordinates don&#39;t connect to an FPGA.</span>
 <span class="sd">        :type chip_coords: tuple(int, int) or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Do some checks</span>
@@ -191,7 +196,8 @@
         <span class="k">return</span> <span class="n">n</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
 
     <span class="k">def</span> <span class="nf">__incoming_fpgas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the incoming FPGA connections</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the incoming FPGA connections.</span>
 
 <span class="sd">        :rtype: list(FPGAConnection)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -200,7 +206,8 @@
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">SPIF_INPUT_FPGA_LINKS</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__outgoing_fpga</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the outgoing FPGA connection (for commands)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the outgoing FPGA connection (for commands).</span>
 
 <span class="sd">        :rtype: FGPA_Connection</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -383,7 +390,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

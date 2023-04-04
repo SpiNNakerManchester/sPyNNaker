@@ -61,7 +61,8 @@
 
 <span class="k">class</span> <span class="nc">PushBotEthernetLaserDevice</span><span class="p">(</span>
         <span class="n">PushBotEthernetDevice</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The Laser of a PushBot</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Laser of a PushBot.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -69,18 +70,17 @@
             <span class="n">start_active_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_total_period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">start_frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timesteps_between_send</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param laser: The PushBotLaser value to control</span>
-<span class="sd">        :type laser:</span>
-<span class="sd">            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser</span>
-<span class="sd">        :param protocol: The protocol instance to get commands from</span>
-<span class="sd">        :type protocol: MunichIoEthernetProtocol</span>
-<span class="sd">        :param start_active_time: The &quot;active time&quot; value to send at the start</span>
-<span class="sd">        :param start_total_period:</span>
+<span class="sd">        :param PushBotLaser laser: The PushBotLaser value to control</span>
+<span class="sd">        :param MunichIoEthernetProtocol protocol:</span>
+<span class="sd">            The protocol instance to get commands from</span>
+<span class="sd">        :param int start_active_time:</span>
+<span class="sd">            The &quot;active time&quot; value to send at the start</span>
+<span class="sd">        :param int start_total_period:</span>
 <span class="sd">            The &quot;total period&quot; value to send at the start</span>
-<span class="sd">        :param start_frequency: The &quot;frequency&quot; to send at the start</span>
-<span class="sd">        :param timesteps_between_send:</span>
-<span class="sd">            The number of timesteps between sending commands to the device,\</span>
-<span class="sd">            or None to use the default</span>
+<span class="sd">        :param int start_frequency: The &quot;frequency&quot; to send at the start</span>
+<span class="sd">        :param int timesteps_between_send:</span>
+<span class="sd">            The number of timesteps between sending commands to the device,</span>
+<span class="sd">            or `None` to use the default</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">laser</span><span class="p">,</span> <span class="n">PushBotLaser</span><span class="p">):</span>
@@ -173,7 +173,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

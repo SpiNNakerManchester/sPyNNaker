@@ -59,16 +59,16 @@
 
 
 <span class="k">class</span> <span class="nc">ThresholdTypeStatic</span><span class="p">(</span><span class="n">AbstractThresholdType</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; A threshold that is a static value.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A threshold that is a static value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__v_thresh&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v_thresh</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param v_thresh: :math:`V_{thresh}`</span>
-<span class="sd">        :type v_thresh:</span>
-<span class="sd">            float, iterable(float), ~pyNN.random.RandomDistribution</span>
-<span class="sd">            or (mapping) function</span>
+<span class="sd">        :type v_thresh: float or iterable(float) or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution or (mapping) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="p">[</span><span class="n">Struct</span><span class="p">([(</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span> <span class="n">V_THRESH</span><span class="p">)])],</span>
@@ -127,7 +127,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

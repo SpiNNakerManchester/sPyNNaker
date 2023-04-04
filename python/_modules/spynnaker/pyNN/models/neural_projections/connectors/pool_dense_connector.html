@@ -77,8 +77,8 @@
 
 <span class="k">class</span> <span class="nc">PoolDenseConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Where the pre- and post-synaptic populations are considered as a 2D\</span>
-<span class="sd">    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\</span>
+<span class="sd">    Where the pre- and post-synaptic populations are considered as a 2D</span>
+<span class="sd">    array. Connect every post(row, col) neuron to many pre(row, col, kernel)</span>
 <span class="sd">    through a (kernel) set of weights and/or delays.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -96,15 +96,17 @@
                  <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param weights:</span>
-<span class="sd">            The synaptic strengths</span>
-<span class="sd">            Can be:</span>
+<span class="sd">            The synaptic strengths. Can be:</span>
+
 <span class="sd">            * single value: the same value will be used for all weights</span>
-<span class="sd">            * list: the total number of elements must be\</span>
-<span class="sd">                    (num after pooling * num post)</span>
-<span class="sd">            * numpy.ndarray: As above for list</span>
-<span class="sd">            * RandomDistribution: weights will be drawn at random</span>
+<span class="sd">            * :py:class:`list`: the total number of elements must be</span>
+<span class="sd">              (num after pooling * num post)</span>
+<span class="sd">            * :py:class:`~numpy.ndarray`: As above for list</span>
+<span class="sd">            * :py:class:`~spynnaker.pyNN.RandomDistribution`:</span>
+<span class="sd">              weights will be drawn at random</span>
 <span class="sd">        :type weights:</span>
-<span class="sd">            int or float or list or numpy.ndarray or RandomDistribution</span>
+<span class="sd">            int or float or list(int or float) or ~numpy.ndarray or</span>
+<span class="sd">            ~spynnaker.pyNN.RandomDistribution</span>
 <span class="sd">        :param pool_shape:</span>
 <span class="sd">            Shape of average pooling. If a single value is provided, it will</span>
 <span class="sd">            be used for every dimension, otherwise must be the same number of</span>
@@ -114,7 +116,7 @@
 <span class="sd">            Jumps between pooling regions. If a single value is provided, the</span>
 <span class="sd">            same stride will be used for all dimensions, otherwise must be</span>
 <span class="sd">            the same number of values as there are dimensions in the source.</span>
-<span class="sd">            If None, and pool_shape is provided, pool_stride will be set to</span>
+<span class="sd">            If `None`, and pool_shape is provided, pool_stride will be set to</span>
 <span class="sd">            pool_shape.</span>
 <span class="sd">        :type pool_stride: int or tuple(int) or None</span>
 <span class="sd">        :param str positive_receptor_type:</span>
@@ -142,14 +144,23 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">positive_receptor_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__positive_receptor_type</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">negative_receptor_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__negative_receptor_type</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: ~numpy.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weights</span>
 
     <span class="k">def</span> <span class="nf">__decode_weights</span><span class="p">(</span>
@@ -209,7 +220,8 @@
             <span class="n">pre_shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_stride</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_n_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_shape</span><span class="p">,</span> <span class="n">post_shape</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the expected number of weights</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the expected number of weights.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_pre_in_post_shape</span><span class="p">(</span><span class="n">pre_shape</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">post_shape</span><span class="p">)</span>
@@ -282,10 +294,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__weights</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__pre_as_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_coords</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write pre coords as post coords.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write pre coords as post coords.</span>
 
-<span class="sd">        :param Iterable pre_coords: An iterable of (x, y) coordinates</span>
-<span class="sd">        :rtype: numpy.ndarray</span>
+<span class="sd">        :param ~collections.abc.Iterable pre_coords:</span>
+<span class="sd">            An iterable of (x, y) coordinates</span>
+<span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pre_coords</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_stride</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -293,6 +307,11 @@
         <span class="k">return</span> <span class="n">coords</span>
 
 <div class="viewcode-block" id="PoolDenseConnector.local_only_n_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.PoolDenseConnector.local_only_n_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">local_only_n_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_slices</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param iterable(~pacman.model.graphs.common.Slice) incoming_slices:</span>
+<span class="sd">        :param int n_post_atoms:</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">n_weights</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_n_sub_weights</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">)</span>
                      <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">incoming_slices</span><span class="p">]</span>
         <span class="n">n_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">n_weights</span><span class="p">]</span>
@@ -305,7 +324,16 @@
 <div class="viewcode-block" id="PoolDenseConnector.write_local_only_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.PoolDenseConnector.write_local_only_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_local_only_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">n_colour_bits</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">        :param ~pacman.model.graphs.application.ApplicationEdge app_edge:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
+<span class="sd">        :param int key:</span>
+<span class="sd">        :param int mask:</span>
+<span class="sd">        :param int n_colour_bits:</span>
+<span class="sd">        :param weight_scales:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Write source key info</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
@@ -386,8 +414,9 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">final_weights</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">__recip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Compute the reciprocal of a number as an signed 1-bit integer,</span>
-<span class="sd">            14-bit fractional fixed point number, encoded in an integer</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the reciprocal of a number as an signed 1-bit integer,</span>
+<span class="sd">        14-bit fractional fixed point number, encoded in an integer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">14</span><span class="p">)))</span>
 </pre></div>
@@ -428,7 +457,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>

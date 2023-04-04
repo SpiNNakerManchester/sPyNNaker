@@ -58,8 +58,9 @@
 
 
 <span class="k">class</span> <span class="nc">ArrayConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Make connections using an array of integers based on the IDs\</span>
-<span class="sd">        of the neurons in the pre- and post-populations.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make connections using an array of integers based on the IDs</span>
+<span class="sd">    of the neurons in the pre- and post-populations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -183,7 +184,7 @@
         <span class="k">return</span> <span class="n">block</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;ArrayConnector(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__array</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;ArrayConnector(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__array</span><span class="si">}</span><span class="s2">)&quot;</span>
 </pre></div>
 
             <div class="clearer"></div>
@@ -222,7 +223,7 @@
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014-2021.
+        &#169; Copyright 2014-2023.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
