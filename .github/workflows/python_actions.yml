@@ -119,8 +119,8 @@ jobs:
         install: true
     - name: Install matplotlib
       uses: ./support/actions/install-matplotlib
-    - name: Setup
-      uses: ./support/actions/run-setup
+    - name: Install
+      uses: ./support/actions/run-install
     - name: Setup PyNN
       uses: ./support/actions/pynn-setup
 
