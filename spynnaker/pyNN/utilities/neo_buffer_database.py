@@ -597,7 +597,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param int base_key:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param tuple(int) atoms_shape:
-        :param int n_colour_bits
+        :param int n_colour_bits:
         :return: all recording indexes spikes or not
         :rtype: list(int)
         """
@@ -640,7 +640,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
         :param tuple(int) atoms_shape:
-        :param int n_colour_bits
+        :param int n_colour_bits:
         :return: numpy array of spike ids and spike times, all ids recording
         :rtype: tuple(~numpy.ndarray, list(int))
         """
@@ -764,7 +764,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param list(int) view_indexes:
         :param buffer_type:
         :param tuple(int) atoms_shape:
-        :param int n_colour_bits
+        :param int n_colour_bits:
         :param str variable:
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -1057,7 +1057,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param str variable:
         :param ~neo.core.Block block: neo block
         :param ~neo.core.Segment segment: Segment to add data to
-        :param float t_stop
+        :param float t_stop:
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
@@ -1109,7 +1109,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param ~csv.writer csv_writer: Open csv writer to write to
         :param view_indexes:
         :type view_indexes: None, ~numpy.array or list(int)
-        :param float t_stop
+        :param float t_stop:
         """
         (rec_id, data_type, buffer_type, t_start, sampling_interval_ms,
          pop_size, units, atoms_shape, n_colour_bits) = \

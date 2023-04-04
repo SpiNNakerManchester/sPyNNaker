@@ -204,9 +204,9 @@ class SynapseDynamicsStructuralCommon(
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             the vertex for which data specs are being prepared
-        :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \
-                structural_projections:
-            Projections that are structural
+        :param structural_projections: Projections that are structural
+        :type structural_projections:
+            list(tuple(ProjectionApplicationEdge,SynapseInformation))
         :param machine_edges_by_app:
             map of app edge to associated machine edges
         :type machine_edges_by_app:
@@ -283,8 +283,9 @@ class SynapseDynamicsStructuralCommon(
         Post to pre table is basically the transpose of the synaptic matrix.
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \
-                pop_index:
+        :param pop_index:
+        :type pop_index:
+            dict(tuple(AbstractPopulationVertex,SynapseInformation), int)
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             the vertex for which data specs are being prepared
         :param ~pacman.model.graphs.common.Slice vertex_slice:

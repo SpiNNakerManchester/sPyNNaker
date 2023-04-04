@@ -289,7 +289,7 @@ class PoolDenseConnector(AbstractConnector):
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param int key:
-        :param int mask
+        :param int mask:
         :param int n_colour_bits:
         :param weight_scales:
         """

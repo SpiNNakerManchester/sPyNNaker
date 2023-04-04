@@ -24,9 +24,9 @@ class SpYNNakerConnectionHolderGenerator(object):
 
     def __call__(self, application_graph):
         """
-        :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph:
-            app graph
+        :param application_graph: app graph
+        :type application_graph:
+            ~pacman.model.graphs.application.ApplicationGraph
         :return: the set of connection holders for after DSG generation
         :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation),
             ConnectionHolder)

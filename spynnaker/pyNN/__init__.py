@@ -17,7 +17,8 @@ The :py:mod:`spynnaker.pyNN` package contains the front end specifications
 and implementation for the PyNN High-level API
 (https://neuralensemble.org/trac/PyNN).
 
-This package contains the profile of that code for PyNN 0.9
+This package contains the profile of that code for PyNN 0.9.
+
 """
 
 # common imports
@@ -319,7 +320,8 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :param extra_params: other keyword arguments used to configure PyNN
     :return: MPI rank (always 0 on SpiNNaker)
     :rtype: int
-    :raises ConfigurationException:
+    :raises \
+        ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
         if both ``n_chips_required`` and ``n_boards_required`` are used.
     """
     # pylint: disable=global-statement

@@ -364,9 +364,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             back to S1615 values
         :param list(int) weight_scales:
             The scale to apply to weights to encode them in the 16-bit synapses
-        :param list(~pacman.model.graphs.machine.MachineVertex) \
-                synapse_vertices:
-            A list to add the core to
+        :param synapse_vertices: A list to add the core to
+        :type synapse_vertices:
+            list(~pacman.model.graphs.machine.MachineVertex)
         :param PopulationNeuronsMachineVertex neuron_vertex:
             The neuron vertex the synapses will feed into
         :param int atoms_per_core: The maximum atoms per core
@@ -408,9 +408,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             References to the synapse regions
         :param ~pacman.model.resources.AbstractSDRAM shared_synapse_sdram:
         :param feedback_partition:
-        :param list(~pacman.model.graphs.machine.MachineVertex) \
-                synapse_vertices:
-            A list to add the core to
+        :param synapse_vertices: A list to add the core to
+        :type synapse_vertices:
+            list(~pacman.model.graphs.machine.MachineVertex)
         :param PopulationNeuronsMachineVertex neuron_vertex:
             The neuron vertex the synapses will feed into
         """
