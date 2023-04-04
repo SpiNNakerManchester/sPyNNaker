@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pyNN.random import RandomDistribution as _PynnRandomDistribution
+import pyNN.random
 # This file is to work around a Sphinx bug
 
 
-class RandomDistribution(_PynnRandomDistribution):
+class RandomDistribution(pyNN.random.RandomDistribution):
     """
     Class which defines a next(n) method which returns an array of ``n``
     random numbers from a given distribution.
