@@ -28,8 +28,9 @@ TYPE = "type"
 
 
 class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
-    """ A threshold type that can send multicast keys with the value of\
-        membrane voltage as the payload
+    """
+    A threshold type that can send multicast keys with the value of
+    membrane voltage as the payload.
     """
     __slots__ = ["__devices"]
 

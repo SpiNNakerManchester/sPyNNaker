@@ -25,7 +25,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
     """
-    See UtilsDataWriter
+    See :py:class:`~spinn_utilities.data.utils_data_writer.UtilsDataWriter`.
 
     This class is designed to only be used directly by AbstractSpinnakerBase
     and its subclasses and within the PyNN repositories unittests.
@@ -60,17 +60,17 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
     def set_up_timings_and_delay(
             self, simulation_time_step_us, time_scale_factor, min_delay):
         """
-
         :param simulation_time_step_us:
             An explicitly specified time step for the simulation in
             microseconds.
-            If None, the value is read from the config
+            If `None`, the value is read from the config
         :type simulation_time_step_us: int or None
         :param time_scale_factor:
             An explicitly specified time scale factor for the simulation.
-            If None, the value is read from the config
+            If `None`, the value is read from the config
         :type time_scale_factor: float or None
-        :param min_delay: new value or None to say use simulation_time_step_ms
+        :param min_delay:
+            new value or `None` to say use simulation_time_step_ms
         :type min_delay: int, float or None
         """
         try:
@@ -82,9 +82,10 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
 
     def _set_min_delay(self, min_delay):
         """
-        Sets a min delay or accepts None to use simulation_time_step_ms
+        Sets a min delay or accepts `None` to use simulation_time_step_ms.
 
-        :param min_delay: new value or None to say use simulation_time_step_ms
+        :param min_delay:
+            new value or `None` to say use simulation_time_step_ms
         :type min_delay: int, float or None
         """
         if min_delay is None:
@@ -105,7 +106,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
             raise ConfigurationException(
                 f'invalid min_delay {min_delay} '
                 f'must be a multiple of simulation time step in microseconds '
-                f' {self.get_simulation_time_step_ms()}')
+                f'{self.get_simulation_time_step_ms()}')
 
         self.__spy_data._min_delay = min_delay
 

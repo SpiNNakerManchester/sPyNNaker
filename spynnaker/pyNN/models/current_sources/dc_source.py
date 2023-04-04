@@ -21,8 +21,8 @@ from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
 
 
 class DCSource(AbstractCurrentSource):
-    """ Current source with amplitude turned on at "start" and off at "stop"
-
+    """
+    Current source with amplitude turned on at "start" and off at "stop".
     """
     __slots__ = [
         "__amplitude",
@@ -32,6 +32,11 @@ class DCSource(AbstractCurrentSource):
         "__parameter_types"]
 
     def __init__(self, amplitude=0.0, start=0.0, stop=0.0):
+        """
+        :param float amplitude:
+        :param float start:
+        :param float stop:
+        """
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
         self.__amplitude = amplitude
@@ -53,18 +58,13 @@ class DCSource(AbstractCurrentSource):
 
         super().__init__()
 
+    @overrides(AbstractCurrentSource.set_parameters)
     def set_parameters(self, **parameters):
-        """ Set the current source parameters
-
-        :param parameters: the parameters to set
-        """
         for key, value in parameters.items():
             if key not in self.__parameters.keys():
                 # throw an exception
-                msg = "{} is not a parameter of {}".format(key, self)
-                raise SpynnakerException(msg)
-            else:
-                self.__parameters[key] = value
+                raise SpynnakerException(f"{key} is not a parameter of {self}")
+            self.__parameters[key] = value
 
         # Parameters have been set, so if multi-run then it will have been
         # injected already; if not then it can just be ignored
@@ -75,34 +75,18 @@ class DCSource(AbstractCurrentSource):
     @property
     @overrides(AbstractCurrentSource.get_parameters)
     def get_parameters(self):
-        """ Get the parameters of the current source
-
-        :rtype dict(str, Any)
-        """
         return self.__parameters
 
     @property
     @overrides(AbstractCurrentSource.get_parameter_types)
     def get_parameter_types(self):
-        """ Get the parameters of the current source
-
-        :rtype dict(str, Any)
-        """
         return self.__parameter_types
 
     @property
     @overrides(AbstractCurrentSource.current_source_id)
     def current_source_id(self):
-        """ The ID of the current source.
-
-        :rtype: int
-        """
         return CurrentSourceIDs.DC_SOURCE.value
 
     @overrides(AbstractCurrentSource.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self):
-        """ The sdram usage of the current source.
-
-        :rtype: int
-        """
         return len(self.__parameters) * BYTES_PER_WORD

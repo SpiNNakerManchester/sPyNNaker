@@ -42,8 +42,9 @@ NEUROMODULATION_TARGETS = {
 class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics,
         AbstractGenerateOnMachine):
-    """ The dynamics of a synapse that changes over time using a \
-        Spike Timing Dependent Plasticity (STDP) rule.
+    """
+    The dynamics of a synapse that changes over time using a
+    Spike Timing Dependent Plasticity (STDP) rule.
     """
 
     __slots__ = [
@@ -163,7 +164,7 @@ class SynapseDynamicsSTDP(
             if hasattr(obj, key):
                 return getattr(obj, key)
         raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
+            f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics.set_value)
     def set_value(self, key, value):
@@ -173,7 +174,7 @@ class SynapseDynamicsSTDP(
                 SpynnakerDataView.set_requires_mapping()
                 return
         raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
+            f"Type {type(self)} does not have parameter {key}")
 
     @property
     def weight_dependence(self):
@@ -191,7 +192,8 @@ class SynapseDynamicsSTDP(
 
     @property
     def dendritic_delay_fraction(self):
-        """ Settable.
+        """
+        Settable.
 
         :rtype: float
         """
@@ -203,7 +205,8 @@ class SynapseDynamicsSTDP(
 
     @property
     def backprop_delay(self):
-        """ Settable.
+        """
+        Settable.
 
         :rtype: bool
         """
@@ -305,9 +308,8 @@ class SynapseDynamicsSTDP(
     def __get_n_connections(self, n_connections, check_length_padded=True):
         """
         :param int n_connections:
-        :rtype: int
         :param bool check_length_padded:
-        :rtype: bool
+        :rtype: int
         """
         synapse_structure = self.__timing_dependence.synaptic_structure
         if self.__pad_to_length is not None and check_length_padded:

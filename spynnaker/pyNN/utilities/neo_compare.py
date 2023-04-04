@@ -16,7 +16,8 @@
 
 
 def compare_spiketrain(spiketrain1, spiketrain2, same_length=True):
-    """ Checks two Spiketrains have the exact same data
+    """
+    Checks two Spiketrains have the exact same data
 
     :param ~neo.core.SpikeTrain spiketrain1: first spiketrain
     :param ~neo.core.SpikeTrain spiketrain2: second spiketrain
@@ -24,30 +25,28 @@ def compare_spiketrain(spiketrain1, spiketrain2, same_length=True):
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional spikes after the first ends. This is used to
         compare data extracted part way with data extracted at the end.
-    :rtype: None
     :raises AssertionError: If the spiketrains are not equal
     """
     id1 = spiketrain1.annotations['source_index']
     id2 = spiketrain2.annotations['source_index']
     if id1 != id2:
         raise AssertionError(
-            "Different annotations['source_index'] found {} and {}".format(
-                id1, id2))
+            f"Different annotations['source_index'] found {id1} and {id2}")
     if same_length and len(spiketrain1) != len(spiketrain2):
         raise AssertionError(
-            "spiketrains1 has {} spikes while spiketrains2 as {} for ID {}"
-            .format(len(spiketrain1), len(spiketrain2), id1))
+            f"spiketrains1 has {len(spiketrain1)} spikes while spiketrains2 "
+            f"has {len(spiketrain2)} for ID {id1}")
     for spike1, spike2 in zip(spiketrain1, spiketrain2):
         if spike1 != spike2:
             # print(id1, spiketrain1, spiketrain2)
             raise AssertionError(
-                "spike1 is {} while spike2 is {} for ID {}".format(
-                    spike1, spike2, id1))
+                f"spike1 is {spike1} while spike2 is {spike2} for ID {id1}")
 
 
 def compare_spiketrains(
         spiketrains1, spiketrains2, same_data=True, same_length=True):
-    """ Check two Lists of SpikeTrains have the exact same data
+    """
+    Check two Lists of SpikeTrains have the exact same data
 
     :param list(~neo.core.SpikeTrain) spiketrains1:
         First list SpikeTrains to compare
@@ -67,15 +66,15 @@ def compare_spiketrains(
         return
     if len(spiketrains1) != len(spiketrains2):
         raise AssertionError(
-            "spiketrains1 has {} spiketrains while spiketrains2 as {} "
-            "analogsignalarrays".format(
-                len(spiketrains1), len(spiketrains2)))
+            f"spiketrains1 has {len(spiketrains1)} spiketrains while "
+            f"spiketrains2 fas {len(spiketrains2)} analogsignalarrays")
     for spiketrain1, spiketrain2 in zip(spiketrains1, spiketrains2):
         compare_spiketrain(spiketrain1, spiketrain2, same_length)
 
 
 def compare_analogsignal(as1, as2, same_length=True):
-    """ Compares two analogsignal Objects to see if they are the same
+    """
+    Compares two analogsignal Objects to see if they are the same.
 
     :param ~neo.core.AnalogSignal as1:
         first analogsignal holding list of individual analogsignal Objects
@@ -92,47 +91,45 @@ def compare_analogsignal(as1, as2, same_length=True):
 
     if as1.name != as2.name:
         raise AssertionError(
-            "analogsignalarray1 has name {} while analogsignalarray1 has {}"
-            .format(as1.name, as2.name))
+            f"analogsignalarray1 has name {as1.name} while "
+            f"analogsignalarray1 has {as2.name}")
 
     if same_length and len(as1_index) != len(as2_index):
         raise AssertionError(
-            "channel_index 1 has len {} while channel_index 2 has {} for {}"
-            .format(len(as1_index), len(as2_index), as1.name))
+            f"channel_index 1 has len {len(as1_index)} while "
+            f"channel_index 2 has {len(as2_index)} for {as1.name}")
 
     for id1, id2 in zip(as1_index, as2_index):
         if id1 != id2:
             raise AssertionError(
-                "ID 1 is {} while ID 2 is {} for {}".format(
-                    id1, id2, as1.name))
+                f"ID 1 is {id1} while ID 2 is {id2} for {as1.name}")
 
     if same_length and len(as1.times) != len(as2.times):
         raise AssertionError(
-            "times 1 has len {} while times 2 has {} for {}".format(
-                len(as1.times), len(as2.times), as1.name))
+            f"times 1 has len {len(as1.times)} while "
+            f"times 2 has {len(as2.times)} for {as1.name}")
 
     for time1, time2 in zip(as1.times, as2.times):
         if time1 != time2:
             raise AssertionError(
-                "time 1 is {} while time 2 is {} for {}".format(
-                    time1, time2, as1.name))
+                f"time 1 is {time1} while time 2 is {time2} for {as1.name}")
 
     if same_length and len(as1) != len(as2):
         raise AssertionError(
-            "analogsignal 1 has len {} while analogsignal 2 has {} for {}"
-            .format(len(as1), len(as2), as1.name))
+            f"analogsignal 1 has len {len(as1)} while "
+            f"analogsignal 2 has {len(as2)} for {as1.name}")
 
     for signal1, signal2 in zip(as1, as2):
         # print(signal1, signal2)
         if len(signal1) != len(signal2):
             raise AssertionError(
-                "signal 1 has len {} while signal 2 has {} for {}".format(
-                    len(signal1), len(signal2), as1.name))
+                f"signal 1 has len {len(signal1)} while "
+                f"signal 2 has {len(signal2)} for {as1.name}")
         for value1, value2 in zip(signal1, signal2):
             if value1 != value2:
                 raise AssertionError(
-                    "value 1 is {} while value2 is {} for {}".format(
-                        value1, value2, as1.name))
+                    f"value 1 is {value1} while "
+                    f"value 2 is {value1} for {as1.name}")
 
 
 def compare_segments(seg1, seg2, same_data=True, same_length=True):
@@ -155,26 +152,23 @@ def compare_segments(seg1, seg2, same_data=True, same_length=True):
 
     if same_data and len(seg1_analogsignals) != len(seg2_analogsignals):
         raise AssertionError(
-            "Segment1 has {} analogsignalarrays while Segment2 as {} "
-            "analogsignalarrays".format(
-                len(seg1_analogsignals), len(seg1_analogsignals)))
+            f"Segment1 has {len(seg1_analogsignals)} analogsignalarrays while "
+            f"Segment2 has {len(seg1_analogsignals)} analogsignalarrays")
 
     for analogsignal1 in seg1_analogsignals:
         name = analogsignal1.name
         filtered = seg2.filter(name=name)
-        if not filtered:
-            if same_data:
-                raise AssertionError(
-                    "Segment1 has {} data while Segment2 does not".format(
-                        name))
-        else:
-            analogsignal2 = seg2.filter(name=name)[0]
-            compare_analogsignal(analogsignal1, analogsignal2, same_length)
+        if (not filtered) and same_data:
+            raise AssertionError(
+                f"Segment1 has {name} data while Segment2 does not")
+        analogsignal2 = seg2.filter(name=name)[0]
+        compare_analogsignal(analogsignal1, analogsignal2, same_length)
 
 
 def compare_blocks(
         neo1, neo2, same_runs=True, same_data=True, same_length=True):
-    """ Compares two neo Blocks to see if they hold the same data.
+    """
+    Compares two neo Blocks to see if they hold the same data.
 
     :param ~neo.core.Block neo1: First block to check
     :param ~neo.core.Block neo2: Second block to check
@@ -191,7 +185,7 @@ def compare_blocks(
     """
     if same_runs and len(neo1.segments) != len(neo2.segments):
         raise AssertionError(
-            "Block1 has {} segments while block2 as {} segments".format(
-                len(neo1.segments), len(neo2.segments)))
+            f"Block1 has {len(neo1.segments)} segments while "
+            f"block2 has {len(neo2.segments)} segments")
     for seg1, seg2 in zip(neo1.segments, neo2.segments):
         compare_segments(seg1, seg2, same_data, same_length)

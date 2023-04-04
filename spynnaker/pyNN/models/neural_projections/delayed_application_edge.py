@@ -15,7 +15,6 @@ from pacman.model.graphs.application import ApplicationEdge
 
 
 class DelayedApplicationEdge(ApplicationEdge):
-
     __slots__ = [
         "__synapse_information",
         "__undelayed_edge"]
@@ -59,7 +58,8 @@ class DelayedApplicationEdge(ApplicationEdge):
 
     @property
     def undelayed_edge(self):
-        """ Get the edge that for projections without extended delays
+        """
+        The edge for projections without extended delays.
 
         :rtype: ProjectionApplicationEdge
         """

@@ -19,18 +19,16 @@ from spinn_front_end_common.abstract_models import (
 
 class AbstractPushBotRetinaDevice(
         AbstractSendMeMulticastCommandsVertex):
-    """ An abstraction of a silicon retina attached to a SpiNNaker system.
+    """
+    An abstraction of a silicon retina attached to a SpiNNaker system.
     """
 
     def __init__(self, protocol, resolution):
         """
         :param protocol:
         :type protocol:
-            MunichIoEthernetProtocol or
-            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
-        :param resolution:
-        :type resolution:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
+            MunichIoEthernetProtocol or MunichIoSpiNNakerLinkProtocol
+        :param PushBotRetinaResolution resolution:
         """
         self._protocol = protocol
         self._resolution = resolution

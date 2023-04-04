@@ -28,17 +28,14 @@ class PushBotEthernetRetinaDevice(
             injector_port=None, local_host=None, local_port=None,
             retina_injector_label="PushBotRetinaInjector"):
         """
-        :param protocol:
-        :type protocol: MunichIoEthernetProtocol
-        :param resolution:
-        :type resolution:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
-        :param pushbot_ip_address:
-        :param pushbot_port:
-        :param injector_port:
-        :param local_host:
-        :param local_port:
-        :param retina_injector_label:
+        :param MunichIoEthernetProtocol protocol:
+        :param PushBotRetinaResolution resolution:
+        :param str pushbot_ip_address:
+        :param int pushbot_port:
+        :param int injector_port:
+        :param str local_host:
+        :param int local_port:
+        :param str retina_injector_label:
         """
         # pylint: disable=too-many-arguments
         super().__init__(protocol, None)

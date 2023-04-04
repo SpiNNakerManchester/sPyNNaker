@@ -38,11 +38,12 @@ def _is_multidimensional(app_vertex):
 
 
 def spynnaker_splitter_selector():
-    """ Add a splitter to every vertex that doesn't already have one.
+    """
+    Add a splitter to every vertex that doesn't already have one.
 
-        default for APV is the SplitterAbstractPopulationVertexFixed\
-        default for external device splitters are SplitterExternalDevice\
-        default for the rest is the SplitterFixedLegacy.
+    default for APV is the SplitterAbstractPopulationVertexFixed.
+    default for external device splitters are SplitterExternalDevice.
+    default for the rest is the SplitterFixedLegacy.
 
     :raises PacmanConfigurationException: If a bad configuration is set
     """
@@ -55,14 +56,14 @@ def spynnaker_splitter_selector():
 
 
 def spynakker_vertex_selector(app_vertex):
-    """ main point for selecting a splitter object for a given app vertex.
+    """
+    Main point for selecting a splitter object for a given app vertex.
 
-    Will delegate to the none spynnaker selector if no heuristic is known for
+    Will delegate to the non-sPyNNaker selector if no heuristic is known for
     the app vertex.
 
     :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         app vertex to give a splitter object to
-    :rtype: None
     """
     if app_vertex.splitter is None:
         if isinstance(app_vertex, AbstractPopulationVertex):

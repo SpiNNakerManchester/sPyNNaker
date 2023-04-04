@@ -16,8 +16,9 @@ import math
 
 
 class RunningStats(object):
-    """ Keeps running statistics.
-        From: https://www.johndcook.com/blog/skewness_kurtosis/
+    """
+    Keeps running statistics.
+    From: https://www.johndcook.com/blog/skewness_kurtosis/
     """
     __slots__ = ["__mean", "__mean_2", "__n_items"]
 
@@ -27,7 +28,8 @@ class RunningStats(object):
         self.__n_items = 0
 
     def add_item(self, x):
-        """ Adds an item to the running statistics.
+        """
+        Adds an item to the running statistics.
 
         :param x: The item to add
         :type x: int or float
@@ -43,7 +45,8 @@ class RunningStats(object):
         self.__mean_2 += term_1
 
     def add_items(self, mean, variance, n_items):
-        """ Add a bunch of items (via their statistics).
+        """
+        Add a bunch of items (via their statistics).
 
         :param float mean: The mean of the items to add.
         :param float variance: The variance of the items to add.
@@ -66,7 +69,8 @@ class RunningStats(object):
 
     @property
     def n_items(self):
-        """ The number of items seen.
+        """
+        The number of items seen.
 
         :rtype: int
         """
@@ -74,7 +78,8 @@ class RunningStats(object):
 
     @property
     def mean(self):
-        """ The mean of the items seen.
+        """
+        The mean of the items seen.
 
         :rtype: float
         """
@@ -82,7 +87,8 @@ class RunningStats(object):
 
     @property
     def variance(self):
-        """ The variance of the items seen.
+        """
+        The variance of the items seen.
 
         :rtype: float
         """
@@ -92,7 +98,8 @@ class RunningStats(object):
 
     @property
     def standard_deviation(self):
-        """ The population standard deviation of the items seen.
+        """
+        The population standard deviation of the items seen.
 
         :rtype: float
         """
