@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-The code that used to be here has been merged into SpiNNaker
+The code that used to be here has been merged into SpiNNaker.
 
 This is now just a depreciation redirect hook
 """

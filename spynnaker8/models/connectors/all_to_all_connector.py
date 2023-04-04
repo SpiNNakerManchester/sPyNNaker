@@ -18,8 +18,9 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class AllToAllConnector(_BaseClass):
-    """ Connects all cells in the presynaptic population to all cells in \
-        the postsynaptic population
+    """
+    Connects all cells in the presynaptic population to all cells in
+    the postsynaptic population.
 
     .. deprecated:: 6.0
         Use

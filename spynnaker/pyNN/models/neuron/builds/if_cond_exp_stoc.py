@@ -23,7 +23,8 @@ from spynnaker.pyNN.models.neuron.threshold_types import (
 
 
 class IFCondExpStoc(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with a stochastic threshold.
+    """
+    Leaky integrate and fire neuron with a stochastic threshold.
 
     Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical
     microcircuit models. *PLoS Computational Biology.* 2013;9(11):e1003311.
@@ -46,37 +47,37 @@ class IFCondExpStoc(AbstractPyNNNeuronModelStandard):
     :param v: :math:`V_{init}`
     :param isyn_exc: :math:`I^{syn}_e`
     :param isyn_inh: :math:`I^{syn}_i`
-    :type tau_m: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type tau_m: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type cm: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type cm: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type v_rest: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type v_rest: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type v_reset: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type v_reset: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type v_thresh: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type v_thresh: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type tau_syn_E: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type tau_syn_E: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type tau_syn_I: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type tau_syn_I: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type tau_refrac: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type tau_refrac: float, iterable(float),
+        ~spynnaker.pyNN.RandomDistribution or (mapping) function
+    :type i_offset: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type i_offset: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type e_rev_E: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type e_rev_E: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type e_rev_I: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type e_rev_I: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type du_th: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type du_th: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type tau_th: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type tau_th: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type v: Float, float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type v: Float, float, iterable(float), ~pyNN.random.RandomDistribution
+    :type isyn_exc: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
-    :type isyn_exc: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :type isyn_inh: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type isyn_inh: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     """
 

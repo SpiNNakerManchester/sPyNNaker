@@ -21,8 +21,9 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 
 
 class SynapseInformation(object):
-    """ Contains the synapse information including the connector, synapse type\
-        and synapse dynamics
+    """
+    Contains the synapse information including the connector, synapse type
+    and synapse dynamics.
     """
     __slots__ = [
         "__connector",
@@ -85,7 +86,8 @@ class SynapseInformation(object):
 
     @property
     def connector(self):
-        """ The connector connected to the synapse
+        """
+        The connector connected to the synapse.
 
         :rtype: AbstractConnector
         """
@@ -93,7 +95,8 @@ class SynapseInformation(object):
 
     @property
     def pre_population(self):
-        """ The population sending spikes to the synapse
+        """
+        The population sending spikes to the synapse.
 
         :rtype: ~spynnaker.pyNN.models.populations.Population or
             ~spynnaker.pyNN.models.populations.PopulationView
@@ -102,7 +105,8 @@ class SynapseInformation(object):
 
     @property
     def post_population(self):
-        """ The population hosting the synapse
+        """
+        The population hosting the synapse.
 
         :rtype: ~spynnaker.pyNN.models.populations.Population or
             ~spynnaker.pyNN.models.populations.PopulationView
@@ -111,7 +115,8 @@ class SynapseInformation(object):
 
     @property
     def n_pre_neurons(self):
-        """ The number of neurons in the prepopulation
+        """
+        The number of neurons in the prepopulation.
 
         :rtype: int
         """
@@ -119,7 +124,8 @@ class SynapseInformation(object):
 
     @property
     def n_post_neurons(self):
-        """ The number of neurons in the postpopulation
+        """
+        The number of neurons in the postpopulation.
 
         :rtype: int
         """
@@ -127,7 +133,8 @@ class SynapseInformation(object):
 
     @property
     def prepop_is_view(self):
-        """ Whether the :py:meth:`pre_population` is a view
+        """
+        Whether the :py:meth:`pre_population` is a view.
 
         :rtype: bool
         """
@@ -135,7 +142,8 @@ class SynapseInformation(object):
 
     @property
     def postpop_is_view(self):
-        """ Whether the :py:meth:`post_population` is a view
+        """
+        Whether the :py:meth:`post_population` is a view.
 
         :rtype: bool
         """
@@ -143,7 +151,8 @@ class SynapseInformation(object):
 
     @property
     def rng(self):
-        """ Random number generator
+        """
+        Random number generator.
 
         :rtype: ~pyNN.random.NumpyRNG
         """
@@ -151,7 +160,8 @@ class SynapseInformation(object):
 
     @property
     def synapse_dynamics(self):
-        """ The dynamic behaviour of the synapse
+        """
+        The dynamic behaviour of the synapse.
 
         :rtype: AbstractSynapseDynamics
         """
@@ -159,7 +169,8 @@ class SynapseInformation(object):
 
     @property
     def synapse_type(self):
-        """ The type of the synapse
+        """
+        The type of the synapse.
 
         :rtype: int
         """
@@ -167,7 +178,8 @@ class SynapseInformation(object):
 
     @property
     def receptor_type(self):
-        """ A string representing the receptor type
+        """
+        A string representing the receptor type.
 
         :rtype: str
         """
@@ -175,7 +187,8 @@ class SynapseInformation(object):
 
     @property
     def weights(self):
-        """ The synaptic weights (if any)
+        """
+        The synaptic weights (if any).
 
         :rtype: float or list(float) or ~numpy.ndarray(float) or None
         """
@@ -183,18 +196,20 @@ class SynapseInformation(object):
 
     @property
     def delays(self):
-        """ The total synaptic delays (if any)
+        """
+        The total synaptic delays (if any).
 
         :rtype: float or list(float) or ~numpy.ndarray(float) or None
         """
         return self.__delays
 
     def may_generate_on_machine(self):
-        """ Do we describe a collection of synapses whose synaptic matrix may\
-            be generated on SpiNNaker instead of needing to be calculated in\
-            this process and uploaded? This depends on the connector, the\
-            definitions of the weights and delays, and the dynamics of the\
-            synapses.
+        """
+        Do we describe a collection of synapses whose synaptic matrix may
+        be generated on SpiNNaker instead of needing to be calculated in
+        this process and uploaded? This depends on the connector, the
+        definitions of the weights and delays, and the dynamics of the
+        synapses.
 
         :return: True if the synaptic matrix may be generated on machine (or
             may have already been so done)
@@ -212,8 +227,9 @@ class SynapseInformation(object):
         return connector_gen and synapse_gen
 
     def may_use_direct_matrix(self):
-        """ Do the properties of the synaptic information allow it to use the
-            direct matrix?
+        """
+        Do the properties of the synaptic information allow it to use the
+        direct matrix?
 
         :rtype: bool
         """
@@ -225,14 +241,16 @@ class SynapseInformation(object):
 
     @property
     def pre_run_connection_holders(self):
-        """ The list of connection holders to be filled in before run
+        """
+        The list of connection holders to be filled in before run.
 
         :rtype: list(ConnectionHolder)
         """
         return self.__pre_run_connection_holders
 
     def add_pre_run_connection_holder(self, pre_run_connection_holder):
-        """ Add a connection holder that will be filled in before run
+        """
+        Add a connection holder that will be filled in before run.
 
         :param ConnectionHolder pre_run_connection_holder:
             The connection holder to be added
@@ -240,8 +258,9 @@ class SynapseInformation(object):
         self.__pre_run_connection_holders.append(pre_run_connection_holder)
 
     def finish_connection_holders(self):
-        """ Finish all the connection holders, and clear the list so that they
-            are not generated again later
+        """
+        Finish all the connection holders, and clear the list so that they
+        are not generated again later.
         """
         for holder in self.__pre_run_connection_holders:
             holder.finish()
@@ -249,7 +268,8 @@ class SynapseInformation(object):
 
     @property
     def synapse_type_from_dynamics(self):
-        """ Whether the synapse type comes from the synapse dynamics
+        """
+        Whether the synapse type comes from the synapse dynamics.
 
         :rtype: bool
         """

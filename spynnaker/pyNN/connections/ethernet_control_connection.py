@@ -17,8 +17,9 @@ from spinn_front_end_common.utilities.connections import LiveEventConnection
 
 
 class EthernetControlConnection(LiveEventConnection):
-    """ A connection that can translate Ethernet control messages received\
-        from a Population
+    """
+    A connection that can translate Ethernet control messages received
+    from a Population.
     """
     __slots__ = ["__translators"]
 
@@ -42,7 +43,8 @@ class EthernetControlConnection(LiveEventConnection):
         self.add_receive_callback(label, self._translate, translate_key=False)
 
     def add_translator(self, label, translator):
-        """ Add another translator that routes via the LPG.
+        """
+        Add another translator that routes via the LPG.
 
         :param str label: The label of the vertex to attach the translator to
         :param AbstractEthernetTranslator translator:

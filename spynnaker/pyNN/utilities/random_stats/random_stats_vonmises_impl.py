@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsVonmisesImpl(AbstractRandomStats):
-    """ An implementation of AbstractRandomStats for vonmises distributions
+    """
+    An implementation of AbstractRandomStats for von Mises distributions.
     """
 
     def _get_params(self, dist):

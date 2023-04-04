@@ -21,7 +21,8 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 class PushBotSpiNNakerLinkLaserDevice(
         PushBotEthernetLaserDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
-    """ The Laser of a PushBot
+    """
+    The Laser of a PushBot.
     """
     __slots__ = []
 
@@ -38,11 +39,9 @@ class PushBotSpiNNakerLinkLaserDevice(
             start_total_period=default_parameters['start_total_period'],
             start_frequency=default_parameters['start_frequency']):
         """
-        :param laser: Which laser device to control
-        :type laser:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser
-        :param protocol: The protocol instance to get commands from
-        :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
+        :param PushBotLaser laser: Which laser device to control
+        :param MunichIoSpiNNakerLinkProtocol protocol:
+            The protocol instance to get commands from
         :param int spinnaker_link_id:
             The SpiNNakerLink that the PushBot is connected to
         :param int n_neurons: The number of neurons in the device
@@ -50,10 +49,11 @@ class PushBotSpiNNakerLinkLaserDevice(
         :param board_address:
             The IP address of the board that the device is connected to
         :type board_address: str or None
-        :param start_active_time: The "active time" value to send at the start
-        :param start_total_period:
+        :param int start_active_time:
+            The "active time" value to send at the start
+        :param int start_total_period:
             The "total period" value to send at the start
-        :param start_frequency: The "frequency" to send at the start
+        :param int start_frequency: The "frequency" to send at the start
         """
         # pylint: disable=too-many-arguments
         super().__init__(

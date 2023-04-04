@@ -15,7 +15,8 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
-    """ A connector that can be generated on host
+    """
+    A connector that can be generated on host.
     """
 
     # Mix-in class, so don't add anything here!
@@ -24,7 +25,8 @@ class AbstractGenerateConnectorOnHost(object, metaclass=AbstractBase):
     @abstractmethod
     def create_synaptic_block(
             self, post_slices, post_vertex_slice, synapse_type, synapse_info):
-        """ Create a synaptic block from the data.
+        """
+        Create a synaptic block from the data.
 
         :param list(~pacman.model.graphs.common.Slice) post_slices:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:

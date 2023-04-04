@@ -23,7 +23,8 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
 
 class PushBotEthernetSpeakerDevice(
         PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex):
-    """ The Speaker of a PushBot
+    """
+    The Speaker of a PushBot.
     """
 
     def __init__(
@@ -31,18 +32,16 @@ class PushBotEthernetSpeakerDevice(
             start_total_period=0, start_frequency=0, start_melody=None,
             timesteps_between_send=None):
         """
-        :param speaker: The PushBotSpeaker value to control
-        :type speaker:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker
-        :param protocol: The protocol instance to get commands from
-        :type protocol: MunichIoEthernetProtocol
-        :param start_active_time: The "active time" to set at the start
-        :param start_total_period: The "total period" to set at the start
-        :param start_frequency: The "frequency" to set at the start
-        :param start_melody: The "melody" to set at the start
-        :param timesteps_between_send:
-            The number of timesteps between sending commands to the device,\
-            or None to use the default
+        :param PushBotSpeaker speaker: The speaker to control
+        :param MunichIoEthernetProtocol protocol:
+            The protocol instance to get commands from
+        :param int start_active_time: The "active time" to set at the start
+        :param int start_total_period: The "total period" to set at the start
+        :param int start_frequency: The "frequency" to set at the start
+        :param int start_melody: The "melody" to set at the start
+        :param int timesteps_between_send:
+            The number of timesteps between sending commands to the device,
+            or `None` to use the default
         """
         # pylint: disable=too-many-arguments
         if not isinstance(speaker, PushBotSpeaker):

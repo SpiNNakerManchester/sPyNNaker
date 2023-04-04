@@ -33,14 +33,14 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     def __init__(self, tau_ca2, i_ca2, i_alpha):
         r"""
         :param tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`
-        :type tau_ca2: float, iterable(float),
-            ~pyNN.random.RandomDistribution or (mapping) function
+        :type tau_ca2: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param i_ca2: :math:`I_{\mathrm{Ca}^{+2}}`
-        :type i_ca2: float, iterable(float),
-            ~pyNN.random.RandomDistribution or (mapping) function
+        :type i_ca2: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param i_alpha: :math:`I_{\alpha}`
-        :type i_alpha: float, iterable(float),
-            ~pyNN.random.RandomDistribution or (mapping) function
+        :type i_alpha: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([
@@ -65,7 +65,8 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @property
     def tau_ca2(self):
-        r""" Settable model parameter: :math:`\tau_{\mathrm{Ca}^{+2}}`
+        r"""
+        Settable model parameter: :math:`\tau_{\mathrm{Ca}^{+2}}`
 
         :rtype: float
         """
@@ -73,7 +74,8 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @property
     def i_ca2(self):
-        r""" Settable model parameter: :math:`I_{\mathrm{Ca}^{+2}}`
+        r"""
+        Settable model parameter: :math:`I_{\mathrm{Ca}^{+2}}`
 
         :rtype: float
         """
@@ -81,7 +83,8 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @property
     def i_alpha(self):
-        r""" Settable model parameter: :math:`I_{\alpha}`
+        r"""
+        Settable model parameter: :math:`I_{\alpha}`
 
         :rtype: float
         """

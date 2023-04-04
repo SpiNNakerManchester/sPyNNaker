@@ -20,7 +20,8 @@ from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 
 class SpikeSourceArrayMachineVertex(ReverseIPTagMulticastSourceMachineVertex):
-    """ Extended to add colour
+    """
+    Extended to add colour.
     """
 
     @overrides(

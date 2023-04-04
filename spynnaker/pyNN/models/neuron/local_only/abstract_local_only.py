@@ -18,29 +18,33 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 
 
 class AbstractLocalOnly(AbstractSynapseDynamics):
-    """ Processes synapses locally without the need for SDRAM.
+    """
+    Processes synapses locally without the need for SDRAM.
     """
 
     @abstractmethod
     def get_parameters_usage_in_bytes(
             self, n_atoms, incoming_projections):
-        """ Get the size of the parameters in bytes
+        """
+        Get the size of the parameters in bytes.
 
         :param int n_atoms: The number of atoms in the vertex
-        :param list(~spynnaker.pyNN.models.projection.Projection)\
-                incoming_projections:
-            The projections to get the size of
+        :param incoming_projections: The projections to get the size of
+        :type incoming_projections:
+            list(~spynnaker.pyNN.models.projection.Projection)
         :rtype: int
         """
 
     @abstractmethod
     def write_parameters(self, spec, region, machine_vertex, weight_scales):
-        """ Write the parameters to the spec
+        """
+        Write the parameters to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The specification to write to
         :param int region: region ID to write to
-        :param MachineVertex machine_vertex: The machine vertex being targeted
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+            The machine vertex being targeted
         :param list(float) weight_scales: Scale factors to apply to the weights
         """
 

@@ -71,7 +71,7 @@ class Projection(object):
                 post_synaptic_population:
         :param AbstractConnector connector:
         :param AbstractSynapseDynamics synapse_type:
-        :param None source: Unsupported; must be None
+        :param None source: Unsupported; must be `None`
         :param str receptor_type:
         :param ~pyNN.space.Space space:
         :param str label:
@@ -79,8 +79,8 @@ class Projection(object):
         # pylint: disable=too-many-arguments
         if source is not None:
             raise NotImplementedError(
-                "sPyNNaker {} does not yet support multi-compartmental "
-                "cells.".format(__version__))
+                f"sPyNNaker {__version__} does not yet support "
+                "multi-compartmental cells.")
 
         self.__projection_edge = None
         self.__label = label
@@ -92,9 +92,9 @@ class Projection(object):
         if label is None:
             # set the projection's label to a default (maybe non-unique!)
             self.__label = (
-                "from pre {} to post {} with connector {}".format(
-                    pre_synaptic_population.label,
-                    post_synaptic_population.label, connector))
+                f"from pre {pre_synaptic_population.label} "
+                f"to post {post_synaptic_population.label} "
+                f"with connector {connector}")
             # give an auto generated label for the underlying edge
             label = "projection edge {}".format(
                 SpynnakerDataView.get_next_none_labelled_edge_number())
@@ -127,8 +127,8 @@ class Projection(object):
             synapse_type_from_dynamics = True
         if synaptic_type is None:
             raise ConfigurationException(
-                "Synapse target {} not found in {}".format(
-                    receptor_type, post_synaptic_population.label))
+                f"Synapse target {receptor_type} not found "
+                f"in {post_synaptic_population.label}")
 
         # as a from-list connector can have plastic parameters, grab those (
         # if any) and add them to the synapse dynamics object
@@ -207,8 +207,8 @@ class Projection(object):
             return False
         if not isinstance(param, PopulationView):
             raise ConfigurationException(
-                "Unexpected parameter type {}. Expected Population".format(
-                    type(param)))
+                f"Unexpected parameter type {type(param)}. "
+                "Expected Population")
         # Check whether the array is contiguous or not
         inds = param._indexes  # pylint: disable=protected-access
         if inds != tuple(range(inds[0], inds[-1] + 1)):
@@ -220,7 +220,8 @@ class Projection(object):
 
     def get(self, attribute_names, format,  # @ReservedAssignment
             gather=True, with_address=True, multiple_synapses='last'):
-        """ Get a parameter/attribute of the projection.
+        """
+        Get a parameter/attribute of the projection.
 
         .. note::
             SpiNNaker always gathers.
@@ -250,11 +251,12 @@ class Projection(object):
     def save(
             self, attribute_names, file, format='list',  # @ReservedAssignment
             gather=True, with_address=True):
-        """ Print synaptic attributes (weights, delays, etc.) to file. In the\
-            array format, zeros are printed for non-existent connections.\
-            Values will be expressed in the standard PyNN units (i.e., \
-            millivolts, nanoamps, milliseconds, microsiemens, nanofarads, \
-            event per second).
+        """
+        Print synaptic attributes (weights, delays, etc.) to file. In the
+        array format, zeros are printed for non-existent connections.
+        Values will be expressed in the standard PyNN units (i.e.,
+        millivolts, nanoamps, milliseconds, microsiemens, nanofarads,
+        event per second).
 
         .. note::
             SpiNNaker always gathers.
@@ -288,7 +290,8 @@ class Projection(object):
     def __get_data(
             self, attribute_names, format,  # @ReservedAssignment
             with_address, notify):
-        """ Internal data getter to add notify option
+        """
+        Internal data getter to add notify option.
 
         :param attribute_names: list of attributes to gather
         :type attribute_names: str or iterable(str)
@@ -354,7 +357,8 @@ class Projection(object):
 
     @property
     def pre(self):
-        """ The pre-population or population view.
+        """
+        The pre-population or population view.
 
         :rtype: ~spynnaker.pyNN.models.populations.PopulationBase
         """
@@ -362,7 +366,8 @@ class Projection(object):
 
     @property
     def post(self):
-        """ The post-population or population view.
+        """
+        The post-population or population view.
 
         :rtype: ~spynnaker.pyNN.models.populations.PopulationBase
         """
@@ -376,7 +381,7 @@ class Projection(object):
         return self.__label
 
     def __repr__(self):
-        return "projection {}".format(self.__label)
+        return f"projection {self.__label}"
 
     # -----------------------------------------------------------------
 
@@ -395,8 +400,9 @@ class Projection(object):
         return self.__projection_edge
 
     def _find_existing_edge(self, pre_synaptic_vertex, post_synaptic_vertex):
-        """ Searches though the graph's edges to locate any\
-            edge which has the same post and pre vertex
+        """
+        Searches though the graph's edges to locate any
+        edge which has the same post- and pre- vertex
 
         :param pre_synaptic_vertex: the source vertex of the multapse
         :type pre_synaptic_vertex:
@@ -404,7 +410,7 @@ class Projection(object):
         :param post_synaptic_vertex: The destination vertex of the multapse
         :type post_synaptic_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
-        :return: None or the edge going to these vertices.
+        :return: `None` or the edge going to these vertices.
         :rtype: ~.ApplicationEdge
         """
         # Find edges ending at the postsynaptic vertex
@@ -561,7 +567,8 @@ class Projection(object):
 
     def size(self, gather=True):  # @UnusedVariable
         # pylint: disable=unused-argument
-        """ Return the total number of connections.
+        """
+        Return the total number of connections.
 
         .. note::
             SpiNNaker always gathers.

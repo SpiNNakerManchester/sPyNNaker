@@ -18,8 +18,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class FixedProbabilityConnector(_BaseClass):
-    """ For each pair of pre-post cells, the connection probability is \
-        constant.
+    """
+    For each pair of pre-post cells, the connection probability is constant.
 
     .. deprecated:: 6.0
         Use

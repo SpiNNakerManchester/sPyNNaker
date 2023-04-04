@@ -17,9 +17,10 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class IndexBasedProbabilityConnector(_BaseClass):
-    """ Create an index-based probability connector.
-        The `index_expression` must depend on the indices `i`, `j` of the\
-        populations.
+    """
+    Create an index-based probability connector.
+    The `index_expression` must depend on the indices `i`, `j` of the
+    populations.
 
     .. deprecated:: 6.0
         Use

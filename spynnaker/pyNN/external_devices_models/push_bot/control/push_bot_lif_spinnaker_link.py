@@ -18,9 +18,10 @@ from spynnaker.pyNN.models.defaults import default_initial_values
 
 
 class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
-    """ Control module for a PushBot connected to a SpiNNaker Link
+    """
+    Control module for a PushBot connected to a SpiNNaker Link.
 
-    :param ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol protocol:
+    :param MunichIoSpiNNakerLinkProtocol protocol:
         How to talk to the bot.
     :param iterable(AbstractMulticastControllableDevice) devices:
         The devices on the bot that we are interested in.

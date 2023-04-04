@@ -29,7 +29,6 @@ _SELECTIVE_RECORDED_MSG = (
 
 
 class DataPopulation(object):
-
     __slots__ = [
         "__database_file",
         "__label",
@@ -147,7 +146,6 @@ class DataPopulation(object):
 
     def __getitem__(self, index_or_slice):
         """
-
         :param selector: a slice or numpy mask array.
             The mask array should either be a boolean array (ideally) of the
             same size as the parent,
