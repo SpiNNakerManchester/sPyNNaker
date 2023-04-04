@@ -47,26 +47,26 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
         r"""
         :param v_init: :math:`V_{init}`
-        :type v_init: float, iterable(float), RandomDistribution or
-            (mapping) function
+        :type v_init: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param v_rest: :math:`V_{rest}`
-        :type v_rest: float, iterable(float), RandomDistribution or
-            (mapping) function
+        :type v_rest: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_m: :math:`\tau_{m}`
-        :type tau_m: float, iterable(float), RandomDistribution or
-            (mapping) function
+        :type tau_m: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param cm: :math:`C_m`
-        :type cm: float, iterable(float), RandomDistribution or
-            (mapping) function
+        :type cm: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param i_offset: :math:`I_{offset}`
-        :type i_offset: float, iterable(float), RandomDistribution or
-            (mapping) function
+        :type i_offset: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param v_reset: :math:`V_{reset}`
-        :type v_reset: float, iterable(float), RandomDistribution or
-            (mapping) function
+        :type v_reset: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_refrac: :math:`\tau_{refrac}`
-        :type tau_refrac: float, iterable(float), RandomDistribution or
-            (mapping) function
+        :type tau_refrac: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([

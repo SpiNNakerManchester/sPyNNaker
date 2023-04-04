@@ -106,7 +106,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         Get the minimum delay given a float or RandomDistribution.
 
         :param delays: the delays
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
+        :type delays: ~numpy.ndarray or ~spynnaker.pyNN.RandomDistribution
+            or int or float
         :param int n_connections: how many connections
         """
         if isinstance(delays, RandomDistribution):
@@ -195,7 +196,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         max_delay given given a float, RandomDistribution or list of delays.
 
         :param delays:
-        :type delays: ~numpy.ndarray or pyNN.random.NumpyRNG or int or float
+        :type delays: ~numpy.ndarray or spynnaker.pyNN.RandomDistribution
+            or int or float
         :param int n_total_connections:
         :param int n_connections:
         :param float min_delay:

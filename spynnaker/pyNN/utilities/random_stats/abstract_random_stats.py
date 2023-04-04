@@ -17,7 +17,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 class AbstractRandomStats(object, metaclass=AbstractBase):
     """
-    Statistics about PyNN RandomDistribution objects.
+    Statistics about PyNN `~spynnaker.pyNN.RandomDistribution` objects.
     """
     __slots__ = ()
 

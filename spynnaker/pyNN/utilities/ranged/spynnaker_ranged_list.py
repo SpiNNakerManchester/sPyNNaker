@@ -19,7 +19,7 @@ from spinn_utilities.ranged.ranged_list import RangedList
 
 class SpynnakerRangedList(RangedList):
     """
-    Adds support for :py:class:`pyNN.random.RandomDistribution` to
+    Adds support for :py:class:`~spynnaker.pyNN.RandomDistribution` to
     :py:class:`~spinn_utilities.ranged.RangedList`.
     """
 

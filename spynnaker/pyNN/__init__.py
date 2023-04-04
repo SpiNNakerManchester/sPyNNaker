@@ -18,7 +18,6 @@ and implementation for the PyNN High-level API
 (https://neuralensemble.org/trac/PyNN).
 
 This package contains the profile of that code for PyNN 0.9.
-
 """
 
 # common imports
@@ -269,10 +268,11 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
     :param src: Measure from this cell
     :param tgt: To this cell
     :param ~numpy.ndarray mask:
-        allows only certain dimensions to be considered, e.g.,
-        to ignore the z-dimension, use ``mask=array([0,1])``,
-        to ignore y, use ``mask=array([0,2])``, and
-        to just consider z-distance, use ``mask=array([2])``
+        allows only certain dimensions to be considered, e.g.:
+
+        * to ignore the z-dimension, use ``mask=array([0,1])``
+        * to ignore y, ``mask=array([0,2])``
+        * to just consider z-distance, ``mask=array([2])``
     :param float scale_factor:
         allows for different units in the pre- and post-position
         (the post-synaptic position is multiplied by this quantity).

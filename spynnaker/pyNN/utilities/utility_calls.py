@@ -249,7 +249,7 @@ def get_probability_within_range(dist, lower, upper):
     Get the probability that a value will fall within the given range for
     a given RandomDistribution.
 
-    :param RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution dist:
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.cdf(dist, upper) - stats.cdf(dist, lower)
@@ -260,7 +260,7 @@ def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
     Get the likely maximum value of a RandomDistribution given a
     number of draws.
 
-    :param RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution dist:
     """
     stats = STATS_BY_NAME[dist.name]
     prob = 1.0 - (chance / float(n_items))
@@ -272,7 +272,7 @@ def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
     Get the likely minimum value of a RandomDistribution given a
     number of draws.
 
-    :param RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution dist:
     """
     stats = STATS_BY_NAME[dist.name]
     prob = chance / float(n_items)
@@ -283,7 +283,7 @@ def get_mean(dist):
     """
     Get the mean of a RandomDistribution.
 
-    :param RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution dist:
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.mean(dist)
@@ -293,7 +293,7 @@ def get_standard_deviation(dist):
     """
     Get the standard deviation of a RandomDistribution.
 
-    :param RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution dist:
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.std(dist)
@@ -303,7 +303,7 @@ def get_variance(dist):
     """
     Get the variance of a RandomDistribution.
 
-    :param RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution dist:
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.var(dist)
@@ -315,7 +315,7 @@ def high(dist):
 
     Could return `None`.
 
-    :param RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution dist:
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.high(dist)
@@ -327,7 +327,7 @@ def low(dist):
 
     Could return `None`.
 
-    :param RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution dist:
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.low(dist)
