@@ -20,8 +20,9 @@ from .abstract_generate_connector_on_host import (
 
 
 class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
-    """ A connector that uses connection statistics based on the Small World\
-        network connectivity model.
+    """
+    A connector that uses connection statistics based on the Small World
+    network connectivity model.
 
     .. note::
         This is typically used from a population to itself.
@@ -185,5 +186,5 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         return block
 
     def __repr__(self):
-        return "SmallWorldConnector(degree={}, rewiring={})".format(
-            self.__degree, self.__rewiring)
+        return ("SmallWorldConnector"
+                f"(degree={self.__degree}, rewiring={self.__rewiring})")

@@ -18,7 +18,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class FromFileConnector(_BaseClass):
-    """ Make connections according to a list read from a file.
+    """
+    Make connections according to a list read from a file.
 
     .. deprecated:: 6.0
         Use
@@ -41,7 +42,8 @@ class FromFileConnector(_BaseClass):
 
                 # columns = ["i", "j", "weight", "delay", "U", "tau_rec"]
 
-            Note that the header requires `#` at the beginning of the line.
+            .. note::
+                The header requires `#` at the beginning of the line.
         :type file: str or ~io.FileIO
         :param bool distributed:
             Basic pyNN says:

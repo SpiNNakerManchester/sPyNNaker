@@ -28,7 +28,8 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics,
         AbstractGenerateOnMachine):
-    """ The dynamics of a synapse that does not change over time.
+    """
+    The dynamics of a synapse that does not change over time.
     """
 
     __slots__ = [

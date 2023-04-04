@@ -21,14 +21,16 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_parameter_names(self):
-        """ Returns the parameter names
+        """
+        Returns the parameter names.
 
         :rtype: iterable(str)
         """
 
     @abstractmethod
     def is_same_as(self, weight_dependence):
-        """ Determine if this weight dependence is the same as another
+        """
+        Determine if this weight dependence is the same as another.
 
         :param AbstractWeightDependence weight_dependence:
         :rtype: bool
@@ -36,7 +38,8 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
 
     @abstractproperty
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
@@ -44,7 +47,8 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
     @abstractmethod
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
-        """ Get the amount of SDRAM used by the parameters of this rule
+        """
+        Get the amount of SDRAM used by the parameters of this rule.
 
         :param int n_synapse_types:
         :param int n_weight_terms:
@@ -55,7 +59,8 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
     def write_parameters(
             self, spec, global_weight_scale, synapse_weight_scales,
             n_weight_terms):
-        """ Write the parameters of the rule to the spec
+        """
+        Write the parameters of the rule to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The specification to write to
@@ -68,8 +73,9 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
 
     @abstractproperty
     def weight_maximum(self):
-        """ The maximum weight that will ever be set in a synapse as a result\
-            of this rule
+        """
+        The maximum weight that will ever be set in a synapse as a result
+        of this rule.
 
         :rtype: float
         """

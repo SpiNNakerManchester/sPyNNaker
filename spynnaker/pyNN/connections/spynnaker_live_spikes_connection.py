@@ -22,8 +22,9 @@ _MAX_HALF_KEYS_PER_PACKET = 127
 
 
 class SpynnakerLiveSpikesConnection(LiveEventConnection):
-    """ A connection for receiving and sending live spikes from and to\
-        SpiNNaker
+    """
+    A connection for receiving and sending live spikes from and to
+    SpiNNaker.
     """
     __slots__ = []
 
@@ -49,7 +50,8 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
             local_host, local_port)
 
     def send_spike(self, label, neuron_id, send_full_keys=False):
-        """ Send a spike from a single neuron
+        """
+        Send a spike from a single neuron.
 
         :param str label:
             The label of the population from which the spike will originate
@@ -61,7 +63,8 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
         self.send_spikes(label, [neuron_id], send_full_keys)
 
     def send_spikes(self, label, neuron_ids, send_full_keys=False):
-        """ Send a number of spikes
+        """
+        Send a number of spikes.
 
         :param str label:
             The label of the population from which the spikes will originate

@@ -18,8 +18,9 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class FixedNumberPostConnector(_BaseClass):
-    """ PyNN connector that puts a fixed number of connections on each of the\
-        post neurons.
+    """
+    PyNN connector that puts a fixed number of connections on each of the
+    post neurons.
 
     .. deprecated:: 6.0
         Use

@@ -24,8 +24,9 @@ from .abstract_generate_connector_on_host import (
 
 class AllToAllConnector(AbstractGenerateConnectorOnMachine,
                         AbstractGenerateConnectorOnHost):
-    """ Connects all cells in the presynaptic population to all cells in \
-        the postsynaptic population.
+    """
+    Connects all cells in the presynaptic population to all cells in
+    the postsynaptic population.
     """
 
     __slots__ = [

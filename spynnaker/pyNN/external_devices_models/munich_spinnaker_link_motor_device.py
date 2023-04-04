@@ -38,8 +38,9 @@ class MunichMotorDevice(
         AbstractOneAppOneMachineVertex,
         AbstractVertexWithEdgeToDependentVertices,
         PopulationApplicationVertex):
-    """ An Omnibot motor control device. This has a real vertex and an \
-        external device vertex.
+    """
+    An Omnibot motor control device. This has a real vertex and an
+    external device vertex.
     """
 
     __slots__ = ["__dependent_vertices"]
@@ -63,7 +64,6 @@ class MunichMotorDevice(
         :type label: str or None
         """
         # pylint: disable=too-many-arguments
-
         m_vertex = MachineMunichMotorDevice(
             speed, sample_time, update_time, delay_time, delta_threshold,
             continue_if_not_different, label, app_vertex=self)

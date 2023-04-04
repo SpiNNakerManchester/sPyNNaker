@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class PopulationView(_BaseClass):
-    """ A view of a subset of neurons within a\
+    """
+    A view of a subset of neurons within a
     :py:class:`~spynnaker.pyNN.models.populations.Population`.
 
     In most ways, Populations and PopulationViews have the same behaviour,

@@ -19,7 +19,8 @@ from spynnaker.pyNN.models.neuron.implementations import (
 
 class AbstractThresholdType(
         AbstractStandardNeuronComponent, metaclass=AbstractBase):
-    """ Represents types of threshold for a neuron (e.g., stochastic).
+    """
+    Represents types of threshold for a neuron (e.g., stochastic).
     """
 
     __slots__ = ()

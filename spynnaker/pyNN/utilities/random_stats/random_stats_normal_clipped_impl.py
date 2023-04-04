@@ -17,8 +17,9 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsNormalClippedImpl(AbstractRandomStats):
-    """ An implementation of AbstractRandomStats for normal distributions that\
-        are clipped to a boundary (redrawn)
+    """
+    An implementation of AbstractRandomStats for normal distributions that
+    are clipped to a boundary (redrawn).
     """
 
     def _get_params(self, dist):

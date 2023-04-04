@@ -16,8 +16,9 @@ from spinn_utilities.helpful_functions import is_singleton
 
 
 class ParameterHolder(object):
-    """ Holds a set of parameters and state variables to be returned in a
-        PyNN-specific format
+    """
+    Holds a set of parameters and state variables to be returned in a
+    PyNN-specific format.
     """
 
     __slots__ = (
@@ -39,9 +40,9 @@ class ParameterHolder(object):
         :param data_items_to_return: A list of data fields to be returned
         :type data_items_to_return: list(str) or tuple(str)
         :param get_call: A function to call to read a value
-        :type get_call: function(str, selector=None)->list
-        :param selector: a description of the subrange to accept, or None for
-            all. See:
+        :type get_call: callable(str, selector=None)->list
+        :param selector: a description of the subrange to accept,
+            or `None` for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
         """
@@ -58,7 +59,7 @@ class ParameterHolder(object):
         # if a random distribution we must not have generated yet!
         if isinstance(values, RandomDistribution):
             raise ValueError(
-                f"Although it is possible to request the values"
+                "Although it is possible to request the values"
                 " before the simulation has run, it is not possible to read"
                 " those values until after the simulation has run.  Please run"
                 f" the simulation before reading {parameter}.")
@@ -68,7 +69,8 @@ class ParameterHolder(object):
         return values
 
     def _get_data_items(self):
-        """ Merges the parameters and values in to the final data items
+        """
+        Merges the parameters and values in to the final data items
         """
         # If there are already merged connections cached, return those
         if self.__data_items is not None:

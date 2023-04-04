@@ -19,7 +19,8 @@ from spynnaker.pyNN.external_devices_models\
 
 
 class AbstractPushBotOutputDevice(Enum):
-    """ Superclass of all output device descriptors
+    """
+    Superclass of all output device descriptors.
     """
 
     def __new__(

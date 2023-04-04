@@ -19,17 +19,19 @@ from pacman.model.graphs.application import ApplicationVertex
 
 @require_subclass(ApplicationVertex)
 class AbstractHasDelayStages(object, metaclass=AbstractBase):
-    """ Indicates that this object (an application vertex) has delay stages\
-        that are used to increase the space required for bitfields in \
-        :py:func:`spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region`
+    """
+    Indicates that this object (an application vertex) has delay stages that
+    are used to increase the space required for bitfields in
+    :py:func:`spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region`
     """
 
     __slots__ = ()
 
     @abstractproperty
     def n_delay_stages(self):
-        """ The maximum number of delay stages required by any connection\
-            out of this delay extension vertex
+        """
+        The maximum number of delay stages required by any connection
+        out of this delay extension vertex.
 
         :rtype: int
         """
