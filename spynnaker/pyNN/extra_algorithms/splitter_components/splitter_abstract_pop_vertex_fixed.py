@@ -45,8 +45,9 @@ MAX_RING_BUFFER_BITS = 14
 
 class SplitterAbstractPopulationVertexFixed(
         AbstractSplitterCommon, AbstractSpynnakerSplitterDelay):
-    """ handles the splitting of the AbstractPopulationVertex using fixed
-        slices
+    """
+    Handles the splitting of the :py:class:`AbstractPopulationVertex`
+    using fixed slices.
     """
 
     __slots__ = [
@@ -55,14 +56,6 @@ class SplitterAbstractPopulationVertexFixed(
         "__max_delay",
         "__expect_delay_extension"
     ]
-
-    """ The message to use when the Population is invalid """
-    INVALID_POP_ERROR_MESSAGE = (
-        "The vertex {} cannot be supported by the "
-        "SplitterAbstractPopulationVertexFixed as"
-        " the only vertex supported by this splitter is a "
-        "AbstractPopulationVertex. Please use the correct splitter for "
-        "your vertex and try again.")
 
     def __init__(self):
         super().__init__()
@@ -75,7 +68,11 @@ class SplitterAbstractPopulationVertexFixed(
         super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
-                self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+                f"The vertex {app_vertex} cannot be supported by the "
+                "SplitterAbstractPopulationVertexFixed as the only vertex "
+                "supported by this splitter is a AbstractPopulationVertex. "
+                "Please use the correct splitter for your vertex and try "
+                "again.")
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
@@ -132,7 +129,6 @@ class SplitterAbstractPopulationVertexFixed(
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex, partition_id):
-
         # Determine the real pre-vertex
         pre_vertex = source_vertex
         if isinstance(source_vertex, DelayExtensionVertex):
@@ -159,7 +155,6 @@ class SplitterAbstractPopulationVertexFixed(
             self, vertex_slice, sdram, label,
             structural_sz, ring_buffer_shifts, weight_scales, index,
             max_atoms_per_core, synaptic_matrices, neuron_data):
-
         # If using local-only create a local-only vertex
         s_dynamics = self._governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractLocalOnly):
@@ -177,9 +172,10 @@ class SplitterAbstractPopulationVertexFixed(
 
     def get_sdram_used_by_atoms(
             self, n_atoms, all_syn_block_sz, structural_sz):
-        """  Gets the resources of a slice of atoms
+        """
+        Gets the resources of a slice of atoms.
 
-        :param int n_atoms
+        :param int n_atoms:
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         # pylint: disable=arguments-differ
@@ -194,7 +190,8 @@ class SplitterAbstractPopulationVertexFixed(
         return sdram
 
     def __get_variable_sdram(self, n_atoms):
-        """ returns the variable sdram from the recorders
+        """
+        Returns the variable SDRAM from the recorders.
 
         :param int n_atoms: The number of atoms to account for
         :return: the variable sdram used by the neuron recorder
@@ -211,7 +208,8 @@ class SplitterAbstractPopulationVertexFixed(
             self._governed_app_vertex.get_max_synapse_variable_sdram(n_atoms))
 
     def __get_constant_sdram(self, n_atoms, all_syn_block_sz, structural_sz):
-        """ returns the constant sdram used by the atoms
+        """
+        Returns the constant SDRAM used by the atoms.
 
         :param int n_atoms: The number of atoms to account for
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
@@ -263,8 +261,8 @@ class SplitterAbstractPopulationVertexFixed(
 
     def __get_synapse_constant_sdram(
             self, n_atoms, all_syn_block_sz, structural_sz):
-
-        """ Get the amount of fixed SDRAM used by synapse parts
+        """
+        Get the amount of fixed SDRAM used by synapse parts.
 
         :param int n_atoms: The number of atoms to account for
 
@@ -298,7 +296,8 @@ class SplitterAbstractPopulationVertexFixed(
         self.__expect_delay_extension = None
 
     def __create_slices(self):
-        """ Create slices if not already done
+        """
+        Create slices if not already done.
         """
         if self.__slices is not None:
             return

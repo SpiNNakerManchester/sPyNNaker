@@ -18,7 +18,8 @@ from spynnaker.pyNN.external_devices_models.push_bot import (
 
 
 class PushBotMotor(AbstractPushBotOutputDevice):
-    """ The properties of the motor devices that may be set.
+    """
+    The properties of the motor devices that may be set.
     The pushbot has two motors, 0 (left) and 1 (right).
     """
     # TODO: is that the right way round?

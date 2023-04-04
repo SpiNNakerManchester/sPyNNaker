@@ -31,9 +31,12 @@ _P_MASK = 0x1
 
 
 class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
-    """ A connection that sends spikes from the PushBot retina to a\
-        spike injector in SpiNNaker.  Note that this assumes a packet format\
-        of 16-bits per retina event.
+    """
+    A connection that sends spikes from the PushBot retina to a spike injector
+    in SpiNNaker.
+
+    .. note::
+        This assumes a packet format of 16-bits per retina event.
     """
     __slots__ = [
         "__lock",
@@ -55,13 +58,9 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
             resolution=PushBotRetinaResolution.NATIVE_128_X_128,
             local_host=None, local_port=None):
         """
-        :param retina_injector_label:
-        :type retina_injector_label: str
-        :param pushbot_wifi_connection:
-        :type pushbot_wifi_connection: PushBotWIFIConnection
-        :param resolution:
-        :type resolution:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
+        :param str retina_injector_label:
+        :param PushBotWIFIConnection pushbot_wifi_connection:
+        :param PushBotRetinaResolution resolution:
         :param local_host:
         :type local_host: str or None
         :param local_port:
@@ -108,10 +107,11 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
             self.__ready = False
 
     def _receive_retina_data(self, data):
-        """ Receive retina packets from the PushBot and converts them into\
-            neuron spikes within the spike injector system.
+        """
+        Receive retina packets from the PushBot and converts them into
+        neuron spikes within the spike injector system.
 
-        :param data: Data to be processed
+        :param bytearray data: Data to be processed
         """
         with self.__lock:
             if not self.__ready:

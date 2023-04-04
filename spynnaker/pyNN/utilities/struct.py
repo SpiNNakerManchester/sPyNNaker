@@ -26,7 +26,8 @@ REPEAT_PER_NEURON_FLAG = 0xFFFFFFFF
 
 
 class StructRepeat(Enum):
-    """ How a struct repeats, or not, in memory
+    """
+    How a struct repeats, or not, in memory.
     """
     #: Indicates a single global struct
     GLOBAL = 0
@@ -36,7 +37,8 @@ class StructRepeat(Enum):
 
 
 class Struct(object):
-    """ Represents a C code structure.
+    """
+    Represents a C code structure.
     """
 
     __slots__ = [
@@ -56,7 +58,7 @@ class Struct(object):
         :param default_values:
             Dict of field name -> value to use when values doesn't contain the
             field
-        :type default_values: dict(str->int or float) or None
+        :type default_values: dict(str, int or float) or None
         """
         self.__fields = fields
         self.__repeat_type = repeat_type
@@ -64,8 +66,9 @@ class Struct(object):
 
     @property
     def fields(self):
-        """ The types and names of the fields, ordered as they appear in the
-            struct.
+        """
+        The types and names of the fields, ordered as they appear in the
+        struct.
 
         :rtype: list(~data_specification.enums.DataType, str)
         """
@@ -73,7 +76,8 @@ class Struct(object):
 
     @property
     def repeat_type(self):
-        """ How the structure repeats
+        """
+        How the structure repeats.
 
         :rtype: StructRepeat
         """
@@ -81,7 +85,8 @@ class Struct(object):
 
     @property
     def numpy_dtype(self):
-        """ The numpy data type of the struct
+        """
+        The numpy data type of the struct.
 
         :rtype: ~numpy.dtype
         """
@@ -91,8 +96,9 @@ class Struct(object):
             align=True)
 
     def get_size_in_whole_words(self, array_size=1):
-        """ Get the size of the struct in whole words in an array of given\
-            size (default 1 item)
+        """
+        Get the size of the struct in whole words in an array of given
+        size (default 1 item).
 
         :param int array_size: The number of elements in an array of structs
         :rtype: int
@@ -102,12 +108,13 @@ class Struct(object):
         return (size_in_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
     def get_data(self, values, vertex_slice=None):
-        """ Get a numpy array of uint32 of data for the given values
+        """
+        Get a numpy array of uint32 of data for the given values.
 
         :param values: The values to fill in the data with
-        :type values: dict(str->one of int, float or AbstractList)
+        :type values: dict(str, int or float or AbstractList)
         :param vertex_slice:
-            The vertex slice to get the data for, or None if the struct is
+            The vertex slice to get the data for, or `None` if the struct is
             global.
         :type vertex_slice: Slice or None
         :rtype: ~numpy.ndarray(dtype="uint32")
@@ -162,7 +169,8 @@ class Struct(object):
 
     def __get_data_for_slice(
             self, data, all_vals, name, data_type, vertex_slice):
-        """ Get the data for a single value from a vertex slice
+        """
+        Get the data for a single value from a vertex slice.
         """
         # If there is a list of values, convert it
         ids = vertex_slice.get_raster_ids()
@@ -181,14 +189,15 @@ class Struct(object):
             data_pos += n_values
 
     def get_generator_data(self, values, vertex_slice=None):
-        """ Get a numpy array of uint32 of data to generate the given values
+        """
+        Get a numpy array of uint32 of data to generate the given values.
 
         :param ~dict-like values:
             The values to fill in the data with
         :param vertex_slice:
-            The vertex slice or None for a struct with repeat_type global, or
+            The vertex slice or `None` for a struct with repeat_type global, or
             where a single value repeats for every neuron.  If this is not the
-            case and vertex_slice is None, an error will be raised!
+            case and vertex_slice is `None`, an error will be raised!
         :type vertex_slice: Slice or None
         :rtype: ~numpy.ndarray(dtype="uint32")
         """
@@ -238,9 +247,9 @@ class Struct(object):
         return numpy.concatenate(all_data)
 
     def __gen_data_one_for_all(self, data, gen_data, values, name):
-        """ Generate data with a single value for all neurons
         """
-
+        Generate data with a single value for all neurons.
+        """
         # How many sub-sets of repeats there are (1 in this case as
         # that one sub-set covers all neurons)
         data.append(1)
@@ -266,9 +275,9 @@ class Struct(object):
 
     def __gen_data_for_slice(
             self, data, gen_data, values, name, vertex_slice):
-        """ Generate data with different values for each neuron
         """
-
+        Generate data with different values for each neuron.
+        """
         # If we have a range list for the value, generate for the range
         if name in values:
             vals = values[name]
@@ -308,7 +317,8 @@ class Struct(object):
 
     @property
     def is_generatable(self):
-        """ Determine if the data inside could be generated on machine
+        """
+        Whether the data inside could be generated on machine.
 
         :rtype: bool
         """
@@ -317,7 +327,8 @@ class Struct(object):
 
     def read_data(
             self, data, values, data_offset=0, vertex_slice=None):
-        """ Read a bytearray of data and write to values
+        """
+        Read a bytearray of data and write to values.
 
         :param data: The data to be read
         :type data: bytes or bytearray
@@ -328,7 +339,7 @@ class Struct(object):
         :param int offset:
             The first index into values to write to.
         :param array_size:
-            The number of struct copies to read, or None if this is a
+            The number of struct copies to read, or `None` if this is a
             non-repeating struct.
         :type array_size: int or None
         """

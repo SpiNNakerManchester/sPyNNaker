@@ -39,8 +39,8 @@ _DIM_DTYPE = [("mask", "uint32"), ("shift", "uint32"), ("pre_start", "uint16"),
 
 class PoolDenseConnector(AbstractConnector):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D\
-    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
+    Where the pre- and post-synaptic populations are considered as a 2D
+    array. Connect every post(row, col) neuron to many pre(row, col, kernel)
     through a (kernel) set of weights and/or delays.
     """
 
@@ -58,15 +58,17 @@ class PoolDenseConnector(AbstractConnector):
                  verbose=False, callback=None):
         """
         :param weights:
-            The synaptic strengths
-            Can be:
+            The synaptic strengths. Can be:
+
             * single value: the same value will be used for all weights
-            * list: the total number of elements must be\
-                    (num after pooling * num post)
-            * numpy.ndarray: As above for list
-            * RandomDistribution: weights will be drawn at random
+            * :py:class:`list`: the total number of elements must be
+              (num after pooling * num post)
+            * :py:class:`~numpy.ndarray`: As above for list
+            * :py:class:`~spynnaker.pyNN.RandomDistribution`:
+              weights will be drawn at random
         :type weights:
-            int or float or list or numpy.ndarray or RandomDistribution
+            int or float or list(int or float) or ~numpy.ndarray or
+            ~spynnaker.pyNN.RandomDistribution
         :param pool_shape:
             Shape of average pooling. If a single value is provided, it will
             be used for every dimension, otherwise must be the same number of
@@ -76,7 +78,7 @@ class PoolDenseConnector(AbstractConnector):
             Jumps between pooling regions. If a single value is provided, the
             same stride will be used for all dimensions, otherwise must be
             the same number of values as there are dimensions in the source.
-            If None, and pool_shape is provided, pool_stride will be set to
+            If `None`, and pool_shape is provided, pool_stride will be set to
             pool_shape.
         :type pool_stride: int or tuple(int) or None
         :param str positive_receptor_type:
@@ -104,14 +106,23 @@ class PoolDenseConnector(AbstractConnector):
 
     @property
     def positive_receptor_type(self):
+        """
+        :rtype: str
+        """
         return self.__positive_receptor_type
 
     @property
     def negative_receptor_type(self):
+        """
+        :rtype: str
+        """
         return self.__negative_receptor_type
 
     @property
     def weights(self):
+        """
+        :rtype: ~numpy.ndarray
+        """
         return self.__weights
 
     def __decode_weights(
@@ -172,7 +183,8 @@ class PoolDenseConnector(AbstractConnector):
             pre_shape, self.__pool_shape, self.__pool_stride)
 
     def __get_n_weights(self, pre_shape, post_shape):
-        """ Get the expected number of weights
+        """
+        Get the expected number of weights.
         """
         shape = self.__get_pre_in_post_shape(pre_shape)
         return numpy.prod(shape) * numpy.prod(post_shape)
@@ -245,10 +257,12 @@ class PoolDenseConnector(AbstractConnector):
             self.__weights, n_conns, synapse_info)
 
     def __pre_as_post(self, pre_coords):
-        """ Write pre coords as post coords.
+        """
+        Write pre coords as post coords.
 
-        :param Iterable pre_coords: An iterable of (x, y) coordinates
-        :rtype: numpy.ndarray
+        :param ~collections.abc.Iterable pre_coords:
+            An iterable of (x, y) coordinates
+        :rtype: ~numpy.ndarray
         """
         coords = numpy.array(pre_coords)
         if self.__pool_stride is not None:
@@ -256,6 +270,11 @@ class PoolDenseConnector(AbstractConnector):
         return coords
 
     def local_only_n_bytes(self, incoming_slices, n_post_atoms):
+        """
+        :param iterable(~pacman.model.graphs.common.Slice) incoming_slices:
+        :param int n_post_atoms:
+        :rtype: int
+        """
         n_weights = [self.__get_n_sub_weights(s, n_post_atoms)
                      for s in incoming_slices]
         n_weights = [n + 1 if n % 2 != 0 else n for n in n_weights]
@@ -268,7 +287,16 @@ class PoolDenseConnector(AbstractConnector):
     def write_local_only_data(
             self, spec, app_edge, pre_vertex_slice, post_vertex_slice,
             key, mask, n_colour_bits, weight_scales):
-
+        """
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~pacman.model.graphs.application.ApplicationEdge app_edge:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int key:
+        :param int mask:
+        :param int n_colour_bits:
+        :param weight_scales:
+        """
         # Write source key info
         spec.write_value(key, data_type=DataType.UINT32)
         spec.write_value(mask, data_type=DataType.UINT32)
@@ -349,7 +377,8 @@ class PoolDenseConnector(AbstractConnector):
         spec.write_array(final_weights.view(numpy.uint32))
 
     def __recip(self, v):
-        """ Compute the reciprocal of a number as an signed 1-bit integer,
-            14-bit fractional fixed point number, encoded in an integer
+        """
+        Compute the reciprocal of a number as an signed 1-bit integer,
+        14-bit fractional fixed point number, encoded in an integer.
         """
         return int(round((1 / v) * (1 << 14)))

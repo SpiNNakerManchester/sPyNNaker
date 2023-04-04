@@ -39,7 +39,8 @@ LOOKUP_TAU_D_SHIFT = 2
 
 class SynapseDynamicsNeuromodulation(
         AbstractPlasticSynapseDynamics, AbstractGenerateOnMachine):
-    """ Synapses that target a neuromodulation receptor
+    """
+    Synapses that target a neuromodulation receptor.
     """
 
     __slots__ = [
@@ -139,14 +140,14 @@ class SynapseDynamicsNeuromodulation(
         if hasattr(self, key):
             return getattr(self, key)
         raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
+            f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics.set_value)
     def set_value(self, key, value):
         if hasattr(self, key):
             setattr(self, key, value)
         raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
+            f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics
                .get_n_words_for_plastic_connections)

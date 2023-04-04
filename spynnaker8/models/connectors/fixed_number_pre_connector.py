@@ -18,8 +18,9 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class FixedNumberPreConnector(_BaseClass):
-    """ Connects a fixed number of pre-synaptic neurons selected at random,\
-        to all post-synaptic neurons.
+    """
+    Connects a fixed number of pre-synaptic neurons selected at random,
+    to all post-synaptic neurons.
 
     .. deprecated:: 6.0
         Use

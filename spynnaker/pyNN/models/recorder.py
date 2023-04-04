@@ -24,7 +24,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class Recorder(object):
-    """ Object to hold recording behaviour, used by populations.
+    """
+    Object to hold recording behaviour, used by populations.
     """
 
     __slots__ = [
@@ -53,15 +54,17 @@ class Recorder(object):
 
     @property
     def write_to_files_indicators(self):
-        """ What variables should be written to files, and where should they\
-            be written.
+        """
+        What variables should be written to files, and where should they
+        be written.
 
         :rtype: dict(str, neo.io.baseio.BaseIO or str or None)
         """
         return self.__write_to_files_indicators
 
     def record(self, variables, to_file, sampling_interval, indexes):
-        """ Turns on (or off) recording
+        """
+        Turns on (or off) recording.
 
         :param variables: either a single variable name or a list of variable
             names. For a given celltype class, ``celltype.recordable`` contains
@@ -115,11 +118,10 @@ class Recorder(object):
 
     def __turn_on_all_record(self, sampling_interval, to_file, indexes):
         """
-
         :param int sampling_interval: the interval to record them
         :param to_file: If set, a file to write to (by handle or name)
         :type to_file: neo.io.baseio.BaseIO or str or None
-        :param indexes: List of indexes to record or None for all
+        :param indexes: List of indexes to record or `None` for all
         :type indexes: list(int) or None
         :raises SimulatorRunningException: If sim.run is currently running
         :raises SimulatorNotSetupException: If called before sim.setup
@@ -136,20 +138,20 @@ class Recorder(object):
 
     def turn_on_record(self, variable, sampling_interval=None, to_file=None,
                        indexes=None):
-        """ Tell the vertex to record data.
+        """
+        Tell the vertex to record data.
 
         :param str variable: The variable to record, supported variables to
             record are: ``gsyn_exc``, ``gsyn_inh``, ``v``, ``spikes``.
         :param int sampling_interval: the interval to record them
         :param to_file: If set, a file to write to (by handle or name)
         :type to_file: neo.io.baseio.BaseIO or str or None
-        :param indexes: List of indexes to record or None for all
+        :param indexes: List of indexes to record or `None` for all
         :type indexes: list(int) or None
         :raises SimulatorRunningException: If sim.run is currently running
         :raises SimulatorNotSetupException: If called before sim.setup
         :raises SimulatorShutdownException: If called after sim.end
         """
-
         SpynnakerDataView.check_user_can_act()
 
         # update file writer
@@ -177,7 +179,8 @@ class Recorder(object):
         return self.__vertex.label
 
     def turn_off_all_recording(self, indexes=None):
-        """ Turns off recording, is used by a pop saying ``.record()``
+        """
+        Turns off recording, is used by a pop saying ``.record()``.
 
         :param indexes:
         :type indexes: list or None
@@ -186,7 +189,8 @@ class Recorder(object):
             self.__vertex.set_not_recording(variable, indexes)
 
     def extract_neo_block(self, variables, view_indexes, clear, annotations):
-        """ Extracts block from the vertices and puts them into a Neo block
+        """
+        Extracts block from the vertices and puts them into a Neo block.
 
         :param list(str) variables: the variables to extract
         :param slice view_indexes: the indexes to be included in the view
@@ -217,7 +221,8 @@ class Recorder(object):
 
     def csv_neo_block(
             self, csv_file, variables, view_indexes=None, annotations=None):
-        """ Extracts block from the vertices and puts them into a Neo block
+        """
+        Extracts block from the vertices and puts them into a Neo block.
 
         :param str variables: the variables to extract
         :param list(str) variables: the variables to extract
@@ -249,15 +254,16 @@ class Recorder(object):
         with NeoBufferDatabase() as db:
             if SpynnakerDataView.is_reset_last():
                 logger.warning(
-                    "Due to the call directly after reset. "
-                    "The data will only contain "
-                    f"{SpynnakerDataView.get_segment_counter()-1} segments")
+                    "Due to the call directly after reset, "
+                    "the data will only contain {} segments",
+                    SpynnakerDataView.get_segment_counter() - 1)
             else:
                 db.csv_segment(
                     csv_file, pop_label, variables, view_indexes)
 
     def cache_data(self):
-        """ Store data for later extraction
+        """
+        Store data for later extraction.
         """
         variables = self.__vertex.get_recording_variables()
         if variables:
@@ -267,12 +273,10 @@ class Recorder(object):
 
     def __append_current_segment(self, block, variables, view_indexes, clear):
         """
-
         :param block:
         :param variables:
         :param view_indexes:
         :param clear:
-        :return:
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
@@ -282,9 +286,9 @@ class Recorder(object):
         with NeoBufferDatabase() as db:
             if SpynnakerDataView.is_reset_last():
                 logger.warning(
-                    "Due to the call directly after reset. "
-                    "The data will only contain "
-                    f"{SpynnakerDataView.get_segment_counter()-1} segments")
+                    "Due to the call directly after reset, "
+                    "the data will only contain {} segments",
+                    SpynnakerDataView.get_segment_counter() - 1)
             else:
                 db.add_segment(
                     block, self.__population.label, variables, view_indexes)
@@ -294,13 +298,11 @@ class Recorder(object):
     def __append_previous_segment(
             self, block, segment_number, variables, view_indexes, clear):
         """
-
         :param block:
         :param segment_number:
         :param variables:
         :param view_indexes:
         :param bool clear:
-        :return:
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording not setup correctly
@@ -308,7 +310,7 @@ class Recorder(object):
         if segment_number not in self.__data_cache:
             logger.warning("No Data available for Segment {}", segment_number)
             segment = neo.Segment(
-                name="segment{}".format(segment_number),
+                name=f"segment{segment_number}",
                 description="Empty",
                 rec_datetime=datetime.now())
             block.segments.append(segment)

@@ -24,11 +24,11 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class _SpynnakerDataModel(object):
     """
-    Singleton data model
+    Singleton data model.
 
     This class should not be accessed directly please use the DataView and
     DataWriter classes.
-    Accessing or editing the data held here directly is NOT SUPPORTED
+    Accessing or editing the data held here directly is *not supported!*
 
     There are other DataModel classes which sit next to this one and hold
     additional data. The DataView and DataWriter classes will combine these
@@ -60,7 +60,7 @@ class _SpynnakerDataModel(object):
 
     def _clear(self):
         """
-        Clears out all data
+        Clears out all data.
         """
         self._id_counter = 0
         self._min_delay = None
@@ -73,14 +73,14 @@ class _SpynnakerDataModel(object):
     def _hard_reset(self):
         """
         Puts all data back into the state expected at graph changed and
-            sim.reset
+        `sim.reset`.
         """
         self._soft_reset()
 
     def _soft_reset(self):
         """
-        Puts all data back into the state expected at sim.reset but not
-        graph changed
+        Puts all data back into the state expected at `sim.reset` but not
+        graph changed.
         """
         # segment_counter is increased by the writer
 
@@ -89,9 +89,10 @@ class SpynnakerDataView(FecDataView):
     """
     Adds the extra Methods to the View for PyNN level.
 
-    See UtilsDataView for a more detailed description.
+    See :py:class:`~spinn_utilities.data.UtilsDataView` for a more detailed
+    description.
 
-    Use this class weherever possible as it inherits all methods from all View
+    Use this class wherever possible as it inherits all methods from all View
     classes.
     """
     # pylint: disable=attribute-defined-outside-init
@@ -102,9 +103,11 @@ class SpynnakerDataView(FecDataView):
 
     @classmethod
     def get_min_delay(cls):
-        """ The minimum supported delay, in milliseconds if available
+        """
+        The minimum supported delay if available, in milliseconds.
 
-        Typically simulation_time_step_per_ms but may be a positive multiple
+        Typically `simulation_time_step_per_ms` but may be a positive multiple
+        of it.
 
         :rtype: float
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -117,7 +120,7 @@ class SpynnakerDataView(FecDataView):
     @classmethod
     def has_min_delay(cls):
         """
-        report if the minimum supported delay, in milliseconds if available
+        Report if there is a minimum supported delay available.
 
         :rtype: bool
         """
@@ -128,18 +131,18 @@ class SpynnakerDataView(FecDataView):
     @classmethod
     def iterate_projections(cls):
         """
-        An iteration of the projections previously added
+        An iteration of the projections previously added.
 
         The iteration will be empty if no projections added.
 
-        :rtpye: iterable(Projection)
+        :rtype: iterable(Projection)
         """
         return iter(cls.__spy_data._projections)
 
     @classmethod
     def get_n_projections(cls):
         """
-        The number of projections previously added
+        The number of projections previously added.
 
         rtype: int
         """
@@ -150,11 +153,11 @@ class SpynnakerDataView(FecDataView):
         """
         Called by each projection to add itself to the list.
 
-        Usage other than from Projection.__init__ is not supported and likely
+        Usage other than from `Projection.__init__` is not supported and likely
         to raise an exception
 
-        :param projection: Projection to add
-        :type projection: ~spynnaker.pyNN.models.projectionProjection
+        :param ~spynnaker.pyNN.models.projection.Projection projection:
+            Projection to add
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If projections should not be added in the current state
         """
@@ -171,20 +174,20 @@ class SpynnakerDataView(FecDataView):
     @classmethod
     def iterate_populations(cls):
         """
-        An iteration of the populations previously added
+        An iteration of the populations previously added.
 
         The iteration will be empty if no populations added.
 
-        :rtpye: iterable(~spynnaker.pyNN.models.populations.Population)
+        :rtype: iterable(~spynnaker.pyNN.models.populations.Population)
         """
         return iter(cls.__spy_data._populations)
 
     @classmethod
     def get_n_populations(cls):
         """
-        The number of populations previously added
+        The number of populations previously added.
 
-        :rtpye: int
+        :rtype: int
         """
         return len(cls.__spy_data._populations)
 
@@ -193,18 +196,21 @@ class SpynnakerDataView(FecDataView):
         """
         Called by each population to add itself to the list.
 
-        Usage other than from Population.__init__ is not supported and likely
+        Usage other than from `Population.__init__` is not supported and likely
         to raise an exception
 
-        Increments the all population id counter by the size of the population.
+        Increments the all population ID counter by the size of the population.
 
-        :param population: Population to add
-        :type population: ~spynnaker.pyNN.models.populations.Population
-        :rtype: (int, int)
-        :return: The first and last global ids for this Population
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
+        :param ~spynnaker.pyNN.models.populations.Population population:
+            Population to add
+        :return: The first and last global IDs for this Population
+        :rtype: tuple(int, int)
+        :raises ~spinn_utilites.exceptions.SimulatorRunningException:
+            If `sim.run` is currently running
+        :raises ~spinn_utilites.exceptions.SimulatorNotSetupException:
+            If called before `sim.setup`
+        :raises ~spinn_utilites.exceptions.SimulatorShutdownException:
+            If called after `sim.end`
         """
         # UGLY but needed to avoid circular import
         from spynnaker.pyNN.models.populations.population import Population
@@ -223,13 +229,12 @@ class SpynnakerDataView(FecDataView):
     def set_number_of_neurons_per_dimension_per_core(
             cls, neuron_type, max_permitted):
         """
-        Sets a ceiling on the number of neurons of a given type that can be\
+        Sets a ceiling on the number of neurons of a given type that can be
         placed on a single core for each dimension.
 
         :param AbstractPopulationVertex neuron_type: neuron type
         :param max_permitted: the number to set to
         :type max_permitted: int or tuple or None
-        :return:
         """
         cls.check_valid_simulator()
         if not issubclass(neuron_type, AbstractPyNNModel):
@@ -240,7 +245,8 @@ class SpynnakerDataView(FecDataView):
 
     @classmethod
     def get_segment_counter(cls):
-        """ The number of the current recording segment being generated.
+        """
+        The number of the current recording segment being generated.
 
         :return: the segment counter
         :rtype: int
@@ -250,9 +256,8 @@ class SpynnakerDataView(FecDataView):
     @classmethod
     def get_sim_name(cls):
         """
-        Gets the name to be returned by pyNN.spiNNaker.name
+        Gets the name to be returned by `pyNN.spiNNaker.name`.
 
-        :rtype str
+        :rtype: str
         """
-
         return _version._NAME   # pylint: disable=protected-access

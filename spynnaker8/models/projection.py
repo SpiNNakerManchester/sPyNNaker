@@ -18,7 +18,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 # pylint: disable=abstract-method,too-many-arguments
 class Projection(_BaseClass):
-    """ sPyNNaker 8 projection class
+    """
+    sPyNNaker 8 projection class.
 
     .. deprecated:: 6.0
         Use

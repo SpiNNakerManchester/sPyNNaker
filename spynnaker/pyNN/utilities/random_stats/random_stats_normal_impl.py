@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsNormalImpl(AbstractRandomStats):
-    """ An implementation of AbstractRandomStats for normal distributions
+    """
+    An implementation of AbstractRandomStats for normal distributions.
     """
 
     def _get_params(self, dist):

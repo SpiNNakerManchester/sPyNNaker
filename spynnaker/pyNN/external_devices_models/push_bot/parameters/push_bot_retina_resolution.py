@@ -17,7 +17,8 @@ from spynnaker.pyNN.protocols import RetinaKey
 
 
 class PushBotRetinaResolution(Enum):
-    """ Resolutions supported by the pushbot retina device
+    """
+    Resolutions supported by the pushbot retina device.
     """
 
     #: The native resolution

@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v7
 
 
 class SpiNNaker(_BaseClass):
-    """ Main interface for the sPyNNaker implementation of PyNN 0.8/0.9
+    """
+    Main interface for the sPyNNaker implementation of PyNN 0.8/0.9.
 
     .. deprecated:: 7.0
         Use

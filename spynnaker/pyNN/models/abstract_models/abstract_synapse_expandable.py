@@ -22,9 +22,10 @@ SYNAPSE_EXPANDER_APLX = "synapse_expander.aplx"
 
 @require_subclass(MachineVertex)
 class AbstractSynapseExpandable(object, metaclass=AbstractBase):
-    """ Indicates a class (a \
-        :py:class:`~pacman.model.graphs.machine.MachineVertex`) \
-        that has may need to run the SYNAPSE_EXPANDER aplx
+    """
+    Indicates a class (a
+    :py:class:`~pacman.model.graphs.machine.MachineVertex`)
+    that has may need to run the SYNAPSE_EXPANDER aplx
 
     .. note::
         This is *not* implemented by the
@@ -36,8 +37,9 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
 
     @abstractmethod
     def gen_on_machine(self):
-        """ True if the synapses of a the slice of this vertex should be \
-            generated on the machine.
+        """
+        True if the synapses of a the slice of this vertex should be
+        generated on the machine.
 
         .. note::
             The typical implementation for this method will be to ask the
@@ -48,16 +50,16 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
 
     @abstractproperty
     def connection_generator_region(self):
-        """ The region containing the parameters of synaptic expansion
+        """
+        The region ID containing the parameters of synaptic expansion.
 
         :rtype: int
-
-        :rtype: bool
         """
 
     @abstractmethod
     def read_generated_connection_holders(self, placement):
-        """ Fill in the connection holders
+        """
+        Fill in the connection holders.
 
         :param ~pacman.model.placements.Placement placement:
             Where the data is on the machine
@@ -65,16 +67,18 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
 
     @abstractproperty
     def max_gen_data(self):
-        """ The maximum amount of synaptic data to be generated.  This
-            is used to calculate the timeout of the execution.
+        """
+        The maximum amount of synaptic data to be generated.
+        This is used to calculate the timeout of the execution.
 
         :rtype: int
         """
 
     @abstractproperty
     def bit_field_size(self):
-        """ The amount of bit field data to be generated.  This is used to
-            calculate the timeout of the execution.
+        """
+        The amount of bit field data to be generated.
+        This is used to calculate the timeout of the execution.
 
         :rtype: int
         """
