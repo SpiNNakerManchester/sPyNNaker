@@ -387,7 +387,7 @@ if _on_rtd:
     # Some packages need mocking
     autodoc_mock_imports = [
         '_tkinter', 'scipy', 'scipy.stats', 'matplotlib',
-        'pyNN', 'pyNN.common', 'neo', 'quantities', 'lazyarray']
+        'neo', 'quantities', 'lazyarray']
 
 
 # Automatically called by sphinx at startup
