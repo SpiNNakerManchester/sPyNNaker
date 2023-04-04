@@ -26,7 +26,7 @@ import numpy as __numpy
 from pyNN import common as pynn_common
 from pyNN.common import control as _pynn_control
 from pyNN.recording import get_io
-from pyNN.random import NumpyRNG, RandomDistribution as _PynnRandomDistribution
+from pyNN.random import NumpyRNG
 from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
 from pyNN.space import distance as _pynn_distance
@@ -37,6 +37,7 @@ from spinn_utilities.helpful_functions import is_singleton
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException)
 
+from spynnaker.pyNN.random_distribution import RandomDistribution
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
@@ -182,81 +183,6 @@ __all__ = [
 __pynn = {}
 # Cache of the simulator created by setup
 __simulator = None
-
-
-class RandomDistribution(_PynnRandomDistribution):
-    """
-    Class which defines a next(n) method which returns an array of ``n``
-    random numbers from a given distribution.
-
-    :param str distribution: the name of a random number distribution.
-    :param parameters_pos:
-        parameters of the distribution, provided as a tuple. For the correct
-        ordering, see `random.available_distributions`.
-    :type parameters_pos: tuple or None
-    :param rng: the random number generator to use, if a specific one is
-        desired (e.g., to provide a seed).
-    :type rng: ~pyNN.random.NumpyRNG or ~pyNN.random.GSLRNG or
-        ~pyNN.random.NativeRNG or None
-    :param parameters_named:
-        parameters of the distribution, provided as keyword arguments.
-
-    Parameters may be provided either through ``parameters_pos`` or through
-    ``parameters_named``, but not both. All parameters must be provided, there
-    are no default values. Parameter names are, in general, as used in
-    Wikipedia.
-
-    Examples::
-
-        >>> rd = RandomDistribution('uniform', (-70, -50))
-        >>> rd = RandomDistribution('normal', mu=0.5, sigma=0.1)
-        >>> rng = NumpyRNG(seed=8658764)
-        >>> rd = RandomDistribution('gamma', k=2.0, theta=5.0, rng=rng)
-
-    .. list-table:: Available distributions
-        :widths: auto
-        :header-rows: 1
-
-        * - Name
-          - Parameters
-          - Comments
-        * - ``binomial``
-          - ``n``, ``p``
-          -
-        * - ``gamma``
-          - ``k``, ``theta``
-          -
-        * - ``exponential``
-          - ``beta``
-          -
-        * - ``lognormal``
-          - ``mu``, ``sigma``
-          -
-        * - ``normal``
-          - ``mu``, ``sigma``
-          -
-        * - ``normal_clipped``
-          - ``mu``, ``sigma``, ``low``, ``high``
-          - Values outside (``low``, ``high``) are redrawn
-        * - ``normal_clipped_to_boundary``
-          - ``mu``, ``sigma``, ``low``, ``high``
-          - Values below/above ``low``/``high`` are set to ``low``/``high``
-        * - ``poisson``
-          - ``lambda_``
-          - Trailing underscore since ``lambda`` is a Python keyword
-        * - ``uniform``
-          - ``low``, ``high``
-          -
-        * - ``uniform_int``
-          - ``low``, ``high``
-          - Only generates integer values
-        * - ``vonmises``
-          - ``mu``, ``kappa``
-          -
-    """
-
-    def __repr__(self):
-        return self.__str__()
 
 
 # Patch the bugs in the PyNN documentation... Ugh!
