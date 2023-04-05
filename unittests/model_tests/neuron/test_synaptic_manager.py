@@ -19,7 +19,7 @@ from tempfile import mkdtemp
 import numpy
 import pytest
 
-from spinn_machine import SDRAM
+from spinn_machine import Machine
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import load_config
 from spinnman.model import CPUInfo
@@ -85,7 +85,8 @@ def say_false(self, weights, delays):
 def test_write_data_spec():
     unittest_setup()
     writer = SpynnakerDataWriter.mock()
-    SDRAM()
+    machine = writer.get_machine()
+    machine.set_max_sdram_found(117 * 1024 * 1024)
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
@@ -427,7 +428,8 @@ def test_pop_based_master_pop_table_standard(
         n_pre_neurons, neurons_per_core, max_delay):
     unittest_setup()
     writer = SpynnakerDataWriter.mock()
-    SDRAM()
+    machine = writer.get_machine()
+    machine.set_max_sdram_found(117 * 1024 * 1024)
 
     # Build a from list connector with the delays we want
     connections = []
@@ -489,7 +491,7 @@ def test_pop_based_master_pop_table_standard(
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(
-            spec_reader, SDRAM.max_sdram_found)
+            spec_reader, Machine.get_max_sdram_found())
         executor.execute()
 
     # Read the population table and check entries
