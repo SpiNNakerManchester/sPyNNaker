@@ -19,7 +19,6 @@ from tempfile import mkdtemp
 import numpy
 import pytest
 
-from spinn_machine import Machine
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import load_config
 from spinnman.model import CPUInfo
@@ -30,6 +29,7 @@ from pacman.operations.routing_info_allocator_algorithms import (
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices,\
     SynapseRegions
@@ -491,7 +491,7 @@ def test_pop_based_master_pop_table_standard(
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(
-            spec_reader, Machine.get_max_sdram_found())
+            spec_reader, SpynnakerDataView.get_max_sdram_found())
         executor.execute()
 
     # Read the population table and check entries
