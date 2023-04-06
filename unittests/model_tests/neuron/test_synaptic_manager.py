@@ -85,7 +85,7 @@ def say_false(self, weights, delays):
 def test_write_data_spec():
     unittest_setup()
     writer = SpynnakerDataWriter.mock()
-    writer.set_max_sdram_found(117 * 1024 * 1024)
+    writer.set_mocked_max_sdram_found(117 * 1024 * 1024)
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
@@ -424,7 +424,7 @@ def test_pop_based_master_pop_table_standard(
         n_pre_neurons, neurons_per_core, max_delay):
     unittest_setup()
     writer = SpynnakerDataWriter.mock()
-    writer.set_max_sdram_found(117 * 1024 * 1024)
+    writer.set_mocked_max_sdram_found(117 * 1024 * 1024)
 
     # Build a from list connector with the delays we want
     connections = []
