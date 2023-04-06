@@ -89,7 +89,6 @@ def test_write_data_spec():
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
-    p.setup(1.0)
     load_config()
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
     pre_pop = p.Population(
@@ -115,7 +114,6 @@ def test_write_data_spec():
         pre_pop, post_pop, p.FromListConnector(from_list_list),
         p.StaticSynapse())
 
-    writer.start_run()
     writer.set_plan_n_timesteps(100)
     d_vertices, d_edges = delay_support_adder()
     for vertex in d_vertices:
@@ -217,7 +215,6 @@ def test_write_data_spec():
 
 def test_set_synapse_dynamics():
     unittest_setup()
-    p.setup(1.0)
     post_app_model = IFCurrExpBase()
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", spikes_per_second=None,
@@ -441,7 +438,6 @@ def test_pop_based_master_pop_table_standard(
     # Make simple source and target, where the source has 1000 atoms
     # split into 10 vertices (100 each) and the target has 100 atoms in
     # a single vertex
-    p.setup(1.0)
     post_pop = p.Population(
         256, p.IF_curr_exp(), label="Post",
         additional_parameters={
@@ -454,7 +450,6 @@ def test_pop_based_master_pop_table_standard(
     p.Projection(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
-    writer.start_run()
     writer.set_plan_n_timesteps(100)
     d_vertices, d_edges = delay_support_adder()
     for vertex in d_vertices:
