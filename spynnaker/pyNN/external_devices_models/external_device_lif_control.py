@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,9 +27,9 @@ from .threshold_type_multicast_device_control import (
 
 
 class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
-    """ Abstract control module for the PushBot, based on the LIF neuron,\
-        but without spikes, and using the voltage as the output to the various\
-        devices
+    """
+    Abstract control module for the PushBot, based on the LIF neuron, but
+    without spikes, and using the voltage as the output to the various devices.
     """
     __slots__ = [
         "_create_edges",
@@ -101,8 +101,8 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             max_stdp_spike_delta):
         if n_neurons != len(self._devices):
             raise ConfigurationException(
-                "Number of neurons does not match number of devices in {}"
-                .format(label))
+                "Number of neurons does not match number of "
+                f"devices in {label}")
         self._model.n_steps_per_timestep = n_steps_per_timestep
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return ExternalDeviceLifControlVertex(

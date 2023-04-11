@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,7 +31,8 @@ from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 
 class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
-    """ Class that enables synaptic rewiring in the absence of STDP.
+    """
+    Class that enables synaptic rewiring in the absence of STDP.
 
     It acts as a wrapper around SynapseDynamicsStatic, meaning that rewiring
     can operate in parallel with static synapses.

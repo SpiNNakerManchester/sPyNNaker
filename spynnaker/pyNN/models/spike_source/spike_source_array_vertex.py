@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,7 +54,8 @@ def _send_buffer_times(spike_times, time_step):
 class SpikeSourceArrayVertex(
         ReverseIpTagMultiCastSource, PopulationApplicationVertex,
         SupportsStructure):
-    """ Model for play back of spikes
+    """
+    Model for play back of spikes.
     """
 
     __slots__ = ["__model_name",
@@ -137,14 +138,14 @@ class SpikeSourceArrayVertex(
                 logger.warning(
                     "Danger of SpikeSourceArray sending too many spikes "
                     "at the same time. "
-                    f"This is because ({self.n_atoms}) neurons "
-                    f"share the same spike list")
+                    "This is because ({}) neurons share the same spike list",
+                    self.n_atoms)
             else:
                 logger.warning(
                     "Danger of SpikeSourceArray sending too many spikes "
                     "at the same time. "
-                    f"For example at time {val} {count * self.n_atoms} "
-                    f"spikes will be sent")
+                    "For example at time {}, {} spikes will be sent",
+                    val, count * self.n_atoms)
 
     def _check_density_double_list(self, spike_times):
         counter = Counter()
@@ -156,7 +157,8 @@ class SpikeSourceArrayVertex(
             logger.warning(
                 "Danger of SpikeSourceArray sending too many spikes "
                 "at the same time. "
-                f"For example at time {val} {count} spikes will be sent")
+                "For example at time {}, {} spikes will be sent",
+                val, count)
 
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure):
@@ -171,11 +173,11 @@ class SpikeSourceArrayVertex(
 
     def _to_early_spikes_single_list(self, spike_times):
         """
-        Checks if there is one or more spike_times before the current time
+        Checks if there is one or more spike_times before the current time.
 
-        Logs a warning for the first oen found
+        Logs a warning for the first one found
 
-        :param iterable(int spike_times:
+        :param iterable(int) spike_times:
         """
         current_time = SpynnakerDataView.get_current_run_time_ms()
         for i in range(len(spike_times)):
@@ -183,17 +185,17 @@ class SpikeSourceArrayVertex(
                 logger.warning(
                     "SpikeSourceArray {} has spike_times that are lower than "
                     "the current time {} For example {} - "
-                    "these will be ignored.".format(
-                        self, current_time, float(spike_times[i])))
+                    "these will be ignored.",
+                    self, current_time, float(spike_times[i]))
                 return
 
     def _check_spikes_double_list(self, spike_times):
         """
-        Checks if there is one or more spike_times before the current time
+        Checks if there is one or more spike_times before the current time.
 
-        Logs a warning for the first oen found
+        Logs a warning for the first one found
 
-        :param iterable(iterable(int) spike_times:
+        :param iterable(int) spike_times:
         """
         current_time = SpynnakerDataView.get_current_run_time_ms()
         for neuron_id in range(0, self.n_atoms):
@@ -201,15 +203,15 @@ class SpikeSourceArrayVertex(
             for i in range(len(id_times)):
                 if id_times[i] < current_time:
                     logger.warning(
-                       "SpikeSourceArray {} has spike_times that are lower "
-                       "than the current time {} For example {} - "
-                       "these will be ignored.".format(
-                            self, current_time, float(id_times[i])))
+                        "SpikeSourceArray {} has spike_times that are lower "
+                        "than the current time {} For example {} - "
+                        "these will be ignored.",
+                        self, current_time, float(id_times[i]))
                     return
 
     def __set_spike_buffer_times(self, spike_times):
-        """ Set the spike source array's buffer spike times
-
+        """
+        Set the spike source array's buffer spike times.
         """
         time_step = SpynnakerDataView.get_simulation_time_step_us()
         # warn the user if they are asking for a spike time out of range
@@ -315,16 +317,16 @@ class SpikeSourceArrayVertex(
         return None
 
     def describe(self):
-        """ Returns a human-readable description of the cell or synapse type.
+        """
+        Returns a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template\
-        together with an associated template engine\
+        The output may be customised by specifying a different template
+        together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template\
+        If template is `None`, then a dictionary containing the template
         context will be returned.
         """
-
         parameters = self.get_parameter_values(self.__model.default_parameters)
 
         context = {

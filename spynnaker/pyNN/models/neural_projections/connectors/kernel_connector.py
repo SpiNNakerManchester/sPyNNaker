@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,8 +40,8 @@ def shape2word(sw, sh):
 class KernelConnector(AbstractGenerateConnectorOnMachine,
                       AbstractGenerateConnectorOnHost):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D\
-    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
+    Where the pre- and post-synaptic populations are considered as a 2D
+    array. Connect every post(row, col) neuron to many pre(row, col, kernel)
     through a (kernel) set of weights and/or delays.
 
     .. admonition:: TODO
@@ -161,7 +161,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         self._post_as_pre = {}
 
     def __to_post_coords(self, post_vertex_slice):
-        """ Get a list of possible post-slice coordinates.
+        """
+        Get a list of possible post-slice coordinates.
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
@@ -171,7 +172,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return numpy.divmod(post, self._post_w)
 
     def __map_to_pre_coords(self, post_r, post_c):
-        """ Get a map from post to pre coords.
+        """
+        Get a map from post to pre coords.
 
         :param ~numpy.ndarray post_r: rows
         :param ~numpy.ndarray post_c: columns
@@ -181,7 +183,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 self._post_start_w + post_c * self._post_step_w)
 
     def __post_as_pre(self, post_vertex_slice):
-        """ Write post coords as pre coords.
+        """
+        Write post coords as pre coords.
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
@@ -195,7 +198,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return self._post_as_pre[str(post_vertex_slice)]
 
     def __pre_as_post(self, pre_r, pre_c):
-        """ Write pre coords as post coords.
+        """
+        Write pre coords as post coords.
 
         :param int pre_r: row
         :param int pre_c: column
@@ -206,7 +210,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return (r, c)
 
     def __get_kernel_vals(self, vals):
-        """ Convert kernel values given into the correct format.
+        """
+        Convert kernel values given into the correct format.
 
         :param vals:
         :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
@@ -234,7 +239,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     def __compute_statistics(
             self, weights, delays, post_vertex_slice, n_pre_neurons):
-        """ Compute the relevant information required for the connections.
+        """
+        Compute the relevant information required for the connections.
 
         :param weights:
         :type weights: int or float or ~pyNN.random.NumpyRNG or
@@ -408,8 +414,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             weights, synapse_info)
 
     def __repr__(self):
-        return "KernelConnector(shape_kernel[{},{}])".format(
-            self._kernel_w, self._kernel_h)
+        return \
+            f"KernelConnector(shape_kernel[{self._kernel_w},{self._kernel_h}])"
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(

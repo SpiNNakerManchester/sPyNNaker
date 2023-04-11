@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,8 +29,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class PopulationView(PopulationBase):
-    """ A view of a subset of neurons within a\
-        :py:class:`~spynnaker.pyNN.models.populations.Population`.
+    """
+    A view of a subset of neurons within a
+    :py:class:`~spynnaker.pyNN.models.populations.Population`.
 
     In most ways, Populations and PopulationViews have the same behaviour,
     i.e., they can be recorded, connected with Projections, etc.
@@ -109,7 +110,8 @@ class PopulationView(PopulationBase):
 
     @property
     def size(self):
-        """ The total number of neurons in the Population View.
+        """
+        The total number of neurons in the Population View.
 
         :rtype: int
         """
@@ -117,7 +119,8 @@ class PopulationView(PopulationBase):
 
     @property
     def label(self):
-        """ A label for the Population View.
+        """
+        A label for the Population View.
 
         :rtype: str
         """
@@ -125,7 +128,8 @@ class PopulationView(PopulationBase):
 
     @property
     def celltype(self):
-        """ The type of neurons making up the underlying Population.
+        """
+        The type of neurons making up the underlying Population.
 
         :rtype: AbstractPyNNModel
         """
@@ -133,7 +137,8 @@ class PopulationView(PopulationBase):
 
     @property
     def initial_values(self):
-        """ A dict containing the initial values of the state variables.
+        """
+        A dict containing the initial values of the state variables.
 
         :rtype: InitialValuesHolder
         """
@@ -142,7 +147,8 @@ class PopulationView(PopulationBase):
 
     @property
     def current_values(self):
-        """ A dict containing the initial values of the state variables.
+        """
+        A dict containing the current values of the state variables.
 
         :rtype: InitialValuesHolder
         """
@@ -154,7 +160,8 @@ class PopulationView(PopulationBase):
 
     @property
     def parent(self):
-        """ A reference to the parent Population (that this is a view of).
+        """
+        A reference to the parent Population (that this is a view of).
 
         :rtype: ~spynnaker.pyNN.models.populations.Population
         """
@@ -162,7 +169,8 @@ class PopulationView(PopulationBase):
 
     @property
     def mask(self):
-        """  The selector mask that was used to create this view.
+        """
+        The selector mask that was used to create this view.
 
         :rtype: None or slice or int or list(bool) or list(int) or
             ~numpy.ndarray(bool) or ~numpy.ndarray(int)
@@ -171,8 +179,9 @@ class PopulationView(PopulationBase):
 
     @property
     def all_cells(self):
-        """ An array containing the cell IDs of all neurons in the\
-            Population (all MPI nodes).
+        """
+        An array containing the cell IDs of all neurons in the
+        Population (all MPI nodes).
 
         :rtype: list(IDMixin)
         """
@@ -183,9 +192,10 @@ class PopulationView(PopulationBase):
         return tuple(self.__indexes)
 
     def __getitem__(self, index):
-        """ Return either a single cell (ID object) from the Population,\
-            if index is an integer, or a subset of the cells\
-            (PopulationView object), if index is a slice or array.
+        """
+        Return either a single cell (ID object) from the Population,
+        if index is an integer, or a subset of the cells
+        (PopulationView object), if index is a slice or array.
 
         .. note::
             ``__getitem__`` is called when using[] access, e.g. if
@@ -193,37 +203,41 @@ class PopulationView(PopulationBase):
             ``p[2]`` is equivalent to ``p.__getitem__(2)``, and
             ``p[3:6]`` is equivalent to ``p.__getitem__(slice(3, 6))``
 
-        :rtype: ~.IDMixin or ~.PopulationView
+        :rtype: IDMixin or ~.PopulationView
         """
         if isinstance(index, int):
             return IDMixin(self.__population, index)
         return PopulationView(self, index, label=self.label + "_" + str(index))
 
     def __iter__(self):
-        """ Iterator over cell IDs (on the local node).
+        """
+        Iterator over cell IDs (on the local node).
 
-        :rtype: iterable(~.IDMixin)
+        :rtype: iterable(IDMixin)
         """
         for idx in self.__indexes:
             yield IDMixin(self.__population, idx)
 
     def __len__(self):
-        """ Return the total number of cells in the population (all nodes).
+        """
+        Return the total number of cells in the population (all nodes).
 
         :rtype: int
         """
         return len(self.__indexes)
 
     def all(self):
-        """ Iterator over cell IDs (on all MPI nodes).
+        """
+        Iterator over cell IDs (on all MPI nodes).
 
-        :rtype: iterable(~.IDMixin)
+        :rtype: iterable(IDMixin)
         """
         for idx in self.__indexes:
             yield IDMixin(self.__population, idx)
 
     def can_record(self, variable):
-        """ Determine whether variable can be recorded from this population.
+        """
+        Determine whether variable can be recorded from this population.
 
         :rtype: bool
         """
@@ -231,24 +245,27 @@ class PopulationView(PopulationBase):
 
     @property
     def conductance_based(self):
-        """ Indicates whether the post-synaptic response is modelled as a\
-            change in conductance or a change in current.
+        """
+        Whether the post-synaptic response is modelled as a
+        change in conductance or a change in current.
 
         :rtype: bool
         """
         return self.__vertex.conductance_based
 
     def inject(self, current_source):
-        """ Injects the specified current_source into this PopulationView.
+        """
+        Injects the specified current_source into this PopulationView.
 
-        :param ~pyNN.standardmodels.electrodes.StandardCurrentSource\
-            current_source: the CurrentSource to be injected
+        :param AbstractCurrentSource current_source:
+            the current source to be injected
         """
         self.__vertex.inject(current_source, self.__indexes)
 
     def describe(self, template='populationview_default.txt',
                  engine='default'):
-        """ Returns a human-readable description of the population view.
+        """
+        Returns a human-readable description of the population view.
 
         The output may be customized by specifying a different template
         together with an associated template engine (see pyNN.descriptions).
@@ -269,7 +286,8 @@ class PopulationView(PopulationBase):
         return descriptions.render(engine, template, context)
 
     def find_units(self, variable):
-        """ Get the units of a variable
+        """
+        Get the units of a variable
 
         .. warning::
             No PyNN description of this method.
@@ -281,9 +299,9 @@ class PopulationView(PopulationBase):
         return self.__vertex.get_units(variable)
 
     def get(self, parameter_names, gather=False, simplify=True):
-        """ Get the values of the given parameters for every local cell in\
-            the population, or, if ``gather=True``,\
-            for all cells in the population.
+        """
+        Get the values of the given parameters for every local cell in the
+        population, or, if ``gather=True``, for all cells in the population.
 
         Values will be expressed in the standard PyNN units (i.e. millivolts,
         nanoamps, milliseconds, microsiemens, nanofarads, event per second).
@@ -308,8 +326,9 @@ class PopulationView(PopulationBase):
 
     def get_data(
             self, variables='all', gather=True, clear=False, annotations=None):
-        """ Return a Neo Block containing the data(spikes, state variables)\
-            recorded from the Population.
+        """
+        Return a Neo Block containing the data(spikes, state variables)
+        recorded from the Population.
 
         :param variables: Either a single variable name or a list of variable
             names. Variables must have been previously recorded, otherwise an
@@ -346,15 +365,17 @@ class PopulationView(PopulationBase):
             variables, self.__indexes, clear, annotations)
 
     def spinnaker_get_spikes(self):
-        """ Pulic accessor for getting spikes as a numpy array, instead of\
-            the neo based object
+        """
+        Public accessor for getting spikes as a numpy array, instead of
+        the Neo-based object
         """
         spikes = self.__recorder.get_data("spikes")
         return spikes[numpy.isin(spikes[:, 0], self.__indexes)]
 
     def spinnaker_get_data(self, variable, as_matrix=False):
-        """ Public accessor for getting data as a numpy array, instead of\
-            the neo based object
+        """
+        Public accessor for getting data as a numpy array, instead of
+        the Neo-based object
 
         :param str variable: a single variable name
         :param bool as_matrix: If set True the data is returned as a 2d matrix
@@ -365,7 +386,8 @@ class PopulationView(PopulationBase):
             variable, as_matrix, self.__indexes)
 
     def get_spike_counts(self, gather=True):
-        """ Returns a dict containing the number of spikes for each neuron.
+        """
+        Returns a dict containing the number of spikes for each neuron.
 
         The dict keys are neuron IDs, not indices.
 
@@ -387,8 +409,9 @@ class PopulationView(PopulationBase):
 
     @property
     def grandparent(self):
-        """ Returns the parent Population at the root of the tree (since the\
-            immediate parent may itself be a PopulationView).
+        """
+        The parent Population at the root of the tree (since the
+        immediate parent may itself be a PopulationView).
 
         The name "grandparent" is of course a little misleading, as it could
         be just the parent, or the great, great, great, ..., grandparent.
@@ -398,8 +421,9 @@ class PopulationView(PopulationBase):
         return self.__population
 
     def id_to_index(self, id):  # pylint: disable=redefined-builtin
-        """ Given the ID(s) of cell(s) in the PopulationView, return its /\
-            their index / indices(order in the PopulationView).
+        """
+        Given the ID(s) of cell(s) in the PopulationView, return its /
+        their index / indices(order in the PopulationView).
 
         assert pv.id_to_index(pv[3]) == 3
 
@@ -412,8 +436,9 @@ class PopulationView(PopulationBase):
         return [self.__indexes.index(idx) for idx in id]
 
     def index_in_grandparent(self, indices):
-        """ Given an array of indices, return the indices in the parent\
-            population at the root of the tree.
+        """
+        Given an array of indices, return the indices in the parent
+        population at the root of the tree.
 
         :param list(int) indices:
         :rtype: list(int)
@@ -421,11 +446,12 @@ class PopulationView(PopulationBase):
         return [self.__indexes[index] for index in indices]
 
     def initialize(self, **initial_values):
-        """ Set initial values of state variables, e.g. the membrane\
-            potential.  Values passed to ``initialize()`` may be:
+        """
+        Set initial values of state variables, e.g. the membrane potential.
+        Values passed to ``initialize()`` may be:
 
         * single numeric values (all neurons set to the same value), or
-        * :py:class:`~pyNN.random.RandomDistribution` objects, or
+        * :py:class:`~spynnaker.pyNN.RandomDistribution` objects, or
         * lists / arrays of numbers of the same size as the population
           mapping functions, where a mapping function accepts a single
           argument (the cell index) and returns a single number.
@@ -440,17 +466,17 @@ class PopulationView(PopulationBase):
             p.initialize(v=rand_distr, gsyn_exc=0.0)
             p.initialize(v=lambda i: -65 + i / 10.0)
         """
-
         for variable, value in initial_values.items():
             self.__vertex.set_initial_state_values(
                 variable, value, self.__indexes)
 
     def set_state(self, **initial_values):
-        """ Set current values of state variables, e.g. the membrane\
-            potential.  Values passed to ``initialize()`` may be:
+        """
+        Set current values of state variables, e.g. the membrane potential.
+        Values passed to ``initialize()`` may be:
 
         * single numeric values (all neurons set to the same value), or
-        * :py:class:`~pyNN.random.RandomDistribution` objects, or
+        * :py:class:`~spynnaker.pyNN.RandomDistribution` objects, or
         * lists / arrays of numbers of the same size as the population
           mapping functions, where a mapping function accepts a single
           argument (the cell index) and returns a single number.
@@ -473,8 +499,9 @@ class PopulationView(PopulationBase):
                 variable, value, self.__indexes)
 
     def record(self, variables,  to_file=None, sampling_interval=None):
-        """ Record the specified variable or variables for all cells in the\
-            Population or view.
+        """
+        Record the specified variable or variables for all cells in the
+        Population or view.
 
         :param variables: either a single variable name, or a list of variable
             names, or ``all`` to record everything. For a given celltype
@@ -494,8 +521,9 @@ class PopulationView(PopulationBase):
             variables, to_file, sampling_interval, self.__indexes)
 
     def sample(self, n, rng=None):
-        """ Randomly sample `n` cells from the Population view, and return a\
-            new PopulationView object.
+        """
+        Randomly sample `n` cells from the Population view, and return a
+        new PopulationView object.
 
         :param int n: The number of cells to select
         :param ~pyNN.random.NumpyRNG rng: Random number generator
@@ -507,14 +535,15 @@ class PopulationView(PopulationBase):
             numpy.arange(len(self), dtype=numpy.int))[0:n]
         return PopulationView(
             self, indices,
-            label="Random sample size {} from {}".format(n, self.label))
+            label=f"Random sample size {n} from {self.label}")
 
     def set(self, **parameters):
-        """ Set one or more parameters for every cell in the population.\
-            Values passed to `set()` may be:
+        """
+        Set one or more parameters for every cell in the population.
+        Values passed to `set()` may be:
 
         * single values,
-        * :py:class:`~pyNN.random.RandomDistribution` objects, or
+        * :py:class:`~spynnaker.pyNN.RandomDistribution` objects, or
         * lists / arrays of values of the same size as the population
           mapping functions, where a mapping function accepts a single
           argument (the cell index) and returns a single value.
@@ -538,8 +567,9 @@ class PopulationView(PopulationBase):
 
     def write_data(self, io, variables='all', gather=True, clear=False,
                    annotations=None):
-        """ Write recorded data to file, using one of the file formats\
-            supported by Neo.
+        """
+        Write recorded data to file, using one of the file formats
+        supported by Neo.
 
         :param io: a Neo IO instance or the name of a file to write
         :type io: neo.io.BaseIO or str
@@ -617,7 +647,8 @@ class IDMixin(PopulationView):
     __slots__ = []
 
     def get_parameters(self):
-        """ Return a dict of all cell parameters.
+        """
+        Return a dict of all cell parameters.
 
         :rtype: dict(str, ...)
         """
@@ -644,7 +675,8 @@ class IDMixin(PopulationView):
         return self._vertex.set_parameter_values(name, value, self.id)
 
     def get_initial_value(self, variable):
-        """ Get the initial value of a state variable of the cell.
+        """
+        Get the initial value of a state variable of the cell.
 
         :param str variable: The name of the variable
         :rtype: float
@@ -657,21 +689,24 @@ class IDMixin(PopulationView):
             self._vertex.get_state_variables(), self.id)
 
     def set_initial_value(self, variable, value):
-        """ Set the initial value of a state variable of the cell.
+        """
+        Set the initial value of a state variable of the cell.
+
         :param str variable: The name of the variable
         :param float value: The value of the variable
         """
         self._vertex.set_initial_state_values(variable, value, self.id)
 
     def set_parameters(self, **parameters):
-        """ Set cell parameters, given as a sequence of parameter=value\
-            arguments.
+        """
+        Set cell parameters, given as a sequence of parameter=value arguments.
         """
         for (name, value) in parameters.items():
             self._vertex.set_parameter_values(name, value, self.id)
 
     def as_view(self):
-        """ Return a PopulationView containing just this cell.
+        """
+        Return a PopulationView containing just this cell.
 
         :rtype: ~spynnaker.pyNN.models.populations.PopulationView
         """
@@ -679,7 +714,8 @@ class IDMixin(PopulationView):
 
     @property
     def local(self):
-        """ Whether this cell is local to the current MPI node.
+        """
+        Whether this cell is local to the current MPI node.
 
         :rtype: bool
         """

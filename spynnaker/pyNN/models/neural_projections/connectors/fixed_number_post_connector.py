@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,8 +28,9 @@ N_GEN_PARAMS = 8
 
 class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
                                AbstractGenerateConnectorOnHost):
-    """ Connects a fixed number of post-synaptic neurons selected at random,\
-        to all pre-synaptic neurons.
+    """
+    Connects a fixed number of post-synaptic neurons selected at random,
+    to all pre-synaptic neurons.
     """
 
     __slots__ = [
@@ -119,9 +120,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
             # if verbose open a file to output the connectivity
             if self.verbose:
-                filename = synapse_info.pre_population.label + \
-                    '_to_' + synapse_info.post_population.label + \
-                    '_fixednumberpost-conn.csv'
+                filename = "{}_to_{}_fixednumberpost-conn.csv".format(
+                    synapse_info.pre_population.label,
+                    synapse_info.post_population.label)
                 print('Output post-connectivity to ', filename)
                 with open(filename, 'w', encoding="utf-8") as file_handle:
                     numpy.savetxt(file_handle,
@@ -183,8 +184,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             this_post_neuron_array <= post_vertex_slice.hi_atom)]
 
     def _n_post_neurons_in_slice(self, post_vertex_slice, n, synapse_info):
-        """ Count the number of post neurons in the slice. \
-            Faster than ``len(_post_neurons_in_slice(...))``.
+        """
+        Count the number of post neurons in the slice.
+        Faster than ``len(_post_neurons_in_slice(...))``.
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param int n:
@@ -276,7 +278,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return "FixedNumberPostConnector({})".format(self.__n_post)
+        return f"FixedNumberPostConnector({self.__n_post})"
 
     @property
     def allow_self_connections(self):

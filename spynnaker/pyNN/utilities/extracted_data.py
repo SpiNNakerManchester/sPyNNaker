@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,8 @@ from collections import defaultdict
 
 
 class ExtractedData(object):
-    """ Data holder for all synaptic data being extracted in parallel.
+    """
+    Data holder for all synaptic data being extracted in parallel.
     """
     # @Chimp: play here to hearts content.
 
@@ -26,7 +27,8 @@ class ExtractedData(object):
         self.__data = defaultdict(dict)
 
     def get(self, projection, attribute):
-        """ Allow getting data from a given projection and attribute
+        """
+        Allow getting data from a given projection and attribute.
 
         :param ~spynnaker.pyNN.models.projection.Projection projection:
             the projection data was extracted from
@@ -41,7 +43,8 @@ class ExtractedData(object):
         return None
 
     def set(self, projection, attribute, data):
-        """ Allow the addition of data from a projection and attribute.
+        """
+        Allow the addition of data from a projection and attribute.
 
         :param ~spynnaker.pyNN.models.projection.Projection projection:
             the projection data was extracted from
@@ -49,6 +52,5 @@ class ExtractedData(object):
         :type attribute: list(int) or tuple(int) or None
         :param ConnectionHolder data:
             attribute data in a connection holder
-        :rtype: None
         """
         self.__data[projection][attribute] = data

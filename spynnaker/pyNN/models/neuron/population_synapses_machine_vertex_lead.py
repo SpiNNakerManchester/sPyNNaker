@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,8 +25,9 @@ class PopulationSynapsesMachineVertexLead(
         PopulationMachineSynapses,
         AbstractGeneratesDataSpecification,
         AbstractRewritesDataSpecification):
-    """ A synaptic machine vertex that leads other Synaptic machine vertices,
-        writing shared areas.
+    """
+    A synaptic machine vertex that leads other synaptic machine vertices,
+    writing shared areas.
     """
 
     __slots__ = [
@@ -91,13 +92,8 @@ class PopulationSynapsesMachineVertexLead(
             self.vertex_slice)
         return ids
 
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification)
+    @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        """
-        :param routing_info: (injected)
-        """
-        # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)

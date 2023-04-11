@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,16 +34,16 @@ class TestMultiDelay(BaseTestCase):
             synapse_type=sim.StaticSynapse(weight=5, delay=1))
         sim.Projection(
             input, pop_1, sim.OneToOneConnector(),
-            synapse_type=sim.StaticSynapse(weight=5, delay=20))
-        sim.Projection(
-            input, pop_1, sim.OneToOneConnector(),
-            synapse_type=sim.StaticSynapse(weight=5, delay=40))
-        sim.Projection(
-            input, pop_1, sim.OneToOneConnector(),
-            synapse_type=sim.StaticSynapse(weight=5, delay=60))
-        sim.Projection(
-            input, pop_1, sim.OneToOneConnector(),
             synapse_type=sim.StaticSynapse(weight=5, delay=80))
+        sim.Projection(
+            input, pop_1, sim.OneToOneConnector(),
+            synapse_type=sim.StaticSynapse(weight=5, delay=160))
+        sim.Projection(
+            input, pop_1, sim.OneToOneConnector(),
+            synapse_type=sim.StaticSynapse(weight=5, delay=240))
+        sim.Projection(
+            input, pop_1, sim.OneToOneConnector(),
+            synapse_type=sim.StaticSynapse(weight=5, delay=320))
         pop_1.record(["spikes"])
         sim.run(4000)
 

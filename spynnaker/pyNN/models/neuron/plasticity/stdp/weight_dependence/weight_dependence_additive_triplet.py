@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,8 @@ _SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
 class WeightDependenceAdditiveTriplet(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
-    """ An triplet-based additive weight dependence STDP rule.
+    """
+    An triplet-based additive weight dependence STDP rule.
     """
     __slots__ = [
         "__a3_minus",
@@ -56,7 +57,8 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def w_min(self):
-        """ :math:`w^{min}`
+        """
+        :math:`w^{min}`
 
         :rtype: float
         """
@@ -64,7 +66,8 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def w_max(self):
-        """ :math:`w^{max}`
+        """
+        :math:`w^{max}`
 
         :rtype: float
         """
@@ -72,7 +75,8 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def A3_plus(self):
-        """ :math:`A_3^+`
+        """
+        :math:`A_3^+`
 
         :rtype: float
         """
@@ -80,7 +84,8 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def A3_minus(self):
-        """ :math:`A_3^-`
+        """
+        :math:`A_3^-`
 
         :rtype: float
         """
@@ -100,7 +105,8 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
@@ -147,6 +153,12 @@ class WeightDependenceAdditiveTriplet(
     @property
     @overrides(AbstractWeightDependence.weight_maximum)
     def weight_maximum(self):
+        """
+        The maximum weight that will ever be set in a synapse as a result
+        of this rule.
+
+        :rtype: float
+        """
         return self.__w_max
 
     @property

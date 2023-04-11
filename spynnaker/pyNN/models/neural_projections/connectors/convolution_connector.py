@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,19 +26,21 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 #: The number of 32-bit words in the source_key_info struct
 SOURCE_KEY_INFO_WORDS = 7
 
 #: The number of 16-bit shorts in the connector struct,
-#: ignoring the source_key_info struct but including the 32-bit weight index
-CONNECTOR_CONFIG_SHORTS = 14
+#: ignoring the source_key_info struct but including the delay and the
+#: 32-bit weight index
+CONNECTOR_CONFIG_SHORTS = 16
 
 
 class ConvolutionConnector(AbstractConnector):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D\
-    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
+    Where the pre- and post-synaptic populations are considered as a 2D
+    array. Connect every post(row, col) neuron to many pre(row, col, kernel)
     through a (kernel) set of weights and/or delays.
     """
 
@@ -61,21 +63,23 @@ class ConvolutionConnector(AbstractConnector):
         :param kernel_weights:
             The synaptic strengths, shared by neurons in the post population.
             Can be:
-            * single value: kernel_shape must be provided;\
-                            the same value will be used for all weights
-            * simple list: kernel_shape must be provided; the list must\
-                           be sized shape width * height
-            * 2D list: If kernel_shape is provided, it must match
-            * numpy.ndarray: As above for simple or 2D list
-            * RandomDistribution: kernel_shape must be provided; weights\
-                                  will be drawn from the distribution
+
+            * single value: `kernel_shape` must be provided;
+              the same value will be used for all weights
+            * simple list: `kernel_shape` must be provided; the list must
+              be sized shape width * height
+            * 2D list: If `kernel_shape` is provided, it must match
+            * :py:class:`~numpy.ndarray`: As above for simple or 2D list
+            * :py:class:`~spynnaker.pyNN.RandomDistribution`:
+              `kernel_shape` must be provided; weights will be drawn from the
+              distribution
         :type kernel_weights:
-            int or list or 2D-list or numpy.ndarray or RandomDistribution
+            int or list or ~numpy.ndarray or ~spynnaker.pyNN.RandomDistribution
         :param kernel_shape:
             The shape of the kernel if it cannot be determined from
-            kernel_weights. If a single value is provided, a square kernel will
-            be assumed.  If two values are provided, it will be assumed to be
-            (n_rows, n_columns)
+            `kernel_weights`. If a single value is provided, a square kernel
+            will be assumed.  If two values are provided, it will be assumed to
+            be (n_rows, n_columns)
         :type kernel_shape: int or tuple(int,int)
         :param strides:
             Spatial sampling frequency, jumps between the post neurons.
@@ -85,31 +89,31 @@ class ConvolutionConnector(AbstractConnector):
             (stride_rows, stride_columns)
         :type strides: int or tuple(int, int)
         :param padding:
-            How many 'extra pixels' around the pre population will be added,
+            How many 'extra pixels' around the pre-population will be added,
             only zero-valued pixels are currently supported.  If a single
             value is provided, the same padding will be used for rows and
             columns.  If two values are provided it will be assumed to be
-            (padding_rows, padding_columns).  If True, automatic padding will
-            be used based on the kernel shape.  If False or None, no padding
+            `(padding_rows, padding_columns)`.  If True, automatic padding will
+            be used based on the kernel shape.  If False or `None`, no padding
             will be used.
         :type padding: bool or int or tuple(int, int) or None
         :param pool_shape:
             Area of pooling, only average pooling is supported (and seems to
             make sense). If a single value is provided, the pooling area will
             be square.  If two values are provided it will be assumed to be
-            (pooling_rows, pooling_columns).
+            `(pooling_rows, pooling_columns)`.
         :type pool_shape: int or tuple(int, int) or None
         :param pool_stride:
             Jumps between pooling regions. If a single value is provided, the
             same stride will be used for rows and columns.  If two values are
-            provided it will be assumed to be (stride_rows, stride_columns)
+            provided it will be assumed to be `(stride_rows, stride_columns)`
         :type pool_stride: int or tuple(int, int) or None
         :param str positive_receptor_type:
             The receptor type to add the positive weights to.  By default this
-            is "excitatory".
+            is "``excitatory``".
         :param str negative_receptor_type:
             The receptor type to add the negative weights to.  By default this
-            is "inhibitory".
+            is "``inhibitory``".
         :param bool safe: (ignored)
         :param bool verbose: (ignored)
         :param callable callback: (ignored)
@@ -206,7 +210,8 @@ class ConvolutionConnector(AbstractConnector):
                 f"Unrecognized padding {padding}")
 
     def get_post_shape(self, shape):
-        """ Get the shape of the post image given the pre-image shape
+        """
+        Get the shape of the post image given the pre-image shape.
         """
         shape = numpy.array(shape)
         if self.__pool_shape is not None:
@@ -249,18 +254,20 @@ class ConvolutionConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
-        # All delays are 1 timestep
-        return 1
+        return synapse_info.delays
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        # All delays are 1 timestep
-        return 1
+        return synapse_info.delays
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
+        if min_delay is not None and max_delay is not None:
+            delay = synapse_info.delays
+            if min_delay > delay or max_delay < delay:
+                return 0
         w, h = self.__kernel_weights.shape
         return numpy.clip(w * h, 0, n_post_atoms)
 
@@ -355,9 +362,11 @@ class ConvolutionConnector(AbstractConnector):
         return max_connected
 
     def __pre_as_post(self, pre_coords):
-        """ Write pre coords as post coords.
+        """
+        Write pre coords as post coords.
 
-        :param Iterable pre_coords: An iterable of (x, y) coordinates
+        :param ~collections.abc.Iterable pre_coords:
+            An iterable of (x, y) coordinates
         :rtype: numpy.ndarray
         """
         coords = numpy.array(pre_coords)
@@ -386,7 +395,7 @@ class ConvolutionConnector(AbstractConnector):
 
     def get_local_only_data(
             self, app_edge, vertex_slice, key, mask, n_colour_bits,
-            weight_index):
+            delay, weight_index):
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
@@ -425,9 +434,15 @@ class ConvolutionConnector(AbstractConnector):
             self.__recip(ps_y), self.__recip(ps_x),
             pos_synapse_type, neg_synapse_type], dtype="uint16")
 
+        # Work out delay
+        delay_step = (delay *
+                      SpynnakerDataView.get_simulation_time_step_per_ms())
+        local_delay = (delay_step %
+                       app_edge.post_vertex.splitter.max_support_delay())
+
         data = [numpy.array(values, dtype="uint32"),
                 short_values.view("uint32"),
-                numpy.array([weight_index], dtype="uint32")]
+                numpy.array([local_delay, weight_index], dtype="uint32")]
         return data
 
     def get_encoded_kernel_weights(self, app_edge, weight_scales):
@@ -446,7 +461,8 @@ class ConvolutionConnector(AbstractConnector):
         return kernel_weights
 
     def __recip(self, v):
-        """ Compute the reciprocal of a number as an signed 1-bit integer,
-            14-bit fractional fixed point number, encoded in an integer
+        """
+        Compute the reciprocal of a number as an signed 1-bit integer,
+        14-bit fractional fixed point number, encoded in an integer.
         """
         return int(round((1 / v) * (1 << 14)))

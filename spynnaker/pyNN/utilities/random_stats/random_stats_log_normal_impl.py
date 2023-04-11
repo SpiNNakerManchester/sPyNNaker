@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsLogNormalImpl(AbstractRandomStats):
-    """ An implementation of AbstractRandomStats for log normal distributions
+    """
+    An implementation of AbstractRandomStats for log normal distributions.
     """
 
     def _get_params(self, dist):
@@ -39,11 +40,7 @@ class RandomStatsLogNormalImpl(AbstractRandomStats):
         return lognorm.var(*self._get_params(dist))
 
     def high(self, dist):
-        """ Return the variance of the distribution
-        """
         return None
 
     def low(self, dist):
-        """ Return the variance of the distribution
-        """
         return None

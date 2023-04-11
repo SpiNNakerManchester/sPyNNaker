@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,10 +28,10 @@ class CurrentSourceIDs(Enum):
 
 
 class AbstractCurrentSource(object, metaclass=AbstractBase):
-    """ A simplified version of the PyNN class, since in most cases we work
-        out the actual offset value on the SpiNNaker machine itself based on
-        the parameters during the run.
-
+    """
+    A simplified version of the PyNN class, since in most cases we work
+    out the actual offset value on the SpiNNaker machine itself based on
+    the parameters during the run.
     """
     __slots__ = [
         "__app_vertex",
@@ -42,15 +42,17 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         self.__population = None
 
     def inject_into(self, cells):
-        """ Inject this source into the specified population cells
+        """
+        Inject this source into the specified population cells.
 
-        :param pop/pop_base/view cells: The cells to inject the source into
+        :param PopulationBase cells: The cells to inject the source into
         """
         # Call the population method to pass the source in
         cells.inject(self)
 
     def set_app_vertex(self, vertex):
-        """ Set the app vertex associated with the current source
+        """
+        Set the app vertex associated with the current source.
 
         :param AbstractPopulationVertex vertex: The population vertex
         """
@@ -58,14 +60,16 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
 
     @property
     def app_vertex(self):
-        """ Get the app vertex associated with the current source
+        """
+        The application vertex associated with the current source.
 
-        :param AbstractPopulationVertex
+        :rtype: AbstractPopulationVertex
         """
         return self.__app_vertex
 
     def set_population(self, population):
-        """ Set the population associated with the current source
+        """
+        Set the population associated with the current source.
 
         :param ~spynnaker.pyNN.models.populations.Population population:
         """
@@ -73,43 +77,51 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
 
     @property
     def population(self):
-        """ Get the population associated with the current source
+        """
+        The population associated with the current source.
 
-        :rtype ~spynnaker.pyNN.models.populations.Population
+        :rtype: ~spynnaker.pyNN.models.populations.Population
         """
         return self.__population
 
     @abstractmethod
     def set_parameters(self, **parameters):
-        """ Set the current source parameters
+        """
+        Set the current source parameters.
 
         :param parameters: the parameters to set
         """
 
     @abstractproperty
     def get_parameters(self):
-        """ Get the parameters of the current source
-
-        :rtype dict(str, Any)
         """
+        The parameters of the current source.
+
+        :rtype: dict(str, Any)
+        """
+        # TODO: Wrong naming for a property!
 
     @abstractproperty
     def get_parameter_types(self):
-        """ Get the parameter types for the current source
-
-        :rtype dict(str, Any)
         """
+        The parameter types for the current source.
+
+        :rtype: dict(str, Any)
+        """
+        # TODO: Wrong naming for a property!
 
     @abstractproperty
     def current_source_id(self):
-        """ The ID of the current source.
+        """
+        The ID of the current source.
 
         :rtype: int
         """
 
     @abstractmethod
     def get_sdram_usage_in_bytes(self):
-        """ The sdram usage in bytes of the current source.
+        """
+        The SDRAM usage in bytes of the current source.
 
         :rtype: int
         """

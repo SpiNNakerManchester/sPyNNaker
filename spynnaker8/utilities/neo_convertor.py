@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,8 @@ from spynnaker.pyNN.utilities.neo_convertor import (
 
 
 def convert_analog_signal(signal_array, time_unit):
-    """ Converts part of a NEO object into told spynnaker7 format
+    """
+    Converts part of a NEO object into told spynnaker7 format.
 
     .. deprecated:: 6.0
         Use
@@ -41,7 +42,8 @@ def convert_analog_signal(signal_array, time_unit):
 
 
 def convert_data(data, name, run=0):
-    """ Converts the data into a numpy array in the format ID, time, value
+    """
+    Converts the data into a numpy array in the format ID, time, value.
 
     .. deprecated:: 6.0
         Use
@@ -60,8 +62,9 @@ def convert_data(data, name, run=0):
 
 
 def convert_data_list(data, name, runs=None):
-    """ Converts the data into a list of numpy arrays in the format ID, time,\
-        value
+    """
+    Converts the data into a list of numpy arrays in the format ID, time,
+    value.
 
     .. deprecated:: 6.0
         Use
@@ -82,8 +85,9 @@ def convert_data_list(data, name, runs=None):
 
 
 def convert_v_list(data, runs=None):
-    """ Converts the voltage into a list numpy array one per segment (all\
-        runs) in the format ID, time, value
+    """
+    Converts the voltage into a list numpy array one per segment (all runs)
+    in the format ID, time, value.
 
     .. deprecated:: 6.0
         Use
@@ -102,8 +106,9 @@ def convert_v_list(data, runs=None):
 
 
 def convert_gsyn_exc_list(data, runs=None):
-    """ Converts the gsyn_exc into a list numpy array one per segment (all\
-        runs) in the format ID, time, value
+    """
+    Converts the gsyn_exc into a list numpy array one per segment (all runs)
+    in the format ID, time, value.
 
     .. deprecated:: 6.0
         Use
@@ -123,8 +128,9 @@ def convert_gsyn_exc_list(data, runs=None):
 
 
 def convert_gsyn_inh_list(data, runs=None):
-    """ Converts the gsyn_inh into a list numpy array one per segment (all\
-        runs) in the format ID, time, value
+    """
+    Converts the gsyn_inh into a list numpy array one per segment (all runs)
+    in the format ID, time, value.
 
     .. deprecated:: 6.0
         Use
@@ -144,7 +150,8 @@ def convert_gsyn_inh_list(data, runs=None):
 
 
 def convert_gsyn(gsyn_exc, gsyn_inh):
-    """ Converts two neo objects into the spynnaker7 format
+    """
+    Converts two neo objects into the spynnaker7 format.
 
     .. deprecated:: 6.0
         Use
@@ -161,7 +168,8 @@ def convert_gsyn(gsyn_exc, gsyn_inh):
 
 
 def convert_spiketrains(spiketrains):
-    """ Converts a list of spiketrains into spynnaker7 format
+    """
+    Converts a list of spiketrains into spynnaker7 format.
 
     .. deprecated:: 6.0
         Use
@@ -177,7 +185,8 @@ def convert_spiketrains(spiketrains):
 
 
 def convert_spikes(neo, run=0):
-    """ Extracts the spikes for run one from a Neo Object
+    """
+    Extracts the spikes for run one from a Neo Object.
 
     .. deprecated:: 6.0
         Use
@@ -194,7 +203,8 @@ def convert_spikes(neo, run=0):
 
 
 def count_spiketrains(spiketrains):
-    """ Help function to count the number of spikes in a list of spiketrains
+    """
+    Help function to count the number of spikes in a list of spiketrains.
 
     .. deprecated:: 6.0
         Use
@@ -211,7 +221,8 @@ def count_spiketrains(spiketrains):
 
 
 def count_spikes(neo):
-    """ Help function to count the number of spikes in a list of spiketrains
+    """
+    Help function to count the number of spikes in a list of spiketrains.
 
     .. deprecated:: 6.0
         Use

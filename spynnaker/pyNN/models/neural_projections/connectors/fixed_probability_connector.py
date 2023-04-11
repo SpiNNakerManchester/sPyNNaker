@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,8 +35,8 @@ N_GEN_PARAMS = 6
 
 class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
                                 AbstractGenerateConnectorOnHost):
-    """ For each pair of pre-post cells, the connection probability is \
-        constant.
+    """
+    For each pair of pre-post cells, the connection probability is constant.
     """
 
     __slots__ = [
@@ -61,7 +61,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             Whether to output extra information about the connectivity to a
             CSV file
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or `None` to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         :param callable callback:
             if given, a callable that display a progress bar on the terminal.
@@ -74,9 +74,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         if p_connect == 1.0:
             p_connect = float(DataType.U032.max)
             logger.warning(
-                "Probability of 1.0 in the FixedProbabilityConnector will use"
-                f" {p_connect} instead.  If this is a problem, use the"
-                " AllToAllConnector instead.")
+                "Probability of 1.0 in the FixedProbabilityConnector will use "
+                "{} instead.  If this is a problem, use the AllToAllConnector "
+                "instead.", p_connect)
         if not 0.0 <= p_connect < 1.0:
             raise ConfigurationException(
                 "The probability must be >= 0 and < 1")
@@ -169,7 +169,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
         return block
 
     def __repr__(self):
-        return "FixedProbabilityConnector({})".format(self._p_connect)
+        return f"FixedProbabilityConnector({self._p_connect})"
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)

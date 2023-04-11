@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,10 +32,13 @@ BIT_IN_A_WORD = 32.0
 
 
 def get_sdram_for_bit_field_region(incoming_projections):
-    """ the SDRAM for the bit field filter region
+    """
+    The SDRAM for the bit field filter region.
 
-    :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
+    :param incoming_projections:
         The projections that target the vertex in question
+    :type incoming_projections:
+        iterable(~spynnaker.pyNN.models.projection.Projection)
     :return: the estimated number of bytes used by the bit field region
     :rtype: int
     """
@@ -56,14 +59,16 @@ def get_sdram_for_bit_field_region(incoming_projections):
 
 
 def get_sdram_for_keys(incoming_projections):
-    """ gets the space needed for keys
+    """
+    Gets the space needed for keys.
 
-    :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
+    :param incoming_projections:
         The projections that target the vertex in question
+    :type incoming_projections:
+        iterable(~spynnaker.pyNN.models.projection.Projection)
     :return: SDRAM needed
     :rtype: int
     """
-
     # basic sdram
     sdram = 0
     seen_app_edges = set()
@@ -79,10 +84,13 @@ def get_sdram_for_keys(incoming_projections):
 
 
 def get_bitfield_key_map_data(incoming_projections):
-    """ Get data for the key map region
+    """
+    Get data for the key map region.
 
-    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+    :param incoming_projections:
         The projections to generate bitfields for
+    :type incoming_projections:
+        iterable(~spynnaker.pyNN.models.projection.Projection)
     :rtype: ~numpy.ndarray
     """
     # Gather the source vertices that target this core
@@ -118,7 +126,8 @@ def get_bitfield_key_map_data(incoming_projections):
 
 def write_bitfield_init_data(
         spec, bit_field_region, n_bit_field_bytes, bit_field_region_ref=None):
-    """ writes the init data needed for the bitfield generator
+    """
+    Writes the init data needed for the bitfield generator.
 
     :param ~data_specification.DataSpecificationGenerator spec:
         data spec writer

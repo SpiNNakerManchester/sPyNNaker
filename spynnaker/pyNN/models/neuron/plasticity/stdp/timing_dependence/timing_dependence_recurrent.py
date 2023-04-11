@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,8 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):
-    """ A timing dependence STDP rule based on recurrences.
+    """
+    A timing dependence STDP rule based on recurrences.
     """
     __slots__ = [
         "__accumulator_depression_plus_one",
@@ -78,7 +79,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def A_plus(self):
-        r""" :math:`A^+`
+        r"""
+        :math:`A^+`
 
         :rtype: float
         """
@@ -90,7 +92,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def A_minus(self):
-        r""" :math:`A^-`
+        r"""
+        :math:`A^-`
 
         :rtype: float
         """
@@ -116,7 +119,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
@@ -126,7 +130,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def pre_trace_n_bytes(self):
-        """ The number of bytes used by the pre-trace of the rule per neuron
+        """
+        The number of bytes used by the pre-trace of the rule per neuron.
 
         :rtype: int
         """
@@ -143,7 +148,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def n_weight_terms(self):
-        """ The number of weight terms expected by this timing rule
+        """
+        The number of weight terms expected by this timing rule.
 
         :rtype: int
         """
@@ -182,7 +188,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def synaptic_structure(self):
-        """ Get the synaptic structure of the plastic part of the rows
+        """
+        The synaptic structure of the plastic part of the rows.
 
         :rtype: AbstractSynapseStructure
         """

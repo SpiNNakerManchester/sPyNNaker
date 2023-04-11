@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,8 @@ from spynnaker.pyNN.external_devices_models.push_bot import (
 
 
 class PushBotMotor(AbstractPushBotOutputDevice):
-    """ The properties of the motor devices that may be set.
+    """
+    The properties of the motor devices that may be set.
     The pushbot has two motors, 0 (left) and 1 (right).
     """
     # TODO: is that the right way round?

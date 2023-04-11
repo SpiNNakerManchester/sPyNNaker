@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,8 +34,9 @@ class MachineMunichMotorDevice(
         MachineVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary,
         ProvidesProvenanceDataFromMachineImpl):
-    """ An Omnibot motor control device. This has a real vertex and an \
-        external device vertex.
+    """
+    An Omnibot motor control device. This has a real vertex and an
+    external device vertex.
     """
     __slots__ = [
         "__continue_if_not_different",
@@ -76,7 +77,7 @@ class MachineMunichMotorDevice(
         :param int delta_threshold:
         :param bool continue_if_not_different:
         :param str label:
-        :param app_vertex:
+        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
         """
         super().__init__(
             label=label, app_vertex=app_vertex,
@@ -131,11 +132,8 @@ class MachineMunichMotorDevice(
                     "Please increase the timer_tic or time_scale_factor "
                     "or decrease the number of neurons per core.")
 
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification)
+    @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        # pylint: disable=too-many-arguments, arguments-differ
-
         # reserve regions
         self.reserve_memory_regions(spec)
 
@@ -169,7 +167,8 @@ class MachineMunichMotorDevice(
         spec.end_specification()
 
     def reserve_memory_regions(self, spec):
-        """ Reserve SDRAM space for memory areas:
+        """
+        Reserve SDRAM space for memory areas:
 
         #. Area for information on what data to record
         #. area for start commands

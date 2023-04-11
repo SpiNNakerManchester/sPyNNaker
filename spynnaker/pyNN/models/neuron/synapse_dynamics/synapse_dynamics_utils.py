@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,10 @@
 import numpy
 
 
-def calculate_stdp_times(pre_spikes, post_spikes, plastic_delay):
+def _calculate_stdp_times(pre_spikes, post_spikes, plastic_delay):
+    """
+    :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
+    """
     # If no post spikes, no changes
     if len(post_spikes) == 0:
         return numpy.zeros(0), numpy.zeros(0)
@@ -39,19 +42,21 @@ def calculate_stdp_times(pre_spikes, post_spikes, plastic_delay):
 def calculate_spike_pair_additive_stdp_weight(
         pre_spikes, post_spikes, initial_weight, plastic_delay,
         a_plus, a_minus, tau_plus, tau_minus):
-    """ Calculates the expected stdp weight for SpikePair Additive STDP
-
-    :param pre_spikes:
-    :param post_spikes:
-    :param initial_weight:
-    :param plastic_delay:
-    :param a_plus:
-    :param a_minus:
-    :param tau_plus:
-    :param tau_minus:
-    :return:
     """
-    potentiation_times, depression_times = calculate_stdp_times(
+    Calculates the expected stdp weight for SpikePair Additive STDP.
+
+    :param iterable(int) pre_spikes:
+    :param iterable(int) post_spikes:
+    :param float initial_weight:
+    :param int plastic_delay:
+    :param float a_plus:
+    :param float a_minus:
+    :param float tau_plus:
+    :param float tau_minus:
+    :return:
+    :rtype: float
+    """
+    potentiation_times, depression_times = _calculate_stdp_times(
         pre_spikes, post_spikes, plastic_delay)
 
     # Work out the weight according to the additive rule
@@ -69,7 +74,7 @@ def calculate_spike_pair_multiplicative_stdp_weight(
         pre_spikes, post_spikes, initial_weight, plastic_delay, min_weight,
         max_weight, a_plus, a_minus, tau_plus, tau_minus):
     """
-    Calculates the expected stdp weight for SpikePair Multiplicative STDP
+    Calculates the expected stdp weight for SpikePair Multiplicative STDP.
 
     :param iterable(int) pre_spikes: Spikes going into the model
     :param iterable(int) post_spikes: Spikes recorded on the model
@@ -83,7 +88,7 @@ def calculate_spike_pair_multiplicative_stdp_weight(
     :param float tau_minus: param of the stdp model
     :return:
     """
-    potentiation_times, depression_times = calculate_stdp_times(
+    potentiation_times, depression_times = _calculate_stdp_times(
         pre_spikes, post_spikes, plastic_delay)
 
     # Work out the weight according to the multiplicative rule

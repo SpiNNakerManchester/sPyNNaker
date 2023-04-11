@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,7 +54,8 @@ class _ReadOnlyDict(dict):
 
 
 def get_sampling_interval(sampling_rate):
-    """ Return the current sampling interval given a sampling rate
+    """
+    Return the current sampling interval given a sampling rate.
 
     :param float sampling_rate: The sampling rate in time steps
     :return: Sampling interval in microseconds
@@ -132,9 +133,17 @@ class NeuronRecorder(object):
             events_per_core_variables, events_per_core_datatypes):
         """
         :param list(str) allowed_variables:
-        :param list(str) data_types:
+        :param dict(str,~data_specification.enums.DataType) data_types:
         :param list(str) bitfield_variables:
         :param int n_neurons:
+        :param list(str) per_timestep_variables:
+        :param per_timestep_datatypes:
+        :type per_timestep_datatypes:
+            dict(str,~data_specification.enums.DataType)
+        :param list(str) events_per_core_variables:
+        :param events_per_core_datatypes:
+        :type events_per_core_datatypes:
+            dict(str,~data_specification.enums.DataType)
         """
         self.__sampling_rates = dict()
         self.__indexes = dict()
@@ -167,8 +176,9 @@ class NeuronRecorder(object):
         self.__offset_added = False
 
     def add_region_offset(self, offset):
-        """ Add an offset to the regions.  Used when there are multiple\
-            recorders on a single core
+        """
+        Add an offset to the regions.
+        Used when there are multiple recorders on a single core.
 
         :param int offset: The offset to add
         """
@@ -180,7 +190,8 @@ class NeuronRecorder(object):
         self.__offset_added = True
 
     def get_region(self, variable):
-        """ Get the region of a variable
+        """
+        Get the region of a variable.
 
         :param str variable: The variable to get the region of
         :rtype: int
@@ -202,6 +213,8 @@ class NeuronRecorder(object):
 
     def _max_recording_per_slice(self, variable, n_atoms):
         """
+        :param str variable:
+        :param int n_atoms:
         """
         if variable not in self.__sampling_rates:
             return None
@@ -250,8 +263,7 @@ class NeuronRecorder(object):
     def _process_missing_data(
             missing_str, placement, expected_rows, n_neurons, times,
             sampling_rate, label, placement_data, region):
-        missing_str += "({}, {}, {}); ".format(
-            placement.x, placement.y, placement.p)
+        missing_str += f"({placement.x}, {placement.y}, {placement.p}); "
         # Start the fragment for this slice empty
         fragment = numpy.empty((expected_rows, n_neurons))
         for i in range(0, expected_rows):
@@ -273,7 +285,8 @@ class NeuronRecorder(object):
     def _get_placement_matrix_data(
             self, vertex, region, expected_rows,
             missing_str, sampling_rate, label, data_type, n_per_timestep):
-        """ processes a placement for matrix data
+        """
+        Processes a placement for matrix data.
 
         :param ~pacman.model.placements.Placements placements:
             the placements object
@@ -329,9 +342,12 @@ class NeuronRecorder(object):
         return placement_data
 
     def get_recorded_indices(self, application_vertex, variable):
-        """ Get the indices being recorded for a given variable
+        """
+        Get the indices being recorded for a given variable.
 
-        :param ApplicationVertex application_vertex: The vertex being recorded
+        :param application_vertex: The vertex being recorded
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
         :param str variable: The name of the variable to get the indices of
         :rtype: list(int)
         """
@@ -342,7 +358,8 @@ class NeuronRecorder(object):
         return self.__indexes[variable]
 
     def get_sampling_interval_ms(self, variable):
-        """ Get the sampling interval of a variable
+        """
+        Get the sampling interval of a variable.
 
         :param str variable: The variable to get the sampling interval of
         :rtype: float
@@ -354,6 +371,10 @@ class NeuronRecorder(object):
         return get_sampling_interval(self.__sampling_rates[variable])
 
     def get_buffer_data_type(self, variable):
+        """
+        :param str variable:
+        :rtype: BufferDataType
+        """
         if variable == self.SPIKES:
             return BufferDataType.NEURON_SPIKES
         elif variable == self.REWIRING:
@@ -365,6 +386,10 @@ class NeuronRecorder(object):
             return BufferDataType.MATRIX
 
     def get_data_type(self, variable):
+        """
+        :param str variable:
+        :rtype: ~data_specification.enums.DataType
+        """
         if variable in self.__per_timestep_variables:
             return self.__per_timestep_datatypes[variable]
         if variable in self.__data_types:
@@ -401,7 +426,8 @@ class NeuronRecorder(object):
         return False
 
     def is_recordable(self, variable):
-        """ Identify if the given variable can be recorded
+        """
+        Identify if the given variable can be recorded.
 
         :param str variable: The variable to check for
         :rtype: bool
@@ -492,8 +518,9 @@ class NeuronRecorder(object):
         return variables
 
     def _compute_rate(self, sampling_interval):
-        """ Convert a sampling interval into a rate. \
-            Remember, machine time step is in nanoseconds
+        """
+        Convert a sampling interval into a rate.
+        Remember, machine time step is in nanoseconds
 
         :param int sampling_interval: interval between samples in microseconds
         :return: rate
@@ -505,13 +532,13 @@ class NeuronRecorder(object):
         step = SpynnakerDataView.get_simulation_time_step_ms()
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:
-            msg = "sampling_interval {} is not an an integer multiple of the "\
-                  "simulation timestep {}".format(sampling_interval, step)
-            raise ConfigurationException(msg)
+            raise ConfigurationException(
+                f"sampling_interval {sampling_interval} is not an an "
+                f"integer multiple of the simulation timestep {step}")
         if rate > self._MAX_RATE:
-            msg = "sampling_interval {} higher than max allowed which is {}" \
-                  "".format(sampling_interval, step * self._MAX_RATE)
-            raise ConfigurationException(msg)
+            raise ConfigurationException(
+                f"sampling_interval {sampling_interval} higher than "
+                f"max allowed which is {step * self._MAX_RATE}")
         return rate
 
     def check_indexes(self, indexes):
@@ -535,15 +562,16 @@ class NeuronRecorder(object):
             else:
                 found = True
             if warning is not None:
-                logger.warning(warning)
+                logger.warning("{}", warning)
         if not found:
             raise ConfigurationException(
                 "All indexes larger than population size")
 
     def __check_per_timestep_params(
             self, variable, sampling_interval, indexes):
-        """ Check if certain parameters have been provided for a per-timestep
-            variable and if so, raise an Exception
+        """
+        Check if certain parameters have been provided for a per-timestep
+        variable and if so, raise an Exception.
 
         :param str variable:
         :param int sampling_interval:
@@ -553,13 +581,15 @@ class NeuronRecorder(object):
             raise ValueError(
                 f"Variable {variable} does not support a sampling interval")
         if indexes is not None:
-            raise ValueError(f"Variable {variable} can only be recorded "
-                             f"on the whole population")
+            raise ValueError(
+                f"Variable {variable} can only be recorded "
+                "on the whole population")
 
     def __check_events_per_core_params(
             self, variable, sampling_interval, indexes):
-        """ Check if certain parameters have been provided for an
-            events-per-core variable and if so, raise an Exception
+        """
+        Check if certain parameters have been provided for an
+        events-per-core variable and if so, raise an Exception.
 
         :param str variable:
         :param int sampling_interval:
@@ -569,8 +599,9 @@ class NeuronRecorder(object):
             raise ValueError(
                 f"Variable {variable} does not support a sampling interval")
         if indexes is not None:
-            raise ValueError(f"Variable {variable} can only be recorded "
-                             f"on the whole population")
+            raise ValueError(
+                f"Variable {variable} can only be recorded "
+                "on the whole population")
 
     def _turn_off_recording(self, variable, sampling_interval, remove_indexes):
         """
@@ -614,9 +645,10 @@ class NeuronRecorder(object):
             self.__indexes[variable] = range(self.__n_neurons)
 
         # remove the indexes not recording
-        self.__indexes[variable] = \
-            [index for index in self.__indexes[variable]
-                if index not in remove_indexes]
+        self.__indexes[variable] = [
+            index
+            for index in self.__indexes[variable]
+            if index not in remove_indexes]
 
         # Check is at least one index still recording
         if len(self.__indexes[variable]) == 0:
@@ -641,8 +673,7 @@ class NeuronRecorder(object):
                 return
         raise ConfigurationException(
             "Current implementation does not support multiple "
-            "sampling_intervals for {} on one population.".format(
-                variable))
+            f"sampling_intervals for {variable} on one population.")
 
     def _turn_on_recording(self, variable, sampling_interval, indexes):
         """
@@ -711,14 +742,15 @@ class NeuronRecorder(object):
             else:
                 self._turn_off_recording(variable, sampling_interval, indexes)
         else:
-            raise ConfigurationException("Variable {} is not supported".format(
-                variable))
+            raise ConfigurationException(
+                f"Variable {variable} is not supported")
 
     def get_region_sizes(self, vertex_slice):
-        """ Get the sizes of the regions for the variables, whether they are
-            recorded or not, with those that are not having a size of 0
+        """
+        Get the sizes of the regions for the variables, whether they are
+        recorded or not, with those that are not having a size of 0.
 
-        :param ~pacman.model.graphs.commmon.Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: list(int)
         """
         values = list()
@@ -731,13 +763,13 @@ class NeuronRecorder(object):
 
     def write_neuron_recording_region(
             self, spec, neuron_recording_region, vertex_slice):
-        """ recording data specification
+        """
+        Recording data specification.
 
         :param ~data_specification.DataSpecificationGenerator spec: dsg spec
         :param int neuron_recording_region: the recording region
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the vertex slice
-        :rtype: None
         """
         spec.switch_write_focus(neuron_recording_region)
 
@@ -751,7 +783,8 @@ class NeuronRecorder(object):
         spec.write_array(recording_data)
 
     def _get_buffered_sdram_per_record(self, variable, n_neurons):
-        """ Return the SDRAM used per record
+        """
+        Return the SDRAM used per record.
 
         :param str variable: PyNN variable name
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -782,7 +815,8 @@ class NeuronRecorder(object):
 
     def get_buffered_sdram_per_record(
             self, variable, vertex_slice):
-        """ Return the SDRAM used per record
+        """
+        Return the SDRAM used per record.
 
         :param str variable: PyNN variable name
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -793,7 +827,8 @@ class NeuronRecorder(object):
         return self._get_buffered_sdram_per_record(variable, n_neurons)
 
     def get_max_buffered_sdram_per_record(self, variable, n_atoms):
-        """ Return the SDRAM used per record
+        """
+        Return the SDRAM used per record.
 
         :param str variable: PyNN variable name
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -805,9 +840,10 @@ class NeuronRecorder(object):
 
     def get_buffered_sdram_per_timestep(
             self, variable, vertex_slice):
-        """ Return the SDRAM used per timestep.
+        """
+        Return the SDRAM used per timestep.
 
-        In the case where sampling is used it returns the average\
+        In the case where sampling is used it returns the average
         for recording and none recording based on the recording rate
 
         :param str variable: PyNN variable name
@@ -835,14 +871,15 @@ class NeuronRecorder(object):
             return data_size // rate
 
     def get_sampling_overflow_sdram(self, vertex_slice):
-        """ Get the extra SDRAM that should be reserved if using per_timestep
+        """
+        Get the extra SDRAM that should be reserved if using per_timestep.
 
-        This is the extra that must be reserved if per_timestep is an average\
+        This is the extra that must be reserved if per_timestep is an average
         rather than fixed for every timestep.
 
-        When sampling the average * time_steps may not be quite enough.\
-        This returns the extra space in the worst case\
-        where time_steps is a multiple of sampling rate + 1,\
+        When sampling the average * time_steps may not be quite enough.
+        This returns the extra space in the worst case
+        where time_steps is a multiple of sampling rate + 1,
         and recording is done in the first and last time_step
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -863,9 +900,10 @@ class NeuronRecorder(object):
 
     def get_buffered_sdram(
             self, variable, vertex_slice):
-        """ Returns the SDRAM used for this many time steps for a variable
+        """
+        Returns the SDRAM used for this many time steps for a variable.
 
-        If required the total is rounded up so the space will always fit
+        If required the total is rounded up so the space will always fit.
 
         :param str variable: The PyNN variable name to get buffered sdram of
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -894,7 +932,8 @@ class NeuronRecorder(object):
         return data_size * records
 
     def get_metadata_sdram_usage_in_bytes(self, n_atoms):
-        """ Get the SDRAM usage of the metadata for recording
+        """
+        Get the SDRAM usage of the metadata for recording.
 
         :param int n_atoms: The number of atoms to record
         :rtype: int
@@ -915,7 +954,8 @@ class NeuronRecorder(object):
                 bitfield_bytes)
 
     def get_generator_sdram_usage_in_bytes(self, n_atoms):
-        """ Get the SDRAM usage of the generator data for recording metadata
+        """
+        Get the SDRAM usage of the generator data for recording metadata.
 
         :param int n_atoms: The number of atoms to be recorded
         :rtype: int
@@ -996,7 +1036,8 @@ class NeuronRecorder(object):
         return VariableSDRAM(fixed_sdram, per_timestep_sdram)
 
     def __ceil_n_indices(self, n_neurons):
-        """ The number of indices rounded up to a whole number of words
+        """
+        The number of indices rounded up to a whole number of words.
 
         :param int n_neurons: The number of neurons to account for
         :rtype: int
@@ -1065,8 +1106,9 @@ class NeuronRecorder(object):
 
     @property
     def is_global_generatable(self):
-        """ Is the data for all neurons the same i.e. all or none of the
-            neurons are recorded for all variables
+        """
+        Whether the data for all neurons the same, i.e., all or none of the
+        neurons are recorded for all variables.
 
         :rtype: bool
         """
@@ -1076,15 +1118,17 @@ class NeuronRecorder(object):
         return True
 
     def get_generator_data(self, vertex_slice=None, atoms_shape=None):
-        """ Get the recorded data as a generatable data set
+        """
+        Get the recorded data as a generatable data set.
 
         :param vertex_slice:
-            The slice to generate the data for, or None to generate for
+            The slice to generate the data for, or `None` to generate for
             all neurons (assuming all the same, otherwise error)
-        :type vertex_slice: Slice or None
+        :type vertex_slice: ~pacman.model.graphs.common.Slice or None
         :param atoms_shape:
-            The shape of the atoms in the vertex; if vertex_slice is not None,
-            atoms_shape must be not None
+            The shape of the atoms in the vertex;
+            if `vertex_slice` is not `None`, atoms_shape must be not `None`
+        :type atoms_shape: tuple(int) or None
         :rtype: numpy.ndarray
         """
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
@@ -1105,8 +1149,8 @@ class NeuronRecorder(object):
 
     def __get_generator_indices(
             self, variable, vertex_slice=None, atoms_shape=None):
-        """ Get the indices of the variables to record in run-length-encoded
-            form
+        """
+        Get the indices of the variables to record in run-length-encoded form.
         """
         index = self.__indexes.get(variable)
 

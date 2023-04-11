@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 def plot_spiketrains(ax, spiketrains, label='', **options):
-    """ Plot all spike trains in a Segment in a raster plot.
+    """
+    Plot all spike trains in a Segment in a raster plot.
 
     .. deprecated:: 6.0
         Use
@@ -35,7 +36,8 @@ def plot_spiketrains(ax, spiketrains, label='', **options):
 
 
 def plot_spikes_numpy(ax, spikes, label='', **options):
-    """ Plot all spikes
+    """
+    Plot all spikes.
 
     .. deprecated:: 6.0
         Use
@@ -52,7 +54,8 @@ def plot_spikes_numpy(ax, spikes, label='', **options):
 
 
 def heat_plot_numpy(ax, data, label='', **options):
-    """ Plots neurons, times and values into a heatmap
+    """
+    Plots neurons, times and values into a heatmap.
 
     .. deprecated:: 6.0
         Use
@@ -69,7 +72,8 @@ def heat_plot_numpy(ax, data, label='', **options):
 
 
 def heat_plot_neo(ax, signal_array, label='', **options):
-    """ Plots neurons, times and values into a heatmap
+    """
+    Plots neurons, times and values into a heatmap.
 
     .. deprecated:: 6.0
         Use
@@ -86,7 +90,8 @@ def heat_plot_neo(ax, signal_array, label='', **options):
 
 
 def plot_segment(axes, segment, label='', **options):
-    """ Plots a segment into a plot of spikes or a heatmap
+    """
+    Plots a segment into a plot of spikes or a heatmap.
 
     .. deprecated:: 6.0
         Use
@@ -103,7 +108,8 @@ def plot_segment(axes, segment, label='', **options):
 
 
 class SpynnakerPanel(_BaseClass):
-    """ Represents a single panel in a multi-panel figure.
+    """
+    Represents a single panel in a multi-panel figure.
 
     .. deprecated:: 6.0
         Use

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,7 +32,8 @@ def _this_is_wholly_deprecated(msg, *args):  # pylint: disable=unused-argument
 
 
 class PopulationBase(object, metaclass=AbstractBase):
-    r""" Shared methods between :py:class:`Population`\ s and
+    r"""
+    Shared methods between :py:class:`Population`\ s and
     :py:class:`PopulationView`\ s.
 
     Mainly pass through and not implemented.
@@ -41,8 +42,9 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @property
     def local_cells(self):
-        """ An array containing the cell IDs of those neurons in the\
-            Population that exist on the local MPI node.
+        """
+        An array containing the cell IDs of those neurons in the
+        Population that exist on the local MPI node.
 
         :rtype: list(int)
         """
@@ -52,15 +54,17 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @abstractproperty
     def all_cells(self):
-        """ An array containing the cell IDs of all neurons in the\
-            Population (all MPI nodes).
+        """
+        An array containing the cell IDs of all neurons in the
+        Population (all MPI nodes).
 
         :rtype: list(int)
         """
 
     def __add__(self, other):
-        """ A Population / PopulationView can be added to another\
-            Population, PopulationView or Assembly, returning an Assembly.
+        """
+        A Population / PopulationView can be added to another
+        Population, PopulationView or Assembly, returning an Assembly.
 
         .. warning::
             Currently unimplemented.
@@ -84,8 +88,9 @@ class PopulationBase(object, metaclass=AbstractBase):
     @abstractmethod
     def get_data(self, variables='all', gather=True, clear=False,
                  annotations=None):
-        """ Return a Neo Block containing the data(spikes, state variables)\
-            recorded from the Population.
+        """
+        Return a Neo Block containing the data(spikes, state variables)
+        recorded from the Population.
 
         :param variables:
             Either a single variable name or a list of variable names.
@@ -120,7 +125,8 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_spike_counts(self, gather=True):
-        """ Returns a dict containing the number of spikes for each neuron.
+        """
+        Returns a dict containing the number of spikes for each neuron.
 
         The dict keys are neuron IDs, not indices.
 
@@ -148,17 +154,19 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @abstractmethod
     def inject(self, current_source):
-        """ Connect a current source to all cells in the Population.
+        """
+        Connect a current source to all cells in the Population.
 
         :param current_source:
         :type current_source:
-            pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
+            ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
         """
 
     def is_local(self,
                  id):  # pylint: disable=unused-argument, redefined-builtin
-        """ Indicates whether the cell with the given ID exists on the\
-            local MPI node.
+        """
+        Indicates whether the cell with the given ID exists on the
+        local MPI node.
 
         :rtype: bool
         """
@@ -168,7 +176,8 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @property
     def local_size(self):
-        """ Return the number of cells in the population on the local MPI node.
+        """
+        The number of cells in the population on the local MPI node.
 
         :rtype: int
         """
@@ -187,7 +196,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         return self.mean_spike_count(*args, **kwargs)
 
     def mean_spike_count(self, gather=True):
-        """ Returns the mean number of spikes per neuron.
+        """
+        Returns the mean number of spikes per neuron.
 
         :param bool gather:
             For parallel simulators, if this is True, all data will be gathered
@@ -208,7 +218,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         return sum(counts.values()) / len(counts)
 
     def nearest(self, position):
-        """ Return the neuron closest to the specified position.
+        """
+        Return the neuron closest to the specified position.
 
         .. warning::
             Currently unimplemented.
@@ -245,8 +256,9 @@ class PopulationBase(object, metaclass=AbstractBase):
     @abstractmethod
     def write_data(self, io, variables='all', gather=True, clear=False,
                    annotations=None):
-        """ Write recorded data to file, using one of the file formats\
-            supported by Neo.
+        """
+        Write recorded data to file, using one of the file formats
+        supported by Neo.
 
         :param io:
             a Neo IO instance, or a string for where to put a Neo instance
@@ -335,8 +347,9 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @abstractmethod
     def record(self, variables, to_file=None, sampling_interval=None):
-        """ Record the specified variable or variables for all cells in the\
-            Population or view.
+        """
+        Record the specified variable or variables for all cells in the
+        Population or view.
 
         :param variables: either a single variable name or a list of variable
             names. For a given celltype class, `celltype.recordable` contains
@@ -389,7 +402,8 @@ class PopulationBase(object, metaclass=AbstractBase):
             " Use set(parametername=rand_distr) instead.", args, kwargs)
 
     def save_positions(self, file):  # pylint: disable=redefined-builtin
-        """ Save positions to file. The output format is index x y z
+        """
+        Save positions to file. The output format is index x y z
 
         .. warning::
             Currently unimplemented.
@@ -399,7 +413,8 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @property
     def structure(self):
-        """ The spatial structure of the parent Population.
+        """
+        The spatial structure of the parent Population.
 
         .. warning::
             Currently unimplemented.
@@ -419,14 +434,16 @@ class PopulationBase(object, metaclass=AbstractBase):
 
     @abstractproperty
     def _vertex(self):
-        """ The underlying application vertex.
+        """
+        The underlying application vertex.
 
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
 
     @abstractproperty
     def _recorder(self):
-        """ The recorder of the population
+        """
+        The recorder of the population.
 
         :rtype: ~Recorder
         """

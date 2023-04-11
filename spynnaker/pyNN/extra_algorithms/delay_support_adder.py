@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,8 +29,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def delay_support_adder():
-    """ adds the delay extensions to the app graph, now that all the\
-        splitter objects have been set.
+    """
+    Adds the delay extensions to the app graph, now that all the
+    splitter objects have been set.
 
     """
     adder = _DelaySupportAdder()
@@ -39,10 +40,8 @@ def delay_support_adder():
 
 
 class _DelaySupportAdder(object):
-    """ adds delay extension vertices into the APP graph as needed
-
-    :param ApplicationGraph app_graph: the app graph
-    :rtype: None
+    """
+    Adds delay extension vertices into the APP graph as needed.
     """
 
     __slots__ = [
@@ -58,9 +57,9 @@ class _DelaySupportAdder(object):
         self._new_vertices = list()
 
     def _run(self):
-        """ adds the delay extensions to the app graph, now that all the\
-            splitter objects have been set.
-
+        """
+        Adds the delay extensions to the app graph, now that all the
+        splitter objects have been set.
         """
         progress = ProgressBar(1 + SpynnakerDataView.get_n_partitions(),
                                "Adding delay extensions as required")
@@ -98,12 +97,12 @@ class _DelaySupportAdder(object):
         return self._new_vertices, self._new_edges
 
     def _create_post_delay_edge(self, delay_app_vertex, app_edge):
-        """ creates the edge between delay extension and post vertex. stores\
-            for future loading to the app graph when safe to do so.
+        """
+        Creates the edge between delay extension and post vertex. Stores
+        for future loading to the app graph when safe to do so.
 
         :param ApplicationVertex delay_app_vertex: delay extension vertex
         :param app_edge: the undelayed app edge this is associated with.
-        :rtype: None
         """
         # check for post edge
         delayed_edge = self._delay_post_edge_map.get(
@@ -112,8 +111,8 @@ class _DelaySupportAdder(object):
             delay_edge = DelayedApplicationEdge(
                 delay_app_vertex, app_edge.post_vertex,
                 app_edge.synapse_information,
-                label="{}_delayed_to_{}".format(
-                    app_edge.pre_vertex.label, app_edge.post_vertex.label),
+                label=(f"{app_edge.pre_vertex.label}_delayed_"
+                       f"to_{app_edge.post_vertex.label}"),
                 undelayed_edge=app_edge)
             self._delay_post_edge_map[
                 (delay_app_vertex, app_edge.post_vertex)] = delay_edge
@@ -124,24 +123,23 @@ class _DelaySupportAdder(object):
     def _create_delay_app_vertex_and_pre_edge(
             self, app_outgoing_edge_partition, app_edge, delay_per_stage,
             n_delay_stages):
-        """ creates the delay extension app vertex and the edge from the src\
-            vertex to this delay extension. Adds to the graph, as safe to do\
-            so.
+        """
+        Creates the delay extension app vertex and the edge from the src
+        vertex to this delay extension. Adds to the graph, as safe to do so.
 
-        :param OutgoingEdgePartition app_outgoing_edge_partition:
+        :param ApplicationEdgePartition app_outgoing_edge_partition:
             the original outgoing edge partition.
-        :param AppEdge app_edge: the undelayed app edge.
+        :param ApplicationEdge app_edge: the undelayed app edge.
         :param int delay_per_stage: delay for each delay stage
         :param int n_delay_stages: the number of delay stages needed
         :return: the DelayExtensionAppVertex
         """
-
         # get delay extension vertex if it already exists.
         delay_app_vertex = self._app_to_delay_map.get(
             app_outgoing_edge_partition, None)
         if delay_app_vertex is None:
             # build delay app vertex
-            delay_name = "{}_delayed".format(app_edge.pre_vertex.label)
+            delay_name = f"{app_edge.pre_vertex.label}_delayed"
             delay_app_vertex = DelayExtensionVertex(
                 app_outgoing_edge_partition, delay_per_stage, n_delay_stages,
                 app_edge.pre_vertex.n_colour_bits, label=delay_name)
@@ -155,8 +153,7 @@ class _DelaySupportAdder(object):
             # build afferent app edge
             delay_pre_edge = DelayAfferentApplicationEdge(
                 app_edge.pre_vertex, delay_app_vertex,
-                label="{}_to_DelayExtension".format(
-                    app_edge.pre_vertex.label))
+                label=f"{app_edge.pre_vertex.label}_to_DelayExtension")
             self._new_edges.append(delay_pre_edge)
         else:
             delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
@@ -164,14 +161,14 @@ class _DelaySupportAdder(object):
         return delay_app_vertex
 
     def _check_delay_values(self, app_edge, synapse_infos):
-        """ checks the delay required from the user defined max, the max delay\
-            supported by the post vertex splitter and the delay Extensions.
+        """
+        Checks the delay required from the user defined max, the max delay
+        supported by the post vertex splitter and the delay Extensions.
 
         :param ApplicationEdge app_edge: the undelayed app edge
         :param iterable[SynapseInfo] synapse_infos: iterable of synapse infos
         :return: tuple(n_delay_stages, delay_steps_per_stage, extension_needed)
         """
-
         # get max delay required
         max_delay_needed_ms = max(
             synapse_info.synapse_dynamics.get_delay_maximum(

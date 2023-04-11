@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,14 +18,15 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 
 class SpYNNakerConnectionHolderGenerator(object):
-    """ Sets up connection holders for reports to use.
+    """
+    Sets up connection holders for reports to use.
     """
 
     def __call__(self, application_graph):
         """
-        :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph:
-            app graph
+        :param application_graph: app graph
+        :type application_graph:
+            ~pacman.model.graphs.application.ApplicationGraph
         :return: the set of connection holders for after DSG generation
         :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation),
             ConnectionHolder)

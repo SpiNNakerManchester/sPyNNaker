@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -77,9 +77,9 @@ class SynapseDynamicsStructuralCommon(
 
     @property
     def p_rew(self):
-        """ The period of rewiring.
+        """
+        The period of rewiring.
 
-        :return: The period of rewiring
         :rtype: float
         """
         return 1. / self.f_rew
@@ -116,13 +116,11 @@ class SynapseDynamicsStructuralCommon(
         spec.comment("Writing partner selection parameters")
         self.partner_selection.write_parameters(spec)
         for proj in structural_projections:
-            spec.comment("Writing formation parameters for {}".format(
-                proj.label))
+            spec.comment(f"Writing formation parameters for {proj.label}")
             dynamics = proj._synapse_information.synapse_dynamics
             dynamics.formation.write_parameters(spec)
         for proj in structural_projections:
-            spec.comment("Writing elimination parameters for {}".format(
-                proj.label))
+            spec.comment(f"Writing elimination parameters for {proj.label}")
             dynamics = proj._synapse_information.synapse_dynamics
             dynamics.elimination.write_parameters(
                 spec, weight_scales[proj._synapse_information.synapse_type])
@@ -151,7 +149,8 @@ class SynapseDynamicsStructuralCommon(
 
     def __write_common_rewiring_data(
             self, spec, app_vertex, vertex_slice, n_pre_pops):
-        """ Write the non-sub-population synapse parameters to the spec.
+        """
+        Write the non-sub-population synapse parameters to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             the data spec
@@ -160,8 +159,6 @@ class SynapseDynamicsStructuralCommon(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the target vertex to generate for
         :param int n_pre_pops: the number of pre-populations
-        :return: None
-        :rtype: None
         """
         time_step_us = SpynnakerDataView.get_simulation_time_step_us()
         spec.comment("Writing common rewiring data")
@@ -207,9 +204,9 @@ class SynapseDynamicsStructuralCommon(
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             the vertex for which data specs are being prepared
-        :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \
-                structural_projections:
-            Projections that are structural
+        :param structural_projections: Projections that are structural
+        :type structural_projections:
+            list(tuple(ProjectionApplicationEdge,SynapseInformation))
         :param machine_edges_by_app:
             map of app edge to associated machine edges
         :type machine_edges_by_app:
@@ -226,8 +223,7 @@ class SynapseDynamicsStructuralCommon(
         lo_atom_index = dict()
         index = 0
         for proj in structural_projections:
-            spec.comment("Writing pre-population info for {}".format(
-                proj.label))
+            spec.comment(f"Writing pre-population info for {proj.label}")
             # pylint: disable=protected-access
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
@@ -283,12 +279,13 @@ class SynapseDynamicsStructuralCommon(
     def __write_post_to_pre_table(
             self, spec, pop_index, subpop_index, lo_atom_index, app_vertex,
             vertex_slice):
-        """ Post to pre table is basically the transpose of the synaptic\
-            matrix.
+        """
+        Post to pre table is basically the transpose of the synaptic matrix.
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \
-                pop_index:
+        :param pop_index:
+        :type pop_index:
+            dict(tuple(AbstractPopulationVertex,SynapseInformation), int)
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             the vertex for which data specs are being prepared
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -343,8 +340,9 @@ class SynapseDynamicsStructuralCommon(
             raise ValueError(
                 f"Wrong size of pre-to-pop tables: {len(post_to_pre)} "
                 f"Found, {vertex_slice.n_atoms * self.s_max} Expected")
-        spec.comment("Writing post-to-pre table of {} words".format(
-            vertex_slice.n_atoms * self.s_max))
+        spec.comment(
+            "Writing post-to-pre table of "
+            f"{vertex_slice.n_atoms * self.s_max} words")
         spec.write_array(post_to_pre)
 
     @overrides(AbstractSynapseDynamicsStructural.
@@ -408,31 +406,35 @@ class SynapseDynamicsStructuralCommon(
 
     @abstractproperty
     def connections(self):
-        """ initial connectivity as defined via connector
+        """
+        Initial connectivity as defined via connector.
 
         :rtype: dict
         """
 
     @abstractmethod
     def get_seeds(self, app_vertex=None):
-        """ Generate a seed for the RNG on chip that is the same for all\
-            of the cores that have perform structural updates.
+        """
+        Generate a seed for the RNG on chip that is the same for all
+        of the cores that have perform structural updates.
 
         It should be different between application vertices
         but the same for the same app_vertex.
-        It should be different every time called with None.
+        It should be different every time called with `None`.
 
         :param app_vertex:
-        :type app_vertex: ApplicationVertex or None
+        :type app_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex or None
         :return: list of random seed (4 words), generated randomly
         :rtype: list(int)
         """
 
     def check_initial_delay(self, max_delay_ms):
-        """ Check that delays can be done without delay extensions
+        """
+        Check that delays can be done without delay extensions.
 
         :param float max_delay_ms: The maximum delay supported, in milliseconds
-        :raises Exception: if the delay is out of range
+        :raises ValueError: if the delay is out of range
         """
         if isinstance(self.initial_delay, Iterable):
             # pylint: disable=unsubscriptable-object

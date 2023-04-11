@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -52,8 +52,10 @@ _SPIF_OUTPUT_SET_LEN = 0x5ec40000
 
 
 class SPIFLiveSpikesConnection(DatabaseConnection):
-    """ A connection for receiving live spikes from spif
     """
+    A connection for receiving live spikes from SPIF.
+    """
+    # TODO: define SPIF
     __slots__ = [
         "_atom_id_to_key",
         "__error_keys",
@@ -126,6 +128,9 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
         self.__error_keys = set()
 
     def add_receive_label(self, label):
+        """
+        :param str label:
+        """
         if self.__receive_labels is None:
             self.__receive_labels = list()
         if label not in self.__receive_labels:
@@ -137,7 +142,8 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             self.__init_callbacks[label] = list()
 
     def add_init_callback(self, label, init_callback):
-        """ Add a callback to be called to initialise a vertex
+        """
+        Add a callback to be called to initialise a vertex.
 
         :param str label:
             The label of the vertex to be notified about. Must be one of the
@@ -153,7 +159,8 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
 
     def add_receive_callback(self, label, live_event_callback,
                              translate_key=True):
-        """ Add a callback for the reception of live events from a vertex
+        """
+        Add a callback for the reception of live events from a vertex.
 
         :param str label: The label of the vertex to be notified about.
             Must be one of the vertices listed in the constructor
@@ -166,34 +173,39 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             key should stay a key
         """
         label_id = self.__receive_labels.index(label)
-        logger.info("Receive callback {} registered to label {}".format(
-            live_event_callback, label))
+        logger.info(
+            "Receive callback {} registered to label {}",
+            live_event_callback, label)
         self.__live_event_callbacks[label_id].append(
             (live_event_callback, translate_key))
 
     def add_start_resume_callback(self, label, start_resume_callback):
-        """ Add a callback for the start and resume state of the simulation
+        """
+        Add a callback for the start and resume state of the simulation.
 
         :param str label: the label of the function to be sent
         :param start_resume_callback: A function to be called when the start
             or resume message has been received. This function should take
             the label of the referenced vertex, and an instance of this
             class, which can be used to send events.
-        :type start_resume_callback: callable(str, LiveEventConnection) -> None
-        :rtype: None
+        :type start_resume_callback: callable(str,
+            ~spinn_front_end_common.utilities.connections.LiveEventConnection)
+            -> None
         """
         self.__start_resume_callbacks[label].append(start_resume_callback)
 
     def add_pause_stop_callback(self, label, pause_stop_callback):
-        """ Add a callback for the pause and stop state of the simulation
+        """
+        Add a callback for the pause and stop state of the simulation.
 
         :param str label: the label of the function to be sent
         :param pause_stop_callback: A function to be called when the pause
             or stop message has been received. This function should take the
             label of the referenced  vertex, and an instance of this class,
             which can be used to send events.
-        :type pause_stop_callback: callable(str, LiveEventConnection) -> None
-        :rtype: None
+        :type pause_stop_callback: callable(str,
+            ~spinn_front_end_common.utilities.connections.LiveEventConnection)
+            -> None
         """
         self.__pause_stop_callbacks[label].append(pause_stop_callback)
 
@@ -252,10 +264,9 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
             self.__receiver_connection = None
 
     def __launch_thread(self, kind, label, callback):
-        thread = Thread(
-            target=callback, args=(label, self),
-            name="{} callback thread for live_event_connection {}:{}".format(
-                kind, self._local_port, self._local_ip_address))
+        thread = Thread(target=callback, args=(label, self), name=(
+            f"{kind} callback thread for live_event_connection "
+            f"{self._local_port}:{self._local_ip_address}"))
         thread.start()
 
     def __do_start_resume(self):
@@ -310,4 +321,4 @@ class SPIFLiveSpikesConnection(DatabaseConnection):
     def __handle_unknown_key(self, key):
         if key not in self.__error_keys:
             self.__error_keys.add(key)
-            logger.warning("Received unexpected key {}".format(key))
+            logger.warning("Received unexpected key {}", key)

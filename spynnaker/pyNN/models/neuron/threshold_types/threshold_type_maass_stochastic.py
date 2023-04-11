@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,11 +25,12 @@ TIMESTEP = "timestep"
 
 
 class ThresholdTypeMaassStochastic(AbstractThresholdType):
-    """ A stochastic threshold.
+    """
+    A stochastic threshold.
 
-    Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical \
-    microcircuit models. *PLoS Computational Biology.* 2013;9(11):e1003311. \
-    `doi:10.1371/journal.pcbi.1003311 \
+    Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical
+    microcircuit models. *PLoS Computational Biology.* 2013;9(11):e1003311.
+    `doi:10.1371/journal.pcbi.1003311
     <https://doi.org/10.1371/journal.pcbi.1003311>`_
     """
     __slots__ = [
@@ -40,15 +41,14 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     def __init__(self, du_th, tau_th, v_thresh):
         r"""
         :param du_th: :math:`du_{thresh}`
-        :type du_th: float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type du_th: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_th: :math:`\tau_{thresh}`
-        :type tau_th: float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type tau_th: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param v_thresh: :math:`V_{thresh}`
-        :type v_thresh:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type v_thresh: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([

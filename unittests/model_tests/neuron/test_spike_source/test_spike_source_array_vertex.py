@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,7 +31,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
                 n_colour_bits=None)
         found = False
         for record in lc.records:
-            if "no spike" in record.msg.fmt:
+            if "no spike" in str(record.msg):
                 found = True
         self.assertTrue(found)
         v.set_parameter_values("spike_times", [])
@@ -69,9 +69,10 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
                 splitter=None, n_colour_bits=None)
             found = False
             for record in lc.records:
-                if "too many spikes" in record.msg.fmt:
-                    self.assertIn("110", record.msg.fmt)
-                    self.assertIn("15", record.msg.fmt)
+                msg = str(record.msg)
+                if "too many spikes" in msg:
+                    self.assertIn("110", msg)
+                    self.assertIn("15", msg)
                     found = True
             self.assertTrue(found)
 
@@ -84,8 +85,9 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             v.set_parameter_values("spike_times", [34] * 35)
             found = False
             for record in lc.records:
-                if "too many spikes" in record.msg.fmt:
-                    self.assertIn("share", record.msg.fmt)
+                msg = str(record.msg)
+                if "too many spikes" in msg:
+                    self.assertIn("share", msg)
                     found = True
             self.assertTrue(found)
 
@@ -97,8 +99,9 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
                 splitter=None, n_colour_bits=None)
             found = False
             for record in lc.records:
-                if "too many spikes" in record.msg.fmt:
-                    self.assertIn("37", record.msg.fmt)
-                    self.assertIn("109", record.msg.fmt)
+                msg = str(record.msg)
+                if "too many spikes" in msg:
+                    self.assertIn("37", msg)
+                    self.assertIn("109", msg)
                     found = True
             self.assertTrue(found)

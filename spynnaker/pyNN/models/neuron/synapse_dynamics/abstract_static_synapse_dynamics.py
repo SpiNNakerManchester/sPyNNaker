@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,8 @@ from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 
 class AbstractStaticSynapseDynamics(
         AbstractSDRAMSynapseDynamics, metaclass=AbstractBase):
-    """ Dynamics which don't change over time.
+    """
+    Dynamics which don't change over time.
     """
     # pylint: disable=too-many-arguments
 
@@ -26,7 +27,8 @@ class AbstractStaticSynapseDynamics(
 
     @abstractmethod
     def get_n_words_for_static_connections(self, n_connections):
-        """ Get the number of 32-bit words for `n_connections` in a single row.
+        """
+        Get the number of 32-bit words for `n_connections` in a single row.
 
         :param int n_connections:
         :rtype: int
@@ -37,15 +39,16 @@ class AbstractStaticSynapseDynamics(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types, max_n_synapses,
             max_atoms_per_core):
-        """ Get the fixed-fixed data for each row, and lengths for the\
-            fixed-fixed parts of each row.
+        """
+        Get the fixed-fixed data for each row, and lengths for the
+        fixed-fixed parts of each row.
 
-        Data is returned as an array made up of an array of 32-bit words for\
-        each row for the fixed-fixed region. The row into which connection\
-        should go is given by `connection_row_indices`, and the total number\
+        Data is returned as an array made up of an array of 32-bit words for
+        each row for the fixed-fixed region. The row into which connection
+        should go is given by `connection_row_indices`, and the total number
         of rows is given by `n_rows`.
 
-        Lengths are returned as an array made up of an integer for each row,\
+        Lengths are returned as an array made up of an integer for each row,
         for the fixed-fixed region.
 
         :param ~numpy.ndarray connections: The connections to get data for
@@ -63,8 +66,9 @@ class AbstractStaticSynapseDynamics(
 
     @abstractmethod
     def get_n_static_words_per_row(self, ff_size):
-        """ Get the number of bytes to be read per row for the static data\
-            given the size that was written to each row.
+        """
+        Get the number of bytes to be read per row for the static data
+        given the size that was written to each row.
 
         :param ~numpy.ndarray ff_size:
         :rtype: ~numpy.ndarray
@@ -72,7 +76,8 @@ class AbstractStaticSynapseDynamics(
 
     @abstractmethod
     def get_n_synapses_in_rows(self, ff_size):
-        """ Get the number of synapses in the rows with sizes `ff_size`.
+        """
+        Get the number of synapses in the rows with sizes `ff_size`.
 
         :param ~numpy.ndarray ff_size:
         :rtype: ~numpy.ndarray
@@ -82,11 +87,13 @@ class AbstractStaticSynapseDynamics(
     def read_static_synaptic_data(
             self, post_vertex_slice, n_synapse_types, ff_size, ff_data,
             max_atoms_per_core):
-        """ Read the connections from the words of data in `ff_data`.
+        """
+        Read the connections from the words of data in `ff_data`.
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param int n_synapse_types:
         :param ~numpy.ndarray ff_size:
         :param list(~numpy.ndarray) ff_data:
         :param int max_atoms_per_core:
+        :rtype: ~numpy.ndarray
         """

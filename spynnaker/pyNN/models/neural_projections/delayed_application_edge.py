@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,6 @@ from pacman.model.graphs.application import ApplicationEdge
 
 
 class DelayedApplicationEdge(ApplicationEdge):
-
     __slots__ = [
         "__synapse_information",
         "__undelayed_edge"]
@@ -59,7 +58,8 @@ class DelayedApplicationEdge(ApplicationEdge):
 
     @property
     def undelayed_edge(self):
-        """ Get the edge that for projections without extended delays
+        """
+        The edge for projections without extended delays.
 
         :rtype: ProjectionApplicationEdge
         """
