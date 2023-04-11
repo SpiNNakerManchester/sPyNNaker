@@ -1571,6 +1571,7 @@ class AbstractPopulationVertex(
         """
         Get the maximum delay and whether a delay extension is needed
         for a given maximum number of ring buffer bits.
+
         :param int max_ring_buffer_bits:
             The maximum number of bits that can be used for the ring buffer
             identifier (i.e. delay, synapse type, neuron index)
