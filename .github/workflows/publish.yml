@@ -44,20 +44,22 @@ jobs:
           echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
       - name: Install pip, etc
         uses: ./support/actions/python-tools
+
       - name: Checkout SpiNNaker Dependencies
-        uses: ./support/actions/checkout-spinn-deps
+        uses: ./support/actions/install-spinn-deps
         with:
           repositories: >
             spinnaker_tools SpiNNUtils SpiNNMachine SpiNNMan PACMAN
             DataSpecification spalloc SpiNNFrontEndCommon TestBase
           install: true
+
       - name: Install matplotlib
         uses: ./support/actions/install-matplotlib
       - name: Read tags
         run: make doxysetup
         working-directory: neural_modelling
       - name: Setup
-        uses: ./support/actions/run-setup
+        uses: ./support/actions/run-install
 
       - name: Build Python Documentation
         uses: ./support/actions/sphinx
