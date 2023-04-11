@@ -1,1 +1,1 @@
-include CITATION.cff LICENSE.md requirements.txt pypi_to_import
+include CITATION.cff LICENSE LICENSE_POLICY.md README.md
