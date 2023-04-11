@@ -37,18 +37,25 @@ jobs:
       uses: ./support/actions/apt-get-install
       with:
         packages: doxygen gcc-arm-none-eabi
-    - name: Checkout SpiNNaker Dependencies
-      uses: ./support/actions/checkout-spinn-deps
+
+    - name: Checkout SpiNNaker C Dependencies
+      uses: ./support/actions/install-spinn-deps
       with:
         # Note: SpiNNUtils needed for spinn_utilities.make_tools
-        repositories: spinnaker_tools spinn_common SpiNNFrontEndCommon SpiNNUtils
+        repositories: spinnaker_tools spinn_common SpiNNFrontEndCommon
+        install: false
+
+    - name: "Prepare: Install SpiNNUtils"
+      uses: ./support/actions/install-spinn-deps
+      with:
+        # Note: SpiNNUtils needed for spinn_utilities.make_tools
+        repositories: SpiNNUtils
+        install: true
+
     - name: Set environment variables
       run: |
         echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
         echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
-    - name: Install SpiNNUtils
-      run: python setup.py install
-      working-directory: SpiNNUtils
 
     - name: Lint C code using Vera++
       uses: ./support/actions/vera
