@@ -30,7 +30,6 @@ from pacman.operations.routing_info_allocator_algorithms import (
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices,\
     SynapseRegions
