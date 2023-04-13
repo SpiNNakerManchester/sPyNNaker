@@ -37,6 +37,7 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
+        ref: spell-chucking
 
     - name: Install Ubuntu dependencies
       uses: ./support/actions/apt-get-install
@@ -85,6 +86,8 @@ jobs:
       with:
         package: spynnaker spynnaker8
         exitcheck: 39
+        # Enable spell checking
+        language: en_GB
 
   validate:
     runs-on: ubuntu-latest
@@ -99,6 +102,7 @@ jobs:
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
+        ref: spell-chucking
 
     - name: Install Ubuntu dependencies
       uses: ./support/actions/apt-get-install
@@ -129,10 +133,11 @@ jobs:
       with:
         config_file: rat_asl20.xml
 
-    #- name: Validate all XML
-    #  uses: ./support/actions/validate-xml
-    #  with:
-    #    base-path: spynnaker
+    - name: Validate all XML
+      if: false
+      uses: ./support/actions/validate-xml
+      with:
+        base-path: spynnaker
 
     - name: Build documentation with sphinx (3.8 only)
       uses: ./support/actions/sphinx
