@@ -33,7 +33,7 @@ def setup_configs():
     clear_cfg_files(False)
     add_spinnaker_cfg()  # This add its dependencies too
     set_cfg_files(
-        configfile=CONFIG_FILE_NAME,
+        config_file=CONFIG_FILE_NAME,
         default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
 
 
