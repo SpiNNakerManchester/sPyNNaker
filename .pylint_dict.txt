@@ -14,10 +14,34 @@
 
 # Our abbreviations/names
 MPI
+gsyn
+spinnman
+pacman
+spalloc
+SDP
+timestep
+nanoamps
+microsiemens
+nanofarads
+multapse
+APLX
 
 # Python types
+ApplicationVertex
+MachineVertex
+ApplicationEdge
+MachineEdge
 NumpyRNG
+PopulationBase
+PopulationView
+RandomDistribution
+ConnectionHolder
+TemplateEngine
+BaseStructure
 
 # Python packages
+io
 neo
+pynn
 pyNN
+matplotlib
