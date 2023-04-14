@@ -25,7 +25,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 class SynapticMatrixApp(object):
     """
     The synaptic matrix (and delay matrix if applicable) for an incoming
-    app edge.
+    application edge.
     """
 
     # pylint: disable=unused-private-member

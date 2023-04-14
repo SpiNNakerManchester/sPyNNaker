@@ -59,16 +59,6 @@ rewirings
 analog
 unsets
 
-# Because they occur a lot as arguments and related
-sdram
-csv
-cellclass
-cellparams
-structs
-rd
-tstop
-params
-
 # Our Python types
 ApplicationGraph
 AbstractVertex
@@ -143,3 +133,17 @@ cset
 connset
 unitquantity
 ctypes
+
+# Misc (arguments, etc.)
+Wi
+sdram
+csv
+cellclass
+cellparams
+structs
+rd
+tstop
+params
+csvfile
+db
+dt

@@ -63,7 +63,7 @@ class ExternalDeviceLifControlVertex(
         :param str label:
         :param float ring_buffer_sigma:
         :param int incoming_spike_buffer_size:
-        :param splitter: splitter from app to machine
+        :param splitter: splitter from application vertices to machine vertices
         :type splitter: None or
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         :param int n_colour_bits: The number of colour bits to use

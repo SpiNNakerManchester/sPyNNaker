@@ -52,7 +52,7 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
 
     def set_app_vertex(self, vertex):
         """
-        Set the app vertex associated with the current source.
+        Set the application vertex associated with the current source.
 
         :param AbstractPopulationVertex vertex: The population vertex
         """
