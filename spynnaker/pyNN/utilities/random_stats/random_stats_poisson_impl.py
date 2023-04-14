@@ -18,7 +18,7 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 class RandomStatsPoissonImpl(AbstractRandomStats):
     """
-    An implementation of AbstractRandomStats for poisson distributions.
+    An implementation of AbstractRandomStats for Poisson distributions.
     """
 
     def _get_params(self, dist):
@@ -39,8 +39,8 @@ class RandomStatsPoissonImpl(AbstractRandomStats):
     def var(self, dist):
         return poisson.var(*self._get_params(dist))
 
-    def high(self, dist):
+    def high(self, distribution):
         return None
 
-    def low(self, dist):
+    def low(self, distribution):
         return None

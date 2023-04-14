@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-utility class containing simple helper methods
+Utility package containing simple helper functions.
 """
 import logging
 import os
@@ -220,8 +220,8 @@ def get_probable_maximum_selected(
         n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
     """
     Get the likely maximum number of items that will be selected from a
-    set of n_trials from a total set of n_total_trials
-    with a probability of selection of selection_prob.
+    set of `n_trials` from a total set of `n_total_trials`
+    with a probability of selection of `selection_prob`.
     """
     prob = 1.0 - (chance / float(n_total_trials))
     val = binom.ppf(prob, n_trials, selection_prob)
@@ -237,100 +237,104 @@ def get_probable_minimum_selected(
         n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
     """
     Get the likely minimum number of items that will be selected from a
-    set of n_trials from a total set of n_total_trials
-    with a probability of selection of selection_prob.
+    set of `n_trials` from a total set of `n_total_trials`
+    with a probability of selection of `selection_prob`.
     """
     prob = (chance / float(n_total_trials))
     return binom.ppf(prob, n_trials, selection_prob)
 
 
-def get_probability_within_range(dist, lower, upper):
+def get_probability_within_range(distribution, lower, upper):
     """
     Get the probability that a value will fall within the given range for
     a given RandomDistribution.
 
-    :param ~spynnaker.pyNN.RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    :param float lower:
+    :param float upper:
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.cdf(dist, upper) - stats.cdf(dist, lower)
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.cdf(distribution, upper) - stats.cdf(distribution, lower)
 
 
-def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
+def get_maximum_probable_value(distribution, n_items, chance=(1.0 / 100.0)):
     """
     Get the likely maximum value of a RandomDistribution given a
     number of draws.
 
-    :param ~spynnaker.pyNN.RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
+    :param int n_items:
+    :param float chance:
     """
-    stats = STATS_BY_NAME[dist.name]
+    stats = STATS_BY_NAME[distribution.name]
     prob = 1.0 - (chance / float(n_items))
-    return stats.ppf(dist, prob)
+    return stats.ppf(distribution, prob)
 
 
-def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
+def get_minimum_probable_value(distribution, n_items, chance=(1.0 / 100.0)):
     """
     Get the likely minimum value of a RandomDistribution given a
     number of draws.
 
-    :param ~spynnaker.pyNN.RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
     """
-    stats = STATS_BY_NAME[dist.name]
+    stats = STATS_BY_NAME[distribution.name]
     prob = chance / float(n_items)
-    return stats.ppf(dist, prob)
+    return stats.ppf(distribution, prob)
 
 
-def get_mean(dist):
+def get_mean(distribution):
     """
     Get the mean of a RandomDistribution.
 
-    :param ~spynnaker.pyNN.RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.mean(dist)
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.mean(distribution)
 
 
-def get_standard_deviation(dist):
+def get_standard_deviation(distribution):
     """
     Get the standard deviation of a RandomDistribution.
 
-    :param ~spynnaker.pyNN.RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.std(dist)
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.std(distribution)
 
 
-def get_variance(dist):
+def get_variance(distribution):
     """
     Get the variance of a RandomDistribution.
 
-    :param ~spynnaker.pyNN.RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.var(dist)
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.var(distribution)
 
 
-def high(dist):
+def high(distribution):
     """
-    Gets the high or max boundary value for this distribution.
+    Gets the high or maximum boundary value for this distribution.
 
     Could return `None`.
 
-    :param ~spynnaker.pyNN.RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.high(dist)
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.high(distribution)
 
 
-def low(dist):
+def low(distribution):
     """
-    Gets the high or min boundary value for this distribution.
+    Gets the high or minimum boundary value for this distribution.
 
     Could return `None`.
 
-    :param ~spynnaker.pyNN.RandomDistribution dist:
+    :param ~spynnaker.pyNN.RandomDistribution distribution:
     """
-    stats = STATS_BY_NAME[dist.name]
-    return stats.low(dist)
+    stats = STATS_BY_NAME[distribution.name]
+    return stats.low(distribution)
 
 
 def _validate_mars_kiss_64_seed(seed):
@@ -357,8 +361,8 @@ def create_mars_kiss_seeds(rng):
     :param seed:
         the seed to create a random number generator if not handed.
     :type seed: int or None
-    :return: a list of 4 ints which are used by the mars64 kiss random number
-        generator for seeds.
+    :return: a list of 4 integers which are used by the mars64 kiss random
+        number generator for seeds.
     :rtype: list(int)
     """
     kiss_seed = _validate_mars_kiss_64_seed([

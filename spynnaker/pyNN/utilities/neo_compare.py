@@ -17,15 +17,15 @@
 
 def compare_spiketrain(spiketrain1, spiketrain2, same_length=True):
     """
-    Checks two Spiketrains have the exact same data
+    Checks two spike trains have the exact same data.
 
-    :param ~neo.core.SpikeTrain spiketrain1: first spiketrain
-    :param ~neo.core.SpikeTrain spiketrain2: second spiketrain
+    :param ~neo.core.SpikeTrain spiketrain1: first spike train
+    :param ~neo.core.SpikeTrain spiketrain2: second spike train
     :param bool same_length: Flag to indicate if the same length of data is
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional spikes after the first ends. This is used to
         compare data extracted part way with data extracted at the end.
-    :raises AssertionError: If the spiketrains are not equal
+    :raises AssertionError: If the spike trains are not equal
     """
     id1 = spiketrain1.annotations['source_index']
     id2 = spiketrain2.annotations['source_index']
@@ -46,12 +46,12 @@ def compare_spiketrain(spiketrain1, spiketrain2, same_length=True):
 def compare_spiketrains(
         spiketrains1, spiketrains2, same_data=True, same_length=True):
     """
-    Check two Lists of SpikeTrains have the exact same data
+    Check two Lists of spike trains have the exact same data.
 
     :param list(~neo.core.SpikeTrain) spiketrains1:
-        First list SpikeTrains to compare
+        First list of spike trains to compare
     :param list(~neo.core.SpikeTrain) spiketrains2:
-        Second list of SpikeTrains to compare
+        Second list of spike trains to compare
     :param bool same_data: Flag to indicate if the same type of data is held,
         i.e., same spikes, v, gsyn_exc and gsyn_inh.
         If False allows one or both lists to be Empty.
@@ -60,7 +60,7 @@ def compare_spiketrains(
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional spikes after the first ends. This is used to compare
         data extracted part way with data extracted at the end.
-    :raises AssertionError: If the spiketrains are not equal
+    :raises AssertionError: If the spike trains are not equal
     """
     if not same_data and (not spiketrains1 or not spiketrains2):
         return
@@ -84,7 +84,7 @@ def compare_analogsignal(as1, as2, same_length=True):
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional data after the first ends. This is used to compare
         data extracted part way with data extracted at the end.
-    :raises AssertionError: If the analogsignals are not equal
+    :raises AssertionError: If the analog signals are not equal
     """
     as1_index = as1.channel_index.index
     as2_index = as2.channel_index.index
