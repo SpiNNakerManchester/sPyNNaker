@@ -20,28 +20,50 @@ pacman
 spalloc
 SDP
 timestep
+timesteps
 nanoamps
 microsiemens
 nanofarads
 multapse
 APLX
 
-# Python types
+# Our Python types
+ApplicationGraph
 ApplicationVertex
 MachineVertex
+AbstractPopulationVertex
 ApplicationEdge
 MachineEdge
-NumpyRNG
+ProjectionApplicationEdge
+DelayedApplicationEdge
+ApplicationEdgePartition
 PopulationBase
 PopulationView
 RandomDistribution
 ConnectionHolder
+IDMixin
+ProgressBar
+SynapseInfo
+SynapseRegions
+ExecutableTargets
+MultiRegionSDRAM
+AbstractMulticastControllableDevice
+
+# Others' Python types
+NumpyRNG
+NativeRNG
 TemplateEngine
 BaseStructure
+BaseIO
+FileIO
+CSet
+NeuronCurrentSource
 
 # Python packages
+csa
 io
 neo
 pynn
 pyNN
 matplotlib
+graphviz
