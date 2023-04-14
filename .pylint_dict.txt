@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# People names
+Habenschuss
+Jonke
+Maass
+Izhikevich
+Petrut
+Bogdan
+Djurfeldt
+
 # Our abbreviations/names
 MPI
 gsyn
@@ -23,6 +32,7 @@ APLX
 STDP
 Omnibot
 pushbot
+RNG
 
 # Our "special" words
 timestep
@@ -37,9 +47,12 @@ heatmap
 bitfield
 bitfields
 undelayed
+multiplicator
+generatable
 
 # Our Python types
 ApplicationGraph
+AbstractVertex
 ApplicationVertex
 MachineVertex
 AbstractPopulationVertex
@@ -51,9 +64,10 @@ ApplicationEdgePartition
 SourceSegmentedSDRAMMachinePartition
 PopulationBase
 PopulationView
+IDMixin
 RandomDistribution
 ConnectionHolder
-IDMixin
+FPGAConnection
 ProgressBar
 SynapseInformation
 SynapseRegions
@@ -67,6 +81,7 @@ NeuronRegions
 DataSpecificationGenerator
 CoreSubset
 CoreSubsets
+SpinnmanIOException
 
 # Others' Python types
 NumpyRNG
@@ -80,6 +95,7 @@ NeuronCurrentSource
 AnalogSignal
 SpikeTrain
 StandardTextFile
+datetime
 
 # Python packages
 csa

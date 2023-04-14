@@ -745,26 +745,26 @@ class Population(PopulationBase):
         self.__recorder.cache_data()
 
     @staticmethod
-    def __create_model(cellclass, cellparams):
+    def __create_model(cell_class, cell_params):
         """
-        :param cellclass: The implementation of the individual neurons.
-        :type cellclass: type or AbstractPyNNModel or ApplicationVertex
-        :param cellparams: Parameters to pass to ``cellclass`` if it
-            is a class to instantiate. Must be ``None`` if ``cellclass`` is an
+        :param cell_class: The implementation of the individual neurons.
+        :type cell_class: type or AbstractPyNNModel or ApplicationVertex
+        :param cell_params: Parameters to pass to ``cell_class`` if it
+            is a class to instantiate. Must be ``None`` if ``cell_class`` is an
             instantiated object.
-        :type cellparams: dict(str,object) or None
+        :type cell_params: dict(str,object) or None
         :rtype: ApplicationVertex or AbstractPyNNModel
         """
-        model = cellclass
-        if inspect.isclass(cellclass):
-            if cellparams is None:
-                model = cellclass()
+        model = cell_class
+        if inspect.isclass(cell_class):
+            if cell_params is None:
+                model = cell_class()
             else:
-                model = cellclass(**cellparams)
-        elif cellparams:
+                model = cell_class(**cell_params)
+        elif cell_params:
             raise ConfigurationException(
-                "cellclass is an instance which includes params so "
-                "cellparams must be None")
+                "cell_class is an instance which includes params so "
+                "cell_params must be None")
         return model
 
     def __create_vertex(
@@ -838,13 +838,13 @@ class Population(PopulationBase):
             additional_parameters, population_parameters):
         """
         Essential method for allowing things like splitter objects at
-        pop level.
+        population level.
 
         :param additional_parameters:
-            the additional params handed down from user
+            the additional parameters handed down from user
         :param population_parameters:
-            the additional params the vertex can support.
-        :return: the list of params that are accepted.
+            the additional parameters the vertex can support.
+        :return: the list of parameters that are accepted.
         """
         for key in additional_parameters.keys():
             if key in population_parameters:

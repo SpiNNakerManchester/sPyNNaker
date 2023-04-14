@@ -200,7 +200,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     def __pre_as_post(self, pre_r, pre_c):
         """
-        Write pre coords as post coords.
+        Write pre-population coordinates as post-population coordinates.
 
         :param int pre_r: row
         :param int pre_c: column

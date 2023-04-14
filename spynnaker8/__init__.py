@@ -200,7 +200,7 @@ class RandomDistribution(sim.RandomDistribution):
 def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
              periodic_boundaries=None):
     """
-    Return the Euclidian distance between two cells.
+    Return the Euclidean distance between two cells.
 
     .. deprecated:: 7.0
         Use
@@ -347,7 +347,7 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
 
 def create(cellclass, cellparams=None, n=1):
     """
-    Builds a population with certain params.
+    Builds a population with certain parameters.
 
     .. deprecated:: 7.0
         Use

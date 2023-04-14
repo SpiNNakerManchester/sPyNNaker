@@ -162,8 +162,8 @@ def register_database_notification_request(hostname, notify_port, ack_port):
     Adds a socket system which is registered with the notification protocol.
 
     :param str hostname: hostname to connect to
-    :param int notify_port: port num for the notify command
-    :param int ack_port: port num for the acknowledge command
+    :param int notify_port: UDP port number for the notify command
+    :param int ack_port: UDP port number for the acknowledge command
     """
     SpynnakerDataView.add_database_socket_address(
         SocketAddress(hostname, notify_port, ack_port))
