@@ -165,8 +165,9 @@ class _DelaySupportAdder(object):
         Checks the delay required from the user defined max, the max delay
         supported by the post vertex splitter and the delay Extensions.
 
-        :param ApplicationEdge app_edge: the undelayed app edge
-        :param iterable[SynapseInfo] synapse_infos: iterable of synapse infos
+        :param ApplicationEdge app_edge: the undelayed application edge
+        :param iterable[SynapseInformation] synapse_infos:
+            iterable of synapse infos
         :return: tuple(n_delay_stages, delay_steps_per_stage, extension_needed)
         """
         # get max delay required

@@ -62,8 +62,8 @@ def _plot_spikes(ax, spike_times, neurons, label='', **options):
     Plots the spikes based on two lists.
 
     :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param list(~neo.core.SpikeTrain) spike_times: List of Spiketimes
-    :param neurons: List of Neuron Ids
+    :param list(~neo.core.SpikeTrain) spike_times: List of spike times
+    :param neurons: List of Neuron IDs
     :param str label: Label for the graph
     :param options: plotting options
     """
@@ -83,7 +83,7 @@ def plot_spiketrains(ax, spiketrains, label='', **options):
     Plot all spike trains in a Segment in a raster plot.
 
     :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param list(~neo.core.SpikeTrain) spiketrains: List of spiketimes
+    :param list(~neo.core.SpikeTrain) spiketrains: List of spike times
     :param str label: Label for the graph
     :param options: plotting options
     """
@@ -102,7 +102,7 @@ def plot_spikes_numpy(ax, spikes, label='', **options):
     Plot all spikes.
 
     :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param ~numpy.ndarray spikes: sPyNNaker7 format nparray of spikes
+    :param ~numpy.ndarray spikes: sPyNNaker7 format numpy array of spikes
     :param str label: Label for the graph
     :param options: plotting options
     """
@@ -141,7 +141,7 @@ def heat_plot_numpy(ax, data, label='', **options):
     Plots neurons, times and values into a heatmap.
 
     :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param ~numpy.ndarray data: nparray of values in spynnaker7 format
+    :param ~numpy.ndarray data: numpy array of values in spynnaker7 format
     :param str label: Label for the graph
     :param options: plotting options
     """
@@ -156,7 +156,7 @@ def heat_plot_neo(ax, signal_array, label='', **options):
     Plots neurons, times and values into a heatmap.
 
     :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param ~neo.core.AnalogSignal signal_array: Neo Signal array Object
+    :param ~neo.core.AnalogSignal signal_array: Neo Signal array object
     :param str label: Label for the graph
     :param options: plotting options
     """
@@ -181,8 +181,8 @@ def plot_segment(axes, segment, label='', **options):
     include the name of the data to plot
 
     .. note::
-        Method signature defined by pynn plotting.
-        This allows mixing of this plotting tool and pynn's
+        Method signature defined by PyNN plotting.
+        This allows mixing of this plotting tool and PyNN's
 
     :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
     :param ~neo.core.Segment segment: Data for one run to plot

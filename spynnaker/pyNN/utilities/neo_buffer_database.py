@@ -68,7 +68,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             If omitted the default location will be used.
         :type database_file: None or str
         :param bool read_only:
-            By default the database is readonly if given a database file.
+            By default the database is read-only if given a database file.
             This allows to override that (mainly for clear)
         """
         if database_file is None:
@@ -91,7 +91,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         Writes the global information from the Views.
 
         This writes information held in SpynnakerDataView so that the database
-        is usable standalone.
+        is usable stand-alone.
 
         .. note::
             The database must be writable for this to work!
@@ -115,7 +115,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         Records the current run time as `t_Stop`.
 
         This writes information held in SpynnakerDataView so that the database
-        is usable standalone
+        is usable stand-alone
 
         .. note::
             The database must be writable for this to work!
@@ -238,7 +238,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param ~spynnaker.pyNN.models.populations.Population population:
             the population to record for
         :param Population population:
-        :param sampling_interval: the simulation time in ms between sampling.
+        :param sampling_interval:
+            The simulation time in milliseconds between sampling.
             Typically the sampling rate * simulation_timestep_ms
         :type sampling_interval_ms: float or None
         :type data_type: DataType or None
@@ -283,7 +284,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 Typically the Population label, corrected for `None` or
                 duplicate values
 
-        :return: population size, first id and description
+        :return: population size, first ID and description
         :rtype: (int, int, str)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -524,11 +525,11 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
-        :param array(int) neurons: mapping of local id to global id
+        :param array(int) neurons: mapping of local ID to global ID
         :param float simulation_time_step_ms:
         :param bool selective_recording: flag to say if
         :param list(float) spike_times: List to add spike times to
-        :param list(int) spike_ids: List to add spike ids to
+        :param list(int) spike_ids: List to add spike IDs to
         """
         neurons_recording = len(neurons)
         if neurons_recording == 0:
@@ -568,7 +569,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
-        :return: numpy array of spike ids and spike times, all ids recording
+        :return: numpy array of spike IDs and spike times, all IDs recording
         :rtype: tuple(~numpy.ndarray, list(int))
         """
         spike_times = list()
@@ -641,7 +642,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param int rec_id:
         :param tuple(int) atoms_shape:
         :param int n_colour_bits:
-        :return: numpy array of spike ids and spike times, all ids recording
+        :return: numpy array of spike IDs and spike times, all IDs recording
         :rtype: tuple(~numpy.ndarray, list(int))
         """
         simulation_time_step_ms = self.__get_simulation_time_step_ms(cursor)
@@ -674,7 +675,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param ~numpy.ndarray neurons:
         :param float simulation_time_step_ms:
         :param list(float) spike_times: List to add spike times to
-        :param list(int) spike_ids: List to add spike ids to
+        :param list(int) spike_ids: List to add spike IDs to
         :return: all recording indexes spikes or not
         :rtype: list(int)
         """
@@ -708,7 +709,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
-        :return: numpy array of spike ids and spike times, all ids recording
+        :return: numpy array of spike IDs and spike times, all IDs recording
         :rtype: tuple(~numpy.ndarray, list(int))
         """
         spike_times = list()
@@ -799,7 +800,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :param ~sqlite3.Cursor cursor:
         :param int region_id: Region data came from
-        :param array(int) neurons: mapping of local id to global id
+        :param array(int) neurons: mapping of local ID to global ID
         :param DataType data_type: type of data to extract
         :return: times, data
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
@@ -829,7 +830,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def __get_matrix_data(
             self, cursor, rec_id, data_type, view_indexes, pop_size, variable):
         """
-        Gets the matrix data  for this population/recording id.
+        Gets the matrix data  for this population/recording ID.
 
         :param ~sqlite3.Cursor cursor:
         :param int rec_id:
@@ -1153,7 +1154,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variables:
             One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or `None` for all
+        :param view_indexes: List of neurons IDs to include or `None` for all
         :type view_indexes: None or list(int)
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
@@ -1184,7 +1185,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variables:
             One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or `None` for all
+        :param view_indexes: List of neurons IDs to include or `None` for all
         :type view_indexes: None or list(int)
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
@@ -1212,7 +1213,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variables:
             One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or `None` for all
+        :param view_indexes: List of neurons IDs to include or `None` for all
         :type view_indexes: None or list(int)
         :param annotations: annotations to put on the neo block
         :type annotations: None or dict(str, ...)
@@ -1241,7 +1242,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variables:
             One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or `None` for all
+        :param view_indexes: List of neurons IDs to include or `None` for all
         :type view_indexes: None or list(int)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -1311,7 +1312,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variables:
             One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or `None` for all
+        :param view_indexes: List of neurons IDs to include or `None` for all
         :type view_indexes: None or list(int)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -1346,7 +1347,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         :param variables:
             One or more variable names or `None` for all available
         :type variables: str, list(str) or None
-        :param view_indexes: List of neurons ids to include or `None` for all
+        :param view_indexes: List of neurons IDs to include or `None` for all
         :type view_indexes: None or list(int)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -1477,7 +1478,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     @staticmethod
     def array_to_string(indexes):
         """
-        Converts a list of ints into a compact string.
+        Converts a list of integers into a compact string.
         Works best if the list is sorted.
 
         IDs are comma separated, except when a series of IDs is sequential then
@@ -1511,7 +1512,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     @staticmethod
     def string_to_array(string):
         """
-        Converts a string into a list of ints.
+        Converts a string into a list of integers.
         Assumes the string was created by :py:meth:`array_to_string`
 
         :param str string:

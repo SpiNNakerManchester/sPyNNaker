@@ -25,7 +25,7 @@ class AbstractNeuronExpandable(object, metaclass=AbstractBase):
     """
     Indicates a class (a
     :py:class:`~pacman.model.graphs.machine.MachineVertex`)
-    that has may need to run the NEURON_EXPANDER aplx
+    that has may need to run the neuron expander APLX.
     """
 
     __slots__ = ()

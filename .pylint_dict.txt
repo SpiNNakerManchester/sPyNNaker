@@ -19,16 +19,24 @@ spinnman
 pacman
 spalloc
 SDP
+APLX
+STDP
+Omnibot
+pushbot
+
+# Our "special" words
 timestep
 timesteps
 nanoamps
 microsiemens
 nanofarads
 multapse
-APLX
 spiketrain
 spiketrains
 heatmap
+bitfield
+bitfields
+undelayed
 
 # Our Python types
 ApplicationGraph
@@ -40,19 +48,25 @@ MachineEdge
 ProjectionApplicationEdge
 DelayedApplicationEdge
 ApplicationEdgePartition
+SourceSegmentedSDRAMMachinePartition
 PopulationBase
 PopulationView
 RandomDistribution
 ConnectionHolder
 IDMixin
 ProgressBar
-SynapseInfo
+SynapseInformation
 SynapseRegions
 ExecutableTargets
 AbstractSDRAM
+ConstantSDRAM
+VariableSDRAM
 MultiRegionSDRAM
 AbstractMulticastControllableDevice
 NeuronRegions
+DataSpecificationGenerator
+CoreSubset
+CoreSubsets
 
 # Others' Python types
 NumpyRNG
@@ -65,6 +79,7 @@ CSet
 NeuronCurrentSource
 AnalogSignal
 SpikeTrain
+StandardTextFile
 
 # Python packages
 csa
@@ -76,3 +91,6 @@ matplotlib
 graphviz
 rawio
 baseio
+struct
+cset
+connset

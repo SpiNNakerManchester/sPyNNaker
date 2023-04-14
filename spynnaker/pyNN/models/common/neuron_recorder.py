@@ -766,7 +766,8 @@ class NeuronRecorder(object):
         """
         Recording data specification.
 
-        :param ~data_specification.DataSpecificationGenerator spec: dsg spec
+        :param ~data_specification.DataSpecificationGenerator spec:
+            where to write the data specification
         :param int neuron_recording_region: the recording region
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the vertex slice
@@ -788,7 +789,7 @@ class NeuronRecorder(object):
 
         :param str variable: PyNN variable name
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :return:
+        :return: usage
         :rtype: int
         """
         if variable in self.__per_timestep_variables:
@@ -820,7 +821,7 @@ class NeuronRecorder(object):
 
         :param str variable: PyNN variable name
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :return:
+        :return: usage
         :rtype: int
         """
         _, n_neurons = self._rate_and_count_per_slice(variable, vertex_slice)
@@ -832,7 +833,7 @@ class NeuronRecorder(object):
 
         :param str variable: PyNN variable name
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :return:
+        :return: usage
         :rtype: int
         """
         n_neurons = self._max_recording_per_slice(variable, n_atoms)
@@ -848,7 +849,7 @@ class NeuronRecorder(object):
 
         :param str variable: PyNN variable name
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :return:
+        :return: usage
         :rtype: int
         """
         if variable in self.__per_timestep_variables:
@@ -905,7 +906,7 @@ class NeuronRecorder(object):
 
         If required the total is rounded up so the space will always fit.
 
-        :param str variable: The PyNN variable name to get buffered sdram of
+        :param str variable: The PyNN variable name to get buffered SDRAM of
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :return: data size
         :rtype: int

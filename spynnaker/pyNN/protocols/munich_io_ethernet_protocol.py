@@ -29,7 +29,7 @@ def _active_time_for_frequency(frequency):
 class MunichIoEthernetProtocol(object):
     """
     Implementation of the Munich robot IO protocol, communicating over
-    ethernet.
+    Ethernet.
     """
 
     def __init__(self):

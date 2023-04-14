@@ -43,17 +43,17 @@ def calculate_spike_pair_additive_stdp_weight(
         pre_spikes, post_spikes, initial_weight, plastic_delay,
         a_plus, a_minus, tau_plus, tau_minus):
     """
-    Calculates the expected stdp weight for SpikePair Additive STDP.
+    Calculates the expected STDP weight for SpikePair Additive STDP.
 
     :param iterable(int) pre_spikes:
     :param iterable(int) post_spikes:
     :param float initial_weight:
-    :param int plastic_delay:
-    :param float a_plus:
-    :param float a_minus:
-    :param float tau_plus:
-    :param float tau_minus:
-    :return:
+    :param int plastic_delay: parameter of the STDP model
+    :param float a_plus: parameter of the STDP model
+    :param float a_minus: parameter of the STDP model
+    :param float tau_plus: parameter of the STDP model
+    :param float tau_minus: parameter of the STDP model
+    :return: overall weight
     :rtype: float
     """
     potentiation_times, depression_times = _calculate_stdp_times(
@@ -74,19 +74,20 @@ def calculate_spike_pair_multiplicative_stdp_weight(
         pre_spikes, post_spikes, initial_weight, plastic_delay, min_weight,
         max_weight, a_plus, a_minus, tau_plus, tau_minus):
     """
-    Calculates the expected stdp weight for SpikePair Multiplicative STDP.
+    Calculates the expected STDP weight for SpikePair Multiplicative STDP.
 
     :param iterable(int) pre_spikes: Spikes going into the model
     :param iterable(int) post_spikes: Spikes recorded on the model
     :param float initial_weight: Starting weight for the model
-    :param int plastic_delay: param of the stdp model
-    :param float min_weight: param of the stdp model
-    :param float max_weight: param of the stdp model
-    :param float a_plus: param of the stdp model
-    :param float a_minus: param of the stdp model
-    :param float tau_plus: param of the stdp model
-    :param float tau_minus: param of the stdp model
-    :return:
+    :param int plastic_delay: parameter of the STDP model
+    :param float min_weight: parameter of the STDP model
+    :param float max_weight: parameter of the STDP model
+    :param float a_plus: parameter of the STDP model
+    :param float a_minus: parameter of the STDP model
+    :param float tau_plus: parameter of the STDP model
+    :param float tau_minus: parameter of the STDP model
+    :return: overall weight
+    :rtype: float
     """
     potentiation_times, depression_times = _calculate_stdp_times(
         pre_spikes, post_spikes, plastic_delay)
