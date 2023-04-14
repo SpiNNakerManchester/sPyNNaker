@@ -13,13 +13,15 @@
 # limitations under the License.
 
 # People names
-Habenschuss
-Jonke
-Maass
-Izhikevich
-Petrut
 Bogdan
 Djurfeldt
+Gerstner
+Habenschuss
+Izhikevich
+Jonke
+Maass
+Petrut
+Vogels
 
 # Our abbreviations/names
 MPI
@@ -49,6 +51,10 @@ bitfields
 undelayed
 multiplicator
 generatable
+componentised
+writable
+rng
+PLoS
 
 # Our Python types
 ApplicationGraph
@@ -77,11 +83,13 @@ ConstantSDRAM
 VariableSDRAM
 MultiRegionSDRAM
 AbstractMulticastControllableDevice
+CommonRegions
 NeuronRegions
 DataSpecificationGenerator
 CoreSubset
 CoreSubsets
 SpinnmanIOException
+AbstractCurrentSource
 
 # Others' Python types
 NumpyRNG
@@ -95,10 +103,12 @@ NeuronCurrentSource
 AnalogSignal
 SpikeTrain
 StandardTextFile
-datetime
+dtype
+UnitTime
 
 # Python packages
 csa
+datetime
 io
 neo
 pynn

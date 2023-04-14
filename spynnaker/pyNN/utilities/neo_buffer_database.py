@@ -134,8 +134,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :param ~sqlite3.Cursor cursor:
         :return: segment number, record time, last run time recorded,
-            simulator timesteup in ms, simulator name
-        :rtype: tuple(int, datatime, float, float, str)
+            simulator timestep in ms, simulator name
+        :rtype: tuple(int, ~datetime.datetime, float, float, str)
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             If the recording metadata not setup correctly
@@ -181,7 +181,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
     def __get_population_id(
             self, cursor, pop_label, population):
         """
-        Gets an id for this population label.
+        Gets an ID for this population label.
         Will create a new population if required.
 
         For speed does not verify the additional fields if a record already
@@ -426,7 +426,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 duplicate values
 
         :param str variable:
-        :return: datatype, t_start, sampling_interval_ms, first_id, pop_size,
+        :return: data_type, t_start, sampling_interval_ms, first_id, pop_size,
             units
         :rtype: (DataType, float, float, int, int, str)
         :raises \
@@ -453,7 +453,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
         :param str variable:
         :return:
-            id, datatype, buffered_type,  t_start,
+            id, data_type, buffered_type,  t_start,
             sampling_interval_ms, first_id, pop_size, units
         :rtype:
             tuple(int, DataType, BufferedDataType, float, float, int, int, str)

@@ -147,9 +147,9 @@ class Population(PopulationBase):
     @property
     def celltype(self):
         """
-        Implements the PyNN expected celltype property.
+        Implements the PyNN expected `celltype` property.
 
-        :return: The celltype this property has been set to
+        :return: The cell type this property has been set to
         :rtype: AbstractPyNNModel
         """
         return self.__celltype
@@ -170,8 +170,8 @@ class Population(PopulationBase):
         Population or view.
 
         :param variables: either a single variable name or a list of variable
-            names. For a given celltype class, ``celltype.recordable`` contains
-            a list of variables that can be recorded for that celltype.
+            names. For a given `celltype` class, `celltype.recordable` contains
+            a list of variables that can be recorded for that `celltype`.
         :type variables: str or list(str)
         :param to_file: a file to automatically record to (optional).
             :py:meth:`write_data` will be automatically called when

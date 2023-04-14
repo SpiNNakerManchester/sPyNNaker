@@ -499,7 +499,7 @@ class NeoCsv(object):
 
         :param ~csv.writer csv_writer: Open CSV writer to write to
         :param int segment_number:
-        :param datatime rec_datetime:
+        :param ~datetime.datetime rec_datetime:
         """
         csv_writer.writerow([self._SEGMENT_NUMBER, segment_number])
         csv_writer.writerow([self._REC_DATETIME, rec_datetime])

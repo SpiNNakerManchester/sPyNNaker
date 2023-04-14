@@ -74,12 +74,12 @@ def compare_spiketrains(
 
 def compare_analogsignal(as1, as2, same_length=True):
     """
-    Compares two analogsignal Objects to see if they are the same.
+    Compares two analog signal objects to see if they are the same.
 
     :param ~neo.core.AnalogSignal as1:
-        first analogsignal holding list of individual analogsignal Objects
+        first analog signal holding list of individual analog signal objects
     :param ~neo.core.AnalogSignal as2:
-        second analogsignal holding list of individual analogsignal Objects
+        second analog signal holding list of individual analog signal objects
     :param bool same_length: Flag to indicate if the same length of data is
         held, i.e., all spikes up to the same time. If False allows one trains
         to have additional data after the first ends. This is used to compare
