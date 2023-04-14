@@ -92,12 +92,12 @@ static inline weight_state_t weight_one_term_apply_potentiation(
 	if (PRINT_PLASTICITY){
 		io_printf(IO_BUF, "potentiating: %d\n", a2_plus);
 	}
-	log_info("weight %k a2_plus %d converted to %k bitsk(weight) %d",
-			state.weight, a2_plus, kbits(a2_plus), bitsk(state.weight));
+//	log_info("weight %k a2_plus %d converted to %k bitsk(weight) %d",
+//			state.weight, a2_plus, kbits(a2_plus), bitsk(state.weight));
 //    state.weight += mul_accum_fixed(state.weight_region->a2_plus, a2_plus);
     state.weight += kbits(a2_plus);
     state.weight = kbits(MIN(bitsk(state.weight), bitsk(state.weight_region->max_weight)));
-    log_info("weight after min of max %k", state.weight);
+//    log_info("weight after min of max %k", state.weight);
     return state;
 //    state.a2_plus += a2_plus;
 //    return state;
@@ -150,8 +150,8 @@ static inline weight_t weight_get_final(weight_state_t new_state,
 			new_weight, reg_weight, new_state.weight_region->reg_rate, reg_error);
 	}
 
-	log_info("reg_weight %k new_weight %k reg_error %k reg_change %k reg_boundary %k",
-			reg_weight, new_weight, reg_error, reg_change, reg_boundary);
+//	log_info("reg_weight %k new_weight %k reg_error %k reg_change %k reg_boundary %k",
+//			reg_weight, new_weight, reg_error, reg_change, reg_boundary);
 
     return (weight_t) (bitsk(reg_weight) >> new_state.weight_shift);
 }

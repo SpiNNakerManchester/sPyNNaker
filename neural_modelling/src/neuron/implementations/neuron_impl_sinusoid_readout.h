@@ -344,9 +344,9 @@ static void neuron_impl_do_timestep_update(
 	//                neuron->syn_state[3].delta_w;
 	//                neuron->syn_state[0].z_bar;
 
-			log_info("neuron_index %u time %u voltage %k result %k exc input %k targetV %k",
-					neuron_index, time, voltage, result, exc_input_values[0],
-					neuron->target_V[target_ind]);
+//			log_info("neuron_index %u time %u voltage %k result %k exc input %k targetV %k",
+//					neuron_index, time, voltage, result, exc_input_values[0],
+//					neuron->target_V[target_ind]);
 
 			// Record readout
 			neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, result);

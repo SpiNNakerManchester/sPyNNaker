@@ -400,8 +400,8 @@ bool synapse_dynamics_process_plastic_synapses(
     			io_printf(IO_BUF, "update_ready=0\n");
     		}
 
-    		log_info("Check: eprop plasticity update, delta_w %k syn_ind %u time %u",
-    				neuron->syn_state[syn_ind_from_delay].delta_w, syn_ind_from_delay, time);
+//    		log_info("Check: eprop plasticity update, delta_w %k syn_ind %u time %u",
+//    				neuron->syn_state[syn_ind_from_delay].delta_w, syn_ind_from_delay, time);
 
             // Go through typical weight update process to clip to limits
     		final_state = eprop_plasticity_update(current_state,
@@ -436,8 +436,8 @@ bool synapse_dynamics_process_plastic_synapses(
         int16_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
 
-        log_info("Check: accumulation %d ring_buffer %d time %u",
-        		accumulation, ring_buffers[ring_buffer_index], time);
+//        log_info("Check: accumulation %d ring_buffer %d time %u",
+//        		accumulation, ring_buffers[ring_buffer_index], time);
 
 //        uint32_t sat_test = accumulation & 0x10000;
 //        if (sat_test) {

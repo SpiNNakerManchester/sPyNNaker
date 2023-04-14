@@ -295,7 +295,7 @@ static inline final_state_t eprop_plasticity_update(
 
 	int32_t delta_w_int = (int32_t) roundk(delta_w, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
 
-	log_info("delta_w_int %d", delta_w_int);
+//	log_info("delta_w_int %d", delta_w_int);
 
     if (delta_w){ // TODO: This should probably be delta_w_int
 //        if (PRINT_PLASTICITY){
@@ -466,8 +466,8 @@ bool synapse_dynamics_process_plastic_synapses(
         int16_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
 
-        log_info("Check: accumulation %d ring_buffer %d time %u",
-        		accumulation, ring_buffers[ring_buffer_index], time);
+//        log_info("Check: accumulation %d ring_buffer %d time %u",
+//        		accumulation, ring_buffers[ring_buffer_index], time);
 
 //        uint32_t sat_test = accumulation & 0x10000;
 //        if (sat_test) {
