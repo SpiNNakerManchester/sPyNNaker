@@ -54,6 +54,7 @@ WINDOW_SIZE = "window_size"
 NUMBER_OF_CUES = "number_of_cues"
 
 # eprop "global"
+CORE_POP_RATE = "core_pop_rate"
 TARGET_RATE = "target_rate"
 TAU_ERR = "tau_err"
 ETA = "eta"  # (global learning rate)
@@ -181,6 +182,7 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
             (DataType.S1615, W_FB),
             (DataType.UINT32, WINDOW_SIZE),
             (DataType.UINT32, NUMBER_OF_CUES),
+            (DataType.S1615, CORE_POP_RATE), # core_pop_rate
             (DataType.S1615, TARGET_RATE),  #  core_target_rate
             (DataType.S1615, TAU_ERR),  #  rate_exp_TC
             (DataType.S1615, ETA)]    #  eta (learning rate)
@@ -262,7 +264,7 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
         parameters[NUMBER_OF_CUES] = self.__number_of_cues
 
         # Are these parameters or variables?
-        # parameters[CORE_POP_RATE] = self.__core_pop_rate
+        parameters[CORE_POP_RATE] = 0.0  # initialise here, not in C
         # parameters[CORE_TARGET_RATE] = self.__core_target_rate
         # parameters[RATE_EXP_TC] = self.__rate_exp_TC
         parameters[TARGET_RATE] = self.__target_rate
@@ -527,3 +529,5 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
     @window_size.setter
     def window_size(self, new_value):
         self.__number_of_cues = new_value
+
+    # setter for "globals" like target rate etc. ?

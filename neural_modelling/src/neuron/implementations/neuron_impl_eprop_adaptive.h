@@ -112,7 +112,8 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     if (sizeof(neuron_t)) {
         neuron_array = spin1_malloc(n_neurons * sizeof(neuron_t));
         if (neuron_array == NULL) {
-            log_error("Unable to allocate neuron array - Out of DTCM");
+            log_error("Unable to allocate neuron array - Out of DTCM %u %u",
+            		n_neurons, sizeof(neuron_t));
             return false;
         }
     }
@@ -240,14 +241,6 @@ static void neuron_impl_load_neuron_parameters(
     	spin1_memcpy(save_initial_state, address, next * sizeof(uint32_t));
     }
 
-#if LOG_LEVEL >= LOG_DEBUG
-    for (index_t n = 0; n < n_neurons; n++) {
-        neuron_model_print_parameters(&neuron_array[n]);
-        neuron_model_print_state_variables(&neuron_array[n]);
-    }
-#endif // LOG_LEVEL >= LOG_DEBUG
-
-
     //
 
 //    if (sizeof(global_neuron_params_t)) {
@@ -321,6 +314,7 @@ static void neuron_impl_load_neuron_parameters(
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
         neuron_model_print_parameters(&neuron_array[n]);
+        neuron_model_print_state_variables(&neuron_array[n]);
     }
     log_debug("-------------------------------------\n");
 #endif // LOG_LEVEL >= LOG_DEBUG
@@ -565,8 +559,11 @@ static void neuron_impl_do_timestep_update(
 			additional_input_has_spiked(additional_input);
 
 			// Add contribution from this neuron's spike to global rate trace
-			// TODO: this needs to be global somehow...
-			neuron->core_pop_rate += 1.0k;
+			// Make sure it's the same across all neurons
+			for (uint32_t n_ind=0; n_ind < n_neurons; n_ind++) {
+				neuron_t *global_neuron = &neuron_array[n_ind];
+				global_neuron->core_pop_rate += 1.0k;
+			}
 
 			// Record spike
 			neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);

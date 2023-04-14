@@ -77,7 +77,8 @@ static inline weight_state_t weight_one_term_apply_depression(
 	if (PRINT_PLASTICITY){
 		io_printf(IO_BUF, "depressing: %d\n", a2_minus);
 	}
-    state.weight -= mul_accum_fixed(state.weight_region->a2_minus, a2_minus);
+//    state.weight -= mul_accum_fixed(state.weight_region->a2_minus, a2_minus);
+    state.weight -= kbits(a2_minus);
     state.weight = kbits(MAX(bitsk(state.weight), bitsk(state.weight_region->min_weight)));
     return state;
 //    state.a2_minus += a2_minus;
@@ -91,8 +92,12 @@ static inline weight_state_t weight_one_term_apply_potentiation(
 	if (PRINT_PLASTICITY){
 		io_printf(IO_BUF, "potentiating: %d\n", a2_plus);
 	}
-    state.weight += mul_accum_fixed(state.weight_region->a2_plus, a2_plus);
+	log_info("weight %k a2_plus %d converted to %k bitsk(weight) %d",
+			state.weight, a2_plus, kbits(a2_plus), bitsk(state.weight));
+//    state.weight += mul_accum_fixed(state.weight_region->a2_plus, a2_plus);
+    state.weight += kbits(a2_plus);
     state.weight = kbits(MIN(bitsk(state.weight), bitsk(state.weight_region->max_weight)));
+    log_info("weight after min of max %k", state.weight);
     return state;
 //    state.a2_plus += a2_plus;
 //    return state;
@@ -109,7 +114,8 @@ static inline weight_t weight_get_final(weight_state_t new_state,
 //            new_state.a2_minus, new_state.weight_region->a2_minus);
 
     // Apply eprop plasticity updates to initial weight
-	accum new_weight = bitsk(new_state.weight) >> new_state.weight_shift;
+//	accum new_weight = bitsk(new_state.weight) >> new_state.weight_shift;
+	accum new_weight = new_state.weight;
 //    int32_t new_weight =
 //            new_state.initial_weight + new_state.a2_plus + new_state.a2_minus;
     accum reg_weight = new_weight;
@@ -144,7 +150,10 @@ static inline weight_t weight_get_final(weight_state_t new_state,
 			new_weight, reg_weight, new_state.weight_region->reg_rate, reg_error);
 	}
 
-    return (weight_t) reg_weight;
+	log_info("reg_weight %k new_weight %k reg_error %k reg_change %k reg_boundary %k",
+			reg_weight, new_weight, reg_error, reg_change, reg_boundary);
+
+    return (weight_t) (bitsk(reg_weight) >> new_state.weight_shift);
 }
 
 #endif // _WEIGHT_EPROPREG_ONE_TERM_IMPL_H_

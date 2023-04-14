@@ -239,9 +239,9 @@ static inline bool process_fixed_synapses(
         // Add weight to current ring buffer value
         int32_t accumulation = ring_buffers[ring_buffer_index] + weight; // switch to saturated arithmetic to avoid complicated saturation check, will it check saturation at both ends?
 
-//        int32_t test = -22;
-//        log_info("Check weight: %d accumulation %d test %d buffer %d", weight, accumulation, test,
-//        		ring_buffers[ring_buffer_index]);
+        int32_t test = -22;
+        log_info("Check weight: %d accumulation %d test %d buffer %d time %u",
+        		weight, accumulation, test, ring_buffers[ring_buffer_index], time);
 
         // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
         // **NOTE** 0x10000 can be expressed as an ARM literal,

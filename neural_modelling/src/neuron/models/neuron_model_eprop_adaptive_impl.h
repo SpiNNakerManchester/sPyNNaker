@@ -101,6 +101,7 @@ struct neuron_params_t {
     uint32_t window_size;
     uint32_t number_of_cues;
 
+    REAL pop_rate;
 	REAL target_rate;
 	REAL tau_err;
 	REAL eta; // learning rate
@@ -265,7 +266,7 @@ static inline void neuron_model_initialise(
 //	log_info("Check: z %k A %k psi %k B %k b %k b_0 %k window_size %u",
 //			state->z, state->A, state->psi, state->B, state->b, state->b_0, state->window_size);
 
-	state->core_pop_rate = 0.0k;
+	state->core_pop_rate = params->pop_rate;
 	state->core_target_rate = params->target_rate;
 	state->rate_exp_TC = expk(-kdivk(ts, params->tau_err));
 	state->eta = params->eta;
@@ -276,30 +277,50 @@ static inline void neuron_model_initialise(
 	for (uint32_t n_syn = 0; n_syn < SYNAPSES_PER_NEURON; n_syn++) {
 		state->syn_state[n_syn] = params->syn_state[n_syn];
 	}
-
 }
 
 static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *params) {
 	// TODO: probably more parameters need copying across at this point, syn_state for a start
 	params->V_init = state->V_membrane;
 	params->refract_timer_init = state->refract_timer;
+	params->z = state->z;
+	params->A = state->A;
+	params->psi = state->psi;
+	params->B = state->B;
+	params->b = state->b;
+	params->b_0 = state->b_0;
+//	state->e_to_dt_on_tau_a = expk(-kdivk(ts, params->tau_a));
+	params->beta = state->beta;
+//	state->adpt = 1 - expk(-kdivk(ts, params->tau_a));
+	params->scalar = state->scalar;
+	params->L = state->L;
+	params->w_fb = state->w_fb;
+	params->window_size = state->window_size;
+	params->number_of_cues = state->number_of_cues;
+
+//	log_info("Check: z %k A %k psi %k B %k b %k b_0 %k window_size %u",
+//			state->z, state->A, state->psi, state->B, state->b, state->b_0, state->window_size);
+
+//	state->core_pop_rate = 0.0k;
+	params->pop_rate = state->core_pop_rate;
+	params->target_rate = state->core_target_rate;
+//	state->rate_exp_TC = expk(-kdivk(ts, params->tau_err));
+	params->eta = state->eta;
+
+	for (uint32_t n_syn = 0; n_syn < SYNAPSES_PER_NEURON; n_syn++) {
+		params->syn_state[n_syn] = state->syn_state[n_syn];
+	}
 }
 
 // simple Leaky I&F ODE
 static inline void lif_neuron_closed_form(
         neuron_t *neuron, REAL V_prev, input_t input_this_timestep,
 		REAL B_t) {
-
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
-
-//    log_info("alpha %k input %k R_membrane %k V_rest %k",
-//    		alpha, input_this_timestep, neuron->R_membrane, neuron->V_rest);
 
     // update membrane voltage
     neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev))
     		- neuron->z * B_t; // this line achieves reset
-
-//    log_info("neuron->V_membrane is %k neuron_z %k B_t %k", neuron->V_membrane, neuron->z, B_t);
 }
 
 //void neuron_model_set_global_neuron_params(

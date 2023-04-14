@@ -68,7 +68,7 @@ address_t weight_initialise(
         // Copy weight shift
         weight_shift[s] = ring_buffer_to_input_buffer_left_shifts[s];
 
-        log_debug("\tSynapse type %u: Min weight:%k, Max weight:%k, A2+:%k, A2-:%k reg_rate:%k",
+        log_info("\tSynapse type %u: Min weight:%k, Max weight:%k, A2+:%k, A2-:%k reg_rate:%k",
                 s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,
                 dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus,
 				dtcm_copy[s].reg_rate);

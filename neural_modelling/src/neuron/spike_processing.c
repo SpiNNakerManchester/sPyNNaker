@@ -488,8 +488,8 @@ bool spike_processing_initialise( // EXPORTED
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
             multicast_packet_received_callback, mc_packet_callback_priority);
-    spin1_callback_on(MCPL_PACKET_RECEIVED,
-            multicast_packet_pl_received_callback, mc_packet_callback_priority);
+//    spin1_callback_on(MCPL_PACKET_RECEIVED,
+//            multicast_packet_pl_received_callback, mc_packet_callback_priority);
     simulation_dma_transfer_done_callback_on(
             DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);
     spin1_callback_on(USER_EVENT, user_event_callback, user_event_priority);
@@ -499,8 +499,8 @@ bool spike_processing_initialise( // EXPORTED
 //
 //    // This is unlikely to work properly now because of the use of MCPL for multiple spikes
 //    // Register MC_PACKET_RECEIVED_PAYLOAD
-//    spin1_callback_on(MCPL_PACKET_RECEIVED,
-//    		multicast_packet_wpayload_received_callback, mc_packet_callback_priority);
+    spin1_callback_on(MCPL_PACKET_RECEIVED,
+    		multicast_packet_wpayload_received_callback, mc_packet_callback_priority);
 //
 //    io_printf(IO_BUF, "Registered MCPL callback successfully\n");
 

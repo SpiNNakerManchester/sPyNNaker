@@ -30,7 +30,8 @@ from spynnaker.pyNN.models.neuron.builds import (
     IFCurrDualExpBase as IF_curr_dual_exp,
     IzkCondExpBase as Izhikevich_cond,
     IFCurrExpSEMDBase as IF_curr_exp_sEMD,
-    EPropAdaptive as EPropAdaptive)
+    EPropAdaptive as EPropAdaptive,
+    SinusoidReadout as SinusoidReadout)
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
@@ -39,7 +40,9 @@ __all__ = [
     # sPyNNaker models not currently part of full pyNN
     'IFCurDelta', 'IFCurrExpCa2Adaptive', 'IFCondExpStoc',
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',
-    'EPropAdaptive',
+
+    # Eprop implementation and related models (Adam Perrett/Oliver Rhodes)
+    'EPropAdaptive', 'SinusoidReadout',
 
     # Neuromodulation synapse dynamics (Mantas Mikaitis)
     'Neuromodulation',
