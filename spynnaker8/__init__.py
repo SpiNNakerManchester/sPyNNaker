@@ -197,7 +197,7 @@ class RandomDistribution(sim.RandomDistribution):
     """
 
 
-def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
+def distance(src_cell, tgt_cell, mask=None, scale_factor=1.0, offset=0.0,
              periodic_boundaries=None):
     """
     Return the Euclidean distance between two cells.
@@ -208,7 +208,7 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
     """
     use_spynnaker_pynn()
     return sim.distance(
-        src, tgt, mask, scale_factor, offset, periodic_boundaries)
+        src_cell, tgt_cell, mask, scale_factor, offset, periodic_boundaries)
 
 
 def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,

@@ -107,8 +107,9 @@ class _SingleValue_Iterator(object):
     """
     Iterator that repeats the single values the required number of times.
 
-    Allows a single Value parameter to be treated the same as parameters with
-    len. Caches `cmd_word_list` and `cmd_string` so they are only created once.
+    Allows a single value parameter to be treated the same as parameters with
+    a given length.
+    Caches `cmd_word_list` and `cmd_string` so they are only created once.
     """
     __slots__ = [
         "__cmd_pair",

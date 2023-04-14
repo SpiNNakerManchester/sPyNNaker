@@ -78,6 +78,7 @@ RandomDistribution
 ConnectionHolder
 FPGAConnection
 ProgressBar
+AbstractSynapseType
 SynapseInformation
 SynapseRegions
 ExecutableTargets
@@ -147,3 +148,8 @@ params
 csvfile
 db
 dt
+vals
+addr
+simtime
+eieio
+ylabel
