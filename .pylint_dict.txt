@@ -57,6 +57,17 @@ rng
 PLoS
 rewirings
 analog
+unsets
+
+# Because they occur a lot as arguments and related
+sdram
+csv
+cellclass
+cellparams
+structs
+rd
+tstop
+params
 
 # Our Python types
 ApplicationGraph
@@ -92,6 +103,9 @@ CoreSubset
 CoreSubsets
 SpinnmanIOException
 AbstractCurrentSource
+GeneratorData
+EIEIOType
+EIEIOPrefix
 
 # Others' Python types
 NumpyRNG
@@ -109,6 +123,8 @@ dtype
 UnitTime
 RandomState
 ChannelIndex
+ctype
+GSLRNG
 
 # Python packages
 csa
@@ -126,3 +142,4 @@ struct
 cset
 connset
 unitquantity
+ctypes

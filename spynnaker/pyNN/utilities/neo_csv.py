@@ -328,7 +328,7 @@ class NeoCsv(object):
         :param ~neo.core.Segment segment: Segment to add data to
         :param str variable: the variable name
         :param list[~quantities.Quantity] formation_times:
-        :param lis[str] formation_labels:
+        :param list[str] formation_labels:
         """
         # pylint: disable=too-many-arguments, no-member, c-extension-no-member
         formation_event_array = neo.Event(

@@ -90,8 +90,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         Writes the global information from the Views.
 
-        This writes information held in SpynnakerDataView so that the database
-        is usable stand-alone.
+        This writes information held in :py:class:`SpynnakerDataView` so that
+        the database is usable stand-alone.
 
         .. note::
             The database must be writable for this to work!
@@ -114,8 +114,8 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         """
         Records the current run time as `t_Stop`.
 
-        This writes information held in SpynnakerDataView so that the database
-        is usable stand-alone
+        This writes information held in :py:class:`SpynnakerDataView` so that
+        the database is usable stand-alone.
 
         .. note::
             The database must be writable for this to work!
@@ -326,10 +326,10 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         Gets a list of the labels of Populations recording.
         Or to be exact the ones with metadata saved so likely to be recording.
 
-            .. note::
-                These are actually the labels of the Application Vertices.
-                Typically the Population label, corrected for `None` or
-                duplicate values
+        .. note::
+            These are actually the labels of the Application Vertices.
+            Typically the Population label, corrected for `None` or
+            duplicate values
 
         :return: List of population labels
         :rtype: list(str)
@@ -351,9 +351,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
         Retrieval is limited to recorded data and a little metadata needed to
         create a single Neo Segment wrapped in a Neo Block.
 
-            .. note::
-                As each database only includes data for one run (with resets
-                creating another database) the structure is relatively simple.
+        .. note::
+            As each database only includes data for one run (with resets
+            creating another database) the structure is relatively simple.
 
         :param str pop_label: The label for the population of interest
 
@@ -1107,7 +1107,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 duplicate values
 
         :param str variable:
-        :param ~csv.writer csv_writer: Open csv writer to write to
+        :param ~csv.writer csv_writer: Open CSV writer to write to
         :param view_indexes:
         :type view_indexes: None, ~numpy.array or list(int)
         :param float t_stop:

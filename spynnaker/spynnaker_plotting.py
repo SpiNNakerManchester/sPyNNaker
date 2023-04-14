@@ -30,7 +30,7 @@ except ImportError:
 
 def _handle_options(axes, options):
     """
-    Handles options that can not be passed to axes.plot.
+    Handles options that can not be passed to `axes.plot`.
 
     Removes the ones it has handled
 
@@ -232,8 +232,8 @@ class SpynnakerPanel(object):
         `data_labels`:
             a list of strings of the same length as the number of data items.
         `line_properties`:
-            a list of dicts containing Matplotlib formatting options, of the\
-            same length as the number of data items.
+            a list of dictionaries containing Matplotlib formatting options,\
+            of the same length as the number of data items.
 
     Whole Neo Objects can be passed in as long as they
     contain a single Segment/run
