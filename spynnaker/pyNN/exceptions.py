@@ -84,7 +84,7 @@ class SynapseRowTooBigException(SpynnakerException):
     def __init__(self, max_size, message):
         """
         :param max_size: the maximum permitted size of row
-        :param message: the excepton message
+        :param message: the exception message
         """
         super().__init__(message)
         self._max_size = max_size

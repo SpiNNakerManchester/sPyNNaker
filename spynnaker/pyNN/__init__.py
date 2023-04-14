@@ -189,7 +189,7 @@ __simulator = None
 def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
              periodic_boundaries=None):
     """
-    Return the Euclidian distance between two cells.
+    Return the Euclidean distance between two cells.
 
     :param src: Measure from this cell
     :param tgt: To this cell
@@ -220,9 +220,9 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
 
     :param timestep:
         the time step of the simulations in microseconds;
-        if `None`, the cfg value is used
+        if `None`, the configuration value is used
     :type timestep: float or None
-    :param min_delay: the min delay of the simulation
+    :param min_delay: the minimum delay of the simulation
     :type min_delay: float or str
     :param max_delay: Ignored and logs a warning if provided
     :type max_delay: float or str or None
@@ -314,7 +314,7 @@ def Projection(
     :param presynaptic_population: the source pop
     :type presynaptic_population:
         ~spynnaker.pyNN.models.populations.Population
-    :param postsynaptic_population: the dest pop
+    :param postsynaptic_population: the destination population
     :type postsynaptic_population:
         ~spynnaker.pyNN.models.populations.Population
     :param AbstractConnector connector: the connector type
@@ -366,7 +366,7 @@ def end(_=True):
     """
     Cleans up the SpiNNaker machine and software
 
-    :param _: was named compatible_output, which we don't care about,
+    :param _: was named `compatible_output`, which we don't care about,
         so is a non-existent parameter
     """
     if SpynnakerDataView.is_shutdown():
@@ -493,11 +493,11 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
 
 def create(cellclass, cellparams=None, n=1):
     """
-    Builds a population with certain params.
+    Builds a population with certain parameters.
 
     :param cellclass: population class
     :type cellclass: type or AbstractPyNNModel
-    :param cellparams: population params.
+    :param cellparams: population parameters.
     :param int n: number of neurons
     :rtype: ~spynnaker.pyNN.models.populations.Population
     """
@@ -566,10 +566,10 @@ def initialize(cells, **initial_values):
     """
     Sets cells to be initialised to the given values.
 
-    :param cells: the cells to change params on
+    :param cells: the cells to change parameters on
     :type cells: ~spynnaker.pyNN.models.populations.Population or
         ~spynnaker.pyNN.models.populations.PopulationView
-    :param initial_values: the params and their values to change
+    :param initial_values: the parameters and their values to change
     """
     SpynnakerDataView.check_user_can_act()
     pynn_common.initialize(cells, **initial_values)
@@ -609,8 +609,8 @@ def record(variables, source, filename, sampling_interval=None,
     Sets variables to be recorded.
 
     :param variables: may be either a single variable name or a list of
-        variable names. For a given celltype class, celltype.recordable
-        contains a list of variables that can be recorded for that celltype.
+        variable names. For a given `celltype` class, `celltype.recordable`
+        contains a list of variables that can be recorded for that `celltype`.
     :type variables: str or list(str)
     :param source: where to record from
     :type source: ~spynnaker.pyNN.models.populations.Population or

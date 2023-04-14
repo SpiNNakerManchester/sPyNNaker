@@ -26,6 +26,9 @@ microsiemens
 nanofarads
 multapse
 APLX
+spiketrain
+spiketrains
+heatmap
 
 # Our Python types
 ApplicationGraph
@@ -46,8 +49,10 @@ ProgressBar
 SynapseInfo
 SynapseRegions
 ExecutableTargets
+AbstractSDRAM
 MultiRegionSDRAM
 AbstractMulticastControllableDevice
+NeuronRegions
 
 # Others' Python types
 NumpyRNG
@@ -58,6 +63,8 @@ BaseIO
 FileIO
 CSet
 NeuronCurrentSource
+AnalogSignal
+SpikeTrain
 
 # Python packages
 csa
@@ -67,3 +74,5 @@ pynn
 pyNN
 matplotlib
 graphviz
+rawio
+baseio
