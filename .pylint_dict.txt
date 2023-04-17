@@ -29,35 +29,22 @@ gsyn
 spinnman
 pacman
 spalloc
-SDP
-APLX
-STDP
 Omnibot
 pushbot
 RNG
 
 # Our "special" words
-timestep
-timesteps
-nanoamps
-microsiemens
-nanofarads
 multapse
 spiketrain
 spiketrains
 heatmap
-bitfield
-bitfields
-undelayed
 multiplicator
 generatable
 componentised
-writable
 rng
 PLoS
 rewirings
 analog
-unsets
 
 # Our Python types
 ApplicationGraph
@@ -120,12 +107,10 @@ GSLRNG
 # Python packages
 csa
 datetime
-io
 neo
 pynn
 pyNN
 standardmodels
-matplotlib
 graphviz
 rawio
 baseio
