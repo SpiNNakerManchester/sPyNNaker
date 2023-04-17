@@ -31,7 +31,6 @@ pacman
 spalloc
 Omnibot
 pushbot
-RNG
 
 # Our "special" words
 multapse
