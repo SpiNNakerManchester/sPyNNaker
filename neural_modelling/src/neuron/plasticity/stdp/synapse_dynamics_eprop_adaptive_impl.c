@@ -262,25 +262,35 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
-    // Load timing dependence data
-    address_t weight_region_address = timing_initialise(address);
-    if (address == NULL) {
-        return NULL;
-    }
+//    // Load timing dependence data
+//    address_t weight_region_address = timing_initialise(address);
+//    if (address == NULL) {
+//        return NULL;
+//    }
+//
+//    syn_dynamics_neurons_in_partition = n_neurons;
+//
+//    // Load weight dependence data
+//    address_t weight_result = weight_initialise(
+//            weight_region_address, n_synapse_types,
+//            ring_buffer_to_input_buffer_left_shifts);
+//    if (weight_result == NULL) {
+//        return NULL;
+//    }
+//
+//    post_event_history = post_events_init_buffers(n_neurons);
+//    if (post_event_history == NULL) {
+//        return NULL;
+//    }
 
-    syn_dynamics_neurons_in_partition = n_neurons;
-
-    // Load weight dependence data
-    address_t weight_result = weight_initialise(
-            weight_region_address, n_synapse_types,
-            ring_buffer_to_input_buffer_left_shifts);
-    if (weight_result == NULL) {
-        return NULL;
+    if (!synapse_dynamics_stdp_init(&address, &params, n_synapse_types,
+                ring_buffer_to_input_buffer_left_shifts)) {
+        return false;
     }
 
     post_event_history = post_events_init_buffers(n_neurons);
     if (post_event_history == NULL) {
-        return NULL;
+        return false;
     }
 
     return true; // weight_result;

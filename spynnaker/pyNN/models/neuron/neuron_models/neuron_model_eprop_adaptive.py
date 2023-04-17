@@ -276,7 +276,7 @@ class NeuronModelEPropAdaptive(AbstractStandardNeuronComponent):
         state_variables[V] = self.__v_init
         state_variables[REFRACT_TIMER] = 0
         state_variables[PSI] = self.__psi
-        state_variables[Z] = 0  # initalise to zero
+        state_variables[Z] = 0  # initialise to zero
         state_variables[A] = 0  # initialise to zero
 
         state_variables[BIG_B] = self.__B
