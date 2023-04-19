@@ -30,7 +30,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 def delay_support_adder():
     """
-    Adds the delay extensions to the app graph, now that all the
+    Adds the delay extensions to the application graph, now that all the
     splitter objects have been set.
 
     """
@@ -41,7 +41,7 @@ def delay_support_adder():
 
 class _DelaySupportAdder(object):
     """
-    Adds delay extension vertices into the APP graph as needed.
+    Adds delay extension vertices into the application graph as needed.
     """
 
     __slots__ = [
@@ -58,7 +58,7 @@ class _DelaySupportAdder(object):
 
     def _run(self):
         """
-        Adds the delay extensions to the app graph, now that all the
+        Adds the delay extensions to the application graph, now that all the
         splitter objects have been set.
         """
         progress = ProgressBar(1 + SpynnakerDataView.get_n_partitions(),
@@ -99,10 +99,11 @@ class _DelaySupportAdder(object):
     def _create_post_delay_edge(self, delay_app_vertex, app_edge):
         """
         Creates the edge between delay extension and post vertex. Stores
-        for future loading to the app graph when safe to do so.
+        for future loading to the application graph when safe to do so.
 
-        :param ApplicationVertex delay_app_vertex: delay extension vertex
-        :param app_edge: the undelayed app edge this is associated with.
+        :param DelayExtensionVertex delay_app_vertex: delay extension vertex
+        :param ProjectionApplicationEdge app_edge:
+            the undelayed application edge this is associated with.
         """
         # check for post edge
         delayed_edge = self._delay_post_edge_map.get(
@@ -124,15 +125,17 @@ class _DelaySupportAdder(object):
             self, app_outgoing_edge_partition, app_edge, delay_per_stage,
             n_delay_stages):
         """
-        Creates the delay extension app vertex and the edge from the src
-        vertex to this delay extension. Adds to the graph, as safe to do so.
+        Creates the delay extension application vertex and the edge from the
+        source vertex to this delay extension. Adds to the graph, as safe to
+        do so.
 
         :param ApplicationEdgePartition app_outgoing_edge_partition:
             the original outgoing edge partition.
-        :param ApplicationEdge app_edge: the undelayed app edge.
+        :param ApplicationEdge app_edge: the undelayed application edge.
         :param int delay_per_stage: delay for each delay stage
         :param int n_delay_stages: the number of delay stages needed
         :return: the DelayExtensionAppVertex
+        :rtype: DelayExtensionVertex
         """
         # get delay extension vertex if it already exists.
         delay_app_vertex = self._app_to_delay_map.get(
@@ -165,8 +168,9 @@ class _DelaySupportAdder(object):
         Checks the delay required from the user defined max, the max delay
         supported by the post vertex splitter and the delay Extensions.
 
-        :param ApplicationEdge app_edge: the undelayed app edge
-        :param iterable[SynapseInfo] synapse_infos: iterable of synapse infos
+        :param ApplicationEdge app_edge: the undelayed application edge
+        :param iterable[SynapseInformation] synapse_infos:
+            the synapse information objects
         :return: tuple(n_delay_stages, delay_steps_per_stage, extension_needed)
         """
         # get max delay required
@@ -183,8 +187,8 @@ class _DelaySupportAdder(object):
                 f"The app vertex {app_edge.post_vertex} "
                 f"with splitter {post_splitter} does not support delays "
                 f"and yet requires a delay support for edge {app_edge}. "
-                f"Please use a Splitter which utilises the "
-                f"AbstractSpynnakerSplitterDelay interface.")
+                "Please use a Splitter which utilises the "
+                "AbstractSpynnakerSplitterDelay interface.")
         max_delay_steps = app_edge.post_vertex.splitter.max_support_delay()
         time_step_ms = SpynnakerDataView.get_simulation_time_step_ms()
         max_delay_ms = max_delay_steps * time_step_ms
@@ -199,8 +203,8 @@ class _DelaySupportAdder(object):
                 f"The app vertex {app_edge.post_vertex} "
                 f"with splitter {post_splitter} does not support delays "
                 f"and yet requires a delay support for edge {app_edge}. "
-                f"Please use a Splitter which does not have "
-                f"accepts_edges_from_delay_vertex turned off.")
+                "Please use a Splitter which does not have "
+                "accepts_edges_from_delay_vertex turned off.")
 
         # needs a delay extension, check can be supported with 1 delay
         # extension. coz we dont do more than 1 at the moment
@@ -211,8 +215,7 @@ class _DelaySupportAdder(object):
             raise DelayExtensionException(
                 f"Edge:{app_edge.label} "
                 f"has a max delay of {max_delay_needed_ms}. "
-                f"But at a timestep of "
-                f"{time_step_ms} "
+                f"But at a timestep of {time_step_ms} "
                 f"the max delay supported is {total_delay_ms}")
 
         # return data for building delay extensions

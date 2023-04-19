@@ -28,7 +28,7 @@ from spynnaker.pyNN.models.populations import Population
 
 class SpynnakerExternalDevicePluginManager(object):
     """
-    User-level interface for the external device plugin manager.
+    User-level interface for the external device plug-in manager.
     """
     __slots__ = []
 
@@ -263,8 +263,9 @@ class SpynnakerExternalDevicePluginManager(object):
         device) on a given partition.
 
         :param ~pacman.model.graphs.application.ApplicationVertex vertex:
-            the pre-vertex to connect the edge from
-        :param device_vertex: the post vertex to connect the edge to
+            the pre-population vertex to connect the edge from
+        :param device_vertex:
+            the post-population vertex to connect the edge to
         :type device_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str partition_id: the partition identifier for making nets

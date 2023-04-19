@@ -155,7 +155,7 @@ class PopulationMachineVertex(
             structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram used by the vertex
+            The SDRAM used by the vertex
         :param str label: The label of the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -168,7 +168,7 @@ class PopulationMachineVertex(
         :param list(int) weight_scales:
             The scaling to apply to weights to store them in the synapses
         :param int structural_sz: The size of the structural data
-        :param int n_neuron_bits: The number of bits to use for neuron ids
+        :param int n_neuron_bits: The number of bits to use for neuron IDs
         :param SynapticMatrices synaptic_matrices: The synaptic matrices
         :param NeuronData neuron_data: The handler of neuron data
         """
@@ -232,7 +232,7 @@ class PopulationMachineVertex(
     def __get_binary_file_name(app_vertex):
         """
         Get the local binary filename for this vertex.  Static because at
-        the time this is needed, the local app_vertex is not set.
+        the time this is needed, the local `app_vertex` is not set.
 
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex

@@ -24,7 +24,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
 
     def __init__(self, structs, units):
         """
-        :param list(Struct) structs: The structs of the component
+        :param list(Struct) structs: The structures of the component
         :param dict units: The units to use for each parameter
         """
         self.__structs = structs
@@ -33,12 +33,12 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
     @property
     def structs(self):
         """
-        The structures of the component.  If there are multiple structs,
+        The structures of the component.  If there are multiple structures,
         the order is how they will appear in memory; where there are
-        structs that repeat per neuron the repeats will appear adjacent
-        e.g. for non-repeating struct g, followed by repeating structs s1
-        and s2 with 3 neurons the layout will be:
-        [g, s1, s1, s1, s2, s2, s2].
+        structures that repeat per neuron the repeats will appear adjacent
+        e.g. for non-repeating structure `g`, followed by repeating structures
+        `s1` and `s2` with 3 neurons the layout will be:
+        ``[g, s1, s1, s1, s2, s2, s2]``.
 
         :rtype: list(~spynnaker.pyNN.utilities.struct.Struct)
         """

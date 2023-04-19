@@ -27,8 +27,9 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
     """
     See :py:class:`~spinn_utilities.data.utils_data_writer.UtilsDataWriter`.
 
-    This class is designed to only be used directly by AbstractSpinnakerBase
-    and its subclasses and within the PyNN repositories unittests.
+    This class is designed to only be used directly by
+    :py:class:`spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase`
+    and its subclasses and within the PyNN repositories unit tests.
     """
 
     __spy_data = _SpynnakerDataModel()
@@ -63,11 +64,11 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         :param simulation_time_step_us:
             An explicitly specified time step for the simulation in
             microseconds.
-            If `None`, the value is read from the config
+            If `None`, the value is read from the configuration
         :type simulation_time_step_us: int or None
         :param time_scale_factor:
             An explicitly specified time scale factor for the simulation.
-            If `None`, the value is read from the config
+            If `None`, the value is read from the configuration
         :type time_scale_factor: float or None
         :param min_delay:
             new value or `None` to say use simulation_time_step_ms
