@@ -57,26 +57,26 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_check_args</span><span class="p">(</span><span class="n">args_to_find</span><span class="p">,</span> <span class="n">default_args</span><span class="p">,</span> <span class="n">init</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_check_args</span><span class="p">(</span><span class="n">args_to_find</span><span class="p">,</span> <span class="n">default_args</span><span class="p">,</span> <span class="n">init_method</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args_to_find</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">default_args</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Argument </span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2"> not found, or &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;no default value provided in </span><span class="si">{</span><span class="n">init</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="sa">f</span><span class="s2">&quot;no default value provided in </span><span class="si">{</span><span class="n">init_method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="get_dict_from_init"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.defaults.get_dict_from_init">[docs]</a><span class="k">def</span> <span class="nf">get_dict_from_init</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="get_dict_from_init"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.defaults.get_dict_from_init">[docs]</a><span class="k">def</span> <span class="nf">get_dict_from_init</span><span class="p">(</span><span class="n">init_method</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get an argument initialisation dictionary by examining an</span>
 <span class="sd">    ``__init__`` method or function.</span>
 
-<span class="sd">    :param callable init: The method.</span>
+<span class="sd">    :param callable init_method: The method.</span>
 <span class="sd">    :param frozenset(str) skip: The arguments to be skipped, if any</span>
 <span class="sd">    :param frozenset(str) include: The arguments that must be present, if any</span>
 <span class="sd">    :return: an initialisation dictionary</span>
 <span class="sd">    :rtype: dict(str, Any)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">init_args</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+    <span class="n">init_args</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">init_method</span><span class="p">)</span>
     <span class="n">n_defaults</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">init_args</span><span class="o">.</span><span class="n">defaults</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">init_args</span><span class="o">.</span><span class="n">defaults</span><span class="p">)</span>
     <span class="n">n_args</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">init_args</span><span class="o">.</span><span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">init_args</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
     <span class="n">default_args</span> <span class="o">=</span> <span class="p">([]</span> <span class="k">if</span> <span class="n">init_args</span><span class="o">.</span><span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span>
@@ -85,9 +85,9 @@
 
     <span class="c1"># Check that included / skipped things exist</span>
     <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">_check_args</span><span class="p">(</span><span class="n">include</span><span class="p">,</span> <span class="n">default_args</span><span class="p">,</span> <span class="n">init</span><span class="p">)</span>
+        <span class="n">_check_args</span><span class="p">(</span><span class="n">include</span><span class="p">,</span> <span class="n">default_args</span><span class="p">,</span> <span class="n">init_method</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">skip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">_check_args</span><span class="p">(</span><span class="n">skip</span><span class="p">,</span> <span class="n">default_args</span><span class="p">,</span> <span class="n">init</span><span class="p">)</span>
+        <span class="n">_check_args</span><span class="p">(</span><span class="n">skip</span><span class="p">,</span> <span class="n">default_args</span><span class="p">,</span> <span class="n">init_method</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">{</span><span class="n">arg</span><span class="p">:</span> <span class="n">value</span>
             <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">default_args</span><span class="p">,</span> <span class="n">default_values</span><span class="p">)</span>

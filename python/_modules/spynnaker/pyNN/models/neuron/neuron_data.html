@@ -203,7 +203,7 @@
 <span class="sd">        Write the generated data.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
-<span class="sd">            The spec to write to</span>
+<span class="sd">            The data specification to write to</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The vertex slice to generate for</span>
 <span class="sd">        :param NeuronRegions neuron_regions: The regions to write to</span>
@@ -275,10 +275,10 @@
 
     <span class="k">def</span> <span class="nf">__get_struct_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the data for a struct.</span>
+<span class="sd">        Get the data for a structure.</span>
 
-<span class="sd">        :param Struct struct: The struct to get the data for</span>
-<span class="sd">        :param RangeDictionary values: The values to fill in the struct with</span>
+<span class="sd">        :param Struct struct: The structure to get the data for</span>
+<span class="sd">        :param RangeDictionary values: The values to fill in the structure with</span>
 <span class="sd">        :param Slice vertex_slice: The slice to get the values for</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">repeat_type</span> <span class="o">==</span> <span class="n">StructRepeat</span><span class="o">.</span><span class="n">GLOBAL</span><span class="p">:</span>
@@ -291,7 +291,7 @@
 <span class="sd">        Get the data to build neuron parameters with.</span>
 
 <span class="sd">        :param Slice vertex_slice: The slice to get the parameters for</span>
-<span class="sd">        :return: The number of structs and the data</span>
+<span class="sd">        :return: The number of structures and the data</span>
 <span class="sd">        :rtype: tuple(int, numpy.ndarray)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">structs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">structs</span>
@@ -305,10 +305,10 @@
 
     <span class="k">def</span> <span class="nf">__get_builder_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the builder data for a struct.</span>
+<span class="sd">        Get the builder data for a structure.</span>
 
-<span class="sd">        :param Struct struct: The struct to get the data for</span>
-<span class="sd">        :param RangeDictionary values: The values to fill in the struct with</span>
+<span class="sd">        :param Struct struct: The structure to get the data for</span>
+<span class="sd">        :param RangeDictionary values: The values to fill in the structure with</span>
 <span class="sd">        :param Slice vertex_slice: The slice to get the values for</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">repeat_type</span> <span class="o">==</span> <span class="n">StructRepeat</span><span class="o">.</span><span class="n">GLOBAL</span><span class="p">:</span>
@@ -322,7 +322,7 @@
 <span class="sd">        Get the header of the neuron builder region.</span>
 
 <span class="sd">        :param Slice vertex_slice: The slice to put in the header</span>
-<span class="sd">        :param int n_structs: The number of structs to generate</span>
+<span class="sd">        :param int n_structs: The number of structures to generate</span>
 <span class="sd">        :param NeuronRegions neuron_regions: The regions to point to</span>
 <span class="sd">        :rtype: numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>

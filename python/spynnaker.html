@@ -351,7 +351,7 @@ applied to the Axes/Subplot, plus in addition:</p>
 <div><dl class="simple">
 <dt><cite>data_labels</cite>:</dt><dd><p>a list of strings of the same length as the number of data items.</p>
 </dd>
-<dt><cite>line_properties</cite>:</dt><dd><p>a list of dicts containing Matplotlib formatting options, of the            same length as the number of data items.</p>
+<dt><cite>line_properties</cite>:</dt><dd><p>a list of dictionaries containing Matplotlib formatting options,            of the same length as the number of data items.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -383,13 +383,13 @@ or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.spynnaker_plotting.heat_plot_neo">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">heat_plot_neo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#heat_plot_neo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.heat_plot_neo" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">heat_plot_neo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#heat_plot_neo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.heat_plot_neo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots neurons, times and values into a heatmap.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.7.1)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
-<li><p><strong>signal_array</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.12)"><em>AnalogSignal</em></a>) – Neo Signal array Object</p></li>
+<li><p><strong>axes</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.7.1)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
+<li><p><strong>signal_array</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.12)"><em>AnalogSignal</em></a>) – Neo Signal array object</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the graph</p></li>
 <li><p><strong>options</strong> – plotting options</p></li>
 </ul>
@@ -399,13 +399,13 @@ or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.spynnaker_plotting.heat_plot_numpy">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">heat_plot_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#heat_plot_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.heat_plot_numpy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">heat_plot_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#heat_plot_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.heat_plot_numpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots neurons, times and values into a heatmap.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.7.1)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
-<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – nparray of values in spynnaker7 format</p></li>
+<li><p><strong>axes</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.7.1)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – numpy array of values in spynnaker7 format</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the graph</p></li>
 <li><p><strong>options</strong> – plotting options</p></li>
 </ul>
@@ -421,8 +421,8 @@ or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference
 include the name of the data to plot</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Method signature defined by pynn plotting.
-This allows mixing of this plotting tool and pynn’s</p>
+<p>Method signature defined by PyNN plotting.
+This allows mixing of this plotting tool and PyNN’s</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -438,13 +438,13 @@ This allows mixing of this plotting tool and pynn’s</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.spynnaker_plotting.plot_spikes_numpy">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">plot_spikes_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#plot_spikes_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.plot_spikes_numpy" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">plot_spikes_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#plot_spikes_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.plot_spikes_numpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot all spikes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.7.1)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
-<li><p><strong>spikes</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – sPyNNaker7 format nparray of spikes</p></li>
+<li><p><strong>axes</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.7.1)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
+<li><p><strong>spikes</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – sPyNNaker7 format numpy array of spikes</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the graph</p></li>
 <li><p><strong>options</strong> – plotting options</p></li>
 </ul>
@@ -454,13 +454,13 @@ This allows mixing of this plotting tool and pynn’s</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.spynnaker_plotting.plot_spiketrains">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">plot_spiketrains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiketrains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#plot_spiketrains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.plot_spiketrains" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.spynnaker_plotting.</span></span><span class="sig-name descname"><span class="pre">plot_spiketrains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiketrains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/spynnaker_plotting.html#plot_spiketrains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.spynnaker_plotting.plot_spiketrains" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot all spike trains in a Segment in a raster plot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.7.1)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
-<li><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a><em>)</em>) – List of spiketimes</p></li>
+<li><p><strong>axes</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.7.1)"><em>Axes</em></a>) – An Axes in a matplotlib figure</p></li>
+<li><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a><em>)</em>) – List of spike times</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Label for the graph</p></li>
 <li><p><strong>options</strong> – plotting options</p></li>
 </ul>

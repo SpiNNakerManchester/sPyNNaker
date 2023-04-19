@@ -62,7 +62,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structs</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param list(Struct) structs: The structs of the component</span>
+<span class="sd">        :param list(Struct) structs: The structures of the component</span>
 <span class="sd">        :param dict units: The units to use for each parameter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__structs</span> <span class="o">=</span> <span class="n">structs</span>
@@ -71,12 +71,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">structs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The structures of the component.  If there are multiple structs,</span>
+<span class="sd">        The structures of the component.  If there are multiple structures,</span>
 <span class="sd">        the order is how they will appear in memory; where there are</span>
-<span class="sd">        structs that repeat per neuron the repeats will appear adjacent</span>
-<span class="sd">        e.g. for non-repeating struct g, followed by repeating structs s1</span>
-<span class="sd">        and s2 with 3 neurons the layout will be:</span>
-<span class="sd">        [g, s1, s1, s1, s2, s2, s2].</span>
+<span class="sd">        structures that repeat per neuron the repeats will appear adjacent</span>
+<span class="sd">        e.g. for non-repeating structure `g`, followed by repeating structures</span>
+<span class="sd">        `s1` and `s2` with 3 neurons the layout will be:</span>
+<span class="sd">        ``[g, s1, s1, s1, s2, s2, s2]``.</span>
 
 <span class="sd">        :rtype: list(~spynnaker.pyNN.utilities.struct.Struct)</span>
 <span class="sd">        &quot;&quot;&quot;</span>

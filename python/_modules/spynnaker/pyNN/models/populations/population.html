@@ -185,9 +185,9 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">celltype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implements the PyNN expected celltype property.</span>
+<span class="sd">        Implements the PyNN expected `celltype` property.</span>
 
-<span class="sd">        :return: The celltype this property has been set to</span>
+<span class="sd">        :return: The cell type this property has been set to</span>
 <span class="sd">        :rtype: AbstractPyNNModel</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__celltype</span>
@@ -208,8 +208,8 @@
 <span class="sd">        Population or view.</span>
 
 <span class="sd">        :param variables: either a single variable name or a list of variable</span>
-<span class="sd">            names. For a given celltype class, ``celltype.recordable`` contains</span>
-<span class="sd">            a list of variables that can be recorded for that celltype.</span>
+<span class="sd">            names. For a given `celltype` class, `celltype.recordable` contains</span>
+<span class="sd">            a list of variables that can be recorded for that `celltype`.</span>
 <span class="sd">        :type variables: str or list(str)</span>
 <span class="sd">        :param to_file: a file to automatically record to (optional).</span>
 <span class="sd">            :py:meth:`write_data` will be automatically called when</span>
@@ -426,9 +426,9 @@
 <span class="sd">            str or dict(str, int or float or list(int) or list(float))</span>
 <span class="sd">        :param value: the value of the parameter to set.</span>
 <span class="sd">        :type value: int or float or list(int) or list(float)</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
+<span class="sd">        :raises SimulatorRunningException: If `sim.run` is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before `sim.setup`</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after `sim.end`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -739,9 +739,9 @@
 <span class="sd">        :param int x: The x-coordinate of the placement constraint</span>
 <span class="sd">        :param int y: The y-coordinate of the placement constraint</span>
 <span class="sd">        :param int p: The processor ID of the placement constraint (optional)</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
+<span class="sd">        :raises SimulatorRunningException: If `sim.run` is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before `sim.setup`</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after `sim.end`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_fixed_location</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span></div>
 
@@ -753,9 +753,9 @@
 
 <span class="sd">        :param int max_atoms_per_core:</span>
 <span class="sd">            the new value for the max atoms per dimension per core.</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
+<span class="sd">        :raises SimulatorRunningException: If `sim.run` is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before `sim.setup`</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after `sim.end`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
         <span class="n">cap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltype</span><span class="o">.</span><span class="n">absolute_max_atoms_per_core</span>
@@ -783,26 +783,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__recorder</span><span class="o">.</span><span class="n">cache_data</span><span class="p">()</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__create_model</span><span class="p">(</span><span class="n">cellclass</span><span class="p">,</span> <span class="n">cellparams</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__create_model</span><span class="p">(</span><span class="n">cell_class</span><span class="p">,</span> <span class="n">cell_params</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param cellclass: The implementation of the individual neurons.</span>
-<span class="sd">        :type cellclass: type or AbstractPyNNModel or ApplicationVertex</span>
-<span class="sd">        :param cellparams: Parameters to pass to ``cellclass`` if it</span>
-<span class="sd">            is a class to instantiate. Must be ``None`` if ``cellclass`` is an</span>
+<span class="sd">        :param cell_class: The implementation of the individual neurons.</span>
+<span class="sd">        :type cell_class: type or AbstractPyNNModel or ApplicationVertex</span>
+<span class="sd">        :param cell_params: Parameters to pass to ``cell_class`` if it</span>
+<span class="sd">            is a class to instantiate. Must be ``None`` if ``cell_class`` is an</span>
 <span class="sd">            instantiated object.</span>
-<span class="sd">        :type cellparams: dict(str,object) or None</span>
+<span class="sd">        :type cell_params: dict(str,object) or None</span>
 <span class="sd">        :rtype: ApplicationVertex or AbstractPyNNModel</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">cellclass</span>
-        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">cellclass</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">cellparams</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">model</span> <span class="o">=</span> <span class="n">cellclass</span><span class="p">()</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">cell_class</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">cell_class</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">cell_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">model</span> <span class="o">=</span> <span class="n">cell_class</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">model</span> <span class="o">=</span> <span class="n">cellclass</span><span class="p">(</span><span class="o">**</span><span class="n">cellparams</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">cellparams</span><span class="p">:</span>
+                <span class="n">model</span> <span class="o">=</span> <span class="n">cell_class</span><span class="p">(</span><span class="o">**</span><span class="n">cell_params</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cell_params</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;cellclass is an instance which includes params so &quot;</span>
-                <span class="s2">&quot;cellparams must be None&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;cell_class is an instance which includes params so &quot;</span>
+                <span class="s2">&quot;cell_params must be None&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">model</span>
 
     <span class="k">def</span> <span class="nf">__create_vertex</span><span class="p">(</span>
@@ -876,13 +876,13 @@
             <span class="n">additional_parameters</span><span class="p">,</span> <span class="n">population_parameters</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Essential method for allowing things like splitter objects at</span>
-<span class="sd">        pop level.</span>
+<span class="sd">        population level.</span>
 
 <span class="sd">        :param additional_parameters:</span>
-<span class="sd">            the additional params handed down from user</span>
+<span class="sd">            the additional parameters handed down from user</span>
 <span class="sd">        :param population_parameters:</span>
-<span class="sd">            the additional params the vertex can support.</span>
-<span class="sd">        :return: the list of params that are accepted.</span>
+<span class="sd">            the additional parameters the vertex can support.</span>
+<span class="sd">        :return: the list of parameters that are accepted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">additional_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">population_parameters</span><span class="p">:</span>

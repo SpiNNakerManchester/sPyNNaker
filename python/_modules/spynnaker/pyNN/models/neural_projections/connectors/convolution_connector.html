@@ -78,7 +78,8 @@
 <span class="k">class</span> <span class="nc">ConvolutionConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Where the pre- and post-synaptic populations are considered as a 2D</span>
-<span class="sd">    array. Connect every post(row, col) neuron to many pre(row, col, kernel)</span>
+<span class="sd">    array. Connect every post(row, column) neuron to many</span>
+<span class="sd">    pre(row, column, kernel)</span>
 <span class="sd">    through a (kernel) set of weights and/or delays.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -391,7 +392,7 @@
 
     <span class="k">def</span> <span class="nf">__pre_as_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_coords</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Write pre coords as post coords.</span>
+<span class="sd">        Write pre-population coordinates as post-population coordinates.</span>
 
 <span class="sd">        :param ~collections.abc.Iterable pre_coords:</span>
 <span class="sd">            An iterable of (x, y) coordinates</span>

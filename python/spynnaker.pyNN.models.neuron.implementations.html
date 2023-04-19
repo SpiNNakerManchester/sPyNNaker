@@ -118,7 +118,10 @@ variables holder.</p>
 <dd><p>Get the data type of the variables that can be recorded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict of name of variable to DataType of variable</p>
+<dd class="field-odd"><p>dictionary of name of variable to data type of variable</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>,<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -193,6 +196,9 @@ recorded.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -235,7 +241,7 @@ recorded.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.structs">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structs</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.structs" title="Permalink to this definition">¶</a></dt>
-<dd><p>A list of structs used by the implementation.</p>
+<dd><p>A list of structures used by the implementation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct" title="spynnaker.pyNN.utilities.struct.Struct">Struct</a>)</p>
@@ -253,7 +259,7 @@ recorded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>structs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct" title="spynnaker.pyNN.utilities.struct.Struct"><em>Struct</em></a><em>)</em>) – The structs of the component</p></li>
+<li><p><strong>structs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct" title="spynnaker.pyNN.utilities.struct.Struct"><em>Struct</em></a><em>)</em>) – The structures of the component</p></li>
 <li><p><strong>units</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – The units to use for each parameter</p></li>
 </ul>
 </dd>
@@ -309,12 +315,12 @@ variables holder.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.structs">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structs</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.structs" title="Permalink to this definition">¶</a></dt>
-<dd><p>The structures of the component.  If there are multiple structs,
+<dd><p>The structures of the component.  If there are multiple structures,
 the order is how they will appear in memory; where there are
-structs that repeat per neuron the repeats will appear adjacent
-e.g. for non-repeating struct g, followed by repeating structs s1
-and s2 with 3 neurons the layout will be:
-[g, s1, s1, s1, s2, s2, s2].</p>
+structures that repeat per neuron the repeats will appear adjacent
+e.g. for non-repeating structure <cite>g</cite>, followed by repeating structures
+<cite>s1</cite> and <cite>s2</cite> with 3 neurons the layout will be:
+<code class="docutils literal notranslate"><span class="pre">[g,</span> <span class="pre">s1,</span> <span class="pre">s1,</span> <span class="pre">s1,</span> <span class="pre">s2,</span> <span class="pre">s2,</span> <span class="pre">s2]</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct" title="spynnaker.pyNN.utilities.struct.Struct"><em>Struct</em></a>)</p>
@@ -404,7 +410,10 @@ variables holder.</p>
 <dd><p>Get the data type of the variables that can be recorded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict of name of variable to DataType of variable</p>
+<dd class="field-odd"><p>dictionary of name of variable to data type of variable</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>,<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -479,6 +488,9 @@ recorded.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable</p>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -526,7 +538,7 @@ recorded.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.structs">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structs</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.structs" title="Permalink to this definition">¶</a></dt>
-<dd><p>A list of structs used by the implementation.</p>
+<dd><p>A list of structures used by the implementation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct" title="spynnaker.pyNN.utilities.struct.Struct">Struct</a>)</p>

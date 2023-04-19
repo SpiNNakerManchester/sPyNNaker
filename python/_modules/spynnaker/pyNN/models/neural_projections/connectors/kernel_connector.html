@@ -79,7 +79,8 @@
                       <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Where the pre- and post-synaptic populations are considered as a 2D</span>
-<span class="sd">    array. Connect every post(row, col) neuron to many pre(row, col, kernel)</span>
+<span class="sd">    array. Connect every post(row, column) neuron to many</span>
+<span class="sd">    pre(row, column, kernel)</span>
 <span class="sd">    through a (kernel) set of weights and/or delays.</span>
 
 <span class="sd">    .. admonition:: TODO</span>
@@ -95,14 +96,14 @@
             <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param shape_pre:</span>
-<span class="sd">            2D shape of the pre population (rows/height, cols/width, usually</span>
+<span class="sd">            2D shape of the pre-population (rows/height, columns/width, usually</span>
 <span class="sd">            the input image shape)</span>
 <span class="sd">        :type shape_pre: list(int) or tuple(int,int)</span>
 <span class="sd">        :param shape_post:</span>
-<span class="sd">            2D shape of the post population (rows/height, cols/width)</span>
+<span class="sd">            2D shape of the post-population (rows/height, columns/width)</span>
 <span class="sd">        :type shape_post: list(int) or tuple(int,int)</span>
 <span class="sd">        :param shape_kernel:</span>
-<span class="sd">            2D shape of the kernel (rows/height, cols/width)</span>
+<span class="sd">            2D shape of the kernel (rows/height, columns/width)</span>
 <span class="sd">        :type shape_kernel: list(int) or tuple(int,int)</span>
 <span class="sd">        :param weight_kernel: (optional)</span>
 <span class="sd">            2D matrix of size shape_kernel describing the weights</span>
@@ -113,20 +114,20 @@
 <span class="sd">        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG</span>
 <span class="sd">            or int or float or list(int) or list(float) or None</span>
 <span class="sd">        :param shape_common: (optional)</span>
-<span class="sd">            2D shape of common coordinate system (for both pre and post,</span>
+<span class="sd">            2D shape of common coordinate system (for both pre- and post-,</span>
 <span class="sd">            usually the input image sizes)</span>
 <span class="sd">        :type shape_common: list(int) or tuple(int,int) or None</span>
 <span class="sd">        :param pre_sample_steps_in_post: (optional)</span>
-<span class="sd">            Sampling steps/jumps for pre pop &lt;=&gt; (stepX, stepY)</span>
+<span class="sd">            Sampling steps/jumps for pre-population &lt;=&gt; (stepX, stepY)</span>
 <span class="sd">        :type pre_sample_steps_in_post: None or list(int) or tuple(int,int)</span>
 <span class="sd">        :param pre_start_coords_in_post: (optional)</span>
-<span class="sd">            Starting row/col for pre sampling &lt;=&gt; (offX, offY)</span>
+<span class="sd">            Starting row/column for pre-population sampling &lt;=&gt; (offX, offY)</span>
 <span class="sd">        :type pre_start_coords_in_post: None or list(int) or tuple(int,int)</span>
 <span class="sd">        :param post_sample_steps_in_pre: (optional)</span>
-<span class="sd">            Sampling steps/jumps for post pop &lt;=&gt; (stepX, stepY)</span>
+<span class="sd">            Sampling steps/jumps for post-population &lt;=&gt; (stepX, stepY)</span>
 <span class="sd">        :type post_sample_steps_in_pre: None or list(int) or tuple(int,int)</span>
 <span class="sd">        :param post_start_coords_in_pre: (optional)</span>
-<span class="sd">            Starting row/col for post sampling &lt;=&gt; (offX, offY)</span>
+<span class="sd">            Starting row/column for post-population sampling &lt;=&gt; (offX, offY)</span>
 <span class="sd">        :type post_start_coords_in_pre: None or list(int) or tuple(int,int)</span>
 <span class="sd">        :param bool safe:</span>
 <span class="sd">            Whether to check that weights and delays have valid values.</span>
@@ -211,7 +212,7 @@
 
     <span class="k">def</span> <span class="nf">__map_to_pre_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">post_r</span><span class="p">,</span> <span class="n">post_c</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get a map from post to pre coords.</span>
+<span class="sd">        Get a map from post to pre-population coordinates.</span>
 
 <span class="sd">        :param ~numpy.ndarray post_r: rows</span>
 <span class="sd">        :param ~numpy.ndarray post_c: columns</span>
@@ -222,7 +223,7 @@
 
     <span class="k">def</span> <span class="nf">__post_as_pre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Write post coords as pre coords.</span>
+<span class="sd">        Write post-population coordinates as pre-population coordinates.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
 <span class="sd">        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)</span>
@@ -237,7 +238,7 @@
 
     <span class="k">def</span> <span class="nf">__pre_as_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_r</span><span class="p">,</span> <span class="n">pre_c</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Write pre coords as post coords.</span>
+<span class="sd">        Write pre-population coordinates as post-population coordinates.</span>
 
 <span class="sd">        :param int pre_r: row</span>
 <span class="sd">        :param int pre_c: column</span>

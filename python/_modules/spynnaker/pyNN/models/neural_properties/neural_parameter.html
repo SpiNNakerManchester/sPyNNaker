@@ -68,11 +68,11 @@
         <span class="s2">&quot;__spec&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__stop_range&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">datatype</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~spinn_utilities.ranged.AbstractList value:</span>
 <span class="sd">            The abstract list holding the data</span>
-<span class="sd">        :param ~data_specification.enums.DataType datatype:</span>
+<span class="sd">        :param ~data_specification.enums.DataType data_type:</span>
 <span class="sd">            The type of each element of data</span>
 <span class="sd">        :param int slice_start: Inclusive start of the range</span>
 <span class="sd">        :param int slice_stop: Exclusive end of the range</span>
@@ -86,7 +86,7 @@
         <span class="c1"># iterator to be called, and set self._cmd_pair</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__stop_range</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__datatype</span> <span class="o">=</span> <span class="n">datatype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__datatype</span> <span class="o">=</span> <span class="n">data_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spec</span> <span class="o">=</span> <span class="n">spec</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_pair</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -114,11 +114,11 @@
         <span class="s2">&quot;__spec&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__value&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">datatype</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param value: The list holding the data</span>
 <span class="sd">        :type value: list(int) or list(float) or list(bool) or ~numpy.ndarray</span>
-<span class="sd">        :param ~data_specification.enums.DataType datatype:</span>
+<span class="sd">        :param ~data_specification.enums.DataType data_type:</span>
 <span class="sd">            The type of each element of data</span>
 <span class="sd">        :param int slice_start: Inclusive start of the range</span>
 <span class="sd">        :param int slice_stop: Exclusive end of the range</span>
@@ -127,7 +127,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__datatype</span> <span class="o">=</span> <span class="n">datatype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__datatype</span> <span class="o">=</span> <span class="n">data_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="n">slice_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__slice_stop</span> <span class="o">=</span> <span class="n">slice_stop</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spec</span> <span class="o">=</span> <span class="n">spec</span>
@@ -145,19 +145,20 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Iterator that repeats the single values the required number of times.</span>
 
-<span class="sd">    Allows a single Value parameter to be treated the same as parameters with</span>
-<span class="sd">    len. Caches `cmd_word_list` and `cmd_string` so they are only created once.</span>
+<span class="sd">    Allows a single value parameter to be treated the same as parameters with</span>
+<span class="sd">    a given length.</span>
+<span class="sd">    Caches `cmd_word_list` and `cmd_string` so they are only created once.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__cmd_pair&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__index&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__stop&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">datatype</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param value: The simple value that is the data for each element</span>
 <span class="sd">        :type value: int or float or bool</span>
-<span class="sd">        :param ~data_specification.enums.DataType datatype:</span>
+<span class="sd">        :param ~data_specification.enums.DataType data_type:</span>
 <span class="sd">            The type of each element of data</span>
 <span class="sd">        :param int slice_start: Inclusive start of the range</span>
 <span class="sd">        :param int slice_stop: Exclusive end of the range</span>
@@ -165,7 +166,7 @@
 <span class="sd">            The data specification to write to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_pair</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">create_cmd</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">datatype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_pair</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">create_cmd</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">data_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="n">slice_start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span> <span class="o">=</span> <span class="n">slice_stop</span>
 

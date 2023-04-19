@@ -3080,22 +3080,22 @@ error if merge is not possible.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.calculate_spike_pair_additive_stdp_weight">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.</span></span><span class="sig-name descname"><span class="pre">calculate_spike_pair_additive_stdp_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plastic_delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_plus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_minus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_plus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_minus</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.calculate_spike_pair_additive_stdp_weight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the expected stdp weight for SpikePair Additive STDP.</p>
+<dd><p>Calculates the expected STDP weight for SpikePair Additive STDP.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pre_spikes</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – </p></li>
 <li><p><strong>post_spikes</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – </p></li>
 <li><p><strong>initial_weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
-<li><p><strong>plastic_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>a_plus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
-<li><p><strong>a_minus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
-<li><p><strong>tau_plus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
-<li><p><strong>tau_minus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
+<li><p><strong>plastic_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – parameter of the STDP model</p></li>
+<li><p><strong>a_plus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – parameter of the STDP model</p></li>
+<li><p><strong>a_minus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – parameter of the STDP model</p></li>
+<li><p><strong>tau_plus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – parameter of the STDP model</p></li>
+<li><p><strong>tau_minus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – parameter of the STDP model</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>overall weight</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
@@ -3106,24 +3106,27 @@ error if merge is not possible.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.calculate_spike_pair_multiplicative_stdp_weight">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.</span></span><span class="sig-name descname"><span class="pre">calculate_spike_pair_multiplicative_stdp_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plastic_delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_plus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_minus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_plus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_minus</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.calculate_spike_pair_multiplicative_stdp_weight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the expected stdp weight for SpikePair Multiplicative STDP.</p>
+<dd><p>Calculates the expected STDP weight for SpikePair Multiplicative STDP.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pre_spikes</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – Spikes going into the model</p></li>
 <li><p><strong>post_spikes</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – Spikes recorded on the model</p></li>
 <li><p><strong>initial_weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Starting weight for the model</p></li>
-<li><p><strong>plastic_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – param of the stdp model</p></li>
-<li><p><strong>min_weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – param of the stdp model</p></li>
-<li><p><strong>max_weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – param of the stdp model</p></li>
-<li><p><strong>a_plus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – param of the stdp model</p></li>
-<li><p><strong>a_minus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – param of the stdp model</p></li>
-<li><p><strong>tau_plus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – param of the stdp model</p></li>
-<li><p><strong>tau_minus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – param of the stdp model</p></li>
+<li><p><strong>plastic_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – parameter of the STDP model</p></li>
+<li><p><strong>min_weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – parameter of the STDP model</p></li>
+<li><p><strong>max_weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – parameter of the STDP model</p></li>
+<li><p><strong>a_plus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – parameter of the STDP model</p></li>
+<li><p><strong>a_minus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – parameter of the STDP model</p></li>
+<li><p><strong>tau_plus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – parameter of the STDP model</p></li>
+<li><p><strong>tau_minus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – parameter of the STDP model</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>overall weight</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
 </dd></dl>

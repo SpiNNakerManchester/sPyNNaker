@@ -51,7 +51,7 @@
 <span class="c1"># limitations under the License.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">utility class containing simple helper methods</span>
+<span class="sd">Utility package containing simple helper functions.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -258,8 +258,8 @@
         <span class="n">n_total_trials</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the likely maximum number of items that will be selected from a</span>
-<span class="sd">    set of n_trials from a total set of n_total_trials</span>
-<span class="sd">    with a probability of selection of selection_prob.</span>
+<span class="sd">    set of `n_trials` from a total set of `n_total_trials`</span>
+<span class="sd">    with a probability of selection of `selection_prob`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">chance</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_total_trials</span><span class="p">))</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">binom</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">)</span>
@@ -275,100 +275,104 @@
         <span class="n">n_total_trials</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the likely minimum number of items that will be selected from a</span>
-<span class="sd">    set of n_trials from a total set of n_total_trials</span>
-<span class="sd">    with a probability of selection of selection_prob.</span>
+<span class="sd">    set of `n_trials` from a total set of `n_total_trials`</span>
+<span class="sd">    with a probability of selection of `selection_prob`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="p">(</span><span class="n">chance</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_total_trials</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">binom</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_probability_within_range"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_probability_within_range">[docs]</a><span class="k">def</span> <span class="nf">get_probability_within_range</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
+<div class="viewcode-block" id="get_probability_within_range"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_probability_within_range">[docs]</a><span class="k">def</span> <span class="nf">get_probability_within_range</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the probability that a value will fall within the given range for</span>
 <span class="sd">    a given RandomDistribution.</span>
 
-<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution dist:</span>
+<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution distribution:</span>
+<span class="sd">    :param float lower:</span>
+<span class="sd">    :param float upper:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">lower</span><span class="p">)</span></div>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">lower</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_maximum_probable_value"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_maximum_probable_value">[docs]</a><span class="k">def</span> <span class="nf">get_maximum_probable_value</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">n_items</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
+<div class="viewcode-block" id="get_maximum_probable_value"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_maximum_probable_value">[docs]</a><span class="k">def</span> <span class="nf">get_maximum_probable_value</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">n_items</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the likely maximum value of a RandomDistribution given a</span>
 <span class="sd">    number of draws.</span>
 
-<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution dist:</span>
+<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution distribution:</span>
+<span class="sd">    :param int n_items:</span>
+<span class="sd">    :param float chance:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">chance</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_items</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_minimum_probable_value"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_minimum_probable_value">[docs]</a><span class="k">def</span> <span class="nf">get_minimum_probable_value</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">n_items</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
+<div class="viewcode-block" id="get_minimum_probable_value"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_minimum_probable_value">[docs]</a><span class="k">def</span> <span class="nf">get_minimum_probable_value</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">n_items</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the likely minimum value of a RandomDistribution given a</span>
 <span class="sd">    number of draws.</span>
 
-<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution dist:</span>
+<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution distribution:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="n">chance</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_items</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_mean"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_mean">[docs]</a><span class="k">def</span> <span class="nf">get_mean</span><span class="p">(</span><span class="n">dist</span><span class="p">):</span>
+<div class="viewcode-block" id="get_mean"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_mean">[docs]</a><span class="k">def</span> <span class="nf">get_mean</span><span class="p">(</span><span class="n">distribution</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the mean of a RandomDistribution.</span>
 
-<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution dist:</span>
+<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution distribution:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span></div>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_standard_deviation"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_standard_deviation">[docs]</a><span class="k">def</span> <span class="nf">get_standard_deviation</span><span class="p">(</span><span class="n">dist</span><span class="p">):</span>
+<div class="viewcode-block" id="get_standard_deviation"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_standard_deviation">[docs]</a><span class="k">def</span> <span class="nf">get_standard_deviation</span><span class="p">(</span><span class="n">distribution</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the standard deviation of a RandomDistribution.</span>
 
-<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution dist:</span>
+<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution distribution:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span></div>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_variance"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_variance">[docs]</a><span class="k">def</span> <span class="nf">get_variance</span><span class="p">(</span><span class="n">dist</span><span class="p">):</span>
+<div class="viewcode-block" id="get_variance"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_variance">[docs]</a><span class="k">def</span> <span class="nf">get_variance</span><span class="p">(</span><span class="n">distribution</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the variance of a RandomDistribution.</span>
 
-<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution dist:</span>
+<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution distribution:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span></div>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="high"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.high">[docs]</a><span class="k">def</span> <span class="nf">high</span><span class="p">(</span><span class="n">dist</span><span class="p">):</span>
+<div class="viewcode-block" id="high"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.high">[docs]</a><span class="k">def</span> <span class="nf">high</span><span class="p">(</span><span class="n">distribution</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Gets the high or max boundary value for this distribution.</span>
+<span class="sd">    Gets the high or maximum boundary value for this distribution.</span>
 
 <span class="sd">    Could return `None`.</span>
 
-<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution dist:</span>
+<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution distribution:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">high</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span></div>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">high</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="low"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.low">[docs]</a><span class="k">def</span> <span class="nf">low</span><span class="p">(</span><span class="n">dist</span><span class="p">):</span>
+<div class="viewcode-block" id="low"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.low">[docs]</a><span class="k">def</span> <span class="nf">low</span><span class="p">(</span><span class="n">distribution</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Gets the high or min boundary value for this distribution.</span>
+<span class="sd">    Gets the high or minimum boundary value for this distribution.</span>
 
 <span class="sd">    Could return `None`.</span>
 
-<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution dist:</span>
+<span class="sd">    :param ~spynnaker.pyNN.RandomDistribution distribution:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">low</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span></div>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">distribution</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">low</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_validate_mars_kiss_64_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
@@ -395,8 +399,8 @@
 <span class="sd">    :param seed:</span>
 <span class="sd">        the seed to create a random number generator if not handed.</span>
 <span class="sd">    :type seed: int or None</span>
-<span class="sd">    :return: a list of 4 ints which are used by the mars64 kiss random number</span>
-<span class="sd">        generator for seeds.</span>
+<span class="sd">    :return: a list of 4 integers which are used by the mars64 kiss random</span>
+<span class="sd">        number generator for seeds.</span>
 <span class="sd">    :rtype: list(int)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">kiss_seed</span> <span class="o">=</span> <span class="n">_validate_mars_kiss_64_seed</span><span class="p">([</span>

@@ -57,11 +57,12 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.data.spynnaker_data_writer.</span></span><span class="sig-name descname"><span class="pre">SpynnakerDataWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_writer.html#SpynnakerDataWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.spynnaker_data_writer.SpynnakerDataWriter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.data/#spinn_front_end_common.data.fec_data_writer.FecDataWriter" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FecDataWriter</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.data.SpynnakerDataView" title="spynnaker.pyNN.SpynnakerDataView"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpynnakerDataView</span></code></a></p>
 <p>See <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.data/#spinn_utilities.data.utils_data_writer.UtilsDataWriter" title="(in SpiNNUtils v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UtilsDataWriter</span></code></a>.</p>
-<p>This class is designed to only be used directly by AbstractSpinnakerBase
-and its subclasses and within the PyNN repositories unittests.</p>
+<p>This class is designed to only be used directly by
+<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface/#spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase</span></code></a>
+and its subclasses and within the PyNN repositories unit tests.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>state</strong> (<em>Data_Status</em>) – State writer should be in</p>
+<dd class="field-odd"><p><strong>state</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.data/#spinn_utilities.data.DataStatus" title="(in SpiNNUtils v6.0)"><em>DataStatus</em></a>) – State writer should be in</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -72,9 +73,9 @@ and its subclasses and within the PyNN repositories unittests.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>simulation_time_step_us</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – An explicitly specified time step for the simulation in
 microseconds.
-If <cite>None</cite>, the value is read from the config</p></li>
+If <cite>None</cite>, the value is read from the configuration</p></li>
 <li><p><strong>time_scale_factor</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – An explicitly specified time scale factor for the simulation.
-If <cite>None</cite>, the value is read from the config</p></li>
+If <cite>None</cite>, the value is read from the configuration</p></li>
 <li><p><strong>min_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – new value or <cite>None</cite> to say use simulation_time_step_ms</p></li>
 </ul>
 </dd>

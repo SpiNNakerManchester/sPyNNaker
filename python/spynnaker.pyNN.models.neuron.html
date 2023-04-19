@@ -936,7 +936,7 @@ application vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The spec to write to</p></li>
+<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The data specification to write to</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The vertex slice to generate for</p></li>
 <li><p><strong>neuron_regions</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.NeuronRegions" title="spynnaker.pyNN.models.neuron.NeuronRegions"><em>NeuronRegions</em></a>) – The regions to write to</p></li>
 <li><p><strong>gen_on_machine</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to allow generation on machine</p></li>
@@ -992,7 +992,7 @@ application vertex.</p>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex</p></li>
 <li><p><strong>app_vertex</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – The associated application vertex</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the population that this implements</p></li>
-<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The sdram used by the vertex</p></li>
+<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The SDRAM used by the vertex</p></li>
 <li><p><strong>regions</strong> (<em>.CommonRegions</em>) – The regions to be assigned</p></li>
 <li><p><strong>n_provenance_items</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of additional provenance items to be read</p></li>
 <li><p><strong>profile_tags</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – A mapping of profile identifiers to names</p></li>
@@ -1726,7 +1726,7 @@ can be <cite>None</cite>.</p></li>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synaptic_matrix_app.</span></span><span class="sig-name descname"><span class="pre">SynapticMatrixApp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_syn_block_sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_key_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_app_key_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_scales</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix_app.html#SynapticMatrixApp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The synaptic matrix (and delay matrix if applicable) for an incoming
-app edge.</p>
+application edge.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1805,13 +1805,13 @@ app edge.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.reserve_matrices">
-<span class="sig-name descname"><span class="pre">reserve_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_addr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poptable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix_app.html#SynapticMatrixApp.reserve_matrices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.reserve_matrices" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reserve_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_addr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_table</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synaptic_matrix_app.html#SynapticMatrixApp.reserve_matrices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.reserve_matrices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allocate the master pop table entries for the blocks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>block_addr</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Where the allocation can start from</p></li>
-<li><p><strong>poptable</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch" title="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch"><em>MasterPopTableAsBinarySearch</em></a>) – The master population table</p></li>
+<li><p><strong>pop_table</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch" title="spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch"><em>MasterPopTableAsBinarySearch</em></a>) – The master population table</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -3330,7 +3330,7 @@ source, target, weight and delay</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The sdram used by the vertex</p></li>
+<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The SDRAM used by the vertex</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex</p></li>
 <li><p><strong>app_vertex</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – The associated application vertex</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the population that this implements</p></li>
@@ -3558,7 +3558,7 @@ have changed and need to be reloaded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The sdram used by the vertex</p></li>
+<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The SDRAM used by the vertex</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex</p></li>
 <li><p><strong>app_vertex</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – The associated application vertex</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the population that this implements</p></li>
@@ -3566,7 +3566,7 @@ have changed and need to be reloaded.</p>
 <li><p><strong>ring_buffer_shifts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The shifts to apply to convert ring buffer values to S1615 values</p></li>
 <li><p><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The scaling to apply to weights to store them in the synapses</p></li>
 <li><p><strong>structural_sz</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The size of the structural data</p></li>
-<li><p><strong>n_neuron_bits</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of bits to use for neuron ids</p></li>
+<li><p><strong>n_neuron_bits</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of bits to use for neuron IDs</p></li>
 <li><p><strong>synaptic_matrices</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices" title="spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices"><em>SynapticMatrices</em></a>) – The synaptic matrices</p></li>
 <li><p><strong>neuron_data</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.neuron_data.NeuronData" title="spynnaker.pyNN.models.neuron.neuron_data.NeuronData"><em>NeuronData</em></a>) – The handler of neuron data</p></li>
 </ul>
@@ -3845,7 +3845,7 @@ have changed and need to be reloaded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The sdram used by the vertex</p></li>
+<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The SDRAM used by the vertex</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex</p></li>
 <li><p><strong>app_vertex</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – The associated application vertex</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the population that this implements</p></li>
@@ -4107,7 +4107,7 @@ over SDRAM, one for each synapse type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The sdram used by the vertex</p></li>
+<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The SDRAM used by the vertex</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex</p></li>
 <li><p><strong>app_vertex</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – The associated application vertex</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the population that this implements</p></li>
@@ -4352,7 +4352,7 @@ writing shared areas.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The sdram used by the vertex</p></li>
+<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The SDRAM used by the vertex</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex</p></li>
 <li><p><strong>app_vertex</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – The associated application vertex</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the population that this implements</p></li>
@@ -4440,7 +4440,7 @@ have changed and need to be reloaded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The sdram used by the vertex</p></li>
+<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The SDRAM used by the vertex</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex</p></li>
 <li><p><strong>app_vertex</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – The associated application vertex</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the population that this implements</p></li>

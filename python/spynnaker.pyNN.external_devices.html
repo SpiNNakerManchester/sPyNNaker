@@ -373,12 +373,13 @@ the conditions.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">get_machine_fixed_key_and_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/icub_retina_device.html#ICUBRetinaDevice.get_machine_fixed_key_and_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Get a fixed key and mask for the given machine vertex and partition
-identifier, or <cite>None</cite> if not fixed (the default).  If this doesn’t
-return <cite>None</cite>, get_fixed_key_and_mask must also not return <cite>None</cite>,
+identifier, or <cite>None</cite> if not fixed (the default).</p>
+<p>If this doesn’t return <cite>None</cite>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_fixed_key_and_mask()</span></code>
+must also not return <cite>None</cite>,
 and the keys returned here must align with those such that for each
-key:mask returned here, key &amp; app_mask == app_key.  It is OK for
-this to return <cite>None</cite> and get_fixed_key_and_mask to return not <cite>None</cite>
-iff there is only one machine vertex.</p>
+<code class="docutils literal notranslate"><span class="pre">key:mask</span></code> returned here, <code class="docutils literal notranslate"><span class="pre">key</span> <span class="pre">&amp;</span> <span class="pre">app_mask</span> <span class="pre">==</span> <span class="pre">app_key</span></code>.  It is OK
+for this to return <cite>None</cite> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_fixed_key_and_mask()</span></code> to
+return non-<cite>None</cite> if and only if there is only one machine vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2151,12 +2152,13 @@ n_machine_vertices_per_link &gt; 1</p></li>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">get_machine_fixed_key_and_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_retina_device.html#SPIFRetinaDevice.get_machine_fixed_key_and_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Get a fixed key and mask for the given machine vertex and partition
-identifier, or <cite>None</cite> if not fixed (the default).  If this doesn’t
-return <cite>None</cite>, get_fixed_key_and_mask must also not return <cite>None</cite>,
+identifier, or <cite>None</cite> if not fixed (the default).</p>
+<p>If this doesn’t return <cite>None</cite>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_fixed_key_and_mask()</span></code>
+must also not return <cite>None</cite>,
 and the keys returned here must align with those such that for each
-key:mask returned here, key &amp; app_mask == app_key.  It is OK for
-this to return <cite>None</cite> and get_fixed_key_and_mask to return not <cite>None</cite>
-iff there is only one machine vertex.</p>
+<code class="docutils literal notranslate"><span class="pre">key:mask</span></code> returned here, <code class="docutils literal notranslate"><span class="pre">key</span> <span class="pre">&amp;</span> <span class="pre">app_mask</span> <span class="pre">==</span> <span class="pre">app_key</span></code>.  It is OK
+for this to return <cite>None</cite> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_fixed_key_and_mask()</span></code> to
+return non-<cite>None</cite> if and only if there is only one machine vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2559,8 +2561,8 @@ used, False if SDP is to be used (default)</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – hostname to connect to</p></li>
-<li><p><strong>notify_port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – port num for the notify command</p></li>
-<li><p><strong>ack_port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – port num for the acknowledge command</p></li>
+<li><p><strong>notify_port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – UDP port number for the notify command</p></li>
+<li><p><strong>ack_port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – UDP port number for the acknowledge command</p></li>
 </ul>
 </dd>
 </dl>

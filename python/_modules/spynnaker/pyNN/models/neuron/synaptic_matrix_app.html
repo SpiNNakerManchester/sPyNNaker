@@ -63,7 +63,7 @@
 <div class="viewcode-block" id="SynapticMatrixApp"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp">[docs]</a><span class="k">class</span> <span class="nc">SynapticMatrixApp</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The synaptic matrix (and delay matrix if applicable) for an incoming</span>
-<span class="sd">    app edge.</span>
+<span class="sd">    application edge.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># pylint: disable=unused-private-member</span>
@@ -162,27 +162,27 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">max_row_length</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
 
-<div class="viewcode-block" id="SynapticMatrixApp.reserve_matrices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.reserve_matrices">[docs]</a>    <span class="k">def</span> <span class="nf">reserve_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">poptable</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapticMatrixApp.reserve_matrices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.reserve_matrices">[docs]</a>    <span class="k">def</span> <span class="nf">reserve_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">pop_table</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allocate the master pop table entries for the blocks.</span>
 
 <span class="sd">        :param int block_addr: Where the allocation can start from</span>
-<span class="sd">        :param MasterPopTableAsBinarySearch poptable:</span>
+<span class="sd">        :param MasterPopTableAsBinarySearch pop_table:</span>
 <span class="sd">            The master population table</span>
 <span class="sd">        :return: Where the next allocation can start from</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reserve_app_matrix</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="n">poptable</span><span class="p">)</span>
-        <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reserve_delay_app_matrix</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="n">poptable</span><span class="p">)</span>
+        <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reserve_app_matrix</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="n">pop_table</span><span class="p">)</span>
+        <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__reserve_delay_app_matrix</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="n">pop_table</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">block_addr</span></div>
 
-    <span class="k">def</span> <span class="nf">__reserve_app_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">poptable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__reserve_app_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">pop_table</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reserve space for the matrix in the master pop table.</span>
 
 <span class="sd">        :param int block_addr:</span>
 <span class="sd">            The address in the synaptic matrix region to start writing at</span>
-<span class="sd">        :param MasterPopTableAsBinarySearch poptable:</span>
+<span class="sd">        :param MasterPopTableAsBinarySearch pop_table:</span>
 <span class="sd">            The master population table</span>
 <span class="sd">        :return: The updated block address</span>
 <span class="sd">        :rtype: int</span>
@@ -193,7 +193,7 @@
 
         <span class="c1"># If we have routing info but no synapses, write an invalid entry</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_n_synapses</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="n">poptable</span><span class="o">.</span><span class="n">add_invalid_application_entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="n">pop_table</span><span class="o">.</span><span class="n">add_invalid_application_entry</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span><span class="o">.</span><span class="n">core_mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span><span class="o">.</span><span class="n">core_shift</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span><span class="o">.</span><span class="n">n_neurons</span><span class="p">,</span>
@@ -201,8 +201,8 @@
             <span class="k">return</span> <span class="n">block_addr</span>
 
         <span class="c1"># Write a matrix for the whole application vertex</span>
-        <span class="n">block_addr</span> <span class="o">=</span> <span class="n">poptable</span><span class="o">.</span><span class="n">get_next_allowed_address</span><span class="p">(</span><span class="n">block_addr</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="n">poptable</span><span class="o">.</span><span class="n">add_application_entry</span><span class="p">(</span>
+        <span class="n">block_addr</span> <span class="o">=</span> <span class="n">pop_table</span><span class="o">.</span><span class="n">get_next_allowed_address</span><span class="p">(</span><span class="n">block_addr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="n">pop_table</span><span class="o">.</span><span class="n">add_application_entry</span><span class="p">(</span>
             <span class="n">block_addr</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span><span class="o">.</span><span class="n">core_mask</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span><span class="o">.</span><span class="n">core_shift</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span><span class="o">.</span><span class="n">n_neurons</span><span class="p">,</span>
@@ -211,13 +211,13 @@
         <span class="n">block_addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next_addr</span><span class="p">(</span><span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrix_size</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">block_addr</span>
 
-    <span class="k">def</span> <span class="nf">__reserve_delay_app_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">poptable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__reserve_delay_app_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">pop_table</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reserve space in the master pop table for a delayed matrix.</span>
 
 <span class="sd">        :param int block_addr:</span>
 <span class="sd">            The address in the synaptic matrix region to start writing at</span>
-<span class="sd">        :param MasterPopTableAsBinarySearch poptable:</span>
+<span class="sd">        :param MasterPopTableAsBinarySearch pop_table:</span>
 <span class="sd">            The master population table</span>
 <span class="sd">        :return: The updated block address</span>
 <span class="sd">        :rtype: int</span>
@@ -228,7 +228,7 @@
 
         <span class="c1"># If we have routing info but no synapses, write an invalid entry</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_n_synapses</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delay_index</span> <span class="o">=</span> <span class="n">poptable</span><span class="o">.</span><span class="n">add_invalid_application_entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__delay_index</span> <span class="o">=</span> <span class="n">pop_table</span><span class="o">.</span><span class="n">add_invalid_application_entry</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_info</span><span class="o">.</span><span class="n">core_mask</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_info</span><span class="o">.</span><span class="n">core_shift</span><span class="p">,</span>
@@ -237,8 +237,8 @@
             <span class="k">return</span> <span class="n">block_addr</span>
 
         <span class="c1"># Write a matrix for the whole application vertex</span>
-        <span class="n">block_addr</span> <span class="o">=</span> <span class="n">poptable</span><span class="o">.</span><span class="n">get_next_allowed_address</span><span class="p">(</span><span class="n">block_addr</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__delay_index</span> <span class="o">=</span> <span class="n">poptable</span><span class="o">.</span><span class="n">add_application_entry</span><span class="p">(</span>
+        <span class="n">block_addr</span> <span class="o">=</span> <span class="n">pop_table</span><span class="o">.</span><span class="n">get_next_allowed_address</span><span class="p">(</span><span class="n">block_addr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__delay_index</span> <span class="o">=</span> <span class="n">pop_table</span><span class="o">.</span><span class="n">add_application_entry</span><span class="p">(</span>
             <span class="n">block_addr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_info</span><span class="o">.</span><span class="n">key_and_mask</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_info</span><span class="o">.</span><span class="n">core_mask</span><span class="p">,</span>

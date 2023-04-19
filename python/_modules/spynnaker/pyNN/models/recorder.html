@@ -105,8 +105,8 @@
 <span class="sd">        Turns on (or off) recording.</span>
 
 <span class="sd">        :param variables: either a single variable name or a list of variable</span>
-<span class="sd">            names. For a given celltype class, ``celltype.recordable`` contains</span>
-<span class="sd">            a list of variables that can be recorded for that celltype.</span>
+<span class="sd">            names. For a given `celltype` class, `celltype.recordable` contains</span>
+<span class="sd">            a list of variables that can be recorded for that `celltype`.</span>
 <span class="sd">            Can also be ``None`` to reset the list of variables.</span>
 <span class="sd">        :type variables: str or list(str) or None</span>
 <span class="sd">        :param to_file: a file to automatically record to (optional).</span>
@@ -161,9 +161,9 @@
 <span class="sd">        :type to_file: neo.io.baseio.BaseIO or str or None</span>
 <span class="sd">        :param indexes: List of indexes to record or `None` for all</span>
 <span class="sd">        :type indexes: list(int) or None</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
+<span class="sd">        :raises SimulatorRunningException: If `sim.run` is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before `sim.setup`</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after `sim.end`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">warn_once</span><span class="p">(</span>
             <span class="n">logger</span><span class="p">,</span> <span class="s1">&#39;record(&quot;all&quot;) is non-standard PyNN, and &#39;</span>
@@ -186,9 +186,9 @@
 <span class="sd">        :type to_file: neo.io.baseio.BaseIO or str or None</span>
 <span class="sd">        :param indexes: List of indexes to record or `None` for all</span>
 <span class="sd">        :type indexes: list(int) or None</span>
-<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
-<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
-<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
+<span class="sd">        :raises SimulatorRunningException: If `sim.run` is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before `sim.setup`</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after `sim.end`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
 

@@ -890,22 +890,24 @@ if <cite>None</cite> the cfg value is used</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.config_setup.setup_configs">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.config_setup.</span></span><span class="sig-name descname"><span class="pre">setup_configs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/config_setup.html#setup_configs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.config_setup.setup_configs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets up the configs including the users cfg file.</p>
-<p>Clears out any previous read configs but does not load the new configs
-so a warning is generated if a config is used before setup is called.</p>
+<dd><p>Sets up the configurations including the users configuration file.</p>
+<p>Clears out any previous read configurations but does not load the new
+configurations so a warning is generated if a configuration is used before
+setup is called.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.config_setup.unittest_setup">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.config_setup.</span></span><span class="sig-name descname"><span class="pre">unittest_setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/config_setup.html#unittest_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.config_setup.unittest_setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Does all the steps that may be required before a unittest.</p>
-<p>Resets the configs so only the local default configs are included.
-The user cfg is NOT included!</p>
-<p>Unsets any previous simulators and tempdirs</p>
+<dd><p>Does all the steps that may be required before a unit-test.</p>
+<p>Resets the configurations so only the local default configurations are
+included.
+The user configuration is <em>not</em> included!</p>
+<p>Unsets any previous simulators and temporary directories</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This file should only be called from Spynnaker tests
-that do not call sim.setup</p>
+<p>This file should only be called from sPyNNaker tests
+that do not call <cite>sim.setup</cite></p>
 </div>
 </dd></dl>
 
@@ -963,7 +965,7 @@ that do not call sim.setup</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>max_size</strong> – the maximum permitted size of row</p></li>
-<li><p><strong>message</strong> – the excepton message</p></li>
+<li><p><strong>message</strong> – the exception message</p></li>
 </ul>
 </dd>
 </dl>
@@ -1059,7 +1061,7 @@ module’s implementation. This is very nasty!</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.spynnaker_external_device_plugin_manager.</span></span><span class="sig-name descname"><span class="pre">SpynnakerExternalDevicePluginManager</span></span><a class="reference internal" href="_modules/spynnaker/pyNN/spynnaker_external_device_plugin_manager.html#SpynnakerExternalDevicePluginManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>User-level interface for the external device plugin manager.</p>
+<p>User-level interface for the external device plug-in manager.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.activate_live_output_for">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">activate_live_output_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_notify_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_notify_port_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_ack_port_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_sdp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">EIEIOType.KEY_32_BIT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload_as_time_stamps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_payload_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload_right_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_packets_sent_per_time_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translate_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/spynnaker_external_device_plugin_manager.html#SpynnakerExternalDevicePluginManager.activate_live_output_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.activate_live_output_for" title="Permalink to this definition">¶</a></dt>
@@ -1159,8 +1161,8 @@ device) on a given partition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – the pre-vertex to connect the edge from</p></li>
-<li><p><strong>device_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – the post vertex to connect the edge to</p></li>
+<li><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – the pre-population vertex to connect the edge from</p></li>
+<li><p><strong>device_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – the post-population vertex to connect the edge to</p></li>
 <li><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the partition identifier for making nets</p></li>
 </ul>
 </dd>
@@ -1788,7 +1790,8 @@ in the post vertex from neurons in the pre vertex.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">ConvolutionConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel_weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive_receptor_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'excitatory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_receptor_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inhibitory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code></p>
 <p>Where the pre- and post-synaptic populations are considered as a 2D
-array. Connect every post(row, col) neuron to many pre(row, col, kernel)
+array. Connect every post(row, column) neuron to many
+pre(row, column, kernel)
 through a (kernel) set of weights and/or delays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -3373,8 +3376,10 @@ dependent upon the indices of the pre- and post-populations.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>index_expression</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the right-hand side of a valid python expression for
-probability, involving the indices of the pre and post populations,
-that can be parsed by eval(), that computes a probability dist;
+probability, involving the indices of the pre- and
+post-populations,
+that can be parsed by <cite>eval()</cite>, that computes a probability
+distribution;
 the indices will be given as variables <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> when the
 expression is evaluated.</p></li>
 <li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – if the connector is used to connect a Population to itself, this
@@ -3538,7 +3543,8 @@ be parsed by <cite>eval()</cite>, that computes a probability distribution.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">KernelConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape_pre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_post</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_common</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_sample_steps_in_post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_start_coords_in_post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_sample_steps_in_pre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_start_coords_in_pre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code></p>
 <p>Where the pre- and post-synaptic populations are considered as a 2D
-array. Connect every post(row, col) neuron to many pre(row, col, kernel)
+array. Connect every post(row, column) neuron to many
+pre(row, column, kernel)
 through a (kernel) set of weights and/or delays.</p>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
@@ -3547,10 +3553,10 @@ through a (kernel) set of weights and/or delays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>shape_pre</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – 2D shape of the pre population (rows/height, cols/width, usually
+<li><p><strong>shape_pre</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – 2D shape of the pre-population (rows/height, columns/width, usually
 the input image shape)</p></li>
-<li><p><strong>shape_post</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – 2D shape of the post population (rows/height, cols/width)</p></li>
-<li><p><strong>shape_kernel</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – 2D shape of the kernel (rows/height, cols/width)</p></li>
+<li><p><strong>shape_post</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – 2D shape of the post-population (rows/height, columns/width)</p></li>
+<li><p><strong>shape_kernel</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – 2D shape of the kernel (rows/height, columns/width)</p></li>
 <li><p><strong>weight_kernel</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em> or </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.10)"><em>NumpyRNG</em></a><em>
 or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><em>None</em>) – (optional)
 2D matrix of size shape_kernel describing the weights</p></li>
@@ -3558,16 +3564,16 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><em>None</em>) – (optional)
 2D matrix of size shape_kernel describing the delays</p></li>
 <li><p><strong>shape_common</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – (optional)
-2D shape of common coordinate system (for both pre and post,
+2D shape of common coordinate system (for both pre- and post-,
 usually the input image sizes)</p></li>
 <li><p><strong>pre_sample_steps_in_post</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – (optional)
-Sampling steps/jumps for pre pop &lt;=&gt; (stepX, stepY)</p></li>
+Sampling steps/jumps for pre-population &lt;=&gt; (stepX, stepY)</p></li>
 <li><p><strong>pre_start_coords_in_post</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – (optional)
-Starting row/col for pre sampling &lt;=&gt; (offX, offY)</p></li>
+Starting row/column for pre-population sampling &lt;=&gt; (offX, offY)</p></li>
 <li><p><strong>post_sample_steps_in_pre</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – (optional)
-Sampling steps/jumps for post pop &lt;=&gt; (stepX, stepY)</p></li>
+Sampling steps/jumps for post-population &lt;=&gt; (stepX, stepY)</p></li>
 <li><p><strong>post_start_coords_in_pre</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – (optional)
-Starting row/col for post sampling &lt;=&gt; (offX, offY)</p></li>
+Starting row/column for post-population sampling &lt;=&gt; (offX, offY)</p></li>
 <li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to check that weights and delays have valid values.
 If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this check is skipped.</p></li>
 <li><p><strong>space</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.Space" title="(in PyNN v0.10)"><em>Space</em></a>) – Currently ignored; for future compatibility.</p></li>
@@ -3879,8 +3885,8 @@ to this structure.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">NoisyCurrentSource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractCurrentSource</span></code></p>
 <p>A noisy current source beginning at “start” and ending at “stop”, with
-noise simulated based on the given mean and stdev, and updating every
-dt (dt should default to the machine time step).</p>
+noise simulated based on the given mean and standard deviation, and
+updating every <cite>dt</cite> (<cite>dt</cite> should default to the machine time step).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -4181,7 +4187,8 @@ in the post vertex from neurons in the pre vertex.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">PoolDenseConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive_receptor_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'excitatory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_receptor_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inhibitory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code></p>
 <p>Where the pre- and post-synaptic populations are considered as a 2D
-array. Connect every post(row, col) neuron to many pre(row, col, kernel)
+array. Connect every post(row, column) neuron to many
+pre(row, column, kernel)
 through a (kernel) set of weights and/or delays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -4191,7 +4198,7 @@ through a (kernel) set of weights and/or delays.</p>
 <ul>
 <li><p>single value: the same value will be used for all weights</p></li>
 <li><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>: the total number of elements must be
-(num after pooling * num post)</p></li>
+(number after pooling * number post)</p></li>
 <li><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>: As above for list</p></li>
 <li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomDistribution</span></code>:
 weights will be drawn at random</p></li>
@@ -4420,9 +4427,9 @@ instantiated object.</p></li>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
-<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
-<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+<li><p><strong>SimulatorRunningException</strong> – If <cite>sim.run</cite> is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before <cite>sim.setup</cite></p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after <cite>sim.end</cite></p></li>
 </ul>
 </dd>
 </dl>
@@ -4477,10 +4484,10 @@ instantiated object.</p></li>
 <dl class="py property">
 <dt class="sig sig-object py">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">celltype</span></span></dt>
-<dd><p>Implements the PyNN expected celltype property.</p>
+<dd><p>Implements the PyNN expected <cite>celltype</cite> property.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The celltype this property has been set to</p>
+<dd class="field-odd"><p>The cell type this property has been set to</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">AbstractPyNNModel</a></p>
@@ -4811,8 +4818,8 @@ Population or view.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – either a single variable name or a list of variable
-names. For a given celltype class, <code class="docutils literal notranslate"><span class="pre">celltype.recordable</span></code> contains
-a list of variables that can be recorded for that celltype.</p></li>
+names. For a given <cite>celltype</cite> class, <cite>celltype.recordable</cite> contains
+a list of variables that can be recorded for that <cite>celltype</cite>.</p></li>
 <li><p><strong>to_file</strong> (<em>io</em><em> or </em><em>rawio</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – a file to automatically record to (optional).
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">write_data()</span></code> will be automatically called when
 <cite>sim.end()</cite> is called.</p></li>
@@ -4862,9 +4869,9 @@ list of such (e.g. for setting spike times):</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
-<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
-<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+<li><p><strong>SimulatorRunningException</strong> – If <cite>sim.run</cite> is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before <cite>sim.setup</cite></p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after <cite>sim.end</cite></p></li>
 </ul>
 </dd>
 </dl>
@@ -4881,9 +4888,9 @@ dimension per core.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
-<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
-<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+<li><p><strong>SimulatorRunningException</strong> – If <cite>sim.run</cite> is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before <cite>sim.setup</cite></p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after <cite>sim.end</cite></p></li>
 </ul>
 </dd>
 </dl>
@@ -5355,9 +5362,9 @@ Population or view.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – either a single variable name, or a list of variable
-names, or <code class="docutils literal notranslate"><span class="pre">all</span></code> to record everything. For a given celltype
-class, celltype.recordable contains a
-list of variables that can be recorded for that celltype.</p></li>
+names, or <code class="docutils literal notranslate"><span class="pre">all</span></code> to record everything. For a given <cite>celltype</cite>
+class, <cite>celltype.recordable</cite> contains a
+list of variables that can be recorded for that <cite>celltype</cite>.</p></li>
 <li><p><strong>to_file</strong> (<em>io</em><em> or </em><em>rawio</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – If specified, should be a Neo IO instance and
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">write_data()</span></code>
 will be automatically called when <cite>sim.end()</cite> is called.</p></li>
@@ -5517,7 +5524,7 @@ record.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>presynaptic_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – the source pop</p></li>
-<li><p><strong>postsynaptic_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – the dest pop</p></li>
+<li><p><strong>postsynaptic_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – the destination population</p></li>
 <li><p><strong>connector</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector" title="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector"><em>AbstractConnector</em></a>) – the connector type</p></li>
 <li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics"><em>AbstractStaticSynapseDynamics</em></a>) – the synapse type</p></li>
 <li><p><strong>source</strong> (<em>None</em>) – Unsupported; must be <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
@@ -6179,12 +6186,12 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 <dl class="py function">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cellclass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cellparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN.html#create"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Builds a population with certain params.</p>
+<dd><p>Builds a population with certain parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cellclass</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em> or </em><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><em>AbstractPyNNModel</em></a>) – population class</p></li>
-<li><p><strong>cellparams</strong> – population params.</p></li>
+<li><p><strong>cellparams</strong> – population parameters.</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – number of neurons</p></li>
 </ul>
 </dd>
@@ -6196,13 +6203,13 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 
 <dl class="py function">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic_boundaries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN.html#distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Return the Euclidian distance between two cells.</p>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgt_cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic_boundaries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN.html#distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Return the Euclidean distance between two cells.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> – Measure from this cell</p></li>
-<li><p><strong>tgt</strong> – To this cell</p></li>
+<li><p><strong>src_cell</strong> – Measure from this cell</p></li>
+<li><p><strong>tgt_cell</strong> – To this cell</p></li>
 <li><p><strong>mask</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – <p>allows only certain dimensions to be considered, e.g.:</p>
 <ul>
 <li><p>to ignore the z-dimension, use <code class="docutils literal notranslate"><span class="pre">mask=array([0,1])</span></code></p></li>
@@ -6225,7 +6232,7 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 <dd><p>Cleans up the SpiNNaker machine and software</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>_</strong> – was named compatible_output, which we don’t care about,
+<dd class="field-odd"><p><strong>_</strong> – was named <cite>compatible_output</cite>, which we don’t care about,
 so is a non-existent parameter</p>
 </dd>
 </dl>
@@ -6307,8 +6314,8 @@ least this.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cells</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a><em> or
-</em><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationView" title="spynnaker.pyNN.models.populations.PopulationView"><em>PopulationView</em></a>) – the cells to change params on</p></li>
-<li><p><strong>initial_values</strong> – the params and their values to change</p></li>
+</em><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationView" title="spynnaker.pyNN.models.populations.PopulationView"><em>PopulationView</em></a>) – the cells to change parameters on</p></li>
+<li><p><strong>initial_values</strong> – the parameters and their values to change</p></li>
 </ul>
 </dd>
 </dl>
@@ -6381,8 +6388,8 @@ simulator.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – may be either a single variable name or a list of
-variable names. For a given celltype class, celltype.recordable
-contains a list of variables that can be recorded for that celltype.</p></li>
+variable names. For a given <cite>celltype</cite> class, <cite>celltype.recordable</cite>
+contains a list of variables that can be recorded for that <cite>celltype</cite>.</p></li>
 <li><p><strong>source</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a><em> or
 </em><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationView" title="spynnaker.pyNN.models.populations.PopulationView"><em>PopulationView</em></a>) – where to record from</p></li>
 <li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – file name to write data to</p></li>
@@ -6539,8 +6546,8 @@ Needs to be called before any other function</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>timestep</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – the time step of the simulations in microseconds;
-if <cite>None</cite>, the cfg value is used</p></li>
-<li><p><strong>min_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the min delay of the simulation</p></li>
+if <cite>None</cite>, the configuration value is used</p></li>
+<li><p><strong>min_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the minimum delay of the simulation</p></li>
 <li><p><strong>max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – Ignored and logs a warning if provided</p></li>
 <li><p><strong>database_socket_addresses</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities/#spinn_utilities.socket_address.SocketAddress" title="(in SpiNNUtils v6.0)"><em>SocketAddress</em></a><em>)</em>) – the sockets used by external devices
 for the database notification protocol</p></li>

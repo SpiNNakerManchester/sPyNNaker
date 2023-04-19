@@ -253,12 +253,12 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">write_bitfield_init_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bit_field_bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#write_bitfield_init_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes the init data needed for the bitfield generator.</p>
+<dd><p>Writes the initialisation data needed for the bitfield generator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – data spec writer</p></li>
-<li><p><strong>bit_field_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the bit-field filters</p></li>
+<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – data specification writer</p></li>
+<li><p><strong>bit_field_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region ID for the bit-field filters</p></li>
 <li><p><strong>n_bit_field_bytes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the size of the region</p></li>
 <li><p><strong>bit_field_region_ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The reference to the region</p></li>
 </ul>
@@ -673,7 +673,7 @@ extra tables and access methods added.</p>
 <li><p><strong>database_file</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of a file that contains (or will contain) an SQLite
 database holding the data.
 If omitted the default location will be used.</p></li>
-<li><p><strong>read_only</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – By default the database is readonly if given a database file.
+<li><p><strong>read_only</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – By default the database is read-only if given a database file.
 This allows to override that (mainly for clear)</p></li>
 </ul>
 </dd>
@@ -694,7 +694,7 @@ duplicate values</p>
 </div>
 </p></li>
 <li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><em>None</em>) – One or more variable names or <cite>None</cite> for all available</p></li>
-<li><p><strong>view_indexes</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – List of neurons ids to include or <cite>None</cite> for all</p></li>
+<li><p><strong>view_indexes</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – List of neurons IDs to include or <cite>None</cite> for all</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -706,7 +706,7 @@ duplicate values</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.array_to_string">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">array_to_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indexes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_buffer_database.html#NeoBufferDatabase.array_to_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.array_to_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts a list of ints into a compact string.
+<dd><p>Converts a list of integers into a compact string.
 Works best if the list is sorted.</p>
 <p>IDs are comma separated, except when a series of IDs is sequential then
 the start:end is used.</p>
@@ -784,7 +784,7 @@ duplicate values</p>
 </div>
 </p></li>
 <li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><em>None</em>) – One or more variable names or <cite>None</cite> for all available</p></li>
-<li><p><strong>view_indexes</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – List of neurons ids to include or <cite>None</cite> for all</p></li>
+<li><p><strong>view_indexes</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – List of neurons IDs to include or <cite>None</cite> for all</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -809,7 +809,7 @@ duplicate values</p>
 </div>
 </p></li>
 <li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><em>None</em>) – One or more variable names or <cite>None</cite> for all available</p></li>
-<li><p><strong>view_indexes</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – List of neurons ids to include or <cite>None</cite> for all</p></li>
+<li><p><strong>view_indexes</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – List of neurons IDs to include or <cite>None</cite> for all</p></li>
 <li><p><strong>annotations</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – annotations to put on the neo block</p></li>
 </ul>
 </dd>
@@ -842,7 +842,7 @@ duplicate values</p>
 </div>
 </p></li>
 <li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><em>None</em>) – One or more variable names or <cite>None</cite> for all available</p></li>
-<li><p><strong>view_indexes</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – List of neurons ids to include or <cite>None</cite> for all</p></li>
+<li><p><strong>view_indexes</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – List of neurons IDs to include or <cite>None</cite> for all</p></li>
 <li><p><strong>annotations</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>...</em><em>)</em>) – annotations to put on the neo block</p></li>
 </ul>
 </dd>
@@ -861,13 +861,11 @@ duplicate values</p>
 <dd><p>Gets an Object with the same data retrieval API as a Population.</p>
 <p>Retrieval is limited to recorded data and a little metadata needed to
 create a single Neo Segment wrapped in a Neo Block.</p>
-<blockquote>
-<div><div class="admonition note">
+<div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>As each database only includes data for one run (with resets
 creating another database) the structure is relatively simple.</p>
 </div>
-</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>pop_label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – <p>The label for the population of interest</p>
@@ -935,7 +933,7 @@ duplicate values</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>datatype, t_start, sampling_interval_ms, first_id, pop_size,
+<dd class="field-even"><p>data_type, t_start, sampling_interval_ms, first_id, pop_size,
 units</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -952,14 +950,12 @@ units</p>
 <span class="sig-name descname"><span class="pre">get_recording_populations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_buffer_database.html#NeoBufferDatabase.get_recording_populations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.get_recording_populations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets a list of the labels of Populations recording.
 Or to be exact the ones with metadata saved so likely to be recording.</p>
-<blockquote>
-<div><div class="admonition note">
+<div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>These are actually the labels of the Application Vertices.
 Typically the Population label, corrected for <cite>None</cite> or
 duplicate values</p>
 </div>
-</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List of population labels</p>
@@ -1006,7 +1002,7 @@ duplicate values</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.string_to_array">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">string_to_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_buffer_database.html#NeoBufferDatabase.string_to_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.string_to_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts a string into a list of ints.
+<dd><p>Converts a string into a list of integers.
 Assumes the string was created by <a class="reference internal" href="#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.array_to_string" title="spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.array_to_string"><code class="xref py py-meth docutils literal notranslate"><span class="pre">array_to_string()</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1032,8 +1028,8 @@ Assumes the string was created by <a class="reference internal" href="#spynnaker
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.write_segment_metadata">
 <span class="sig-name descname"><span class="pre">write_segment_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_buffer_database.html#NeoBufferDatabase.write_segment_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.write_segment_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the global information from the Views.</p>
-<p>This writes information held in SpynnakerDataView so that the database
-is usable standalone.</p>
+<p>This writes information held in <code class="xref py py-class docutils literal notranslate"><span class="pre">SpynnakerDataView</span></code> so that
+the database is usable stand-alone.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The database must be writable for this to work!</p>
@@ -1044,8 +1040,8 @@ is usable standalone.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.write_t_stop">
 <span class="sig-name descname"><span class="pre">write_t_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_buffer_database.html#NeoBufferDatabase.write_t_stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_buffer_database.NeoBufferDatabase.write_t_stop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Records the current run time as <cite>t_Stop</cite>.</p>
-<p>This writes information held in SpynnakerDataView so that the database
-is usable standalone</p>
+<p>This writes information held in <code class="xref py py-class docutils literal notranslate"><span class="pre">SpynnakerDataView</span></code> so that
+the database is usable stand-alone.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The database must be writable for this to work!</p>
@@ -1060,12 +1056,12 @@ is usable standalone</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_compare.compare_analogsignal">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_compare.</span></span><span class="sig-name descname"><span class="pre">compare_analogsignal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">as1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_compare.html#compare_analogsignal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_compare.compare_analogsignal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compares two analogsignal Objects to see if they are the same.</p>
+<dd><p>Compares two analog signal objects to see if they are the same.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>as1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.12)"><em>AnalogSignal</em></a>) – first analogsignal holding list of individual analogsignal Objects</p></li>
-<li><p><strong>as2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.12)"><em>AnalogSignal</em></a>) – second analogsignal holding list of individual analogsignal Objects</p></li>
+<li><p><strong>as1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.12)"><em>AnalogSignal</em></a>) – first analog signal holding list of individual analog signal objects</p></li>
+<li><p><strong>as2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.12)"><em>AnalogSignal</em></a>) – second analog signal holding list of individual analog signal objects</p></li>
 <li><p><strong>same_length</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Flag to indicate if the same length of data is
 held, i.e., all spikes up to the same time. If False allows one trains
 to have additional data after the first ends. This is used to compare
@@ -1073,7 +1069,7 @@ data extracted part way with data extracted at the end.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the analogsignals are not equal</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the analog signals are not equal</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1130,12 +1126,12 @@ data extracted part way with data extracted at the end.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_compare.compare_spiketrain">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_compare.</span></span><span class="sig-name descname"><span class="pre">compare_spiketrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spiketrain1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiketrain2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_compare.html#compare_spiketrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_compare.compare_spiketrain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks two Spiketrains have the exact same data</p>
+<dd><p>Checks two spike trains have the exact same data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spiketrain1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a>) – first spiketrain</p></li>
-<li><p><strong>spiketrain2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a>) – second spiketrain</p></li>
+<li><p><strong>spiketrain1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a>) – first spike train</p></li>
+<li><p><strong>spiketrain2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a>) – second spike train</p></li>
 <li><p><strong>same_length</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Flag to indicate if the same length of data is
 held, i.e., all spikes up to the same time. If False allows one trains
 to have additional spikes after the first ends. This is used to
@@ -1143,7 +1139,7 @@ compare data extracted part way with data extracted at the end.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the spiketrains are not equal</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the spike trains are not equal</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1151,12 +1147,12 @@ compare data extracted part way with data extracted at the end.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_compare.compare_spiketrains">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_compare.</span></span><span class="sig-name descname"><span class="pre">compare_spiketrains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spiketrains1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiketrains2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_compare.html#compare_spiketrains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_compare.compare_spiketrains" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check two Lists of SpikeTrains have the exact same data</p>
+<dd><p>Check two Lists of spike trains have the exact same data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spiketrains1</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a><em>)</em>) – First list SpikeTrains to compare</p></li>
-<li><p><strong>spiketrains2</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a><em>)</em>) – Second list of SpikeTrains to compare</p></li>
+<li><p><strong>spiketrains1</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a><em>)</em>) – First list of spike trains to compare</p></li>
+<li><p><strong>spiketrains2</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.12)"><em>SpikeTrain</em></a><em>)</em>) – Second list of spike trains to compare</p></li>
 <li><p><strong>same_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Flag to indicate if the same type of data is held,
 i.e., same spikes, v, gsyn_exc and gsyn_inh.
 If False allows one or both lists to be Empty.
@@ -1168,7 +1164,7 @@ data extracted part way with data extracted at the end.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the spiketrains are not equal</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the spike trains are not equal</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1493,7 +1489,7 @@ From: <a class="reference external" href="https://www.johndcook.com/blog/skewnes
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fields</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The types and names of the fields, ordered as they appear in the
-struct.</p></li>
+structure.</p></li>
 <li><p><strong>repeat_type</strong> (<a class="reference internal" href="#spynnaker.pyNN.utilities.struct.StructRepeat" title="spynnaker.pyNN.utilities.struct.StructRepeat"><em>StructRepeat</em></a>) – How the structure repeats</p></li>
 <li><p><strong>default_values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><em>None</em>) – Dict of field name -&gt; value to use when values doesn’t contain the
 field</p></li>
@@ -1504,7 +1500,7 @@ field</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.fields">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fields</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.fields" title="Permalink to this definition">¶</a></dt>
 <dd><p>The types and names of the fields, ordered as they appear in the
-struct.</p>
+structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a>, <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
@@ -1520,7 +1516,7 @@ struct.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>AbstractList</em><em>)</em>) – The values to fill in the data with</p></li>
-<li><p><strong>vertex_slice</strong> (<em>Slice</em><em> or </em><em>None</em>) – The vertex slice to get the data for, or <cite>None</cite> if the struct is
+<li><p><strong>vertex_slice</strong> (<em>Slice</em><em> or </em><em>None</em>) – The vertex slice to get the data for, or <cite>None</cite> if the structure is
 global.</p></li>
 <li><p><strong>atoms_shape</strong> – The shape of the atoms in the whole application vertex.
 When vertex_slice is not <cite>None</cite>, atoms_shape must not be not
@@ -1542,9 +1538,9 @@ When vertex_slice is <cite>None</cite>, atoms_shape is ignored.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> (<em>~dict-like</em>) – The values to fill in the data with</p></li>
-<li><p><strong>vertex_slice</strong> (<em>Slice</em><em> or </em><em>None</em>) – The vertex slice or <cite>None</cite> for a struct with repeat_type global, or
-where a single value repeats for every neuron.  If this is not the
-case and vertex_slice is <cite>None</cite>, an error will be raised!</p></li>
+<li><p><strong>vertex_slice</strong> (<em>Slice</em><em> or </em><em>None</em>) – The vertex slice or <cite>None</cite> for a structure with repeat_type global,
+or where a single value repeats for every neuron.  If this is not
+the case and vertex_slice is <cite>None</cite>, an error will be raised!</p></li>
 <li><p><strong>atoms_shape</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The shape of the atoms in the whole application vertex.
 When vertex_slice is not <cite>None</cite>, atoms_shape must not be not
 <cite>None</cite>.
@@ -1560,11 +1556,11 @@ When vertex_slice is <cite>None</cite>, atoms_shape is ignored.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.get_size_in_whole_words">
 <span class="sig-name descname"><span class="pre">get_size_in_whole_words</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.get_size_in_whole_words"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.get_size_in_whole_words" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the size of the struct in whole words in an array of given
+<dd><p>Get the size of the structure in whole words in an array of given
 size (default 1 item).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>array_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of elements in an array of structs</p>
+<dd class="field-odd"><p><strong>array_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of elements in an array of structures</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -1586,7 +1582,7 @@ size (default 1 item).</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.numpy_dtype">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">numpy_dtype</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.numpy_dtype" title="Permalink to this definition">¶</a></dt>
-<dd><p>The numpy data type of the struct.</p>
+<dd><p>The numpy data type of the structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.20)"><em>dtype</em></a></p>
@@ -1597,7 +1593,7 @@ size (default 1 item).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct.read_data">
 <span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.read_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a bytearray of data and write to values.</p>
+<dd><p>Read a byte string of data and write to values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1605,8 +1601,8 @@ size (default 1 item).</p>
 <li><p><strong>values</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged/#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The values to update with the read data</p></li>
 <li><p><strong>data_offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of the byte at the start of the valid data.</p></li>
 <li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The first index into values to write to.</p></li>
-<li><p><strong>array_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The number of struct copies to read, or <cite>None</cite> if this is a
-non-repeating struct.</p></li>
+<li><p><strong>array_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The number of structure copies to read, or <cite>None</cite> if this is a
+non-repeating structure.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1629,7 +1625,7 @@ non-repeating struct.</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.StructRepeat">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.struct.</span></span><span class="sig-name descname"><span class="pre">StructRepeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#StructRepeat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.StructRepeat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
-<p>How a struct repeats, or not, in memory.</p>
+<p>How a structure repeats, or not, in memory.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.StructRepeat.GLOBAL">
 <span class="sig-name descname"><span class="pre">GLOBAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.StructRepeat.GLOBAL" title="Permalink to this definition">¶</a></dt>
@@ -1647,7 +1643,7 @@ non-repeating struct.</p></li>
 </section>
 <section id="module-spynnaker.pyNN.utilities.utility_calls">
 <span id="spynnaker-pynn-utilities-utility-calls-module"></span><h2>spynnaker.pyNN.utilities.utility_calls module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.utility_calls" title="Permalink to this heading">¶</a></h2>
-<p>utility class containing simple helper methods</p>
+<p>Utility package containing simple helper functions.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">check_directory_exists_and_create_if_not</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#check_directory_exists_and_create_if_not"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not" title="Permalink to this definition">¶</a></dt>
@@ -1714,8 +1710,8 @@ suitable for use as a mars 64 kiss seed.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a list of 4 ints which are used by the mars64 kiss random number
-generator for seeds.</p>
+<dd class="field-even"><p>a list of 4 integers which are used by the mars64 kiss random
+number generator for seeds.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
@@ -1725,35 +1721,39 @@ generator for seeds.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.get_maximum_probable_value">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_maximum_probable_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_maximum_probable_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_maximum_probable_value" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_maximum_probable_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_maximum_probable_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_maximum_probable_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the likely maximum value of a RandomDistribution given a
 number of draws.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dist</strong> (<em>RandomDistribution</em>) – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> (<em>RandomDistribution</em>) – </p></li>
+<li><p><strong>n_items</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>chance</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.get_mean">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_mean" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the mean of a RandomDistribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dist</strong> (<em>RandomDistribution</em>) – </p>
+<dd class="field-odd"><p><strong>distribution</strong> (<em>RandomDistribution</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.get_minimum_probable_value">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_minimum_probable_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_minimum_probable_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_minimum_probable_value" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_minimum_probable_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_minimum_probable_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_minimum_probable_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the likely minimum value of a RandomDistribution given a
 number of draws.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dist</strong> (<em>RandomDistribution</em>) – </p>
+<dd class="field-odd"><p><strong>distribution</strong> (<em>RandomDistribution</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -1777,12 +1777,16 @@ number of draws.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.get_probability_within_range">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_probability_within_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_probability_within_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_probability_within_range" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_probability_within_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_probability_within_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_probability_within_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the probability that a value will fall within the given range for
 a given RandomDistribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dist</strong> (<em>RandomDistribution</em>) – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distribution</strong> (<em>RandomDistribution</em>) – </p></li>
+<li><p><strong>lower</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
+<li><p><strong>upper</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1791,25 +1795,25 @@ a given RandomDistribution.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.get_probable_maximum_selected">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_probable_maximum_selected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_total_trials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection_prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_probable_maximum_selected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_probable_maximum_selected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the likely maximum number of items that will be selected from a
-set of n_trials from a total set of n_total_trials
-with a probability of selection of selection_prob.</p>
+set of <cite>n_trials</cite> from a total set of <cite>n_total_trials</cite>
+with a probability of selection of <cite>selection_prob</cite>.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.get_probable_minimum_selected">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_probable_minimum_selected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_total_trials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection_prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_probable_minimum_selected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_probable_minimum_selected" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the likely minimum number of items that will be selected from a
-set of n_trials from a total set of n_total_trials
-with a probability of selection of selection_prob.</p>
+set of <cite>n_trials</cite> from a total set of <cite>n_total_trials</cite>
+with a probability of selection of <cite>selection_prob</cite>.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.get_standard_deviation">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_standard_deviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_standard_deviation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_standard_deviation" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_standard_deviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_standard_deviation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_standard_deviation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the standard deviation of a RandomDistribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dist</strong> (<em>RandomDistribution</em>) – </p>
+<dd class="field-odd"><p><strong>distribution</strong> (<em>RandomDistribution</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -1830,35 +1834,35 @@ with a probability of selection of selection_prob.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.get_variance">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_variance" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_variance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the variance of a RandomDistribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dist</strong> (<em>RandomDistribution</em>) – </p>
+<dd class="field-odd"><p><strong>distribution</strong> (<em>RandomDistribution</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.high">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the high or max boundary value for this distribution.</p>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the high or maximum boundary value for this distribution.</p>
 <p>Could return <cite>None</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dist</strong> (<em>RandomDistribution</em>) – </p>
+<dd class="field-odd"><p><strong>distribution</strong> (<em>RandomDistribution</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.low">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the high or min boundary value for this distribution.</p>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the high or minimum boundary value for this distribution.</p>
 <p>Could return <cite>None</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dist</strong> (<em>RandomDistribution</em>) – </p>
+<dd class="field-odd"><p><strong>distribution</strong> (<em>RandomDistribution</em>) – </p>
 </dd>
 </dl>
 </dd></dl>

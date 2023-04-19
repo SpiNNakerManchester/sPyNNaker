@@ -121,7 +121,7 @@ be provided if the dev is to be controlled over Ethernet.</p></li>
 <li><p><strong>ring_buffer_sigma</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
 <li><p><strong>incoming_spike_buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>splitter</strong> (<em>None</em><em> or
-</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_splitters.abstract_splitters/#pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon" title="(in PACMAN v6.0)"><em>AbstractSplitterCommon</em></a>) – splitter from app to machine</p></li>
+</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_splitters.abstract_splitters/#pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon" title="(in PACMAN v6.0)"><em>AbstractSplitterCommon</em></a>) – splitter from application vertices to machine vertices</p></li>
 <li><p><strong>n_colour_bits</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of colour bits to use</p></li>
 </ul>
 </dd>
@@ -1148,12 +1148,13 @@ the conditions.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ICUBRetinaDevice.get_machine_fixed_key_and_mask">
 <span class="sig-name descname"><span class="pre">get_machine_fixed_key_and_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/icub_retina_device.html#ICUBRetinaDevice.get_machine_fixed_key_and_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ICUBRetinaDevice.get_machine_fixed_key_and_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a fixed key and mask for the given machine vertex and partition
-identifier, or <cite>None</cite> if not fixed (the default).  If this doesn’t
-return <cite>None</cite>, get_fixed_key_and_mask must also not return <cite>None</cite>,
+identifier, or <cite>None</cite> if not fixed (the default).</p>
+<p>If this doesn’t return <cite>None</cite>, <a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ICUBRetinaDevice.get_fixed_key_and_mask" title="spynnaker.pyNN.external_devices_models.ICUBRetinaDevice.get_fixed_key_and_mask"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_fixed_key_and_mask()</span></code></a>
+must also not return <cite>None</cite>,
 and the keys returned here must align with those such that for each
-key:mask returned here, key &amp; app_mask == app_key.  It is OK for
-this to return <cite>None</cite> and get_fixed_key_and_mask to return not <cite>None</cite>
-iff there is only one machine vertex.</p>
+<code class="docutils literal notranslate"><span class="pre">key:mask</span></code> returned here, <code class="docutils literal notranslate"><span class="pre">key</span> <span class="pre">&amp;</span> <span class="pre">app_mask</span> <span class="pre">==</span> <span class="pre">app_key</span></code>.  It is OK
+for this to return <cite>None</cite> and <a class="reference internal" href="#spynnaker.pyNN.external_devices_models.ICUBRetinaDevice.get_fixed_key_and_mask" title="spynnaker.pyNN.external_devices_models.ICUBRetinaDevice.get_fixed_key_and_mask"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_fixed_key_and_mask()</span></code></a> to
+return non-<cite>None</cite> if and only if there is only one machine vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1662,12 +1663,13 @@ n_machine_vertices_per_link &gt; 1</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_machine_fixed_key_and_mask">
 <span class="sig-name descname"><span class="pre">get_machine_fixed_key_and_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/spif_retina_device.html#SPIFRetinaDevice.get_machine_fixed_key_and_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_machine_fixed_key_and_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a fixed key and mask for the given machine vertex and partition
-identifier, or <cite>None</cite> if not fixed (the default).  If this doesn’t
-return <cite>None</cite>, get_fixed_key_and_mask must also not return <cite>None</cite>,
+identifier, or <cite>None</cite> if not fixed (the default).</p>
+<p>If this doesn’t return <cite>None</cite>, <a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_fixed_key_and_mask" title="spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_fixed_key_and_mask"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_fixed_key_and_mask()</span></code></a>
+must also not return <cite>None</cite>,
 and the keys returned here must align with those such that for each
-key:mask returned here, key &amp; app_mask == app_key.  It is OK for
-this to return <cite>None</cite> and get_fixed_key_and_mask to return not <cite>None</cite>
-iff there is only one machine vertex.</p>
+<code class="docutils literal notranslate"><span class="pre">key:mask</span></code> returned here, <code class="docutils literal notranslate"><span class="pre">key</span> <span class="pre">&amp;</span> <span class="pre">app_mask</span> <span class="pre">==</span> <span class="pre">app_key</span></code>.  It is OK
+for this to return <cite>None</cite> and <a class="reference internal" href="#spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_fixed_key_and_mask" title="spynnaker.pyNN.external_devices_models.SPIFRetinaDevice.get_fixed_key_and_mask"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_fixed_key_and_mask()</span></code></a> to
+return non-<cite>None</cite> if and only if there is only one machine vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

@@ -1240,13 +1240,13 @@ set the maximum on each Population.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.defaults.get_dict_from_init">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.defaults.</span></span><span class="sig-name descname"><span class="pre">get_dict_from_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/defaults.html#get_dict_from_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.defaults.get_dict_from_init" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.defaults.</span></span><span class="sig-name descname"><span class="pre">get_dict_from_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/defaults.html#get_dict_from_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.defaults.get_dict_from_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an argument initialisation dictionary by examining an
 <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method or function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>init</strong> (<em>callable</em>) – The method.</p></li>
+<li><p><strong>init_method</strong> (<em>callable</em>) – The method.</p></li>
 <li><p><strong>skip</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#frozenset" title="(in Python v3.8)"><em>frozenset</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The arguments to be skipped, if any</p></li>
 <li><p><strong>include</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#frozenset" title="(in Python v3.8)"><em>frozenset</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The arguments that must be present, if any</p></li>
 </ul>
@@ -1538,8 +1538,8 @@ are calculated automatically.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><em>None</em>) – either a single variable name or a list of variable
-names. For a given celltype class, <code class="docutils literal notranslate"><span class="pre">celltype.recordable</span></code> contains
-a list of variables that can be recorded for that celltype.
+names. For a given <cite>celltype</cite> class, <cite>celltype.recordable</cite> contains
+a list of variables that can be recorded for that <cite>celltype</cite>.
 Can also be <code class="docutils literal notranslate"><span class="pre">None</span></code> to reset the list of variables.</p></li>
 <li><p><strong>to_file</strong> (<em>io</em><em> or </em><em>rawio</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – a file to automatically record to (optional).
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">write_data()</span></code> will be automatically called when
@@ -1586,9 +1586,9 @@ record are: <code class="docutils literal notranslate"><span class="pre">gsyn_ex
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
-<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
-<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+<li><p><strong>SimulatorRunningException</strong> – If <cite>sim.run</cite> is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before <cite>sim.setup</cite></p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after <cite>sim.end</cite></p></li>
 </ul>
 </dd>
 </dl>

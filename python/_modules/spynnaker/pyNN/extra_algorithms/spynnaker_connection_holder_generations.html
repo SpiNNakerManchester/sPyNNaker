@@ -62,10 +62,12 @@
 
 <div class="viewcode-block" id="SpYNNakerConnectionHolderGenerator.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpYNNakerConnectionHolderGenerator.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param application_graph: app graph</span>
+<span class="sd">        :param application_graph: application graph</span>
 <span class="sd">        :type application_graph:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationGraph</span>
-<span class="sd">        :return: the set of connection holders for after DSG generation</span>
+<span class="sd">        :return:</span>
+<span class="sd">            the set of connection holders for after data specification</span>
+<span class="sd">            generation</span>
 <span class="sd">        :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation),</span>
 <span class="sd">            ConnectionHolder)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -88,6 +90,10 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_generate_holder_for_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">data_holders</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ProjectionApplicationEdge edge:</span>
+<span class="sd">        :param dict data_holders:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># build connection holders</span>
         <span class="n">connection_holder</span> <span class="o">=</span> <span class="n">ConnectionHolder</span><span class="p">(</span>
             <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>

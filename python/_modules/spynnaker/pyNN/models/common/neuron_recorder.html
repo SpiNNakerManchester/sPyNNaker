@@ -804,7 +804,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Recording data specification.</span>
 
-<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec: dsg spec</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            where to write the data specification</span>
 <span class="sd">        :param int neuron_recording_region: the recording region</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            the vertex slice</span>
@@ -826,7 +827,7 @@
 
 <span class="sd">        :param str variable: PyNN variable name</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :return: usage</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
@@ -858,7 +859,7 @@
 
 <span class="sd">        :param str variable: PyNN variable name</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :return: usage</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">n_neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rate_and_count_per_slice</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
@@ -870,7 +871,7 @@
 
 <span class="sd">        :param str variable: PyNN variable name</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :return: usage</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">n_neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_recording_per_slice</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">)</span>
@@ -886,7 +887,7 @@
 
 <span class="sd">        :param str variable: PyNN variable name</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :return: usage</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
@@ -943,7 +944,7 @@
 
 <span class="sd">        If required the total is rounded up so the space will always fit.</span>
 
-<span class="sd">        :param str variable: The PyNN variable name to get buffered sdram of</span>
+<span class="sd">        :param str variable: The PyNN variable name to get buffered SDRAM of</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :return: data size</span>
 <span class="sd">        :rtype: int</span>

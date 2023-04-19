@@ -58,21 +58,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.cdf">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -84,7 +84,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -109,21 +109,21 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -135,7 +135,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -160,21 +160,21 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -186,7 +186,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -211,21 +211,21 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -237,7 +237,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -262,21 +262,21 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -288,7 +288,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -314,21 +314,21 @@ are clipped to a boundary (redrawn).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -340,7 +340,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -365,21 +365,21 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -391,7 +391,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -412,25 +412,25 @@ distribution is unbounded</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsPoissonImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractRandomStats</span></code></a></p>
-<p>An implementation of AbstractRandomStats for poisson distributions.</p>
+<p>An implementation of AbstractRandomStats for Poisson distributions.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -442,7 +442,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -467,21 +467,21 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -493,7 +493,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -518,21 +518,21 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -544,7 +544,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -569,21 +569,21 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -595,7 +595,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -620,21 +620,21 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.cdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the cumulative distribution function value for the value v.</p>
+<dd><p>Return the cumulative distribution function value for the value <cite>v</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.high" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the high cutoff value of the distribution, or <cite>None</cite> if the
+<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cut-off value of the distribution, or <cite>None</cite> if the
 distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the low cutoff value of the distribution, or <cite>None</cite> if the
-distribution is unbounded</p>
+<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cut-off value of the distribution, or <cite>None</cite> if the
+distribution is unbounded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -646,7 +646,7 @@ distribution is unbounded</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.ppf">
 <span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.ppf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the percent point function value for the probability p.</p>
+<dd><p>Return the percent point function value for the probability <cite>p</cite>.</p>
 </dd></dl>
 
 <dl class="py method">

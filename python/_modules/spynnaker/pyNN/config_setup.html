@@ -62,31 +62,32 @@
 
 <div class="viewcode-block" id="setup_configs"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.config_setup.setup_configs">[docs]</a><span class="k">def</span> <span class="nf">setup_configs</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Sets up the configs including the users cfg file.</span>
+<span class="sd">    Sets up the configurations including the users configuration file.</span>
 
-<span class="sd">    Clears out any previous read configs but does not load the new configs</span>
-<span class="sd">    so a warning is generated if a config is used before setup is called.</span>
-
+<span class="sd">    Clears out any previous read configurations but does not load the new</span>
+<span class="sd">    configurations so a warning is generated if a configuration is used before</span>
+<span class="sd">    setup is called.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">clear_cfg_files</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">add_spinnaker_cfg</span><span class="p">()</span>  <span class="c1"># This add its dependencies too</span>
     <span class="n">set_cfg_files</span><span class="p">(</span>
-        <span class="n">configfile</span><span class="o">=</span><span class="n">CONFIG_FILE_NAME</span><span class="p">,</span>
+        <span class="n">config_file</span><span class="o">=</span><span class="n">CONFIG_FILE_NAME</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="unittest_setup"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.config_setup.unittest_setup">[docs]</a><span class="k">def</span> <span class="nf">unittest_setup</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Does all the steps that may be required before a unittest.</span>
+<span class="sd">    Does all the steps that may be required before a unit-test.</span>
 
-<span class="sd">    Resets the configs so only the local default configs are included.</span>
-<span class="sd">    The user cfg is NOT included!</span>
+<span class="sd">    Resets the configurations so only the local default configurations are</span>
+<span class="sd">    included.</span>
+<span class="sd">    The user configuration is *not* included!</span>
 
-<span class="sd">    Unsets any previous simulators and tempdirs</span>
+<span class="sd">    Unsets any previous simulators and temporary directories</span>
 
 <span class="sd">    .. note::</span>
-<span class="sd">         This file should only be called from Spynnaker tests</span>
-<span class="sd">         that do not call sim.setup</span>
+<span class="sd">         This file should only be called from sPyNNaker tests</span>
+<span class="sd">         that do not call `sim.setup`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">clear_cfg_files</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">add_spynnaker_cfg</span><span class="p">()</span>

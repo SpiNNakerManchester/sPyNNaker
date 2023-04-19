@@ -55,15 +55,15 @@
 
 <div class="viewcode-block" id="compare_spiketrain"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_spiketrain">[docs]</a><span class="k">def</span> <span class="nf">compare_spiketrain</span><span class="p">(</span><span class="n">spiketrain1</span><span class="p">,</span> <span class="n">spiketrain2</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Checks two Spiketrains have the exact same data</span>
+<span class="sd">    Checks two spike trains have the exact same data.</span>
 
-<span class="sd">    :param ~neo.core.SpikeTrain spiketrain1: first spiketrain</span>
-<span class="sd">    :param ~neo.core.SpikeTrain spiketrain2: second spiketrain</span>
+<span class="sd">    :param ~neo.core.SpikeTrain spiketrain1: first spike train</span>
+<span class="sd">    :param ~neo.core.SpikeTrain spiketrain2: second spike train</span>
 <span class="sd">    :param bool same_length: Flag to indicate if the same length of data is</span>
 <span class="sd">        held, i.e., all spikes up to the same time. If False allows one trains</span>
 <span class="sd">        to have additional spikes after the first ends. This is used to</span>
 <span class="sd">        compare data extracted part way with data extracted at the end.</span>
-<span class="sd">    :raises AssertionError: If the spiketrains are not equal</span>
+<span class="sd">    :raises AssertionError: If the spike trains are not equal</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">id1</span> <span class="o">=</span> <span class="n">spiketrain1</span><span class="o">.</span><span class="n">annotations</span><span class="p">[</span><span class="s1">&#39;source_index&#39;</span><span class="p">]</span>
     <span class="n">id2</span> <span class="o">=</span> <span class="n">spiketrain2</span><span class="o">.</span><span class="n">annotations</span><span class="p">[</span><span class="s1">&#39;source_index&#39;</span><span class="p">]</span>
@@ -84,12 +84,12 @@
 <div class="viewcode-block" id="compare_spiketrains"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_spiketrains">[docs]</a><span class="k">def</span> <span class="nf">compare_spiketrains</span><span class="p">(</span>
         <span class="n">spiketrains1</span><span class="p">,</span> <span class="n">spiketrains2</span><span class="p">,</span> <span class="n">same_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Check two Lists of SpikeTrains have the exact same data</span>
+<span class="sd">    Check two Lists of spike trains have the exact same data.</span>
 
 <span class="sd">    :param list(~neo.core.SpikeTrain) spiketrains1:</span>
-<span class="sd">        First list SpikeTrains to compare</span>
+<span class="sd">        First list of spike trains to compare</span>
 <span class="sd">    :param list(~neo.core.SpikeTrain) spiketrains2:</span>
-<span class="sd">        Second list of SpikeTrains to compare</span>
+<span class="sd">        Second list of spike trains to compare</span>
 <span class="sd">    :param bool same_data: Flag to indicate if the same type of data is held,</span>
 <span class="sd">        i.e., same spikes, v, gsyn_exc and gsyn_inh.</span>
 <span class="sd">        If False allows one or both lists to be Empty.</span>
@@ -98,7 +98,7 @@
 <span class="sd">        held, i.e., all spikes up to the same time. If False allows one trains</span>
 <span class="sd">        to have additional spikes after the first ends. This is used to compare</span>
 <span class="sd">        data extracted part way with data extracted at the end.</span>
-<span class="sd">    :raises AssertionError: If the spiketrains are not equal</span>
+<span class="sd">    :raises AssertionError: If the spike trains are not equal</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">same_data</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">spiketrains1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">spiketrains2</span><span class="p">):</span>
         <span class="k">return</span>
@@ -112,17 +112,17 @@
 
 <div class="viewcode-block" id="compare_analogsignal"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_compare.compare_analogsignal">[docs]</a><span class="k">def</span> <span class="nf">compare_analogsignal</span><span class="p">(</span><span class="n">as1</span><span class="p">,</span> <span class="n">as2</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compares two analogsignal Objects to see if they are the same.</span>
+<span class="sd">    Compares two analog signal objects to see if they are the same.</span>
 
 <span class="sd">    :param ~neo.core.AnalogSignal as1:</span>
-<span class="sd">        first analogsignal holding list of individual analogsignal Objects</span>
+<span class="sd">        first analog signal holding list of individual analog signal objects</span>
 <span class="sd">    :param ~neo.core.AnalogSignal as2:</span>
-<span class="sd">        second analogsignal holding list of individual analogsignal Objects</span>
+<span class="sd">        second analog signal holding list of individual analog signal objects</span>
 <span class="sd">    :param bool same_length: Flag to indicate if the same length of data is</span>
 <span class="sd">        held, i.e., all spikes up to the same time. If False allows one trains</span>
 <span class="sd">        to have additional data after the first ends. This is used to compare</span>
 <span class="sd">        data extracted part way with data extracted at the end.</span>
-<span class="sd">    :raises AssertionError: If the analogsignals are not equal</span>
+<span class="sd">    :raises AssertionError: If the analog signals are not equal</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">as1_index</span> <span class="o">=</span> <span class="n">as1</span><span class="o">.</span><span class="n">channel_index</span><span class="o">.</span><span class="n">index</span>
     <span class="n">as2_index</span> <span class="o">=</span> <span class="n">as2</span><span class="o">.</span><span class="n">channel_index</span><span class="o">.</span><span class="n">index</span>

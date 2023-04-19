@@ -95,9 +95,9 @@
     <span class="k">def</span> <span class="nf">_csv_variable_metdata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">variable_type</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span>
                               <span class="n">t_start</span><span class="p">,</span> <span class="n">t_stop</span><span class="p">,</span> <span class="n">sampling_interval_ms</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes the metadata for a variable to csv</span>
+<span class="sd">        Writes the metadata for a variable to CSV</span>
 
-<span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
+<span class="sd">        :param ~csv.writer csv_writer: Open CSV writer to write to</span>
 <span class="sd">        :param str variable_type:</span>
 <span class="sd">        :param str variable:</span>
 <span class="sd">        :param float t_start:</span>
@@ -135,7 +135,7 @@
 <span class="sd">        A block is a number of rows each of exactly 2 values followed by an</span>
 <span class="sd">        empty row</span>
 
-<span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
+<span class="sd">        :param ~csv.reader csv_reader: Open CSV writer to read from</span>
 <span class="sd">        :return: t_start, t_stop, sampling_period, units</span>
 <span class="sd">        :rtype: tuple(~quantities.Quantity, ~quantities.Quantity,</span>
 <span class="sd">            ~quantities.Quantity, str)</span>
@@ -149,13 +149,13 @@
 
     <span class="k">def</span> <span class="nf">__read_signal_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads a block of data nad converts it in a numpy array</span>
+<span class="sd">        Reads a block of data and converts it in a numpy array.</span>
 
-<span class="sd">        A block is a number of rows followed by an empty row</span>
-<span class="sd">        All rows must have the same length</span>
-<span class="sd">        The assumption is that all values in the block represent floats</span>
+<span class="sd">        A block is a number of rows followed by an empty row.</span>
+<span class="sd">        All rows must have the same length.</span>
+<span class="sd">        The assumption is that all values in the block represent floats.</span>
 
-<span class="sd">        :param ~csv.writer csv_writer: Open csv writer to read from</span>
+<span class="sd">        :param ~csv.writer csv_writer: Open CSV writer to read from</span>
 <span class="sd">        :return: Numpy signal array of floats</span>
 <span class="sd">        :rtype: ~numpy.array</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -168,10 +168,10 @@
 
     <span class="k">def</span> <span class="nf">_csv_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes the indexes for which there could be data to the csv</span>
+<span class="sd">        Writes the indexes for which there could be data to the CSV.</span>
 
 <span class="sd">        The indexes will be the intersection of the view used to record</span>
-<span class="sd">        and the view used to write the csv.</span>
+<span class="sd">        and the view used to write the CSV.</span>
 
 <span class="sd">        If there is no indexes this will write the NO_INTERESTION string</span>
 
@@ -179,7 +179,7 @@
 <span class="sd">        no data below. This happens when the data is an empty array</span>
 <span class="sd">        such as no spikes or rewires happened or the run was for time 0</span>
 
-<span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
+<span class="sd">        :param ~csv.writer csv_writer: Open CSV writer to write to</span>
 <span class="sd">        :param list(int) indexes:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -189,9 +189,9 @@
 
     <span class="k">def</span> <span class="nf">__read_indexes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads the index or NO_INTERESTION string from the csv</span>
+<span class="sd">        Reads the index or NO_INTERSECTION string from the CSV</span>
 
-<span class="sd">        :param ~csv.writer csv_writer: Open csv writer to read from</span>
+<span class="sd">        :param ~csv.writer csv_writer: Open CSV writer to read from</span>
 <span class="sd">        :return: list of indexes</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -243,9 +243,9 @@
 
     <span class="k">def</span> <span class="nf">_csv_spike_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes the spikes to the csv file.</span>
+<span class="sd">        Writes the spikes to the CSV file.</span>
 
-<span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
+<span class="sd">        :param ~csv.writer csv_writer: Open CSV writer to write to</span>
 <span class="sd">        :param ~numpy.ndarray spikes:</span>
 <span class="sd">        :param list(int) indexes: The indexes for which there could be data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -255,9 +255,9 @@
 
     <span class="k">def</span> <span class="nf">__read_spike_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads spikes from the csv file and add SpikeTrains to the segment.</span>
+<span class="sd">        Reads spikes from the CSV file and add SpikeTrains to the segment.</span>
 
-<span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
+<span class="sd">        :param ~csv.reader csv_reader: Open CSV writer to read from</span>
 <span class="sd">        :param Segment segment:</span>
 <span class="sd">        :param str variable: Name of the variable being read</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -302,7 +302,7 @@
 <span class="sd">        :param ~numpy.ndarray signal_array: the raw signal data</span>
 <span class="sd">        :param list(int) indexes: The indexes for the data</span>
 <span class="sd">        :type t_start: float or int</span>
-<span class="sd">        :param ~quantities.Quantity sampling_rate: Arte a neuron is recorded</span>
+<span class="sd">        :param ~quantities.Quantity sampling_rate: Rate a neuron is recorded</span>
 <span class="sd">        :param units: the units of the recorded value</span>
 <span class="sd">        :type units: quantities.quantity.Quantity or str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -332,7 +332,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes data to a CSV file.</span>
 
-<span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
+<span class="sd">        :param ~csv.writer csv_writer: Open CSV writer to write to</span>
 <span class="sd">        :param ~numpy.ndarray signal_array: the raw signal data</span>
 <span class="sd">        :param list(int) indexes: The indexes for the data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -345,7 +345,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads matrix data and adds it to the segment.</span>
 
-<span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
+<span class="sd">        :param ~csv.reader csv_reader: Open CSV writer to read from</span>
 <span class="sd">        :param Segment segment:</span>
 <span class="sd">        :param str variable:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -366,7 +366,7 @@
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
 <span class="sd">        :param str variable: the variable name</span>
 <span class="sd">        :param list[~quantities.Quantity] formation_times:</span>
-<span class="sd">        :param lis[str] formation_labels:</span>
+<span class="sd">        :param list[str] formation_labels:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, no-member, c-extension-no-member</span>
         <span class="n">formation_event_array</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span>
@@ -433,9 +433,9 @@
 
     <span class="k">def</span> <span class="nf">_csv_rewirings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">event_array</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds data that represent rewirings events to a csv file.</span>
+<span class="sd">        Adds data that represent rewirings events to a CSV file.</span>
 
-<span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
+<span class="sd">        :param ~csv.writer csv_writer: Open CSV writer to write to</span>
 <span class="sd">        :param ~numpy.ndarray event_array: the raw &quot;event&quot; data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, no-member, c-extension-no-member</span>
@@ -465,9 +465,9 @@
 
     <span class="k">def</span> <span class="nf">__read_times_and_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads formation or elimination data from the csv file.</span>
+<span class="sd">        Reads formation or elimination data from the CSV file.</span>
 
-<span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
+<span class="sd">        :param ~csv.reader csv_reader: Open CSV writer to read from</span>
 <span class="sd">        :return: A list of times and a list of labels</span>
 <span class="sd">        :rtype: (list[~quantities.Quantity], list[str])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -483,9 +483,9 @@
 
     <span class="k">def</span> <span class="nf">__read_rewirings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_reader</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reads rewiring data from a csv file and adds it to the segment.</span>
+<span class="sd">        Reads rewiring data from a CSV file and adds it to the segment.</span>
 
-<span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
+<span class="sd">        :param ~csv.reader csv_reader: Open CSV writer to read from</span>
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
 <span class="sd">        :param str variable:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -503,7 +503,7 @@
 
     <span class="k">def</span> <span class="nf">_insert_empty_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">segment_number</span><span class="p">,</span> <span class="n">rec_datetime</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates an emtpy segment and adds it to the block.</span>
+<span class="sd">        Creates an empty segment and adds it to the block.</span>
 
 <span class="sd">        Unless other insert methods are called the segment will hold no data.</span>
 
@@ -531,13 +531,13 @@
 
     <span class="k">def</span> <span class="nf">_csv_segment_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">segment_number</span><span class="p">,</span> <span class="n">rec_datetime</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes only the segment&#39;s metadata to csv.</span>
+<span class="sd">        Writes only the segment&#39;s metadata to CSV.</span>
 
-<span class="sd">        Unless other csv methods are called the csv will hold no data.</span>
+<span class="sd">        Unless other CSV methods are called the CSV will hold no data.</span>
 
-<span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
+<span class="sd">        :param ~csv.writer csv_writer: Open CSV writer to write to</span>
 <span class="sd">        :param int segment_number:</span>
-<span class="sd">        :param datatime rec_datetime:</span>
+<span class="sd">        :param ~datetime.datetime rec_datetime:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">csv_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_SEGMENT_NUMBER</span><span class="p">,</span> <span class="n">segment_number</span><span class="p">])</span>
         <span class="n">csv_writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_REC_DATETIME</span><span class="p">,</span> <span class="n">rec_datetime</span><span class="p">])</span>
@@ -549,7 +549,7 @@
 
 <span class="sd">        Unless other read methods are called the segment will hold no data</span>
 
-<span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
+<span class="sd">        :param ~csv.reader csv_reader: Open CSV writer to read from</span>
 <span class="sd">        :param ~neo.core.Block block:</span>
 <span class="sd">        :param str segment_number_st:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -564,12 +564,12 @@
     <span class="k">def</span> <span class="nf">_insert_empty_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">first_id</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span>
                             <span class="n">simulator</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates and empty Noe block object with just metedata.</span>
+<span class="sd">        Creates and empty Neo block object with just metadata.</span>
 
 <span class="sd">        Unless other insert methods are called this block will hold no data</span>
 
 <span class="sd">        Does not actually &quot;insert&quot; the block anywhere.</span>
-<span class="sd">        The insert name is allign it with other methods to create a full block</span>
+<span class="sd">        The insert name is aligned with other methods to create a full block</span>
 
 <span class="sd">        :param str pop_label:</span>
 <span class="sd">        :param str description:</span>
@@ -602,7 +602,7 @@
     <span class="k">def</span> <span class="nf">_csv_block_metadat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_writer</span><span class="p">,</span> <span class="n">pop_label</span><span class="p">,</span> <span class="n">t_stop</span><span class="p">,</span>
                            <span class="n">pop_size</span><span class="p">,</span> <span class="n">first_id</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param ~csv.writer csv_writer: Open csv writer to write to</span>
+<span class="sd">        :param ~csv.writer csv_writer: Open CSV writer to write to</span>
 <span class="sd">        :param str pop_label:</span>
 <span class="sd">        :param float t_stop:</span>
 <span class="sd">        :param int pop_size:</span>
@@ -629,7 +629,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads block metadata and uses it to create an empty block.</span>
 
-<span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
+<span class="sd">        :param ~csv.reader csv_reader: Open CSV writer to read from</span>
 <span class="sd">        :return: empty block</span>
 <span class="sd">        :rtype: ~neo.core.Block</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -650,7 +650,7 @@
 <span class="sd">        A metadata block is zero or more lines of two columns followed by an</span>
 <span class="sd">        empty line. the first column will be the keys the second the data</span>
 
-<span class="sd">        :param ~csv.reader csv_reader: Open csv writer to read from</span>
+<span class="sd">        :param ~csv.reader csv_reader: Open CSV writer to read from</span>
 <span class="sd">        :return: a dict of the keys to unformatted values</span>
 <span class="sd">        :rtype: dict(str, str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>

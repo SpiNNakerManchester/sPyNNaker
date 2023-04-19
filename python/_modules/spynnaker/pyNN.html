@@ -223,13 +223,13 @@
 
 
 <span class="c1"># Patch the bugs in the PyNN documentation... Ugh!</span>
-<div class="viewcode-block" id="distance"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.distance">[docs]</a><span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">tgt</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<div class="viewcode-block" id="distance"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.distance">[docs]</a><span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="n">src_cell</span><span class="p">,</span> <span class="n">tgt_cell</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
              <span class="n">periodic_boundaries</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return the Euclidian distance between two cells.</span>
+<span class="sd">    Return the Euclidean distance between two cells.</span>
 
-<span class="sd">    :param src: Measure from this cell</span>
-<span class="sd">    :param tgt: To this cell</span>
+<span class="sd">    :param src_cell: Measure from this cell</span>
+<span class="sd">    :param tgt_cell: To this cell</span>
 <span class="sd">    :param ~numpy.ndarray mask:</span>
 <span class="sd">        allows only certain dimensions to be considered, e.g.:</span>
 
@@ -243,7 +243,7 @@
 <span class="sd">    :param periodic_boundaries:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_pynn_distance</span><span class="p">(</span>
-        <span class="n">src</span><span class="p">,</span> <span class="n">tgt</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">periodic_boundaries</span><span class="p">)</span></div>
+        <span class="n">src_cell</span><span class="p">,</span> <span class="n">tgt_cell</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">periodic_boundaries</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="setup"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">timestep</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_TIMESTEP</span><span class="p">,</span>
@@ -257,9 +257,9 @@
 
 <span class="sd">    :param timestep:</span>
 <span class="sd">        the time step of the simulations in microseconds;</span>
-<span class="sd">        if `None`, the cfg value is used</span>
+<span class="sd">        if `None`, the configuration value is used</span>
 <span class="sd">    :type timestep: float or None</span>
-<span class="sd">    :param min_delay: the min delay of the simulation</span>
+<span class="sd">    :param min_delay: the minimum delay of the simulation</span>
 <span class="sd">    :type min_delay: float or str</span>
 <span class="sd">    :param max_delay: Ignored and logs a warning if provided</span>
 <span class="sd">    :type max_delay: float or str or None</span>
@@ -351,7 +351,7 @@
 <span class="sd">    :param presynaptic_population: the source pop</span>
 <span class="sd">    :type presynaptic_population:</span>
 <span class="sd">        ~spynnaker.pyNN.models.populations.Population</span>
-<span class="sd">    :param postsynaptic_population: the dest pop</span>
+<span class="sd">    :param postsynaptic_population: the destination population</span>
 <span class="sd">    :type postsynaptic_population:</span>
 <span class="sd">        ~spynnaker.pyNN.models.populations.Population</span>
 <span class="sd">    :param AbstractConnector connector: the connector type</span>
@@ -403,7 +403,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cleans up the SpiNNaker machine and software</span>
 
-<span class="sd">    :param _: was named compatible_output, which we don&#39;t care about,</span>
+<span class="sd">    :param _: was named `compatible_output`, which we don&#39;t care about,</span>
 <span class="sd">        so is a non-existent parameter</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">():</span>
@@ -530,11 +530,11 @@
 
 <div class="viewcode-block" id="create"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">cellclass</span><span class="p">,</span> <span class="n">cellparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Builds a population with certain params.</span>
+<span class="sd">    Builds a population with certain parameters.</span>
 
 <span class="sd">    :param cellclass: population class</span>
 <span class="sd">    :type cellclass: type or AbstractPyNNModel</span>
-<span class="sd">    :param cellparams: population params.</span>
+<span class="sd">    :param cellparams: population parameters.</span>
 <span class="sd">    :param int n: number of neurons</span>
 <span class="sd">    :rtype: ~spynnaker.pyNN.models.populations.Population</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -603,10 +603,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sets cells to be initialised to the given values.</span>
 
-<span class="sd">    :param cells: the cells to change params on</span>
+<span class="sd">    :param cells: the cells to change parameters on</span>
 <span class="sd">    :type cells: ~spynnaker.pyNN.models.populations.Population or</span>
 <span class="sd">        ~spynnaker.pyNN.models.populations.PopulationView</span>
-<span class="sd">    :param initial_values: the params and their values to change</span>
+<span class="sd">    :param initial_values: the parameters and their values to change</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
     <span class="n">pynn_common</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="o">**</span><span class="n">initial_values</span><span class="p">)</span></div>
@@ -646,8 +646,8 @@
 <span class="sd">    Sets variables to be recorded.</span>
 
 <span class="sd">    :param variables: may be either a single variable name or a list of</span>
-<span class="sd">        variable names. For a given celltype class, celltype.recordable</span>
-<span class="sd">        contains a list of variables that can be recorded for that celltype.</span>
+<span class="sd">        variable names. For a given `celltype` class, `celltype.recordable`</span>
+<span class="sd">        contains a list of variables that can be recorded for that `celltype`.</span>
 <span class="sd">    :type variables: str or list(str)</span>
 <span class="sd">    :param source: where to record from</span>
 <span class="sd">    :type source: ~spynnaker.pyNN.models.populations.Population or</span>

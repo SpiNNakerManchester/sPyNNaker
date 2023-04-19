@@ -80,7 +80,7 @@
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">structs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        A list of structs used by the implementation.</span>
+<span class="sd">        A list of structures used by the implementation.</span>
 
 <span class="sd">        :rtype: list(Struct)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -139,7 +139,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the data type of the variables that can be recorded.</span>
 
-<span class="sd">        :return: dict of name of variable to DataType of variable</span>
+<span class="sd">        :return: dictionary of name of variable to data type of variable</span>
+<span class="sd">        :rtype: dict(str,~data_specification.enums.DataType)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractNeuronImpl.is_recordable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.is_recordable">[docs]</a>    <span class="nd">@abstractmethod</span>
@@ -186,6 +187,7 @@
 <span class="sd">        Get the units of the given variable.</span>
 
 <span class="sd">        :param str variable: The name of the variable</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractproperty</span>

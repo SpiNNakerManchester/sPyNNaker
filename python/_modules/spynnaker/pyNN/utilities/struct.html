@@ -65,7 +65,7 @@
 
 <div class="viewcode-block" id="StructRepeat"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.StructRepeat">[docs]</a><span class="k">class</span> <span class="nc">StructRepeat</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    How a struct repeats, or not, in memory.</span>
+<span class="sd">    How a structure repeats, or not, in memory.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#: Indicates a single global struct</span>
     <span class="n">GLOBAL</span> <span class="o">=</span> <span class="mi">0</span>
@@ -90,7 +90,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param fields:</span>
 <span class="sd">            The types and names of the fields, ordered as they appear in the</span>
-<span class="sd">            struct.</span>
+<span class="sd">            structure.</span>
 <span class="sd">        :type fields: list(~data_specification.enums.DataType, str)</span>
 <span class="sd">        :param StructRepeat repeat_type: How the structure repeats</span>
 <span class="sd">        :param default_values:</span>
@@ -106,7 +106,7 @@
     <span class="k">def</span> <span class="nf">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The types and names of the fields, ordered as they appear in the</span>
-<span class="sd">        struct.</span>
+<span class="sd">        structure.</span>
 
 <span class="sd">        :rtype: list(~data_specification.enums.DataType, str)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -124,7 +124,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">numpy_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The numpy data type of the struct.</span>
+<span class="sd">        The numpy data type of the structure.</span>
 
 <span class="sd">        :rtype: ~numpy.dtype</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -135,10 +135,10 @@
 
 <div class="viewcode-block" id="Struct.get_size_in_whole_words"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct.get_size_in_whole_words">[docs]</a>    <span class="k">def</span> <span class="nf">get_size_in_whole_words</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the size of the struct in whole words in an array of given</span>
+<span class="sd">        Get the size of the structure in whole words in an array of given</span>
 <span class="sd">        size (default 1 item).</span>
 
-<span class="sd">        :param int array_size: The number of elements in an array of structs</span>
+<span class="sd">        :param int array_size: The number of elements in an array of structures</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span>
@@ -152,7 +152,7 @@
 <span class="sd">        :param values: The values to fill in the data with</span>
 <span class="sd">        :type values: dict(str, int or float or AbstractList)</span>
 <span class="sd">        :param vertex_slice:</span>
-<span class="sd">            The vertex slice to get the data for, or `None` if the struct is</span>
+<span class="sd">            The vertex slice to get the data for, or `None` if the structure is</span>
 <span class="sd">            global.</span>
 <span class="sd">        :type vertex_slice: Slice or None</span>
 <span class="sd">        :param atoms_shape:</span>
@@ -242,9 +242,9 @@
 <span class="sd">        :param ~dict-like values:</span>
 <span class="sd">            The values to fill in the data with</span>
 <span class="sd">        :param vertex_slice:</span>
-<span class="sd">            The vertex slice or `None` for a struct with repeat_type global, or</span>
-<span class="sd">            where a single value repeats for every neuron.  If this is not the</span>
-<span class="sd">            case and vertex_slice is `None`, an error will be raised!</span>
+<span class="sd">            The vertex slice or `None` for a structure with repeat_type global,</span>
+<span class="sd">            or where a single value repeats for every neuron.  If this is not</span>
+<span class="sd">            the case and vertex_slice is `None`, an error will be raised!</span>
 <span class="sd">        :type vertex_slice: Slice or None</span>
 <span class="sd">        :param atoms_shape:</span>
 <span class="sd">            The shape of the atoms in the whole application vertex.</span>
@@ -385,7 +385,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">data_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">atoms_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Read a bytearray of data and write to values.</span>
+<span class="sd">        Read a byte string of data and write to values.</span>
 
 <span class="sd">        :param data: The data to be read</span>
 <span class="sd">        :type data: bytes or bytearray</span>
@@ -396,8 +396,8 @@
 <span class="sd">        :param int offset:</span>
 <span class="sd">            The first index into values to write to.</span>
 <span class="sd">        :param array_size:</span>
-<span class="sd">            The number of struct copies to read, or `None` if this is a</span>
-<span class="sd">            non-repeating struct.</span>
+<span class="sd">            The number of structure copies to read, or `None` if this is a</span>
+<span class="sd">            non-repeating structure.</span>
 <span class="sd">        :type array_size: int or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">n_items</span> <span class="o">=</span> <span class="mi">1</span>

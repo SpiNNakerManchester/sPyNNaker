@@ -62,13 +62,13 @@
 <div class="viewcode-block" id="AbstractRandomStats.cdf"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.cdf">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return the cumulative distribution function value for the value v.</span>
+<span class="sd">        Return the cumulative distribution function value for the value `v`.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractRandomStats.ppf"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">ppf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return the percent point function value for the probability p.</span>
+<span class="sd">        Return the percent point function value for the probability `p`.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractRandomStats.mean"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.mean">[docs]</a>    <span class="nd">@abstractmethod</span>
@@ -90,17 +90,17 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractRandomStats.high"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">high</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">high</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return the high cutoff value of the distribution, or `None` if the</span>
+<span class="sd">        Return the high cut-off value of the distribution, or `None` if the</span>
 <span class="sd">        distribution is unbounded.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractRandomStats.low"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.random_stats.html#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">low</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">low</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return the low cutoff value of the distribution, or `None` if the</span>
-<span class="sd">        distribution is unbounded</span>
+<span class="sd">        Return the low cut-off value of the distribution, or `None` if the</span>
+<span class="sd">        distribution is unbounded.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 </pre></div>
 

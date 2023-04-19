@@ -65,8 +65,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    See :py:class:`~spinn_utilities.data.utils_data_writer.UtilsDataWriter`.</span>
 
-<span class="sd">    This class is designed to only be used directly by AbstractSpinnakerBase</span>
-<span class="sd">    and its subclasses and within the PyNN repositories unittests.</span>
+<span class="sd">    This class is designed to only be used directly by</span>
+<span class="sd">    :py:class:`spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase`</span>
+<span class="sd">    and its subclasses and within the PyNN repositories unit tests.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__spy_data</span> <span class="o">=</span> <span class="n">_SpynnakerDataModel</span><span class="p">()</span>
@@ -101,11 +102,11 @@
 <span class="sd">        :param simulation_time_step_us:</span>
 <span class="sd">            An explicitly specified time step for the simulation in</span>
 <span class="sd">            microseconds.</span>
-<span class="sd">            If `None`, the value is read from the config</span>
+<span class="sd">            If `None`, the value is read from the configuration</span>
 <span class="sd">        :type simulation_time_step_us: int or None</span>
 <span class="sd">        :param time_scale_factor:</span>
 <span class="sd">            An explicitly specified time scale factor for the simulation.</span>
-<span class="sd">            If `None`, the value is read from the config</span>
+<span class="sd">            If `None`, the value is read from the configuration</span>
 <span class="sd">        :type time_scale_factor: float or None</span>
 <span class="sd">        :param min_delay:</span>
 <span class="sd">            new value or `None` to say use simulation_time_step_ms</span>
