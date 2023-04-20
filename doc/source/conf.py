@@ -54,6 +54,9 @@ extensions = [
     'sphinx.ext.mathjax'
 ]
 
+# Which version of other SpiNNaker docs do we refer to?
+spinnaker_doc_version = "latest"
+
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.8', None),
     'numpy': ("https://numpy.org/doc/1.20/", None),
@@ -61,14 +64,22 @@ intersphinx_mapping = {
     'pynn': ("https://neuralensemble.github.io/docs/PyNN/", None),
     'neo': ('https://neo.readthedocs.io/en/stable/', None),
     # We don't link to quantities; their docs are too awful
-    'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
-    'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
-    'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
-    'pacman': ('https://pacman.readthedocs.io/en/latest/', None),
+    'spinn_utilities': (
+        f'https://spinnutils.readthedocs.io/en/{spinnaker_doc_version}/',
+        None),
+    'spinn_machine': (
+        f'https://spinnmachine.readthedocs.io/en/{spinnaker_doc_version}/',
+        None),
+    'spinnman': (
+        f'https://spinnman.readthedocs.io/en/{spinnaker_doc_version}/', None),
+    'pacman': (
+        f'https://pacman.readthedocs.io/en/{spinnaker_doc_version}/', None),
     'data_specification': (
-        'https://dataspecification.readthedocs.io/en/latest/', None),
+        'https://dataspecification.readthedocs.io/en/'
+        f'{spinnaker_doc_version}/', None),
     'spinn_front_end_common': (
-        'https://spinnfrontendcommon.readthedocs.io/en/latest/', None)
+        'https://spinnfrontendcommon.readthedocs.io/en/'
+        f'{spinnaker_doc_version}/', None)
 }
 
 # Add any paths that contain templates here, relative to this directory.
