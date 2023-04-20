@@ -13,6 +13,7 @@
 # limitations under the License.
 from dataclasses import dataclass
 from spinn_utilities.overrides import overrides
+from spinnman.model.enums import ExecutableType
 from pacman.model.graphs.machine import MachineVertex
 
 from spinn_front_end_common.interface.provenance import (
@@ -30,7 +31,6 @@ from spinn_front_end_common.interface.buffer_management\
 from spinn_front_end_common.interface.simulation.simulation_utilities import (
     get_simulation_header_array)
 
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 

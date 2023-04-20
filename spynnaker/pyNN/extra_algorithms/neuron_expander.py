@@ -17,7 +17,7 @@ from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinnman.model.enums import ExecutableType
 from spinn_front_end_common.utilities.helpful_functions import (
     write_address_to_user1)
 from spinnman.model import ExecutableTargets
