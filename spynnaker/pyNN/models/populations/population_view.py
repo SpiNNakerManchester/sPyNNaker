@@ -508,9 +508,9 @@ class PopulationView(PopulationBase):
         Population or view.
 
         :param variables: either a single variable name, or a list of variable
-            names, or ``all`` to record everything. For a given celltype
-            class, celltype.recordable contains a
-            list of variables that can be recorded for that celltype.
+            names, or ``all`` to record everything. For a given `celltype`
+            class, `celltype.recordable` contains a
+            list of variables that can be recorded for that `celltype`.
         :type variables: str or list(str)
         :param to_file:
             If specified, should be a Neo IO instance and

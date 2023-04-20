@@ -40,7 +40,8 @@ _DIM_DTYPE = [("mask", "uint32"), ("shift", "uint32"), ("pre_start", "uint16"),
 class PoolDenseConnector(AbstractConnector):
     """
     Where the pre- and post-synaptic populations are considered as a 2D
-    array. Connect every post(row, col) neuron to many pre(row, col, kernel)
+    array. Connect every post(row, column) neuron to many
+    pre(row, column, kernel)
     through a (kernel) set of weights and/or delays.
     """
 
@@ -62,7 +63,7 @@ class PoolDenseConnector(AbstractConnector):
 
             * single value: the same value will be used for all weights
             * :py:class:`list`: the total number of elements must be
-              (num after pooling * num post)
+              (number after pooling * number post)
             * :py:class:`~numpy.ndarray`: As above for list
             * :py:class:`~spynnaker.pyNN.RandomDistribution`:
               weights will be drawn at random
@@ -257,7 +258,7 @@ class PoolDenseConnector(AbstractConnector):
 
     def __pre_as_post(self, pre_coords):
         """
-        Write pre coords as post coords.
+        Write pre coordinates as post coordinates.
 
         :param ~collections.abc.Iterable pre_coords:
             An iterable of (x, y) coordinates

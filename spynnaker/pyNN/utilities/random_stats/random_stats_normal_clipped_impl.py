@@ -45,8 +45,8 @@ class RandomStatsNormalClippedImpl(AbstractRandomStats):
     def var(self, dist):
         return truncnorm.var(*self._get_params(dist))
 
-    def high(self, dist):
-        return dist.parameters['high']
+    def high(self, distribution):
+        return distribution.parameters['high']
 
-    def low(self, dist):
-        return dist.parameters['low']
+    def low(self, distribution):
+        return distribution.parameters['low']

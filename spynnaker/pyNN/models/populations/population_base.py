@@ -352,8 +352,8 @@ class PopulationBase(object, metaclass=AbstractBase):
         Population or view.
 
         :param variables: either a single variable name or a list of variable
-            names. For a given celltype class, `celltype.recordable` contains
-            a list of variables that can be recorded for that celltype.
+            names. For a given `celltype` class, `celltype.recordable` contains
+            a list of variables that can be recorded for that `celltype`.
         :type variables: str or list(str)
         :param to_file: a file to automatically record to (optional).
             `write_data()` will be automatically called when `end()` is called.

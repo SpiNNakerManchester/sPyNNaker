@@ -21,6 +21,8 @@
 
 name: Python Actions
 on: [push]
+env:
+  BASE_PKG: spynnaker
 
 jobs:
   test:
@@ -74,17 +76,17 @@ jobs:
       with:
         tests: unittests
         coverage: ${{ matrix.python-version == 3.8 }}
-        cover-packages: spynnaker
+        cover-packages: ${{ env.BASE_PKG }}
         coveralls-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Lint with flake8
-      run: flake8 spynnaker spynnaker8 unittests spynnaker_integration_tests
+      run: flake8 ${{ env.BASE_PKG }} spynnaker8 unittests spynnaker_integration_tests
 
     - name: Lint with pylint
       uses: ./support/actions/pylint
       with:
-        package: spynnaker spynnaker8
-        exitcheck: 39
+        package: ${{ env.BASE_PKG }} spynnaker8
+        language: en_GB
 
   validate:
     runs-on: ubuntu-latest
@@ -129,10 +131,11 @@ jobs:
       with:
         config_file: rat_asl20.xml
 
-    #- name: Validate all XML
-    #  uses: ./support/actions/validate-xml
-    #  with:
-    #    base-path: spynnaker
+    - name: Validate all XML
+      if: false
+      uses: ./support/actions/validate-xml
+      with:
+        base-path: ${{ env.BASE_PKG }}
 
     - name: Build documentation with sphinx (3.8 only)
       uses: ./support/actions/sphinx

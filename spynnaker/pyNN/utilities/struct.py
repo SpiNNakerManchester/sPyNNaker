@@ -27,7 +27,7 @@ REPEAT_PER_NEURON_FLAG = 0xFFFFFFFF
 
 class StructRepeat(Enum):
     """
-    How a struct repeats, or not, in memory.
+    How a structure repeats, or not, in memory.
     """
     #: Indicates a single global struct
     GLOBAL = 0
@@ -52,7 +52,7 @@ class Struct(object):
         """
         :param fields:
             The types and names of the fields, ordered as they appear in the
-            struct.
+            structure.
         :type fields: list(~data_specification.enums.DataType, str)
         :param StructRepeat repeat_type: How the structure repeats
         :param default_values:
@@ -68,7 +68,7 @@ class Struct(object):
     def fields(self):
         """
         The types and names of the fields, ordered as they appear in the
-        struct.
+        structure.
 
         :rtype: list(~data_specification.enums.DataType, str)
         """
@@ -86,7 +86,7 @@ class Struct(object):
     @property
     def numpy_dtype(self):
         """
-        The numpy data type of the struct.
+        The numpy data type of the structure.
 
         :rtype: ~numpy.dtype
         """
@@ -97,10 +97,10 @@ class Struct(object):
 
     def get_size_in_whole_words(self, array_size=1):
         """
-        Get the size of the struct in whole words in an array of given
+        Get the size of the structure in whole words in an array of given
         size (default 1 item).
 
-        :param int array_size: The number of elements in an array of structs
+        :param int array_size: The number of elements in an array of structures
         :rtype: int
         """
         datatype = self.numpy_dtype
@@ -114,7 +114,7 @@ class Struct(object):
         :param values: The values to fill in the data with
         :type values: dict(str, int or float or AbstractList)
         :param vertex_slice:
-            The vertex slice to get the data for, or `None` if the struct is
+            The vertex slice to get the data for, or `None` if the structure is
             global.
         :type vertex_slice: Slice or None
         :param atoms_shape:
@@ -204,9 +204,9 @@ class Struct(object):
         :param ~dict-like values:
             The values to fill in the data with
         :param vertex_slice:
-            The vertex slice or `None` for a struct with repeat_type global, or
-            where a single value repeats for every neuron.  If this is not the
-            case and vertex_slice is `None`, an error will be raised!
+            The vertex slice or `None` for a structure with repeat_type global,
+            or where a single value repeats for every neuron.  If this is not
+            the case and vertex_slice is `None`, an error will be raised!
         :type vertex_slice: Slice or None
         :param atoms_shape:
             The shape of the atoms in the whole application vertex.
@@ -347,7 +347,7 @@ class Struct(object):
             self, data, values, data_offset=0, vertex_slice=None,
             atoms_shape=None):
         """
-        Read a bytearray of data and write to values.
+        Read a byte string of data and write to values.
 
         :param data: The data to be read
         :type data: bytes or bytearray
@@ -358,8 +358,8 @@ class Struct(object):
         :param int offset:
             The first index into values to write to.
         :param array_size:
-            The number of struct copies to read, or `None` if this is a
-            non-repeating struct.
+            The number of structure copies to read, or `None` if this is a
+            non-repeating structure.
         :type array_size: int or None
         """
         n_items = 1
