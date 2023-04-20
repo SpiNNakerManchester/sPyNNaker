@@ -25,12 +25,12 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
     """
     Indicates a class (a
     :py:class:`~pacman.model.graphs.machine.MachineVertex`)
-    that has may need to run the SYNAPSE_EXPANDER aplx
+    that has may need to run the synapse expander APLX.
 
     .. note::
         This is *not* implemented by the
         :py:class:`~.DelayExtensionMachineVertex`,
-        which needs a different expander aplx
+        which needs a different expander APLX
     """
 
     __slots__ = ()

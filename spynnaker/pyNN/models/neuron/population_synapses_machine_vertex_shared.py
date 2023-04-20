@@ -36,7 +36,7 @@ class PopulationSynapsesMachineVertexShared(
             self, sdram, label, app_vertex, vertex_slice, synapse_references):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram used by the vertex
+            The SDRAM used by the vertex
         :param str label: The label of the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex

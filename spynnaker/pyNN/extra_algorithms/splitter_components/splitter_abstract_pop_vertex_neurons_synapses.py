@@ -668,7 +668,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def __get_neuron_sdram(self, n_atoms, sdram_edge_sdram):
         """
         Gets the resources of the neurons of a slice of atoms from a given
-        app vertex.
+        application vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice: the slice
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
@@ -724,7 +724,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def __get_synapse_sdram(self, n_atoms, shared_sdram=None):
         """
         Get the resources of the synapses of a slice of atoms from a
-        given app vertex.
+        given application vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice: the slice
         :param ~pacman.model.resources.MultiRegionSDRAM shared_sdram:

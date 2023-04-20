@@ -251,7 +251,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     @dt.setter
     def dt(self, _):
         """
-        We do not support setting dt/ time step except during setup.
+        We do not support setting the time step except during setup.
 
         :raises NotImplementedError
         """
@@ -320,7 +320,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     def _set_up_timings(self, timestep, min_delay, time_scale_factor):
         """
-        :param timestep: machine_time_Step in milli seconds
+        :param timestep: machine_time_Step in milliseconds
         :type timestep: float or None
         :param min_delay:
         :type min_delay: int or None

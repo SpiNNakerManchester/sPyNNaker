@@ -67,8 +67,8 @@ class Recorder(object):
         Turns on (or off) recording.
 
         :param variables: either a single variable name or a list of variable
-            names. For a given celltype class, ``celltype.recordable`` contains
-            a list of variables that can be recorded for that celltype.
+            names. For a given `celltype` class, `celltype.recordable` contains
+            a list of variables that can be recorded for that `celltype`.
             Can also be ``None`` to reset the list of variables.
         :type variables: str or list(str) or None
         :param to_file: a file to automatically record to (optional).
@@ -123,9 +123,9 @@ class Recorder(object):
         :type to_file: neo.io.baseio.BaseIO or str or None
         :param indexes: List of indexes to record or `None` for all
         :type indexes: list(int) or None
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
+        :raises SimulatorRunningException: If `sim.run` is currently running
+        :raises SimulatorNotSetupException: If called before `sim.setup`
+        :raises SimulatorShutdownException: If called after `sim.end`
         """
         warn_once(
             logger, 'record("all") is non-standard PyNN, and '
@@ -148,9 +148,9 @@ class Recorder(object):
         :type to_file: neo.io.baseio.BaseIO or str or None
         :param indexes: List of indexes to record or `None` for all
         :type indexes: list(int) or None
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
+        :raises SimulatorRunningException: If `sim.run` is currently running
+        :raises SimulatorNotSetupException: If called before `sim.setup`
+        :raises SimulatorShutdownException: If called after `sim.end`
         """
         SpynnakerDataView.check_user_can_act()
 
