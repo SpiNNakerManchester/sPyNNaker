@@ -116,7 +116,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     def _split_connections(self, post_slices):
         """
-        :param list(~pacman.model.graphs.commmon.Slice) post_slices:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
         :rtype: bool
         """
         # If nothing has changed, use the cache

@@ -147,9 +147,9 @@ class Population(PopulationBase):
     @property
     def celltype(self):
         """
-        Implements the PyNN expected celltype property.
+        Implements the PyNN expected `celltype` property.
 
-        :return: The celltype this property has been set to
+        :return: The cell type this property has been set to
         :rtype: AbstractPyNNModel
         """
         return self.__celltype
@@ -170,8 +170,8 @@ class Population(PopulationBase):
         Population or view.
 
         :param variables: either a single variable name or a list of variable
-            names. For a given celltype class, ``celltype.recordable`` contains
-            a list of variables that can be recorded for that celltype.
+            names. For a given `celltype` class, `celltype.recordable` contains
+            a list of variables that can be recorded for that `celltype`.
         :type variables: str or list(str)
         :param to_file: a file to automatically record to (optional).
             :py:meth:`write_data` will be automatically called when
@@ -388,9 +388,9 @@ class Population(PopulationBase):
             str or dict(str, int or float or list(int) or list(float))
         :param value: the value of the parameter to set.
         :type value: int or float or list(int) or list(float)
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
+        :raises SimulatorRunningException: If `sim.run` is currently running
+        :raises SimulatorNotSetupException: If called before `sim.setup`
+        :raises SimulatorShutdownException: If called after `sim.end`
         """
         SpynnakerDataView.check_user_can_act()
         for parameter, value in parameters.items():
@@ -701,9 +701,9 @@ class Population(PopulationBase):
         :param int x: The x-coordinate of the placement constraint
         :param int y: The y-coordinate of the placement constraint
         :param int p: The processor ID of the placement constraint (optional)
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
+        :raises SimulatorRunningException: If `sim.run` is currently running
+        :raises SimulatorNotSetupException: If called before `sim.setup`
+        :raises SimulatorShutdownException: If called after `sim.end`
         """
         self.__vertex.set_fixed_location(x, y, p)
 
@@ -715,9 +715,9 @@ class Population(PopulationBase):
 
         :param int max_atoms_per_core:
             the new value for the max atoms per dimension per core.
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
+        :raises SimulatorRunningException: If `sim.run` is currently running
+        :raises SimulatorNotSetupException: If called before `sim.setup`
+        :raises SimulatorShutdownException: If called after `sim.end`
         """
         SpynnakerDataView.check_user_can_act()
         cap = self.celltype.absolute_max_atoms_per_core
@@ -745,26 +745,26 @@ class Population(PopulationBase):
         self.__recorder.cache_data()
 
     @staticmethod
-    def __create_model(cellclass, cellparams):
+    def __create_model(cell_class, cell_params):
         """
-        :param cellclass: The implementation of the individual neurons.
-        :type cellclass: type or AbstractPyNNModel or ApplicationVertex
-        :param cellparams: Parameters to pass to ``cellclass`` if it
-            is a class to instantiate. Must be ``None`` if ``cellclass`` is an
+        :param cell_class: The implementation of the individual neurons.
+        :type cell_class: type or AbstractPyNNModel or ApplicationVertex
+        :param cell_params: Parameters to pass to ``cell_class`` if it
+            is a class to instantiate. Must be ``None`` if ``cell_class`` is an
             instantiated object.
-        :type cellparams: dict(str,object) or None
+        :type cell_params: dict(str,object) or None
         :rtype: ApplicationVertex or AbstractPyNNModel
         """
-        model = cellclass
-        if inspect.isclass(cellclass):
-            if cellparams is None:
-                model = cellclass()
+        model = cell_class
+        if inspect.isclass(cell_class):
+            if cell_params is None:
+                model = cell_class()
             else:
-                model = cellclass(**cellparams)
-        elif cellparams:
+                model = cell_class(**cell_params)
+        elif cell_params:
             raise ConfigurationException(
-                "cellclass is an instance which includes params so "
-                "cellparams must be None")
+                "cell_class is an instance which includes params so "
+                "cell_params must be None")
         return model
 
     def __create_vertex(
@@ -838,13 +838,13 @@ class Population(PopulationBase):
             additional_parameters, population_parameters):
         """
         Essential method for allowing things like splitter objects at
-        pop level.
+        population level.
 
         :param additional_parameters:
-            the additional params handed down from user
+            the additional parameters handed down from user
         :param population_parameters:
-            the additional params the vertex can support.
-        :return: the list of params that are accepted.
+            the additional parameters the vertex can support.
+        :return: the list of parameters that are accepted.
         """
         for key in additional_parameters.keys():
             if key in population_parameters:

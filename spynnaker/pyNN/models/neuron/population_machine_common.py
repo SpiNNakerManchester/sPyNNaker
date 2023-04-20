@@ -83,7 +83,7 @@ class PopulationMachineCommon(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram used by the vertex
+            The SDRAM used by the vertex
         :param .CommonRegions regions: The regions to be assigned
         :param int n_provenance_items:
             The number of additional provenance items to be read

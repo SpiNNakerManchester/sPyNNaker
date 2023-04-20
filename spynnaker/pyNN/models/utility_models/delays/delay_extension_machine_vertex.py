@@ -91,7 +91,7 @@ class DelayExtensionMachineVertex(
     def __init__(self, sdram, label, vertex_slice, app_vertex=None):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram required by the vertex
+            The SDRAM required by the vertex
         :param str label: The name of the vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex
