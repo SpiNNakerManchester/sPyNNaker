@@ -208,7 +208,7 @@ class SynapseDynamicsStructuralCommon(
         :type structural_projections:
             list(tuple(ProjectionApplicationEdge,SynapseInformation))
         :param machine_edges_by_app:
-            map of app edge to associated machine edges
+            map of application edge to associated machine edges
         :type machine_edges_by_app:
             dict(~pacman.model.graphs.application.ApplicationEdge,
             list(~pacman.model.graphs.machine.MachineEdge))

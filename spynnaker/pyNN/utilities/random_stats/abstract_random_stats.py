@@ -24,13 +24,13 @@ class AbstractRandomStats(object, metaclass=AbstractBase):
     @abstractmethod
     def cdf(self, dist, v):
         """
-        Return the cumulative distribution function value for the value v.
+        Return the cumulative distribution function value for the value `v`.
         """
 
     @abstractmethod
     def ppf(self, dist, p):
         """
-        Return the percent point function value for the probability p.
+        Return the percent point function value for the probability `p`.
         """
 
     @abstractmethod
@@ -52,15 +52,15 @@ class AbstractRandomStats(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def high(self, dist):
+    def high(self, distribution):
         """
-        Return the high cutoff value of the distribution, or `None` if the
+        Return the high cut-off value of the distribution, or `None` if the
         distribution is unbounded.
         """
 
     @abstractmethod
-    def low(self, dist):
+    def low(self, distribution):
         """
-        Return the low cutoff value of the distribution, or `None` if the
-        distribution is unbounded
+        Return the low cut-off value of the distribution, or `None` if the
+        distribution is unbounded.
         """

@@ -570,10 +570,11 @@ class SynfireRunner(object):
 
     def get_weights(self):
         """
-        :return: if not recorded returns None.\
-            If recorded once returns a numpy array.\
-            If recorded more than once returns a list of numpy arrays.
-        :rtype: None, nparray, or list of nparray
+        :return:
+            If not recorded, returns None.
+            If recorded once, returns a numpy array.
+            If recorded more than once, returns a list of numpy arrays.
+        :rtype: None or ~numpy.ndarray or list(~numpy.ndarray)
         """
         if len(self._weights) == 0:
             return None
@@ -583,10 +584,11 @@ class SynfireRunner(object):
 
     def get_delay(self):
         """
-        :return: if not recorded returns None.\
-            f recorded once returns a numpy array.\
-            If recorded more than once returns a list of numpy arrays.
-        :rtype: None, nparray, or list of nparray
+        :return:
+            If not recorded, returns None.
+            If recorded once, returns a numpy array.
+            If recorded more than once, returns a list of numpy arrays.
+        :rtype: None or ~numpy.ndarray or list(~numpy.ndarray)
         """
         if len(self._delays) == 0:
             return None
