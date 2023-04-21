@@ -517,9 +517,7 @@ class SynapseDynamicsSTDP(
     def calculate_min_weight(self, min_weights, max_stdp_spike_delta,
                              weight_scale, conn_weight_min, synapse_type):
         min_delta = self.__get_weight_min_delta(max_stdp_spike_delta)
-        print("min_delta ", min_delta)
         min_delta *= weight_scale
-        print("scaled ", min_delta, synapse_type, conn_weight_min, min_weights)
         if min_delta is not None and min_delta != 0:
             # This also depends on the earlier calculated minimum
             min_delta = float_gcd(min_delta, conn_weight_min)
