@@ -78,7 +78,7 @@ jobs:
           cp -vaT $PY_DOC_DIR $DEPLOY_DIR/python
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
