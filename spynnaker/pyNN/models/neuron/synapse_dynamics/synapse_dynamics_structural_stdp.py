@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,12 +29,13 @@ from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 class SynapseDynamicsStructuralSTDP(
         SynapseDynamicsSTDP, SynapseDynamicsStructuralCommon):
-    """ Class that enables synaptic rewiring in the presence of STDP.
+    """
+    Class that enables synaptic rewiring in the presence of STDP.
 
-        It acts as a wrapper around SynapseDynamicsSTDP, meaning rewiring can\
-        operate in parallel with STDP synapses.
+    It acts as a wrapper around SynapseDynamicsSTDP, meaning rewiring can
+    operate in parallel with STDP synapses.
 
-        Written by Petrut Bogdan.
+    Written by Petrut Bogdan.
     """
     __slots__ = [
         # Frequency of rewiring (Hz)
@@ -156,7 +157,7 @@ class SynapseDynamicsStructuralSTDP(
         """
         :param str param:
         :param value:
-       """
+        """
         for item in (self.partner_selection, self.__formation,
                      self.__elimination):
             if hasattr(item, param):

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,8 @@ _DEFAULT_FIRST_SEND_TIMESTEP = 100
 
 class PushBotEthernetDevice(
         AbstractMulticastControllableDevice, metaclass=AbstractBase):
-    """ An arbitrary PushBot device
+    """
+    An arbitrary PushBot device.
     """
 
     def __init__(
@@ -33,7 +34,7 @@ class PushBotEthernetDevice(
         """
         :param MunichIoEthernetProtocol protocol:
             The protocol instance to get commands from
-        :param AbstractPushBotOutputDevicedevice:
+        :param AbstractPushBotOutputDevice device:
             The Enum instance of the device to control
         :param bool uses_payload:
             True if the device uses a payload for control
@@ -56,7 +57,7 @@ class PushBotEthernetDevice(
     @property
     @overrides(AbstractMulticastControllableDevice.device_control_partition_id)
     def device_control_partition_id(self):
-        return "{}_PARTITION_ID".format(self.__device.name)
+        return f"{self.__device.name}_PARTITION_ID"
 
     @property
     @overrides(AbstractMulticastControllableDevice.device_control_uses_payload)
@@ -93,7 +94,8 @@ class PushBotEthernetDevice(
 
     @property
     def protocol(self):
-        """ The protocol instance, for use in the subclass
+        """
+        The protocol instance, for use in the subclass.
 
         :rtype: MunichIoEthernetProtocol
         """
@@ -101,10 +103,10 @@ class PushBotEthernetDevice(
 
     @abstractmethod
     def set_command_protocol(self, command_protocol):
-        """ Set the protocol use to send setup and shutdown commands,\
-            separately from the protocol used to control the device.
+        """
+        Set the protocol use to send setup and shutdown commands,
+        separately from the protocol used to control the device.
 
-        :param command_protocol: The protocol to use for this device
-        :type command_protocol:
-            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
+        :param MunichIoSpiNNakerLinkProtocol command_protocol:
+            The protocol to use for this device
         """

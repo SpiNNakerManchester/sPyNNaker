@@ -6,7 +6,7 @@
 : you may not use this file except in compliance with the License.
 : You may obtain a copy of the License at
 :
-:     http://www.apache.org/licenses/LICENSE-2.0
+:     https://www.apache.org/licenses/LICENSE-2.0
 :
 : Unless required by applicable law or agreed to in writing, software
 : distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ if errorlevel 9009 (
 	echo.may add the Sphinx directory to PATH.
 	echo.
 	echo.If you don't have Sphinx installed, grab it from
-	echo.http://sphinx-doc.org/
+	echo.https://sphinx-doc.org/
 	exit /b 1
 )
 

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,8 @@ ISYN_INH = "isyn_inh"
 
 
 class SynapseTypeDelta(AbstractSynapseType):
-    """ This represents a synapse type with two delta synapses
+    """
+    This represents a synapse type with two delta synapses.
     """
     __slots__ = [
         "__isyn_exc",
@@ -31,13 +32,11 @@ class SynapseTypeDelta(AbstractSynapseType):
     def __init__(self, isyn_exc, isyn_inh):
         """
         :param isyn_exc: :math:`I^{syn}_e`
-        :type isyn_exc:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type isyn_exc: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param isyn_inh: :math:`I^{syn}_i`
-        :type isyn_inh:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type isyn_inh: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([

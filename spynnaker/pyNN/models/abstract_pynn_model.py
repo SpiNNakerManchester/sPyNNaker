@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,8 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 
 
 class AbstractPyNNModel(object, metaclass=AbstractBase):
-    """ A Model that can be passed in to a Population object in PyNN
+    """
+    A Model that can be passed in to a Population object in PyNN.
     """
 
     __slots__ = []
@@ -32,17 +33,18 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
 
     @classmethod
     def set_model_max_atoms_per_dimension_per_core(cls, n_atoms=None):
-        """ Set the default maximum number of atoms per dimension per core for
-            this model.  This can be overridden by the individual Population.
-            The new value can be None, meaning that the maximum is the same as
-            the number of atoms, an int, meaning all Populations of this model
-            must have one dimension, or a tuple of n integers, meaning all
-            Populations of this model must have n dimensions.
-            If not all Populations of this model have the same number of
-            dimensions, it is recommended to set this to None here and then
-            set the maximum on each Population.
+        """
+        Set the default maximum number of atoms per dimension per core for
+        this model.  This can be overridden by the individual Population.
+        The new value can be `None`, meaning that the maximum is the same as
+        the number of atoms, an int, meaning all Populations of this model
+        must have one dimension, or a tuple of *n* integers, meaning all
+        Populations of this model must have *n* dimensions.
+        If not all Populations of this model have the same number of
+        dimensions, it is recommended to set this to `None` here and then
+        set the maximum on each Population.
 
-        :param n_atoms: The new maximum, or None for the largest possible
+        :param n_atoms: The new maximum, or `None` for the largest possible
         :type n_atoms: int or tuple or None
         """
         abs_max = cls.absolute_max_atoms_per_core
@@ -54,8 +56,8 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
 
     @classmethod
     def get_model_max_atoms_per_dimension_per_core(cls):
-        """ Get the maximum number of atoms per dimension per core for this
-            model
+        """
+        Get the maximum number of atoms per dimension per core for this model.
 
         :rtype: int or tuple or None
         """
@@ -69,9 +71,10 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
 
     @classproperty
     def absolute_max_atoms_per_core(cls):  # pylint: disable=no-self-argument
-        """ The absolute maximum number of atoms per core.
-            This is an integer regardless of the number of dimensions
-            in any vertex.
+        """
+        The absolute maximum number of atoms per core.
+        This is an integer regardless of the number of dimensions
+        in any vertex.
 
         :rtype: int
         """
@@ -92,7 +95,8 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
 
     @classproperty
     def default_parameters(cls):  # pylint: disable=no-self-argument
-        """ Get the default values for the parameters of the model.
+        """
+        Get the default values for the parameters of the model.
 
         :rtype: dict(str, Any)
         """
@@ -101,7 +105,8 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
 
     @classproperty
     def default_initial_values(cls):  # pylint: disable=no-self-argument
-        """ Get the default initial values for the state variables of the model
+        """
+        Get the default initial values for the state variables of the model.
 
         :rtype: dict(str, Any)
         """
@@ -112,7 +117,8 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
 
     @classmethod
     def get_parameter_names(cls):
-        """ Get the names of the parameters of the model
+        """
+        Get the names of the parameters of the model.
 
         :rtype: list(str)
         """
@@ -120,7 +126,8 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
 
     @classmethod
     def has_parameter(cls, name):
-        """ Determine if the model has a parameter with the given name
+        """
+        Determine if the model has a parameter with the given name.
 
         :param str name: The name of the parameter to check for
         :rtype: bool
@@ -129,34 +136,37 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
 
     @abstractproperty
     def default_population_parameters(self):
-        """ Get the default values for the parameters at the population level
-            These are parameters that can be passed in to the Population\
-            constructor in addition to the standard PyNN options
+        """
+        The default values for the parameters at the population level.
+        These are parameters that can be passed in to the Population
+        constructor in addition to the standard PyNN options.
 
         :rtype: dict(str, Any)
         """
 
     @abstractmethod
     def create_vertex(self, n_neurons, label):
-        """ Create a vertex for a population of the model
+        """
+        Create a vertex for a population of the model.
 
         :param int n_neurons: The number of neurons in the population
         :param str label: The label to give to the vertex
         :return: An application vertex for the population
-        :rtype: ~spynnaker.pyNN.models.common.PopulationApplicationVertex
+        :rtype: PopulationApplicationVertex
         """
 
     @property
     def name(self):
         """
-        The name of this model
+        The name of this model.
 
         :rtype: str
         """
         return self.__class__.__name__
 
     def describe(self, template='modeltype_default.txt', engine='default'):
-        """ Returns a human-readable description of the population.
+        """
+        Returns a human-readable description of the population.
 
         The output may be customized by specifying a different template
         together with an associated template engine (see

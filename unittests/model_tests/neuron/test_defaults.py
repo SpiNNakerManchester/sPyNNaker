@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -156,7 +156,7 @@ def _check_warnings(lc, expected, not_expected):
         " not cell_params")
     warning_variables = set()
     for record in lc.records:
-        match = line_matcher.match(record.getMessage())
+        match = line_matcher.match(str(record.msg))
         if record.levelname == "WARNING" and match:
             warning_variables.add(match.group(1))
 

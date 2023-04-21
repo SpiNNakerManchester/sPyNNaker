@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -68,6 +68,7 @@ typedef struct {
     uint32_t n_weights;
     uint16_t positive_synapse_type;
     uint16_t negative_synapse_type;
+    uint32_t delay;
     dimension dimensions[];
     // Also follows:
     // lc_weight_t weights[];
@@ -149,48 +150,60 @@ static inline int16_t recip_multiply(int16_t integer, int16_t recip) {
     return (int16_t) ((i * r) >> RECIP_FRACT_BITS);
 }
 
-static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
-        lc_weight_t **weights) {
+static inline bool key_to_index_lookup(uint32_t spike, uint32_t *start, uint32_t *end) {
     for (uint32_t i = 0; i < config.n_connectors; i++) {
         connector *c = connectors[i];
         if ((spike & c->key_info.mask) == c->key_info.key) {
-        	uint32_t local_spike = (spike & ~c->key_info.mask) & c->key_info.n_colour_bits;
-            *conn = c;
-
-            // Now work out the index into the weights from the coordinates
-            uint32_t last_extent = 1;
-            uint32_t index = 0;
-            for (uint32_t j = 0; j < c->n_dims; j++) {
-                dimension *dim = &c->dimensions[j];
-
-                // Get the coordinate for this dimension from the spike
-                uint32_t coord = (local_spike & dim->mask) >> dim->shift;
-
-                // Work out the position in the global space
-                coord += dim->pre_start;
-
-                // Work out the position after pooling
-                coord = recip_multiply(coord, dim->recip_pool_stride);
-
-                // Check that the coordinate is in range now for this core
-                if (coord < dim->pre_in_post_start || coord > dim->pre_in_post_end) {
-                    return false;
-                }
-
-                // Get the local coordinate after pooling and add into the
-                // final index
-                coord -= dim->pre_in_post_start;
-                index += (coord * last_extent);
-
-                // Remember the shape from this dimension to pass to the next
-                last_extent = dim->pre_in_post_shape;
-            }
-            lc_weight_t *all_weights = get_weights(c);
-            *weights = &all_weights[index * config.n_post];
-            return true;
+        	*start = i;
+			uint32_t e = i + 1;
+			while (e < config.n_connectors) {
+				connector *c_e = connectors[e];
+				if ((spike & c_e->key_info.mask) != c_e->key_info.mask) {
+					break;
+				}
+				e = e + 1;
+			}
+			*end = e;
         }
     }
     return false;
+}
+
+bool get_conn_weights(uint32_t spike, uint32_t i, lc_weight_t **weights) {
+	connector *c = connectors[i];
+	uint32_t local_spike = (spike & ~c->key_info.mask) & c->key_info.n_colour_bits;
+
+	// Now work out the index into the weights from the coordinates
+	uint32_t last_extent = 1;
+	uint32_t index = 0;
+	for (uint32_t j = 0; j < c->n_dims; j++) {
+		dimension *dim = &c->dimensions[j];
+
+		// Get the coordinate for this dimension from the spike
+		uint32_t coord = (local_spike & dim->mask) >> dim->shift;
+
+		// Work out the position in the global space
+		coord += dim->pre_start;
+
+		// Work out the position after pooling
+		coord = recip_multiply(coord, dim->recip_pool_stride);
+
+		// Check that the coordinate is in range now for this core
+		if (coord < dim->pre_in_post_start || coord > dim->pre_in_post_end) {
+			return false;
+		}
+
+		// Get the local coordinate after pooling and add into the
+		// final index
+		coord -= dim->pre_in_post_start;
+		index += (coord * last_extent);
+
+		// Remember the shape from this dimension to pass to the next
+		last_extent = dim->pre_in_post_shape;
+	}
+	lc_weight_t *all_weights = get_weights(c);
+	*weights = &all_weights[index * config.n_post];
+	return true;
 }
 
 //! \brief Process incoming spikes. In this implementation we need to:
@@ -201,42 +214,51 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
 //! 4. Add the weights to the appropriate current buffers
 void local_only_impl_process_spike(
         uint32_t time, uint32_t spike, uint16_t* ring_buffers) {
-    connector *connector;
-    lc_weight_t *weights;
 
     // Lookup the spike, and if found, get the appropriate parts
-    if (!key_to_index_lookup(spike, &connector, &weights)) {
+    uint32_t start;
+    uint32_t end;
+    if (!key_to_index_lookup(spike, &start, &end)) {
         return;
     }
 
     // Go through the weights and process them into the ring buffers
-    for (uint32_t post_index = 0; post_index < config.n_post; post_index++) {
-        lc_weight_t weight = weights[post_index];
-        if (weight == 0) {
-            continue;
-        }
-        uint32_t rb_index = 0;
-        if (weight > 0) {
-            rb_index = synapse_row_get_ring_buffer_index(time + 1,
-                connector->positive_synapse_type, post_index,
-                synapse_type_index_bits, synapse_index_bits,
-                synapse_delay_mask);
-        } else {
-            rb_index = synapse_row_get_ring_buffer_index(time + 1,
-                connector->negative_synapse_type, post_index,
-                synapse_type_index_bits, synapse_index_bits,
-                synapse_delay_mask);
-            weight = -weight;
-        }
-        log_debug("Updating ring_buffers[%u] for post neuron %u with weight %u",
-                rb_index, post_index, weight);
+    for (uint32_t i = start; i < end; i++) {
+	    connector *connector = connectors[i];
+	    lc_weight_t *weights;
+	    if (!get_conn_weights(spike, i, &weights)) {
+	    	continue;
+	    }
 
-        // Add weight to current ring buffer value, avoiding saturation
-        uint32_t accumulation = ring_buffers[rb_index] + weight;
-        uint32_t sat_test = accumulation & 0x10000;
-        if (sat_test) {
-            accumulation = sat_test - 1;
-        }
-        ring_buffers[rb_index] = accumulation;
+		for (uint32_t post_index = 0; post_index < config.n_post; post_index++) {
+
+			lc_weight_t weight = weights[post_index];
+			if (weight == 0) {
+				continue;
+			}
+			uint32_t rb_index = 0;
+			if (weight > 0) {
+				rb_index = synapse_row_get_ring_buffer_index(time + connector->delay,
+					connector->positive_synapse_type, post_index,
+					synapse_type_index_bits, synapse_index_bits,
+					synapse_delay_mask);
+			} else {
+				rb_index = synapse_row_get_ring_buffer_index(time + connector->delay,
+					connector->negative_synapse_type, post_index,
+					synapse_type_index_bits, synapse_index_bits,
+					synapse_delay_mask);
+				weight = -weight;
+			}
+			log_debug("Updating ring_buffers[%u] for post neuron %u with weight %u",
+					rb_index, post_index, weight);
+
+			// Add weight to current ring buffer value, avoiding saturation
+			uint32_t accumulation = ring_buffers[rb_index] + weight;
+			uint32_t sat_test = accumulation & 0x10000;
+			if (sat_test) {
+				accumulation = sat_test - 1;
+			}
+			ring_buffers[rb_index] = accumulation;
+		}
     }
 }

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +17,9 @@ from spinn_utilities.progress_bar import ProgressBar
 
 
 def finish_connection_holders():
-    """ Finishes the connection holders after data has been generated within\
-        them, allowing any waiting callbacks to be called.
+    """
+    Finishes the connection holders after data has been generated within
+    them, allowing any waiting callbacks to be called.
 
     :param ~pacman.model.graphs.application.ApplicationGraph application_graph:
     """

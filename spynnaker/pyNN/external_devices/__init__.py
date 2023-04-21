@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,7 @@
 # limitations under the License.
 """
 This contains functions and classes for handling external devices such as the
-PushBot (http://spinnakermanchester.github.io/docs/push_bot/).
+PushBot (https://spinnakermanchester.github.io/docs/push_bot/).
 
 .. note::
     When using external devices, it is normally important to configure your
@@ -114,20 +114,24 @@ __simulator = None
 
 
 def run_forever(sync_time=0):
-    """ Supports running forever in PyNN 0.8/0.9 format
+    """
+    Supports running forever in PyNN 0.8/0.9 format.
 
     :param sync_time:
         The time in milliseconds after which to pause before the host must
-        continue the simulation
-    :return: when the application has started running on the SpiNNaker platform
+        continue the simulation.
+    :return:
+        Only when the application has started running on the SpiNNaker
+        platform; no value is returned.
     """
     SpynnakerDataView.check_user_can_act()
     __simulator.run(None, sync_time)
 
 
 def run_sync(run_time, sync_time):
-    """ Run in steps of the given number of milliseconds pausing between\
-        for a signal to be sent from the host
+    """
+    Run in steps of the given number of milliseconds pausing between
+    for a signal to be sent from the host.
 
     :param float run_time: The time in milliseconds to run the simulation for
     :param float sync_time: The time in milliseconds to pause before allowing
@@ -137,26 +141,29 @@ def run_sync(run_time, sync_time):
 
 
 def continue_simulation():
-    """ Continue a synchronised simulation
+    """
+    Continue a synchronised simulation.
     """
     SpynnakerDataView.check_valid_simulator()
     __simulator.continue_simulation()
 
 
 def request_stop():
-    """ Request a stop in the simulation without a complete stop.  Will stop\
-        after the next auto-pause-and-resume cycle
+    """
+    Request a stop in the simulation without a complete stop.  Will stop
+    after the next auto-pause-and-resume cycle.
     """
     SpynnakerDataView.check_valid_simulator()
     __simulator.stop_run()
 
 
 def register_database_notification_request(hostname, notify_port, ack_port):
-    """ Adds a socket system which is registered with the notification protocol
+    """
+    Adds a socket system which is registered with the notification protocol.
 
     :param str hostname: hostname to connect to
-    :param int notify_port: port num for the notify command
-    :param int ack_port: port num for the acknowledge command
+    :param int notify_port: UDP port number for the notify command
+    :param int ack_port: UDP port number for the acknowledge command
     """
     SpynnakerDataView.add_database_socket_address(
         SocketAddress(hostname, notify_port, ack_port))
@@ -169,8 +176,9 @@ __ethernet_control_connection = None
 def EthernetControlPopulation(
         n_neurons, model, label=None, local_host=None, local_port=None,
         database_notify_port_num=None, database_ack_port_num=None):
-    """ Create a PyNN population that can be included in a network to\
-        control an external device which is connected to the host
+    """
+    Create a PyNN population that can be included in a network to
+    control an external device which is connected to the host.
 
     :param int n_neurons: The number of neurons in the control population
     :param type model:
@@ -193,10 +201,12 @@ def EthernetControlPopulation(
     :type database_notify_port_num: int or None
     :return:
         A pyNN Population which can be used as the target of a Projection.
-        Note that the Population can also be used as the source of a
-        Projection, but it might not send spikes.
+
+        .. note::
+            The Population can also be used as the source of a
+            Projection, but it might not send spikes.
     :rtype: ~spynnaker.pyNN.models.populations.Population
-    :raises Exception: If an invalid model class is used.
+    :raises TypeError: If an invalid model class is used.
     """
     # pylint: disable=protected-access, too-many-arguments
     population = Population(n_neurons, model, label=label)
@@ -241,8 +251,9 @@ def EthernetControlPopulation(
 def EthernetSensorPopulation(
         device, local_host=None,
         database_notify_port_num=None, database_ack_port_num=None):
-    """ Create a pyNN population which can be included in a network to\
-        receive spikes from a device connected to the host
+    """
+    Create a pyNN population which can be included in a network to
+    receive spikes from a device connected to the host.
 
     :param AbstractEthernetSensor device: The sensor model
     :param local_host:
@@ -259,8 +270,11 @@ def EthernetSensorPopulation(
     :type database_notify_port_num: int or None
     :return:
         A pyNN Population which can be used as the source of a Projection.
-        Note that the Population cannot be used as the target of a Projection.
+
+        .. note::
+            The Population cannot be used as the target of a Projection.
     :rtype: ~spynnaker.pyNN.models.populations.Population
+    :raises TypeError: If an invalid model class is used.
     """
     if not isinstance(device, AbstractEthernetSensor):
         raise TypeError(
@@ -289,8 +303,9 @@ def EthernetSensorPopulation(
 def SpikeInjector(
         notify=True, database_notify_host=None, database_notify_port_num=None,
         database_ack_port_num=None):
-    """ Supports creating a spike injector that can be added to the\
-        application graph.
+    """
+    Supports creating a spike injector that can be added to the
+    application graph.
 
     :param bool notify: Whether to register for notifications
     :param database_notify_host: the hostname for the device which is
@@ -305,7 +320,7 @@ def SpikeInjector(
     :type database_notify_port_num: int or None
     :return: The spike injector model object that can be placed in a pyNN
         :py:class:`~spynnaker.pyNN.models.populations.Population`.
-    :rtype: ~spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel
+    :rtype: AbstractPyNNModel
     """
     # pylint: disable=too-many-arguments
     if notify:

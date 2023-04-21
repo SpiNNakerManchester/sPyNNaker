@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,8 @@ from data_specification import ReferenceContext
 
 
 def spynnaker_splitter_partitioner():
-    """ a splitter partitioner that's bespoke for spynnaker vertices.
+    """
+    A splitter partitioner that's bespoke for sPyNNaker vertices.
 
     :return:
          The number of chips needed to satisfy this partitioning.

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,27 +15,22 @@ from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.exceptions import PacmanConfigurationException
+from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
 
 
-class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
-    """ A splitter for Poisson sources that will ignore sources that are
-        one-to-one connected to a single Population
+class SplitterPoissonDelegate(SplitterFixedLegacy):
     """
-
-    # Message to display on error
-    INVALID_POP_ERROR_MESSAGE = (
-        "The vertex {} cannot be supported by the SplitterPoissonDelegate as"
-        " the only vertex supported by this splitter is a "
-        "SpikeSourcePoissonVertex. Please use the correct splitter for "
-        "your vertex and try again.")
+    A splitter for Poisson sources that will ignore sources that are
+    one-to-one connected to a single Population.
+    """
 
     @property
     def send_over_sdram(self):
-        """ Determine if this vertex is to be sent using SDRAM
+        """
+        Whether this vertex is to be sent using SDRAM.
 
         :rtype: bool
         """
@@ -52,14 +47,17 @@ class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
             return False
         return post_vertex.splitter.handles_source_vertex(proj)
 
-    @overrides(SpynnakerSplitterFixedLegacy.set_governed_app_vertex)
+    @overrides(SplitterFixedLegacy.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, SpikeSourcePoissonVertex):
             raise PacmanConfigurationException(
-                self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+                f"The vertex {app_vertex} cannot be supported by the "
+                "SplitterPoissonDelegate as the only vertex supported by this "
+                "splitter is a SpikeSourcePoissonVertex. Please use the "
+                "correct splitter for your vertex and try again.")
 
-    @overrides(SpynnakerSplitterFixedLegacy.create_machine_vertices)
+    @overrides(SplitterFixedLegacy.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
         # If sending over SDRAM, let the target handle this
         if self.send_over_sdram:

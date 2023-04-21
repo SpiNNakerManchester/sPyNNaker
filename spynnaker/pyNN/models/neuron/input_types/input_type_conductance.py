@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,8 @@ E_REV_I = "e_rev_I"
 
 
 class InputTypeConductance(AbstractInputType):
-    """ The conductance input type
+    """
+    The conductance input type.
     """
     __slots__ = [
         "__e_rev_E",
@@ -32,14 +33,12 @@ class InputTypeConductance(AbstractInputType):
         """
         :param e_rev_E: Reversal potential for excitatory input;
             :math:`E^{rev}_e`
-        :type e_rev_E:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type e_rev_E: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param e_rev_I: Reversal potential for inhibitory input;
             :math:`E^{rev}_i`
-        :type e_rev_I:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type e_rev_I: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([(DataType.S1615, E_REV_E),

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -63,7 +63,8 @@ DURATION_FOREVER = 0xFFFFFFFF
 class SpikeSourcePoissonVertex(
         PopulationApplicationVertex,
         LegacyPartitionerAPI, SupportsStructure):
-    """ A Poisson Spike source object
+    """
+    A Poisson Spike source object.
     """
 
     __slots__ = [
@@ -98,12 +99,17 @@ class SpikeSourcePoissonVertex(
         :param float seed:
         :param int max_atoms_per_core:
         :param ~spynnaker.pyNN.models.spike_source.SpikeSourcePoisson model:
-        :param iterable(float) rate:
-        :param iterable(int) start:
-        :param iterable(int) duration:
+        :param float rate:
+        :param int start:
+        :param int duration:
+        :param iterable(float) rates:
+        :param iterable(int) starts:
+        :param iterable(int) durations:
+        :param float max_rate:
         :param splitter:
         :type splitter:
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+        :param int n_colour_bits:
         """
         # pylint: disable=too-many-arguments
         super().__init__(label, max_atoms_per_core, splitter)
@@ -262,24 +268,27 @@ class SpikeSourcePoissonVertex(
 
     @property
     def rates(self):
-        """ Get the rates
+        """
+        Get the rates.
 
-        :rtype: RangedList
+        :rtype: spinn_utilities.ranged.RangedList
         """
         return self.__data["rates"]
 
     def add_outgoing_projection(self, projection):
-        """ Add an outgoing projection from this vertex
+        """
+        Add an outgoing projection from this vertex.
 
-        :param PyNNProjectionCommon projection: The projection to add
+        :param Projection projection: The projection to add
         """
         self.__outgoing_projections.append(projection)
 
     @property
     def outgoing_projections(self):
-        """ The projections outgoing from this vertex
+        """
+        The projections outgoing from this vertex.
 
-        :rtype: list(PyNNProjectionCommon)
+        :rtype: list(Projection)
         """
         return self.__outgoing_projections
 
@@ -474,9 +483,7 @@ class SpikeSourcePoissonVertex(
         return super(SpikeSourcePoissonVertex, self).atoms_shape
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
-    def create_machine_vertex(
-            self, vertex_slice, sdram, label=None):
-        # pylint: disable=arguments-differ
+    def create_machine_vertex(self, vertex_slice, sdram, label=None):
         return SpikeSourcePoissonMachineVertex(
             sdram, self.__spike_recorder.record,
             label, self, vertex_slice)
@@ -506,11 +513,12 @@ class SpikeSourcePoissonVertex(
         return self.__kiss_seed[vertex_slice]
 
     def update_kiss_seed(self, vertex_slice, seed):
-        """ updates a kiss seed from the machine
+        """
+        Updates a KISS seed from the machine.
 
-        :param vertex_slice: the vertex slice to update seed of
-        :param seed: the seed
-        :rtype: None
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the vertex slice to update seed of
+        :param list(int) seed: the seed
         """
         self.__kiss_seed[vertex_slice] = seed
 
@@ -524,18 +532,18 @@ class SpikeSourcePoissonVertex(
                 SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 
     def describe(self):
-        """ Return a human-readable description of the cell or synapse type.
+        """
+        Return a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template\
-        together with an associated template engine\
+        The output may be customised by specifying a different template
+        together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template context\
-        will be returned.
+        If template is `None`, then a dictionary containing the template
+        context will be returned.
 
         :rtype: dict(str, ...)
         """
-
         parameters = self.get_parameter_values(self.__model.default_parameters)
 
         context = {
@@ -549,7 +557,7 @@ class SpikeSourcePoissonVertex(
     def set_live_poisson_control_edge(self, edge):
         if self.__incoming_control_edge is not None:
             raise ValueError(
-                "The Poisson can only be controlled by one source")
+                "The Poisson generator can only be controlled by one source")
         self.__incoming_control_edge = edge
 
     @property

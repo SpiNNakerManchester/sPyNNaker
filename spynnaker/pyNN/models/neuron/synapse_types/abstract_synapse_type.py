@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,14 +19,16 @@ from spynnaker.pyNN.models.neuron.implementations import (
 
 class AbstractSynapseType(
         AbstractStandardNeuronComponent, metaclass=AbstractBase):
-    """ Represents the synapse types supported.
+    """
+    Represents the synapse types supported.
     """
 
     __slots__ = ()
 
     @abstractmethod
     def get_n_synapse_types(self):
-        """ Get the number of synapse types supported.
+        """
+        Get the number of synapse types supported.
 
         :return: The number of synapse types supported
         :rtype: int
@@ -34,7 +36,8 @@ class AbstractSynapseType(
 
     @abstractmethod
     def get_synapse_id_by_target(self, target):
-        """ Get the ID of a synapse given the name.
+        """
+        Get the ID of a synapse given the name.
 
         :return: The ID of the synapse
         :rtype: int
@@ -42,8 +45,9 @@ class AbstractSynapseType(
 
     @abstractmethod
     def get_synapse_targets(self):
-        """ Get the target names of the synapse type.
+        """
+        Get the target names of the synapse type.
 
-        :return: an array of strings
-        :rtype: array(str)
+        :return: an array of strings (usually a list or tuple)
+        :rtype: iterable(str)
         """

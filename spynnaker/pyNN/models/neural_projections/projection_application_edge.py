@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -58,7 +58,8 @@ def are_dynamics_neuromodulation(synapse_dynamics):
 
 class ProjectionApplicationEdge(
         ApplicationEdge, AbstractProvidesLocalProvenanceData):
-    """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
+    """
+    An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
         "__delay_edge",
@@ -109,7 +110,8 @@ class ProjectionApplicationEdge(
 
     @property
     def delay_edge(self):
-        """ Settable.
+        """
+        Settable.
 
         :rtype: DelayedApplicationEdge or None
         """
@@ -121,7 +123,8 @@ class ProjectionApplicationEdge(
 
     @property
     def is_neuromodulation(self):
-        """ Check if this edge is providing neuromodulation
+        """
+        Whether this edge is providing neuromodulation.
 
         :rtype: bool
         """

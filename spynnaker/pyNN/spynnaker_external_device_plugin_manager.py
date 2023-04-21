@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,7 +28,8 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 
 
 class SpynnakerExternalDevicePluginManager(object):
-    """ User-level interface for the external device plugin manager.
+    """
+    User-level interface for the external device plug-in manager.
     """
     __slots__ = []
 
@@ -68,8 +69,9 @@ class SpynnakerExternalDevicePluginManager(object):
             use_payload_prefix=True, payload_prefix=None,
             payload_right_shift=0, number_of_packets_sent_per_time_step=0,
             translate_keys=False):
-        """ Output the spikes from a given population from SpiNNaker as they\
-            occur in the simulation.
+        """
+        Output the spikes from a given population from SpiNNaker as they
+        occur in the simulation.
 
         :param ~spynnaker.pyNN.models.populations.Population population:
             The population to activate the live output for
@@ -163,8 +165,11 @@ class SpynnakerExternalDevicePluginManager(object):
     @staticmethod
     def activate_live_output_to(
             population, device, partition_id=SPIKE_PARTITION_ID):
-        """ Activate the output of spikes from a population to an external\
-            device. Note that all spikes will be sent to the device.
+        """
+        Activate the output of spikes from a population to an external device.
+
+        .. note::
+            All spikes will be sent to the device.
 
         :param ~spynnaker.pyNN.models.populations.Population population:
             The pyNN population object from which spikes will be sent.
@@ -189,19 +194,21 @@ class SpynnakerExternalDevicePluginManager(object):
     @staticmethod
     def update_live_packet_gather_tracker(
             vertex_to_record_from, params, partition_ids):
-        """ Add an edge from a vertex to the live packet gatherer, builds as\
-            needed and has all the parameters for the creation of the live\
-            packet gatherer if needed.
+        """
+        Add an edge from a vertex to the live packet gatherer, builds as
+        needed and has all the parameters for the creation of the live
+        packet gatherer if needed.
 
         :param vertex_to_record_from:
         :type vertex_to_record_from:
             ~pacman.model.graphs.application.ApplicationVertex or
             ~pacman.model.graphs.machine.MachineVertex
-        :param LivePacketGatherParameters params:
+        :param params:
+        :type params:
+             ~spinn_front_end_common.utilities.utility_objs.LivePacketGatherParameters
         :param list(str) partition_ids:
         :param bool translate_keys:
         """
-
         # add to the tracker
         SpynnakerDataView.add_live_packet_gatherer_parameters(
             params, vertex_to_record_from, partition_ids)
@@ -213,7 +220,8 @@ class SpynnakerExternalDevicePluginManager(object):
             database_notify_port_num=None,
             database_ack_port_num=None, notify=True,
             reserve_reverse_ip_tag=False):
-        """ Add a live rate controller to a Poisson population.
+        """
+        Add a live rate controller to a Poisson population.
 
         :param poisson_population: The population to control
         :type poisson_population:
@@ -236,7 +244,7 @@ class SpynnakerExternalDevicePluginManager(object):
         """
         # pylint: disable=too-many-arguments, protected-access
         vertex = poisson_population._vertex
-        control_label = "{}{}".format(vertex.label, control_label_extension)
+        control_label = f"{vertex.label}{control_label_extension}"
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,
             receive_port=receive_port,
@@ -253,12 +261,14 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def add_edge(vertex, device_vertex, partition_id):
-        """ Add an edge between two vertices (often a vertex and a external\
-            device) on a given partition.
+        """
+        Add an edge between two vertices (often a vertex and a external
+        device) on a given partition.
 
         :param ~pacman.model.graphs.application.ApplicationVertex vertex:
-            the pre-vertex to connect the edge from
-        :param device_vertex: the post vertex to connect the edge to
+            the pre-population vertex to connect the edge from
+        :param device_vertex:
+            the post-population vertex to connect the edge to
         :type device_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str partition_id: the partition identifier for making nets

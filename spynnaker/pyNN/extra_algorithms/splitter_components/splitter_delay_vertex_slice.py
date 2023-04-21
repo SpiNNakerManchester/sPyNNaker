@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,20 +24,15 @@ from spynnaker.pyNN.models.utility_models.delays import (
 
 
 class SplitterDelayVertexSlice(AbstractSplitterCommon):
-    """ handles the splitting of the DelayExtensionVertex via slice logic.
+    """
+    Handles the splitting of the :py:class:`DelayExtensionVertex`
+    via slice logic.
     """
 
     __slots__ = [
         "_machine_vertex_by_slice"]
 
     _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
-
-    INVALID_POP_ERROR_MESSAGE = (
-        "The vertex {} cannot be supported by the "
-        "SplitterDelayVertexSlice as"
-        " the only vertex supported by this splitter is a "
-        "DelayExtensionVertex. Please use the correct splitter for "
-        "your vertex and try again.")
 
     NEED_EXACT_ERROR_MESSAGE = (
         "DelayExtensionsSplitters need exact incoming slices. Please fix "
@@ -48,9 +43,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         "asking for them is deemed an error.")
 
     def __init__(self):
-        """ splitter for delay extensions
-
-        """
         super().__init__()
         self._machine_vertex_by_slice = dict()
 
@@ -71,8 +63,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
             for m_vertex in source_vertex.splitter.get_out_going_vertices(
                 partition_id)]
 
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
-        # pylint: disable=arguments-differ
         source_app_vertex = self._governed_app_vertex.source_vertex
         slices = source_app_vertex.splitter.get_out_going_slices()
 
@@ -98,13 +90,18 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, DelayExtensionVertex):
             raise PacmanConfigurationException(
-                self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+                f"The vertex {app_vertex} cannot be supported by the "
+                "SplitterDelayVertexSlice as the only vertex supported by "
+                "this splitter is a DelayExtensionVertex. Please use the "
+                "correct splitter for your vertex and try again.")
 
     def create_machine_vertex(
             self, source_app_vertex, vertex_slice):
-        """ creates a delay extension machine vertex and adds to the tracker.
+        """
+        Creates a delay extension machine vertex and adds to the tracker.
 
-        :param MachineVertex source_vertex: The source of the delay
+        :param ~pacman.model.graphs.machine.MachineVertex source_vertex:
+            The source of the delay
         :return: machine vertex
         :rtype: DelayExtensionMachineVertex
         """
@@ -118,9 +115,10 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         return machine_vertex
 
     def get_sdram_used_by_atoms(self):
-        """ returns the sdram used by the delay extension
+        """
+        Gets the amount of SDRAM used by the delay extension.
 
-        :rtype: ConstantSDRAM
+        :rtype: ~pacman.model.resources.ConstantSDRAM
         """
         return ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
@@ -138,9 +136,11 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         self._machine_vertex_by_slice = dict()
 
     def get_machine_vertex(self, vertex_slice):
-        """ Get a delay extension machine vertex for a given vertex slice
+        """
+        Get a delay extension machine vertex for a given vertex slice.
 
-        :param Slice vertex_slice: The slice to get the data for
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice to get the data for
         :rtype: DelayExtensionMachineVertex
         """
         return self._machine_vertex_by_slice[vertex_slice]

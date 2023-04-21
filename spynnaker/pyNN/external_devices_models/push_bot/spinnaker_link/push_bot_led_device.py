@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,8 @@ from spynnaker.pyNN.models.common import PopulationApplicationVertex
 class PushBotSpiNNakerLinkLEDDevice(
         PushBotEthernetLEDDevice, ApplicationSpiNNakerLinkVertex,
         PopulationApplicationVertex):
-    """ The LED of a PushBot
+    """
+    The LED of a PushBot
     """
     __slots__ = []
 
@@ -41,11 +42,9 @@ class PushBotSpiNNakerLinkLEDDevice(
             start_total_period=default_parameters['start_total_period'],
             start_frequency=default_parameters['start_frequency']):
         """
-        :param led: The LED device to control
-        :type led:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED
-        :param protocol: The protocol instance to get commands from
-        :type protocol: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
+        :param PushBotLED led: The LED device to control
+        :param MunichIoSpiNNakerLinkProtocol protocol:
+            The protocol instance to get commands from
         :param int spinnaker_link_id: The SpiNNakerLink connected to
         :param int n_neurons: The number of neurons in the device
         :param str label: The label of the device

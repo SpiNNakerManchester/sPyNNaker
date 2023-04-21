@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,7 +32,8 @@ from .spif_devices import (
 class SPIFRetinaDevice(
         Application2DFPGAVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex, HasShapeKeyFields):
-    """ A retina device connected to SpiNNaker using a SPIF board.
+    """
+    A retina device connected to SpiNNaker using a SPIF board.
     """
 
     #: SPIF outputs to 8 FPGA output links, so we split into (2 x 4), meaning
@@ -62,7 +63,6 @@ class SPIFRetinaDevice(
                  base_key=None, input_x_shift=16, input_y_shift=0,
                  board_address=None, chip_coords=None):
         """
-
         :param int pipe: Which pipe on SPIF the retina is connected to
         :param int width: The width of the retina in pixels
         :param int height: The height of the retina in pixels
@@ -74,24 +74,29 @@ class SPIFRetinaDevice(
             sending
         :param base_key:
             The key that is common over the whole vertex,
-            or None to use the pipe number as the key
+            or `None` to use the pipe number as the key
         :type base_key: int or None
         :param int input_x_shift:
             The shift to get the x coordinate from the input keys sent to SPIF
         :param int input_y_shift:
             The shift to get the y coordinate from the input keys sent to SPIF
         :param board_address:
-            The IP address of the board to which the FPGA is connected, or None
-            to use the default board or chip_coords.  Note chip_coords will be
-            used first if both are specified, with board_address then being
-            used if the coordinates don't connect to an FPGA.
+            The IP address of the board to which the FPGA is connected,
+            or `None` to use the default board or chip_coords.
+
+            .. note::
+                chip_coords will be used first if both are specified, with
+                board_address then being used if the coordinates don't connect
+                to an FPGA.
         :type board_address: str or None
         :param chip_coords:
             The coordinates of the chip to which the FPGA is connected, or
-            None to use the default board or board_address.   Note chip_coords
-            will be used first if board_address is also specified, with
-            board_address then being used if the coordinates don't connect to
-            an FPGA.
+            `None` to use the default board or board_address.
+
+            .. note::
+                chip_coords will be used first if board_address is also
+                specified, with board_address then being used if the
+                coordinates don't connect to an FPGA.
         :type chip_coords: tuple(int, int) or None
         """
         # Do some checks
@@ -153,7 +158,8 @@ class SPIFRetinaDevice(
         return n & 0xFFFFFFFF
 
     def __incoming_fpgas(self, board_address, chip_coords):
-        """ Get the incoming FPGA connections
+        """
+        Get the incoming FPGA connections.
 
         :rtype: list(FPGAConnection)
         """
@@ -162,7 +168,8 @@ class SPIFRetinaDevice(
                 for i in SPIF_INPUT_FPGA_LINKS]
 
     def __outgoing_fpga(self, board_address, chip_coords):
-        """ Get the outgoing FPGA connection (for commands)
+        """
+        Get the outgoing FPGA connection (for commands).
 
         :rtype: FGPA_Connection
         """

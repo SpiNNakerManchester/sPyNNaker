@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,8 @@ SDRAM_PARAMS_SIZE = 6 * BYTES_PER_WORD
 
 
 class NeuronMainProvenance(ctypes.LittleEndianStructure):
-    """ Provenance items from synapse processing
+    """
+    Provenance items from synapse processing.
     """
     _fields_ = [
         # the maximum number of times the timer tick didn't complete in time
@@ -52,7 +53,8 @@ class PopulationNeuronsMachineVertex(
         AbstractGeneratesDataSpecification,
         AbstractRewritesDataSpecification,
         ReceivesSynapticInputsOverSDRAM):
-    """ A machine vertex for the Neurons of PyNN Populations
+    """
+    A machine vertex for the Neurons of PyNN Populations.
     """
 
     __slots__ = [
@@ -66,7 +68,9 @@ class PopulationNeuronsMachineVertex(
         "__regenerate_data"]
 
     class REGIONS(Enum):
-        """Regions for populations."""
+        """
+        Regions for populations.
+        """
         SYSTEM = 0
         CORE_PARAMS = 1
         PROVENANCE_DATA = 2
@@ -105,7 +109,7 @@ class PopulationNeuronsMachineVertex(
             neuron_data, max_atoms_per_core):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram used by the vertex
+            The SDRAM used by the vertex
         :param str label: The label of the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -165,11 +169,13 @@ class PopulationNeuronsMachineVertex(
         return self.__max_atoms_per_core
 
     def set_sdram_partition(self, sdram_partition):
-        """ Set the SDRAM partition.  Must only be called once per instance
+        """
+        Set the SDRAM partition.  Must only be called once per instance.
 
-        :param ~pacman.model.graphs.machine\
-                .SourceSegmentedSDRAMMachinePartition sdram_partition:
+        :param sdram_partition:
             The SDRAM partition to receive synapses from
+        :type sdram_partition:
+            ~pacman.model.graphs.machine.SourceSegmentedSDRAMMachinePartition
         """
         if self.__sdram_partition is not None:
             raise SynapticConfigurationException(
@@ -178,8 +184,9 @@ class PopulationNeuronsMachineVertex(
 
     @staticmethod
     def __get_binary_file_name(app_vertex):
-        """ Get the local binary filename for this vertex.  Static because at
-            the time this is needed, the local app_vertex is not set.
+        """
+        Get the local binary filename for this vertex.  Static because at
+        the time this is needed, the local app_vertex is not set.
 
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -216,10 +223,8 @@ class PopulationNeuronsMachineVertex(
             self.vertex_slice)
         return ids
 
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification)
+    @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
@@ -285,7 +290,7 @@ class PopulationNeuronsMachineVertex(
                       SendsSynapticInputsOverSDRAM):
             return self.n_bytes_for_transfer
         raise SynapticConfigurationException(
-            "Unknown pre vertex type in edge {}".format(sdram_machine_edge))
+            f"Unknown pre vertex type in edge {sdram_machine_edge}")
 
     @overrides(PopulationMachineNeurons.set_do_neuron_regeneration)
     def set_do_neuron_regeneration(self):

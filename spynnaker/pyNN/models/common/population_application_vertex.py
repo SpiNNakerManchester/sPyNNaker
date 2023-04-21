@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,10 +20,11 @@ from pacman.utilities.utility_calls import get_field_based_keys
 
 
 class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
-    """ A vertex that can be used in a Population.
+    """
+    A vertex that can be used in a Population.
 
-        Provides some default functions that can be overridden if the vertex
-        supports these.
+    Provides some default functions that can be overridden if the vertex
+    supports these.
     """
 
     # No data required here; makes it easy to mix in!
@@ -31,7 +32,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     @staticmethod
     def _as_list(names):
-        """ Normalise the input to a list
+        """
+        Normalise the input to a list.
 
         :param names: The item or items to normalise
         :type names: str or list
@@ -43,7 +45,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     @staticmethod
     def _check_names(names, allowed, type_of_thing):
-        """ Check the list of names are allowed or not
+        """
+        Check the list of names are allowed or not.
 
         :param names: The names to check
         :type names: str or list
@@ -57,7 +60,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     @staticmethod
     def _check_parameters(names, allowed):
-        """ Check that parameters are allowed
+        """
+        Check that parameters are allowed.
 
         :param names: The names to check
         :type names: str or list
@@ -67,7 +71,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     @staticmethod
     def _check_variables(names, allowed):
-        """ Check that state variables are allowed
+        """
+        Check that state variables are allowed.
 
         :param names: The names to check
         :type names: str or list
@@ -76,8 +81,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
         PopulationApplicationVertex._check_names(names, allowed, "variable")
 
     def get_parameter_values(self, names, selector=None):
-        """ Get the values of a parameter or parameters for the whole
-            Population or a subset if the selector is used
+        """
+        Get the values of a parameter or parameters for the whole
+        Population or a subset if the selector is used.
 
         :param names: The name or names of the parameter to get
         :type names: str or list
@@ -92,8 +98,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             "This Population does not support the reading of parameters")
 
     def set_parameter_values(self, name, value, selector=None):
-        """ Set the values of a parameter for the whole Population or a subset
-            if the selector is used
+        """
+        Set the values of a parameter for the whole Population or a subset
+        if the selector is used.
 
         :param str name: The name of the parameter to set
         :param selector: a description of the subrange to accept, or ``None``
@@ -106,18 +113,20 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             "This Population does not support the setting of parameters")
 
     def get_parameters(self):
-        """ Get the names of all the parameters that can be obtained
+        """
+        Get the names of all the parameters that can be obtained
 
         :rtype: list(str)
         """
         return []
 
     def get_initial_state_values(self, names, selector=None):
-        """ Get the initial values of a state variable for the whole Population
-            or a subset if the selector is used
+        """
+        Get the initial values of a state variable for the whole Population
+        or a subset if the selector is used.
 
         :param names: The name or names of the variable to get
-        :type name: str or list
+        :type names: str or list(str)
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -130,8 +139,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             " variables")
 
     def set_initial_state_values(self, name, value, selector=None):
-        """ Set the initial values of a state variable for the whole Population
-            or a subset if the selector is used
+        """
+        Set the initial values of a state variable for the whole Population
+        or a subset if the selector is used.
 
         :param str name: The name of the variable to set
         :param selector: a description of the subrange to accept, or ``None``
@@ -145,11 +155,12 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             " variables")
 
     def get_current_state_values(self, names, selector=None):
-        """ Get the current values of a state variable for the whole Population
-            or a subset if the selector is used
+        """
+        Get the current values of a state variable for the whole Population
+        or a subset if the selector is used.
 
         :param names: The name or names of the variable to get
-        :type name: str or list
+        :type names: str or list(str)
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -162,8 +173,9 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             " variables")
 
     def set_current_state_values(self, name, value, selector=None):
-        """ Set the current values of a state variable for the whole Population
-            or a subset if the selector is used
+        """
+        Set the current values of a state variable for the whole Population
+        or a subset if the selector is used.
 
         :param str name: The name of the variable to set
         :param selector: a description of the subrange to accept, or ``None``
@@ -177,14 +189,16 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             " variables")
 
     def get_state_variables(self):
-        """ Get a list of supported state variables
+        """
+        Get a list of supported state variables.
 
         :rtype: list(str)
         """
         return []
 
     def get_units(self, name):
-        """ Get the units of the given parameter or state variable
+        """
+        Get the units of the given parameter or state variable.
 
         :param str name: the name of the parameter to get the units of
         :rtype: str
@@ -195,13 +209,14 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     @property
     def conductance_based(self):
-        """ Determine whether the vertex models post-synaptic inputs as
-            currents or conductance.
+        """
+        Whether the vertex models post-synaptic inputs as
+        currents or conductance.
 
-            By default this returns False; override if the model accepts
-            conductance based input.
+        By default this is False; override if the model accepts
+        conductance based input.
 
-        :rtype: bool.
+        :rtype: bool
         """
         return False
 
@@ -210,23 +225,25 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     # be too
 
     def get_recordable_variables(self):
-        """ Get a list of the names and types of things that can be recorded
+        """
+        Get a list of the names and types of things that can be recorded.
 
-        This methods list the variable recorded via the Population
+        This methods list the variable recorded via the Population.
 
         :rtype: list(str)
         """
         return []
 
     def set_recording(self, name, sampling_interval=None, indices=None):
-        """ Set a variable recording
+        """
+        Set a variable recording.
 
         :param str name: The name of the variable to set the status of
         :param sampling_interval:
-            How often the variable should be recorded or None for every
+            How often the variable should be recorded or `None` for every
             time step, in milliseconds
         :type sampling_interval: float or None
-        :param indices: The list of neuron indices to record or None for all
+        :param indices: The list of neuron indices to record or `None` for all
         :type indices: list(int) or None
         :raises KeyError: if the variable cannot be recorded
         """
@@ -238,11 +255,12 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"set_recording")
 
     def set_not_recording(self, name, indices=None):
-        """ Set a variable not recording
+        """
+        Set a variable not recording.
 
         :param str name: The name of the variable to not record
         :param indices:
-            The list of neuron indices to not record or None for all
+            The list of neuron indices to not record or `None` for all
         :type indices: list(int) or None
         :raises KeyError: if the variable cannot be stopped from recording
         """
@@ -254,7 +272,8 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"set_not_recording")
 
     def get_recording_variables(self):
-        """ Get a list of variables that are currently being recorded
+        """
+        Get a list of variables that are currently being recorded.
 
         :rtype: list(str)
         """
@@ -265,13 +284,15 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"get_recording_variables")
 
     def get_buffer_data_type(self, name):
-        """ Get the type of data recorded by the buffer manager
+        """
+        Get the type of data recorded by the buffer manager.
 
-        The BufferDatabase value controls how data returned by the cores is
-        handled in NeoBufferDatabase
+        The buffer data type controls how data returned by the cores is
+        handled in NeoBufferDatabase.
 
         :param str name: The name of the variable recorded
-        :rtype: ~spynnaker.pyNN.utilities.neo_buffer_database.BufferDatabase
+        :rtype:
+            ~spinn_front_end_common.interface.buffer_management.storage_objects.BufferDatabase
         :raises KeyError: if the variable isn't being recorded
         """
         if name not in self.get_recordable_variables():
@@ -281,10 +302,11 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"get_recording_variables")
 
     def get_sampling_interval_ms(self, name):
-        """ Get the sampling interval of the recording for the given variable
+        """
+        Get the sampling interval of the recording for the given variable.
 
         The values is in ms and unless selective recording is used will be
-        SpynnakerDataView.get_simulation_time_step_us()
+        `SpynnakerDataView.get_simulation_time_step_us()`
 
         :rtype: float
         :raises KeyError: If the variable isn't being recorded
@@ -296,10 +318,11 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
             f"get_recording_variables")
 
     def get_data_type(self, name):
-        """ Get the type data returned by a recording of the variable
+        """
+        Get the type data returned by a recording of the variable.
 
         This is the type of data the C code is returning.
-        For instance dta such as spikes this will be None
+        For instance data such as spikes this will be `None`.
 
         :param str name: The name of the variable to get the type of
         :rtype: ~data_specification.enums.DataType or None
@@ -313,7 +336,7 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     def get_recording_region(self, name):
         """
-        Gets the recording region for the named variable
+        Gets the recording region for the named variable.
 
         :param str name: The name of the variable to get the region of
         :rtype: int
@@ -327,15 +350,16 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     def get_neurons_recording(self, name, vertex_slice):
         """
-        Gets the neurons being recorded on the core with this slice
+        Gets the neurons being recorded on the core with this slice.
 
-        Typically vertex_slice.get_raster_ids(atoms_shape)
-        But may be a sublist if doing selective recording
+        Typically `vertex_slice.get_raster_ids(atoms_shape)`
+        but may be a sublist if doing selective recording.
 
         :param str name: The name of the variable to get the region of
-        :param vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :return: A list of the global raster IDs of the atoms in recording
             named variable within this slice
+        :rtype: list(int)
         """
         # pylint: disable=unused-argument
         if name not in self.get_recordable_variables():
@@ -347,15 +371,17 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
     # end of recording methods
 
     def inject(self, current_source, selector=None):
-        """ Inject a current source into this population
+        """
+        Inject a current source into this population.
 
-        :param ~pyNN.standardmodels.electrodes.StandardCurrentSource\
-            current_source: the Current Source to be injected
+        :param AbstractCurrentSource current_source:
+            the current source to be injected
         :param selector: a description of the subrange to accept, or ``None``
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
-        :raise ConfigurationException:
+        :raises \
+            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
             if the population doesn't support injection
         """
         raise ConfigurationException(
@@ -363,9 +389,10 @@ class PopulationApplicationVertex(ApplicationVertex, HasCustomAtomKeyMap):
 
     @property
     def n_colour_bits(self):
-        """ The number of colour bits sent by this vertex.
+        """
+        The number of colour bits sent by this vertex.
 
-            Assumed 0 unless overridden
+        Assumed 0 unless overridden
 
         :rtype: int
         """

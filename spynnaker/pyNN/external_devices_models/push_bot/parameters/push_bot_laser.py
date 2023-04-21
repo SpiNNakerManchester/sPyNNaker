@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,8 @@ from spynnaker.pyNN.external_devices_models.push_bot import (
 
 
 class PushBotLaser(AbstractPushBotOutputDevice):
-    """ The properties of the laser device that may be set.
+    """
+    The properties of the laser device that may be set.
     """
 
     #: The total period for the laser
