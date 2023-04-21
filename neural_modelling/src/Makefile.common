@@ -1,6 +1,6 @@
 # THIS FILE WAS USED IN AN OLDER MAKE STYLE
 # Make now has to convert c files before building
-# SEE http://spinnakermanchester.github.io/latest/Makefiles.html
+# SEE https://spinnakermanchester.github.io/latest/Makefiles.html
 
 # Copyright (c) 2017 The University of Manchester
 #

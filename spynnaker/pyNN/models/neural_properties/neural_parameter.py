@@ -30,11 +30,11 @@ class _Range_Iterator(object):
         "__spec",
         "__stop_range"]
 
-    def __init__(self, value, datatype, slice_start, slice_stop, spec):
+    def __init__(self, value, data_type, slice_start, slice_stop, spec):
         """
         :param ~spinn_utilities.ranged.AbstractList value:
             The abstract list holding the data
-        :param ~data_specification.enums.DataType datatype:
+        :param ~data_specification.enums.DataType data_type:
             The type of each element of data
         :param int slice_start: Inclusive start of the range
         :param int slice_stop: Exclusive end of the range
@@ -48,7 +48,7 @@ class _Range_Iterator(object):
         # iterator to be called, and set self._cmd_pair
         self.__index = 0
         self.__stop_range = 0
-        self.__datatype = datatype
+        self.__datatype = data_type
         self.__spec = spec
         self.__cmd_pair = (None, None)
 
@@ -76,11 +76,11 @@ class _Get_Iterator(object):
         "__spec",
         "__value"]
 
-    def __init__(self, value, datatype, slice_start, slice_stop, spec):
+    def __init__(self, value, data_type, slice_start, slice_stop, spec):
         """
         :param value: The list holding the data
         :type value: list(int) or list(float) or list(bool) or ~numpy.ndarray
-        :param ~data_specification.enums.DataType datatype:
+        :param ~data_specification.enums.DataType data_type:
             The type of each element of data
         :param int slice_start: Inclusive start of the range
         :param int slice_stop: Exclusive end of the range
@@ -89,7 +89,7 @@ class _Get_Iterator(object):
         """
         # pylint: disable=too-many-arguments
         self.__value = value
-        self.__datatype = datatype
+        self.__datatype = data_type
         self.__index = slice_start
         self.__slice_stop = slice_stop
         self.__spec = spec
@@ -107,19 +107,20 @@ class _SingleValue_Iterator(object):
     """
     Iterator that repeats the single values the required number of times.
 
-    Allows a single Value parameter to be treated the same as parameters with
-    len. Caches `cmd_word_list` and `cmd_string` so they are only created once.
+    Allows a single value parameter to be treated the same as parameters with
+    a given length.
+    Caches `cmd_word_list` and `cmd_string` so they are only created once.
     """
     __slots__ = [
         "__cmd_pair",
         "__index",
         "__stop"]
 
-    def __init__(self, value, datatype, slice_start, slice_stop, spec):
+    def __init__(self, value, data_type, slice_start, slice_stop, spec):
         """
         :param value: The simple value that is the data for each element
         :type value: int or float or bool
-        :param ~data_specification.enums.DataType datatype:
+        :param ~data_specification.enums.DataType data_type:
             The type of each element of data
         :param int slice_start: Inclusive start of the range
         :param int slice_stop: Exclusive end of the range
@@ -127,7 +128,7 @@ class _SingleValue_Iterator(object):
             The data specification to write to
         """
         # pylint: disable=too-many-arguments
-        self.__cmd_pair = spec.create_cmd(data=value, data_type=datatype)
+        self.__cmd_pair = spec.create_cmd(data=value, data_type=data_type)
         self.__index = slice_start
         self.__stop = slice_stop
 

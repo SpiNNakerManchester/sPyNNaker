@@ -19,26 +19,26 @@ import logging
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def _check_args(args_to_find, default_args, init):
+def _check_args(args_to_find, default_args, init_method):
     for arg in args_to_find:
         if arg not in default_args:
             raise AttributeError(
                 f"Argument {arg} not found, or "
-                f"no default value provided in {init}")
+                f"no default value provided in {init_method}")
 
 
-def get_dict_from_init(init, skip=None, include=None):
+def get_dict_from_init(init_method, skip=None, include=None):
     """
     Get an argument initialisation dictionary by examining an
     ``__init__`` method or function.
 
-    :param callable init: The method.
+    :param callable init_method: The method.
     :param frozenset(str) skip: The arguments to be skipped, if any
     :param frozenset(str) include: The arguments that must be present, if any
     :return: an initialisation dictionary
     :rtype: dict(str, Any)
     """
-    init_args = inspect.getfullargspec(init)
+    init_args = inspect.getfullargspec(init_method)
     n_defaults = 0 if init_args.defaults is None else len(init_args.defaults)
     n_args = 0 if init_args.args is None else len(init_args.args)
     default_args = ([] if init_args.args is None else
@@ -47,9 +47,9 @@ def get_dict_from_init(init, skip=None, include=None):
 
     # Check that included / skipped things exist
     if include is not None:
-        _check_args(include, default_args, init)
+        _check_args(include, default_args, init_method)
     if skip is not None:
-        _check_args(skip, default_args, init)
+        _check_args(skip, default_args, init_method)
 
     return {arg: value
             for arg, value in zip(default_args, default_values)

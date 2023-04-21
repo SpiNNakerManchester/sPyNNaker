@@ -40,7 +40,8 @@ CONNECTOR_CONFIG_SHORTS = 16
 class ConvolutionConnector(AbstractConnector):
     """
     Where the pre- and post-synaptic populations are considered as a 2D
-    array. Connect every post(row, col) neuron to many pre(row, col, kernel)
+    array. Connect every post(row, column) neuron to many
+    pre(row, column, kernel)
     through a (kernel) set of weights and/or delays.
     """
 
@@ -363,7 +364,7 @@ class ConvolutionConnector(AbstractConnector):
 
     def __pre_as_post(self, pre_coords):
         """
-        Write pre coords as post coords.
+        Write pre-population coordinates as post-population coordinates.
 
         :param ~collections.abc.Iterable pre_coords:
             An iterable of (x, y) coordinates

@@ -66,9 +66,11 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         :param float tau_syn_I: (defaulted LIF neuron parameter)
         :param float tau_refrac: (defaulted LIF neuron parameter)
         :param float i_offset: (defaulted LIF neuron parameter)
-        :param float v: (defaulted LIF neuron state variable init)
-        :param float isyn_exc: (defaulted LIF neuron state variable init)
-        :param float isyn_inh: (defaulted LIF neuron state variable init)
+        :param float v: (defaulted LIF neuron state variable initial value)
+        :param float isyn_exc:
+            (defaulted LIF neuron state variable initial value)
+        :param float isyn_inh:
+            (defaulted LIF neuron state variable initial value)
         """
         # pylint: disable=too-many-arguments
 

@@ -192,7 +192,7 @@ class SplitterAbstractPopulationVertexFixed(
         Returns the variable SDRAM from the recorders.
 
         :param int n_atoms: The number of atoms to account for
-        :return: the variable sdram used by the neuron recorder
+        :return: the variable SDRAM used by the neuron recorder
         :rtype: VariableSDRAM
         """
         s_dynamics = self._governed_app_vertex.synapse_dynamics

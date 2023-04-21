@@ -50,8 +50,10 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         """
         :param str index_expression:
             the right-hand side of a valid python expression for
-            probability, involving the indices of the pre and post populations,
-            that can be parsed by eval(), that computes a probability dist;
+            probability, involving the indices of the pre- and
+            post-populations,
+            that can be parsed by `eval()`, that computes a probability
+            distribution;
             the indices will be given as variables ``i`` and ``j`` when the
             expression is evaluated.
         :param bool allow_self_connections:

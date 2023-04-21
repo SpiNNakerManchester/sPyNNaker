@@ -25,7 +25,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 class SynapticMatrixApp(object):
     """
     The synaptic matrix (and delay matrix if applicable) for an incoming
-    app edge.
+    application edge.
     """
 
     # pylint: disable=unused-private-member
@@ -124,27 +124,27 @@ class SynapticMatrixApp(object):
         return (max_row_length * self.__app_edge.pre_vertex.n_atoms *
                 (self.__app_edge.n_delay_stages + 1))
 
-    def reserve_matrices(self, block_addr, poptable):
+    def reserve_matrices(self, block_addr, pop_table):
         """
         Allocate the master pop table entries for the blocks.
 
         :param int block_addr: Where the allocation can start from
-        :param MasterPopTableAsBinarySearch poptable:
+        :param MasterPopTableAsBinarySearch pop_table:
             The master population table
         :return: Where the next allocation can start from
         :rtype: int
         """
-        block_addr = self.__reserve_app_matrix(block_addr, poptable)
-        block_addr = self.__reserve_delay_app_matrix(block_addr, poptable)
+        block_addr = self.__reserve_app_matrix(block_addr, pop_table)
+        block_addr = self.__reserve_delay_app_matrix(block_addr, pop_table)
         return block_addr
 
-    def __reserve_app_matrix(self, block_addr, poptable):
+    def __reserve_app_matrix(self, block_addr, pop_table):
         """
         Reserve space for the matrix in the master pop table.
 
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param MasterPopTableAsBinarySearch poptable:
+        :param MasterPopTableAsBinarySearch pop_table:
             The master population table
         :return: The updated block address
         :rtype: int
@@ -155,7 +155,7 @@ class SynapticMatrixApp(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
-            self.__index = poptable.add_invalid_application_entry(
+            self.__index = pop_table.add_invalid_application_entry(
                 self.__app_key_info.key_and_mask,
                 self.__app_key_info.core_mask, self.__app_key_info.core_shift,
                 self.__app_key_info.n_neurons,
@@ -163,8 +163,8 @@ class SynapticMatrixApp(object):
             return block_addr
 
         # Write a matrix for the whole application vertex
-        block_addr = poptable.get_next_allowed_address(block_addr)
-        self.__index = poptable.add_application_entry(
+        block_addr = pop_table.get_next_allowed_address(block_addr)
+        self.__index = pop_table.add_application_entry(
             block_addr,  self.__max_row_info.undelayed_max_words,
             self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
             self.__app_key_info.core_shift, self.__app_key_info.n_neurons,
@@ -173,13 +173,13 @@ class SynapticMatrixApp(object):
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
         return block_addr
 
-    def __reserve_delay_app_matrix(self, block_addr, poptable):
+    def __reserve_delay_app_matrix(self, block_addr, pop_table):
         """
         Reserve space in the master pop table for a delayed matrix.
 
         :param int block_addr:
             The address in the synaptic matrix region to start writing at
-        :param MasterPopTableAsBinarySearch poptable:
+        :param MasterPopTableAsBinarySearch pop_table:
             The master population table
         :return: The updated block address
         :rtype: int
@@ -190,7 +190,7 @@ class SynapticMatrixApp(object):
 
         # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
-            self.__delay_index = poptable.add_invalid_application_entry(
+            self.__delay_index = pop_table.add_invalid_application_entry(
                 self.__delay_app_key_info.key_and_mask,
                 self.__delay_app_key_info.core_mask,
                 self.__delay_app_key_info.core_shift,
@@ -199,8 +199,8 @@ class SynapticMatrixApp(object):
             return block_addr
 
         # Write a matrix for the whole application vertex
-        block_addr = poptable.get_next_allowed_address(block_addr)
-        self.__delay_index = poptable.add_application_entry(
+        block_addr = pop_table.get_next_allowed_address(block_addr)
+        self.__delay_index = pop_table.add_application_entry(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_app_key_info.key_and_mask,
             self.__delay_app_key_info.core_mask,

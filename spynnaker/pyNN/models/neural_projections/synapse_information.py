@@ -116,7 +116,7 @@ class SynapseInformation(object):
     @property
     def n_pre_neurons(self):
         """
-        The number of neurons in the prepopulation.
+        The number of neurons in the pre-population.
 
         :rtype: int
         """
@@ -125,7 +125,7 @@ class SynapseInformation(object):
     @property
     def n_post_neurons(self):
         """
-        The number of neurons in the postpopulation.
+        The number of neurons in the post-population.
 
         :rtype: int
         """

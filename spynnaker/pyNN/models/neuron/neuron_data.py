@@ -165,7 +165,7 @@ class NeuronData(object):
         Write the generated data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
-            The spec to write to
+            The data specification to write to
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The vertex slice to generate for
         :param NeuronRegions neuron_regions: The regions to write to
@@ -237,10 +237,10 @@ class NeuronData(object):
 
     def __get_struct_data(self, struct, values, vertex_slice):
         """
-        Get the data for a struct.
+        Get the data for a structure.
 
-        :param Struct struct: The struct to get the data for
-        :param RangeDictionary values: The values to fill in the struct with
+        :param Struct struct: The structure to get the data for
+        :param RangeDictionary values: The values to fill in the structure with
         :param Slice vertex_slice: The slice to get the values for
         """
         if struct.repeat_type == StructRepeat.GLOBAL:
@@ -253,7 +253,7 @@ class NeuronData(object):
         Get the data to build neuron parameters with.
 
         :param Slice vertex_slice: The slice to get the parameters for
-        :return: The number of structs and the data
+        :return: The number of structures and the data
         :rtype: tuple(int, numpy.ndarray)
         """
         structs = self.__app_vertex.neuron_impl.structs
@@ -267,10 +267,10 @@ class NeuronData(object):
 
     def __get_builder_data(self, struct, values, vertex_slice):
         """
-        Get the builder data for a struct.
+        Get the builder data for a structure.
 
-        :param Struct struct: The struct to get the data for
-        :param RangeDictionary values: The values to fill in the struct with
+        :param Struct struct: The structure to get the data for
+        :param RangeDictionary values: The values to fill in the structure with
         :param Slice vertex_slice: The slice to get the values for
         """
         if struct.repeat_type == StructRepeat.GLOBAL:
@@ -284,7 +284,7 @@ class NeuronData(object):
         Get the header of the neuron builder region.
 
         :param Slice vertex_slice: The slice to put in the header
-        :param int n_structs: The number of structs to generate
+        :param int n_structs: The number of structures to generate
         :param NeuronRegions neuron_regions: The regions to point to
         :rtype: numpy.ndarray
         """
