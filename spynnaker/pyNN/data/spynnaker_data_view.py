@@ -164,9 +164,6 @@ class SpynnakerDataView(FecDataView):
         # UGLY but needed to avoid circular import
         from spynnaker.pyNN.models.projection import Projection
         cls.check_user_can_act()
-        if projection in cls.__spy_data._projections:
-            raise NotImplementedError(
-                "This method should only be called from the Projection init")
         if not isinstance(projection, Projection):
             raise TypeError("The projection must be a Projection")
         cls.__spy_data._projections.append(projection)
@@ -217,9 +214,6 @@ class SpynnakerDataView(FecDataView):
         cls.check_user_can_act()
         if not isinstance(population, Population):
             raise TypeError("The population must be a Population")
-        if population in cls.__spy_data._populations:
-            raise NotImplementedError(
-                "This method should only be called from the Population init")
         first_id = cls.__spy_data._id_counter
         cls.__spy_data._id_counter += population.size
         cls.__spy_data._populations.append(population)

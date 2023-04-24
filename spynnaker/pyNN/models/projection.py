@@ -60,6 +60,8 @@ class Projection(object):
         "__virtual_connection_list",
         "__label"]
 
+    KNOWN_EDGES = dict()
+
     def __init__(
             self, pre_synaptic_population, post_synaptic_population,
             connector, synapse_type=None, source=None,
@@ -152,7 +154,7 @@ class Projection(object):
         connector.set_projection_information(self.__synapse_information)
 
         # Find out if there is an existing edge between the populations
-        edge_to_merge = self._find_existing_edge(pre_vertex, post_vertex)
+        edge_to_merge = self.KNOWN_EDGES.get((pre_vertex, post_vertex))
         if edge_to_merge is not None:
 
             # If there is an existing edge, add the connector
@@ -164,6 +166,8 @@ class Projection(object):
             self.__projection_edge = ProjectionApplicationEdge(
                 pre_vertex, post_vertex, self.__synapse_information,
                 label=label)
+            self.KNOWN_EDGES[(pre_vertex, post_vertex)] = (
+                self.__projection_edge)
             SpynnakerDataView.add_edge(
                 self.__projection_edge, SPIKE_PARTITION_ID)
 
@@ -398,33 +402,6 @@ class Projection(object):
         :rtype: ProjectionApplicationEdge
         """
         return self.__projection_edge
-
-    def _find_existing_edge(self, pre_synaptic_vertex, post_synaptic_vertex):
-        """
-        Searches though the graph's edges to locate any
-        edge which has the same post- and pre- vertex
-
-        :param pre_synaptic_vertex: the source vertex of the multapse
-        :type pre_synaptic_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :param post_synaptic_vertex: The destination vertex of the multapse
-        :type post_synaptic_vertex:
-            ~pacman.model.graphs.application.ApplicationVertex
-        :return: `None` or the edge going to these vertices.
-        :rtype: ~.ApplicationEdge
-        """
-        # Find edges ending at the postsynaptic vertex
-        partitions = (
-            SpynnakerDataView.get_outgoing_edge_partitions_starting_at_vertex(
-                pre_synaptic_vertex))
-
-        # Partitions and Partition.edges will be OrderedSet but may be empty
-        for partition in partitions:
-            for edge in partition.edges:
-                if edge.post_vertex == post_synaptic_vertex:
-                    return edge
-
-        return None
 
     def _get_synaptic_data(
             self, as_list, data_to_get, fixed_values=None, notify=None):
