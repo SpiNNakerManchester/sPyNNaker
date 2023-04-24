@@ -26,6 +26,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Set up Python 3.8
         uses: actions/setup-python@v4
@@ -66,7 +67,7 @@ jobs:
         with:
           directory: doc/source
       - name: Build C documentation
-        uses: mattnotmitt/doxygen-action@v1.3.1
+        uses: mattnotmitt/doxygen-action@v1.9.5
         with:
           working-directory: neural_modelling
 
@@ -77,8 +78,7 @@ jobs:
           cp -vaT $PY_DOC_DIR $DEPLOY_DIR/python
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
           folder: ${{ env.DEPLOY_DIR }}
