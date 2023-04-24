@@ -16,7 +16,7 @@ import logging
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState
+from spinnman.model.enums import CPUState, ExecutableType
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         machine_bit_field_ordered_covering_compressor,
@@ -25,7 +25,6 @@ from spinn_front_end_common.utilities.helpful_functions import (
     write_address_to_user1)
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
