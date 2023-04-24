@@ -334,7 +334,7 @@ static void neuron_impl_do_timestep_update(
 
 	for (uint32_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
-//		log_info("neuron_index %u time %u ", neuron_index, time);
+//		log_info("timestep_update neuron_index %u time %u ", neuron_index, time);
 
 		// Get the neuron itself
 		neuron_t *neuron = &neuron_array[neuron_index];
@@ -440,11 +440,15 @@ static void neuron_impl_do_timestep_update(
 
 		// Simplified what was below this to choose which delta_w to record for different indices
 		if ((neuron_index == 0) || (neuron_index == 1) || (neuron_index == 2)) {
+//			log_info("z_bar_inp %k (10 + neuron_index) %u L %k time %u",
+//					neuron->syn_state[10+neuron_index].z_bar_inp, 10+neuron_index, neuron->L, time);
 			neuron_recording_record_accum(
 					GSYN_INH_RECORDING_INDEX, neuron_index,
 					neuron->syn_state[10+neuron_index].delta_w);
 		}
 		else {
+//			log_info("z_bar_inp %k neuron_index %u L %k time %u",
+//					neuron->syn_state[0+neuron_index].z_bar_inp, neuron_index, neuron->L, time);
 			neuron_recording_record_accum(
 					GSYN_INH_RECORDING_INDEX, neuron_index,
 					neuron->syn_state[0+neuron_index].delta_w);

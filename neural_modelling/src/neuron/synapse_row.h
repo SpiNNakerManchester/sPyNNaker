@@ -96,13 +96,13 @@
 #endif
 
 //! how many bits the synapse delay will take
-#ifndef SYNAPSE_DELAY_BITS
-#define SYNAPSE_DELAY_BITS 8
-#endif
+//#ifndef SYNAPSE_DELAY_BITS
+//#define SYNAPSE_DELAY_BITS 8
+//#endif
 
-// Create some masks based on the number of bits
-//! the mask for the synapse delay in the row
-#define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
+//// Create some masks based on the number of bits
+////! the mask for the synapse delay in the row
+//#define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
 
 //! should this go somewhere else, perhaps in the models that use it?
 #define SYNAPSE_WEIGHTS_SIGNED true

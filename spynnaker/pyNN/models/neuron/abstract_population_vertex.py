@@ -682,8 +682,8 @@ class AbstractPopulationVertex(
             selector, value)
 
 
-        # This was added to the eprop_adaptive branch; does it need adding to generate_data_spec
-        # (which has now been moved to the machine vertex...)
+        # This was added to the eprop_adaptive branch; does it need adding to
+        # generate_data_spec (which has now been moved to the machine vertex...)
 
         # if isinstance(self.__pynn_model._model.neuron_model, NeuronModelLeftRightReadout):
         #     poisson_key = routing_info.get_first_key_from_pre_vertex(placement.vertex, "CONTROL")

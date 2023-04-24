@@ -74,10 +74,13 @@ static synapse_types_t *synapse_types_array;
 //! The number of steps to run per timestep
 static uint n_steps_per_timestep;
 
+//! Whether key is set, from neuron.c
+extern bool use_key;
+
 // TODO: check if these other parameters are needed
 static REAL next_spike_time = 0;
 extern uint32_t time;
-extern key_t key;
+extern uint32_t *neuron_keys;
 extern REAL learning_signal;
 static uint32_t target_ind = 0;
 
@@ -358,10 +361,15 @@ static void neuron_impl_do_timestep_update(
 			// Send error (learning signal) as packet with payload
 			// ToDo can't I just alter the global variable here?
 			// Another option is just to use "send_spike" instead... ?
-			while (!spin1_send_mc_packet(
-					key | neuron_index,  bitsk(error), 1 )) {
-				spin1_delay_us(1);
+//			send_spike_mc_payload(key, bitsk(error));
+			if (use_key) {
+				send_spike_mc_payload(neuron_keys[neuron_index], bitsk(error));
 			}
+//			log_info("send learning signal key %u neuron_index %u", neuron_keys[neuron_index], neuron_index);
+//			while (!spin1_send_mc_packet(
+//					neuron_keys[neuron_index],  bitsk(error), 1 )) {
+//				spin1_delay_us(1);
+//			}
 		}
 		else{
 			// Record 'Error'

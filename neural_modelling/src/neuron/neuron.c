@@ -34,7 +34,7 @@
 //#define SPIKE_RECORDING_CHANNEL 0
 
 //! The key to be used for this core (will be ORed with neuron ID)
-key_t key;  //MADE NON STATIC!!!
+//key_t key;  //MADE NON STATIC!!!
 //! The keys to be used by the neurons (one per neuron)
 uint32_t *neuron_keys;
 

@@ -27,7 +27,7 @@ class AbstractSpynnakerSplitterDelay(object, metaclass=AbstractBase):
     __slots__ = []
 
     # max delays supported by a slice split machine vertex
-    MAX_SUPPORTED_DELAY_TICS = 255 # 16 ?? at least, I think so...
+    MAX_SUPPORTED_DELAY_TICS = 64 # 16 ?? at least, I think so...
 
     def max_support_delay(self):
         """

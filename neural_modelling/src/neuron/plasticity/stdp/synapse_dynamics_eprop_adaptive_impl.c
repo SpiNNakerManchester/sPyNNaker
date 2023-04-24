@@ -408,6 +408,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
         neuron_t *neuron = &neuron_array[neuron_ind];
         neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024.0k; // !!!! Check what units this is in - same as weight? !!!!
+//        log_info("plastic update of z_bar_inp for neuron_ind %u syn_ind %u", neuron_ind, syn_ind_from_delay);
 
 //        io_printf(IO_BUF, "initial_weight: d%d, k%k, u%u - ", current_state.initial_weight, current_state.initial_weight, current_state.initial_weight);
 //        if (current_state.initial_weight > 0){

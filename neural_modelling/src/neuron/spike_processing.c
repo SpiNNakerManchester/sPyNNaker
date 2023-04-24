@@ -310,18 +310,18 @@ static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
 //! \brief Called when a multicast packet is received
 //! \param[in] key: The key of the packet. The spike.
 //! \param[in] payload: the payload of the packet. The count.
-static void multicast_packet_pl_received_callback(uint key, uint payload) {
-    p_per_ts_struct.packets_this_time_step += 1;
-
-    // cycle through the packet insertion
-    bool added = false;
-    for (uint count = payload; count > 0; count--) {
-        added = in_spikes_add_spike(key);
-    }
-    if (added) {
-        start_dma_loop();
-    }
-}
+//static void multicast_packet_pl_received_callback(uint key, uint payload) {
+//    p_per_ts_struct.packets_this_time_step += 1;
+//
+//    // cycle through the packet insertion
+//    bool added = false;
+//    for (uint count = payload; count > 0; count--) {
+//        added = in_spikes_add_spike(key);
+//    }
+//    if (added) {
+//        start_dma_loop();
+//    }
+//}
 
 //! \brief Called when a DMA completes
 //! \param unused: unused
@@ -419,7 +419,7 @@ static void multicast_packet_wpayload_received_callback(uint key, uint payload){
 	learning_signal = kbits(payload);
 
 	// Print payload to test transmission of error
-//	io_printf(IO_BUF, "payload: %k\n", learning_signal);
+//	io_printf(IO_BUF, "    payload (learning signal): %k\n", learning_signal);
 
 	// Assign learning signal to global memory
 

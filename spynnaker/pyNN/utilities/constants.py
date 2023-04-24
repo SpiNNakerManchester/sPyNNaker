@@ -54,9 +54,7 @@ WEIGHT_FLOAT_TO_FIXED_SCALE = 16.0
 SCALE = WEIGHT_FLOAT_TO_FIXED_SCALE * NA_TO_PA_SCALE
 
 # natively supported delays for all abstract_models
-MAX_SUPPORTED_DELAY_TICS = 256
-MAX_DELAY_BLOCKS = 0
-MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 256
+MAX_SUPPORTED_DELAY_TICS = 64
 
 #: the minimum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
