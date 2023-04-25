@@ -15,6 +15,7 @@ import struct
 from enum import IntEnum
 import numpy
 
+from spinnman.model.enums import ExecutableType
 from data_specification.enums import DataType
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
@@ -34,7 +35,6 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
     AbstractReceiveBuffersToHost)
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.profiling import (
     AbstractHasProfileData, profile_utils)
 from spinn_front_end_common.interface.profiling.profile_utils import (
