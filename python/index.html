@@ -1,162 +1,24 @@
+<html>
+<!--
+Copyright (c) 2023 The University of Manchester
 
-<!DOCTYPE html>
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-<html lang="en">
+     https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html>
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-
-    <title>sPyNNaker &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="spynnaker" href="modules.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="modules.html" title="spynnaker"
-             accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">sPyNNaker</a></li> 
-      </ul>
-    </div>  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <p>These pages document the python code for the <a class="reference external" href="https://github.com/SpiNNakerManchester/sPyNNaker">sPyNNaker</a> module
-which is part of the <a class="reference external" href="https://apt.cs.manchester.ac.uk/projects/SpiNNaker">SpiNNaker</a> Project.</p>
-<p>This code depends on <a class="reference external" href="https://spinnutils.readthedocs.io">SpiNNUtils</a>, <a class="reference external" href="https://spinnmachine.readthedocs.io">SpiNNMachine</a>, <a class="reference external" href="https://spinnman.readthedocs.io">SpiNNMan</a>, <a class="reference external" href="https://pacman.readthedocs.io">PACMAN</a>, <a class="reference external" href="https://dataspecification.readthedocs.io">DataSpecification</a>, <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io">SpiNNFrontEndCommon</a>
-(<a class="reference external" href="https://spinnakermanchester.readthedocs.io">Combined_documentation</a>).</p>
-<section id="id1">
-<h1>sPyNNaker<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h1>
-<p>Contents:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">spynnaker</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.html">spynnaker package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="spynnaker.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.html">spynnaker.pyNN package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="spynnaker.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="spynnaker.html#module-spynnaker.gsyn_tools">spynnaker.gsyn_tools module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.gsyn_tools.check_gsyn"><code class="docutils literal notranslate"><span class="pre">check_gsyn()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.gsyn_tools.check_path_gysn"><code class="docutils literal notranslate"><span class="pre">check_path_gysn()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.gsyn_tools.check_sister_gysn"><code class="docutils literal notranslate"><span class="pre">check_sister_gysn()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="spynnaker.html#module-spynnaker.plot_utils">spynnaker.plot_utils module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.plot_utils.heat_plot"><code class="docutils literal notranslate"><span class="pre">heat_plot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.plot_utils.line_plot"><code class="docutils literal notranslate"><span class="pre">line_plot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.plot_utils.plot_spikes"><code class="docutils literal notranslate"><span class="pre">plot_spikes()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="spynnaker.html#module-spynnaker.spike_checker">spynnaker.spike_checker module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.spike_checker.synfire_multiple_lines_spike_checker"><code class="docutils literal notranslate"><span class="pre">synfire_multiple_lines_spike_checker()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.spike_checker.synfire_spike_checker"><code class="docutils literal notranslate"><span class="pre">synfire_spike_checker()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="spynnaker.html#module-spynnaker.spynnaker_plotting">spynnaker.spynnaker_plotting module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.spynnaker_plotting.SpynnakerPanel"><code class="docutils literal notranslate"><span class="pre">SpynnakerPanel</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.spynnaker_plotting.heat_plot_neo"><code class="docutils literal notranslate"><span class="pre">heat_plot_neo()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.spynnaker_plotting.heat_plot_numpy"><code class="docutils literal notranslate"><span class="pre">heat_plot_numpy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.spynnaker_plotting.plot_segment"><code class="docutils literal notranslate"><span class="pre">plot_segment()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.spynnaker_plotting.plot_spikes_numpy"><code class="docutils literal notranslate"><span class="pre">plot_spikes_numpy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.html#spynnaker.spynnaker_plotting.plot_spiketrains"><code class="docutils literal notranslate"><span class="pre">plot_spiketrains()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="spynnaker.html#module-spynnaker">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
-</section>
-
-
-            <div class="clearer"></div>
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="#">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">sPyNNaker</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="modules.html"
-                          title="next chapter">spynnaker</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="modules.html" title="spynnaker"
-             >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">sPyNNaker</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2014.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.0.
-    </div>
+    <meta http-equiv="refresh" content="0; url='https://spynnaker.readthedocs.io/'" />
+  </head>
+  <body>
+    <p>The Documenation is available on <a href="http://spynnaker.readthedocs.io/">readthedocs</a></p>
   </body>
 </html>
