@@ -25,6 +25,5 @@ Documentation
 <br>
 [sPyNNaker C documentation](http://spinnakermanchester.github.io/sPyNNaker/c/)
 
-<br>
 [Combined PyNN8 python documentation](http://spinnakermanchester.readthedocs.io)
 
