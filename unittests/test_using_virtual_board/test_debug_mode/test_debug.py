@@ -92,9 +92,9 @@ class TestDebug(BaseTestCase):
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
         for report in reports:
             self.assertIn(report, found)
+        self.assertIn("ds.sqlite3", found)
         found = os.listdir(SpynnakerDataView.get_timestamp_dir_path())
         self.assertIn(TIMER_FILENAME, found)
-        self.assertIn("ds.sqlite3", found)
 
     def test_debug(self):
         self.runsafe(self.debug)
