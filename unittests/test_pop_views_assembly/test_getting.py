@@ -185,7 +185,7 @@ class TestGetting(BaseTestCase):
         view = pop[1:4]
         assert {1: 2, 2: 3, 3: 3} == view.get_spike_counts()
 
-        assert 2.2222222222222223 == pop.meanSpikeCount()
+        assert 2.2222222222222223 == pop.mean_spike_count()
         assert 2.6666666666666665 == view.mean_spike_count()
 
         sim.end()
