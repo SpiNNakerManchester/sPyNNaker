@@ -6,13 +6,13 @@ This code depends on SpiNNUtils_, SpiNNMachine_, SpiNNMan_, PACMAN_, DataSpecifi
 
 .. _SpiNNaker: https://apt.cs.manchester.ac.uk/projects/SpiNNaker
 .. _sPyNNaker: https://github.com/SpiNNakerManchester/sPyNNaker
-.. _SpiNNUtils: https://spinnutils.readthedocs.io
-.. _SpiNNMachine: https://spinnmachine.readthedocs.io
-.. _SpiNNMan: https://spinnman.readthedocs.io
-.. _PACMAN: https://pacman.readthedocs.io
-.. _DataSpecification: https://dataspecification.readthedocs.io
-.. _SpiNNFrontEndCommon: https://spinnfrontendcommon.readthedocs.io
-.. _Combined_documentation: https://spinnakermanchester.readthedocs.io
+.. _SpiNNUtils: https://spinnutils.readthedocs.io/en/7.0.0-a5
+.. _SpiNNMachine: https://spinnmachine.readthedocs.io/en/7.0.0-a5
+.. _SpiNNMan: https://spinnman.readthedocs.io/en/7.0.0-a5
+.. _PACMAN: https://pacman.readthedocs.io/en/7.0.0-a5
+.. _DataSpecification: https://dataspecification.readthedocs.io/en/7.0.0-a5
+.. _SpiNNFrontEndCommon: https://spinnfrontendcommon.readthedocs.io/en/7.0.0-a5
+.. _Combined_documentation: https://spinnakermanchester.readthedocs.io/en/7.0.0-a5
 
 sPyNNaker
 =========
