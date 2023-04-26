@@ -26,8 +26,8 @@ from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
 class NoisyCurrentSource(AbstractCurrentSource):
     """
     A noisy current source beginning at "start" and ending at "stop", with
-    noise simulated based on the given mean and stdev, and updating every
-    dt (dt should default to the machine time step).
+    noise simulated based on the given mean and standard deviation, and
+    updating every `dt` (`dt` should default to the machine time step).
     """
     __slots__ = [
         "__mean",

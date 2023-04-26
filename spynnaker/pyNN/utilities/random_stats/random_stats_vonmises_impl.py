@@ -39,8 +39,8 @@ class RandomStatsVonmisesImpl(AbstractRandomStats):
     def var(self, dist):
         return vonmises.var(*self._get_params(dist))
 
-    def high(self, dist):
+    def high(self, distribution):
         return None
 
-    def low(self, dist):
+    def low(self, distribution):
         return None

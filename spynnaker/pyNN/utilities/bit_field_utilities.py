@@ -127,11 +127,11 @@ def get_bitfield_key_map_data(incoming_projections):
 def write_bitfield_init_data(
         spec, bit_field_region, n_bit_field_bytes, bit_field_region_ref=None):
     """
-    Writes the init data needed for the bitfield generator.
+    Writes the initialisation data needed for the bitfield generator.
 
     :param ~data_specification.DataSpecificationGenerator spec:
-        data spec writer
-    :param int bit_field_region: the region id for the bit-field filters
+        data specification writer
+    :param int bit_field_region: the region ID for the bit-field filters
     :param int n_bit_field_bytes: the size of the region
     :param int bit_field_region_ref: The reference to the region
     """

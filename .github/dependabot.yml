@@ -1,8 +1,4 @@
-# THIS FILE WAS USED IN AN OLDER MAKE STYLE
-# Make now has to convert c files before building
-# SEE https://spinnakermanchester.github.io/latest/Makefiles.html
-
-# Copyright (c) 2017 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,4 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$(error inclusion of sPyNNaker/neural_modelling/src/paths.mk)
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "dkfellows"
+    reviewers:
+      - "rowleya"

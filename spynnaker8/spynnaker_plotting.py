@@ -17,7 +17,7 @@ from spynnaker.spynnaker_plotting import SpynnakerPanel as _BaseClass
 from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
-def plot_spiketrains(ax, spiketrains, label='', **options):
+def plot_spiketrains(axes, spiketrains, label='', **options):
     """
     Plot all spike trains in a Segment in a raster plot.
 
@@ -25,17 +25,17 @@ def plot_spiketrains(ax, spiketrains, label='', **options):
         Use
         :py:class:`spynnaker.spynnaker_plotting` instead.
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param list(~neo.core.SpikeTrain) spiketrains: List of spiketimes
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
+    :param list(~neo.core.SpikeTrain) spiketrains: List of spike times
     :param str label: Label for the graph
     :param options: plotting options
     """
     moved_in_v6(
         "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
-    new_plotting.plot_spiketrains(ax, spiketrains, label, **options)
+    new_plotting.plot_spiketrains(axes, spiketrains, label, **options)
 
 
-def plot_spikes_numpy(ax, spikes, label='', **options):
+def plot_spikes_numpy(axes, spikes, label='', **options):
     """
     Plot all spikes.
 
@@ -43,17 +43,17 @@ def plot_spikes_numpy(ax, spikes, label='', **options):
         Use
         :py:class:`spynnaker.spynnaker_plotting` instead.
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param ~numpy.ndarray spikes: spynakker7 format nparray of spikes
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
+    :param ~numpy.ndarray spikes: spynakker7 format numpy array of spikes
     :param str label: Label for the graph
     :param options: plotting options
     """
     moved_in_v6(
         "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
-    new_plotting.plot_spikes_numpy(ax, spikes, label, **options)
+    new_plotting.plot_spikes_numpy(axes, spikes, label, **options)
 
 
-def heat_plot_numpy(ax, data, label='', **options):
+def heat_plot_numpy(axes, data, label='', **options):
     """
     Plots neurons, times and values into a heatmap.
 
@@ -61,17 +61,17 @@ def heat_plot_numpy(ax, data, label='', **options):
         Use
         :py:class:`spynnaker.spynnaker_plotting` instead.
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param ~numpy.ndarray data: nparray of values in spynnaker7 format
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
+    :param ~numpy.ndarray data: numpy array of values in spynnaker7 format
     :param str label: Label for the graph
     :param options: plotting options
     """
     moved_in_v6(
         "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
-    new_plotting.heat_plot_numpy(ax, data, label, **options)
+    new_plotting.heat_plot_numpy(axes, data, label, **options)
 
 
-def heat_plot_neo(ax, signal_array, label='', **options):
+def heat_plot_neo(axes, signal_array, label='', **options):
     """
     Plots neurons, times and values into a heatmap.
 
@@ -79,14 +79,14 @@ def heat_plot_neo(ax, signal_array, label='', **options):
         Use
         :py:class:`spynnaker.spynnaker_plotting` instead.
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
     :param ~neo.core.AnalogSignal signal_array: Neo Signal array Object
     :param str label: Label for the graph
     :param options: plotting options
     """
     moved_in_v6(
         "spynnaker8.spynnaker_plotting", "spynnaker.spynnaker_plotting")
-    new_plotting.heat_plot_neo(ax, signal_array, label, **options)
+    new_plotting.heat_plot_neo(axes, signal_array, label, **options)
 
 
 def plot_segment(axes, segment, label='', **options):

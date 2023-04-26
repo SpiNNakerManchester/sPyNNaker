@@ -42,7 +42,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
     @abstractproperty
     def structs(self):
         """
-        A list of structs used by the implementation.
+        A list of structures used by the implementation.
 
         :rtype: list(Struct)
         """
@@ -101,7 +101,8 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
         Get the data type of the variables that can be recorded.
 
-        :return: dict of name of variable to DataType of variable
+        :return: dictionary of name of variable to data type of variable
+        :rtype: dict(str,~data_specification.enums.DataType)
         """
 
     @abstractmethod
@@ -148,6 +149,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         Get the units of the given variable.
 
         :param str variable: The name of the variable
+        :rtype: str
         """
 
     @abstractproperty

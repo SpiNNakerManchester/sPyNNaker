@@ -147,7 +147,7 @@ class PopulationSynapsesMachineVertexCommon(
             self, sdram, label, app_vertex,  vertex_slice):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram used by the vertex
+            The SDRAM used by the vertex
         :param str label: The label of the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -191,7 +191,7 @@ class PopulationSynapsesMachineVertexCommon(
     def __get_binary_file_name(app_vertex):
         """
         Get the local binary filename for this vertex.  Static because at
-        the time this is needed, the local app_vertex is not set.
+        the time this is needed, the local `app_vertex` is not set.
 
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -226,7 +226,7 @@ class PopulationSynapsesMachineVertexCommon(
 
     def _write_key_spec(self, spec):
         """
-        Write key config region.
+        Write key configuration region.
 
         :param DataSpecificationGenerator spec:
             The generator of the specification to write

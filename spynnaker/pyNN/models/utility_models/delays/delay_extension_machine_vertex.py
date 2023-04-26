@@ -13,6 +13,7 @@
 # limitations under the License.
 from enum import Enum, IntEnum
 
+from spinnman.model.enums import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 from spinn_utilities.overrides import overrides
@@ -21,7 +22,6 @@ from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
@@ -91,7 +91,7 @@ class DelayExtensionMachineVertex(
     def __init__(self, sdram, label, vertex_slice, app_vertex=None):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram required by the vertex
+            The SDRAM required by the vertex
         :param str label: The name of the vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex
