@@ -335,10 +335,10 @@ class Population(PopulationBase):
         """
         FecTimer.start_category(TimerCategory.POP_GET_DATA)
         self._check_params(gather, annotations)
-        neo = self.__recorder.extract_neo_block(
+        neo_data = self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
         FecTimer.end_category(TimerCategory.POP_GET_DATA)
-        return neo
+        return neo_data
 
     def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
         """
