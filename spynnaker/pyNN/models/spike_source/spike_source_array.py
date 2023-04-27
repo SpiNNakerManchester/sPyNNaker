@@ -33,7 +33,7 @@ class SpikeSourceArray(AbstractPyNNModel):
         """
         :param splitter:
         :type splitter:
-            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         :param int n_colour_bits:
         """
         # pylint: disable=arguments-differ

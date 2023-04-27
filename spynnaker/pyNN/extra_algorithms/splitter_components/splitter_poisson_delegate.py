@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_utilities.overrides import overrides
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
@@ -37,9 +36,9 @@ class SplitterPoissonDelegate(SplitterFixedLegacy):
         # If there is only one outgoing projection, and it is one-to-one
         # connected to the target, and the target knows what to do, leave
         # it to the target
-        if len(self._governed_app_vertex.outgoing_projections) != 1:
+        if len(self.governed_app_vertex.outgoing_projections) != 1:
             return False
-        proj = self._governed_app_vertex.outgoing_projections[0]
+        proj = self.governed_app_vertex.outgoing_projections[0]
         # pylint: disable=protected-access
         post_vertex = proj._projection_edge.post_vertex
         if not isinstance(post_vertex.splitter,
@@ -70,7 +69,7 @@ class SplitterPoissonDelegate(SplitterFixedLegacy):
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
         if self.send_over_sdram:
-            proj = self._governed_app_vertex.outgoing_projections[0]
+            proj = self.governed_app_vertex.outgoing_projections[0]
             # pylint: disable=protected-access
             post_vertex = proj._projection_edge.post_vertex
             return post_vertex.splitter.get_in_coming_slices()
@@ -79,7 +78,7 @@ class SplitterPoissonDelegate(SplitterFixedLegacy):
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
         if self.send_over_sdram:
-            proj = self._governed_app_vertex.outgoing_projections[0]
+            proj = self.governed_app_vertex.outgoing_projections[0]
             # pylint: disable=protected-access
             post_vertex = proj._projection_edge.post_vertex
             return post_vertex.splitter.get_out_going_slices()

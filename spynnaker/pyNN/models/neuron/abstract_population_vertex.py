@@ -188,8 +188,8 @@ class AbstractPopulationVertex(
         :param AbstractPyNNNeuronModel pynn_model:
             The PyNN neuron model that this vertex is working on behalf of.
         :param splitter: splitter object
-        :type splitter: None or
-            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+        :type splitter:
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         :param seed:
             The Population seed, used to ensure the same random generation
             on each run.
