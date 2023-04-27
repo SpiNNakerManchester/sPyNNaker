@@ -41,7 +41,7 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
         :param float seed:
         :param splitter:
         :type splitter:
-            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         """
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
