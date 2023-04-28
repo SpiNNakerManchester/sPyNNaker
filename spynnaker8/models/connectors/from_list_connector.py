@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class FromListConnector(_BaseClass):
-    """ Make connections according to a list.
+    """
+    Make connections according to a list.
 
     .. deprecated:: 6.0
         Use

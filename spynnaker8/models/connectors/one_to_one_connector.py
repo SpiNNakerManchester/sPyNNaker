@@ -19,8 +19,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 class OneToOneConnector(_BaseClass):
     """
-    Where the pre- and postsynaptic populations have the same size, connect\
-    cell *i* in the presynaptic population to cell *i* in the postsynaptic\
+    Where the pre- and postsynaptic populations have the same size, connect
+    cell *i* in the presynaptic population to cell *i* in the postsynaptic
     population for all *i*.
 
     .. deprecated:: 6.0

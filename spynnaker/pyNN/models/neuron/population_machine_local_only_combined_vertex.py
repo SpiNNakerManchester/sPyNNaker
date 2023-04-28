@@ -43,7 +43,8 @@ class LocalOnlyProvenance(ctypes.LittleEndianStructure):
 
 
 class MainProvenance(ctypes.LittleEndianStructure):
-    """ Provenance items from synapse processing
+    """
+    Provenance items from synapse processing.
     """
     _fields_ = [
         # the maximum number of background tasks queued
@@ -60,7 +61,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
         PopulationMachineNeurons,
         AbstractGeneratesDataSpecification,
         AbstractRewritesDataSpecification):
-    """ A machine vertex for PyNN Populations
+    """
+    A machine vertex for PyNN Populations.
     """
 
     __slots__ = [
@@ -84,7 +86,9 @@ class PopulationMachineLocalOnlyCombinedVertex(
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     class REGIONS(Enum):
-        """Regions for populations."""
+        """
+        Regions for populations.
+        """
         SYSTEM = 0
         PROVENANCE_DATA = 1
         PROFILING = 2
@@ -126,7 +130,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
             max_atoms_per_core):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram used by the vertex
+            The SDRAM used by the vertex
         :param str label: The label of the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -190,8 +194,9 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     @staticmethod
     def __get_binary_file_name(app_vertex):
-        """ Get the local binary filename for this vertex.  Static because at
-            the time this is needed, the local app_vertex is not set.
+        """
+        Get the local binary filename for this vertex.  Static because at
+        the time this is needed, the local app_vertex is not set.
 
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -244,7 +249,6 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
         rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
@@ -279,11 +283,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
         spec.write_value(self._app_vertex.incoming_spike_buffer_size)
         spec.write_value(int(self._app_vertex.drop_late_spikes))
 
-    @overrides(
-        AbstractRewritesDataSpecification.regenerate_data_specification)
+    @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # pylint: disable=too-many-arguments, arguments-differ
-
         self._rewrite_neuron_data_spec(spec)
 
         # close spec
@@ -299,7 +300,8 @@ class PopulationMachineLocalOnlyCombinedVertex(
 
     def _parse_local_only_provenance(
             self, label, x, y, p, provenance_data):
-        """ Extract and yield local-only provenance
+        """
+        Extract and yield local-only provenance.
 
         :param str label: The label of the node
         :param int x: x coordinate of the chip where this core

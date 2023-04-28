@@ -32,19 +32,19 @@ _MAX_INCOMING = 6
 class SPIFOutputDevice(
         ApplicationFPGAVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):
-    """ Output (only) to a SPIF device.  Each SPIF device can accept up to 6
-        incoming projections.
-        Keys sent from Populations to SPIF will be mapped by removing the
-        SpiNNaker key and adding an index so that the source Population can
-        be identified.  Source Populations must be split into power-of-two
-        sized cores to ensure that keys are contiguous.
-        The keys output by SPIF will be of the form:
+    """
+    Output (only) to a SPIF device.  Each SPIF device can accept up to 6
+    incoming projections.
+    Keys sent from Populations to SPIF will be mapped by removing the
+    SpiNNaker key and adding an index so that the source Population can
+    be identified.  Source Populations must be split into power-of-two
+    sized cores to ensure that keys are contiguous.
+    The keys output by SPIF will be of the form:
 
-            (projection_index << output_key_shift) | neuron_id
+         (projection_index << output_key_shift) | neuron_id
 
-        By default, the projection index will be in the top 8 bits of the
-        packet, but this can be controlled with the output_key_shift parameter.
-
+    By default, the projection index will be in the top 8 bits of the
+    packet, but this can be controlled with the output_key_shift parameter.
     """
 
     __slots__ = ["__incoming_partitions", "__create_database",
@@ -139,7 +139,8 @@ class SPIFOutputDevice(
                 partition.pre_vertex, partition.identifier)
 
     def _get_set_xp_key_payload(self, index):
-        """ Get the payload for the command to set the router key
+        """
+        Get the payload for the command to set the router key.
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_first_key_from_pre_vertex(
@@ -147,7 +148,8 @@ class SPIFOutputDevice(
             self.__incoming_partitions[index].identifier)
 
     def _get_set_xp_mask_payload(self, index):
-        """ Get the payload for the command to set the router mask
+        """
+        Get the payload for the command to set the router mask.
         """
         r_infos = SpynnakerDataView.get_routing_infos()
         return r_infos.get_routing_info_from_pre_vertex(

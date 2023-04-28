@@ -17,8 +17,9 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class ArrayConnector(_BaseClass):
-    """ Make connections using an array of integers based on the IDs\
-        of the neurons in the pre- and post-populations.
+    """
+    Make connections using an array of integers based on the IDs
+    of the neurons in the pre- and post-populations.
 
     .. deprecated:: 6.0
         Use

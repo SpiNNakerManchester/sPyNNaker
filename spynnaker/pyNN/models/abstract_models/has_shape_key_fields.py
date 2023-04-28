@@ -15,19 +15,21 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 class HasShapeKeyFields(object, metaclass=AbstractBase):
-    """ Indicates a source that has keys in fields for each dimension of the
-        source
+    """
+    Indicates a source that has keys in fields for each dimension of the
+    source.
     """
 
     __slots__ = []
 
     @abstractmethod
     def get_shape_key_fields(self, vertex_slice):
-        """ Get the fields to be used for each dimension in the shape of the
-            given source vertex slice, as a list of start, size, mask, shift
-            values in the order of the fields
+        """
+        Get the fields to be used for each dimension in the shape of the
+        given source vertex slice, as a list of start, size, mask, shift
+        values in the order of the fields.
 
-        :param Slice vertex_slice: The slice of the source vertex
-
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the source vertex
         :rtype: list(tuple(int, int, int, int))
         """

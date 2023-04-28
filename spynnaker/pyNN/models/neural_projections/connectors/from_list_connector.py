@@ -28,7 +28,8 @@ _FIRST_PARAM = 2
 
 
 class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
-    """ Make connections according to a list.
+    """
+    Make connections according to a list.
     """
     __slots__ = [
         "__conn_list",
@@ -115,7 +116,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     def _split_connections(self, post_slices):
         """
-        :param list(~pacman.model.graphs.commmon.Slice) post_slices:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
         :rtype: bool
         """
         # If nothing has changed, use the cache
@@ -294,12 +295,12 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         return block
 
     def __repr__(self):
-        return "FromListConnector(n_connections={})".format(
-            len(self.__sources))
+        return f"FromListConnector(n_connections={len(self.__sources)})"
 
     @property
     def conn_list(self):
-        """ The connection list.
+        """
+        The connection list.
 
         :rtype: ~numpy.ndarray
         """
@@ -342,8 +343,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                 column_names = ()
             else:
                 raise TypeError(
-                    "Need to set 'column_names' for n_columns={}".format(
-                        n_columns))
+                    f"Need to set 'column_names' for n_columns={n_columns}")
 
         # Set the source and targets
         self.__sources = self.__conn_list[:, _SOURCE]
@@ -381,9 +381,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             # minimum values of an array, so if 0, all values are equal
             if numpy.ptp(self.__conn_list[:, i]):
                 raise ValueError(
-                    "All values in column {} ({}) of a FromListConnector must"
-                    " have the same value".format(
-                        i, column_names[i - _FIRST_PARAM]))
+                    f"All values in column {i} "
+                    f"({column_names[i - _FIRST_PARAM]}) of a "
+                    "FromListConnector must have the same value")
 
         # Store the extra data
         self.__extra_parameters = None
@@ -395,8 +395,9 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @property
     def column_names(self):
-        """ The names of the columns in the array after the first two. \
-        Of particular interest is whether ``weight`` and ``delay`` columns\
+        """
+        The names of the columns in the array after the first two.
+        Of particular interest is whether ``weight`` and ``delay`` columns
         are present.
 
         :rtype: list(str)
@@ -408,7 +409,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__column_names = column_names
 
     def get_extra_parameters(self):
-        """ Getter for the extra parameters. Excludes ``weight`` and\
+        """
+        Getter for the extra parameters. Excludes ``weight`` and
         ``delay`` columns.
 
         :return: The extra parameters
@@ -417,7 +419,8 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         return self.__extra_parameters
 
     def get_extra_parameter_names(self):
-        """ Getter for the names of the extra parameters.
+        """
+        Get the names of the extra parameters.
 
         :rtype: list(str)
         """
@@ -425,7 +428,6 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
 
     @overrides(AbstractConnector.get_connected_vertices)
     def get_connected_vertices(self, s_info, source_vertex, target_vertex):
-
         # Divide the targets into bins based on post slices
         post_slices = target_vertex.splitter.get_in_coming_slices()
         post_bins = numpy.sort([s.hi_atom + 1 for s in post_slices])

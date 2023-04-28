@@ -39,8 +39,9 @@ CONNECTOR_CONFIG_SHORTS = 16
 
 class ConvolutionConnector(AbstractConnector):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D\
-    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
+    Where the pre- and post-synaptic populations are considered as a 2D
+    array. Connect every post(row, column) neuron to many
+    pre(row, column, kernel)
     through a (kernel) set of weights and/or delays.
     """
 
@@ -63,21 +64,23 @@ class ConvolutionConnector(AbstractConnector):
         :param kernel_weights:
             The synaptic strengths, shared by neurons in the post population.
             Can be:
-            * single value: kernel_shape must be provided;\
-                            the same value will be used for all weights
-            * simple list: kernel_shape must be provided; the list must\
-                           be sized shape width * height
-            * 2D list: If kernel_shape is provided, it must match
-            * numpy.ndarray: As above for simple or 2D list
-            * RandomDistribution: kernel_shape must be provided; weights\
-                                  will be drawn from the distribution
+
+            * single value: `kernel_shape` must be provided;
+              the same value will be used for all weights
+            * simple list: `kernel_shape` must be provided; the list must
+              be sized shape width * height
+            * 2D list: If `kernel_shape` is provided, it must match
+            * :py:class:`~numpy.ndarray`: As above for simple or 2D list
+            * :py:class:`~spynnaker.pyNN.RandomDistribution`:
+              `kernel_shape` must be provided; weights will be drawn from the
+              distribution
         :type kernel_weights:
-            int or list or 2D-list or numpy.ndarray or RandomDistribution
+            int or list or ~numpy.ndarray or ~spynnaker.pyNN.RandomDistribution
         :param kernel_shape:
             The shape of the kernel if it cannot be determined from
-            kernel_weights. If a single value is provided, a square kernel will
-            be assumed.  If two values are provided, it will be assumed to be
-            (n_rows, n_columns)
+            `kernel_weights`. If a single value is provided, a square kernel
+            will be assumed.  If two values are provided, it will be assumed to
+            be (n_rows, n_columns)
         :type kernel_shape: int or tuple(int,int)
         :param strides:
             Spatial sampling frequency, jumps between the post neurons.
@@ -87,31 +90,31 @@ class ConvolutionConnector(AbstractConnector):
             (stride_rows, stride_columns)
         :type strides: int or tuple(int, int)
         :param padding:
-            How many 'extra pixels' around the pre population will be added,
+            How many 'extra pixels' around the pre-population will be added,
             only zero-valued pixels are currently supported.  If a single
             value is provided, the same padding will be used for rows and
             columns.  If two values are provided it will be assumed to be
-            (padding_rows, padding_columns).  If True, automatic padding will
-            be used based on the kernel shape.  If False or None, no padding
+            `(padding_rows, padding_columns)`.  If True, automatic padding will
+            be used based on the kernel shape.  If False or `None`, no padding
             will be used.
         :type padding: bool or int or tuple(int, int) or None
         :param pool_shape:
             Area of pooling, only average pooling is supported (and seems to
             make sense). If a single value is provided, the pooling area will
             be square.  If two values are provided it will be assumed to be
-            (pooling_rows, pooling_columns).
+            `(pooling_rows, pooling_columns)`.
         :type pool_shape: int or tuple(int, int) or None
         :param pool_stride:
             Jumps between pooling regions. If a single value is provided, the
             same stride will be used for rows and columns.  If two values are
-            provided it will be assumed to be (stride_rows, stride_columns)
+            provided it will be assumed to be `(stride_rows, stride_columns)`
         :type pool_stride: int or tuple(int, int) or None
         :param str positive_receptor_type:
             The receptor type to add the positive weights to.  By default this
-            is "excitatory".
+            is "``excitatory``".
         :param str negative_receptor_type:
             The receptor type to add the negative weights to.  By default this
-            is "inhibitory".
+            is "``inhibitory``".
         :param bool safe: (ignored)
         :param bool verbose: (ignored)
         :param callable callback: (ignored)
@@ -208,7 +211,8 @@ class ConvolutionConnector(AbstractConnector):
                 f"Unrecognized padding {padding}")
 
     def get_post_shape(self, shape):
-        """ Get the shape of the post image given the pre-image shape
+        """
+        Get the shape of the post image given the pre-image shape.
         """
         shape = numpy.array(shape)
         if self.__pool_shape is not None:
@@ -349,9 +353,11 @@ class ConvolutionConnector(AbstractConnector):
         return max_connected
 
     def __pre_as_post(self, pre_coords):
-        """ Write pre coords as post coords.
+        """
+        Write pre-population coordinates as post-population coordinates.
 
-        :param Iterable pre_coords: An iterable of (x, y) coordinates
+        :param ~collections.abc.Iterable pre_coords:
+            An iterable of (x, y) coordinates
         :rtype: numpy.ndarray
         """
         coords = numpy.array(pre_coords)
@@ -446,7 +452,8 @@ class ConvolutionConnector(AbstractConnector):
         return kernel_weights
 
     def __recip(self, v):
-        """ Compute the reciprocal of a number as an signed 1-bit integer,
-            14-bit fractional fixed point number, encoded in an integer
+        """
+        Compute the reciprocal of a number as an signed 1-bit integer,
+        14-bit fractional fixed point number, encoded in an integer.
         """
         return int(round((1 / v) * (1 << 14)))

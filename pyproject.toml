@@ -1,4 +1,4 @@
-# Copyright (c) 2017 The University of Manchester
+# Copyright (c) 2023 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,19 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-SpiNNUtilities == 1!6.0.1
-SpiNNMachine == 1!6.0.1
-SpiNNMan == 1!6.0.1
-SpiNNaker_PACMAN == 1!6.0.1
-SpiNNaker_DataSpecification == 1!6.0.1
-spalloc == 1!6.0.1
-SpiNNFrontEndCommon == 1!6.0.1
-matplotlib < 3.5.99; python_version == '3.7'
-matplotlib; python_version >= '3.8'
-quantities >= 0.12.1
-pynn >= 0.9.1, < 0.10
-lazyarray >= 0.2.9, <= 0.4.0
-appdirs >= 1.4.2 , < 2.0.0
-neo >= 0.5.2, < 0.10.0
-# csa  # needed but excluded due to readthedocs
-# spinnaker_tools
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

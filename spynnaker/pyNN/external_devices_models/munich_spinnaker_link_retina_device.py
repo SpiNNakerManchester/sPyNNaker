@@ -39,7 +39,8 @@ def get_spike_value_from_robot_retina(key):
 class MunichRetinaDevice(
         ApplicationSpiNNakerLinkVertex, PopulationApplicationVertex,
         AbstractSendMeMulticastCommandsVertex):
-    """ An Omnibot silicon retina device.
+    """
+    An Omnibot silicon retina device.
     """
     __slots__ = [
         "__fixed_key",

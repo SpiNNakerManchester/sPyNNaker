@@ -31,7 +31,8 @@ REFRACT_TIMER = "refract_timer"
 
 
 class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
-    """ Classic leaky integrate and fire neuron model.
+    """
+    Classic leaky integrate and fire neuron model.
     """
     __slots__ = [
         "__v_init",
@@ -46,32 +47,26 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
         r"""
         :param v_init: :math:`V_{init}`
-        :type v_init:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
+        :type v_init: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param v_rest: :math:`V_{rest}`
-        :type v_rest:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
+        :type v_rest: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_m: :math:`\tau_{m}`
-        :type tau_m:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
+        :type tau_m: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param cm: :math:`C_m`
-        :type cm: float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
+        :type cm: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param i_offset: :math:`I_{offset}`
-        :type i_offset:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
+        :type i_offset: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param v_reset: :math:`V_{reset}`
-        :type v_reset:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
+        :type v_reset: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         :param tau_refrac: :math:`\tau_{refrac}`
-        :type tau_refrac:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
+        :type tau_refrac: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([
@@ -114,7 +109,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def v_init(self):
-        """ Settable model parameter: :math:`V_{init}`
+        """
+        Settable model parameter: :math:`V_{init}`
 
         :rtype: float
         """
@@ -122,7 +118,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def v_rest(self):
-        """ Settable model parameter: :math:`V_{rest}`
+        """
+        Settable model parameter: :math:`V_{rest}`
 
         :rtype: float
         """
@@ -130,7 +127,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def tau_m(self):
-        r""" Settable model parameter: :math:`\tau_{m}`
+        r"""
+        Settable model parameter: :math:`\tau_{m}`
 
         :rtype: float
         """
@@ -138,7 +136,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def cm(self):
-        """ Settable model parameter: :math:`C_m`
+        """
+        Settable model parameter: :math:`C_m`
 
         :rtype: float
         """
@@ -146,7 +145,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def i_offset(self):
-        """ Settable model parameter: :math:`I_{offset}`
+        """
+        Settable model parameter: :math:`I_{offset}`
 
         :rtype: float
         """
@@ -154,7 +154,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def v_reset(self):
-        """ Settable model parameter: :math:`V_{reset}`
+        """
+        Settable model parameter: :math:`V_{reset}`
 
         :rtype: float
         """
@@ -162,7 +163,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
 
     @property
     def tau_refrac(self):
-        r""" Settable model parameter: :math:`\tau_{refrac}`
+        r"""
+        Settable model parameter: :math:`\tau_{refrac}`
 
         :rtype: float
         """

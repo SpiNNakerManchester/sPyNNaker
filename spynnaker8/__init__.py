@@ -187,8 +187,9 @@ else:
 
 
 class RandomDistribution(sim.RandomDistribution):
-    """ Class which defines a next(n) method which returns an array of ``n``\
-        random numbers from a given distribution.
+    """
+    Class which defines a next(n) method which returns an array of ``n``
+    random numbers from a given distribution.
 
     .. deprecated:: 7.0
         Use
@@ -196,9 +197,10 @@ class RandomDistribution(sim.RandomDistribution):
     """
 
 
-def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
+def distance(src_cell, tgt_cell, mask=None, scale_factor=1.0, offset=0.0,
              periodic_boundaries=None):
-    """ Return the Euclidian distance between two cells.
+    """
+    Return the Euclidean distance between two cells.
 
     .. deprecated:: 7.0
         Use
@@ -206,7 +208,7 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
     """
     use_spynnaker_pynn()
     return sim.distance(
-        src, tgt, mask, scale_factor, offset, periodic_boundaries)
+        src_cell, tgt_cell, mask, scale_factor, offset, periodic_boundaries)
 
 
 def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
@@ -215,8 +217,9 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
           database_socket_addresses=None, time_scale_factor=None,
           n_chips_required=None, n_boards_required=None, **extra_params):
     # pylint: disable=unused-argument
-    """ The main method needed to be called to make the PyNN 0.8 setup. Needs\
-        to be called before any other function
+    """
+    The main method needed to be called to make the PyNN 0.8 setup. Needs
+    to be called before any other function.
 
     .. deprecated:: 7.0
         Use
@@ -230,7 +233,8 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
 
 
 def name():
-    """ Returns the name of the simulator
+    """
+    Returns the name of the simulator.
 
     .. deprecated:: 7.0
         Use
@@ -244,7 +248,8 @@ def Projection(
         presynaptic_population, postsynaptic_population,
         connector, synapse_type=None, source=None, receptor_type="excitatory",
         space=None, label=None):
-    """ Used to support PEP 8 spelling correctly
+    """
+    Used to support PEP 8 spelling correctly.
 
     .. deprecated:: 7.0
         Use
@@ -258,8 +263,8 @@ def Projection(
 
 
 def _create_overloaded_functions(spinnaker_simulator):
-    """ Creates functions that the main PyNN interface supports\
-        (given from PyNN)
+    """
+    Creates functions that the main PyNN interface supports (given from PyNN).
 
     .. deprecated:: 7.0
         Use
@@ -287,7 +292,8 @@ def _create_overloaded_functions(spinnaker_simulator):
 
 
 def end(_=True):
-    """ Cleans up the SpiNNaker machine and software
+    """
+    Cleans up the SpiNNaker machine and software.
 
     .. deprecated:: 7.0
         Use
@@ -298,8 +304,9 @@ def end(_=True):
 
 
 def list_standard_models():
-    """ Return a list of all the StandardCellType classes available for this\
-        simulator.
+    """
+    Return a list of all the StandardCellType classes available for this
+    simulator.
 
     .. deprecated:: 7.0
         Use
@@ -310,8 +317,9 @@ def list_standard_models():
 
 
 def set_number_of_neurons_per_core(neuron_type, max_permitted):
-    """ Sets a ceiling on the number of neurons of a given type that can be\
-        placed on a single core.
+    """
+    Sets a ceiling on the number of neurons of a given type that can be
+    placed on a single core.
 
     .. deprecated:: 7.0
         Use
@@ -326,7 +334,8 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
 
 def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
             rng=None):
-    """ Builds a projection
+    """
+    Builds a projection.
 
     .. deprecated:: 7.0
         Use
@@ -337,7 +346,8 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
 
 
 def create(cellclass, cellparams=None, n=1):
-    """ Builds a population with certain params
+    """
+    Builds a population with certain parameters.
 
     .. deprecated:: 7.0
         Use
@@ -348,7 +358,8 @@ def create(cellclass, cellparams=None, n=1):
 
 
 def NativeRNG(seed_value):
-    """ Fixes the random number generator's seed
+    """
+    Fixes the random number generator's seed.
 
     .. deprecated:: 7.0
         Use
@@ -359,7 +370,8 @@ def NativeRNG(seed_value):
 
 
 def get_current_time():
-    """ Gets the time within the simulation
+    """
+    Gets the time within the simulation.
 
     .. deprecated:: 7.0
         Use
@@ -370,8 +382,9 @@ def get_current_time():
 
 
 def get_min_delay():
-    """ The minimum allowed synaptic delay; delays will be clamped to be at\
-        least this.
+    """
+    The minimum allowed synaptic delay; delays will be clamped to be at
+    least this.
 
     .. deprecated:: 7.0
         Use
@@ -382,7 +395,8 @@ def get_min_delay():
 
 
 def get_time_step():
-    """ The integration time step
+    """
+    The integration time step.
 
     .. deprecated:: 7.0
         Use
@@ -393,7 +407,8 @@ def get_time_step():
 
 
 def initialize(cells, **initial_values):
-    """ Sets cells to be initialised to the given values
+    """
+    Sets cells to be initialised to the given values.
 
     .. deprecated:: 7.0
         Use
@@ -404,7 +419,8 @@ def initialize(cells, **initial_values):
 
 
 def num_processes():
-    """ The number of MPI processes.
+    """
+    The number of MPI processes.
 
     .. deprecated:: 7.0
         Use
@@ -415,7 +431,8 @@ def num_processes():
 
 
 def rank():
-    """ The MPI rank of the current node.
+    """
+    The MPI rank of the current node.
 
     .. deprecated:: 7.0
         Use
@@ -427,7 +444,8 @@ def rank():
 
 def record(variables, source, filename, sampling_interval=None,
            annotations=None):
-    """ Sets variables to be recorded.
+    """
+    Sets variables to be recorded.
 
     .. deprecated:: 7.0
         Use
@@ -438,7 +456,8 @@ def record(variables, source, filename, sampling_interval=None,
 
 
 def reset(annotations=None):
-    """ Resets the simulation to t = 0
+    """
+    Resets the simulation to t = 0.
 
     .. deprecated:: 7.0
         Use
@@ -449,8 +468,9 @@ def reset(annotations=None):
 
 
 def run(simtime, callbacks=None):
-    """ The run() function advances the simulation for a given number of \
-        milliseconds, e.g.:
+    """
+    The run() function advances the simulation for a given number of
+    milliseconds.
 
     .. deprecated:: 7.0
         Use
@@ -466,7 +486,8 @@ run_for = run
 
 
 def run_until(tstop):
-    """ Run until a (simulation) time period has completed.
+    """
+    Run until a (simulation) time period has completed.
 
     .. deprecated:: 7.0
         Use
@@ -477,8 +498,8 @@ def run_until(tstop):
 
 
 def get_machine():
-    """ Get the SpiNNaker machine in use.
-
+    """
+    Get the SpiNNaker machine in use.
     """
     use_spynnaker_pynn()
     return sim.get_machine()

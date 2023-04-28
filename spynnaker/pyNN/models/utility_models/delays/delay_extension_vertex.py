@@ -24,10 +24,10 @@ from spynnaker.pyNN.utilities.constants import (
 _DELAY_PARAM_HEADER_WORDS = 9
 
 
-class DelayExtensionVertex(
-        ApplicationVertex, AbstractHasDelayStages):
-    """ Provide delays to incoming spikes in multiples of the maximum delays\
-        of a neuron (typically 16 or 32)
+class DelayExtensionVertex(ApplicationVertex, AbstractHasDelayStages):
+    """
+    Provide delays to incoming spikes in multiples of the maximum delays
+    of a neuron (typically 16 or 32).
     """
     __slots__ = [
         # The parition this Delay is supporting
@@ -43,19 +43,16 @@ class DelayExtensionVertex(
     SAFETY_FACTOR = 5000
     MAX_DTCM_AVAILABLE = 59756 - SAFETY_FACTOR
 
-    MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE = (
-        "The delay per stage is already set to {}, and therefore {} is not "
-        "yet feasible. Please report it to Spinnaker user mail list.")
-
     def __init__(
             self, partition, delay_per_stage, n_delay_stages, n_colour_bits,
             label="DelayExtension"):
         """
-        :param partition: The parition this Delay is supporting
+        :param partition: The partition that this delay is supporting
         :type partition:
-            ~pacman.mode.graph.application.ApplicationEdgePartition
+            ~pacman.model.graphs.application.ApplicationEdgePartition
         :param int delay_per_stage: the delay per stage
         :param int n_delay_stages: the (initial) number of delay stages needed
+        :param int n_colour_bits: the number of bits for event colouring
         :param str label: the vertex label
         """
         # pylint: disable=too-many-arguments
@@ -75,10 +72,20 @@ class DelayExtensionVertex(
 
     @property
     def n_atoms(self):
+        """
+        The number of atoms in this vertex.
+
+        :rtype: int
+        """
         return self.__partition.pre_vertex.n_atoms
 
     @property
     def drop_late_spikes(self):
+        """
+        Whether to drop late spikes.
+
+        :rtype: bool
+        """
         return self.__drop_late_spikes
 
     @staticmethod
@@ -88,25 +95,27 @@ class DelayExtensionVertex(
     @property
     @overrides(AbstractHasDelayStages.n_delay_stages)
     def n_delay_stages(self):
-        """ The maximum number of delay stages required by any connection\
-            out of this delay extension vertex
-
-        :rtype: int
-        """
         return self.__n_delay_stages
 
     def set_new_n_delay_stages_and_delay_per_stage(
             self, n_delay_stages, delay_per_stage):
         if delay_per_stage != self.__delay_per_stage:
             raise DelayExtensionException(
-                self.MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE.format(
-                    self.__delay_per_stage, delay_per_stage))
+                "The delay per stage is already set to "
+                f"{self.__delay_per_stage}, and therefore {delay_per_stage} "
+                "is not yet feasible. "
+                "Please report it to Spinnaker user mail list.")
 
         if n_delay_stages > self.__n_delay_stages:
             self.__n_delay_stages = n_delay_stages
 
     @property
     def delay_per_stage(self):
+        """
+        The delay per stage, in timesteps.
+
+        :rtype: int
+        """
         return self.__delay_per_stage
 
     @property
@@ -117,29 +126,40 @@ class DelayExtensionVertex(
         return self.__partition.pre_vertex
 
     def delay_params_size(self):
-        """ The size of the delay parameters
+        """
+        The size of the delay parameters.
+
+        :rtype: int
         """
         return BYTES_PER_WORD * _DELAY_PARAM_HEADER_WORDS
 
     @property
     def partition(self):
+        """
+        The partition that this delay is supporting.
+        """
         return self.__partition
 
     def add_outgoing_edge(self, edge):
-        """ Add an outgoing edge to the delay extension
+        """
+        Add an outgoing edge to the delay extension.
 
-        :param DelayedApplicationEdge delay_edge: The edge to add
+        :param DelayedApplicationEdge edge: The edge to add
         """
         self.__outgoing_edges.append(edge)
 
     @property
     def outgoing_edges(self):
-        """ Get the outgoing edges from this vertex
+        """
+        The outgoing edges from this vertex.
 
-        :rtype: list(DelayApplicationEdge)
+        :rtype: list(DelayedApplicationEdge)
         """
         return self.__outgoing_edges
 
     @property
     def n_colour_bits(self):
+        """
+        The number of bits for event colouring.
+        """
         return self.__n_colour_bits

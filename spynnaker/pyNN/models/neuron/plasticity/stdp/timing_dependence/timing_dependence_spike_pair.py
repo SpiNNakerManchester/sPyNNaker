@@ -24,7 +24,8 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
 
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
-    """ A basic timing dependence STDP rule.
+    """
+    A basic timing dependence STDP rule.
     """
     __slots__ = [
         "__synapse_structure",
@@ -58,7 +59,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def tau_plus(self):
-        r""" :math:`\tau_+`
+        r"""
+        :math:`\tau_+`
 
         :rtype: float
         """
@@ -66,7 +68,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def tau_minus(self):
-        r""" :math:`\tau_-`
+        r"""
+        :math:`\tau_-`
 
         :rtype: float
         """
@@ -74,7 +77,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def A_plus(self):
-        r""" :math:`A^+`
+        r"""
+        :math:`A^+`
 
         :rtype: float
         """
@@ -86,7 +90,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def A_minus(self):
-        r""" :math:`A^-`
+        r"""
+        :math:`A^-`
 
         :rtype: float
         """
@@ -105,7 +110,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
+        """
+        The suffix to be appended to the vertex executable for this rule.
 
         :rtype: str
         """
@@ -113,7 +119,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def pre_trace_n_bytes(self):
-        """ The number of bytes used by the pre-trace of the rule per neuron
+        """
+        The number of bytes used by the pre-trace of the rule per neuron.
 
         :rtype: int
         """
@@ -128,7 +135,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def n_weight_terms(self):
-        """ The number of weight terms expected by this timing rule
+        """
+        The number of weight terms expected by this timing rule.
 
         :rtype: int
         """
@@ -144,7 +152,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def synaptic_structure(self):
-        """ Get the synaptic structure of the plastic part of the rows
+        """
+        The synaptic structure of the plastic part of the rows.
 
         :rtype: AbstractSynapseStructure
         """

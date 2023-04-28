@@ -25,8 +25,9 @@ class PopulationSynapsesMachineVertexLead(
         PopulationMachineSynapses,
         AbstractGeneratesDataSpecification,
         AbstractRewritesDataSpecification):
-    """ A synaptic machine vertex that leads other Synaptic machine vertices,
-        writing shared areas.
+    """
+    A synaptic machine vertex that leads other synaptic machine vertices,
+    writing shared areas.
     """
 
     __slots__ = [
@@ -45,7 +46,7 @@ class PopulationSynapsesMachineVertexLead(
             synaptic_matrices):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram used by the vertex
+            The SDRAM used by the vertex
         :param str label: The label of the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -90,13 +91,8 @@ class PopulationSynapsesMachineVertexLead(
             self.vertex_slice)
         return ids
 
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification)
+    @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        """
-        :param routing_info: (injected)
-        """
-        # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)

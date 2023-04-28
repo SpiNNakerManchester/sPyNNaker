@@ -16,8 +16,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.ordered_set import OrderedSet
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import MultiRegionSDRAM
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.utilities.algorithm_utilities\
     .partition_algorithm_utilities import get_multidimensional_slices
 from spynnaker.pyNN.models.neuron import (
@@ -45,8 +44,9 @@ MAX_RING_BUFFER_BITS = 14
 
 class SplitterAbstractPopulationVertexFixed(
         AbstractSplitterCommon, AbstractSpynnakerSplitterDelay):
-    """ handles the splitting of the AbstractPopulationVertex using fixed
-        slices
+    """
+    Handles the splitting of the :py:class:`AbstractPopulationVertex`
+    using fixed slices.
     """
 
     __slots__ = [
@@ -55,14 +55,6 @@ class SplitterAbstractPopulationVertexFixed(
         "__max_delay",
         "__expect_delay_extension"
     ]
-
-    """ The message to use when the Population is invalid """
-    INVALID_POP_ERROR_MESSAGE = (
-        "The vertex {} cannot be supported by the "
-        "SplitterAbstractPopulationVertexFixed as"
-        " the only vertex supported by this splitter is a "
-        "AbstractPopulationVertex. Please use the correct splitter for "
-        "your vertex and try again.")
 
     def __init__(self):
         super().__init__()
@@ -75,11 +67,15 @@ class SplitterAbstractPopulationVertexFixed(
         super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
-                self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+                f"The vertex {app_vertex} cannot be supported by the "
+                "SplitterAbstractPopulationVertexFixed as the only vertex "
+                "supported by this splitter is a AbstractPopulationVertex. "
+                "Please use the correct splitter for your vertex and try "
+                "again.")
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
-        app_vertex = self._governed_app_vertex
+        app_vertex = self.governed_app_vertex
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
 
@@ -109,7 +105,7 @@ class SplitterAbstractPopulationVertexFixed(
                 vertex_slice, sdram, label,
                 structural_sz, ring_buffer_shifts, weight_scales,
                 index, max_atoms_per_core, synaptic_matrices, neuron_data)
-            self._governed_app_vertex.remember_machine_vertex(machine_vertex)
+            self.governed_app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
@@ -123,16 +119,15 @@ class SplitterAbstractPopulationVertexFixed(
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id):
-        return list(self._governed_app_vertex.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(self, partition_id):
-        return list(self._governed_app_vertex.machine_vertices)
+        return list(self.governed_app_vertex.machine_vertices)
 
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex, partition_id):
-
         # Determine the real pre-vertex
         pre_vertex = source_vertex
         if isinstance(source_vertex, DelayExtensionVertex):
@@ -153,33 +148,33 @@ class SplitterAbstractPopulationVertexFixed(
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
-        return self._governed_app_vertex.machine_vertices
+        return self.governed_app_vertex.machine_vertices
 
     def create_machine_vertex(
             self, vertex_slice, sdram, label,
             structural_sz, ring_buffer_shifts, weight_scales, index,
             max_atoms_per_core, synaptic_matrices, neuron_data):
-
         # If using local-only create a local-only vertex
-        s_dynamics = self._governed_app_vertex.synapse_dynamics
+        s_dynamics = self.governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractLocalOnly):
             return PopulationMachineLocalOnlyCombinedVertex(
                 sdram, label,
-                self._governed_app_vertex, vertex_slice, index,
+                self.governed_app_vertex, vertex_slice, index,
                 ring_buffer_shifts, weight_scales, neuron_data,
                 max_atoms_per_core)
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
-            sdram, label, self._governed_app_vertex,
+            sdram, label, self.governed_app_vertex,
             vertex_slice, index, ring_buffer_shifts, weight_scales,
             structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data)
 
     def get_sdram_used_by_atoms(
             self, n_atoms, all_syn_block_sz, structural_sz):
-        """  Gets the resources of a slice of atoms
+        """
+        Gets the resources of a slice of atoms.
 
-        :param int n_atoms
+        :param int n_atoms:
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         # pylint: disable=arguments-differ
@@ -194,32 +189,34 @@ class SplitterAbstractPopulationVertexFixed(
         return sdram
 
     def __get_variable_sdram(self, n_atoms):
-        """ returns the variable sdram from the recorders
+        """
+        Returns the variable SDRAM from the recorders.
 
         :param int n_atoms: The number of atoms to account for
-        :return: the variable sdram used by the neuron recorder
+        :return: the variable SDRAM used by the neuron recorder
         :rtype: VariableSDRAM
         """
-        s_dynamics = self._governed_app_vertex.synapse_dynamics
+        s_dynamics = self.governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
             max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts()
-            self._governed_app_vertex.synapse_recorder.set_max_rewires_per_ts(
+            self.governed_app_vertex.synapse_recorder.set_max_rewires_per_ts(
                 max_rewires_per_ts)
 
         return (
-            self._governed_app_vertex.get_max_neuron_variable_sdram(n_atoms) +
-            self._governed_app_vertex.get_max_synapse_variable_sdram(n_atoms))
+            self.governed_app_vertex.get_max_neuron_variable_sdram(n_atoms) +
+            self.governed_app_vertex.get_max_synapse_variable_sdram(n_atoms))
 
     def __get_constant_sdram(self, n_atoms, all_syn_block_sz, structural_sz):
-        """ returns the constant sdram used by the atoms
+        """
+        Returns the constant SDRAM used by the atoms.
 
         :param int n_atoms: The number of atoms to account for
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
-        s_dynamics = self._governed_app_vertex.synapse_dynamics
+        s_dynamics = self.governed_app_vertex.synapse_dynamics
         n_record = (
-            len(self._governed_app_vertex.neuron_recordables) +
-            len(self._governed_app_vertex.synapse_recordables))
+            len(self.governed_app_vertex.neuron_recordables) +
+            len(self.governed_app_vertex.synapse_recordables))
 
         n_provenance = NeuronProvenance.N_ITEMS + MainProvenance.N_ITEMS
         if isinstance(s_dynamics, AbstractLocalOnly):
@@ -230,25 +227,25 @@ class SplitterAbstractPopulationVertexFixed(
 
         sdram = MultiRegionSDRAM()
         if isinstance(s_dynamics, AbstractLocalOnly):
-            sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
+            sdram.merge(self.governed_app_vertex.get_common_constant_sdram(
                 n_record, n_provenance,
                 PopulationMachineLocalOnlyCombinedVertex.COMMON_REGIONS))
-            sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
+            sdram.merge(self.governed_app_vertex.get_neuron_constant_sdram(
                 n_atoms,
                 PopulationMachineLocalOnlyCombinedVertex.NEURON_REGIONS))
             sdram.merge(self.__get_local_only_constant_sdram(n_atoms))
         else:
-            sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
+            sdram.merge(self.governed_app_vertex.get_common_constant_sdram(
                 n_record, n_provenance,
                 PopulationMachineVertex.COMMON_REGIONS))
-            sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
+            sdram.merge(self.governed_app_vertex.get_neuron_constant_sdram(
                 n_atoms, PopulationMachineVertex.NEURON_REGIONS))
             sdram.merge(self.__get_synapse_constant_sdram(
                 n_atoms, all_syn_block_sz, structural_sz))
         return sdram
 
     def __get_local_only_constant_sdram(self, n_atoms):
-        app_vertex = self._governed_app_vertex
+        app_vertex = self.governed_app_vertex
         s_dynamics = app_vertex.synapse_dynamics
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
@@ -263,14 +260,14 @@ class SplitterAbstractPopulationVertexFixed(
 
     def __get_synapse_constant_sdram(
             self, n_atoms, all_syn_block_sz, structural_sz):
-
-        """ Get the amount of fixed SDRAM used by synapse parts
+        """
+        Get the amount of fixed SDRAM used by synapse parts.
 
         :param int n_atoms: The number of atoms to account for
 
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
-        app_vertex = self._governed_app_vertex
+        app_vertex = self.governed_app_vertex
         regions = PopulationMachineVertex.SYNAPSE_REGIONS
         sdram = MultiRegionSDRAM()
         sdram.add_cost(regions.synapse_params,
@@ -298,17 +295,17 @@ class SplitterAbstractPopulationVertexFixed(
         self.__expect_delay_extension = None
 
     def __create_slices(self):
-        """ Create slices if not already done
+        """
+        Create slices if not already done.
         """
         if self.__slices is not None:
             return
-        self.__slices = get_multidimensional_slices(self._governed_app_vertex)
+        self.__slices = get_multidimensional_slices(self.governed_app_vertex)
 
     def __update_max_delay(self):
         # Find the maximum delay from incoming synapses
-        app_vertex = self._governed_app_vertex
         self.__max_delay, self.__expect_delay_extension = \
-            app_vertex.get_max_delay(MAX_RING_BUFFER_BITS)
+            self.governed_app_vertex.get_max_delay(MAX_RING_BUFFER_BITS)
 
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self):

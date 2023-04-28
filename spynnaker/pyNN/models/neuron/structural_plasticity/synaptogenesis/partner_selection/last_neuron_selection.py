@@ -17,8 +17,9 @@ from .abstract_partner_selection import AbstractPartnerSelection
 
 
 class LastNeuronSelection(AbstractPartnerSelection):
-    """ Partner selection that picks a random source neuron from the neurons\
-        that spiked in the last timestep
+    """
+    Partner selection that picks a random source neuron from the neurons
+    that spiked in the last timestep.
     """
 
     __slots__ = ["__spike_buffer_size"]

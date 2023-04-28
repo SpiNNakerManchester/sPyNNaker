@@ -29,8 +29,13 @@ class SpikeSourceArray(AbstractPyNNModel):
 
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=default_population_parameters.keys())
-    def create_vertex(
-            self, n_neurons, label, splitter, n_colour_bits):
+    def create_vertex(self, n_neurons, label, splitter, n_colour_bits):
+        """
+        :param splitter:
+        :type splitter:
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
+        :param int n_colour_bits:
+        """
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return SpikeSourceArrayVertex(

@@ -19,5 +19,5 @@ def make_missing_string(missing):
     :rtype: str
     """
     return "; ".join(
-        "({}, {}, {})".format(placement.x, placement.y, placement.p)
+        f"({placement.x}, {placement.y}, {placement.p})"
         for placement in missing)

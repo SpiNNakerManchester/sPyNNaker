@@ -18,7 +18,8 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
 class CSAConnector(_BaseClass):
-    """ A CSA (*Connection Set Algebra*, Djurfeldt 2012) connector.
+    """
+    A CSA (*Connection Set Algebra*, Djurfeldt 2012) connector.
 
     .. deprecated:: 6.0
         Use
