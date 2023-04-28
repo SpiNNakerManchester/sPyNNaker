@@ -21,16 +21,16 @@ V_THRESH = "v_thresh"
 
 
 class ThresholdTypeStatic(AbstractThresholdType):
-    """ A threshold that is a static value.
+    """
+    A threshold that is a static value.
     """
     __slots__ = ["__v_thresh"]
 
     def __init__(self, v_thresh):
         """
         :param v_thresh: :math:`V_{thresh}`
-        :type v_thresh:
-            float, iterable(float), ~pyNN.random.RandomDistribution
-            or (mapping) function
+        :type v_thresh: float or iterable(float) or
+            ~spynnaker.pyNN.RandomDistribution or (mapping) function
         """
         super().__init__(
             [Struct([(DataType.S1615, V_THRESH)])],

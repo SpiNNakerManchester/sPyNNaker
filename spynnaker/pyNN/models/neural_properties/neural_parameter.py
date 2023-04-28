@@ -18,8 +18,9 @@ from data_specification.exceptions import UnknownTypeException
 
 
 class _Range_Iterator(object):
-    """ Iterator over a :py:class:`~spinn_utilities.ranged.RangedList` \
-        which is range based
+    """
+    Iterator over a :py:class:`~spinn_utilities.ranged.RangedList`
+    which is range based.
     """
     __slots__ = [
         "__cmd_pair",
@@ -29,11 +30,11 @@ class _Range_Iterator(object):
         "__spec",
         "__stop_range"]
 
-    def __init__(self, value, datatype, slice_start, slice_stop, spec):
+    def __init__(self, value, data_type, slice_start, slice_stop, spec):
         """
         :param ~spinn_utilities.ranged.AbstractList value:
             The abstract list holding the data
-        :param ~data_specification.enums.DataType datatype:
+        :param ~data_specification.enums.DataType data_type:
             The type of each element of data
         :param int slice_start: Inclusive start of the range
         :param int slice_stop: Exclusive end of the range
@@ -47,7 +48,7 @@ class _Range_Iterator(object):
         # iterator to be called, and set self._cmd_pair
         self.__index = 0
         self.__stop_range = 0
-        self.__datatype = datatype
+        self.__datatype = data_type
         self.__spec = spec
         self.__cmd_pair = (None, None)
 
@@ -65,7 +66,8 @@ class _Range_Iterator(object):
 
 
 class _Get_Iterator(object):
-    """ Iterator over a standard collection that supports ``__getitem__``
+    """
+    Iterator over a standard collection that supports ``__getitem__``.
     """
     __slots__ = [
         "__datatype",
@@ -74,11 +76,11 @@ class _Get_Iterator(object):
         "__spec",
         "__value"]
 
-    def __init__(self, value, datatype, slice_start, slice_stop, spec):
+    def __init__(self, value, data_type, slice_start, slice_stop, spec):
         """
         :param value: The list holding the data
         :type value: list(int) or list(float) or list(bool) or ~numpy.ndarray
-        :param ~data_specification.enums.DataType datatype:
+        :param ~data_specification.enums.DataType data_type:
             The type of each element of data
         :param int slice_start: Inclusive start of the range
         :param int slice_stop: Exclusive end of the range
@@ -87,7 +89,7 @@ class _Get_Iterator(object):
         """
         # pylint: disable=too-many-arguments
         self.__value = value
-        self.__datatype = datatype
+        self.__datatype = data_type
         self.__index = slice_start
         self.__slice_stop = slice_stop
         self.__spec = spec
@@ -102,21 +104,23 @@ class _Get_Iterator(object):
 
 
 class _SingleValue_Iterator(object):
-    """ Iterator that repeats the single values the required number of times.
+    """
+    Iterator that repeats the single values the required number of times.
 
-    Allows a single Value parameter to be treated the same as parameters with
-    len. Caches `cmd_word_list` and `cmd_string` so they are only created once.
+    Allows a single value parameter to be treated the same as parameters with
+    a given length.
+    Caches `cmd_word_list` and `cmd_string` so they are only created once.
     """
     __slots__ = [
         "__cmd_pair",
         "__index",
         "__stop"]
 
-    def __init__(self, value, datatype, slice_start, slice_stop, spec):
+    def __init__(self, value, data_type, slice_start, slice_stop, spec):
         """
         :param value: The simple value that is the data for each element
         :type value: int or float or bool
-        :param ~data_specification.enums.DataType datatype:
+        :param ~data_specification.enums.DataType data_type:
             The type of each element of data
         :param int slice_start: Inclusive start of the range
         :param int slice_stop: Exclusive end of the range
@@ -124,7 +128,7 @@ class _SingleValue_Iterator(object):
             The data specification to write to
         """
         # pylint: disable=too-many-arguments
-        self.__cmd_pair = spec.create_cmd(data=value, data_type=datatype)
+        self.__cmd_pair = spec.create_cmd(data=value, data_type=data_type)
         self.__index = slice_start
         self.__stop = slice_stop
 
@@ -136,7 +140,8 @@ class _SingleValue_Iterator(object):
 
 
 class NeuronParameter(object):
-    """ A settable parameter of a neuron model.
+    """
+    A settable parameter of a neuron model.
     """
 
     __slots__ = [
@@ -160,8 +165,9 @@ class NeuronParameter(object):
         self.__data_type = data_type
 
     def get_value(self):
-        """ What the value of the parameter is; if a list or array,\
-            potentially provides a different value for each neuron.
+        """
+        What the value of the parameter is; if a list or array,
+        potentially provides a different value for each neuron.
 
         :rtype: int or float or bool or list(int) or list(float) or
             list(bool) or ~numpy.ndarray or
@@ -170,21 +176,25 @@ class NeuronParameter(object):
         return self.__value
 
     def get_dataspec_datatype(self):
-        """ Get the serialization type of the parameter in the neuron model.
+        """
+        Get the serialization type of the parameter in the neuron model.
 
         :rtype: ~data_specification.enums.DataType
         """
         return self.__data_type
 
     def iterator_by_slice(self, slice_start, slice_stop, spec):
-        """ Creates an iterator over the commands to use to write the\
-            parameter to the data specification being generated.
+        """
+        Creates an iterator over the commands to use to write the
+        parameter to the data specification being generated.
 
         :param int slice_start: Inclusive start of the range
         :param int slice_stop: Exclusive end of the range
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to eventually write to.
-            (Note that this does not actually do the write).
+
+            .. note::
+                This does not actually do the write.
         :return: Iterator that produces a command to write to the
             specification for each element in the slice.
         :rtype: iterator(tuple(bytearray, str))

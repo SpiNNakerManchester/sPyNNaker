@@ -16,7 +16,8 @@ from data_specification import ReferenceContext
 
 
 def spynnaker_splitter_partitioner():
-    """ a splitter partitioner that's bespoke for spynnaker vertices.
+    """
+    A splitter partitioner that's bespoke for sPyNNaker vertices.
 
     :return:
          The number of chips needed to satisfy this partitioning.

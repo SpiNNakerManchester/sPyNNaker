@@ -36,8 +36,13 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
 
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=default_population_parameters.keys())
-    def create_vertex(
-            self, n_neurons, label, seed, splitter):
+    def create_vertex(self, n_neurons, label, seed, splitter):
+        """
+        :param float seed:
+        :param splitter:
+        :type splitter:
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
+        """
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return SpikeSourcePoissonVertex(

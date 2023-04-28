@@ -23,46 +23,47 @@ _IZK_THRESHOLD = 30.0
 
 
 class IzkCondExpBase(AbstractPyNNNeuronModelStandard):
-    """ Izhikevich neuron model with conductance inputs.
+    """
+    Izhikevich neuron model with conductance inputs.
 
     :param a: :math:`a`
-    :type a: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type a: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param b: :math:`b`
-    :type b: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type b: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param c: :math:`c`
-    :type c: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type c: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param d: :math:`d`
-    :type d: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type d: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param i_offset: :math:`I_{offset}`
-    :type i_offset: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type i_offset: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param u: :math:`u_{init} = \\delta V_{init}`
-    :type u: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type u: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param v: :math:`v_{init} = V_{init}`
-    :type v: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type v: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param tau_syn_E: :math:`\\tau^{syn}_e`
-    :type tau_syn_E: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type tau_syn_E: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param tau_syn_I: :math:`\\tau^{syn}_i`
-    :type tau_syn_I: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type tau_syn_I: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param e_rev_E: :math:`E^{rev}_e`
-    :type e_rev_E: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type e_rev_E: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param e_rev_I: :math:`E^{rev}_i`
-    :type e_rev_I: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type e_rev_I: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param isyn_exc: :math:`I^{syn}_e`
-    :type isyn_exc: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type isyn_exc: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     :param isyn_inh: :math:`I^{syn}_i`
-    :type isyn_inh: float, iterable(float), ~pyNN.random.RandomDistribution
+    :type isyn_inh: float, iterable(float), ~spynnaker.pyNN.RandomDistribution
         or (mapping) function
     """
 

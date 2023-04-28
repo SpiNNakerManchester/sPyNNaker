@@ -28,128 +28,135 @@ except ImportError:
     _matplotlib_missing = True
 
 
-def _handle_options(ax, options):
-    """ Handles options that can not be passed to axes.plot
+def _handle_options(axes, options):
+    """
+    Handles options that can not be passed to `axes.plot`.
 
     Removes the ones it has handled
 
     axes.plot will throw an exception if it gets unwanted options
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
     :param dict options: All options the plotter can be configured with
     """
     if "xticks" not in options or options.pop("xticks") is False:
-        plt.setp(ax.get_xticklabels(), visible=False)
+        plt.setp(axes.get_xticklabels(), visible=False)
     if "xlabel" in options:
-        ax.set_xlabel(options.pop("xlabel"))
+        axes.set_xlabel(options.pop("xlabel"))
     else:
-        ax.set_xlabel("Time (ms)")
+        axes.set_xlabel("Time (ms)")
     if "yticks" not in options or options.pop("yticks") is False:
-        plt.setp(ax.get_yticklabels(), visible=False)
+        plt.setp(axes.get_yticklabels(), visible=False)
     if "ylabel" in options:
-        ax.set_ylabel(options.pop("ylabel"))
+        axes.set_ylabel(options.pop("ylabel"))
     else:
-        ax.set_ylabel("Neuron index")
+        axes.set_ylabel("Neuron index")
     if "ylim" in options:
-        ax.set_ylim(options.pop("ylim"))
+        axes.set_ylim(options.pop("ylim"))
     if "xlim" in options:
-        ax.set_xlim(options.pop("xlim"))
+        axes.set_xlim(options.pop("xlim"))
 
 
-def _plot_spikes(ax, spike_times, neurons, label='', **options):
-    """ Plots the spikes based on two lists
+def _plot_spikes(axes, spike_times, neurons, label='', **options):
+    """
+    Plots the spikes based on two lists.
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param list(~neo.core.SpikeTrain) spike_times: List of Spiketimes
-    :param neurons: List of Neuron Ids
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
+    :param list(~neo.core.SpikeTrain) spike_times: List of spike times
+    :param neurons: List of Neuron IDs
     :param str label: Label for the graph
     :param options: plotting options
     """
     if len(neurons):
         max_index = max(neurons)
         min_index = min(neurons)
-        ax.plot(spike_times, neurons, 'b.', **options)
-        ax.set_ylim(-0.5 + min_index, max_index + 0.5)
+        axes.plot(spike_times, neurons, 'b.', **options)
+        axes.set_ylim(-0.5 + min_index, max_index + 0.5)
     if label:
         plt.text(0.95, 0.95, label,
-                 transform=ax.transAxes, ha='right', va='top',
+                 transform=axes.transAxes, ha='right', va='top',
                  bbox=dict(facecolor='white', alpha=1.0))
 
 
-def plot_spiketrains(ax, spiketrains, label='', **options):
-    """ Plot all spike trains in a Segment in a raster plot.
+def plot_spiketrains(axes, spiketrains, label='', **options):
+    """
+    Plot all spike trains in a Segment in a raster plot.
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param list(~neo.core.SpikeTrain) spiketrains: List of spiketimes
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
+    :param list(~neo.core.SpikeTrain) spiketrains: List of spike times
     :param str label: Label for the graph
     :param options: plotting options
     """
     # pylint: disable=c-extension-no-member
-    ax.set_xlim(0, spiketrains[0].t_stop / quantities.ms)
-    _handle_options(ax, options)
+    axes.set_xlim(0, spiketrains[0].t_stop / quantities.ms)
+    _handle_options(axes, options)
     neurons = np.concatenate(
         [np.repeat(x.annotations['source_index'], len(x))
          for x in spiketrains])
     spike_times = np.concatenate(spiketrains, axis=0)
-    _plot_spikes(ax, spike_times, neurons, label=label, **options)
+    _plot_spikes(axes, spike_times, neurons, label=label, **options)
 
 
-def plot_spikes_numpy(ax, spikes, label='', **options):
-    """ Plot all spikes
+def plot_spikes_numpy(axes, spikes, label='', **options):
+    """
+    Plot all spikes.
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param ~numpy.ndarray spikes: spynakker7 format nparray of spikes
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
+    :param ~numpy.ndarray spikes: sPyNNaker7 format numpy array of spikes
     :param str label: Label for the graph
     :param options: plotting options
     """
-    _handle_options(ax, options)
+    _handle_options(axes, options)
     neurons = spikes[:, 0]
     spike_times = spikes[:, 1]
-    _plot_spikes(ax, spike_times, neurons, label=label, **options)
+    _plot_spikes(axes, spike_times, neurons, label=label, **options)
 
 
-def _heat_plot(ax, neurons, times, values, label='', **options):
-    """ Plots three lists of neurons, times and values into a heatmap
+def _heat_plot(axes, neurons, times, values, label='', **options):
+    """
+    Plots three lists of neurons, times and values into a heatmap.
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
     :param neurons: List of neuron IDs
     :param times: List of times
     :param values: List of values to plot
     :param str label: Label for the graph
     :param options: plotting options
     """
-    _handle_options(ax, options)
+    _handle_options(axes, options)
     info_array = np.empty((max(neurons)+1, max(times)+1))
     info_array[:] = np.nan
     info_array[neurons, times] = values
-    heat_map = ax.imshow(info_array, cmap='hot', interpolation='none',
-                         origin='lower', aspect='auto')
-    ax.figure.colorbar(heat_map)
+    heat_map = axes.imshow(info_array, cmap='hot', interpolation='none',
+                           origin='lower', aspect='auto')
+    axes.figure.colorbar(heat_map)
     if label:
         plt.text(0.95, 0.95, label,
-                 transform=ax.transAxes, ha='right', va='top',
+                 transform=axes.transAxes, ha='right', va='top',
                  bbox=dict(facecolor='white', alpha=1.0))
 
 
-def heat_plot_numpy(ax, data, label='', **options):
-    """ Plots neurons, times and values into a heatmap
+def heat_plot_numpy(axes, data, label='', **options):
+    """
+    Plots neurons, times and values into a heatmap.
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param ~numpy.ndarray data: nparray of values in spynnaker7 format
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
+    :param ~numpy.ndarray data: numpy array of values in spynnaker7 format
     :param str label: Label for the graph
     :param options: plotting options
     """
     neurons = data[:, 0].astype(int)
     times = data[:, 1].astype(int)
     values = data[:, 2]
-    _heat_plot(ax, neurons, times, values, label=label, **options)
+    _heat_plot(axes, neurons, times, values, label=label, **options)
 
 
-def heat_plot_neo(ax, signal_array, label='', **options):
-    """ Plots neurons, times and values into a heatmap
+def heat_plot_neo(axes, signal_array, label='', **options):
+    """
+    Plots neurons, times and values into a heatmap.
 
-    :param ~matplotlib.axes.Axes ax: An Axes in a matplotlib figure
-    :param ~neo.core.AnalogSignal signal_array: Neo Signal array Object
+    :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
+    :param ~neo.core.AnalogSignal signal_array: Neo Signal array object
     :param str label: Label for the graph
     :param options: plotting options
     """
@@ -163,18 +170,19 @@ def heat_plot_neo(ax, signal_array, label='', **options):
     neurons = np.repeat(xs, len(times))
     magnitude = signal_array.magnitude
     values = np.concatenate([magnitude[:, x] for x in xs])
-    _heat_plot(ax, neurons, all_times, values, label=label, **options)
+    _heat_plot(axes, neurons, all_times, values, label=label, **options)
 
 
 def plot_segment(axes, segment, label='', **options):
-    """ Plots a segment into a plot of spikes or a heatmap
+    """
+    Plots a segment into a plot of spikes or a heatmap.
 
-        If there is more than ode type of Data in the segment options must\
-        include the name of the data to plot
+    If there is more than ode type of Data in the segment options must
+    include the name of the data to plot
 
     .. note::
-        method signature defined by pynn plotting.\
-        This allows mixing of this plotting tool and pynn's
+        Method signature defined by PyNN plotting.
+        This allows mixing of this plotting tool and PyNN's
 
     :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
     :param ~neo.core.Segment segment: Data for one run to plot
@@ -202,40 +210,41 @@ def plot_segment(axes, segment, label='', **options):
 
 
 class SpynnakerPanel(object):
-    """ Represents a single panel in a multi-panel figure.
+    """
+    Represents a single panel in a multi-panel figure.
 
-    Compatible with :py:class:`pyNN.utility.plotting.Frame` and\
-        can be mixed with :py:class:`pyNN.utility.plotting.Panel`
+    Compatible with :py:class:`pyNN.utility.plotting.Frame` and
+    can be mixed with :py:class:`pyNN.utility.plotting.Panel`
 
-    Unlike :py:class:`pyNN.utility.plotting.Panel`,\
-        Spikes are plotted faster,\
-        other data is plotted as a heatmap
+    Unlike :py:class:`pyNN.utility.plotting.Panel`,
+    Spikes are plotted faster,
+    other data is plotted as a heatmap.
 
-    A panel is a Matplotlib Axes or Subplot instance. A data item may be an\
-    :py:class:`~neo.core.AnalogSignal`, or a list of \
-    :py:class:`~neo.core.SpikeTrain`\\ s. The Panel will\
-    automatically choose an appropriate representation. Multiple data items\
+    A panel is a Matplotlib Axes or Subplot instance. A data item may be an
+    :py:class:`~neo.core.AnalogSignal`, or a list of
+    :py:class:`~neo.core.SpikeTrain`\\ s. The Panel will
+    automatically choose an appropriate representation. Multiple data items
     may be plotted in the same panel.
 
-    Valid options are any valid Matplotlib formatting options that should be\
+    Valid options are any valid Matplotlib formatting options that should be
     applied to the Axes/Subplot, plus in addition:
 
         `data_labels`:
             a list of strings of the same length as the number of data items.
         `line_properties`:
-            a list of dicts containing Matplotlib formatting options, of the\
-            same length as the number of data items.
+            a list of dictionaries containing Matplotlib formatting options,\
+            of the same length as the number of data items.
 
-    Whole Neo Objects can be passed in as long as they\
-        contain a single Segment/run\
-        and only contain one type of data
-    Whole Segments can be passed in only if they only contain one type of data
+    Whole Neo Objects can be passed in as long as they
+    contain a single Segment/run
+    and only contain one type of data.
+    Whole Segments can be passed in only if they only contain one type of data.
     """
 
     def __init__(self, *data, **options):
         """
         :param data: One or more data series to be plotted.
-        :type data: list(~neo.core.SpikeTrain) or ~neo.core.AnalogSignal \
+        :type data: list(~neo.core.SpikeTrain) or ~neo.core.AnalogSignal
             or ~numpy.ndarray or ~neo.core.Block or ~neo.core.Segment
         :param options: Any additional information.
         """
@@ -247,7 +256,8 @@ class SpynnakerPanel(object):
         self.line_properties = options.pop("line_properties", repeat({}))
 
     def plot(self, axes):
-        """ Plot the Panel's data in the provided Axes/Subplot instance.
+        """
+        Plot the Panel's data in the provided Axes/Subplot instance.
 
         :param ~matplotlib.axes.Axes axes: An Axes in a matplotlib figure
         """
@@ -301,10 +311,10 @@ class SpynnakerPanel(object):
             run = int(properties.pop("run"))
             if len(datum.segments) <= run:
                 raise ValueError(
-                    "Block only has {len(datum.segments)} segments")
+                    f"Block only has {len(datum.segments)} segments")
             segment = datum.segments[run]
         elif len(datum.segments) != 1:
-            raise ValueError("Block has {len(datum.segments)} segments "
+            raise ValueError(f"Block has {len(datum.segments)} segments "
                              "please specify one to plot using run=")
         else:
             segment = datum.segments[0]

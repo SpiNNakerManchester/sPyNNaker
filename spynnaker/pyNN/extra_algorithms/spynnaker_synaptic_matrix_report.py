@@ -22,15 +22,16 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _DIRNAME = "synaptic_matrix_reports"
-_TMPL_FILENAME = "synaptic_matrix_for_application_edge_{}"
 
 
 class SpYNNakerSynapticMatrixReport(object):
-    """ Generate the synaptic matrices for reporting purposes.
+    """
+    Generate the synaptic matrices for reporting purposes.
     """
 
     def __call__(self, connection_holder):
-        """ Convert synaptic matrix for every application edge.
+        """
+        Convert synaptic matrix for every application edge.
 
         :param connection_holder: where the synaptic matrices are stored
             (possibly after retrieval from the machine)
@@ -38,7 +39,6 @@ class SpYNNakerSynapticMatrixReport(object):
             dict(tuple(ProjectionApplicationEdge, SynapseInformation),
             ConnectionHolder)
         """
-
         # Update the print options to display everything
         print_opts = numpy.get_printoptions()
         numpy.set_printoptions(threshold=numpy.nan)
@@ -58,9 +58,10 @@ class SpYNNakerSynapticMatrixReport(object):
             # only write matrix's for edges which have matrix's
             if isinstance(edge, ProjectionApplicationEdge):
                 # figure new file name
-                file_name = os.path.join(
-                    top_level_folder, _TMPL_FILENAME.format(edge.label))
-                self._write_file(file_name, connection_holder, edge)
+                self._write_file(os.path.join(
+                    top_level_folder,
+                    f"synaptic_matrix_for_application_edge_{edge.label}"),
+                    connection_holder, edge)
 
         # Reset the print options
         numpy.set_printoptions(**print_opts)
@@ -71,7 +72,8 @@ class SpYNNakerSynapticMatrixReport(object):
             with open(file_name, "w", encoding="utf-8") as f:
                 # write all data for all synapse_information's in same file
                 for info in edge.synapse_information:
-                    f.write("{}".format(connection_holder[edge, info]))
+                    f.write(f"{connection_holder[edge, info]}")
         except IOError:
-            logger.exception("Generate_placement_reports: Can't open file"
-                             " {} for writing.".format(file_name))
+            logger.exception(
+                "Generate_placement_reports: Can't open file {} for writing.",
+                file_name)

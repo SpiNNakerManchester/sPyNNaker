@@ -156,7 +156,7 @@ def _check_warnings(lc, expected, not_expected):
         " not cell_params")
     warning_variables = set()
     for record in lc.records:
-        match = line_matcher.match(record.getMessage())
+        match = line_matcher.match(str(record.msg))
         if record.levelname == "WARNING" and match:
             warning_variables.add(match.group(1))
 

@@ -45,6 +45,8 @@ class MultiSpikeRecorder(object):
 
     def get_sdram_usage_in_bytes(self, n_neurons, spikes_per_timestep):
         """
+        :param int n_neurons:
+        :param float spikes_per_timestep:
         :rtype: ~pacman.model.resources.AbstractSDRAM
         """
         if not self.__record:

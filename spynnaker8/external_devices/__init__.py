@@ -98,7 +98,8 @@ moved_in_v7("spynnaker8.external_devices",
 
 
 def run_forever(sync_time=0):
-    """ Supports running forever in PyNN 0.8/0.9 format
+    """
+    Supports running forever in PyNN 0.8/0.9 format.
 
     .. deprecated:: 7.0
         Use
@@ -110,8 +111,9 @@ def run_forever(sync_time=0):
 
 
 def run_sync(run_time, sync_time):
-    """ Run in steps of the given number of milliseconds pausing between\
-        for a signal to be sent from the host
+    """
+    Run in steps of the given number of milliseconds pausing between
+    for a signal to be sent from the host.
 
     .. deprecated:: 7.0
         Use
@@ -123,7 +125,8 @@ def run_sync(run_time, sync_time):
 
 
 def continue_simulation():
-    """ Continue a synchronised simulation
+    """
+    Continue a synchronised simulation.
 
     .. deprecated:: 7.0
         Use
@@ -135,8 +138,9 @@ def continue_simulation():
 
 
 def request_stop():
-    """ Request a stop in the simulation without a complete stop.  Will stop\
-        after the next auto-pause-and-resume cycle
+    """
+    Request a stop in the simulation without a complete stop.  Will stop
+    after the next auto-pause-and-resume cycle.
 
     .. deprecated:: 7.0
         Use
@@ -148,7 +152,8 @@ def request_stop():
 
 
 def register_database_notification_request(hostname, notify_port, ack_port):
-    """ Adds a socket system which is registered with the notification protocol
+    """
+    Adds a socket system which is registered with the notification protocol.
 
     .. deprecated:: 7.0
         Use
@@ -167,8 +172,9 @@ __ethernet_control_connection = None
 def EthernetControlPopulation(
         n_neurons, model, label=None, local_host=None, local_port=None,
         database_notify_port_num=None, database_ack_port_num=None):
-    """ Create a PyNN population that can be included in a network to\
-        control an external device which is connected to the host
+    """
+    Create a PyNN population that can be included in a network to
+    control an external device which is connected to the host.
 
     .. deprecated:: 7.0
         Use
@@ -184,8 +190,9 @@ def EthernetControlPopulation(
 def EthernetSensorPopulation(
         device, local_host=None,
         database_notify_port_num=None, database_ack_port_num=None):
-    """ Create a pyNN population which can be included in a network to\
-        receive spikes from a device connected to the host
+    """
+    Create a pyNN population which can be included in a network to
+    receive spikes from a device connected to the host.
 
     .. deprecated:: 7.0
         Use
@@ -200,8 +207,9 @@ def EthernetSensorPopulation(
 def SpikeInjector(
         notify=True, database_notify_host=None, database_notify_port_num=None,
         database_ack_port_num=None):
-    """ Supports creating a spike injector that can be added to the\
-        application graph.
+    """
+    Supports creating a spike injector that can be added to the
+    application graph.
 
     .. deprecated:: 7.0
         Use

@@ -17,7 +17,8 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsScipyImpl(AbstractRandomStats):
-    """ A Random Statistics object that uses scipy directly
+    """
+    A Random Statistics object that uses scipy directly.
     """
 
     def __init__(self, distribution_type):
@@ -38,12 +39,12 @@ class RandomStatsScipyImpl(AbstractRandomStats):
     def var(self, dist):
         return self._scipy_stats.var(*dist.parameters)
 
-    def high(self, dist):
-        if "high" in dist.parameters:
-            return dist.parameters['high']
+    def high(self, distribution):
+        if "high" in distribution.parameters:
+            return distribution.parameters['high']
         return None
 
-    def low(self, dist):
-        if "low" in dist.parameters:
-            return dist.parameters['low']
+    def low(self, distribution):
+        if "low" in distribution.parameters:
+            return distribution.parameters['low']
         return None

@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from spinn_utilities.overrides import overrides
-from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterCommon)
+from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
@@ -22,29 +21,24 @@ from .abstract_supports_one_to_one_sdram_input import (
 
 
 class SplitterPoissonDelegate(SplitterFixedLegacy):
-    """ A splitter for Poisson sources that will ignore sources that are
-        one-to-one connected to a single Population
     """
-
-    # Message to display on error
-    INVALID_POP_ERROR_MESSAGE = (
-        "The vertex {} cannot be supported by the SplitterPoissonDelegate as"
-        " the only vertex supported by this splitter is a "
-        "SpikeSourcePoissonVertex. Please use the correct splitter for "
-        "your vertex and try again.")
+    A splitter for Poisson sources that will ignore sources that are
+    one-to-one connected to a single Population.
+    """
 
     @property
     def send_over_sdram(self):
-        """ Determine if this vertex is to be sent using SDRAM
+        """
+        Whether this vertex is to be sent using SDRAM.
 
         :rtype: bool
         """
         # If there is only one outgoing projection, and it is one-to-one
         # connected to the target, and the target knows what to do, leave
         # it to the target
-        if len(self._governed_app_vertex.outgoing_projections) != 1:
+        if len(self.governed_app_vertex.outgoing_projections) != 1:
             return False
-        proj = self._governed_app_vertex.outgoing_projections[0]
+        proj = self.governed_app_vertex.outgoing_projections[0]
         # pylint: disable=protected-access
         post_vertex = proj._projection_edge.post_vertex
         if not isinstance(post_vertex.splitter,
@@ -57,7 +51,10 @@ class SplitterPoissonDelegate(SplitterFixedLegacy):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, SpikeSourcePoissonVertex):
             raise PacmanConfigurationException(
-                self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+                f"The vertex {app_vertex} cannot be supported by the "
+                "SplitterPoissonDelegate as the only vertex supported by this "
+                "splitter is a SpikeSourcePoissonVertex. Please use the "
+                "correct splitter for your vertex and try again.")
 
     @overrides(SplitterFixedLegacy.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
@@ -72,7 +69,7 @@ class SplitterPoissonDelegate(SplitterFixedLegacy):
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
         if self.send_over_sdram:
-            proj = self._governed_app_vertex.outgoing_projections[0]
+            proj = self.governed_app_vertex.outgoing_projections[0]
             # pylint: disable=protected-access
             post_vertex = proj._projection_edge.post_vertex
             return post_vertex.splitter.get_in_coming_slices()
@@ -81,7 +78,7 @@ class SplitterPoissonDelegate(SplitterFixedLegacy):
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
         if self.send_over_sdram:
-            proj = self._governed_app_vertex.outgoing_projections[0]
+            proj = self.governed_app_vertex.outgoing_projections[0]
             # pylint: disable=protected-access
             post_vertex = proj._projection_edge.post_vertex
             return post_vertex.splitter.get_out_going_slices()

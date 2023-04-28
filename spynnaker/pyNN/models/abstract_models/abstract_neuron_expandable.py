@@ -22,17 +22,19 @@ NEURON_EXPANDER_APLX = "neuron_expander.aplx"
 
 @require_subclass(MachineVertex)
 class AbstractNeuronExpandable(object, metaclass=AbstractBase):
-    """ Indicates a class (a \
-        :py:class:`~pacman.model.graphs.machine.MachineVertex`) \
-        that has may need to run the NEURON_EXPANDER aplx
+    """
+    Indicates a class (a
+    :py:class:`~pacman.model.graphs.machine.MachineVertex`)
+    that has may need to run the neuron expander APLX.
     """
 
     __slots__ = ()
 
     @abstractmethod
     def gen_neurons_on_machine(self):
-        """ True if the neurons of a the slice of this vertex should be \
-            generated on the machine.
+        """
+        True if the neurons of a the slice of this vertex should be
+        generated on the machine.
 
         .. note::
             The typical implementation for this method will be to ask the
@@ -43,14 +45,16 @@ class AbstractNeuronExpandable(object, metaclass=AbstractBase):
 
     @abstractproperty
     def neuron_generator_region(self):
-        """ The region containing the parameters of neuron expansion
+        """
+        The region containing the parameters of neuron expansion.
 
         :rtype: int
         """
 
     @abstractmethod
     def read_generated_initial_values(self, placement):
-        """ Fill in any requested initial values
+        """
+        Fill in any requested initial values.
 
         :param ~pacman.model.placements.Placement placement:
             Where the data is on the machine

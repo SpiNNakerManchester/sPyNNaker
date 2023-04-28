@@ -30,8 +30,9 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class SpikeInjectorVertex(
         ReverseIpTagMultiCastSource, PopulationApplicationVertex,
         SupportsStructure):
-    """ An Injector of Spikes for PyNN populations.  This only allows the user\
-        to specify the virtual_key of the population to identify the population
+    """
+    An Injector of Spikes for PyNN populations.  This only allows the user
+    to specify the virtual_key of the population to identify the population.
     """
     __slots__ = [
         "__spike_recorder",
@@ -46,7 +47,6 @@ class SpikeInjectorVertex(
             self, n_neurons, label, port, virtual_key,
             reserve_reverse_ip_tag, splitter):
         # pylint: disable=too-many-arguments
-
         super().__init__(
             n_keys=n_neurons, label=label, receive_port=port,
             virtual_key=virtual_key,
@@ -56,7 +56,6 @@ class SpikeInjectorVertex(
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()
-
         self.__structure = None
 
     @overrides(SupportsStructure.set_structure)
@@ -137,7 +136,7 @@ class SpikeInjectorVertex(
     def get_neurons_recording(self, name, vertex_slice):
         if name != "spikes":
             raise KeyError(f"Cannot record {name}")
-        return vertex_slice.get_raster_ids(self.atoms_shape)
+        return vertex_slice.get_raster_ids()
 
     def describe(self):
         """
@@ -147,10 +146,9 @@ class SpikeInjectorVertex(
         together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template context
-        will be returned.
+        If template is `None`, then a dictionary containing the template
+        context will be returned.
         """
-
         context = {
             "name": "SpikeInjector",
             "default_parameters": self.default_parameters,

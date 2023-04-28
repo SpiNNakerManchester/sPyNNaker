@@ -20,8 +20,9 @@ from .abstract_generate_connector_on_host import (
 
 
 class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
-    """ Make connections using an array of integers based on the IDs\
-        of the neurons in the pre- and post-populations.
+    """
+    Make connections using an array of integers based on the IDs
+    of the neurons in the pre- and post-populations.
     """
 
     __slots__ = [
@@ -145,4 +146,4 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         return block
 
     def __repr__(self):
-        return "ArrayConnector({})".format(self.__array)
+        return f"ArrayConnector({self.__array})"

@@ -19,7 +19,8 @@ from spynnaker.pyNN.external_devices_models.push_bot import (
 
 
 class PushBotLED(AbstractPushBotOutputDevice):
-    """ The properties of the LED device that may be set.
+    """
+    The properties of the LED device that may be set.
     """
 
     LED_TOTAL_PERIOD = (

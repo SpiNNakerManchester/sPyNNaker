@@ -18,7 +18,9 @@ from spynnaker.pyNN.utilities import utility_calls
 
 
 class SpikeSourceFromFile(SpikeSourceArray):
-    """ SpikeSourceArray that works from a file
+    """
+    A spike source that works from a file (typically a tab-separated table in
+    a text file).
     """
 
     def __init__(

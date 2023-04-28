@@ -56,9 +56,9 @@ class SynapseDynamicsStructuralSTDP(_BaseClass):
         :param float initial_weight:
             Weight assigned to a newly formed connection
         :param initial_delay:
-            Delay assigned to a newly formed connection; a single value means\
-            a fixed delay value, or a tuple of two values means the delay will\
-            be chosen at random from a uniform distribution between the given\
+            Delay assigned to a newly formed connection; a single value means
+            a fixed delay value, or a tuple of two values means the delay will
+            be chosen at random from a uniform distribution between the given
             values
         :type initial_delay: float or tuple(float, float)
         :param int s_max: Maximum fan-in per target layer neuron

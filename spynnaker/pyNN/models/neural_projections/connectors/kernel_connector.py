@@ -40,8 +40,9 @@ def shape2word(sw, sh):
 class KernelConnector(AbstractGenerateConnectorOnMachine,
                       AbstractGenerateConnectorOnHost):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D\
-    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
+    Where the pre- and post-synaptic populations are considered as a 2D
+    array. Connect every post(row, column) neuron to many
+    pre(row, column, kernel)
     through a (kernel) set of weights and/or delays.
 
     .. admonition:: TODO
@@ -57,14 +58,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             safe=True, space=None, verbose=False, callback=None):
         """
         :param shape_pre:
-            2D shape of the pre population (rows/height, cols/width, usually
+            2D shape of the pre-population (rows/height, columns/width, usually
             the input image shape)
         :type shape_pre: list(int) or tuple(int,int)
         :param shape_post:
-            2D shape of the post population (rows/height, cols/width)
+            2D shape of the post-population (rows/height, columns/width)
         :type shape_post: list(int) or tuple(int,int)
         :param shape_kernel:
-            2D shape of the kernel (rows/height, cols/width)
+            2D shape of the kernel (rows/height, columns/width)
         :type shape_kernel: list(int) or tuple(int,int)
         :param weight_kernel: (optional)
             2D matrix of size shape_kernel describing the weights
@@ -75,20 +76,20 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG
             or int or float or list(int) or list(float) or None
         :param shape_common: (optional)
-            2D shape of common coordinate system (for both pre and post,
+            2D shape of common coordinate system (for both pre- and post-,
             usually the input image sizes)
         :type shape_common: list(int) or tuple(int,int) or None
         :param pre_sample_steps_in_post: (optional)
-            Sampling steps/jumps for pre pop <=> (stepX, stepY)
+            Sampling steps/jumps for pre-population <=> (stepX, stepY)
         :type pre_sample_steps_in_post: None or list(int) or tuple(int,int)
         :param pre_start_coords_in_post: (optional)
-            Starting row/col for pre sampling <=> (offX, offY)
+            Starting row/column for pre-population sampling <=> (offX, offY)
         :type pre_start_coords_in_post: None or list(int) or tuple(int,int)
         :param post_sample_steps_in_pre: (optional)
-            Sampling steps/jumps for post pop <=> (stepX, stepY)
+            Sampling steps/jumps for post-population <=> (stepX, stepY)
         :type post_sample_steps_in_pre: None or list(int) or tuple(int,int)
         :param post_start_coords_in_pre: (optional)
-            Starting row/col for post sampling <=> (offX, offY)
+            Starting row/column for post-population sampling <=> (offX, offY)
         :type post_start_coords_in_pre: None or list(int) or tuple(int,int)
         :param bool safe:
             Whether to check that weights and delays have valid values.
@@ -161,7 +162,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         self._post_as_pre = {}
 
     def __to_post_coords(self, post_vertex_slice):
-        """ Get a list of possible post-slice coordinates.
+        """
+        Get a list of possible post-slice coordinates.
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
@@ -171,7 +173,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return numpy.divmod(post, self._post_w)
 
     def __map_to_pre_coords(self, post_r, post_c):
-        """ Get a map from post to pre coords.
+        """
+        Get a map from post to pre-population coordinates.
 
         :param ~numpy.ndarray post_r: rows
         :param ~numpy.ndarray post_c: columns
@@ -181,7 +184,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 self._post_start_w + post_c * self._post_step_w)
 
     def __post_as_pre(self, post_vertex_slice):
-        """ Write post coords as pre coords.
+        """
+        Write post-population coordinates as pre-population coordinates.
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
@@ -195,7 +199,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return self._post_as_pre[str(post_vertex_slice)]
 
     def __pre_as_post(self, pre_r, pre_c):
-        """ Write pre coords as post coords.
+        """
+        Write pre-population coordinates as post-population coordinates.
 
         :param int pre_r: row
         :param int pre_c: column
@@ -206,7 +211,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
         return (r, c)
 
     def __get_kernel_vals(self, vals):
-        """ Convert kernel values given into the correct format.
+        """
+        Convert kernel values given into the correct format.
 
         :param vals:
         :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray
@@ -234,7 +240,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     def __compute_statistics(
             self, weights, delays, post_vertex_slice, n_pre_neurons):
-        """ Compute the relevant information required for the connections.
+        """
+        Compute the relevant information required for the connections.
 
         :param weights:
         :type weights: int or float or ~pyNN.random.NumpyRNG or
@@ -389,8 +396,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             weights, synapse_info)
 
     def __repr__(self):
-        return "KernelConnector(shape_kernel[{},{}])".format(
-            self._kernel_w, self._kernel_h)
+        return \
+            f"KernelConnector(shape_kernel[{self._kernel_w},{self._kernel_h}])"
 
     @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(

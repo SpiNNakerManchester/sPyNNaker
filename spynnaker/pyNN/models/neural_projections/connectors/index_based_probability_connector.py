@@ -34,8 +34,9 @@ _index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
 
 class IndexBasedProbabilityConnector(AbstractConnector,
                                      AbstractGenerateConnectorOnHost):
-    """ Make connections using a probability distribution which varies\
-        dependent upon the indices of the pre- and post-populations.
+    """
+    Make connections using a probability distribution which varies
+    dependent upon the indices of the pre- and post-populations.
     """
 
     __slots = [
@@ -49,8 +50,10 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         """
         :param str index_expression:
             the right-hand side of a valid python expression for
-            probability, involving the indices of the pre and post populations,
-            that can be parsed by eval(), that computes a probability dist;
+            probability, involving the indices of the pre- and
+            post-populations,
+            that can be parsed by `eval()`, that computes a probability
+            distribution;
             the indices will be given as variables ``i`` and ``j`` when the
             expression is evaluated.
         :param bool allow_self_connections:
@@ -180,14 +183,14 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         return block
 
     def __repr__(self):
-        return "IndexBasedProbabilityConnector({})".format(
-            self.__index_expression)
+        return f"IndexBasedProbabilityConnector({self.__index_expression})"
 
     @property
     def allow_self_connections(self):
-        """ If the connector is used to connect a Population to itself, this\
-            flag determines whether a neuron is allowed to connect to itself,\
-            or only to other neurons in the Population.
+        """
+        When the connector is used to connect a Population to itself, this
+        flag determines whether a neuron is allowed to connect to itself,
+        or only to other neurons in the Population.
 
         :rtype: bool
         """
@@ -199,9 +202,10 @@ class IndexBasedProbabilityConnector(AbstractConnector,
 
     @property
     def index_expression(self):
-        """ The right-hand side of a valid python expression for probability,\
-            involving the indices of the pre and post populations, that can\
-            be parsed by eval(), that computes a probability dist.
+        """
+        The right-hand side of a valid python expression for probability,
+        involving the indices of the pre- and post-populations, that can
+        be parsed by `eval()`, that computes a probability distribution.
 
         :rtype: str
         """

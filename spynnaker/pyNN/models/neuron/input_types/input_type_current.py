@@ -18,7 +18,8 @@ from spynnaker.pyNN.utilities.struct import Struct
 
 
 class InputTypeCurrent(AbstractInputType):
-    """ The current input type.
+    """
+    The current input type.
     """
     __slots__ = []
 
