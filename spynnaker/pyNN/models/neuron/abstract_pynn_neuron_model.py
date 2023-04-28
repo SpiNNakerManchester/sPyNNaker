@@ -56,7 +56,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         :param bool drop_late_spikes:
         :param splitter:
         :type splitter:
-            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         :param float seed:
         :param int n_colour_bits:
         """

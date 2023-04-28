@@ -40,7 +40,7 @@ class SpikeInjector(AbstractPyNNModel):
         :param bool reserve_reverse_ip_tag:
         :param splitter:
         :type splitter:
-            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
         """
         # pylint: disable=arguments-differ
         return SpikeInjectorVertex(
