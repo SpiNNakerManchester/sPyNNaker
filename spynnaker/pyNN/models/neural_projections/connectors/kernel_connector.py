@@ -232,11 +232,21 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 vals.shape[HEIGHT] == self._kernel_h and
                 vals.shape[WIDTH] == self._kernel_w):
             return vals.view(ConvolutionKernel)
-        # TODO: make this error more descriptive?
+        elif ((isinstance(vals, list))):
+            height = len(vals)
+            if height == self._kernel_h:
+                correct_size = True
+                for h in range(height):
+                    width = len(vals[h])
+                    if width != self._kernel_w:
+                        correct_size = False
+                if correct_size:
+                    return numpy.asarray(vals).view(ConvolutionKernel)
         raise SpynnakerException(
-            "Error generating KernelConnector values; if you have supplied "
-            "weight and/or delay kernel then ensure they are the same size "
-            "as specified by the shape kernel values.")
+            f"Error generating KernelConnector values; if you have supplied "
+            f"weight and/or delay kernel then ensure they are the same size "
+            f"as specified by the shape kernel values (height: "
+            f"{self._kernel_h} and width: {self._kernel_w}).")
 
     def __compute_statistics(
             self, weights, delays, post_vertex_slice, n_pre_neurons):
