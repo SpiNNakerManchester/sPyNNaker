@@ -243,9 +243,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
                 if correct_size:
                     return numpy.asarray(vals).view(ConvolutionKernel)
         raise SpynnakerException(
-            f"Error generating KernelConnector values; if you have supplied "
-            f"weight and/or delay kernel then ensure they are the same size "
-            f"as specified by the shape kernel values (height: "
+            "Error generating KernelConnector values; if you have supplied "
+            "weight and/or delay kernel then ensure they are the same size "
+            "as specified by the shape kernel values (height: "
             f"{self._kernel_h} and width: {self._kernel_w}).")
 
     def __compute_statistics(

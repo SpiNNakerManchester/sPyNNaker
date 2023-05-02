@@ -43,7 +43,7 @@ class TestKernelConnector(BaseTestCase):
         weight_list = [[7.0 if ((a + b) % 2 == 0) else 5.0
                         for a in range(ksw)] for b in range(ksh)]
         delay_list = [[20.0 if ((a + b) % 2 == 1) else 10.0
-                        for a in range(ksw)] for b in range(ksh)]
+                       for a in range(ksw)] for b in range(ksh)]
         weight_kernel = np.asarray(weight_list)
 
         kernel_connector = sim.KernelConnector(
