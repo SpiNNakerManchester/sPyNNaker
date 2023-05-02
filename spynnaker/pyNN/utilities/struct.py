@@ -107,7 +107,7 @@ class Struct(object):
         size_in_bytes = array_size * datatype.itemsize
         return (size_in_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
-    def get_data(self, values, vertex_slice=None, atoms_shape=None):
+    def get_data(self, values, vertex_slice=None):
         """
         Get a numpy array of uint32 of data for the given values.
 
@@ -117,11 +117,6 @@ class Struct(object):
             The vertex slice to get the data for, or `None` if the structure is
             global.
         :type vertex_slice: Slice or None
-        :param atoms_shape:
-            The shape of the atoms in the whole application vertex.
-            When vertex_slice is not `None`, atoms_shape must not be not
-            `None`.
-            When vertex_slice is `None`, atoms_shape is ignored.
         :rtype: ~numpy.ndarray(dtype="uint32")
         """
         n_items = 1
@@ -131,9 +126,6 @@ class Struct(object):
                     "Repeating structures must specify a vertex_slice")
         elif self.__repeat_type == StructRepeat.GLOBAL:
             raise ValueError("Global Structures do not have a slice")
-        elif atoms_shape is None:
-            raise ValueError(
-                "atoms_shape must be not None if vertex_slice is not None")
         else:
             n_items = vertex_slice.n_atoms
 
@@ -159,8 +151,7 @@ class Struct(object):
                         all_vals.get_single_value_all(), data_type)
                 else:
                     self.__get_data_for_slice(
-                        data, all_vals, name, data_type, vertex_slice,
-                        atoms_shape)
+                        data, all_vals, name, data_type, vertex_slice)
             else:
                 # If there is only a default value, get that and use it
                 # everywhere
@@ -177,12 +168,12 @@ class Struct(object):
         return data.view("uint32")
 
     def __get_data_for_slice(
-            self, data, all_vals, name, data_type, vertex_slice, atoms_shape):
+            self, data, all_vals, name, data_type, vertex_slice):
         """
         Get the data for a single value from a vertex slice.
         """
         # If there is a list of values, convert it
-        ids = vertex_slice.get_raster_ids(atoms_shape)
+        ids = vertex_slice.get_raster_ids()
         data_pos = 0
         for start, stop, value in all_vals.iter_ranges_by_ids(ids):
             # Get the values and convert to the correct data type
@@ -197,7 +188,7 @@ class Struct(object):
             data[name][data_pos:data_pos + n_values] = data_value
             data_pos += n_values
 
-    def get_generator_data(self, values, vertex_slice=None, atoms_shape=None):
+    def get_generator_data(self, values, vertex_slice=None):
         """
         Get a numpy array of uint32 of data to generate the given values.
 
@@ -208,12 +199,6 @@ class Struct(object):
             or where a single value repeats for every neuron.  If this is not
             the case and vertex_slice is `None`, an error will be raised!
         :type vertex_slice: Slice or None
-        :param atoms_shape:
-            The shape of the atoms in the whole application vertex.
-            When vertex_slice is not `None`, atoms_shape must not be not
-            `None`.
-            When vertex_slice is `None`, atoms_shape is ignored.
-        :type atoms_shape: tuple(int) or None
         :rtype: ~numpy.ndarray(dtype="uint32")
         """
         # Define n_repeats, which is either the total number of neurons
@@ -227,9 +212,6 @@ class Struct(object):
             if self.__repeat_type == StructRepeat.GLOBAL:
                 raise ValueError(
                     "Global Structures cannot repeat more than once")
-            if atoms_shape is None:
-                raise ValueError(
-                    "atoms_shape must be not None if vertex_slice is not None")
             n_repeats = vertex_slice.n_atoms
 
         # Start with bytes per repeat, n_repeats (from above),
@@ -252,7 +234,7 @@ class Struct(object):
             # If we know the array size, the values can vary per neuron
             else:
                 self.__gen_data_for_slice(
-                    data, gen_data, values, name, vertex_slice, atoms_shape)
+                    data, gen_data, values, name, vertex_slice)
 
         # Update with size *before* adding generator parameters
         data[2] = len(data) * BYTES_PER_WORD
@@ -292,7 +274,7 @@ class Struct(object):
         gen_data.append(param_generator_params(value))
 
     def __gen_data_for_slice(
-            self, data, gen_data, values, name, vertex_slice, atoms_shape):
+            self, data, gen_data, values, name, vertex_slice):
         """
         Generate data with different values for each neuron.
         """
@@ -316,7 +298,7 @@ class Struct(object):
                 n_items = 0
 
                 # Go through and get the data for each value
-                ids = vertex_slice.get_raster_ids(atoms_shape)
+                ids = vertex_slice.get_raster_ids()
                 for start, stop, value in vals.iter_ranges_by_ids(ids):
                     n_items += 1
                     # This is the metadata
@@ -344,8 +326,7 @@ class Struct(object):
                    for data_type, _name in self.__fields)
 
     def read_data(
-            self, data, values, data_offset=0, vertex_slice=None,
-            atoms_shape=None):
+            self, data, values, data_offset=0, vertex_slice=None):
         """
         Read a byte string of data and write to values.
 
@@ -370,12 +351,9 @@ class Struct(object):
                     "Repeating structures must specify an array size")
         elif self.__repeat_type == StructRepeat.GLOBAL:
             raise ValueError("Global Structures do not have a slice")
-        elif atoms_shape is None:
-            raise ValueError(
-                "atoms_shape must be not None if vertex_slice is not None")
         else:
             n_items = vertex_slice.n_atoms
-            ids = vertex_slice.get_raster_ids(atoms_shape)
+            ids = vertex_slice.get_raster_ids()
 
         if not self.__fields:
             return
