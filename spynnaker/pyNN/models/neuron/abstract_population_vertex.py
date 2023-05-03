@@ -927,7 +927,7 @@ class AbstractPopulationVertex(
         # If synapses change during the run also regenerate these to get
         # back to the initial state
         if self.__synapse_dynamics.changes_during_run:
-            SpynnakerDataView.set_requires_data_generation()
+            SpynnakerDataView.set_requires_mapping()
         else:
             # We only get neuron vertices to regenerate not redoing data
             # generation
