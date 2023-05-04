@@ -7,7 +7,7 @@
 
 #define SYNAPSES_PER_NEURON 250
 
-extern uint32_t time;
+//extern uint32_t time;
 extern REAL learning_signal;
 //extern REAL local_eta;
 

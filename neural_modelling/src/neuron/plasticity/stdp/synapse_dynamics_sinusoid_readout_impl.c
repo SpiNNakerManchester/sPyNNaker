@@ -485,7 +485,8 @@ void synapse_dynamics_process_post_synaptic_event(
 //    return plastic_saturation_count;
 //}
 
-// TODO: fix below to match other dynamics impls
+// TODO: fix below to match other dynamics impls so that structural
+//       plasticity can be used
 
 #if SYNGEN_ENABLED == 1
 

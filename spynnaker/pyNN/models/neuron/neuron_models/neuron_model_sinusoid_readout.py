@@ -95,7 +95,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractStandardNeuronComp
             (DataType.S1615, TIMESTEP),  # timestep
             # Learning signal
             (DataType.S1615, L),  # L
-            (DataType.S1615, W_FB),  # w_fb
+            (DataType.S1615, W_FB)  # w_fb
         ]
 
         # former global parameters

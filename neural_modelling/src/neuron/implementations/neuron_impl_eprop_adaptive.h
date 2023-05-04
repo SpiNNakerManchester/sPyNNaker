@@ -521,8 +521,11 @@ static void neuron_impl_do_timestep_update(
 			neuron->z = 1.0k * neuron->A; // implements refractory period
 		}
 
+
 		bool spike = z_t;
 
+//		log_info("time %u neuron_index %u z_t %u spike %u z %k nu %k",
+//				time, neuron_index, z_t, spike, neuron->z, nu);
 
 
 		// *********************************************************

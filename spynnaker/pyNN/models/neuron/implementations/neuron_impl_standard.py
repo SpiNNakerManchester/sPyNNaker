@@ -86,11 +86,9 @@ class NeuronImplStandard(AbstractNeuronImpl):
         if self.__additional_input_type is not None:
             self.__components.append(self.__additional_input_type)
 
-    # TODO: not convinced this is needed... ?
-    # @property
-    # @overrides(AbstractNeuronImpl.neuron_model)
-    # def neuron_model(self):
-    #     return self.__neuron_model
+    @property
+    def neuron_model(self):
+        return self.__neuron_model
 
     @property
     def n_steps_per_timestep(self):

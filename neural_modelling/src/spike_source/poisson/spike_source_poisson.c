@@ -1034,7 +1034,13 @@ static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
 //! \param[in] key: Received multicast key
 //! \param[in] payload: Received multicast payload
 static void multicast_packet_callback(uint key, uint payload) {
+
+//	log_info("multicast packet callback SSP key %u payload %u time %u",
+//			key, payload, time);
+
     uint32_t id = key & ssp_params.set_rate_neuron_id_mask;
+
+//    log_info("id value is %u mask %u", id, ssp_params.set_rate_neuron_id_mask);
     if ((id < ssp_params.first_source_id) ||
             (id - ssp_params.first_source_id >= ssp_params.n_spike_sources)) {
         return;

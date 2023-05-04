@@ -681,20 +681,6 @@ class AbstractPopulationVertex(
         self.__state_variables[name].set_value_by_selector(
             selector, value)
 
-
-        # This was added to the eprop_adaptive branch; does it need adding to
-        # generate_data_spec (which has now been moved to the machine vertex...)
-
-        # if isinstance(self.__pynn_model._model.neuron_model, NeuronModelLeftRightReadout):
-        #     poisson_key = routing_info.get_first_key_from_pre_vertex(placement.vertex, "CONTROL")
-        #     self.__pynn_model._model.neuron_model.set_poisson_key(poisson_key)
-        #
-        # # Get the poisson key
-        # p_key = routing_info.get_first_key_from_pre_vertex(
-        #     vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
-        # if hasattr(self.__neuron_impl, "set_poisson_key"):
-        #     self.__neuron_impl.set_poisson_key(p_key)
-
     @overrides(PopulationApplicationVertex.get_state_variables)
     def get_state_variables(self):
         return self.__pynn_model.default_initial_values.keys()
@@ -888,17 +874,9 @@ class AbstractPopulationVertex(
     def __repr__(self):
         return self.__str__()
 
-    # This was in the eprop_adpative branch but I don't think it's needed now?
-
-    # def get_n_keys_for_partition(self, partition, graph_mapper):
-    #     if partition.identifier == constants.LIVE_POISSON_CONTROL_PARTITION_ID:
-    #         n_keys = 0
-    #         for edge in partition.edges:
-    #             slice = graph_mapper.get_slice(edge.post_vertex)
-    #             n_keys += slice.n_atoms
-    #         return n_keys
-    #     else:
-    #         return self.n_atoms
+    @property
+    def _pynn_model(self):
+        return self.__pynn_model
 
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):

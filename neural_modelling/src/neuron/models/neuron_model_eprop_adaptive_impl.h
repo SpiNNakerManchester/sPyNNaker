@@ -243,9 +243,9 @@ static inline void neuron_model_initialise(
 	state->V_reset = params->V_reset;
 	state->T_refract = lif_ceil_accum(kdivk(params->T_refract_ms, ts));
 
-	log_info("V_membrane %k V_rest %k R_membrane %k exp_TC %k I_offset %k refract_timer %k V_reset %k T_refract %k",
+	log_info("V_membrane %k V_rest %k R_membrane %k exp_TC %k I_offset %k refract_timer %k V_reset %k T_refract_ms %k T_refract %d",
 			state->V_membrane, state->V_rest, state->R_membrane, state->exp_TC, state->I_offset,
-			state->refract_timer, state->V_reset, state->T_refract);
+			state->refract_timer, state->V_reset, params->T_refract_ms, state->T_refract);
 
 	// for everything else just copy across for now
 	state->z = params->z;
