@@ -415,6 +415,7 @@ class PopulationMachineVertex(
         n_colours = 2 ** self._app_vertex.n_colour_bits
         if partition_id == constants.LIVE_POISSON_CONTROL_PARTITION_ID:
             n_keys = 0
+            # Seems like overkill, there should be a simpler way to do this
             partitions = (
                 SpynnakerDataView.get_outgoing_edge_partitions_starting_at_vertex(
                 self._app_vertex))
@@ -422,8 +423,6 @@ class PopulationMachineVertex(
                 if partition.identifier == constants.LIVE_POISSON_CONTROL_PARTITION_ID:
                     for edge in partition.edges:
                         n_keys += edge.post_vertex.n_atoms
-                        # n_keys += slice.n_atoms
-                  partition_id, n_keys, n_colours)
             return n_keys * n_colours
         else:
             return self._vertex_slice.n_atoms * n_colours
