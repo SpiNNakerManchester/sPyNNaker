@@ -306,6 +306,8 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
+        # if we are here, the rates have changed!
+        # self.__rate_changed = True
 
         # write setup data
         spec.reserve_memory_region(
