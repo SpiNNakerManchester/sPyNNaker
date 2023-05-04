@@ -923,15 +923,7 @@ class AbstractPopulationVertex(
     def reset_to_first_timestep(self):
         # Reset state variables
         self.__state_variables.copy_into(self.__initial_state_variables)
-
-        # If synapses change during the run also regenerate these to get
-        # back to the initial state
-        if self.__synapse_dynamics.changes_during_run:
-            SpynnakerDataView.set_requires_mapping()
-        else:
-            # We only get neuron vertices to regenerate not redoing data
-            # generation
-            self.__tell_neuron_vertices_to_regenerate()
+        self.__tell_neuron_vertices_to_regenerate()
 
     @staticmethod
     def _ring_buffer_expected_upper_bound(
