@@ -78,17 +78,15 @@ static uint n_steps_per_timestep;
 extern bool use_key;
 
 // TODO: are these parameters needed?
-static REAL next_spike_time = 0;
 //extern uint32_t time;
 extern uint32_t *neuron_keys;
 extern REAL learning_signal;
-static uint32_t target_ind = 0;
 
 // recording params (?)
-uint32_t is_it_right = 0;
+//uint32_t is_it_right = 0;
 //uint32_t choice = 0;
 
-// Left right parameters
+// Left right state parameters
 typedef enum
 {
     STATE_CUE,
@@ -309,7 +307,7 @@ static void neuron_impl_do_timestep_update(
 
 		// Get the neuron itself
 		neuron_t *neuron = &neuron_array[neuron_index];
-		bool spike = false;
+//		bool spike = false;
 
 	//    current_time = time & 0x3ff; // repeats on a cycle of 1024 entries in array
 
@@ -428,8 +426,7 @@ static void neuron_impl_do_timestep_update(
 			softmax_0 = 0k;
 			softmax_1 = 0k;
 			if (use_key) {
-				// I don't understand, this just sends zero
-				// Oh, maybe it's a "completed" signal
+				// This sends a "completed" signal
 				send_spike_mc_payload(
 						neuron_keys[neuron_index], bitsk(neuron->cross_entropy));
 //				while (!spin1_send_mc_packet(
@@ -455,8 +452,8 @@ static void neuron_impl_do_timestep_update(
 					if ((time - current_time) %
 							(wait_between_cues + duration_of_cue) == wait_between_cues){
 						// pick new value and broadcast
-						REAL random_value = (REAL)(mars_kiss64_seed(
-								neuron->kiss_seed) / (REAL)0xffffffff); // 0-1
+						REAL random_value = kdivui(
+								(REAL)(mars_kiss64_seed(neuron->kiss_seed)), UINT32_MAX); // 0-1
 						if (random_value < 0.5k){
 							current_cue_direction = 0;
 						}
@@ -556,8 +553,11 @@ static void neuron_impl_do_timestep_update(
 				}
 				else{
 	//                accum denominator = 1.k  / (exp_1 + exp_0);
-					softmax_0 = exp_0 / (exp_1 + exp_0);
-					softmax_1 = exp_1 / (exp_1 + exp_0);
+//					softmax_0 = exp_0 / (exp_1 + exp_0);
+//					softmax_1 = exp_1 / (exp_1 + exp_0);
+					// These divides are okay in kdivk because exp is always positive
+					softmax_0 = kdivk(exp_0, (exp_1 + exp_0));
+					softmax_1 = kdivk(exp_1, (exp_1 + exp_0));
 				}
 	//            io_printf(IO_BUF, "soft0 %k - soft1 %k - v0 %k - v1 %k\n", softmax_0, softmax_1, global_parameters->readout_V_0, global_parameters->readout_V_1);
 				// What to do if log(0)?
@@ -568,7 +568,7 @@ static void neuron_impl_do_timestep_update(
 						glob_neuron->cross_entropy = -logk(softmax_1);
 					}
 					learning_signal = softmax_0;
-					is_it_right = 1;
+//					is_it_right = 1;
 				}
 				else{
 					for (uint32_t glob_n = 0; glob_n < n_neurons; glob_n++) {
@@ -577,7 +577,7 @@ static void neuron_impl_do_timestep_update(
 						glob_neuron->cross_entropy = -logk(softmax_0);
 					}
 					learning_signal = softmax_0 - 1.k;
-					is_it_right = 0;
+//					is_it_right = 0;
 				}
 	//            if (learning_signal > 0.5){
 	//                learning_signal = 1k;
@@ -665,15 +665,15 @@ static void neuron_impl_do_timestep_update(
 	//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = softmax_0;
 		}
 
-		// If spike occurs, communicate to relevant parts of model
-		if (spike) {
-			// Call relevant model-based functions
-			// Tell the neuron model
-	//        neuron_model_has_spiked(neuron);
-
-			// Tell the additional input
-			additional_input_has_spiked(additional_input);
-		}
+		// This model doesn't spike so this can be commented out
+//		if (spike) {
+//			// Call relevant model-based functions
+//			// Tell the neuron model
+//	//        neuron_model_has_spiked(neuron);
+//
+//			// Tell the additional input
+//			additional_input_has_spiked(additional_input);
+//		}
 
 		// Shape the existing input according to the included rule
 		synapse_types_shape_input(synapse_type);
@@ -681,9 +681,6 @@ static void neuron_impl_do_timestep_update(
 		#if LOG_LEVEL >= LOG_DEBUG
 			neuron_model_print_state_variables(neuron);
 		#endif // LOG_LEVEL >= LOG_DEBUG
-
-		// Return the boolean to the model timestep update
-		//    return spike;
 	}
 
 //	log_info("end of do_timestep_update time %u", time);

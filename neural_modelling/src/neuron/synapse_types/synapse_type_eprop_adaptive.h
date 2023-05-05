@@ -205,8 +205,7 @@ static inline const char *synapse_types_get_type_char(
 //! \return Nothing
 static inline void synapse_types_print_input(
         synapse_types_t *parameter) {
-    io_printf(
-        IO_BUF, "%12.6k + %12.6k - %12.6k - %12.6k",
+    log_debug("%12.6k + %12.6k - %12.6k - %12.6k",
         parameter->exc, parameter->exc2,
         parameter->inh, parameter->inh2);
 }
@@ -215,10 +214,10 @@ static inline void synapse_types_print_input(
 //! \param[in] parameter: the pointer to the parameters to print
 static inline void synapse_types_print_parameters(
         synapse_types_t *parameter) {
-    log_info("exc_init   = %11.4k\n", parameter->exc);
-    log_info("exc2_init  = %11.4k\n", parameter->exc2);
-    log_info("inh_init   = %11.4k\n", parameter->inh);
-    log_info("inh2_init   = %11.4k\n", parameter->inh2);
+    log_debug("exc_init   = %11.4k\n", parameter->exc);
+    log_debug("exc2_init  = %11.4k\n", parameter->exc2);
+    log_debug("inh_init   = %11.4k\n", parameter->inh);
+    log_debug("inh2_init   = %11.4k\n", parameter->inh2);
 }
 
 #endif  // _SYNAPSE_TYPES_ERBP_IMPL_H_

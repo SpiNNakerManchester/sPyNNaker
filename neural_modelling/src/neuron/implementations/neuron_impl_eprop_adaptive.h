@@ -304,11 +304,11 @@ static void neuron_impl_load_neuron_parameters(
 //    }
 
     // This can probably be commented out at some point as well
-    for (index_t n = 0; n < n_neurons; n++) {
-        neuron_model_print_parameters(&neuron_array[n]);
-        log_debug("Neuron id %u", n);
-        neuron_model_print_state_variables(&neuron_array[n]);
-    }
+//    for (index_t n = 0; n < n_neurons; n++) {
+//        neuron_model_print_parameters(&neuron_array[n]);
+//        log_debug("Neuron id %u", n);
+//        neuron_model_print_state_variables(&neuron_array[n]);
+//    }
 
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
@@ -503,8 +503,10 @@ static void neuron_impl_do_timestep_update(
 	//                                    - global_parameters->core_target_rate;
 	//    REAL reg_learning_signal = global_parameters->core_target_rate - (global_parameters->core_pop_rate / neuron_impl_neurons_in_partition);
 	//    REAL reg_learning_signal = (global_parameters->core_pop_rate / neuron_impl_neurons_in_partition) - global_parameters->core_target_rate;
-		REAL reg_learning_signal = (
-				neuron->core_pop_rate / neuron_impl_neurons_in_partition) - neuron->core_target_rate;
+//		REAL reg_learning_signal = (
+//				neuron->core_pop_rate / neuron_impl_neurons_in_partition) - neuron->core_target_rate;
+		REAL reg_learning_signal = kdivui(
+				neuron->core_pop_rate, neuron_impl_neurons_in_partition) - neuron->core_target_rate;
 //		recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = reg_learning_signal;//global_parameters->core_pop_rate;
 		neuron_recording_record_accum(
 				GSYN_EXC_RECORDING_INDEX, neuron_index, reg_learning_signal);
@@ -515,6 +517,7 @@ static void neuron_impl_do_timestep_update(
 
 //		log_info("Check: voltage %k neuron->B %k time %u", voltage, neuron->B, time);
 
+		// Can't replace this (yet) with kdivk as that only works for positive accums
 		state_t nu = (voltage - neuron->B)/neuron->B;
 
 		if (nu > ZERO){

@@ -243,9 +243,9 @@ static inline void neuron_model_initialise(
 	state->V_reset = params->V_reset;
 	state->T_refract = lif_ceil_accum(kdivk(params->T_refract_ms, ts));
 
-	log_info("V_membrane %k V_rest %k R_membrane %k exp_TC %k I_offset %k refract_timer %k V_reset %k T_refract_ms %k T_refract %d",
-			state->V_membrane, state->V_rest, state->R_membrane, state->exp_TC, state->I_offset,
-			state->refract_timer, state->V_reset, params->T_refract_ms, state->T_refract);
+//	log_info("V_membrane %k V_rest %k R_membrane %k exp_TC %k I_offset %k refract_timer %k V_reset %k T_refract_ms %k T_refract %d",
+//			state->V_membrane, state->V_rest, state->R_membrane, state->exp_TC, state->I_offset,
+//			state->refract_timer, state->V_reset, params->T_refract_ms, state->T_refract);
 
 	// for everything else just copy across for now
 	state->z = params->z;
@@ -263,16 +263,16 @@ static inline void neuron_model_initialise(
 	state->window_size = params->window_size;
 	state->number_of_cues = params->number_of_cues;
 
-	log_info("Check: z %k A %k psi %k B %k b %k b_0 %k window_size %u",
-			state->z, state->A, state->psi, state->B, state->b, state->b_0, state->window_size);
+//	log_info("Check: z %k A %k psi %k B %k b %k b_0 %k window_size %u",
+//			state->z, state->A, state->psi, state->B, state->b, state->b_0, state->window_size);
 
 	state->core_pop_rate = params->pop_rate;
 	state->core_target_rate = params->target_rate;
 	state->rate_exp_TC = expk(-kdivk(ts, params->tau_err));
 	state->eta = params->eta;
 
-	log_info("Check: core_pop_rate %k core_target_rate %k rate_exp_TC %k eta %k",
-			state->core_pop_rate, state->core_target_rate, state->rate_exp_TC, state->eta);
+//	log_info("Check: core_pop_rate %k core_target_rate %k rate_exp_TC %k eta %k",
+//			state->core_pop_rate, state->core_target_rate, state->rate_exp_TC, state->eta);
 
 	for (uint32_t n_syn = 0; n_syn < SYNAPSES_PER_NEURON; n_syn++) {
 		state->syn_state[n_syn] = params->syn_state[n_syn];

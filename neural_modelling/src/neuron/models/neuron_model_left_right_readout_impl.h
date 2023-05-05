@@ -243,11 +243,11 @@ static inline void neuron_model_initialise(
 	state->number_of_cues = params->number_of_cues;
 //	local_eta = params->eta;
 
-	log_info("Check p_key %u p_pop_size %u", params->p_key, params->p_pop_size);
-	log_info("Check number_of_cues %u eta %k", params->number_of_cues, params->eta);
-	log_info("mean_0 %k mean_1 %k rate_on %k rate_off %k readout_V_0 %k readout_V_1 %k",
-			params->mean_0, params->mean_1, params->rate_on, params->rate_off,
-			params->readout_V_0, params->readout_V_1);
+//	log_info("Check p_key %u p_pop_size %u", params->p_key, params->p_pop_size);
+//	log_info("Check number_of_cues %u eta %k", params->number_of_cues, params->eta);
+//	log_info("mean_0 %k mean_1 %k rate_on %k rate_off %k readout_V_0 %k readout_V_1 %k",
+//			params->mean_0, params->mean_1, params->rate_on, params->rate_off,
+//			params->readout_V_0, params->readout_V_1);
 
 	for (uint32_t n_syn = 0; n_syn < SYNAPSES_PER_NEURON; n_syn++) {
 		state->syn_state[n_syn] = params->syn_state[n_syn];
