@@ -519,6 +519,9 @@ static void neuron_impl_do_timestep_update(
 
 		// Can't replace this (yet) with kdivk as that only works for positive accums
 		state_t nu = (voltage - neuron->B)/neuron->B;
+		// The below works but doesn't save ITCM
+//		state_t nu = kdivi(bitsk(voltage-neuron->B), bitsk(neuron->B));
+
 
 		if (nu > ZERO){
 			neuron->z = 1.0k * neuron->A; // implements refractory period
