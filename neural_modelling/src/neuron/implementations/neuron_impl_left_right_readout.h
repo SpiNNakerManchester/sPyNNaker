@@ -452,8 +452,10 @@ static void neuron_impl_do_timestep_update(
 					if ((time - current_time) %
 							(wait_between_cues + duration_of_cue) == wait_between_cues){
 						// pick new value and broadcast
-						REAL random_value = kdivui(
-								(REAL)(mars_kiss64_seed(neuron->kiss_seed)), UINT32_MAX); // 0-1
+//						REAL random_value = kdivui(
+//								(REAL)(mars_kiss64_seed(neuron->kiss_seed)), UINT32_MAX); // 0-1
+						REAL random_value = (
+								(REAL)mars_kiss64_seed(neuron->kiss_seed) / (REAL)UINT32_MAX); // 0-1
 						if (random_value < 0.5k){
 							current_cue_direction = 0;
 						}
