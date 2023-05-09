@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,8 +26,9 @@ except ImportError as _ex:
 
 
 class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
-    """ Make connections using a Connection Set Algebra (Djurfeldt 2012)\
-        description between the neurons in the pre- and post-populations.
+    """
+    Make connections using a Connection Set Algebra (Djurfeldt 2012)
+    description between the neurons in the pre- and post-populations.
 
     .. note::
         If you get TypeError in Python 3 see:
@@ -171,5 +172,4 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         csa.show(self.__full_connection_set, n_pre_neurons, n_post_neurons)
 
     def __repr__(self):
-        return "CSAConnector({})".format(
-            self.__full_cset)
+        return f"CSAConnector({self.__full_cset})"

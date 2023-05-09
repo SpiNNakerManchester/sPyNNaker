@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,6 @@ logger = FormatAdapter(logging.getLogger(__name__))
 CUTOFF = 100
 _GRAPH_TITLE = "The graph of the network in graphical form"
 _GRAPH_NAME = "network_graph.gv"
-_NODE_LABEL = "{} ({} neurons)"
 _GRAPH_FORMAT = "png"
 
 
@@ -47,8 +46,8 @@ def _get_diagram(label):
 
 def spynnaker_neuron_graph_network_specification_report():
     """
-    Produces a report describing the graph created from the neural \
-        populations and projections.
+    Produces a report describing the graph created from the neural
+    populations and projections.
 
     :param str report_folder: the report folder to put figure into
     """
@@ -99,7 +98,7 @@ def _generate_vertices(dot_diagram, progress):
         # Arbitrary labels used inside dot
         vertex_id = str(vertex_counter)
         dot_diagram.node(
-            vertex_id, _NODE_LABEL.format(vertex.label, vertex.n_atoms))
+            vertex_id, f"{vertex.label} ({vertex.n_atoms} neurons)")
         vertex_ids[vertex] = vertex_id
     return vertex_ids
 

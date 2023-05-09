@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -191,6 +191,8 @@ class ConnectorsTest(BaseTestCase):
                 sim.FixedTotalNumberConnector(
                     connections, with_replacement=with_replacement),
                 connections,  with_replacement, conn_type="total")
+        # We have to end here as the exception happens before end
+        sim.end()
 
     def test_total_connector_too_many(self):
         self.runsafe(self.total_connector_too_many)

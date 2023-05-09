@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,8 @@ import spynnaker.pyNN.utilities.utility_calls as utility_calls
 
 
 def check_gsyn(gsyn1, gsyn2):
-    """ Compare two arrays of conductances. For testing.
+    """
+    Compare two arrays of conductances. For testing.
 
     :param gsyn1: An array of conductances.
     :param gsyn2: An array of conductances.
@@ -35,8 +36,9 @@ def check_gsyn(gsyn1, gsyn2):
 
 
 def check_path_gysn(path, n_neurons, runtime, gsyn):
-    """ Compare an arrays of conductances with baseline data from a file. \
-        For testing.
+    """
+    Compare an arrays of conductances with baseline data from a file.
+    For testing.
 
     :param path: A file path.
     :param n_neurons: The number of neurons that produced the data.
@@ -50,8 +52,9 @@ def check_path_gysn(path, n_neurons, runtime, gsyn):
 
 
 def check_sister_gysn(sister, n_neurons, runtime, gsyn):
-    """ Compare an arrays of conductances with baseline data from a file next\
-        to a specified module. For testing.
+    """
+    Compare an arrays of conductances with baseline data from a file next
+    to a specified module. For testing.
 
     :param sister: A module. The file read from will be ``gsyn.data``
         adjacent to this module.

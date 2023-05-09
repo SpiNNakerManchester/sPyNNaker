@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,6 +38,7 @@ class TestSampling(BaseTestCase):
         ps.check(pop, simtime,
                  spike_rate=spike_rate, spike_rec_indexes=spike_rec_indexes,
                  v_rate=v_rate, v_rec_indexes=v_rec_indexes, is_view=False)
+        sim.end()
 
     def test_medium(self):
         self.runsafe(self.medium)
@@ -106,6 +107,7 @@ class TestSampling(BaseTestCase):
         pop_1[0:3].record(["spikes", "v"])
         simtime = 10
         sim.run(simtime)
+        sim.end()
 
     def test_one_core_no_recording(self):
         self.runsafe(self.one_core_no_recording)

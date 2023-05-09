@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,9 @@ from spynnaker.pyNN.utilities import utility_calls
 
 
 class SpikeSourceFromFile(SpikeSourceArray):
-    """ SpikeSourceArray that works from a file
+    """
+    A spike source that works from a file (typically a tab-separated table in
+    a text file).
     """
 
     def __init__(

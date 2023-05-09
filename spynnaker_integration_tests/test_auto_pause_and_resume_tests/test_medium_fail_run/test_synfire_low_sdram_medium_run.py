@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ class TestVeryLow(BaseTestCase):
 
     @unittest.skip("does not work with this size for purely the java. Python "
                    "is fine. Needs investigating.")
-    def test_more_runs(self):
+    def more_runs(self):
         with LogCapture() as lc:
             synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                                run_times=[runtime])
@@ -51,7 +51,7 @@ class TestVeryLow(BaseTestCase):
         synfire_run.get_output_pop_gsyn_exc_numpy()
         synfire_run.get_output_pop_voltage_numpy()
 
-    def more_runs(self):
+    def test_more_runs(self):
         self.runsafe(self.more_runs)
 
 

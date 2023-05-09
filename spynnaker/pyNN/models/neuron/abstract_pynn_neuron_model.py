@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,6 +49,17 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             self, n_neurons, label, spikes_per_second, ring_buffer_sigma,
             incoming_spike_buffer_size, drop_late_spikes, splitter, seed,
             n_colour_bits):
+        """
+        :param float spikes_per_second:
+        :param float ring_buffer_sigma:
+        :param int incoming_spike_buffer_size:
+        :param bool drop_late_spikes:
+        :param splitter:
+        :type splitter:
+            ~pacman.model.partitioner_splitters.AbstractSplitterCommon or None
+        :param float seed:
+        :param int n_colour_bits:
+        """
         # pylint: disable=arguments-differ
         max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return AbstractPopulationVertex(

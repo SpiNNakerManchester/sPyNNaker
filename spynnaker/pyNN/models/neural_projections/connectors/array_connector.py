@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,8 +20,9 @@ from .abstract_generate_connector_on_host import (
 
 
 class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
-    """ Make connections using an array of integers based on the IDs\
-        of the neurons in the pre- and post-populations.
+    """
+    Make connections using an array of integers based on the IDs
+    of the neurons in the pre- and post-populations.
     """
 
     __slots__ = [
@@ -145,4 +146,4 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         return block
 
     def __repr__(self):
-        return "ArrayConnector({})".format(self.__array)
+        return f"ArrayConnector({self.__array})"

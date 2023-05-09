@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,8 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
 
 class PushBotEthernetLaserDevice(
         PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex):
-    """ The Laser of a PushBot
+    """
+    The Laser of a PushBot.
     """
 
     def __init__(
@@ -31,18 +32,17 @@ class PushBotEthernetLaserDevice(
             start_active_time=None, start_total_period=None,
             start_frequency=None, timesteps_between_send=None):
         """
-        :param laser: The PushBotLaser value to control
-        :type laser:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser
-        :param protocol: The protocol instance to get commands from
-        :type protocol: MunichIoEthernetProtocol
-        :param start_active_time: The "active time" value to send at the start
-        :param start_total_period:
+        :param PushBotLaser laser: The PushBotLaser value to control
+        :param MunichIoEthernetProtocol protocol:
+            The protocol instance to get commands from
+        :param int start_active_time:
+            The "active time" value to send at the start
+        :param int start_total_period:
             The "total period" value to send at the start
-        :param start_frequency: The "frequency" to send at the start
-        :param timesteps_between_send:
-            The number of timesteps between sending commands to the device,\
-            or None to use the default
+        :param int start_frequency: The "frequency" to send at the start
+        :param int timesteps_between_send:
+            The number of timesteps between sending commands to the device,
+            or `None` to use the default
         """
         # pylint: disable=too-many-arguments
         if not isinstance(laser, PushBotLaser):

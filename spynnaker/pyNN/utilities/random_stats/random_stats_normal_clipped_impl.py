@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +17,9 @@ from spynnaker.pyNN.utilities.random_stats import AbstractRandomStats
 
 
 class RandomStatsNormalClippedImpl(AbstractRandomStats):
-    """ An implementation of AbstractRandomStats for normal distributions that\
-        are clipped to a boundary (redrawn)
+    """
+    An implementation of AbstractRandomStats for normal distributions that
+    are clipped to a boundary (redrawn).
     """
 
     def _get_params(self, dist):
@@ -44,8 +45,8 @@ class RandomStatsNormalClippedImpl(AbstractRandomStats):
     def var(self, dist):
         return truncnorm.var(*self._get_params(dist))
 
-    def high(self, dist):
-        return dist.parameters['high']
+    def high(self, distribution):
+        return distribution.parameters['high']
 
-    def low(self, dist):
-        return dist.parameters['low']
+    def low(self, distribution):
+        return distribution.parameters['low']

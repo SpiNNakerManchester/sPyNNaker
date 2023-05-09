@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,12 +21,14 @@ class HasSynapses(object):
     @abstractmethod
     def get_connections_from_machine(
             self, placement, app_edge, synapse_info):
-        """ Get the connections from the machine for this vertex.
+        """
+        Get the connections from the machine for this vertex.
 
-        :param ~pacman.model.placement.Placement placement:
+        :param ~pacman.model.placements.Placement placement:
             Where the connection data is on the machine
         :param ProjectionApplicationEdge app_edge:
             The edge for which the data is being read
         :param SynapseInformation synapse_info:
             The specific projection within the edge
+        :rtype: ~numpy.ndarray
         """

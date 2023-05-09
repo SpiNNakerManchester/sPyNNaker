@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,11 +45,10 @@ class TestKernelConnector(BaseTestCase):
         delay_list = [[20.0 if ((a + b) % 2 == 1) else 10.0
                        for a in range(ksw)] for b in range(ksh)]
         weight_kernel = np.asarray(weight_list)
-        delay_kernel = np.asarray(delay_list)
 
         kernel_connector = sim.KernelConnector(
             shape_pre, shape_post, shape_kernel,
-            weight_kernel=weight_kernel, delay_kernel=delay_kernel,
+            weight_kernel=weight_kernel, delay_kernel=delay_list,
             pre_sample_steps_in_post=pre_step,
             post_sample_steps_in_pre=post_step,
             pre_start_coords_in_post=pre_start,

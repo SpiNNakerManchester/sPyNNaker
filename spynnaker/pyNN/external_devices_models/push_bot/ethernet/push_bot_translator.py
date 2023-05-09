@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,8 +30,9 @@ def _signed_int(uint_value):
 
 
 class PushBotTranslator(AbstractEthernetTranslator):
-    """ Translates packets between PushBot Multicast packets and PushBot\
-        Wi-Fi Commands
+    """
+    Translates packets between PushBot Multicast packets and PushBot
+    Wi-Fi Commands.
     """
     __slots__ = [
         "__protocol",
@@ -39,10 +40,10 @@ class PushBotTranslator(AbstractEthernetTranslator):
 
     def __init__(self, protocol, pushbot_wifi_connection):
         """
-        :param protocol: The instance of the PushBot protocol to get keys from
-        :type protocol: MunichIoEthernetProtocol
-        :param pushbot_wifi_connection: A Wi-Fi connection to the PushBot
-        :type pushbot_wifi_connection: PushBotWIFIConnection
+        :param MunichIoEthernetProtocol protocol:
+            The instance of the PushBot protocol to get keys from
+        :param PushBotWIFIConnection pushbot_wifi_connection:
+            A Wi-Fi connection to the PushBot
         """
         self.__protocol = protocol
         self.__pushbot_wifi_connection = pushbot_wifi_connection

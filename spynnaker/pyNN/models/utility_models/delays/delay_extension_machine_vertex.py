@@ -4,15 +4,16 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from enum import Enum
+from enum import Enum, IntEnum
 
+from spinnman.model.enums import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 from spinn_utilities.overrides import overrides
@@ -21,7 +22,6 @@ from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
@@ -34,24 +34,42 @@ class DelayExtensionMachineVertex(
         "__sdram",
         "__drop_late_spikes"]
 
-    class _DELAY_EXTENSION_REGIONS(Enum):
+    class _DELAY_EXTENSION_REGIONS(IntEnum):
+        """
+        Region indices.
+        """
         SYSTEM = 0
         DELAY_PARAMS = 1
         PROVENANCE_REGION = 2
         TDMA_REGION = 3
 
     class EXTRA_PROVENANCE_DATA_ENTRIES(Enum):
+        """
+        Indices into raw provenance data about delay extension vertices.
+        """
+        #: The number of packets received
         N_PACKETS_RECEIVED = 0
+        #: The number of packets processed
         N_PACKETS_PROCESSED = 1
+        #: The number of packets added to a send queue
         N_PACKETS_ADDED = 2
+        #: The number of packets sent
         N_PACKETS_SENT = 3
+        #: The number of times a buffer overflowed
         N_BUFFER_OVERFLOWS = 4
+        #: The number of delays
         N_DELAYS = 5
+        #: The number of packets lost due to saturation
         N_PACKETS_LOST_DUE_TO_COUNT_SATURATION = 6
+        #: The number of packets with bad neuron IDs
         N_PACKETS_WITH_INVALID_NEURON_IDS = 7
+        #: The number of packets lost due to an invalid key
         N_PACKETS_DROPPED_DUE_TO_INVALID_KEY = 8
+        #: The number of packets that arrived too late
         N_LATE_SPIKES = 9
+        #: The maximum number of packets queued for background processing
         MAX_BACKGROUND_QUEUED = 10
+        #: The number of times the background queue overflowed
         N_BACKGROUND_OVERLOADS = 11
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
@@ -73,12 +91,13 @@ class DelayExtensionMachineVertex(
     def __init__(self, sdram, label, vertex_slice, app_vertex=None):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram required by the vertex
+            The SDRAM required by the vertex
         :param str label: The name of the vertex
-        :param Slice vertex_slice: The slice of the vertex
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the vertex
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
             The application vertex that caused this machine vertex to be
-            created. If None, there is no such application vertex.
+            created. If `None`, there is no such application vertex.
         """
         super().__init__(
             label, app_vertex=app_vertex, vertex_slice=vertex_slice)
@@ -87,7 +106,7 @@ class DelayExtensionMachineVertex(
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self):
-        return self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value
+        return self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION
 
     @property
     @overrides(
@@ -220,11 +239,8 @@ class DelayExtensionMachineVertex(
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
 
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification)
+    @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        # pylint: disable=arguments-differ
-
         vertex = placement.vertex
 
         # Reserve memory:
@@ -235,11 +251,11 @@ class DelayExtensionMachineVertex(
         delay_params_sz = self._app_vertex.delay_params_size()
 
         spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
+            region=self._DELAY_EXTENSION_REGIONS.SYSTEM,
             size=SIMULATION_N_BYTES, label='setup')
 
         spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
+            region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS,
             size=delay_params_sz, label='delay_params')
 
         # reserve region for provenance
@@ -275,13 +291,14 @@ class DelayExtensionMachineVertex(
         :param str binary_name: the binary name
         """
         # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
+        spec.switch_write_focus(self._DELAY_EXTENSION_REGIONS.SYSTEM)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             binary_name))
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask):
-        """ Generate Delay Parameter data
+        """
+        Generate Delay Parameter data.
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -292,12 +309,11 @@ class DelayExtensionMachineVertex(
         # pylint: disable=too-many-arguments
 
         # Write spec with commands to construct required delay region:
-        spec.comment("\nWriting Delay Parameters for {} Neurons:\n"
-                     .format(vertex_slice.n_atoms))
+        spec.comment(
+            f"Writing Delay Parameters for {vertex_slice.n_atoms} Neurons:\n")
 
         # Set the focus to the memory region 2 (delay parameters):
-        spec.switch_write_focus(
-            self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value)
+        spec.switch_write_focus(self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS)
 
         # Write header info to the memory region:
         # Write Key info for this core and the incoming key and mask:

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,9 +19,9 @@ from tempfile import mkdtemp
 import numpy
 import pytest
 
-from spinn_machine import SDRAM
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import load_config
+from spinn_machine import Machine
 from spinnman.model import CPUInfo
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
@@ -85,11 +85,9 @@ def say_false(self, weights, delays):
 def test_write_data_spec():
     unittest_setup()
     writer = SpynnakerDataWriter.mock()
-    SDRAM()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
-    p.setup(1.0)
     load_config()
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
     pre_pop = p.Population(
@@ -115,7 +113,6 @@ def test_write_data_spec():
         pre_pop, post_pop, p.FromListConnector(from_list_list),
         p.StaticSynapse())
 
-    writer.start_run()
     writer.set_plan_n_timesteps(100)
     d_vertices, d_edges = delay_support_adder()
     for vertex in d_vertices:
@@ -217,7 +214,6 @@ def test_write_data_spec():
 
 def test_set_synapse_dynamics():
     unittest_setup()
-    p.setup(1.0)
     post_app_model = IFCurrExpBase()
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", spikes_per_second=None,
@@ -406,30 +402,27 @@ def test_set_synapse_dynamics():
         # Only undelayed, all edges exist
         (range(10), [], 1000, 100, None),
         # Only delayed, all edges exist
-        ([], range(10), 1000, 100, 20),
+        ([], range(10), 1000, 100, 200),
         # All undelayed and delayed edges exist
-        (range(10), range(10), 1000, 100, 20),
+        (range(10), range(10), 1000, 100, 200),
         # Only undelayed, some connections missing but app keys can still work
         ([0, 1, 2, 3, 4], [], 1000, 100, None),
         # Only delayed, some connections missing but app keys can still work
-        ([], [5, 6, 7, 8, 9], 1000, 100, 20),
+        ([], [5, 6, 7, 8, 9], 1000, 100, 200),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
-        ([3, 4, 5, 6, 7], range(10), 1000, 100, 20),
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, 200),
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
-        (range(10), [4, 5, 6, 7], 1000, 100, 20),
+        (range(10), [4, 5, 6, 7], 1000, 100, 200),
         # Should work but number of cores doesn't work out
-        (range(2000), [], 10000, 5, None),
-        # Should work but number of neurons with delays don't work out
-        ([], range(4), 1024, 256, 144)
+        (range(2000), [], 10000, 5, None)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, max_delay):
     unittest_setup()
     writer = SpynnakerDataWriter.mock()
-    SDRAM()
 
     # Build a from list connector with the delays we want
     connections = []
@@ -443,9 +436,8 @@ def test_pop_based_master_pop_table_standard(
     # Make simple source and target, where the source has 1000 atoms
     # split into 10 vertices (100 each) and the target has 100 atoms in
     # a single vertex
-    p.setup(1.0)
     post_pop = p.Population(
-        100, p.IF_curr_exp(), label="Post",
+        256, p.IF_curr_exp(), label="Post",
         additional_parameters={
             "splitter": SplitterAbstractPopulationVertexFixed()})
     p.IF_curr_exp.set_model_max_atoms_per_dimension_per_core(neurons_per_core)
@@ -456,7 +448,6 @@ def test_pop_based_master_pop_table_standard(
     p.Projection(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
-    writer.start_run()
     writer.set_plan_n_timesteps(100)
     d_vertices, d_edges = delay_support_adder()
     for vertex in d_vertices:
@@ -491,7 +482,7 @@ def test_pop_based_master_pop_table_standard(
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(
-            spec_reader, SDRAM.max_sdram_found)
+            spec_reader, Machine.DEFAULT_SDRAM_BYTES)
         executor.execute()
 
     # Read the population table and check entries

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,7 +30,8 @@ _STEPS_PER_TIMESTEP_STRUCT = Struct(
 
 
 class NeuronImplStandard(AbstractNeuronImpl):
-    """ The standard componentised neuron implementation.
+    """
+    The standard componentised neuron implementation.
     """
 
     __slots__ = [
@@ -169,8 +170,8 @@ class NeuronImplStandard(AbstractNeuronImpl):
                 return component.get_units(variable)
 
         raise KeyError(
-            "The parameter {} does not exist in this input "
-            "conductance component".format(variable))
+            f"The parameter {variable} does not exist in this input "
+            "conductance component")
 
     @property
     @overrides(AbstractNeuronImpl.is_conductance_based)
@@ -183,5 +184,5 @@ class NeuronImplStandard(AbstractNeuronImpl):
             if hasattr(component, key):
                 return getattr(component, key)
         # ... or fail
-        raise AttributeError("'{}' object has no attribute {}".format(
-            self.__class__.__name__, key))
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute {key}")

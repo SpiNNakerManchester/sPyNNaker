@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,18 +19,16 @@ from spinn_front_end_common.abstract_models import (
 
 class AbstractPushBotRetinaDevice(
         AbstractSendMeMulticastCommandsVertex):
-    """ An abstraction of a silicon retina attached to a SpiNNaker system.
+    """
+    An abstraction of a silicon retina attached to a SpiNNaker system.
     """
 
     def __init__(self, protocol, resolution):
         """
         :param protocol:
         :type protocol:
-            MunichIoEthernetProtocol or
-            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
-        :param resolution:
-        :type resolution:
-            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
+            MunichIoEthernetProtocol or MunichIoSpiNNakerLinkProtocol
+        :param PushBotRetinaResolution resolution:
         """
         self._protocol = protocol
         self._resolution = resolution
@@ -46,8 +44,11 @@ class AbstractPushBotRetinaDevice(
 
         # device specific commands
         commands.append(self._protocol.disable_retina())
+        retina_key = None
+        if self._resolution is not None:
+            retina_key = self._resolution.value
         commands.append(self._protocol.set_retina_transmission(
-            retina_key=self._resolution.value))
+            retina_key=retina_key))
 
         return commands
 

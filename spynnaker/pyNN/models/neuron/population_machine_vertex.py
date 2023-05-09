@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -52,7 +52,8 @@ class SpikeProcessingProvenance(ctypes.LittleEndianStructure):
 
 
 class MainProvenance(ctypes.LittleEndianStructure):
-    """ Provenance items from synapse processing
+    """
+    Provenance items from synapse processing.
     """
     _fields_ = [
         # the maximum number of background tasks queued
@@ -70,7 +71,8 @@ class PopulationMachineVertex(
         PopulationMachineSynapses,
         AbstractGeneratesDataSpecification,
         AbstractRewritesDataSpecification):
-    """ A machine vertex for PyNN Populations
+    """
+    A machine vertex for PyNN Populations.
     """
 
     __slots__ = [
@@ -95,7 +97,9 @@ class PopulationMachineVertex(
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     class REGIONS(Enum):
-        """Regions for populations."""
+        """
+        Regions for populations.
+        """
         SYSTEM = 0
         CORE_PARAMS = 1
         NEURON_PARAMS = 2
@@ -155,7 +159,7 @@ class PopulationMachineVertex(
             structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data):
         """
         :param ~pacman.model.resources.AbstractSDRAM sdram:
-            The sdram used by the vertex
+            The SDRAM used by the vertex
         :param str label: The label of the vertex
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -168,7 +172,7 @@ class PopulationMachineVertex(
         :param list(int) weight_scales:
             The scaling to apply to weights to store them in the synapses
         :param int structural_sz: The size of the structural data
-        :param int n_neuron_bits: The number of bits to use for neuron ids
+        :param int n_neuron_bits: The number of bits to use for neuron IDs
         :param SynapticMatrices synaptic_matrices: The synaptic matrices
         :param NeuronData neuron_data: The handler of neuron data
         """
@@ -230,8 +234,9 @@ class PopulationMachineVertex(
 
     @staticmethod
     def __get_binary_file_name(app_vertex):
-        """ Get the local binary filename for this vertex.  Static because at
-            the time this is needed, the local app_vertex is not set.
+        """
+        Get the local binary filename for this vertex.  Static because at
+        the time this is needed, the local `app_vertex` is not set.
 
         :param AbstractPopulationVertex app_vertex:
             The associated application vertex
@@ -287,10 +292,8 @@ class PopulationMachineVertex(
             self.vertex_slice))
         return ids
 
-    @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification)
+    @overrides(AbstractGeneratesDataSpecification.generate_data_specification)
     def generate_data_specification(self, spec, placement):
-        # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
         rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
@@ -342,15 +345,14 @@ class PopulationMachineVertex(
 
     def _parse_spike_processing_provenance(
             self, label, x, y, p, provenance_data):
-        """ Extract and yield spike processing provenance
+        """
+        Extract and yield spike processing provenance.
 
         :param str label: The label of the node
         :param int x: x coordinate of the chip where this core
         :param int y: y coordinate of the core where this core
         :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
-        :return: a list of provenance data items
-        :rtype: iterator of ProvenanceDataItem
         """
         prov = SpikeProcessingProvenance(*provenance_data)
 

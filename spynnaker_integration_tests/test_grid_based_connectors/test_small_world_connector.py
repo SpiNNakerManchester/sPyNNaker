@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,10 +45,10 @@ def do_run(plot):
     weight_to_spike = 2.0
     delay = 2
     runtime = 1000
-    p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
 
     # Network population
     small_world = create_grid(n, 'small_world')
+    small_world.set_max_atoms_per_core((10, 10))
 
     # SpikeInjector
     injectionConnection = [(0, 0)]

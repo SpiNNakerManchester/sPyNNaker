@@ -5,7 +5,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,6 +32,7 @@ class TestPopulation(BaseTestCase):
             model._model['tau_syn_I'] = 6
         self.assertEqual(
             pop_1.get('tau_syn_I'), [value, value, value, value, value])
+        sim.end()
 
     def test_model_fail_to_set_neuron_param(self):
         n_neurons = 5
@@ -45,6 +46,7 @@ class TestPopulation(BaseTestCase):
             model._model['i_offset'] = 6
         self.assertEqual(
             pop_1.get('i_offset'), [value, value, value, value, value])
+        sim.end()
 
     def test_model_fail_to_set_neuron_param_array(self):
         n_neurons = 5
@@ -61,6 +63,7 @@ class TestPopulation(BaseTestCase):
                 new_value, new_value, new_value, new_value, new_value]
         self.assertEqual(
             pop_1.get('i_offset'), [value, value, value, value, value])
+        sim.end()
 
     def test_model_fail_to_set_neuron_param_array_wrong_size(self):
         n_neurons = 5
@@ -70,6 +73,7 @@ class TestPopulation(BaseTestCase):
         model = sim.IF_curr_exp(i_offset=[value, value, value, value])
         with self.assertRaises(Exception):
             sim.Population(n_neurons, model, label=label)
+        sim.end()
 
     def test_model_fail_to_set_neuron_param_function(self):
         n_neurons = 5
@@ -84,3 +88,4 @@ class TestPopulation(BaseTestCase):
         pop_1 = sim.Population(n_neurons, model, label=label)
         values = pop_1.get('i_offset')
         self.assertEqual([5, 5, 5, 5, 5], values)
+        sim.end()

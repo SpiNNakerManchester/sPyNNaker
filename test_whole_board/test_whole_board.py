@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,8 +14,8 @@
 
 import pyNN.spiNNaker as sim
 import spynnaker
-from spalloc.job import Job
-from spalloc.states import JobState
+from spalloc_client.job import Job
+from spalloc_client.states import JobState
 import pytest
 import tempfile
 import os
@@ -192,8 +192,7 @@ boards = [(x, y, b) for x in range(20) for y in range(20) for b in range(3)]
 
 @pytest.mark.parametrize("x,y,b", boards)
 def test_run(x, y, b):
-    tmp_dir = os.path.abspath(os.path.join(
-        spynnaker.__path__[0], os.path.pardir, "test_whole_board"))
+    test_dir = os.path.dirname(__file__)
     job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk",
               owner="Jenkins Machine Test")
     # Sleep before checking for queued in case of multiple jobs running
@@ -205,7 +204,7 @@ def test_run(x, y, b):
         pytest.skip(f"Board {x}, {y}, {b} could not be allocated")
     with job:
         with tempfile.TemporaryDirectory(
-                prefix=f"{x}_{y}_{b}", dir=tmp_dir) as tmpdir:
+                prefix=f"{x}_{y}_{b}", dir=test_dir) as tmpdir:
             os.chdir(tmpdir)
             with open("spynnaker.cfg", "w", encoding="utf-8") as f:
                 f.write("[Machine]\n")

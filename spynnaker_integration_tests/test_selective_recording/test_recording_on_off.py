@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -71,6 +71,7 @@ class TestRecordingOnOff(BaseTestCase):
         assert len(gsyn_neo.segments[0].spiketrains) == 0
         assert len(spikes_neo.segments[0].filter(name="v")) == 0
         assert len(gsyn_neo.segments[0].filter(name="gsyn_exc")) > 0
+        sim.end()
 
     def test_record_all(self):
         self.runsafe(self.record_all)
@@ -110,6 +111,7 @@ class TestRecordingOnOff(BaseTestCase):
             pop.write_data(pickle_path, "spikes")
         with self.assertRaises(ConfigurationException):
             pop.write_data(pickle_path, "gsyn_exc")
+        sim.end()
 
     def test_record_v(self):
         self.runsafe(self.record_v)

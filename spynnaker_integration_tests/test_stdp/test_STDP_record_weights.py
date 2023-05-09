@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -117,7 +117,7 @@ def record_weights_using_callback():
     return ILSpike, LIFLSpikes, vLIFL, w_LIFL_LIFL
 
 
-# http://neuralensemble.org/docs/PyNN/examples/simple_STDP.html
+# https://neuralensemble.org/docs/PyNN/examples/simple_STDP.html
 class weight_recorder(object):
     """
     Recording of weights is not yet built in to PyNN, so therefore we need

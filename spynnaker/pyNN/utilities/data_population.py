@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,7 +29,6 @@ _SELECTIVE_RECORDED_MSG = (
 
 
 class DataPopulation(object):
-
     __slots__ = [
         "__database_file",
         "__label",
@@ -147,7 +146,6 @@ class DataPopulation(object):
 
     def __getitem__(self, index_or_slice):
         """
-
         :param selector: a slice or numpy mask array.
             The mask array should either be a boolean array (ideally) of the
             same size as the parent,

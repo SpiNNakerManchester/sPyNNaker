@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,10 +21,11 @@ _TWO_WORDS = struct.Struct("<II")
 
 
 class EIEIOSpikeRecorder(object):
-    """ Records spikes using EIEIO format
     """
-    __slots__ = [
-        "__record"]
+    Records spikes using EIEIO format.
+    """
+    __slots__ = (
+        "__record")
 
     def __init__(self):
         self.__record = False
@@ -38,13 +39,15 @@ class EIEIOSpikeRecorder(object):
 
     @record.setter
     def record(self, new_state):
-        """ Old method assumed to be spikes """
+        """
+        Old method assumed to be spikes.
+        """
         self.__record = new_state
 
     def set_recording(self, new_state, sampling_interval=None):
         """
-        :param new_state: bool
-        :param sampling_interval: not supported functionality
+        :param bool new_state:
+        :param None sampling_interval: not supported functionality
         """
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "

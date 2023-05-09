@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,7 +29,8 @@ _existing_connections = dict()
 
 
 def get_pushbot_wifi_connection(remote_host, remote_port=56000):
-    """ Get an existing connection to a PushBot, or make a new one.
+    """
+    Get an existing connection to a PushBot, or make a new one.
 
     :param str remote_host: The IP address of the PushBot
     :param int remote_port: The port number of the PushBot (default 56000)
@@ -42,7 +43,8 @@ def get_pushbot_wifi_connection(remote_host, remote_port=56000):
 
 
 class PushBotWIFIConnection(Connection, Listenable):
-    """ A connection to a PushBot via Wi-Fi.
+    """
+    A connection to a PushBot via Wi-Fi.
     """
     __slots__ = [
         "__local_ip_address",
@@ -57,7 +59,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         :param str remote_host: The IP address of the PushBot
         :param int remote_port: The port number of the PushBot (default 56000)
-        :raise SpinnmanIOException:
+        :raise ~spinnman.exceptions.SpinnmanIOException:
             If there is an error setting up the communication channel
         """
         # Create a TCP Socket
@@ -79,12 +81,10 @@ class PushBotWIFIConnection(Connection, Listenable):
         self.__local_ip_address, self.__local_port = get_socket_address(
             self.__socket)
 
-        # Set a general timeout on the socket
-        self.__socket.settimeout(0)
-
     def is_connected(self):
-        """ See\
-            :py:meth:`~spinnman.connections.Connection.is_connected`
+        """
+        See
+        :py:meth:`~spinnman.connections.Connection.is_connected`.
         """
         # check if machine is active and on the network
         for _ in range(5):  # Try up to five times...
@@ -98,8 +98,9 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def local_ip_address(self):
-        """ The local IP address to which the connection is bound, \
-            as a dotted string, e.g. `0.0.0.0`
+        """
+        The local IP address to which the connection is bound,
+        as a dotted string, e.g. `0.0.0.0`.
 
         :rtype: str
         """
@@ -107,7 +108,8 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def local_port(self):
-        """ The local port to which the connection is bound.
+        """
+        The local port to which the connection is bound.
 
         :rtype: int
         """
@@ -115,8 +117,9 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def remote_ip_address(self):
-        """ The remote IP address to which the connection is connected, \
-            as a dotted string, or None if not connected remotely
+        """
+        The remote IP address to which the connection is connected,
+        as a dotted string, or `None` if not connected remotely.
 
         :rtype: str or None
         """
@@ -124,37 +127,43 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def remote_port(self):
-        """ The remote port to which the connection is connected, \
-            or None if not connected remotely
+        """
+        The remote port to which the connection is connected,
+        or `None` if not connected remotely.
 
         :rtype: int or None
         """
         return self.__remote_port
 
     def receive(self, timeout=None):
-        """ Receive data from the connection
+        """
+        Receive data from the connection
 
-        :param timeout: The timeout, or None to wait forever
+        :param timeout: The timeout, or `None` to wait forever
         :type timeout: float or None
         :return: The data received
         :rtype: bytes
         :raise SpinnmanTimeoutException:
             If a timeout occurs before any data is received
-        :raise SpinnmanIOException: If an error occurs receiving the data
+        :raise ~spinnman.exceptions.SpinnmanIOException:
+            If an error occurs receiving the data
         """
         return receive_message(self.__socket, timeout, self.RECV_SIZE)
 
     def send(self, data):
-        """ Send data down this connection
+        """
+        Send data down this connection
 
         :param bytearray data: The data to be sent
-        :raise SpinnmanIOException: If there is an error sending the data
+        :raise ~spinnman.exceptions.SpinnmanIOException:
+            If there is an error sending the data
         """
         send_message(self.__socket, data)
 
     def close(self):
-        """ See\
-            :py:meth:`spinnman.connections.Connection.close`
+        """
+        See
+        :py:meth:`spinnman.connections.Connection.close`.
         """
         try:
             self.__socket.shutdown(socket.SHUT_WR)

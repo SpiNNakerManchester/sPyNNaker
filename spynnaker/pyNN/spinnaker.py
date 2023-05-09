@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -58,7 +58,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
-    """ Main interface for the sPyNNaker implementation of PyNN 0.8/0.9
+    """
+    Main interface for the sPyNNaker implementation of PyNN 0.8/0.9.
     """
 
     __slots__ = []
@@ -67,7 +68,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             self, time_scale_factor, min_delay,
             n_chips_required=None, n_boards_required=None, timestep=0.1):
         """
-
         :param time_scale_factor:
             multiplicative factor to the machine time step
             (does not affect the neuron models accuracy)
@@ -75,7 +75,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param min_delay:
         :param n_chips_required:
             Deprecated! Use n_boards_required instead.
-            Must be None if n_boards_required specified.
+            Must be `None` if n_boards_required specified.
         :type n_chips_required: int or None
         :param n_boards_required:
             if you need to be allocated a machine (for spalloc) before
@@ -84,8 +84,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             allocate you a machine big enough for your needs.
         :type n_boards_required: int or None
         :param timestep:
-            the time step of the simulations in micro seconds
-            if None the cfg value is used
+            the time step of the simulations in microseconds;
+            if `None` the cfg value is used
         :type timestep: float or None
         """
         # pylint: disable=too-many-arguments, too-many-locals
@@ -123,7 +123,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             db.insert_version("lazyarray_version", lazyarray_version)
 
     def _clear_and_run(self, run_time, sync_time=0.0):
-        """ Clears the projections and Run the model created.
+        """
+        Clears the projections and Run the model created.
 
         :param run_time: the time (in milliseconds) to run the simulation for
         :type run_time: float or int
@@ -131,7 +132,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             If not 0, this specifies that the simulation should pause after
             this duration.  The continue_simulation() method must then be
             called for the simulation to continue.
-        :rtype: None
         """
         # pylint: disable=protected-access
 
@@ -145,14 +145,16 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             projection._clear_cache()
 
     def run(self, run_time, sync_time=0.0):
-        """ Run the simulation for a span of simulation time.
+        """
+        Run the simulation for a span of simulation time.
+
         :param run_time: the time to run for, in milliseconds
-        :return: None
         """
         self._clear_and_run(run_time, sync_time)
 
     def run_until(self, tstop):
-        """ Run the simulation until the given simulation time.
+        """
+        Run the simulation until the given simulation time.
 
         :param tstop: when to run until in milliseconds
         """
@@ -160,7 +162,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         self._clear_and_run(tstop - self.t)
 
     def clear(self):
-        """ Clear the current recordings and reset the simulation
+        """
+        Clear the current recordings and reset the simulation.
         """
         self.recorders = set([])
         self.reset()
@@ -169,7 +172,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         self.stop()
 
     def reset(self):
-        """ Reset the state of the current network to time t = 0.
+        """
+        Reset the state of the current network to time t = 0.
         """
         if not self._data_writer.is_ran_last():
             if not self._data_writer.is_ran_ever():
@@ -185,7 +189,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @property
     def state(self):
-        """ Used to bypass the dual level object
+        """
+        Used to bypass the dual level object.
 
         :return: the SpiNNaker object
         :rtype: ~spynnaker8.spinnaker.SpiNNaker
@@ -194,7 +199,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @property
     def mpi_rank(self):
-        """ Gets the MPI rank of the simulator
+        """
+        The MPI rank of the simulator.
 
         .. note::
             Meaningless on SpiNNaker, so we pretend we're the head node.
@@ -206,14 +212,16 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @mpi_rank.setter
     def mpi_rank(self, new_value):
-        """ sPyNNaker does not use this value meaningfully
+        """
+         sPyNNaker does not use this value meaningfully.
 
         :param new_value: Ignored
         """
 
     @property
     def num_processes(self):
-        """ Gets the number of MPI worker processes
+        """
+        The number of MPI worker processes.
 
         .. note::
             Meaningless on SpiNNaker, so we pretend there's one MPI process
@@ -225,14 +233,16 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @num_processes.setter
     def num_processes(self, new_value):
-        """ sPyNNaker does not use this value meaningfully
+        """
+        sPyNNaker does not use this value meaningfully.
 
         :param new_value: Ignored
         """
 
     @property
     def dt(self):
-        """ The simulation time step in milliseconds
+        """
+        The simulation time step in milliseconds.
 
         :return: the machine time step
         :rtype: float
@@ -241,7 +251,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @dt.setter
     def dt(self, _):
-        """ We do not support setting dt/ time step except during setup
+        """
+        We do not support setting the time step except during setup.
 
         :raises NotImplementedError
         """
@@ -250,7 +261,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @property
     def t(self):
-        """ The current simulation time in milliseconds
+        """
+        The current simulation time in milliseconds.
 
         :return: the current runtime already executed
         :rtype: float
@@ -259,7 +271,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @property
     def segment_counter(self):
-        """ The number of the current recording segment being generated.
+        """
+        The number of the current recording segment being generated.
 
         :return: the segment counter
         :rtype: int
@@ -268,7 +281,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @segment_counter.setter
     def segment_counter(self, _):
-        """ We do not support externally altering the segment counter
+        """
+        We do not support externally altering the segment counter
 
         raises: NotImplementedError
         """
@@ -277,8 +291,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @property
     def name(self):
-        """ The name of the simulator. Used to ensure PyNN recording neo\
-            blocks are correctly labelled.
+        """
+        The name of the simulator. Used to ensure PyNN recording neo
+        blocks are correctly labelled.
 
         :return: the name of the simulator.
         :rtype: str
@@ -287,7 +302,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @property
     def recorders(self):
-        """ The recorders, used by the PyNN state object
+        """
+        The recorders, used by the PyNN state object.
 
         :return: the internal recorders object
         :rtype: list(~spynnaker.pyNN.models.recorder.Recorder)
@@ -296,7 +312,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @recorders.setter
     def recorders(self, new_value):
-        """ Setter for the internal recorders object
+        """
+        Setter for the internal recorders object
 
         :param new_value: the new value for the recorder
         """
@@ -304,12 +321,13 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     def _set_up_timings(self, timestep, min_delay, time_scale_factor):
         """
-        :param timestep: machine_time_Step in milli seconds
+        :param timestep: machine_time_Step in milliseconds
         :type timestep: float or None
-        :tpye min_delay: int or None
+        :param min_delay:
+        :type min_delay: int or None
+        :param time_scale_factor:
         :type time_scale_factor: int or None
         """
-
         # Get the standard values
         if timestep is None:
             self._data_writer.set_up_timings_and_delay(
@@ -331,7 +349,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                     "SpiNNaker machine.  If you would like to override this"
                     "behaviour (at your own risk), please add "
                     "violate_1ms_wall_clock_restriction = True to the [Mode] "
-                    "section of your .{} file".format(CONFIG_FILE_NAME))
+                    f"section of your .{CONFIG_FILE_NAME} file")
             logger.warning(
                 "****************************************************")
             logger.warning(
@@ -351,9 +369,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return len(unique_keys)
 
     def stop(self):
-        """
-        :rtype: None
-        """
         # pylint: disable=protected-access
         FecTimer.start_category(TimerCategory.SHUTTING_DOWN)
         for population in self._data_writer.iterate_populations():
@@ -363,10 +378,10 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @staticmethod
     def register_binary_search_path(search_path):
-        """ Register an additional binary search path for executables.
+        """
+        Register an additional binary search path for executables.
 
         :param str search_path: absolute search path for binaries
-        :rtype: None
         """
         # pylint: disable=protected-access
         moved_in_v7_warning("register_binary_search_path is now a View method")
@@ -471,7 +486,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                extend_doc=False)
     def _execute_delay_support_adder(self):
         """
-        Runs, times and logs the DelaySupportAdder if required
+        Runs, times and logs the DelaySupportAdder if required.
         """
         name = get_config_str("Mapping", "delay_support_adder")
         if name is None:

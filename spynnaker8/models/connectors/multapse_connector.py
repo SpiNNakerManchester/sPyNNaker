@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,10 +20,10 @@ from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 class MultapseConnector(_BaseClass):
     """
-    Create a multapse connector. The size of the source and destination\
-    populations are obtained when the projection is connected. The number of\
-    synapses is specified. when instantiated, the required number of synapses\
-    is created by selecting at random from the source and target populations\
+    Create a multapse connector. The size of the source and destination
+    populations are obtained when the projection is connected. The number of
+    synapses is specified. when instantiated, the required number of synapses
+    is created by selecting at random from the source and target populations
     *with replacement* (by default). Uniform selection probability is assumed.
 
     .. deprecated:: 6.0
