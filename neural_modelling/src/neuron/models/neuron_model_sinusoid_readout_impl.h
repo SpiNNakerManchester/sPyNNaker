@@ -7,17 +7,12 @@
 
 #define SYNAPSES_PER_NEURON 250
 
-//extern uint32_t time;
 extern REAL learning_signal;
-//extern REAL local_eta;
-
 
 typedef struct eprop_syn_state_t {
 	REAL delta_w; // weight change to apply
 	REAL z_bar_inp;
 	REAL z_bar; // low-pass filtered spike train
-//	REAL el_a; // adaptive component of eligibility vector
-//	REAL e_bar; // low-pass filtered eligibility trace
 	uint32_t update_ready; // counter to enable batch update (i.e. don't perform on every spike).
 }eprop_syn_state_t;
 
@@ -50,8 +45,6 @@ struct neuron_params_t {
 
     // The time step in milliseconds
     REAL     time_step;
-
-    // TODO: double-check that everything above this point is needed
 
     REAL    L; // learning signal
     REAL w_fb; // feedback weight
@@ -102,28 +95,7 @@ typedef struct neuron_t {
     // array of synaptic states - peak fan-in of >250 for this case
     eprop_syn_state_t syn_state[SYNAPSES_PER_NEURON];
 
-    // Poisson compartment params
-//    REAL mean_isi_ticks;
-//    REAL time_to_spike_ticks;
-//
-//    int32_t time_since_last_spike;
-//    REAL rate_at_last_setting;
-//    REAL rate_update_threshold;
-
-//    // Should be in global params
-//    mars_kiss64_seed_t spike_source_seed; // array of 4 values
-////    UFRACT seconds_per_tick;
-//    REAL ticks_per_second;
-
 } neuron_t;
-
-//typedef struct global_neuron_params_t {
-//// 	mars_kiss64_seed_t spike_source_seed; // array of 4 values
-////	REAL ticks_per_second;
-////	REAL readout_V;
-//	REAL target_V[1024];
-//	REAL eta;
-//} global_neuron_params_t;
 
 //! \brief Performs a ceil operation on an accum
 //! \param[in] value The value to ceil
@@ -158,16 +130,13 @@ static inline void neuron_model_initialise(
 		state->target_V[n_v] = params->target_V[n_v];
 	}
 	state->eta = params->eta;
-//	local_eta = params->eta;
 
 	for (uint32_t n_syn = 0; n_syn < SYNAPSES_PER_NEURON; n_syn++) {
 		state->syn_state[n_syn] = params->syn_state[n_syn];
 	}
-
 }
 
 static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *params) {
-	// TODO: probably more parameters need copying across at this point, syn_state for a start
 	params->V_init = state->V_membrane;
 	params->refract_timer_init = state->refract_timer;
 	params->L = state->L;
@@ -188,16 +157,6 @@ static inline void lif_neuron_closed_form(
     neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
 }
 
-//void neuron_model_set_global_neuron_params(
-//        global_neuron_params_pointer_t params) {
-//    use(params);
-//
-//    local_eta = params->eta;
-//    io_printf(IO_BUF, "local eta = %k\n", local_eta);
-//
-//    // Does Nothing - no params
-//}
-
 state_t neuron_model_state_update(
 		uint16_t num_excitatory_inputs, input_t* exc_input,
 		uint16_t num_inhibitory_inputs, input_t* inh_input,
@@ -210,17 +169,6 @@ state_t neuron_model_state_update(
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
-//		REAL total_exc = 0;
-//		REAL total_inh = 0;
-//
-//		total_exc += exc_input[0];
-//		total_inh += inh_input[0];
-//		for (int i=0; i < num_excitatory_inputs; i++){
-//			total_exc += exc_input[i];
-//		}
-//		for (int i=0; i< num_inhibitory_inputs; i++){
-//			total_inh += inh_input[i];
-//		}
         // Get the input in nA
         input_t input_this_timestep =
                 exc_input[0] + exc_input[1] + neuron->I_offset + external_bias + current_offset;
@@ -249,58 +197,21 @@ state_t neuron_model_state_update(
     			+
     			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
-
-		// ******************************************************************
-		// Update eligibility vector
-		// ******************************************************************
-//    	neuron->syn_state[syn_ind].el_a =
-//    			(neuron->psi * neuron->syn_state[syn_ind].z_bar) +
-//    		(rho - neuron->psi * neuron->beta) *
-//			neuron->syn_state[syn_ind].el_a;
-
-
-    	// ******************************************************************
-		// Update eligibility trace
-		// ******************************************************************
-//    	REAL temp_elig_trace = neuron->psi * (neuron->syn_state[syn_ind].z_bar -
-//    		neuron->beta * neuron->syn_state[syn_ind].el_a);
-//
-//    	neuron->syn_state[syn_ind].e_bar =
-//    			neuron->exp_TC * neuron->syn_state[syn_ind].e_bar
-//				+ (1 - neuron->exp_TC) * temp_elig_trace;
-
 		// ******************************************************************
 		// Update cached total weight change
 		// ******************************************************************
     	REAL this_dt_weight_change =
-//    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
     			local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
 
     	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change;
-//    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
-//            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
-//                              "z_bar_inp = %k \t z_bar = %k \t time:%u\n"
-//                              "L = %k = %k * %k = l * w_fb\n"
-//                              "this dw = %k \t tot dw %k\n"
-//                              ,
-//                total_synapses_per_neuron,
-//                syn_ind,
-//                neuron->syn_state[syn_ind].z_bar_inp,
-//                neuron->syn_state[syn_ind].z_bar,
-//                time,
-//                neuron->L, learning_signal, neuron -> w_fb,
-//                this_dt_weight_change, neuron->syn_state[syn_ind].delta_w
-//                );
-//        }
+
     	// reset input (can't have more than one spike per timestep
         neuron->syn_state[syn_ind].z_bar_inp = 0;
-
 
     	// decrease timestep counter preventing rapid updates
     	if (neuron->syn_state[syn_ind].update_ready > 0){
     		neuron->syn_state[syn_ind].update_ready -= 1;
     	}
-
     }
 
     return neuron->V_membrane;
@@ -324,31 +235,15 @@ void neuron_model_print_state_variables(const neuron_t *neuron) {
 }
 
 void neuron_model_print_parameters(const neuron_t *neuron) {
-//    io_printf(IO_BUF, "V reset       = %11.4k mv\n", neuron->V_reset);
-//    io_printf(IO_BUF, "V rest        = %11.4k mv\n", neuron->V_rest);
-//
-//    io_printf(IO_BUF, "I offset      = %11.4k nA\n", neuron->I_offset);
-//    io_printf(IO_BUF, "R membrane    = %11.4k Mohm\n", neuron->R_membrane);
-//
-//    io_printf(IO_BUF, "exp(-ms/(RC)) = %11.4k [.]\n", neuron->exp_TC);
-//
-//    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
-//
-//    io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
-//
-//    io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
-//
-//    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
-//    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);
-//    io_printf(IO_BUF, "time_to_spike_ticks  = %k \n",
-//    		neuron->time_to_spike_ticks);
-
-//    io_printf(IO_BUF, "Seed 1: %u\n", neuron->spike_source_seed[0]);
-//    io_printf(IO_BUF, "Seed 2: %u\n", neuron->spike_source_seed[1]);
-//    io_printf(IO_BUF, "Seed 3: %u\n", neuron->spike_source_seed[2]);
-//    io_printf(IO_BUF, "Seed 4: %u\n", neuron->spike_source_seed[3]);
-////    io_printf(IO_BUF, "seconds per tick: %u\n", neuron->seconds_per_tick);
-//    io_printf(IO_BUF, "ticks per second: %k\n", neuron->ticks_per_second);
+    log_debug("V reset       = %11.4k mv\n", neuron->V_reset);
+    log_debug("V rest        = %11.4k mv\n", neuron->V_rest);
+    log_debug("I offset      = %11.4k nA\n", neuron->I_offset);
+    log_debug("R membrane    = %11.4k Mohm\n", neuron->R_membrane);
+    log_debug("exp(-ms/(RC)) = %11.4k [.]\n", neuron->exp_TC);
+    log_debug("T refract     = %u timesteps\n", neuron->T_refract);
+    log_debug("learning      = %k n/a\n", neuron->L);
+    log_debug("feedback w    = %k n/a\n\n", neuron->w_fb);
+    log_debug("T refract     = %u timesteps\n", neuron->T_refract);
 }
 
 #endif // _NEURON_MODEL_SINUSOID_READOUT_IMPL_H_

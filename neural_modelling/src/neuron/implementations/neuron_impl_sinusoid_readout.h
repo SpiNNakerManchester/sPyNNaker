@@ -17,7 +17,7 @@
 #include <recording.h>
 #include <debug.h>
 #include <random.h>
-#include <log.h> // maybe not needed?
+#include <log.h> // TODO: maybe not needed?
 
 //! Indices for recording of words
 enum word_recording_indices {
@@ -65,9 +65,6 @@ static additional_input_t *additional_input_array;
 //! Threshold states array
 static threshold_type_t *threshold_type_array;
 
-////! Global parameters for the neurons
-//static global_neuron_params_pointer_t global_parameters;
-
 // The synapse shaping parameters
 static synapse_types_t *synapse_types_array;
 
@@ -78,25 +75,13 @@ static uint n_steps_per_timestep;
 extern bool use_key;
 
 // TODO: check if these other parameters are needed
-static REAL next_spike_time = 0;
+//static REAL next_spike_time = 0;
 extern uint32_t time;
 extern uint32_t *neuron_keys;
 extern REAL learning_signal;
 static uint32_t target_ind = 0;
 
-
 static bool neuron_impl_initialise(uint32_t n_neurons) {
-
-    // allocate DTCM for the global parameter details
-//    if (sizeof(global_neuron_params_t) > 0) {
-//        global_parameters = (global_neuron_params_t *) spin1_malloc(
-//            sizeof(global_neuron_params_t));
-//        if (global_parameters == NULL) {
-//            log_error("Unable to allocate global neuron parameters"
-//                      "- Out of DTCM");
-//            return false;
-//        }
-//    }
 
     // Allocate DTCM for neuron array
     if (sizeof(neuron_t)) {
@@ -147,10 +132,6 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
             return false;
         }
     }
-
-    // Initialise pointers to Neuron parameters in STDP code
-//    synapse_dynamics_set_neuron_array(neuron_array);
-//    log_info("set pointer to neuron array in stdp code");
 
     return true;
 }
@@ -233,21 +214,6 @@ static void neuron_impl_load_neuron_parameters(
     	spin1_memcpy(save_initial_state, address, next * sizeof(uint32_t));
     }
 
-//    io_printf(IO_BUF, "\nPrinting global params\n");
-//    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->spike_source_seed[0]);
-//    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->spike_source_seed[1]);
-//    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->spike_source_seed[2]);
-//    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->spike_source_seed[3]);
-//    io_printf(IO_BUF, "eta: %k \n\n", neuron_array[0]->eta);
-
-
-    for (index_t n = 0; n < n_neurons; n++) {
-        neuron_model_print_parameters(&neuron_array[n]);
-    }
-
-//    io_printf(IO_BUF, "size of global params: %u",
-//    		sizeof(global_neuron_params_t));
-
     #if LOG_LEVEL >= LOG_DEBUG
         log_debug("-------------------------------------\n");
         for (index_t n = 0; n < n_neurons; n++) {
@@ -258,21 +224,15 @@ static void neuron_impl_load_neuron_parameters(
     #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-
 static void neuron_impl_do_timestep_update(
 		uint32_t timer_count, uint32_t time, uint32_t n_neurons) {
 
 	for (uint32_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 		// Get the neuron itself
 		neuron_t *neuron = &neuron_array[neuron_index];
-		bool spike = false;
-//		neuron_t *neuron_zero = &neuron_array[0];
+		bool spike = false; // TODO: don't think this is needed
 
 		target_ind = time & 0x3ff; // repeats on a cycle of 1024 entries in array
-
-	//    io_printf(IO_BUF, "Updating Neuron Index: %u\n", neuron_index);
-	//    io_printf(IO_BUF, "Target: %k\n\n",
-	//    		global_parameters->target_V[target_ind]);
 
 		// Get the input_type parameters and voltage for this neuron
 		input_type_t *input_type = &input_type_array[neuron_index];
@@ -288,7 +248,6 @@ static void neuron_impl_do_timestep_update(
 		// Get the voltage
 		state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
-
 		// Get the exc and inh values from the synapses
 		input_t exc_values[NUM_EXCITATORY_RECEPTORS];
 		input_t* exc_syn_values = synapse_types_get_excitatory_input(
@@ -303,21 +262,6 @@ static void neuron_impl_do_timestep_update(
 		input_t* inh_input_values = input_type_get_input_value(
 				inh_syn_values, input_type, NUM_INHIBITORY_RECEPTORS);
 
-		// Sum g_syn contributions from all receptors for recording
-	//    REAL total_exc = 0;
-	//    REAL total_inh = 0;
-	//
-	//    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS-1; i++){
-	//    	total_exc += exc_input_values[i];
-	//    }
-	//    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS-1; i++){
-	//    	total_inh += inh_input_values[i];
-	//    }
-
-		// Call functions to get the input values to be recorded
-	//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-	//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
-
 		// Call functions to convert exc_input and inh_input to current
 		input_type_convert_excitatory_input_to_current(
 				exc_input_values, input_type, voltage);
@@ -328,11 +272,8 @@ static void neuron_impl_do_timestep_update(
 		input_t external_bias = additional_input_get_input_value_as_current(
 				additional_input, voltage);
 
-		// This is clearly overwritten so why is it here?
-//		recorded_variable_values[V_RECORDING_INDEX] = voltage;
-//		neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, voltage);
+		// Update neuron only on index 0
 		if (neuron_index == 0){
-				// update neuron parameters
 			state_t result = neuron_model_state_update(
 						NUM_EXCITATORY_RECEPTORS, exc_input_values,
 						NUM_INHIBITORY_RECEPTORS, inh_input_values,
@@ -341,62 +282,33 @@ static void neuron_impl_do_timestep_update(
 			// Calculate error
 			REAL error = result - neuron->target_V[target_ind];
 			learning_signal = error;
-			// Record Error
-	//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-	//                error;
-	//                neuron->syn_state[3].delta_w;
-	//                neuron->syn_state[0].z_bar;
-
-//			log_info("neuron_index %u time %u voltage %k result %k exc input %k targetV %k",
-//					neuron_index, time, voltage, result, exc_input_values[0],
-//					neuron->target_V[target_ind]);
 
 			// Record readout
 			neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, result);
-//			neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, voltage);
-//			recorded_variable_values[V_RECORDING_INDEX] =
-//							result;
-		//                    neuron->syn_state[0].z_bar;
-
 			// Send error (learning signal) as packet with payload
-			// ToDo can't I just alter the global variable here?
-			// Another option is just to use "send_spike" instead... ?
 //			send_spike_mc_payload(key, bitsk(error));
 			if (use_key) {
 				send_spike_mc_payload(neuron_keys[neuron_index], bitsk(error));
 			}
-//			log_info("send learning signal key %u neuron_index %u", neuron_keys[neuron_index], neuron_index);
-//			while (!spin1_send_mc_packet(
-//					neuron_keys[neuron_index],  bitsk(error), 1 )) {
-//				spin1_delay_us(1);
-//			}
 		}
 		else{
 			// Record 'Error'
 			neuron_recording_record_accum(
 					V_RECORDING_INDEX, neuron_index,
 					neuron->target_V[target_ind]);
-//			recorded_variable_values[V_RECORDING_INDEX] =
-//	//                neuron->syn_state[0].z_bar;
-//					global_parameters->target_V[target_ind];
-//	//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-//	//                - global_parameters->target_V[target_ind];
 		}
-//		recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index*20].z_bar;
+
+		// Record z_bar
 		neuron_recording_record_accum(
 				GSYN_INH_RECORDING_INDEX, neuron_index,
 				neuron->syn_state[neuron_index*20].z_bar);
-		// Record target
-//		recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-//	//        			global_parameters->target_V[target_ind];
-//						neuron->syn_state[neuron_index*20].delta_w;
-//	//        			exc_input_values[0];
+		// Record target delta_w
 		neuron_recording_record_accum(
 				GSYN_EXC_RECORDING_INDEX, neuron_index,
 				neuron->syn_state[neuron_index*20].delta_w);
 
 		// If spike occurs, communicate to relevant parts of model
-		// TODO I don't know why this is here
+		// TODO I don't know why this is here since this can (currently) never happen
 		if (spike) {
 			// Call relevant model-based functions
 			// Tell the neuron model
@@ -413,8 +325,6 @@ static void neuron_impl_do_timestep_update(
 			neuron_model_print_state_variables(neuron);
 		#endif // LOG_LEVEL >= LOG_DEBUG
 
-		// Return the boolean to the model timestep update
-//		return spike;
 	}
 }
 
@@ -430,8 +340,6 @@ static void neuron_impl_store_neuron_parameters(
 
     if (sizeof(neuron_t)) {
         log_debug("writing neuron local parameters");
-//        spin1_memcpy(&address[next], neuron_array,
-//                n_neurons * sizeof(neuron_t));
         neuron_params_t *params = (neuron_params_t *) &address[next];
         for (uint32_t i = 0; i < n_neurons; i++) {
         	neuron_model_save_state(&neuron_array[i], &params[i]);
@@ -490,7 +398,6 @@ void neuron_impl_print_inputs(uint32_t n_neurons) {
 
 	if (!empty) {
 		log_debug("-------------------------------------\n");
-
 		for (index_t i = 0; i < n_neurons; i++) {
 			synapse_types_t *params = &synapse_types_array[i];
 			input_t exc_values[NUM_EXCITATORY_RECEPTORS];
