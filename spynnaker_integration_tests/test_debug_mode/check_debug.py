@@ -41,11 +41,8 @@ import pyNN.spiNNaker as sim
 
 
 class CheckDebug(BaseTestCase):
-    """
-    that it does not crash in debug mode. All reports on.
-    """
-    def debug(self):
-        # pylint: disable=protected-access
+
+    def _reports(self, reset_number):
         reports = [
             # write_energy_report
             # EnergyReport._DETAILED_FILENAME,
@@ -65,12 +62,12 @@ class CheckDebug(BaseTestCase):
             reports_names._VIRTKEY_FILENAME,
             # write_routing_table_reports
             reports_names._ROUTING_TABLE_DIR,
-            reports_names._C_ROUTING_TABLE_DIR,
-            reports_names._COMPARED_FILENAME,
+            reports_names._C_ROUTING_TABLE_DIR.format(reset_number),
+            reports_names._COMPARED_FILENAME.format(reset_number),
             # write_routing_tables_from_machine_report
-            routing_tables_from_machine_report,
+            routing_tables_from_machine_report.format(reset_number),
             # write_memory_map_report
-            memory_map_on_host_report,
+            memory_map_on_host_report.format(reset_number),
             # write_network_specification_report
             network_specification_file_name,
             # write_provenance_data
@@ -78,21 +75,28 @@ class CheckDebug(BaseTestCase):
             # write_tag_allocation_reports
             reports_names._TAGS_FILENAME,
             # write_drift_report_end or start
-            CLOCK_DRIFT_REPORT,
+            CLOCK_DRIFT_REPORT.format(reset_number),
             # write_board_chip_report
             AREA_CODE_REPORT_NAME,
             _GRAPH_NAME,
             _GRAPH_NAME + "." +
             _GRAPH_FORMAT,
             ]
-
-        sim.setup(1.0)
         if (get_config_bool("Machine", "enable_advanced_monitor_support")
                 and not get_config_bool("Java", "use_java")):
             # write_data_speed_up_report
             reports.append(
                 DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)
             reports.append(DataSpeedUpPacketGatherMachineVertex.IN_REPORT_NAME)
+        return reports
+
+    """
+    that it does not crash in debug mode. All reports on.
+    """
+    def debug(self):
+        # pylint: disable=protected-access
+
+        sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
         pop.record("v")
         inp = sim.Population(1, sim.SpikeSourceArray(
@@ -103,7 +107,7 @@ class CheckDebug(BaseTestCase):
         pop.get_data("v")
         run0 = SpynnakerDataView.get_run_dir_path()
         found = os.listdir(run0)
-        for report in reports:
+        for report in self._reports(""):
             self.assertIn(report, found)
         self.assertIn("data.sqlite3", found)
         self.assertIn("ds.sqlite3", found)
@@ -137,7 +141,7 @@ class CheckDebug(BaseTestCase):
         pop.get_data("v")
         self.assertNotEqual(run0, SpynnakerDataView.get_run_dir_path())
         found = os.listdir(SpynnakerDataView.get_run_dir_path())
-        for report in reports:
+        for report in self._reports("3"):
             self.assertIn(report, found)
         self.assertIn("data3.sqlite3", found)
         self.assertIn("ds3.sqlite3", found)
